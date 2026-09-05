@@ -1,0 +1,44 @@
+{
+  "servers": {
+    "codegraph": {
+      "command": "cmd.exe",
+      "args": [
+        "/c",
+        "codegraph",
+        "mcp",
+        "--multi-repo"
+      ],
+      "env": {},
+      "disabled": false
+    },
+    "tavily": {
+      "command": "cmd.exe",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "tavily-mcp@latest"
+      ],
+      "env": {
+        "TAVILY_API_KEY": "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",
+        "NODE_TLS_REJECT_UNAUTHORIZED": "0"
+      },
+      "disabled": false
+    },
+    "context-mode": {
+      "command": "cmd.exe",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "context-mode"
+      ],
+      "env": {
+        "SOURCE": "",
+        "JAVA_HOME": "C:\\Program Files\\Java\\jdk-22",
+        "CONTEXT_MODE_IDLE_TIMEOUT_MS": "0"
+      },
+      "disabled": false
+    }
+  }
+}
