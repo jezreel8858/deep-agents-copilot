@@ -5,7 +5,7 @@ description: >-
   log ou sintoma reportado — navegação de call graph, hipótese de causa raiz
   e reprodução mínima. Não corrige o código (isso é do agent especializado
   por stack); complementa bug-triage com investigação mais profunda.
-model: "Claude Sonnet 5"
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_search']
 ---
 # Debugger

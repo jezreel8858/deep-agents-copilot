@@ -4,7 +4,7 @@ description: >-
   Revisa código por performance especializada — Core Web Vitals (frontend),
   N+1 queries e profiling de latência (backend), otimização de query (banco).
   Nunca corrige, apenas analisa e reporta com evidência mensurável. Read-only.
-model: "Claude Sonnet 5"
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_search']
 ---
 # Performance Agent

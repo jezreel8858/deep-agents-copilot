@@ -264,7 +264,6 @@ graph TB
 | **R-037: Agent Router First** | Toda solicitação | Triagem + governança |
 | **R-042: Re-triagem por Turno (Anti Sticky-Session)** | Toda solicitação subsequente ao 1º turno | Evita agent downstream continuar sozinho após deriva de intenção |
 | **R-040: Grafo de Roteamento** | Toda nova rota de agent | Dado estruturado > prosa; rastreabilidade + evals |
-| **R-036: Model Enforcement** | Agents/Skills/Prompts | QoS e segurança |
 | **R-034: Health Check Binding** | Novo repositório | Descoberta de adapters |
 | **R-038: Genericidade Obrigatória** | Tudo em `.github/` | Reutilização |
 | **R-031: Plano Auto-Implementável** | Implementação | Zero-interrupção após aprovação |

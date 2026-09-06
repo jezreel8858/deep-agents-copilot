@@ -1,7 +1,7 @@
 ---
 name: ctx-status
 description: Exibe estatísticas de consumo do Context Mode usando `ctx_stats` para diagnosticar uso de contexto e economia.
-model: "Claude Haiku 4.5"
+model: "Gemini 3.8 Flash"
 tools:
   - context-mode/ctx_stats
 ---

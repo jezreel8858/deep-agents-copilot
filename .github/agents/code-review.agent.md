@@ -4,7 +4,7 @@ description: >-
   Revisa código (diff/PR) antes do merge por qualidade, segurança, convenções,
   impacto, testes e performance. Classifica achados por severidade, nunca
   corrige o código e delega para agents especializados quando necessário.
-model: "Claude Sonnet 5"
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_search']
 ---
 # Code Review

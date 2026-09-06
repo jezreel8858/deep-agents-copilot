@@ -6,7 +6,7 @@ description: >-
   contratos e integrações cross-sistema. Cobre desde análise genérica de mudanças
   até análise profunda de contratos (OpenAPI, AsyncAPI, gRPC, GraphQL) com
   classificação BREAKING | COMPATIBLE | DEPRECIAÇÃO e metodologia B1/B2/B3.
-model: "Claude Sonnet 5"
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_fetch_and_index', 'context-mode/ctx_batch_execute', 'context-mode/ctx_stats', 'context-mode/ctx_doctor', 'context-mode/ctx_upgrade', 'context-mode/ctx_purge', 'context-mode/ctx_insight']
 ---
 

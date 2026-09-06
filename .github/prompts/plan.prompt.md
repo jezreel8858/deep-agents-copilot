@@ -1,7 +1,7 @@
 ---
 name: plano
 description: Cria plano de implementação detalhado com análise de dependências, paralelismo e checklist de autonomia.
-model: "Claude Sonnet 5"
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file']
 source_docs:
   - CLAUDE.md

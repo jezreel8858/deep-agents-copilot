@@ -89,7 +89,6 @@ Prompts operacionais para workflow de execução no chat.
 ## ✅ Checklist: Você Está Usando Correto?
 
 - [ ] **Primeira coisa:** Executou `/init-context` na sessão?
-- [ ] **Model validado:** `/init-context` confirmou R-036 (model conforme frontmatter)?
 - [ ] **Para cada projeto:** Executou `/add-project-context <projeto>`?
 - [ ] **catalog.yaml sincronizado:** Verificou se projeto está em `docs/ai-context/catalog.yaml`?
 - [ ] **Pronto para agentes:** Pode agora usar `@agent-router` com contexto completo?
@@ -122,7 +121,7 @@ Use `@governance-factory` para auditar e corrigir automaticamente:
 | Campo | Status | Significado |
 |---|---|---|
 | `description` | **OBRIGATÓRIO** | Habilita discoverability no Quick Pick do Copilot |
-| `model` | Recomendado | "Claude Haiku 4.5" / "Claude Sonnet 5" / "Claude Opus 5" (string única — arrays não são suportados) |
+| `model` | Recomendado | "Gemini 3.8 Flash" / "Gemini 3.8 Flash" / "Claude Opus 5" (string única — arrays não são suportados) |
 | `tools` | Quando usa ferramentas | Princípio de menor privilégio — listar apenas o necessário |
 | `source_docs` | Quando precisa de contexto | Pre-fetch de governança ou projeto |
 | `name` | Opcional | Override do filename como slash command |

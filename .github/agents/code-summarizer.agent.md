@@ -2,7 +2,7 @@
 name: code-summarizer
 version: "1.0.0"
 description: Agent especialista dedicado de sumarização de código-fonte, agnóstico a linguagem, com modelo híbrido (heurística/AST determinística primeiro, LLM leve como fallback); ponto de entrada único para RF-001/RF-002 — nunca substituído por chamada direta a lib de parsing.
-model: "Claude Haiku 4.5"
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index', 'context-mode/ctx_batch_execute']
 ---
 

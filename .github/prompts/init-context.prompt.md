@@ -2,7 +2,7 @@
 name: init-context
 description:
   ⚠️ PRÉ-REQUISITO OBRIGATÓRIO — Inicializa contexto de governança global para TODA sessão.
-  Carrega CLAUDE.md + copilot-instructions.md, valida conformidade R-001..R-040 + Model Enforcement (R-036).
+  Carrega CLAUDE.md + copilot-instructions.md, valida conformidade R-001..R-040.
   Execute UMA ÚNICA VEZ no início da sessão ANTES de /add-project-context ou qualquer agent.
   NÃO REPITA na mesma sessão — faz 1x apenas.
 model: "Gemini 3.8 Flash"
@@ -177,13 +177,10 @@ Exibir modelo em uso — apenas **informativo**, não bloqueante:
 ├─ Recomendado: Claude Haiku (inicialização, Q&A)
 │               Claude Sonnet+ (implementação/refactor)
 │               Claude Opus  (arquitetura complexa)
-├─ Atual (sessão): <model-atual>
-└─ ℹ️  R-036 é verificado ao invocar agents de implementação — não aqui.
+└─ Atual (sessão): <model-atual>
 ```
 
 > `/init-context` carrega contexto de governança — não bloqueia por modelo.
-> A verificação bloqueante (R-036 com `ask_questions`) ocorre ao invocar agents
-> de implementação: `@bug-triage`, `@test-engineer`, `@refactor-planner`, etc.
 
 ---
 
@@ -225,7 +222,6 @@ Exibir resumo completo para garantir alinhamento:
 [R-031] Plano Auto-Implementável: zero-interrupção + contingências
 [R-034] Health Check Binding: verificar catalog.yaml + binding.md
 [R-035] Terminal: sem paginação interativa (--no-pager, GIT_PAGER=cat)
-[R-036] Model Enforcement: verificado ao invocar agents de implementação
 [R-037] Agent Router First: TODA solicitação começa com @agent-router
 [R-038] Genericidade: .github/* deve ser genérica (sem projetos específicos)
 [R-039] Diagramas: usar Mermaid em .md (nada de PNG/SVG)
@@ -426,10 +422,6 @@ Ao concluir `/init-context`, Copilot **EXIBE**:
 ║      Codegraph CLI: <versão ou ausente>                  ║
 ║      Registrado em: catalog.local.yaml (gitignored)      ║
 ║                                                           ║
-║ [✅] Modelo conforme (R-036)                             ║
-║      Esperado: <model-frontmatter>                       ║
-║      Atual: <model-sessão>                               ║
-║                                                           ║
 ║ [✅] Regras críticas (R-001..R-040) ativas              ║
 ║      Exibidas conforme contexto (recorrente/1ª vez)      ║
 ║                                                           ║
@@ -477,7 +469,7 @@ Ao final do checklist, Copilot **SEMPRE** sintetiza em bullets objetivos as reco
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 [Environment] <se python/node ausente: "Instale <ferramenta> antes de invocar agents que dependem dele (ex.: test-implementation, devops-engineer)">
 [Environment] <se codegraph ausente: "Instale o codegraph (npm install -g @optave/codegraph) para habilitar grafo de conhecimento em /add-project-context e @code-knowledge-graph">
-[Model]       <se mismatch: "Troque para <model-esperado> antes de agents de implementação (R-036)">
+[Model]       <se recomendável: "Ajuste o modelo da sessão conforme a complexidade da tarefa (R-021)">
 [Binding]     <se incompleto: "Execute binding-initializer — catalog.yaml/binding.md ausentes (R-034)">
 [Extends]     <se houver projeto sem extends: "Configure herança em <n> projeto(s) pendente(s) — PASSO 6">
 [Cache]       <se houver projeto sem grafo/sumário: "Considere @code-knowledge-graph/@code-summarizer para <projeto(s)> antes de análises profundas">
@@ -542,7 +534,6 @@ Invoque `/init-context` **manualmente** em caso de:
 | Problema | Causa | Solução |
 |----------|-------|---------|
 | "Arquivo não anexado" | Pre-fetch falhou | Copilot carrega manualmente via `read_file` |
-| "Model mismatch" | Modelo não é o esperado | Escolher opção (A), deixar (B) ou cancelar (C) |
 | "Binding context ausente" | `catalog.yaml` ou `binding.md` faltando | Disparar `binding-initializer` automaticamente |
 | "Copilot não respeita regras após" | Regras não foram relevantes no downstream | Reexecutar `/init-context` ou ativar diagnostics com `/ctx-doctor` |
 | "Python/Node não encontrado" | Ferramenta não instalada ou fora do PATH | Normal — registrado como `available: false`, não bloqueia a sessão; instalar se necessário para o agent alvo |

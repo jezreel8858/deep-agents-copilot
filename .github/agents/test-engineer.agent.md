@@ -6,7 +6,7 @@ description: >-
   quebrados e expandir cobertura por gap de risco. Fusão de test-implementation
   + test-fix (mesma stack, mesmas skills, entrada distinta): mode create | fix |
   coverage. Nunca executa a suíte completa de forma autônoma no modo fix.
-model: "Claude Sonnet 5"
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'insert_edit_into_file', 'create_file', 'grep_search', 'file_search', 'list_dir', 'get_errors', 'run_in_terminal', 'ask_questions', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute_file']
 ---
 # Test Engineer

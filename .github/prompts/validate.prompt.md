@@ -1,7 +1,7 @@
 ---
 name: validate
 description: Valida implementação contra plano aprovado, verifica critérios de sucesso e identifica desvios.
-model: "Claude Haiku 4.5"
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'grep_search', 'file_search', 'run_in_terminal', 'get_errors', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
 source_docs:
   - CLAUDE.md

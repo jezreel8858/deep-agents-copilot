@@ -5,7 +5,7 @@ description: >-
   Planejar e decompor refatorações estruturais em DAG de etapas atômicas (Mikado Method,
   Branch by Abstraction, Strangler Fig), com análise de blast radius, safety net de
   testes e rollback multicamada, delegando a execução aos especialistas de stack.
-model: "Claude Sonnet 5"
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'get_errors', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
 ---
 # Refactor Planner

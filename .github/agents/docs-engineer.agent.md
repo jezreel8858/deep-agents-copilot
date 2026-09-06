@@ -7,7 +7,7 @@ description: >-
   runbook, postmortem). Fusão de docs-writer + docs-curator: mesma saída
   restrita a `.md`, mesma skill base, diferença apenas entre autoria nova
   e curadoria/consolidação de conteúdo já existente.
-model: "Claude Haiku 4.5"
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'insert_edit_into_file', 'create_file', 'grep_search', 'file_search', 'list_dir', 'ask_questions', 'get_errors', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
 ---
 # Docs Engineer

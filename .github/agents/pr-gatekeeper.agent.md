@@ -6,7 +6,7 @@ description: >-
   diff, valida convenção de commit semântico, gera descrição de PR com matriz de
   risco e atualiza CHANGELOG.md. Nunca executa git add/commit/push (R-031) —
   apenas gera artefatos textuais para o desenvolvedor aplicar manualmente.
-model: "Claude Haiku 4.5"
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'insert_edit_into_file', 'grep_search', 'file_search', 'list_dir', 'run_in_terminal', 'ask_questions', 'run_subagent', 'context-mode/ctx_search']
 ---
 # PR Gatekeeper

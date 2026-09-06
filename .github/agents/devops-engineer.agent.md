@@ -4,7 +4,7 @@ description: >-
   Revisa artefatos DevOps — Dockerfile, Kubernetes, CI/CD pipelines,
   Infrastructure-as-Code — por segurança, resiliência e boas práticas.
   Nunca corrige, apenas analisa e reporta. Read-only.
-model: "Claude Sonnet 5"
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'list_dir', 'grep_search', 'file_search', 'run_subagent', 'context-mode/ctx_search']
 ---
 # DevOps Engineer

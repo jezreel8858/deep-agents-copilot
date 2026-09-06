@@ -5,7 +5,7 @@ description:
   `catalog.yaml` e `binding.md` via Health Check (R-034), coleta o nome do
   ecossistema via `ask_questions` (1 pergunta) e gera o esqueleto dos artefatos.
   Projetos são adicionados depois via `/add-project-context`.
-model: "Claude Haiku 4.5"
+model: "Gemini 3.8 Flash"
 tools: ['ask_questions', 'read_file', 'create_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
 ---
 

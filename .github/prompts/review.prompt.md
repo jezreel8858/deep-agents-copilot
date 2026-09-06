@@ -4,7 +4,7 @@ description:
   Aciona o agent @code-review para revisar diff/PR/arquivo por qualidade,
   segurança, convenções, impacto e testes. Gera relatório por severidade.
   NÃO executa alterações.
-model: "Claude Sonnet 5"
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent']
 source_docs:
   - CLAUDE.md

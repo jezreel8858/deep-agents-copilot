@@ -5,7 +5,7 @@ description:
   Triar bugs e regressões com foco em reprodução, hipótese de causa raiz e plano
   mínimo de correção sem implementar a solução. Genérico — agnóstico de sistema
   de rastreamento (Jira, GitHub Issues, Linear, CSV ou relato livre).
-model: "Claude Sonnet 5"
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'get_errors', 'run_in_terminal', 'ask_questions', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
 ---
 

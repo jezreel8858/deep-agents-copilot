@@ -5,7 +5,7 @@ description: >-
   Auditor de governança em meta-nível para analisar smells e gaps no catálogo de
   agents/skills/prompts, sem aplicar correções diretamente, com recomendações e
   handoff para agentes executores.
-model: "Claude Sonnet 5"
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
 ---
 

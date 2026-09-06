@@ -4,7 +4,7 @@ description: >-
   Agente operacional read-only para coletar, condensar e persistir contexto
   técnico em `docs/context/`, usando `docs/ai-context/catalog.yaml` como
   referência de escopo.
-model: "Claude Haiku 4.5"
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'create_file', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute_file']
 ---
 # Construtor de Contexto
