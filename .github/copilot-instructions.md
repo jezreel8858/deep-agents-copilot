@@ -192,24 +192,9 @@ Se múltiplos erros: agrupe, liste no máximo 5; resto: `(+N erros similares)`.
 
 ---
 
-## 3) 🧠 Model Routing Signal (R-021) + Conformidade (R-036)
+## 3) 🧠 Model Routing Signal (R-021)
 
-**Pré-requisito OBRIGATÓRIO**: 
-
-1. **Antes de QUALQUER agent (incluindo router)**, execute R-036 (verificar conformidade com frontmatter).
-2. **Se houver mismatch**, resolva PRIMEIRO (troque de modelo).
-3. **Depois**: `@agent-router` → classificar intenção e delegar.
-
-**Health Check Model:**
-
-```
-[Model Check] Expected: <model-frontmatter> | Current: <model-sessão> | Status: ?
-
-❌ MISMATCH? → Troque modelo ANTES de invocar qualquer agent.
-✅ MATCH? → Prossiga com @agent-router (obrigatório).
-```
-
-Após confirmar conformidade, avalie o tipo da tarefa e emita o sinal abaixo quando exigir modelo **1× ou superior**:
+Avalie o tipo da tarefa e emita o sinal abaixo quando exigir modelo **1× ou superior**:
 
 > 🧠 **Modelo recomendado: `<Claude Sonnet / GPT-5>`**
 > **Motivo:** `<razão em 1 linha>`
@@ -226,7 +211,7 @@ Após confirmar conformidade, avalie o tipo da tarefa e emita o sinal abaixo qua
 
 ---
 
-## 4.1) 🏥 Health Check — Binding Context (R-034)
+## 4) 🏥 Health Check — Binding Context (R-034)
 
 **GATILHO AUTOMÁTICO**: Ao iniciar trabalho em novo repositório, Copilot DEVE verificar:
 
@@ -276,68 +261,6 @@ Projetos e adapters por-projeto NUNCA são commitados no repositório compartilh
 
 ---
 
-## 4.2) 🔧 Health Check — Model Enforcement (R-036)
-
-**GATILHO AUTOMÁTICO**: Ao iniciar execução de agent/prompt/skill com frontmatter `model:`, Copilot DEVE verificar **ANTES** de qualquer ação:
-
-```
-[Model Check] Expected: <model-frontmatter> | Current: <model-sessão> | Status: ?
-```
-
-**Se modelos NÃO COINCIDEM** (ex: Agent pede `Claude Sonnet 4.5` mas chat está em `Claude Haiku`):
-
-1. ⚠️ **ALERTAR ao usuário** via `ask_questions`:
-
-```
-Detecção de MISMATCH de Modelo
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✗ ESPERADO (frontmatter): Claude Sonnet 4.5
-✓ ATUAL (sessão):         Claude Haiku
-
-Escolha uma ação:
-```
-
-2. **3 Opções via `ask_questions`**:
-   - **A)** Trocar para modelo correto (`Claude Sonnet 4.5`)
-   - **B)** Continuar com modelo atual (aceitar risco de perda de qualidade)
-   - **C)** Cancelar execução
-
-3. **Se usuário escolhe A:**
-   - Copilot recomenda: "⚙️ Troque em Settings → Model → `Claude Sonnet 4.5`, ou use `/switch-model Claude-Sonnet-4.5` se disponível"
-   - **AGUARDE** trocar manualmente e retome
-   - Não prosseguir até conformidade
-
-4. **Se usuário escolhe B:**
-   - Registrar: `⚠️ CONTINUANDO COM MISMATCH (Claude Haiku ao invés de Claude Sonnet 4.5) — QoS REDUZIDA`
-   - Executar com aviso em cabeçalho do resultado
-   - Não repetir a verificação nesta sessão
-
-5. **Se usuário escolhe C:**
-   - Cancelar: `❌ Execução cancelada. Troque o modelo e execute novamente.`
-   - Bloquear qualquer progresso
-
-**Regra**: Sem exceções — model mismatch impacta QoS, segurança e correção. R-036 é verificação **obrigatória** ANTES de qualquer implementação/análise.
-
----
-
-### ⚠️ Limitação de Plataforma — Cost-Tier Ceiling em Cadeias de Subagent
-
-**O Health Check acima cobre apenas o agent iniciado diretamente pelo usuário.** Ao delegar via `run_subagent` (fluxo multi-agent, R-042), a plataforma VS Code Copilot Chat aplica um **teto de custo independente**: um subagent nunca resolve para um modelo com multiplicador **maior** do que o modelo que está processando o turno/sessão pai — mesmo que o `.agent.md` do subagent declare `model:` corretamente. Se exceder, ocorre **downgrade silencioso** (comportamento oficial documentado, não é bug deste projeto).
-
-**Por que `Auto` é o principal risco**: o modo `Auto` resolve, a cada turno, para um modelo real (0×–1×) com base em disponibilidade/saúde do sistema — não na complexidade da tarefa — e sempre cai para 0× quando a cota premium se esgota. Isso torna o teto de custo da cadeia inteira **não determinístico por turno**.
-
-**Mitigação obrigatória (nenhuma resolve o teto tecnicamente, apenas evita cair nele):**
-
-1. ❌ **Nunca iniciar o fluxo `@agent-router` com `Auto` selecionado.**
-2. ✅ Selecionar manualmente, **antes do 1º turno**, um modelo de tier ≥ ao maior tier usado por qualquer agent do catálogo (atualmente `Claude Sonnet 5`, 1×) — garante que nenhum subagent na cadeia de roteamento seja rebaixado.
-3. ✅ Verificar que `chat.customAgentInSubagent.enabled` está habilitado nas configurações do VS Code — sem essa flag, agents customizados podem nem ser honrados como subagents.
-4. ✅ Ao delegar para agent de tier mais alto, o agent chamador PODE solicitar o modelo explicitamente na própria invocação do `run_subagent` (canal "explicit model parameter", documentado, melhor esforço — **não é uma API estruturada garantida**: `microsoft/vscode#298380` confirma que suporte formal a esse parâmetro no schema do `runSubagent` é feature request ainda **aberta** em 2026) — reforço, não substituto do `model:` do subagent.
-
-**⚠️ Model Gate testado e confirmado INVIÁVEL (2026-09-01)**: uma trava ativa que compararia o tier da sessão atual com o tier do agent-alvo via `ask_questions` foi implementada, testada 2× em produção e **removida** — nenhum agent, em nenhum tier (testado com Claude Haiku 4.5 e Claude Sonnet 5), tem acesso confiável a "qual modelo está realmente executando esta sessão agora". Pesquisa confirmou: LLMs não têm essa informação a menos que injetada explicitamente no system prompt pela plataforma (o que VS Code Copilot Chat não faz para custom agents — GitHub Community Discussion #168899 documenta o próprio Copilot recusando revelar essa informação, alegando "não sei, é segredo"). `ask_questions` também não altera o picker de modelo da UI. **A mitigação real é 100% responsabilidade do usuário** (itens 1-2 acima), não pode ser verificada nem enforçada pelo agent. Ver `agent-router.agent.md` § "Model Awareness" e `agent-contracts/SKILL.md` § 10 para a análise completa.
-
-**Detalhamento técnico completo, fontes oficiais e checklist expandido**: `agent-contracts/SKILL.md` § 10.
-
----
 
 ### Agents atuais
 

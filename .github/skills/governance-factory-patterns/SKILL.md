@@ -163,8 +163,8 @@ Nenhuma criação/revisão de artefato de governança é considerada completa se
 
 | Pergunta (aplicar em ordem — primeira que bater decide) | Tier | Custo (R-021) |
 |---|---|---|
-| Só lê, roteia, ou preenche template a partir de fatos já extraídos, sem julgamento aberto? (scanner, template-fill, roteamento, checklist, validação) | **Claude Haiku 4.5** | 0×/0.33× |
-| Implementa, refatora, planeja com risco, ou sintetiza análise técnica não-trivial? (specialists, planners, reviewers, extractors) | **Claude Sonnet 5** | 1× |
+| Só lê, roteia, ou preenche template a partir de fatos já extraídos, sem julgamento aberto? (scanner, template-fill, roteamento, checklist, validação) | **Gemini 3.8 Flash** | 0×/0.33× |
+| Implementa, refatora, planeja com risco, ou sintetiza análise técnica não-trivial? (specialists, planners, reviewers, extractors) | **Gemini 3.8 Flash** | 1× |
 | Decide arquitetura crítica, causa-raiz complexa cross-sistema, ou ação de alta irreversibilidade? (raro — só escalar se as 2 acima não bastarem) | **Claude Opus 5** | 3× |
 
 **Regra de ouro (redução de créditos):** nunca escalar tier acima do mínimo necessário — um agent operacional em Sonnet/Opus é desperdício de crédito sem ganho de qualidade (ver exemplos reais no catálogo: `adapter-generator`, `agent-router`, `binding-initializer` = Haiku; `analysis-architect`, `code-review`, `angular` = Sonnet).
@@ -174,9 +174,9 @@ Nenhuma criação/revisão de artefato de governança é considerada completa se
 O valor de `model:` deve ser a **string exata do display name oficial** (Title Case) da [tabela oficial](https://docs.github.com/copilot/reference/ai-models/supported-models) — nunca kebab-case, nunca slug de API.
 
 **Protocolo (nesta ordem, sem pular etapa):**
-1. Escrever o candidato (Title Case oficial, ex.: `"Claude Haiku 4.5"`) no frontmatter do arquivo já criado/editado.
+1. Escrever o candidato (Title Case oficial, ex.: `"Gemini 3.8 Flash"`) no frontmatter do arquivo já criado/editado.
 2. Chamar `get_errors` no arquivo.
-3. Se aparecer `Unknown model: '<valor>'` → modelo não reconhecido **neste ambiente real** (VS Code ou JetBrains) — não prosseguir com esse valor; tentar o próximo candidato do mesmo tier (ex.: se `"Claude Sonnet 5"` falhar, considerar `"Claude Sonnet 4.6"` como fallback temporário) e repetir o passo 2.
+3. Se aparecer `Unknown model: '<valor>'` → modelo não reconhecido **neste ambiente real** (VS Code ou JetBrains) — não prosseguir com esse valor; tentar o próximo candidato do mesmo tier (ex.: se `"Gemini 3.8 Flash"` falhar, considerar `"Claude Sonnet 4.6"` como fallback temporário) e repetir o passo 2.
 4. Se `get_errors` não reportar erro de modelo → validado, prosseguir para o restante do checklist (§3).
 5. Se 2 candidatos do mesmo tier falharem e não houver certeza de qual string funciona, perguntar ao usuário via `ask_questions`: *"Qual modelo aparece disponível no seletor do Copilot Chat (VS Code) ou do plugin Copilot/AI Assistant (JetBrains) para o tier <Haiku|Sonnet|Opus>?"* com opções pré-preenchidas da tabela oficial + campo aberto — nunca adivinhar variações às cegas indefinidamente.
 

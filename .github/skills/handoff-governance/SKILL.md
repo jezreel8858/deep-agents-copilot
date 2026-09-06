@@ -99,7 +99,7 @@ handoff_payload:
   emissor:                                # identidade do agent delegante (P10)
     nome: "<nome-do-agent-atual>"
     versao: "<versao-semantica>"          # ex.: "1.1.0"
-    modelo_llm: "<modelo-usado>"          # ex.: "Claude Haiku 4.5"
+    modelo_llm: "<modelo-usado>"          # ex.: "Gemini 3.8 Flash"
     timestamp: "<ISO-8601>"              # ex.: "2026-08-28T14:23:00Z"
   contexto:
     solicitacao_original: "<texto>"
