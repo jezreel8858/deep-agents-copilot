@@ -53,7 +53,7 @@ Estes 4 valores **substituem** qualquer autoavaliação subjetiva de "preservei 
 | Casos de eval e golden files | [`evals/casos-code-summarizer.yaml`](evals/casos-code-summarizer.yaml) | Fixtures por stack para autoteste/validação de fidelidade (RF-004/RF-005) — usados na validação do threshold fechado |
 | Catálogo textual de agents | [`README.md`](README.md) | Registro deste agent como ponto de entrada único |
 | Catálogo estruturado | [`catalog.yaml`](catalog.yaml) | Registro oficial para invocação via `run_subagent` |
-| Especialistas de stack (apoio a heurística) | [`spring-boot-engineer.agent.md`](spring-boot-engineer.agent.md), [`angular-engineer.agent.md`](angular-engineer.agent.md) | Consultar para calibrar heurística por stack quando necessário |
+| Especialistas de stack (apoio a heurística) | [`backend/spring-boot/spring-boot-router.agent.md`](backend/spring-boot/spring-boot-router.agent.md), [`frontend/angular/angular-router.agent.md`](frontend/angular/angular-router.agent.md) | Consultar para calibrar heurística por stack quando necessário |
 | Skill de operação em sandbox | [`../skills/context-mode/SKILL.md`](../skills/context-mode/SKILL.md) | `ctx_execute`/`ctx_execute_file` executam a via determinística; `ctx_index` persiste cache (RNF-003) |
 | Skill de contratos de agent | [`../skills/agent-contracts/SKILL.md`](../skills/agent-contracts/SKILL.md) | Tooling baseline (§9) e formato de saída por perfil (§8) |
 
@@ -151,7 +151,7 @@ Próximo passo mínimo:
 
 | Destino | Delegar quando | Handoff mínimo |
 |---|---|---|
-| [`@spring-boot-engineer`](spring-boot-engineer.agent.md) / [`@angular-engineer`](angular-engineer.agent.md) | calibrar heurística determinística específica da stack (ex.: ajustar definição de "bloco de decisão" para novos padrões de Java/TS) | trecho de código, stack, critério de fidelidade atual |
+| [`@spring-boot-router`](backend/spring-boot/spring-boot-router.agent.md) / [`@angular-router`](frontend/angular/angular-router.agent.md) | calibrar heurística determinística específica da stack (ex.: ajustar definição de "bloco de decisão" para novos padrões de Java/TS) | trecho de código, stack, critério de fidelidade atual |
 | [`@governance-factory`](governance-factory.agent.md) | qualquer ajuste estrutural deste próprio agent (rename, nova ferramenta, etc.) | proposta de mudança + justificativa |
 
 ## Retorno ao Router (R-042 — Anti Sticky-Session)

@@ -2,10 +2,10 @@
 name: governance-audit-patterns
 description: >
   Catálogo consolidado de "agent/governance smells" — anti-padrões estruturais,
-  gaps de perfil, gaps de diretriz, diretrizes redundantes e gaps de cobertura
-  de categoria — detectáveis em artefatos .agent.md/SKILL.md/.prompt.md, com
-  sintoma, forma de detecção, severidade e remediação. Base de conhecimento do
-  agent agent-auditor.
+  gaps de perfil, desalinhamento contratual (perfil ↔ tools ↔ skills ↔ catálogo),
+  gaps de diretriz, diretrizes redundantes e gaps de cobertura de categoria —
+  detectáveis em artefatos .agent.md/SKILL.md/.prompt.md, com sintoma, forma de
+  detecção, severidade e remediação. Base de conhecimento do agent agent-auditor.
 tier: 1
 category: governance
 triggers:
@@ -13,6 +13,9 @@ triggers:
   - "agent smell"
   - "anti-padrão de agent"
   - "gap de perfil"
+  - "auditar tools"
+  - "perfil vs tools"
+  - "tools vs skills"
   - "diretriz redundante"
   - "cobertura de categoria"
 source_docs:
@@ -104,6 +107,33 @@ Consolida, a partir de pesquisa de mercado (2026), um catálogo objetivo de "che
 | Severidade | Bloqueador (mesma severidade de R-038 — vazamento de dado de projeto real para repositório compartilhado) |
 | Remediação | Genericizar in-place (repositório → `[PROJETO-X]`, classe/método → `ServicoExemploX`/`operacaoExemploX`, pacote → `com.exemplo.*`, caminho → `<workspace>\[PROJETO-X]`) — métricas numéricas agregadas podem permanecer reais; se o agent de origem não tem guardrail explícito de R-044, acionar `@governance-factory` para adicioná-lo |
 
+### 2.7 — Desalinhamento Contratual (Perfil ↔ Tools ↔ Skills ↔ Catálogo)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Inconsistência entre o papel/perfil declarado do agent e as ferramentas ou competências atribuídas: *(a)* agent Read-Only / Advisory contendo tools mutativas de escrita (`create_file`, `insert_edit_into_file`); *(b)* agent que utiliza `run_in_terminal` sem declarar a skill mandatória `terminal-governance` em suas `skills:` e `source_docs:`; *(c)* agent que utiliza MCP `context-mode/*` sem declarar a skill `context-mode`; *(d)* agent implementer/fixer/tester sem ferramentas de validação (`get_errors`); *(e)* agent sem `run_subagent` no frontmatter `tools:` (viola R-042); *(f)* divergência atômica (R-015) onde `tools:` ou `skills:` do arquivo `.agent.md` divergem de `related_skills`/`source_docs`/`tools` no `catalog.yaml` ou sub-catálogo `<stack>-catalog.yaml`. |
+| Como detectar | Execução da **Matriz Canônica de Conformidade (§2.7.1)** cruzando cada `.agent.md` contra seu `catalog.yaml` e as regras normativas de `agent-contracts/SKILL.md` § 8-9 e `copilot-instructions.md` § 2. |
+| Origem (TrustAgent) | Intrínseco — violação de integridade entre contrato do agente (brain/tools) e suas habilidades declaradas (skills/memory). |
+| Severidade | **Bloqueador** se: tool mutativa em agent read-only; falta de `run_subagent` (R-042); ou uso de terminal sem `terminal-governance`.<br>**Alta** se: divergência entre `.agent.md` e `catalog.yaml` (R-015); falta de `get_errors` em agent implementer; ou MCP `context-mode` sem skill correspondente.<br>**Sugestão** se: skills de domínio complementares ausentes. |
+| Remediação | `@governance-factory` revisa o `.agent.md` e sincroniza o `catalog.yaml` / sub-catálogo na mesma entrega (R-015). |
+
+### 2.7.1 — Matriz Canônica de Conformidade (Perfil ↔ Tools ↔ Skills)
+
+Toda auditoria deve checar as seguintes regras invariantes:
+
+| Perfil / Papel do Agent | Tools Permitidas | Tools Proibidas | Skills Mandatórias |
+|---|---|---|---|
+| **Read-Only / Advisor / Critic**<br>*(ex.: `*-arch-advisor`, `security-reviewer`, `performance-agent`, `compliance-guardrails`, `agent-auditor`)* | `read_file`, `grep_search`, `file_search`, `list_dir`, `ask_questions`, `run_subagent`, `context-mode/*` | ❌ `create_file`, `insert_edit_into_file`, `replace_string_in_file` | `agent-contracts`, skill da especialidade |
+| **Implementer / Feature-Developer**<br>*(ex.: `*-feature-developer`)* | `read_file`, `create_file`, `insert_edit_into_file`, `get_errors`, `run_in_terminal`, `ask_questions`, `run_subagent`, `context-mode/*` | ❌ Ausência de `get_errors` | Skill de implementação da stack, `test-implementation-*` |
+| **Fixer / Bug-Fixer / Test-Fixer**<br>*(ex.: `*-bug-fixer`, `*-test-fixer`)* | `read_file`, `insert_edit_into_file`, `get_errors`, `run_in_terminal`, `ask_questions`, `run_subagent`, `context-mode/*` | ❌ Ausência de `get_errors` | `code-tracing` (para bug-fixer), skill da stack |
+| **Tester / Test-Writer**<br>*(ex.: `*-unit-test-writer`, `*-component-test-writer`, `*-integration-test-writer`, `*-e2e-writer`)* | `read_file`, `create_file`, `insert_edit_into_file`, `get_errors`, `run_in_terminal`, `ask_questions`, `run_subagent`, `context-mode/*` | ❌ Ausência de `get_errors` | `test-implementation-*` correspondente |
+| **Domain Router / Supervisor**<br>*(ex.: `*-router`)* | `read_file`, `file_search`, `grep_search`, `list_dir`, `ask_questions`, `run_subagent`, `context-mode/ctx_search` | ❌ `create_file`, `insert_edit_into_file`, `run_in_terminal` | `agent-contracts`, `handoff-governance` |
+
+#### Invariantes Transversais de Tooling:
+1. **Tool `run_in_terminal` presente** ➔ **OBRIGATÓRIO** declarar a skill `terminal-governance` nas `skills:` e `source_docs:` do `.agent.md` e em `catalog.yaml`.
+2. **Tools `context-mode/*` presentes** ➔ **OBRIGATÓRIO** declarar a skill `context-mode` nas `skills:` e `source_docs:` do `.agent.md` e em `catalog.yaml`.
+3. **Tool `run_subagent`** ➔ **OBRIGATÓRIO E BLOQUEANTE** em 100% dos agents (R-042).
+4. **Sincronismo R-015** ➔ As ferramentas declaradas no frontmatter `tools:` e as skills em `skills:` do `.agent.md` DEVEM ser idênticas às declaradas no `catalog.yaml` (ou `<stack>-catalog.yaml`).
 
 ## 3) Severidade — Reaproveitamento da Taxonomia Existente
 
@@ -126,7 +156,7 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 
 | Smell | Local(is) afetado(s) | Severidade | Remediação sugerida | Agent a acionar |
 |---|---|---|---|---|
-| <2.1..2.6> | <arquivo(s)> | Bloqueador/Alto/Sugestão | <ação objetiva> | <@governance-factory/@docs-engineer> |
+| <2.1..2.7> | <arquivo(s)> | Bloqueador/Alto/Sugestão | <ação objetiva> | <@governance-factory/@docs-engineer> |
 
 ## Resumo por Severidade
 - Bloqueador: N
@@ -139,16 +169,17 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 
 ## 6) Checklist de Conformidade da Auditoria
 
-- [ ] Todo achado classificado em uma das 6 categorias de smell (§2) — não inventar 7ª categoria sem justificar aqui primeiro.
+- [ ] Todo achado classificado em uma das 7 categorias de smell (§2) — não inventar 8ª categoria sem justificar aqui primeiro.
 - [ ] Severidade reaproveitada de `code-review-patterns` (Bloqueador/Alto/Sugestão).
 - [ ] Origem classificada como intrínseca ou extrínseca (TrustAgent) quando relevante.
 - [ ] Remediação aponta agent executor real do catálogo (nunca "corrigir diretamente" — agent de auditoria é read-only).
 - [ ] Achados de segurança cruzados com `agent-safety-guardrails`, não recriados.
+- [ ] Validações de tooling e perfil cruzadas com a Matriz Canônica de Conformidade (§2.7.1).
 
 ## 7) Anti-padrões
 
 - ❌ Agent de auditoria aplicar a correção diretamente (deve ser read-only — só análise e recomendação).
-- ❌ Inventar categoria de smell fora das 6 listadas sem atualizar esta skill primeiro.
+- ❌ Inventar categoria de smell fora das 7 listadas sem atualizar esta skill primeiro.
 - ❌ Duplicar taxonomia de severidade ou checklist de segurança já existentes em outras skills.
 - ❌ Reportar achado sem apontar agent executor de remediação (relatório inacionável).
 

@@ -44,7 +44,7 @@ Você é o roteador obrigatório do fluxo agent-first. Seu trabalho é classific
 - [`../../CLAUDE.md`](../../CLAUDE.md) — regras globais + IDs normativos (R-001..R-045)
 - [`../copilot-instructions.md`](../copilot-instructions.md) — regras operacionais locais
 - [`catalog.yaml`](catalog.yaml) — catálogo estruturado de agents (verdade para roteamento)
-- [`../../docs/ai-context/routing-graph.yaml`](../../docs/ai-context/routing-graph.yaml) — **grafo declarado de roteamento** (fonte de verdade estrutural — nós, arestas, condições e política de cascata); a Decision Tree abaixo é documentação derivada deste arquivo
+- [`routing-graph.yaml`](routing-graph.yaml) — **grafo declarado de roteamento** (fonte de verdade estrutural — nós, arestas, condições e política de cascata); a Decision Tree abaixo é documentação derivada deste arquivo
 - [`evals/casos-roteamento.yaml`](evals/casos-roteamento.yaml) — **suíte de evals e casos canônicos de roteamento** (fonte de verdade empírica — comparar a intenção do usuário contra `canonicos`, `ambiguos` e `regressao` antes de decidir a rota)
 
 **Referências por Tipo de Delegação:**
@@ -52,7 +52,7 @@ Você é o roteador obrigatório do fluxo agent-first. Seu trabalho é classific
 | Item | Caminho/Uso | Observação |
 |---|---|---|
 | Catálogo textual | [`README.md`](README.md) | Fonte de referência para roteamento humano |
-| Grafo de roteamento | [`../../docs/ai-context/routing-graph.yaml`](../../docs/ai-context/routing-graph.yaml) | Fonte estrutural — nós, arestas, thresholds e cascata |
+| Grafo de roteamento | [`routing-graph.yaml`](routing-graph.yaml) | Fonte estrutural — nós, arestas, thresholds e cascata |
 | Suíte de evals / Casos | [`evals/casos-roteamento.yaml`](evals/casos-roteamento.yaml) | ⭐ Verificação compulsória de precedentes (casos canônicos e regressões conhecidas) |
 | Prompt structuring | [`prompt-structuring.agent.md`](prompt-structuring.agent.md) | ⚠️ Passo mandatório pré-classificação (R-041) — loop máx. 5 iterações |
 | Skill — Técnicas de prompt | [`../skills/prompt-engineering-patterns/SKILL.md`](../skills/prompt-engineering-patterns/SKILL.md) | Base de conhecimento do `prompt-structuring`; consultar se o router precisar avaliar completude do handoff |
@@ -61,13 +61,14 @@ Você é o roteador obrigatório do fluxo agent-first. Seu trabalho é classific
 | Arquiteto de análise | [`analysis-architect.agent.md`](analysis-architect.agent.md) | Análise de impacto local (tier B1) e integração cross-sistema |
 | Sumarização de código | [`code-summarizer.agent.md`](code-summarizer.agent.md) | Ponto de entrada único (RF-008) — modelo híbrido AST/heurística → LLM leve fallback |
 | Grafo de conhecimento | [`code-knowledge-graph.agent.md`](code-knowledge-graph.agent.md) | Mapeamento estrutural, dependências, blast radius e arquitetura (R-045) |
-| Especialista Angular | [`angular-engineer.agent.md`](angular-engineer.agent.md) | Perfil híbrido — Advisory (análise/recomendação) E Implementação (feature/bugfix) |
-| Especialista Spring Boot | [`spring-boot-engineer.agent.md`](spring-boot-engineer.agent.md) | Perfil híbrido — Advisory (análise/recomendação) E Implementação (feature/bugfix) |
-| Especialista Spring Reactive | [`spring-reactive-engineer.agent.md`](spring-reactive-engineer.agent.md) | Perfil híbrido — Advisory (análise/recomendação) E Implementação (feature/bugfix) |
-| Especialista Banco de Dados | [`database-specialist.agent.md`](database-specialist.agent.md) | Migrações de schema (Flyway/Liquibase), otimização SQL e integridade |
+| Router Angular (Frontend) | [`frontend/angular/angular-router.agent.md`](frontend/angular/angular-router.agent.md) | Supervisor hierárquico — orquestra e despacha para os 8 especialistas de frontend |
+| Router Spring Boot | [`backend/spring-boot/spring-boot-router.agent.md`](backend/spring-boot/spring-boot-router.agent.md) | Supervisor hierárquico — orquestra e despacha para os 7 especialistas Spring Boot/Servlet/JPA |
+| Router Spring Reactive | [`backend/spring-reactive/spring-reactive-router.agent.md`](backend/spring-reactive/spring-reactive-router.agent.md) | Supervisor hierárquico — orquestra e despacha para os 7 especialistas WebFlux/Reactor |
+| Router Java Legado EJB | [`backend/ejb/ejb-router.agent.md`](backend/ejb/ejb-router.agent.md) | Supervisor hierárquico — orquestra e despacha para os 7 especialistas Java Legado EJB |
+| Especialista Banco de Dados | [`database-specialist.agent.md`](database-specialist.agent.md) | Migrações de schema (Flyway/Liquibase/Alembic), otimização SQL e integridade |
 | Engenheiro de Documentação | [`docs-engineer.agent.md`](docs-engineer.agent.md) | Autoria e curadoria de documentação técnica exclusivamente em `.md` |
 | Gatekeeper de PR | [`pr-gatekeeper.agent.md`](pr-gatekeeper.agent.md) | Preparação de PR pós-aprovação (diff, commit semântico, changelog) |
-| Factory de governança | [`governance-factory.agent.md`](governance-factory.agent.md) | Governança de criação/revisão de agents, skills e prompts |
+| Factory de governança | [`governance-factory.agent.md`](governance-factory.agent.md) | Governança de criação/revisão de agents, skills, prompts e novas stacks |
 | Cost-Tier Ceiling | [`../skills/agent-contracts/SKILL.md`](../skills/agent-contracts/SKILL.md) § 10 | Teto de custo de plataforma em cadeias `run_subagent` — mitigação obrigatória (nunca iniciar com `Auto`) |
 
 ## Model Awareness — Solicitação de Modelo na Delegação
@@ -168,29 +169,32 @@ Pedido recebido (já refinado por @prompt-structuring)?
 |- É pedido de construir ou consultar relação estrutural/grafo de código, arquitetura em termos de camadas, fluxo de dados ou chamadas entre módulos/camadas?
 |  |- Sim -> @code-knowledge-graph
 |  \- Não
-|- É análise/recomendação técnica ESPECÍFICA de framework OU implementação de feature/bugfix em Angular (componentes, reatividade Signals/RxJS, a11y, CWV, upgrade)?
-|  |- Sim -> @angular-engineer (se envolver camadas/grafo prévio, delegar primeiro ao @code-knowledge-graph)
+|- É feature nova multi-camada / cross-cutting envolvendo backend e frontend (ex.: API Spring Boot + tela Angular)?
+|  |- Sim -> @test-strategy (Fluxo 1 TDD: mapeia Matriz de Riscos e Casos de Borda unificada antes do despacho aos routers de domínio)
 |  \- Não
-|- É análise/recomendação OU implementação de feature/bugfix em Spring Boot (arquitetura, Java/JDK, observabilidade, migração)?
-|  |- Sim -> @spring-boot-engineer
+|- É análise/recomendação técnica ESPECÍFICA de framework OU implementação de feature/bugfix em Angular (componentes, reatividade Signals/RxJS, a11y, CWV, upgrade) OU testes especializados Angular (regras puras/mocks, component harness/DOM, diagnóstico de logs Karma/Vitest ou E2E Playwright/Cypress)?
+|  |- Sim -> @angular-router (supervisor hierárquico de domínio Angular que despacha para os 8 especialistas do catálogo .github/agents/frontend/angular/angular-catalog.yaml; se envolver camadas/grafo prévio, delegar primeiro ao @code-knowledge-graph)
 |  \- Não
-|- É análise/recomendação OU implementação de feature/bugfix reativo Spring WebFlux/Reactor?
-|  |- Sim -> @spring-reactive-engineer
+|- É análise/recomendação, implementação OU testes em Spring Boot (arquitetura, Java/JDK, JPA, REST, performance, observabilidade, migração)?
+|  |- Sim -> @spring-boot-router (supervisor hierárquico que despacha para os 7 especialistas do catálogo .github/agents/backend/spring-boot/spring-boot-catalog.yaml; se envolver camadas/grafo prévio, delegar primeiro ao @code-knowledge-graph)
+|  \- Não
+|- É análise/recomendação, implementação OU testes reativos em Spring WebFlux/Reactor (Mono/Flux, R2DBC, backpressure, resiliência)?
+|  |- Sim -> @spring-reactive-router (supervisor hierárquico que despacha para os 7 especialistas do catálogo .github/agents/backend/spring-reactive/spring-reactive-catalog.yaml; se envolver camadas/grafo prévio, delegar primeiro ao @code-knowledge-graph)
+|  \- Não
+|- É análise/recomendação, implementação OU testes em Java Legado EJB (EJB 2.x/3.x, SLSB, SFSB, MDB, JTA/CMT, JPA legada, EAR/WAR)?
+|  |- Sim -> @ejb-router (supervisor hierárquico que despacha para os 7 especialistas do catálogo .github/agents/backend/ejb/ejb-catalog.yaml; se envolver camadas/grafo prévio, delegar primeiro ao @code-knowledge-graph)
 |  \- Não
 |- É migração de schema (Flyway/Liquibase/Alembic), otimização de queries SQL, índices ou integridade referencial?
 |  |- Sim -> @database-specialist
 |  \- Não
-|- É estratégia/plano de testes?
+|- É estratégia/plano de testes ou matriz de cenários por risco?
 |  |- Sim -> @test-strategy
-|  \- Não
-|- É implementação/correção de testes quebrados com relatório de falhas?
-|  |- Sim -> @test-engineer
 |  \- Não
 |- É extração de regras de negócio ou validação de refatoração?
 |  |- Sim -> @business-rules-extractor
 |  \- Não
 |- Já existe plano de refactor APROVADO para executar (não criar do zero)?
-|  |- Sim -> delegar ao especialista de stack correspondente (@angular-engineer / @spring-boot-engineer / @spring-reactive-engineer / @database-specialist) em modo Implementação
+|  |- Sim -> delegar ao router de stack correspondente (@angular-router / @spring-boot-router / @spring-reactive-router / @ejb-router / @database-specialist)
 |  \- Não
 |- É pedido de refatoração/plano de refactor estrutural (do zero)?
 |  |- Sim -> @refactor-planner (deve delegar mapeamento de blast radius/dependências ao @code-knowledge-graph — R-045)
@@ -322,17 +326,17 @@ Próximo passo mínimo:
 - [@feature-planner](feature-planner.agent.md) para decomposição de feature nova em subtasks — não confundir com `@refactor-planner` (refatoração de código existente).
 - [@code-summarizer](code-summarizer.agent.md) para sumarização de código-fonte agnóstica a linguagem (RF-008) — reduzir bytes/tokens de arquivo levado ao contexto; nunca para revisar/corrigir código (isso é `@code-review`/`@bug-triage`).
 - [@code-knowledge-graph](code-knowledge-graph.agent.md) para construção e consulta do grafo de conhecimento de código-fonte (imports, chamadas, blast radius, ciclos, dead-code) de forma determinística via `@optave/codegraph` (RF-001/RF-002/RF-011 e R-045).
-- [@angular-engineer](angular-engineer.agent.md) para análise/recomendação OU implementação de feature/bugfix em Angular.
-- [@spring-boot-engineer](spring-boot-engineer.agent.md) para análise/recomendação OU implementação de feature/bugfix em backend Spring Boot.
-- [@spring-reactive-engineer](spring-reactive-engineer.agent.md) para análise/recomendação OU implementação de feature/bugfix em backend reativo Spring WebFlux/Reactor.
+- [@angular-router](frontend/angular/angular-router.agent.md) para qualquer solicitação de frontend Angular — despacha para os 8 especialistas de frontend (arch-advisor, feature-developer, bug-fixer, ui-stylist, unit-test, component-test, test-fixer e e2e-writer).
+- [@spring-boot-router](backend/spring-boot/spring-boot-router.agent.md) para qualquer solicitação de backend Spring Boot (Servlet/JPA) — despacha para os 7 especialistas backend (arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer e test-fixer).
+- [@spring-reactive-router](backend/spring-reactive/spring-reactive-router.agent.md) para qualquer solicitação de backend reativo WebFlux/Reactor — despacha para os 7 especialistas reativos (arch-advisor, feature-developer, bug-fixer, resilience-tuner, unit-test-writer, integration-test-writer e test-fixer).
+- [@ejb-router](backend/ejb/ejb-router.agent.md) para qualquer solicitação de backend Java Legado EJB (EJB 2.x/3.x, SLSB, SFSB, MDB, JTA/CMT, EAR/WAR/JAR) — despacha para os 7 especialistas backend (arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer e test-fixer).
 - [@database-specialist](database-specialist.agent.md) para migrações de schema (Flyway/Liquibase/Alembic), otimização de query SQL, índices e integridade referencial.
-- [@test-strategy](test-strategy.agent.md) para estratégia/plano de testes.
-- [@test-engineer](test-engineer.agent.md) para implementação de suítes de teste novas ou correção de testes quebrados com relatório de falhas.
+- [@test-strategy](test-strategy.agent.md) para estratégia/plano de testes e mapeamento de cenários por risco.
 - [@business-rules-extractor](business-rules-extractor.agent.md) para extração de regras de negócio e validação de refatorações.
 - [@refactor-planner](refactor-planner.agent.md) para planejamento e decomposição macro de refactor estrutural (deve delegar mapeamento de blast radius/dependências ao `@code-knowledge-graph` — R-045).
 - [@pr-gatekeeper](pr-gatekeeper.agent.md) para preparação de PR pós-aprovação do quality gate (diff, mensagem de commit semântico, matriz de risco e CHANGELOG.md).
 - [@docs-engineer](docs-engineer.agent.md) para autoria de documentação técnica nova e curadoria/padronização de documentação existente exclusivamente em `.md`.
-- [@governance-factory](governance-factory.agent.md) para criação, padronização e revisão de agents (`.agent.md`), skills (`SKILL.md`) ou prompts (`.prompt.md`).
+- [@governance-factory](governance-factory.agent.md) para criação, padronização e revisão de agents (`.agent.md`), skills (`SKILL.md`), prompts (`.prompt.md`) ou novas stacks de domínio.
 - [@agentic-memory-manager](agentic-memory-manager.agent.md) para persistência/recuperação de memória entre sessões — não confundir com `@context-builder` (consolidação pontual, read-only).
 - [@analysis-architect](analysis-architect.agent.md) para impacto técnico local (tier B1) e análise cross-sistema.
 - [@deep-search](deep-search.agent.md) como fallback para pesquisa interna/externa.
@@ -343,3 +347,4 @@ Próximo passo mínimo:
 - `/plan` -> classificar intenção e decidir rota.
 - `/implement` -> acionar downstream correto.
 - `/validate` -> confirmar consistência do roteamento.
+

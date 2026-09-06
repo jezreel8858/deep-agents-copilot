@@ -7,7 +7,7 @@ description: >-
   puramente determinístico — nunca invoca LLM. Motor único: lib externa
   `@optave/codegraph` via MCP Server enxuto (Least-Tools) para consultas
   e CLI local para build/indexação.
-model: Gemini 3.8 Flash
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'run_in_terminal', 'context-mode/ctx_search', 'context-mode/ctx_index', 'codegraph/query', 'codegraph/module_map', 'codegraph/fn_impact', 'codegraph/find_cycles', 'codegraph/context']
 ---
 # Code Knowledge Graph
@@ -237,8 +237,8 @@ Próximo passo mínimo:
 | [`@code-style-enforcer`](code-style-enforcer.agent.md) | consumidor precisa de complexidade (`complexity`) ou papel do símbolo (`node_roles`) antes de classificar achado de estilo | símbolo/arquivo alvo |
 | [`@performance-agent`](performance-agent.agent.md) | consumidor precisa rastrear dataflow/complexity/execution_flow para localizar hotspots reais | símbolo/arquivo alvo, sintoma de performance |
 | [`@security-reviewer`](security-reviewer.agent.md) | consumidor precisa rastrear dataflow interprocedural ou chamadas dinâmicas suspeitas (`ast_query`) para taint analysis | símbolo/arquivo alvo, padrão suspeito |
-| [`@test-engineer`](test-engineer.agent.md) | consumidor precisa identificar símbolos sem cobertura (`node_roles --role dead`) e priorizar por complexidade/risco | escopo de arquivos/classes candidatos |
-| [`@angular-engineer`](angular-engineer.agent.md) / [`@spring-boot-engineer`](spring-boot-engineer.agent.md) / [`@spring-reactive-engineer`](spring-reactive-engineer.agent.md) | consumidor (perfil híbrido) precisa medir blast radius (`fn-impact`/`diff-impact`) antes de alterar símbolo compartilhado durante implementação | símbolo/arquivo alvo, comando desejado |
+| [`@test-strategy`](test-strategy.agent.md) | consumidor precisa identificar símbolos sem cobertura (`node_roles --role dead`) e priorizar por complexidade/risco | escopo de arquivos/classes candidatos |
+| [`@angular-router`](frontend/angular/angular-router.agent.md) / [`@spring-boot-router`](backend/spring-boot/spring-boot-router.agent.md) / [`@spring-reactive-router`](backend/spring-reactive/spring-reactive-router.agent.md) | consumidor (perfil híbrido) precisa medir blast radius (`fn-impact`/`diff-impact`) antes de alterar símbolo compartilhado durante implementação | símbolo/arquivo alvo, comando desejado |
 | [`@governance-factory`](governance-factory.agent.md) | qualquer ajuste estrutural deste próprio agent (rename, nova ferramenta, etc.) | proposta de mudança + justificativa |
 | [`@deep-search`](deep-search.agent.md) | um dos gaps aceitos precisar de solução complementar futura (verificação de nova lib/abordagem) | gap específico, evidência de bloqueio real em uso |
 

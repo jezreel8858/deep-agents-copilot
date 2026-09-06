@@ -14,7 +14,7 @@ triggers:
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/agents/spring-boot-engineer.agent.md
+  - .github/agents/backend/spring-boot/spring-boot-router.agent.md
 tools: []
 ---
 

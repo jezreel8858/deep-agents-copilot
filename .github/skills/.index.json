@@ -32,13 +32,12 @@
         "@docs-engineer",
         "@context-builder",
         "@test-strategy",
-        "@test-engineer",
         "@governance-factory",
         "@binding-initializer",
         "@adapter-generator",
-        "@angular-engineer",
-        "@spring-boot-engineer",
-        "@spring-reactive-engineer"
+        "@angular-router",
+        "@spring-boot-router",
+        "@spring-reactive-router"
       ]
     },
     {
@@ -89,9 +88,9 @@
       "related_agents": [
         "@deep-search",
         "@analysis-architect",
-        "@angular-engineer",
-        "@spring-boot-engineer",
-        "@spring-reactive-engineer"
+        "@angular-router",
+        "@spring-boot-router",
+        "@spring-reactive-router"
       ]
     },
     {
@@ -220,7 +219,6 @@
       "description": "Padrões agnósticos de framework para backend — pirâmide de testes, AAA, isolamento, nomenclatura",
       "path": ".github/skills/test-implementation-backend/SKILL.md",
       "related_agents": [
-        "@test-engineer",
         "@test-strategy"
       ]
     },
@@ -233,7 +231,6 @@
       "description": "Padrões específicos JUnit 5, Mockito, @WebMvcTest, @DataJpaTest, mvn test",
       "path": ".github/skills/test-implementation-spring-boot/SKILL.md",
       "related_agents": [
-        "@test-engineer",
         "@test-strategy"
       ]
     },
@@ -245,7 +242,6 @@
       "description": "Padrões agnósticos de framework para frontend — componentes, mocks, E2E, data-testid",
       "path": ".github/skills/test-implementation-angular/SKILL.md",
       "related_agents": [
-        "@test-engineer",
         "@test-strategy"
       ]
     },
@@ -258,7 +254,6 @@
       "description": "Padrões específicos TestBed, Jasmine spies, fakeAsync, Signals, ng test",
       "path": ".github/skills/test-implementation-angular-jasmine/SKILL.md",
       "related_agents": [
-        "@test-engineer",
         "@test-strategy"
       ]
     },
@@ -271,7 +266,6 @@
       "description": "Padrões específicos pytest, fixtures, MagicMock, pytest-mock, coverage.py",
       "path": ".github/skills/test-implementation-python/SKILL.md",
       "related_agents": [
-        "@test-engineer",
         "@test-strategy"
       ]
     },
@@ -282,7 +276,6 @@
       "description": "Estratégia agnóstica de cobertura, métricas por risco, interpretação de reports",
       "path": ".github/skills/test-coverage-governance/SKILL.md",
       "related_agents": [
-        "@test-engineer",
         "@test-strategy"
       ]
     },
@@ -315,7 +308,6 @@
       "description": "Setup nativo Angular 20+ (runner:vitest), vi.fn/vi.spyOn, zoneless async/await, Signals, coverage v8, migração de Jasmine/Karma",
       "path": ".github/skills/test-implementation-angular-vitest/SKILL.md",
       "related_agents": [
-        "@test-engineer",
         "@test-strategy"
       ]
     },
@@ -340,7 +332,7 @@
       ],
       "related_agents": [
         "@bug-triage",
-        "@test-engineer",
+        "@test-strategy",
         "@adapter-generator",
         "@context-builder"
       ]
@@ -359,7 +351,7 @@
       ],
       "related_agents": [
         "@bug-triage",
-        "@test-engineer",
+        "@test-strategy",
         "@refactor-planner",
         "@business-rules-extractor",
         "@analysis-architect"
@@ -426,7 +418,7 @@
       "description": "Padrões genéricos de componentização frontend para reduzir acoplamento, aumentar reutilização e melhorar manutenibilidade.",
       "path": ".github/skills/frontend-componentization-patterns/SKILL.md",
       "related_agents": [
-        "@angular-engineer",
+        "@angular-router",
         "@analysis-architect",
         "@test-strategy"
       ]
@@ -438,7 +430,7 @@
       "description": "Boas práticas e patterns de codificação Angular para componentes modernos, templates, reatividade, segurança e consistência arquitetural.",
       "path": ".github/skills/angular-frontend-patterns/SKILL.md",
       "related_agents": [
-        "@angular-engineer",
+        "@angular-router",
         "@analysis-architect",
         "@test-strategy"
       ]
@@ -450,7 +442,7 @@
       "description": "Diretrizes de responsividade para Angular: mobile-first, breakpoints, layout fluido, container queries, imagens responsivas e validação multi-viewport.",
       "path": ".github/skills/angular-responsive-ui-patterns/SKILL.md",
       "related_agents": [
-        "@angular-engineer",
+        "@angular-router",
         "@analysis-architect",
         "@test-strategy"
       ]
@@ -462,7 +454,7 @@
       "description": "Diretrizes enterprise para contratos de componentes (tokens, variantes/estados, inputs/outputs, compatibilidade, semver, depreciação, breaking change e acessibilidade).",
       "path": ".github/skills/design-system-component-contracts/SKILL.md",
       "related_agents": [
-        "@angular-engineer",
+        "@angular-router",
         "@analysis-architect",
         "@test-strategy"
       ]
@@ -474,7 +466,7 @@
       "description": "Diretrizes enterprise para análise e recomendação de arquitetura, operação e evolução de serviços backend com Spring Boot, sem implementação direta.",
       "path": ".github/skills/spring-boot-backend-patterns/SKILL.md",
       "related_agents": [
-        "@spring-boot-engineer",
+        "@spring-boot-router",
         "@analysis-architect"
       ]
     },
@@ -485,7 +477,7 @@
       "description": "Diretrizes enterprise para análise e recomendação de arquiteturas reativas com Spring WebFlux e Project Reactor, com foco em resiliência, capacidade e operação.",
       "path": ".github/skills/spring-reactive-webflux-patterns/SKILL.md",
       "related_agents": [
-        "@spring-reactive-engineer",
+        "@spring-reactive-router",
         "@analysis-architect"
       ]
     },
@@ -496,8 +488,8 @@
       "description": "Governança de versões Java/JDK em backend: LTS, compatibilidade de ecossistema, segurança, performance e migração.",
       "path": ".github/skills/java-jdk-backend-governance/SKILL.md",
       "related_agents": [
-        "@spring-boot-engineer",
-        "@spring-reactive-engineer",
+        "@spring-boot-router",
+        "@spring-reactive-router",
         "@analysis-architect"
       ]
     },
@@ -541,7 +533,7 @@
       "description": "Padrões de mercado (2026) para IMPLEMENTAR features/bugs em Angular — fronteira Signals/RxJS, testing-first, checklist de PR. Contraparte de execução de angular-frontend-patterns.",
       "path": ".github/skills/angular-implementation-patterns/SKILL.md",
       "related_agents": [
-        "@angular-engineer"
+        "@angular-router"
       ]
     },
     {
@@ -551,7 +543,7 @@
       "description": "Padrões de mercado (2026) para IMPLEMENTAR features/bugs em Spring Boot — virtual threads vs reativo, N+1/OSIV, DTOs de borda, testing-first. Contraparte de execução de spring-boot-backend-patterns.",
       "path": ".github/skills/spring-boot-implementation-patterns/SKILL.md",
       "related_agents": [
-        "@spring-boot-engineer"
+        "@spring-boot-router"
       ]
     },
     {
@@ -561,7 +553,7 @@
       "description": "Padrões de mercado (2026) para IMPLEMENTAR features/bugs em Spring WebFlux/Reactor — composição não-bloqueante, tratamento de erro por operador, StepVerifier/WebTestClient. Contraparte de execução de spring-reactive-webflux-patterns.",
       "path": ".github/skills/spring-reactive-implementation-patterns/SKILL.md",
       "related_agents": [
-        "@spring-reactive-engineer"
+        "@spring-reactive-router"
       ]
     },
     {
@@ -572,7 +564,7 @@
       "path": ".github/skills/structured-intake-patterns/SKILL.md",
       "related_agents": [
         "@bug-triage",
-        "@test-engineer",
+        "@test-strategy",
         "@business-rules-extractor",
         "@requirements-analyst"
       ]
@@ -594,16 +586,16 @@
       "description": "Template canônico do perfil híbrido (Advisory + Implementação) para specialists de stack técnico — desambiguação de modo, formatos de saída e checklist unificado.",
       "path": ".github/skills/specialist-hybrid-advisory-implementation-patterns/SKILL.md",
       "related_agents": [
-        "@angular-engineer",
-        "@spring-boot-engineer",
-        "@spring-reactive-engineer"
+        "@angular-router",
+        "@spring-boot-router",
+        "@spring-reactive-router"
       ]
     },
     {
       "name": "governance-audit-patterns",
       "tier": 1,
       "category": "governance",
-      "description": "Catálogo consolidado de agent/governance smells (anti-padrão estrutural, gap de perfil, gap de diretriz, diretriz redundante, gap de cobertura de categoria) com sintoma, detecção, severidade e remediação — base do agent agent-auditor.",
+      "description": "Catálogo consolidado de agent/governance smells (anti-padrão estrutural, gap de perfil, desalinhamento contratual perfil ↔ tools ↔ skills ↔ catálogo, gap de diretriz, diretriz redundante, gap de cobertura de categoria, vazamento de evidência real R-044) com sintoma, detecção, severidade e remediação — base do agent agent-auditor.",
       "path": ".github/skills/governance-audit-patterns/SKILL.md",
       "related_agents": [
         "@agent-auditor"
@@ -617,7 +609,7 @@
       "path": ".github/skills/reflection-self-critique-patterns/SKILL.md",
       "related_agents": [
         "@docs-engineer",
-        "@test-engineer"
+        "@test-strategy"
       ]
     },
     {
@@ -686,7 +678,7 @@
       "category": "quality",
       "path": ".github/skills/angular-performance-patterns/SKILL.md",
       "related_agents": [
-        "@angular-engineer",
+        "@angular-router",
         "@performance-agent",
         "@analysis-architect"
       ]
@@ -697,7 +689,7 @@
       "category": "quality",
       "path": ".github/skills/spring-boot-performance-patterns/SKILL.md",
       "related_agents": [
-        "@spring-boot-engineer",
+        "@spring-boot-router",
         "@performance-agent",
         "@analysis-architect"
       ]
@@ -708,7 +700,7 @@
       "category": "quality",
       "path": ".github/skills/spring-reactive-performance-patterns/SKILL.md",
       "related_agents": [
-        "@spring-reactive-engineer",
+        "@spring-reactive-router",
         "@performance-agent",
         "@analysis-architect"
       ]

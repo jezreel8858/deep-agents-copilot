@@ -6,6 +6,25 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.0.0] — 2026-09-06
+
+### Adicionado
+- **Arquitetura Hierárquica de Routers de Domínio**: Decomposição de agentes monolíticos em ecossistemas de domínio com sub-catálogos locais e isolamento em pastas:
+  - **Frontend Angular (`.github/agents/frontend/angular/`)**: Supervisor `angular-router` + sub-catálogo `angular-catalog.yaml` + 8 especialistas (`angular-arch-advisor`, `angular-feature-developer`, `angular-bug-fixer`, `angular-ui-stylist`, `angular-unit-test-writer`, `angular-component-test-writer`, `angular-test-fixer`, `angular-e2e-writer`).
+  - **Backend Spring Boot (`.github/agents/backend/spring-boot/`)**: Supervisor `spring-boot-router` + sub-catálogo `spring-boot-catalog.yaml` + 7 especialistas (`spring-boot-arch-advisor`, `spring-boot-feature-developer`, `spring-boot-bug-fixer`, `spring-boot-perf-tuner`, `spring-boot-unit-test-writer`, `spring-boot-integration-test-writer`, `spring-boot-test-fixer`).
+  - **Backend Spring Reactive (`.github/agents/backend/spring-reactive/`)**: Supervisor `spring-reactive-router` + sub-catálogo `spring-reactive-catalog.yaml` + 7 especialistas (`spring-reactive-arch-advisor`, `spring-reactive-feature-developer`, `spring-reactive-bug-fixer`, `spring-reactive-resilience-tuner`, `spring-reactive-unit-test-writer`, `spring-reactive-integration-test-writer`, `spring-reactive-test-fixer`).
+  - **Backend Java Legado EJB (`.github/agents/backend/ejb/`)**: Supervisor `ejb-router` + sub-catálogo `ejb-catalog.yaml` + 7 especialistas (`ejb-arch-advisor`, `ejb-feature-developer`, `ejb-bug-fixer`, `ejb-perf-tuner`, `ejb-unit-test-writer`, `ejb-integration-test-writer`, `ejb-test-fixer`).
+- **Suporte a `type: stack` no `@governance-factory`**: Nova capacidade de geração de ecossistemas tecnológicos completos estruturados em pastas de domínio com sub-catálogo, router e especialistas canônicos, com pesquisa prévia compulsória via `@deep-search` e sincronização atômica global (R-015).
+- **Smell 2.7 (Desalinhamento Contratual: Perfil ↔ Tools ↔ Skills ↔ Catálogo) em `governance-audit-patterns`**: Nova regra de conformidade com Matriz Canônica § 2.7.1 auditando papéis, permissões de escrita, tooling de terminal (`terminal-governance`), MCP `context-mode` e sincronismo atômico com o catálogo. Remediação executada com 100% de conformidade nos 33 agentes de frontend e backend.
+- **Dois Fluxos Canônicos de TDD com `@test-strategy`**:
+  - *Fluxo 1 (Cross-cutting Gateway)*: `@agent-router` aciona `@test-strategy` para matriz unificada antes de despachar aos routers de frontend/backend.
+  - *Fluxo 2 (Consulta Interna de Domínio)*: Routers de domínio consultam `@test-strategy` internamente via `run_subagent` antes de acionar seus test-writers.
+
+### Removido
+- Descomissionamento dos agentes monolíticos substituídos pela nova topologia hierárquica: `angular-engineer.agent.md`, `spring-boot-engineer.agent.md`, `spring-reactive-engineer.agent.md` e `test-engineer.agent.md`.
+
+---
+
 ## [1.9.0] — 2026-09-04
 
 ### Adicionado

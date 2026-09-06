@@ -20,7 +20,7 @@ triggers:
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/agents/spring-reactive-engineer.agent.md
+  - .github/agents/backend/spring-reactive/spring-reactive-router.agent.md
 tools: []
 ---
 

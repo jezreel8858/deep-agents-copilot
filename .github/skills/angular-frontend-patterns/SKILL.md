@@ -14,7 +14,7 @@ triggers:
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/agents/angular-engineer.agent.md
+  - .github/agents/frontend/angular/angular-router.agent.md
 tools: []
 ---
 

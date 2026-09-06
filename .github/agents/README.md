@@ -19,12 +19,11 @@
 | Agent | `prompt-structuring` | ⚠️ ***(NEW)*** Passo mandatório pós-`agent-router` (R-041) — refina o prompt em loop controlado (máx. 5 iterações) antes de retornar para classificação de intenção |
 | Agent | `bug-triage` | Triagem de bugs/regressões com reprodução e severidade |
 | Agent | `test-strategy` | Estratégia de testes, cobertura por risco e critérios de aceitação |
-| Agent | `test-engineer` | 🧪 ***(FUSÃO)*** Implementar suítes de teste (unit/integration/E2E), corrigir testes quebrados e expandir cobertura — modos `create`/`fix`/`coverage`; nunca roda a suíte completa autonomamente no modo `fix` |
 | Agent | `refactor-planner` | Planejamento e decomposição macro de refatoração estrutural com blast radius e rollback (delega execução aos especialistas de stack) |
 | Agent | `deep-search` | 🔎 ***(NEW)*** Retriever/Researcher para pesquisa interna (repo + context-mode + terminal read-only) e externa (Tavily), com decomposição paralela de pesquisa composta |
 | Agent | `analysis-architect` | Análise técnica unificada: impacto local (tier B1), risco, dependências, contratos e integrações cross-sistema (OpenAPI/AsyncAPI/gRPC/GraphQL) com metodologia B1/B2/B3 |
 | Agent | `agent-auditor` | 🧪 ***(NEW)*** Auditoria semântica de governança do próprio catálogo (agents/skills/prompts): detecta smells e gaps, classifica severidade e recomenda handoff para executores, sempre read-only |
-| Agent | `governance-factory` | 🏭 ***(FUSÃO v1.1.0)*** Criação/revisão de agent, skill ou prompt via parâmetro `type`; na criação de qualquer artefato, delega compulsoriamente pesquisa prévia de mercado/skills ao `deep-search` antes de materializar o arquivo |
+| Agent | `governance-factory` | 🏭 ***(v1.2.0)*** Criação/revisão de agent, skill, prompt ou nova stack via parâmetro `type`; na criação de qualquer artefato/stack, delega compulsoriamente pesquisa prévia de mercado/skills ao `deep-search` antes de materializar os arquivos |
 | Agent | `context-builder` | Coletar, condensar e persistir contexto técnico em `docs/context/` |
 | Agent | `binding-initializer` | ⚡ ***(NEW)*** Criar `catalog.yaml` + `binding.md` para novo repositório (1 pergunta — Health Check R-034) |
 | Agent | `adapter-generator` | ⚡ ***(NEW)*** Gerar automaticamente adapters em `.github/instructions/` via `/add-project-context` |
@@ -32,9 +31,10 @@
 | Agent | `runtime-verifier` | 🩺 ***(NEW)*** Verifica saúde do ambiente (build limpo, dependências, serviços dependentes) antes de disparar testes/codificadores; read-only, nunca corrige |
 | Agent | `pr-gatekeeper` | 📦 ***(NEW)*** Prepara PR pós-aprovação do quality gate — diff, commit semântico, matriz de risco, `CHANGELOG.md`; nunca executa `git commit`/`push` |
 | Agent | `database-specialist` | 🗄️ ***(NEW)*** Migrações de schema (Flyway/Liquibase/Alembic), otimização de query e integridade referencial; rollback sempre documentado |
-| Agent | `angular-engineer` | 🅰️ Especialista Angular **enterprise, perfil híbrido v2.1.0** — análise/recomendação (arquitetura moderna, RxJS+Signals, performance CWV/SSR, segurança, acessibilidade, testes, upgrades) **E** implementação de feature/bugfix (testing-first, diff mínimo), carregando skills de componentização, patterns Angular e contratos de API para design system |
-| Agent | `spring-boot-engineer` | ☕ Especialista backend Spring Boot **enterprise, perfil híbrido v2.1.0** — análise/recomendação (arquitetura, versões Java/JDK, performance, observabilidade, segurança, migração) **E** implementação de feature/bugfix (virtual threads vs reativo, testing-first) |
-| Agent | `spring-reactive-engineer` | ⚛️ Especialista backend reativo Spring WebFlux/Reactor **enterprise, perfil híbrido v2.1.0** — análise/recomendação (capacidade, resiliência, backpressure, observabilidade, segurança, compatibilidade Java/JDK) **E** implementação de feature/bugfix (sem bloqueio de event-loop, testing-first) |
+| Agent | `angular-router` | 🅰️ **Frontend Angular Router** (`frontend/angular/`) — supervisor hierárquico do ecossistema Angular; orquestra e despacha para os 8 especialistas de frontend mapeados em `.github/agents/frontend/angular/angular-catalog.yaml` (`arch-advisor`, `feature-developer`, `bug-fixer`, `ui-stylist`, `unit-test-writer`, `component-test-writer`, `test-fixer`, `e2e-writer`) |
+| Agent | `spring-boot-router` | ☕ **Backend Spring Boot Router** (`backend/spring-boot/`) — supervisor hierárquico do ecossistema Spring Boot; orquestra e despacha para os 7 especialistas backend mapeados em `.github/agents/backend/spring-boot/spring-boot-catalog.yaml` (`arch-advisor`, `feature-developer`, `bug-fixer`, `perf-tuner`, `unit-test-writer`, `integration-test-writer`, `test-fixer`) |
+| Agent | `spring-reactive-router` | ⚛️ **Backend Spring Reactive Router** (`backend/spring-reactive/`) — supervisor hierárquico do ecossistema WebFlux/Reactor; orquestra e despacha para os 7 especialistas reativos mapeados em `.github/agents/backend/spring-reactive/spring-reactive-catalog.yaml` (`arch-advisor`, `feature-developer`, `bug-fixer`, `resilience-tuner`, `unit-test-writer`, `integration-test-writer`, `test-fixer`) |
+| Agent | `ejb-router` | 🏛️ **Backend Java Legado EJB Router** (`backend/ejb/`) — supervisor hierárquico do ecossistema Java Legado EJB; orquestra e despacha para os 7 especialistas backend mapeados em `.github/agents/backend/ejb/ejb-catalog.yaml` (`arch-advisor`, `feature-developer`, `bug-fixer`, `perf-tuner`, `unit-test-writer`, `integration-test-writer`, `test-fixer`) |
 | Agent | `docs-engineer` | 📝 ***(FUSÃO)*** Autoria e curadoria de documentação técnica em `.md` — modos `author`/`curate`; substitui docs-writer + docs-curator, que já delegavam entre si a mesma decisão |
 | Agent | `code-review` | 🔎 Revisa código (diff/PR) antes do merge por correção, segurança, convenções, impacto, testes e performance; classifica achados por severidade; read-only; delega para `bug-triage`/`analysis-architect`/`test-strategy`/`refactor-planner` |
 | Agent | `requirements-analyst` | 🧾 ***(NEW)*** Elicita e estrutura requisitos funcionais/não-funcionais a partir de pedido de negócio ambíguo (EARS, INVEST, Gherkin, FURPS+); detecta *solution-jumping* via Five Whys; prospectivo (não confundir com `business-rules-extractor`, que é reverso) |
@@ -57,24 +57,22 @@
 | Entrada padrão no chat | `agent-router` |
 | ⚠️ Toda solicitação (pós Health Check R-034) | `prompt-structuring` (mandatório, retorna ao `agent-router`) |
 | Bug, erro, regressão | `bug-triage` |
-| Estratégia de testes | `test-strategy` |
-| Implementação de testes (unit/integration/E2E) | `test-engineer` (`mode: create`) |
-| Correção de testes quebrados (com relatório de falhas) | `test-engineer` (`mode: fix`) |
-| Expansão de cobertura por gap identificado | `test-engineer` (`mode: coverage`) |
+| Estratégia de testes por risco e matriz de cenários | `test-strategy` |
 | Planejamento de refactor | `refactor-planner` |
 | Impacto técnico local | `analysis-architect` (tier B1) |
 | Curadoria/autoria de documentação | `docs-engineer` (`mode: curate`/`author`) |
 | Pesquisa interna aprofundada (repo/context-mode/terminal) ou pesquisa externa composta | `deep-search` |
 | Análise técnica, impacto, contratos, integrações cross-sistema | `analysis-architect` |
 | 🧪 Auditoria semântica de governança do catálogo (smells/gaps em agents, skills e prompts) | `agent-auditor` |
-| Criação/revisão de agent, skill ou prompt (com pesquisa prévia via `@deep-search` na criação) | `governance-factory` (`type: agent\|skill\|prompt`) |
+| Criação/revisão de agent, skill, prompt ou nova stack (com pesquisa prévia via `@deep-search` na criação) | `governance-factory` (`type: agent\|skill\|prompt\|stack`) |
 | Consolidação de contexto para execução posterior | `context-builder` |
 | ⚡ Binding context faltando (Health Check) | `binding-initializer` |
 | ⚡ Gerar adapters após /add-project-context | `adapter-generator` |
 | 📋 Extrair/documentar/validar regras de negócio | `business-rules-extractor` |
-| 🅰️ Análise, recomendação e implementação Angular (feature/bugfix) | `angular-engineer` |
-| ☕ Análise, recomendação e implementação backend Spring Boot (feature/bugfix) | `spring-boot-engineer` |
-| ⚛️ Análise, recomendação e implementação backend reativo WebFlux/Reactor (feature/bugfix) | `spring-reactive-engineer` |
+| 🅰️ Frontend Angular Router (supervisor que despacha para os 8 especialistas em `frontend/angular/`) | `angular-router` |
+| ☕ Backend Spring Boot Router (supervisor que despacha para os 7 especialistas em `backend/spring-boot/`) | `spring-boot-router` |
+| ⚛️ Backend Spring Reactive Router (supervisor que despacha para os 7 especialistas em `backend/spring-reactive/`) | `spring-reactive-router` |
+| 🏛️ Backend Java Legado EJB Router (supervisor que despacha para os 7 especialistas em `backend/ejb/`) | `ejb-router` |
 | 📝 Escrever/gerar/curar documentação técnica em `.md` (qualquer domínio) | `docs-engineer` |
 | 🔎 Revisar código (diff/PR) antes do merge, por severidade | `code-review` |
 | 🧾 Elicitar/estruturar requisitos a partir de pedido ambíguo (pré-técnico) | `requirements-analyst` |
@@ -101,7 +99,7 @@ Antes de tarefas não triviais, anexar ao contexto:
 - `./README.md`
 - `./catalog.yaml`
 - `../skills/README.md`
-- `../../docs/ai-context/routing-graph.yaml` — grafo de roteamento estrutural (R-040)
+- `./routing-graph.yaml` — grafo de roteamento estrutural (R-040)
 
 ## 5) Regras de Catálogo
 
@@ -127,7 +125,7 @@ Antes de tarefas não triviais, anexar ao contexto:
 - Toda decisão operacional deve seguir menor privilégio de tools.
 - Todo agent deve preservar rastreabilidade (rota, evidências e próximo passo mínimo).
 - Todo agent pode declarar `version:` no frontmatter para rastrear mudanças de comportamento.
-- Nova rota de roteamento → atualizar `docs/ai-context/routing-graph.yaml` **antes** de editar a Decision Tree (R-040).
+- Nova rota de roteamento → atualizar `.github/agents/routing-graph.yaml` **antes** de editar a Decision Tree (R-040).
 - **Re-triagem por turno (R-042)**: todo agent downstream deve declarar seção **"Retorno ao Router"** com gatilho objetivo de deriva de intenção — roteamento não é evento único da conversa.
 - **Ferramentas mínimas obrigatórias (Tooling Baseline)**: TODO agent deve incluir `run_subagent` no frontmatter `tools:` — sem essa tool, o handoff de retorno exigido por R-042 não é executável (descrever em texto não basta). Ver tabela de baseline por perfil em `agent-contracts/SKILL.md` § 9. `agent-factory` valida essa regra em toda criação/revisão de agent.
 - **Visibilidade de fluxo (Banner de Identidade)**: TODO agent — não apenas o `agent-router` — abre toda resposta com `Agente Ativo: <name>`, mesmo continuando em `task_mode` sem handoff neste turno; se houve handoff/re-triagem, adiciona `Handoff: <origem> → <destino> (motivo: ...)`. Padrão de mercado (OpenAI Agents SDK `HandoffOutputItem`, LangGraph `active_agent` streaming) — detalhes em `agent-contracts/SKILL.md` § 0. Sem isso, o usuário perde visibilidade do fluxo assim que a conversa passa a ser respondida por um downstream por vários turnos.
