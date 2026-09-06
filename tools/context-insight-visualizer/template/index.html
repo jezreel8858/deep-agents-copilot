@@ -239,6 +239,45 @@
                 </div>
               </div>
 
+              <!-- Invocações de Agentes & Subagentes (Estilo When You Code) -->
+              <div class="chart-card">
+                <div class="chart-card-header">
+                  <div>
+                    <div class="chart-card-title">
+                      <span class="material-symbols-outlined" style="font-size: 18px; color: var(--md-sys-color-cyan);">smart_toy</span>
+                      <span>Invocações de Agentes</span>
+                    </div>
+                    <div class="chart-card-desc">Frequência de acionamento por agente (incluindo subagentes)</div>
+                  </div>
+                </div>
+                <div class="heatmap-mini-stats">
+                  <div class="mini-stat-item">
+                    <div class="mini-stat-value" id="statTopAgent" style="color: var(--md-sys-color-cyan); font-size: 18px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">--</div>
+                    <div class="mini-stat-label">Mais Invocado</div>
+                  </div>
+                  <div class="mini-stat-item">
+                    <div class="mini-stat-value" id="statTotalAgentInvocations">0</div>
+                    <div class="mini-stat-label">Total de Invocações</div>
+                  </div>
+                  <div class="mini-stat-item">
+                    <div class="mini-stat-value" id="statSubagentInvocations" style="color: var(--md-sys-color-primary);">0</div>
+                    <div class="mini-stat-label">Via Subagente</div>
+                  </div>
+                </div>
+                <div class="agent-blocks-container" id="agentInvocationsBars"></div>
+                <div class="heatmap-footer-labels" style="margin-top: 4px;">
+                  <span style="display:flex;align-items:center;gap:4px;">
+                    <span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--md-sys-color-cyan);"></span>
+                    Direto
+                  </span>
+                  <span style="display:flex;align-items:center;gap:4px;">
+                    <span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--md-sys-color-primary);"></span>
+                    Subagente
+                  </span>
+                  <span id="statDistinctAgentsLabel">0 agentes</span>
+                </div>
+              </div>
+
               <!-- Distribuição de Ferramentas -->
               <div class="chart-card">
                 <div class="chart-card-header">

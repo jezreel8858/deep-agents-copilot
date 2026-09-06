@@ -163,6 +163,21 @@
         "timeSavedMin": { "type": "number" }
       }
     },
+    "agentInvocations": {
+      "type": "array",
+      "description": "Frequência de invocação de agentes e subagentes.",
+      "items": {
+        "type": "object",
+        "required": ["agent", "total", "direct", "subagent"],
+        "properties": {
+          "agent": { "type": "string", "description": "Nome canônico do agente." },
+          "total": { "type": "number", "description": "Total de invocações (diretas + subagente)." },
+          "direct": { "type": "number", "description": "Quantidade de invocações diretas." },
+          "subagent": { "type": "number", "description": "Quantidade de invocações via subagente." },
+          "percentage": { "type": "number", "description": "Percentual relativo ao total ou ao topo." }
+        }
+      }
+    },
     "insightsActions": {
       "type": "array",
       "description": "Cards de insights avaliados deterministicamente pelo motor de regras.",

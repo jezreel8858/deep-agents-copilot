@@ -14,10 +14,67 @@ agregação resiliente e higienização/anonimização de caminhos locais (R-044
 import glob
 import json
 import os
+import re
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+
+
+def load_known_agents() -> set:
+    """Carrega dinamicamente a lista de agentes do catálogo e inclui agentes canônicos."""
+    known = {
+        "adapter-generator", "agent-auditor", "agent-router", "agentic-memory-manager",
+        "analysis-architect", "angular-arch-advisor", "angular-bug-fixer",
+        "angular-component-test-writer", "angular-e2e-writer", "angular-feature-developer",
+        "angular-router", "angular-test-fixer", "angular-ui-stylist", "angular-unit-test-writer",
+        "binding-initializer", "bug-triage", "business-rules-extractor", "code-knowledge-graph",
+        "code-review", "code-style-enforcer", "code-summarizer", "compliance-guardrails",
+        "context-builder", "database-specialist", "debugger", "deep-search", "devops-engineer",
+        "docs-engineer", "ejb-arch-advisor", "ejb-bug-fixer", "ejb-feature-developer",
+        "ejb-integration-test-writer", "ejb-perf-tuner", "ejb-router", "ejb-test-fixer",
+        "ejb-unit-test-writer", "feature-planner", "governance-factory", "performance-agent",
+        "pr-gatekeeper", "prompt-structuring", "refactor-planner", "requirements-analyst",
+        "runtime-verifier", "security-reviewer", "spring-boot-arch-advisor", "spring-boot-bug-fixer",
+        "spring-boot-feature-developer", "spring-boot-integration-test-writer", "spring-boot-perf-tuner",
+        "spring-boot-router", "spring-boot-test-fixer", "spring-boot-unit-test-writer",
+        "spring-reactive-arch-advisor", "spring-reactive-bug-fixer", "spring-reactive-feature-developer",
+        "spring-reactive-integration-test-writer", "spring-reactive-resilience-tuner",
+        "spring-reactive-router", "spring-reactive-test-fixer", "spring-reactive-unit-test-writer",
+        "test-strategy", "search", "angular-engineer", "docs-curator", "docs-writer", "agent-factory",
+        "prompt-factory", "code-summarizer"
+    }
+    current_path = Path(__file__).resolve().parent
+    candidates = [
+        current_path.parent.parent.parent / ".github" / "agents",
+        Path.cwd() / ".github" / "agents",
+    ]
+    for c in candidates:
+        if c.exists():
+            for f in c.rglob("*.agent.md"):
+                known.add(f.name.replace(".agent.md", "").lower())
+            break
+    return known
+
+
+SUBAGENT_PATTERNS = [
+    re.compile(r'run_subagent\([^)]*agentName[:=]\s*["\']([a-zA-Z0-9_\-]+)["\']', re.IGNORECASE),
+    re.compile(r'agentName["\']?\s*[:=]\s*["\']([a-zA-Z0-9_\-]+)["\']', re.IGNORECASE),
+    re.compile(r'Custom Agent\s*["\']([a-zA-Z0-9_\-]+)["\']', re.IGNORECASE),
+    re.compile(r'Delegando para\s*@?([a-zA-Z0-9_\-]+)', re.IGNORECASE),
+    re.compile(r'Delegado:\s*@?([a-zA-Z0-9_\-]+)', re.IGNORECASE),
+    re.compile(r'Handoff:\s*@?[a-zA-Z0-9_\-]+\s*→\s*@?([a-zA-Z0-9_\-]+)', re.IGNORECASE),
+    re.compile(r'(?:sub_agent|subagent)\s+(?:para\s+|de\s+)?@?([a-zA-Z0-9_\-]+)', re.IGNORECASE),
+    re.compile(r'subagent[:\s]+@?([a-zA-Z0-9_\-]+)', re.IGNORECASE),
+]
+
+DIRECT_PATTERNS = [
+    re.compile(r'@([a-zA-Z0-9_\-]+)', re.IGNORECASE),
+    re.compile(r'(?:invoque|chame|use|rotei para)\s+(?:o\s+)?(?:agent\s+)?@?([a-zA-Z0-9_\-]+)', re.IGNORECASE),
+    re.compile(r'Follow instructions in \[([a-zA-Z0-9_\-]+)\]\(.*\.prompt\.md\)', re.IGNORECASE),
+    re.compile(r'(?:^|\s)/([a-zA-Z0-9_\-]+)', re.IGNORECASE),
+    re.compile(r'Agente Ativo:\s*@?([a-zA-Z0-9_\-]+)', re.IGNORECASE),
+]
 
 
 def sanitize_project_name(project_dir: str) -> str:
@@ -35,52 +92,54 @@ def sanitize_project_name(project_dir: str) -> str:
 def resolve_default_directories(
     custom_sessions_dir: Optional[str] = None,
     custom_content_dir: Optional[str] = None
-) -> Tuple[Optional[Path], Optional[Path]]:
-    """Localiza as pastas de dados do Context Mode respeitando precedência e fallbacks."""
+) -> Tuple[List[Path], List[Path], List[Path]]:
+    """Localiza todas as pastas de dados e logs do Context Mode ignorando node_modules e caches."""
     home = Path.home()
-    
-    # 1. Sessions dir
-    sessions_path: Optional[Path] = None
+
+    # 1. Sessions dirs (Claude Code, JetBrains, etc.)
+    sessions_dirs: List[Path] = []
     if custom_sessions_dir:
         sp = Path(custom_sessions_dir).expanduser()
-        if sp.exists():
-            sessions_path = sp
-    if not sessions_path:
-        default_claude_sessions = home / ".claude" / "context-mode" / "sessions"
-        if default_claude_sessions.exists():
-            sessions_path = default_claude_sessions
-        else:
-            # Fallback JetBrains no Windows / Linux / macOS
-            jb_patterns = [
-                home / ".config" / "JetBrains" / "context-mode" / "sessions",
-                home / "AppData" / "Roaming" / "JetBrains" / "context-mode" / "sessions",
-            ]
-            for candidate in jb_patterns:
-                if candidate.exists():
-                    sessions_path = candidate
-                    break
+        if sp.exists() and "node_modules" not in str(sp):
+            sessions_dirs.append(sp)
+    if not sessions_dirs:
+        candidates = [
+            home / ".claude" / "context-mode" / "sessions",
+            home / ".config" / "JetBrains" / "context-mode" / "sessions",
+            home / "AppData" / "Roaming" / "JetBrains" / "context-mode" / "sessions",
+            home / "AppData" / "Local" / "JetBrains" / "context-mode" / "sessions",
+            home / ".context-mode" / "sessions",
+        ]
+        for candidate in candidates:
+            if candidate.exists() and "node_modules" not in str(candidate) and candidate not in sessions_dirs:
+                sessions_dirs.append(candidate)
 
-    # 2. Content dir
-    content_path: Optional[Path] = None
+    # 2. Content dirs
+    content_dirs: List[Path] = []
     if custom_content_dir:
         cp = Path(custom_content_dir).expanduser()
-        if cp.exists():
-            content_path = cp
-    if not content_path:
-        default_claude_content = home / ".claude" / "context-mode" / "content"
-        if default_claude_content.exists():
-            content_path = default_claude_content
-        else:
-            jb_content = [
-                home / ".config" / "JetBrains" / "context-mode" / "content",
-                home / "AppData" / "Roaming" / "JetBrains" / "context-mode" / "content",
-            ]
-            for candidate in jb_content:
-                if candidate.exists():
-                    content_path = candidate
-                    break
+        if cp.exists() and "node_modules" not in str(cp):
+            content_dirs.append(cp)
+    if not content_dirs:
+        candidates = [
+            home / ".claude" / "context-mode" / "content",
+            home / ".config" / "JetBrains" / "context-mode" / "content",
+            home / "AppData" / "Roaming" / "JetBrains" / "context-mode" / "content",
+            home / "AppData" / "Local" / "JetBrains" / "context-mode" / "content",
+        ]
+        for candidate in candidates:
+            if candidate.exists() and "node_modules" not in str(candidate) and candidate not in content_dirs:
+                content_dirs.append(candidate)
 
-    return sessions_path, content_path
+    # 3. PostToolUse debug logs (contém histórico de chamadas run_subagent)
+    log_candidates = [
+        home / ".config" / "JetBrains" / "context-mode" / "posttooluse-debug.log",
+        home / "AppData" / "Roaming" / "JetBrains" / "context-mode" / "posttooluse-debug.log",
+        home / ".claude" / "context-mode" / "posttooluse-debug.log",
+    ]
+    debug_logs = [p for p in log_candidates if p.exists() and "node_modules" not in str(p)]
+
+    return sessions_dirs, content_dirs, debug_logs
 
 
 class ContextDataExtractor:
@@ -91,9 +150,9 @@ class ContextDataExtractor:
         sessions_dir: Optional[str] = None,
         content_dir: Optional[str] = None
     ):
-        self.sessions_dir, self.content_dir = resolve_default_directories(sessions_dir, content_dir)
+        self.sessions_dirs, self.content_dirs, self.debug_logs = resolve_default_directories(sessions_dir, content_dir)
         self.warnings: List[str] = []
-        self.source_paths: List[str] = []
+        self.source_paths: List[str] = [str(p) for p in self.sessions_dirs + self.content_dirs + self.debug_logs]
 
     def extract_all(self) -> Dict[str, Any]:
         """Executa a extração completa de sessions, eventos, json e content DBs."""
@@ -103,15 +162,11 @@ class ContextDataExtractor:
         stats_pid_data = self._read_stats_pid_files()
         content_dbs_data = self._read_content_databases()
 
-        if self.sessions_dir:
-            self.source_paths.append(str(self.sessions_dir))
-        else:
-            self.warnings.append("Diretório de sessões do Context Mode não localizado na máquina.")
+        if not self.sessions_dirs:
+            self.warnings.append("Nenhum diretório de sessões do Context Mode localizado na máquina.")
 
-        if self.content_dir:
-            self.source_paths.append(str(self.content_dir))
-        else:
-            self.warnings.append("Diretório de conteúdo do Context Mode não localizado na máquina.")
+        if not self.content_dirs:
+            self.warnings.append("Nenhum diretório de conteúdo do Context Mode localizado na máquina.")
 
         return {
             "meta": {
@@ -129,12 +184,19 @@ class ContextDataExtractor:
         }
 
     def _read_session_databases(self) -> Dict[str, Any]:
-        """Lê todos os arquivos *.db dentro do diretório de sessões."""
-        if not self.sessions_dir or not self.sessions_dir.exists():
+        """Lê todos os arquivos *.db dentro dos diretórios de sessões (ignorando node_modules e caches)."""
+        if not self.sessions_dirs:
             return {"dbsCount": 0, "sessions": [], "eventsSummary": {}}
 
-        db_files = list(self.sessions_dir.glob("*.db"))
+        db_files: List[Path] = []
+        for s_dir in self.sessions_dirs:
+            if s_dir.exists():
+                for p in s_dir.glob("*.db"):
+                    if "node_modules" not in str(p) and ".cache" not in str(p) and p not in db_files:
+                        db_files.append(p)
+
         all_sessions: List[Dict[str, Any]] = []
+        seen_session_ids = set()
 
         total_events_count = 0
         total_errors_count = 0
@@ -149,7 +211,10 @@ class ContextDataExtractor:
         subagent_events: List[Dict[str, Any]] = []
         decisions_list: List[Dict[str, Any]] = []
         detailed_events: List[Dict[str, Any]] = []
+        all_events_for_correlation: List[Tuple[datetime, str, str]] = []
         session_proj_map: Dict[str, str] = {}
+        agent_stats: Dict[str, Dict[str, int]] = {}
+        known_agents = load_known_agents()
 
         for db_file in db_files:
             try:
@@ -171,6 +236,9 @@ class ContextDataExtractor:
                     for r in rows:
                         row_dict = dict(zip(avail_cols, r))
                         s_id = row_dict.get("session_id", "unknown")
+                        if s_id in seen_session_ids:
+                            continue
+                        seen_session_ids.add(s_id)
                         p_dir = row_dict.get("project_dir") or "__unknown__"
                         session_proj_map[s_id] = p_dir
                         started = row_dict.get("started_at")
@@ -252,12 +320,14 @@ class ContextDataExtractor:
                                 "createdAt": ev_created or ""
                             })
 
-                        # Contagem horária (00..23)
+                        # Contagem horária (00..23) e buffer para correlação
                         if ev_created:
                             try:
                                 h_int = int(ev_created[11:13]) if len(ev_created) >= 13 else None
                                 if h_int is not None and 0 <= h_int <= 23:
                                     hourly_counts[h_int] = hourly_counts.get(h_int, 0) + 1
+                                dt_corr = datetime.fromisoformat(ev_created.replace(" ", "T").rstrip("Z"))
+                                all_events_for_correlation.append((dt_corr, ev_type or "", str(ev_data or "")))
                             except Exception:
                                 pass
 
@@ -296,6 +366,62 @@ class ContextDataExtractor:
                             norm_type = ev_type or "other"
                             tool_counts[norm_type] = tool_counts.get(norm_type, 0) + 1
 
+                        # Rastreamento de Invocação de Agentes e Subagentes
+                        d_str = str(ev_data or "")
+                        seen_sub_in_event = set()
+                        if ev_type == "subagent" or ev_cat == "subagent":
+                            found_sub = False
+                            for sp in SUBAGENT_PATTERNS:
+                                for m in sp.finditer(d_str):
+                                    ag = m.group(1).lower()
+                                    if ag in known_agents:
+                                        if ag not in agent_stats:
+                                            agent_stats[ag] = {"direct": 0, "subagent": 0, "total": 0}
+                                        agent_stats[ag]["subagent"] += 1
+                                        seen_sub_in_event.add(ag)
+                                        found_sub = True
+                            if not found_sub:
+                                try:
+                                    j = json.loads(d_str)
+                                    ag = (j.get("agent") or j.get("agentName") or j.get("name") or "").lower()
+                                    if ag in known_agents:
+                                        if ag not in agent_stats:
+                                            agent_stats[ag] = {"direct": 0, "subagent": 0, "total": 0}
+                                        agent_stats[ag]["subagent"] += 1
+                                        seen_sub_in_event.add(ag)
+                                        found_sub = True
+                                except Exception:
+                                    pass
+                            if not found_sub:
+                                for ag in known_agents:
+                                    if ag in d_str.lower():
+                                        if ag not in agent_stats:
+                                            agent_stats[ag] = {"direct": 0, "subagent": 0, "total": 0}
+                                        agent_stats[ag]["subagent"] += 1
+                                        seen_sub_in_event.add(ag)
+                                        break
+                        else:
+                            for sp in SUBAGENT_PATTERNS:
+                                for m in sp.finditer(d_str):
+                                    ag = m.group(1).lower()
+                                    if ag in known_agents and ag not in seen_sub_in_event:
+                                        if ag not in agent_stats:
+                                            agent_stats[ag] = {"direct": 0, "subagent": 0, "total": 0}
+                                        agent_stats[ag]["subagent"] += 1
+                                        seen_sub_in_event.add(ag)
+
+                        # Invocações diretas de agentes (prompts, roles, decisões, intenções)
+                        if ev_type in ("user_prompt", "role", "decision", "intent"):
+                            seen_dir_in_event = set()
+                            for dp in DIRECT_PATTERNS:
+                                for m in dp.finditer(d_str):
+                                    ag = m.group(1).lower()
+                                    if ag in known_agents and ag not in seen_sub_in_event and ag not in seen_dir_in_event:
+                                        if ag not in agent_stats:
+                                            agent_stats[ag] = {"direct": 0, "subagent": 0, "total": 0}
+                                        agent_stats[ag]["direct"] += 1
+                                        seen_dir_in_event.add(ag)
+
                 # 4. Leitura da tabela tool_calls (se existir)
                 if "tool_calls" in tables:
                     tc_cols = [c[1] for c in cur.execute("PRAGMA table_info(tool_calls)").fetchall()]
@@ -311,6 +437,109 @@ class ContextDataExtractor:
 
             except Exception as ex:
                 self.warnings.append(f"Erro ao processar banco SQLite {db_file.name}: {str(ex)}")
+
+        # 5. Processamento da telemetria declarativa nativa de subagentes (JSONL)
+        telemetry_jsonl_candidates = [
+            Path(__file__).resolve().parent.parent / "logs" / "subagent-telemetry.jsonl",
+            Path.cwd() / "tools" / "context-insight-visualizer" / "logs" / "subagent-telemetry.jsonl",
+            Path.home() / ".context-mode" / "subagent-telemetry.jsonl",
+        ]
+        seen_telemetry_timestamps = set()
+        for jf in telemetry_jsonl_candidates:
+            if jf.exists():
+                try:
+                    with open(jf, "r", encoding="utf-8", errors="ignore") as f:
+                        for line in f:
+                            l_str = line.strip()
+                            if not l_str:
+                                continue
+                            try:
+                                entry = json.loads(l_str)
+                                ag = (entry.get("agent") or "search").lower().strip()
+                                ts = entry.get("timestamp") or ""
+                                seen_telemetry_timestamps.add(ts[:19])
+                                if ag in known_agents or True:
+                                    if ag not in agent_stats:
+                                        agent_stats[ag] = {"direct": 0, "subagent": 0, "total": 0}
+                                    agent_stats[ag]["subagent"] += 1
+                                    tool_counts["Subagent"] = tool_counts.get("Subagent", 0) + 1
+                                    subagent_events.append({
+                                        "task": f"Invocação de subagente ({ag}): {entry.get('task', '')}",
+                                        "createdAt": ts,
+                                        "sessionId": entry.get("sessionId", "hook")
+                                    })
+                            except Exception:
+                                pass
+                except Exception as ex:
+                    self.warnings.append(f"Aviso ao ler telemetria de subagentes {jf}: {str(ex)}")
+
+        # 6. Processamento dos logs de debug (fallback histórico de chamadas run_subagent)
+        subagent_log_calls: List[Tuple[str, Optional[str]]] = []
+        for log_file in self.debug_logs:
+            try:
+                with open(log_file, "r", encoding="utf-8", errors="ignore") as f:
+                    for line in f:
+                        m = re.match(r'\[([^\]]+)\]\s+CALL:\s+run_subagent(?:\s+\[agent:([a-zA-Z0-9_\-]+)\])?', line)
+                        if m:
+                            subagent_log_calls.append((m.group(1), m.group(2)))
+            except Exception as ex:
+                self.warnings.append(f"Aviso ao ler log de subagentes {log_file.name}: {str(ex)}")
+
+        if subagent_log_calls:
+            all_events_for_correlation.sort(key=lambda x: x[0])
+            for sc_ts, explicit_ag in subagent_log_calls:
+                # Evita duplicar se já capturado pelo hook nativo
+                if sc_ts[:19] in seen_telemetry_timestamps:
+                    continue
+                chosen_agent = None
+                if explicit_ag and explicit_ag.lower() in known_agents:
+                    chosen_agent = explicit_ag.lower()
+                else:
+                    try:
+                        sc_dt = datetime.fromisoformat(sc_ts[:19].replace(" ", "T"))
+                        candidates = [
+                            ev for dt, *ev in all_events_for_correlation
+                            if -600 <= (sc_dt - dt).total_seconds() <= 120
+                        ]
+                        for ev_type, d_str in reversed(candidates):
+                            for p in SUBAGENT_PATTERNS:
+                                for m in p.finditer(d_str):
+                                    ag = m.group(1).lower()
+                                    if ag in known_agents:
+                                        chosen_agent = ag
+                                        break
+                                if chosen_agent:
+                                    break
+                            if chosen_agent:
+                                break
+                        if not chosen_agent:
+                            for ev_type, d_str in reversed(candidates):
+                                for ag in known_agents:
+                                    pat = r'(?:@|agentName["\']?\s*[:=]\s*["\']|agent\s+|subagent[:\s]+)' + re.escape(ag)
+                                    if re.search(pat, d_str, re.IGNORECASE):
+                                        chosen_agent = ag
+                                        break
+                                if chosen_agent:
+                                    break
+                        if not chosen_agent:
+                            for ev_type, d_str in reversed(candidates):
+                                if ev_type in ("user_prompt", "role", "decision"):
+                                    d_lower = d_str.lower()
+                                    for ag in known_agents:
+                                        if ag in d_lower:
+                                            chosen_agent = ag
+                                            break
+                                    if chosen_agent:
+                                        break
+                    except Exception:
+                        pass
+
+                chosen_agent = chosen_agent or "search"
+                if chosen_agent not in agent_stats:
+                    agent_stats[chosen_agent] = {"direct": 0, "subagent": 0, "total": 0}
+                agent_stats[chosen_agent]["subagent"] += 1
+                tool_counts["Subagent"] = tool_counts.get("Subagent", 0) + 1
+                subagent_events.append({"task": f"Invocação via run_subagent ({chosen_agent})", "createdAt": sc_ts, "sessionId": "subagent-log"})
 
         # Ordenação das sessões por data desc
         all_sessions.sort(key=lambda s: s.get("startedAt") or "", reverse=True)
@@ -332,6 +561,21 @@ class ContextDataExtractor:
         # Subagent burst analysis
         subagent_analysis = self._analyze_subagent_bursts(subagent_events)
 
+        # Agregação e ordenação de agentInvocations
+        agent_invocations_list: List[Dict[str, Any]] = []
+        max_agent_total = max([v["direct"] + v["subagent"] for v in agent_stats.values()], default=0)
+        for ag_name, stats in agent_stats.items():
+            tot = stats["direct"] + stats["subagent"]
+            pct = round((tot / max_agent_total) * 100.0, 1) if max_agent_total > 0 else 0.0
+            agent_invocations_list.append({
+                "agent": ag_name,
+                "total": tot,
+                "direct": stats["direct"],
+                "subagent": stats["subagent"],
+                "percentage": pct
+            })
+        agent_invocations_list.sort(key=lambda a: a["total"], reverse=True)
+
         return {
             "dbsCount": len(db_files),
             "sessions": all_sessions,
@@ -347,6 +591,7 @@ class ContextDataExtractor:
                 "mcpTools": mcp_tools_list,
                 "projects": projects_list,
                 "subagents": subagent_analysis,
+                "agentInvocations": agent_invocations_list,
                 "decisions": decisions_list,
                 "detailedEvents": detailed_events,
             }
@@ -410,10 +655,16 @@ class ContextDataExtractor:
 
     def _read_stats_pid_files(self) -> Dict[str, Any]:
         """Lê e agrega os arquivos stats-pid-*.json do context-mode."""
-        if not self.sessions_dir or not self.sessions_dir.exists():
+        if not self.sessions_dirs:
             return {"filesCount": 0, "totalCalls": 0, "tokensSaved": 0, "dollarsSaved": 0.0, "byTool": {}}
 
-        json_files = list(self.sessions_dir.glob("stats-pid-*.json"))
+        json_files: List[Path] = []
+        for s_dir in self.sessions_dirs:
+            if s_dir.exists():
+                for jf in s_dir.glob("stats-pid-*.json"):
+                    if "node_modules" not in str(jf) and jf not in json_files:
+                        json_files.append(jf)
+
         total_calls = 0
         total_bytes_returned = 0
         tokens_saved_lifetime = 0
@@ -456,10 +707,16 @@ class ContextDataExtractor:
 
     def _read_content_databases(self) -> Dict[str, Any]:
         """Lê metadados agregados das bases content/*.db (chunks indexados, tamanho, fontes)."""
-        if not self.content_dir or not self.content_dir.exists():
+        if not self.content_dirs:
             return {"dbsCount": 0, "totalSources": 0, "totalChunks": 0, "totalSizeBytes": 0, "sources": [], "chunksBySource": {}}
 
-        db_files = list(self.content_dir.glob("*.db"))
+        db_files: List[Path] = []
+        for c_dir in self.content_dirs:
+            if c_dir.exists():
+                for db in c_dir.glob("*.db"):
+                    if "node_modules" not in str(db) and ".cache" not in str(db) and db not in db_files:
+                        db_files.append(db)
+
         total_sources = 0
         total_chunks = 0
         total_size_bytes = 0

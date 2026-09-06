@@ -33,6 +33,10 @@ var AppState = {
     return this.data.hourlyPattern || [];
   },
 
+  getAgentInvocations: function() {
+    return this.data.agentInvocations || [];
+  },
+
   getSessionsByDate: function() {
     return this.data.sessionsByDate || [];
   },

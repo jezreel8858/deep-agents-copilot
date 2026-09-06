@@ -33,6 +33,7 @@ class InsightsEngine:
             "sessions": self.sessions[:200],  # Limita a 200 sessões mais recentes para evitar payload gigante
             "sessionsByDate": self.events_summary.get("sessionsByDate", []),
             "hourlyPattern": self.events_summary.get("hourlyPattern", [{"hour": h, "count": 0} for h in range(24)]),
+            "agentInvocations": self.events_summary.get("agentInvocations", []),
             "toolUsage": self.events_summary.get("toolUsage", []),
             "mcpTools": self.events_summary.get("mcpTools", []),
             "projects": self.events_summary.get("projects", []),
@@ -164,6 +165,12 @@ class InsightsEngine:
         subagent_data = self.events_summary.get("subagents", {})
         time_saved_min = subagent_data.get("timeSavedMin", 0)
 
+        # 7. Métricas de invocações de agentes
+        agent_invs = self.events_summary.get("agentInvocations", [])
+        total_agent_invocations = sum(a.get("total", 0) for a in agent_invs)
+        subagent_invocations = sum(a.get("subagent", 0) for a in agent_invs)
+        top_agent = agent_invs[0].get("agent", "") if agent_invs else ""
+
         return {
             "totalSessions": total_sessions,
             "readWriteRatio": rw_ratio,
@@ -178,6 +185,9 @@ class InsightsEngine:
             "tokensSaved": tokens_saved,
             "dollarsSaved": dollars_saved,
             "timeSavedMin": time_saved_min,
+            "totalAgentInvocations": total_agent_invocations,
+            "subagentInvocations": subagent_invocations,
+            "topAgent": top_agent,
         }
 
     def _evaluate_insights(self, kpis: Dict[str, Any]) -> List[Dict[str, Any]]:

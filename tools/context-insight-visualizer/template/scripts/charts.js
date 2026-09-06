@@ -54,6 +54,93 @@ function renderWhenYouCode() {
   container.innerHTML = html;
 }
 
+function renderAgentInvocations() {
+  var container = document.getElementById("agentInvocationsBars");
+  if (!container) return;
+
+  var agents = AppState.getAgentInvocations();
+  var elTopAgent = document.getElementById("statTopAgent");
+  var elTotalInvocations = document.getElementById("statTotalAgentInvocations");
+  var elSubagentInvocations = document.getElementById("statSubagentInvocations");
+  var elDistinctLabel = document.getElementById("statDistinctAgentsLabel");
+
+  if (!agents || agents.length === 0) {
+    container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--md-sys-color-on-surface-variant);font-size:12px;">Nenhuma invocação de agente registrada</div>';
+    if (elTopAgent) elTopAgent.innerText = "--";
+    if (elTotalInvocations) elTotalInvocations.innerText = "0";
+    if (elSubagentInvocations) elSubagentInvocations.innerText = "0";
+    if (elDistinctLabel) elDistinctLabel.innerText = "0 agentes";
+    return;
+  }
+
+  var maxTotal = 0;
+  var sumTotal = 0;
+  var sumSubagents = 0;
+  var topAgentObj = agents[0];
+
+  for (var i = 0; i < agents.length; i++) {
+    var a = agents[i];
+    var tot = a.total != null ? a.total : ((a.direct || 0) + (a.subagent || 0));
+    sumTotal += tot;
+    sumSubagents += (a.subagent || 0);
+    if (tot > maxTotal) {
+      maxTotal = tot;
+      topAgentObj = a;
+    }
+  }
+
+  // Atualiza mini-stats
+  if (elTopAgent) {
+    elTopAgent.innerText = topAgentObj ? ("@" + topAgentObj.agent) : "--";
+    elTopAgent.title = topAgentObj ? ("@" + topAgentObj.agent) : "";
+  }
+  if (elTotalInvocations) elTotalInvocations.innerText = sumTotal;
+  if (elSubagentInvocations) elSubagentInvocations.innerText = sumSubagents;
+  if (elDistinctLabel) elDistinctLabel.innerText = agents.length + " agentes";
+
+  // Monta as barras para os agentes (até 24 agentes como no When You Code)
+  var displayAgents = agents.slice(0, 24);
+  var html = "";
+
+  for (var j = 0; j < displayAgents.length; j++) {
+    var item = displayAgents[j];
+    var totCount = item.total != null ? item.total : ((item.direct || 0) + (item.subagent || 0));
+    var dirCount = item.direct || 0;
+    var subCount = item.subagent || 0;
+
+    var pct = maxTotal > 0 ? (totCount / maxTotal) : 0;
+    var totalHeightPx = Math.max(Math.round(pct * 65), totCount > 0 ? 4 : 2);
+
+    // Divisão proporcional entre chamadas diretas e via subagente
+    var subHeightPx = totCount > 0 ? Math.round((subCount / totCount) * totalHeightPx) : 0;
+    var dirHeightPx = totalHeightPx - subHeightPx;
+    if (totCount > 0 && dirCount > 0 && dirHeightPx < 2) dirHeightPx = 2;
+    if (totCount > 0 && subCount > 0 && subHeightPx < 2) subHeightPx = 2;
+
+    var opacity = totCount > 0 ? (0.35 + 0.65 * pct).toFixed(2) : "0.08";
+    var directBg = "rgba(6, 182, 212, " + opacity + ")";
+    var subBg = "rgba(168, 85, 247, " + opacity + ")";
+
+    var tooltip = "@" + item.agent + " — " + totCount + " invocações (" + dirCount + " diretas, " + subCount + " via subagente)";
+
+    // Rótulo curto
+    var shortName = item.agent;
+    if (shortName.length > 8) {
+      shortName = shortName.substring(0, 7) + "…";
+    }
+
+    html += '<div class="agent-bar-col" title="' + tooltip + '">' +
+              '<div class="agent-bar-fill-wrap" style="height: ' + totalHeightPx + 'px;">' +
+                (dirHeightPx > 0 ? '<div class="agent-bar-fill-direct" style="height: ' + dirHeightPx + 'px; background: ' + directBg + ';"></div>' : '') +
+                (subHeightPx > 0 ? '<div class="agent-bar-fill-subagent" style="height: ' + subHeightPx + 'px; background: ' + subBg + ';"></div>' : '') +
+              '</div>' +
+              '<span class="agent-bar-label" title="@' + item.agent + '">' + shortName + '</span>' +
+            '</div>';
+  }
+
+  container.innerHTML = html;
+}
+
 function renderActivityChart() {
   var svgWrap = document.getElementById("activityChartContainer");
   if (!svgWrap) return;
