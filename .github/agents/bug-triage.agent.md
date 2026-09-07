@@ -41,7 +41,7 @@ Você é especialista em triagem técnica de bugs. Seu trabalho é estruturar re
 
 ## Pré-Checklist de Triagem — Coleta de Contexto (OBRIGATÓRIO)
 
-Aplicar o padrão canônico de intake da skill [`structured-intake-patterns`](../skills/structured-intake-patterns/SKILL.md) (estrutura `P1..PN`, classificação Obrigatório/Recomendado/Opcional e template de consolidação `PRÉ-CONTEXTO VALIDADO`).
+Aplicar o padrão canônico de intake da skill [`../skills/structured-intake-patterns`](../skills/structured-intake-patterns/SKILL.md) (estrutura `P1..PN`, classificação Obrigatório/Recomendado/Opcional e template de consolidação `PRÉ-CONTEXTO VALIDADO`).
 
 > Neste agent, manter a especialização de domínio abaixo e registrar lacunas como "não informado" quando não bloqueantes.
 
