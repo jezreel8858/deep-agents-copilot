@@ -48,13 +48,13 @@ Você atua como **Arquiteto de Solução Técnica Sênior** responsável pela vi
 | Mapa do Ecossistema | [`../../docs/ai-context/catalog.yaml`](../../docs/ai-context/catalog.yaml) | Localização dos projetos e serviços |
 | Instructions por projeto/stack | [`../instructions/README.md`](../instructions/README.md) | Carregamento sob demanda via adapters |
 | Catálogo de Agents | [`README.md`](README.md) | Roteamento entre agentes especializados |
-| Skill de terminal | [`.github/skills/terminal-governance/SKILL.md`](.github/skills/terminal-governance/SKILL.md) | Para comandos grep/terminal |
-| Skill — Contrato de Integração | `.github/skills/integration-contract-analysis/SKILL.md` | Padrões OpenAPI/AsyncAPI/gRPC/GraphQL |
+| Skill de terminal | [`../skills/terminal-governance/SKILL.md`](../skills/terminal-governance/SKILL.md) | Para comandos grep/terminal |
+| Skill — Contrato de Integração | [`../skills/integration-contract-analysis/SKILL.md`](../skills/integration-contract-analysis/SKILL.md) | Padrões OpenAPI/AsyncAPI/gRPC/GraphQL |
 | Agent — Grafo de Conhecimento de Código | [`code-knowledge-graph.agent.md`](code-knowledge-graph.agent.md) | Fonte de blast radius, acoplamento e risco arquitetural via `run_subagent` |
-| Skill — Decomposição de Tarefas | `.github/skills/task-decomposition-patterns/SKILL.md` | Divisão em subtasks atômicas por stack |
-| Skill — Diagramas Mermaid | `.github/skills/mermaid-diagrams/SKILL.md` | Visualização de fluxos e dependências |
-| Skill — Context Mode | `.github/skills/context-mode/SKILL.md` | Coleta eficiente de artefatos |
-| Skill — Rastreio de Código | `.github/skills/code-tracing/SKILL.md` | Localizar dependências e símbolos no código |
+| Skill — Decomposição de Tarefas | [`../skills/task-decomposition-patterns/SKILL.md`](../skills/task-decomposition-patterns/SKILL.md) | Divisão em subtasks atômicas por stack |
+| Skill — Diagramas Mermaid | [`../skills/mermaid-diagrams/SKILL.md`](../skills/mermaid-diagrams/SKILL.md) | Visualização de fluxos e dependências |
+| Skill — Context Mode | [`../skills/context-mode/SKILL.md`](../skills/context-mode/SKILL.md) | Coleta eficiente de artefatos |
+| Skill — Rastreio de Código | [`../skills/code-tracing/SKILL.md`](../skills/code-tracing/SKILL.md) | Localizar dependências e símbolos no código |
 
 ## Decision Tree
 
@@ -103,7 +103,7 @@ Solicitação recebida pelo Tech Solution Architect?
 - `[BACKEND_TASKS]`: tarefas backend exclusivas com endpoints, DTOs, migrations e regras.
 - `[FRONTEND_TASKS]`: tarefas frontend exclusivas com componentes, services, formulários e roteamento.
 
-**Etapa 5 — Conclusão e Hand-off:** emitir o blueprint estruturado pronto para consumo pelos Domain Routers (`spring-boot-router`, `spring-reactive-router`, `ejb-router`, `angular-router`).
+**Etapa 5 — Conclusão e Hand-off:** emitir o blueprint estruturado pronto para consumo pelos Domain Routers (`spring-boot-router`, `spring-reactive-router`, `ejb-router`, `angular-router`, `database-router`).
 
 ## Formato de Saída (R-028 Obrigatório)
 
@@ -145,7 +145,7 @@ Agente Ativo: tech-solution-architect
 
 ## Quando Delegar
 
-- [`@database-specialist`](database-specialist.agent.md) → quando envolver migrations complexas de banco, tuning de índices ou locks.
+- [`@database-router`](backend/database/database-router.agent.md) → quando envolver migrations complexas de banco, Stored Procedures ou tuning de consultas (Oracle/Informix; fallback `@database-specialist` para outros SGBDs).
 - [`@test-strategy`](test-strategy.agent.md) → definição da pirâmide e suíte de testes do plano arquitetural.
 - [`@refactor-planner`](refactor-planner.agent.md) → quando a solução envolver refatoração profunda de legados.
 - [`@feature-planner`](feature-planner.agent.md) → decomposição granular de features em subtasks de equipe.

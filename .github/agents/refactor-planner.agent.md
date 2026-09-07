@@ -14,7 +14,7 @@ Você é especialista em planejamento e decomposição macro de refatoração ar
 
 ## CRÍTICO: ESCOPO DO AGENT
 
-- ❌ NÃO executar a refatoração no código (a execução pertence aos especialistas de stack: `@angular-router`, `@spring-boot-engineer`, `@spring-reactive-engineer`, `@database-specialist`).
+- ❌ NÃO executar a refatoração no código (a execução pertence aos especialistas de stack: `@angular-router`, `@spring-boot-router`, `@spring-reactive-router`, `@database-router`).
 - ❌ NÃO tentar fazer o papel do `@code-knowledge-graph` — NUNCA realizar varredura manual de diretórios/arquivos (`list_dir`/`grep_search`/`file_search`) nem tentar inferir relações, chamadas, acoplamento ou blast radius por conta própria (violação direta de R-045 / RNF-004). Toda análise estrutural pertence exclusivamente ao `@code-knowledge-graph`.
 - ❌ NÃO propor planos sem Safety Net (exigir testes unitários ou Characterization Tests prévios).
 - ❌ NÃO planejar refatorações "Big Bang" sem fatiamento atômico (máx. 1 a 3 arquivos por nó do DAG).
@@ -58,9 +58,9 @@ Pedido recebido?
 |  │      \- Definir nós sequenciais/paralelizáveis (Gate In, Ação, Gate Out, Rollback Multicamada)
 |  │   5. Plano Aprovado para Execução?
 |  │      |- Etapa Angular -> delegar para @angular-router (modo Implementação)
-|  │      |- Etapa Spring Boot -> delegar para @spring-boot-engineer (modo Implementação)
-|  │      |- Etapa WebFlux/Reativo -> delegar para @spring-reactive-engineer (modo Implementação)
-|  │      \- Etapa Banco/DDL -> delegar para @database-specialist (modo Implementação)
+|  │      |- Etapa Spring Boot -> delegar para @spring-boot-router (modo Implementação)
+|  │      |- Etapa WebFlux/Reativo -> delegar para @spring-reactive-router (modo Implementação)
+|  │      \- Etapa Banco/DDL (Oracle/Informix) -> delegar para @database-router (modo Implementação)
 |  \- Não -> Retornar ao @agent-router
 ```
 
@@ -148,7 +148,7 @@ Próximo Passo Mínimo:
 - [`@angular-router`](frontend/angular/angular-router.agent.md) para executar etapas de refatoração no frontend Angular (modo Implementação, testing-first).
 - [`@spring-boot-router`](backend/spring-boot/spring-boot-router.agent.md) para executar etapas de refatoração no backend Spring Boot / Java (modo Implementação, testing-first).
 - [`@spring-reactive-router`](backend/spring-reactive/spring-reactive-router.agent.md) para executar etapas de refatoração no backend Spring WebFlux / Reactor (modo Implementação, testing-first).
-- [`@database-specialist`](database-specialist.agent.md) para etapas que envolvam migrações de schema, DDL ou queries complexas.
+- [`@database-router`](backend/database/database-router.agent.md) para etapas que envolvam migrações de schema, DDL, Stored Procedures ou queries complexas em Oracle/Informix (fallback `@database-specialist` para outros SGBDs).
 - [`@code-knowledge-graph`](code-knowledge-graph.agent.md) para mapeamento determinístico de blast radius, dependências e ciclos antes de estruturar o plano.
 
 ## Retorno ao Router (R-042 — Anti Sticky-Session)
