@@ -78,7 +78,7 @@ Seguir exatamente o "Formato de Saída" do agent `@deep-search` (Rota, Motivo, C
 - ❌ **NUNCA** implementar, corrigir ou refatorar código de aplicação
 - ❌ **NUNCA** exceder o budget de 3 chamadas Tavily sem justificativa explícita no Formato de Saída
 - ❌ **NUNCA** sintetizar conclusão sem citação de fonte rastreável (arquivo/caminho ou título+URL+ano)
-- ❌ **NUNCA** fundir este papel com análise crítica de impacto/integração (escopo de `@analysis-architect`)
+- ❌ **NUNCA** fundir este papel com análise crítica de impacto/integração (escopo de `@tech-solution-architect`)
 - ✅ **APENAS** pesquisar, decompor consultas, coletar evidências e sintetizar com fonte
 - ✅ Pesquisa composta → decompor e paralelizar obrigatoriamente via `run_subagent`
 

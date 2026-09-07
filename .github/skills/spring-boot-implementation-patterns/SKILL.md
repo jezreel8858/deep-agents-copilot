@@ -40,7 +40,7 @@ tools: []
 
 ## Workflow — Feature Nova
 
-1. Confirmar escopo/critério de aceite (handoff de `@requirements-analyst`/`@analysis-architect` se houver).
+1. Confirmar escopo/critério de aceite (handoff de `@requirements-analyst`/`@tech-solution-architect` se houver).
 2. Escrever teste (unitário e, se aplicável, `@DataJpaTest`/slice) antes da implementação (testing-first).
 3. Implementar seguindo o adapter do projeto (`spring-boot-backend.instructions.md`): `@Entity`/`@Builder`, `XxxService`+`XxxServiceImpl`, `@RequiredArgsConstructor` com `private final`, controller com `@ResponseStatus` explícito.
 4. Nunca retornar `Entity` diretamente do controller — sempre DTO de borda.

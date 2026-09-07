@@ -93,7 +93,7 @@ Estes valores **substituem** qualquer autoavaliação subjetiva nas seções Dec
 - `codegraph roles --role dead -T --json` → dead code.
 - Ver tabela completa de comandos na skill `codegraph-optave-usage` §4.
 
-> **Nota de compatibilidade:** o schema `Node{id,type,projectId,name,filePath,language,metadata}` / `Edge{id,type,sourceId,targetId,confidence,coupling,metadata}` normativo das versões ≤3.3.0 **não é mais produzido por este agent**. Consumidores downstream (`@analysis-architect`, `@bug-triage`, `@refactor-planner`) que dependiam desse schema via `ctx_search`/`code-graph:*` devem passar a interpretar a saída bruta dos comandos `codegraph` (texto/JSON por comando, sem schema unificado) — consumo diferente, sem camada de adaptação nesta versão (aceito conscientemente na decisão de migração total).
+> **Nota de compatibilidade:** o schema `Node{id,type,projectId,name,filePath,language,metadata}` / `Edge{id,type,sourceId,targetId,confidence,coupling,metadata}` normativo das versões ≤3.3.0 **não é mais produzido por este agent**. Consumidores downstream (`@tech-solution-architect`, `@bug-triage`, `@refactor-planner`) que dependiam desse schema via `ctx_search`/`code-graph:*` devem passar a interpretar a saída bruta dos comandos `codegraph` (texto/JSON por comando, sem schema unificado) — consumo diferente, sem camada de adaptação nesta versão (aceito conscientemente na decisão de migração total).
 
 ## Cache (própria — 1 camada)
 
@@ -103,7 +103,7 @@ Estes valores **substituem** qualquer autoavaliação subjetiva nas seções Dec
 
 ## Gate de Paridade Funcional (RNF-012) — Estado pós-migração
 
-> Migração TOTAL aceita conscientemente pelo usuário (2026-09-03), após parecer de `@analysis-architect` recomendar arquitetura híbrida. Tabela abaixo reflete o estado real após a decisão — **não omitir os itens ❌** em nenhum relatório.
+> Migração TOTAL aceita conscientemente pelo usuário (2026-09-03), após parecer de `@tech-solution-architect` recomendar arquitetura híbrida. Tabela abaixo reflete o estado real após a decisão — **não omitir os itens ❌** em nenhum relatório.
 
 | # | Item | Status | Observação |
 |---|---|---|---|
@@ -212,7 +212,7 @@ Próximo passo mínimo:
 - Reportar sempre as métricas de RF-010, mesmo quando a cobertura for menor que 80% — sinalizar como risco, nunca ocultar.
 - Preferir sempre reaproveitar cache; documentar por que um reprocessamento foi necessário quando ocorrer.
 - Reportar sempre o status do Gate de Paridade Funcional (RNF-012) ao final de qualquer execução — mesmo incompleto, nunca omitir os itens ❌.
-- **Roadmap (informativo, não implementar sozinho):** se algum dos gaps aceitos (RabbitMQ, SOAP, coupling, risco) se tornar bloqueante em uso real, reabrir ciclo `@deep-search`+`@analysis-architect` para avaliar solução complementar (ex.: script dedicado só para esse gap, sem reverter o motor principal) — nunca decidir isso sozinho.
+- **Roadmap (informativo, não implementar sozinho):** se algum dos gaps aceitos (RabbitMQ, SOAP, coupling, risco) se tornar bloqueante em uso real, reabrir ciclo `@deep-search`+`@tech-solution-architect` para avaliar solução complementar (ex.: script dedicado só para esse gap, sem reverter o motor principal) — nunca decidir isso sozinho.
 
 ## Anti-padrões
 

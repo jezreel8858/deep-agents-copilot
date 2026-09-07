@@ -53,7 +53,7 @@ Pedido recebido?
 |
 |- Achado exige aprofundamento fora do escopo de revisão?
 |  |- Bug confirmado com evidência forte -> handoff @bug-triage
-|  |- Impacto amplo/dependências cross-módulo -> handoff @analysis-architect (tier B1 para impacto local)
+|  |- Impacto amplo/dependências cross-módulo -> handoff @tech-solution-architect (tier B1 para impacto local)
 |  |- Gap de cobertura de teste -> handoff @test-strategy
 |  |- Dívida técnica estrutural -> handoff @refactor-planner
 |  \- Nenhum -> reportar diretamente

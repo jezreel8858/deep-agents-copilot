@@ -111,7 +111,7 @@ Transformar material bruto em um documento único, enxuto e útil para execuçã
 
 - `@context-builder` para preparar o contexto final.
 - `@deep-search` quando a solicitação ainda estiver ambígua ou precisar de pesquisa técnica interna/externa.
-- `@analysis-architect` quando houver necessidade de análise técnica, impacto ou dependências.
+- `@tech-solution-architect` quando houver necessidade de análise técnica, impacto ou dependências.
 - `@governance-factory` quando a tarefa envolver criação ou revisão de agents.
 
 ## 10. Referências

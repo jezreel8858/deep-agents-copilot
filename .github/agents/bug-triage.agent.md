@@ -227,7 +227,7 @@ C) PARCIALMENTE — Preciso de mais informações
 **Se NÃO** → `ask_questions` com opções:
 - A) Explorar outra hipótese
 - B) Coletar mais evidências específicas
-- C) Escalar para `@analysis-architect`
+- C) Escalar para `@tech-solution-architect`
 - D) Outra (descrever)
 
 **Se PARCIALMENTE** → `ask_questions` com opções:

@@ -3,7 +3,7 @@ description: >
   Grafo de roteamento declarado — fonte de verdade estrutural para o agent-router.
   Nós = agents disponíveis; arestas = condições de roteamento (keywords, sinais R-006, score threshold).
   A Decision Tree em agent-router.agent.md é documentação derivada deste arquivo.
-last_updated: "2026-09-02 (v6 — sincronizado com catalog.yaml pos-fusao/gaps: test-implementation+test-fix->test-engineer, docs-writer+docs-curator->docs-engineer, agent-factory+skill-factory->governance-factory; 3 nos/arestas novos: runtime-verifier, pr-gatekeeper, database-specialist; total 34 agents. v5 anterior preservado no historico do arquivo)"
+last_updated: "2026-09-06 (v7 — sincronizado: expurgo @analysis-architect, R-047 anti-dead-end, arestas context-builder e adapter-generator, protocolo de call stack parent_agent)"
 
 # ─────────────────────────────────────────────
 # NÓS — agents disponíveis no catálogo
@@ -228,7 +228,7 @@ arestas:
       sinal_r006: "É revisão preventiva de qualidade ANTES do merge (não bug já ocorrido)?"
       nao_confundir_com:
         - "bug em produção"        # → bug-triage (algo já quebrou)
-        - "impacto de mudar X"     # → analysis-architect (tier B1 local)
+        - "impacto de mudar X"     # → tech-solution-architect (tier B1 local)
 
   # Revisão especializada de segurança (OWASP/CVE/secrets)
   - de: agent-router

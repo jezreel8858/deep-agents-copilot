@@ -209,7 +209,7 @@ governance_artefacts:
       docs/test-strategy/TEST-STRATEGY-code-summarizer.md. Inclui 4 golden files
       sintéticos por stack (Java/Spring Boot, Angular/TS, Python, SQL) em
       .github/agents/evals/fixtures/code-summarizer/. Threshold de fallback (TODO-b)
-      fechado em 2026-08-31 por @analysis-architect (libs por stack: web-tree-sitter
+      fechado em 2026-08-31 por @tech-solution-architect (libs por stack: web-tree-sitter
       Java/TS, ast nativo Python, node-sql-parser SQL) — casos RNF-001 não são mais
       provisórios.
     version: "1.0"

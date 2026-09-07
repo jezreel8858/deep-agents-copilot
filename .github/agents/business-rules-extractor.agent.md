@@ -45,7 +45,7 @@ Opera em dois modos:
 | Skill de diagramas | [`../skills/mermaid-diagrams/SKILL.md`](../skills/mermaid-diagrams/SKILL.md) | Diagramas de estado para fluxos complexos |
 | Docs de saída | `docs/business-rules/*.md` | Destino de toda documentação gerada |
 | Agent de curadoria | [`docs-engineer.agent.md`](docs-engineer.agent.md) | Para revisão e curadoria pós-geração |
-| Agent de impacto | [`analysis-architect.agent.md`](analysis-architect.agent.md) | Quando violação de regra tem impacto amplo (tier B1 local ou cross-sistema) |
+| Agent de impacto | [`tech-solution-architect.agent.md`](tech-solution-architect.agent.md) | Quando violação de regra tem impacto amplo (tier B1 local ou cross-sistema) |
 | Agent de refatoração | [`refactor-planner.agent.md`](refactor-planner.agent.md) | Quando validação precede plano de refactor |
 
 ## Decision Tree
@@ -302,7 +302,7 @@ Próximo passo mínimo:
 
 | Situação | Agent |
 |---|---|
-| Violação com impacto em múltiplos módulos | `@analysis-architect` (tier B1) |
+| Violação com impacto em múltiplos módulos | `@tech-solution-architect` (tier B1) |
 | Violação detectada exige plano de refatoração segura | `@refactor-planner` |
 | Documento de regras gerado precisa de curadoria/revisão | `@docs-engineer` |
 | Violação implica bug em produção | `@bug-triage` |

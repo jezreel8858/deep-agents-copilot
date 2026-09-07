@@ -251,8 +251,9 @@ Apresentar a saída em duas partes claras:
 - Skill de Governança Git: [`.github/skills/git-governance/SKILL.md`](../skills/git-governance/SKILL.md)
 - Padrão Conventional Commits v1.0.0: https://www.conventionalcommits.org/
 - Regra de Formatação 50/72 (Chris Beams): https://cbea.ms/git-commit/
+- SSOT Normativa: este prompt define o template e regras canônicas de commit também consumidos por `@pr-gatekeeper` ([`.github/agents/pr-gatekeeper.agent.md`](../agents/pr-gatekeeper.agent.md)) no fechamento de PRs.
 
 ---
 
-*v1.2 — commit prompt — 2026-09-04 (alinhamento integral com global-git-commit-instructions.md)*
+*v1.3 — commit prompt — 2026-09-07 (SSOT consolidada com @pr-gatekeeper e alinhamento com global-git-commit-instructions.md)*
 

@@ -30,7 +30,7 @@
 | Agent | `adapter-generator` | ⚡ ***(NEW)*** Gerar automaticamente adapters em `.github/instructions/` via `/add-project-context` |
 | Agent | `business-rules-extractor` | 📋 ***(NEW)*** Extrair regras de negócio de código e documentar em `.md`; validar refatorações contra regras documentadas |
 | Agent | `runtime-verifier` | 🩺 ***(NEW)*** Verifica saúde do ambiente (build limpo, dependências, serviços dependentes) antes de disparar testes/codificadores; read-only, nunca corrige |
-| Agent | `pr-gatekeeper` | 📦 ***(NEW)*** Prepara PR pós-aprovação do quality gate — diff, commit semântico, matriz de risco, `CHANGELOG.md`; nunca executa `git commit`/`push` |
+| Agent | `pr-gatekeeper` | 📦 ***(NEW)*** Prepara PR pós-aprovação do quality gate (v1.1.0) — diff, commit semântico SSOT (`/commit` Formato A/B + guardrail), matriz de risco, `CHANGELOG.md`; nunca executa `git commit`/`push` |
 | Agent | `database-specialist` | 🗄️ ***(NEW)*** Migrações de schema (Flyway/Liquibase/Alembic), otimização de query e integridade referencial; rollback sempre documentado |
 | Agent | `angular-router` | 🅰️ **Frontend Angular Router** (`frontend/angular/`) — supervisor hierárquico do ecossistema Angular; orquestra e despacha para os 8 especialistas de frontend mapeados em `.github/agents/frontend/angular/angular-catalog.yaml` (`arch-advisor`, `feature-developer`, `bug-fixer`, `ui-stylist`, `unit-test-writer`, `component-test-writer`, `test-fixer`, `e2e-writer`) |
 | Agent | `spring-boot-router` | ☕ **Backend Spring Boot Router** (`backend/spring-boot/`) — supervisor hierárquico do ecossistema Spring Boot; orquestra e despacha para os 7 especialistas backend mapeados em `.github/agents/backend/spring-boot/spring-boot-catalog.yaml` (`arch-advisor`, `feature-developer`, `bug-fixer`, `perf-tuner`, `unit-test-writer`, `integration-test-writer`, `test-fixer`) |
@@ -38,7 +38,7 @@
 | Agent | `ejb-router` | 🏛️ **Backend Java Legado EJB Router** (`backend/ejb/`) — supervisor hierárquico do ecossistema Java Legado EJB; orquestra e despacha para os 7 especialistas backend mapeados em `.github/agents/backend/ejb/ejb-catalog.yaml` (`arch-advisor`, `feature-developer`, `bug-fixer`, `perf-tuner`, `unit-test-writer`, `integration-test-writer`, `test-fixer`) |
 | Agent | `database-router` | 🗄️ **Backend Database Router** (`backend/database/`) — supervisor hierárquico do ecossistema de Banco de Dados; orquestra e despacha para os 6 especialistas Oracle e Informix mapeados em `.github/agents/backend/database/database-catalog.yaml` (`oracle-migration-dev`, `oracle-plsql-expert`, `oracle-query-tuner`, `informix-migration-dev`, `informix-spl-expert`, `informix-query-tuner`) |
 | Agent | `docs-engineer` | 📝 ***(FUSÃO)*** Autoria e curadoria de documentação técnica em `.md` — modos `author`/`curate`; substitui docs-writer + docs-curator, que já delegavam entre si a mesma decisão |
-| Agent | `code-review` | 🔎 Revisa código (diff/PR) antes do merge por correção, segurança, convenções, impacto, testes e performance; classifica achados por severidade; read-only; delega para `bug-triage`/`analysis-architect`/`test-strategy`/`refactor-planner` |
+| Agent | `code-review` | 🔎 Revisa código (diff/PR) antes do merge por correção, segurança, convenções, impacto, testes e performance; classifica achados por severidade; read-only; delega para `bug-triage`/`tech-solution-architect`/`test-strategy`/`refactor-planner` |
 | Agent | `requirements-analyst` | 🧾 ***(NEW)*** Elicita e estrutura requisitos funcionais/não-funcionais a partir de pedido de negócio ambíguo (EARS, INVEST, Gherkin, FURPS+); detecta *solution-jumping* via Five Whys; prospectivo (não confundir com `business-rules-extractor`, que é reverso) |
 | Agent | `code-summarizer` | 🗜️ ***(NEW)*** Ponto de entrada único para sumarização de código-fonte agnóstica a linguagem (RF-008); modelo híbrido — heurística/AST determinística primeiro, LLM leve como fallback; nunca substituído por chamada direta a lib de parsing |
 | Agent | `code-knowledge-graph` | 🕸️ Ponto de entrada único para construção/consulta do grafo de conhecimento de código-fonte cross-projeto. Motor único baseado na lib externa **`@optave/codegraph`** (CLI local e MCP Server enxuto, Node.js/TypeScript nativo, Tree-sitter/Rust, zero API keys/LLM). Suporta dataflow/CFG interprocedural, dead-code, complexity metrics, co-change analysis, detecção de ciclos e visualização interativa via `codegraph plot`. Skill de uso: `codegraph-optave-usage` |
@@ -90,7 +90,7 @@
 | 🐛 Investigação de causa raiz a partir de stack trace/log | `debugger` |
 | 🎨 Verificação de aderência a convenções de estilo documentadas | `code-style-enforcer` |
 | 🩺 Verificação de saúde do ambiente (build/deps/serviços) antes de testes/codificadores | `runtime-verifier` |
-| 📦 Preparação de PR pós-aprovação (diff, commit semântico, matriz de risco, changelog) | `pr-gatekeeper` |
+| 📦 Preparação de PR pós-aprovação (diff, commit semântico SSOT, matriz de risco, changelog) | `pr-gatekeeper` |
 | 🗄️ Migrações de schema, otimização de query e integridade referencial | `database-specialist` |
 
 ## 4) Pre-fetch Recomendado

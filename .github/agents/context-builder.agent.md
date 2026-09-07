@@ -34,7 +34,7 @@ Você é especialista em engenharia de contexto e preparação de prompts. Seu t
 | Índice de instructions | [`../instructions/README.md`](../instructions/README.md) | Adapters de convenções por projeto/stack |
 | Template operacional | [`templates/operational-agent.md`](templates/operational-agent.md) | Estrutura oficial de agents operacionais |
 | Agent de pesquisa | [`deep-search.agent.md`](deep-search.agent.md) | Pesquisa interna e externa sob demanda |
-| Agent analítico | [`analysis-architect.agent.md`](analysis-architect.agent.md) | Análise técnica e de impacto |
+| Agent analítico | [`tech-solution-architect.agent.md`](tech-solution-architect.agent.md) | Análise técnica e de impacto |
 | Agent de autoria | [`governance-factory.agent.md`](governance-factory.agent.md) | Criação e revisão de agents customizados |
 | Skill de compactação | [`../skills/context-compact/SKILL.md`](../skills/context-compact/SKILL.md) | Compactar contexto pós-leitura em resumo executável |
 
@@ -49,7 +49,7 @@ Pedido recebido?
 |  |- Sim -> delegar para @deep-search
 |  \- Não
 |- É análise técnica, impacto, risco ou dependência?
-|  |- Sim -> delegar para @analysis-architect
+|  |- Sim -> delegar para @tech-solution-architect
 |  \- Não
 |- É ajuste de agent customizado?
 |  |- Sim -> delegar para @governance-factory
@@ -144,7 +144,7 @@ Documento gerado:
 ## Quando Delegar
 
 - [`@deep-search`](deep-search.agent.md) quando a demanda for pesquisa técnica interna ou externa.
-- [`@analysis-architect`](analysis-architect.agent.md) quando a demanda exigir análise técnica, impacto ou dependência.
+- [`@tech-solution-architect`](tech-solution-architect.agent.md) quando a demanda exigir análise técnica, impacto ou dependência.
 - [`@governance-factory`](governance-factory.agent.md) quando a demanda for criar ou revisar agents customizados.
 
 ## Retorno ao Router (R-042 — Anti Sticky-Session)
@@ -153,7 +153,7 @@ Documento gerado:
 
 Se a solicitação pivotar de "consolidar contexto" para "executar/implementar usando o contexto coletado", retornar para `@agent-router` com handoff (`handoff-governance/SKILL.md` § 2.1, `motivo: "deriva_de_intencao"`).
 
-**Gatilho de deriva:** pedido de execução/implementação com o contexto consolidado; pivô para análise técnica profunda (→ `@analysis-architect`).
+**Gatilho de deriva:** pedido de execução/implementação com o contexto consolidado; pivô para análise técnica profunda (→ `@tech-solution-architect`).
 
 ## Combina Com (Commands)
 

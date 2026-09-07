@@ -37,7 +37,7 @@ source_docs:
 
 Estratégias consolidadas para navegar um codebase a partir de um sintoma — localizando a classe, método, API ou serviço responsável pela falha — com o menor consumo de contexto possível.
 
-> **Aplica-se a**: `bug-triage`, `test-engineer`, `analysis-architect`, `refactor-planner` e qualquer agent ou prompt que precise localizar código a partir de um comportamento observado.
+> **Aplica-se a**: `bug-triage`, `test-engineer`, `tech-solution-architect`, `refactor-planner` e qualquer agent ou prompt que precise localizar código a partir de um comportamento observado.
 
 ---
 

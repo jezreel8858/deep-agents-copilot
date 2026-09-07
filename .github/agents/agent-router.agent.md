@@ -110,6 +110,11 @@ Você é o roteador obrigatório do fluxo agent-first no GitHub Copilot. Seu tra
 |  \- Sim -> checar se a nova mensagem sai do Não-Escopo do agent ativo
 |            (mudança de verbo de ação | stack fora de competência |
 |             pedido de execução/código em agent read-only/advisory)
+|            *Exceção de ação in-scope*: mudança de verbo de ação NÃO constitui deriva
+|            se a ação solicitada já constar expressamente na seção "Quando Delegar" do
+|            agent atualmente ativo (ex.: @tech-solution-architect já delega pesquisa
+|            ao @deep-search). Nesse caso, NÃO re-rotear; devolver o controle ao agent ativo
+|            (que despacha via run_subagent com origem_contexto.parent_agent).
 |            ├─ Deriva detectada -> tratar como handoff recebido
 |            |   (motivo: "deriva_de_intencao") -> continuar para PASSO 0.5
 |            \- Sem deriva -> NÃO re-rotear; devolver ao agent ativo
@@ -196,8 +201,17 @@ Pedido recebido (já refinado por @prompt-structuring)?
 |- É autoria ou curadoria de documentação técnica (.md) de projeto ou governança?
 |  |- Sim -> @docs-engineer
 |  \- Não
+|- É auditoria semântica/estrutural do próprio catálogo de governança, detecção de gaps/smells entre agents, skills e grafo de roteamento?
+|  |- Sim -> @agent-auditor
+|  \- Não
 |- É manutenção atômica, refatoração estrutural, renomeação ou sincronização em lote de artefatos de governança existentes?
 |  |- Sim -> @governance-maintainer
+|  \- Não
+|- É consolidação pontual e recorte de contexto técnico para execução posterior (docs/context/)?
+|  |- Sim -> @context-builder
+|  \- Não
+|- É geração automática de arquivos adapter (.instructions.md) via scanner de convenções de projeto?
+|  |- Sim -> @adapter-generator
 |  \- Não
 |- É criação, padronização ou revisão de agents (.agent.md), skills (SKILL.md) ou prompts (.prompt.md)?
 |  |- Sim -> @governance-factory
@@ -332,7 +346,10 @@ Próximo passo mínimo:
 - [@pr-gatekeeper](pr-gatekeeper.agent.md) para preparação de PR pós-aprovação do quality gate (diff, mensagem de commit semântico, matriz de risco e CHANGELOG.md).
 - [@docs-engineer](docs-engineer.agent.md) para autoria de documentação técnica nova e curadoria/padronização de documentação existente exclusivamente em `.md`.
 - [@governance-factory](governance-factory.agent.md) para criação, padronização e revisão de agents (`.agent.md`), skills (`SKILL.md`), prompts (`.prompt.md`) ou novas stacks de domínio.
+- [@agent-auditor](agent-auditor.agent.md) para auditoria semântica/estrutural do catálogo de governança, detecção de gaps, smells e conformidade entre agents, skills e grafo (read-only).
 - [@governance-maintainer](governance-maintainer.agent.md) para manutenção atômica, refatoração em cascata, renomeações em lote e sincronização de catálogos e referências de governança.
+- [@context-builder](context-builder.agent.md) para preparação e consolidação pontual de contexto técnico em docs/context/ (read-only) — não confundir com @agentic-memory-manager.
+- [@adapter-generator](adapter-generator.agent.md) para geração automática de adapters (.instructions.md) via scanner de convenções de projetos adicionados.
 - [@agentic-memory-manager](agentic-memory-manager.agent.md) para persistência/recuperação de memória entre sessões — não confundir com `@context-builder` (consolidação pontual, read-only).
 - [@tech-solution-architect](tech-solution-architect.agent.md) para elaboração de Technical Blueprint, contratos de API, divisão por stack, impacto técnico local (tier B1) e análise cross-sistema.
 - [@deep-search](deep-search.agent.md) como fallback para pesquisa interna/externa.

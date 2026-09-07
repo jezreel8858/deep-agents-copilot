@@ -537,6 +537,23 @@ canonicos:
     critico: true
     threshold: 0.90
 
+  - id: "canon-039"
+    descricao: "Auditoria semântica e estrutural do catálogo de governança roteada para agent-auditor"
+    input:
+      solicitacao: "Auditar a governança do repositório procurando smells, referências quebradas e gaps no grafo de roteamento"
+    expected:
+      agent_route: "agent-auditor"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.90
+      output_contains:
+        - "Agente Ativo: agent-auditor"
+    nao_confundir_com:
+      - "manutenção/sincronização em lote"  # → governance-maintainer
+      - "criar novo agent do zero"           # → governance-factory
+    critico: true
+    threshold: 0.90
+
 # ─────────────────────────────────────────────
 # SUITE 2 — Casos Ambíguos (threshold ≥ 0.70)
 # Intenção ambígua que exige clarificação ou roteamento defensivo.

@@ -87,7 +87,7 @@ Quando o stakeholder propõe a **solução técnica** direto ("usar Kafka", "cri
 
 1. Perguntar "por que essa solução resolve o problema?" repetidamente (máx. 5 vezes) até isolar a necessidade real.
 2. Documentar a necessidade (requisito) separadamente da solução proposta (candidata de design).
-3. Handoff da necessidade para `analysis-architect` decidir a solução técnica — nunca aceitar a tecnologia como requisito funcional.
+3. Handoff da necessidade para `tech-solution-architect` decidir a solução técnica — nunca aceitar a tecnologia como requisito funcional.
 
 Fonte de mercado: sistemas de mediação de arquitetura para LLM assistants demonstraram 100% de detecção de "solution-jumping" aplicando este fluxo antes de comprometer com tecnologia.
 

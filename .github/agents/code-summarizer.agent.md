@@ -24,7 +24,7 @@ Ser o **único ponto de entrada** para sumarização de código-fonte no reposit
 - ✅ SEMPRE tentar granularidade de arquivo inteiro no MVP (RF-003); granularidade fina (função/classe) é Should, fase 2.
 - ✅ SEMPRE preservar assinatura pública + regras de negócio identificáveis no sumário (RF-004) — ver critérios objetivos abaixo.
 
-> **Threshold de fallback (FECHADO — decisão técnica de `@analysis-architect`, 2026-08-31):** acionar o Modo 2 (LLM) quando **qualquer uma** das condições ocorrer: **(i)** menos de 100% dos símbolos exportados/públicos tiveram assinatura extraída pelo parser determinístico; **(ii)** menos de 80% dos blocos de decisão identificados pela AST/heurística foram mencionados no sumário (mesmo par de números de "Critérios Objetivos e Mensuráveis" — não existe threshold intermediário separado); **(iii)** o parser lançar erro de sintaxe, ou a extensão do arquivo não corresponder a nenhum parser registrado (stack não suportada). Definição operacional de "bloco de decisão" por stack — ver "Libs de Parsing por Stack (Modo 1)" abaixo.
+> **Threshold de fallback (FECHADO — decisão técnica de `@tech-solution-architect`, 2026-08-31):** acionar o Modo 2 (LLM) quando **qualquer uma** das condições ocorrer: **(i)** menos de 100% dos símbolos exportados/públicos tiveram assinatura extraída pelo parser determinístico; **(ii)** menos de 80% dos blocos de decisão identificados pela AST/heurística foram mencionados no sumário (mesmo par de números de "Critérios Objetivos e Mensuráveis" — não existe threshold intermediário separado); **(iii)** o parser lançar erro de sintaxe, ou a extensão do arquivo não corresponder a nenhum parser registrado (stack não suportada). Definição operacional de "bloco de decisão" por stack — ver "Libs de Parsing por Stack (Modo 1)" abaixo.
 
 ## Critérios Objetivos e Mensuráveis
 
@@ -160,7 +160,7 @@ Próximo passo mínimo:
 
 Se a solicitação pivotar de "sumarizar código-fonte" para implementar/corrigir/refatorar o código sumarizado, retornar para `@agent-router` com handoff (`handoff-governance/SKILL.md` § 2.1, `motivo: "deriva_de_intencao"`).
 
-**Gatilho de deriva:** pedido de correção/refatoração do código sumarizado (→ `@bug-triage`/`@refactor-planner`/stack specialist); pedido de expor a lib de parsing diretamente a outro agent (bloquear, é violação de RF-008/RNF-007); pedido de recalibrar o threshold já fechado ou a lib de uma stack (→ `@analysis-architect`, decisão técnica, não deste agent sozinho).
+**Gatilho de deriva:** pedido de correção/refatoração do código sumarizado (→ `@bug-triage`/`@refactor-planner`/stack specialist); pedido de expor a lib de parsing diretamente a outro agent (bloquear, é violação de RF-008/RNF-007); pedido de recalibrar o threshold já fechado ou a lib de uma stack (→ `@tech-solution-architect`, decisão técnica, não deste agent sozinho).
 
 ## Combina Com (Commands)
 

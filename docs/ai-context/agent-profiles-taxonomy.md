@@ -14,7 +14,7 @@
 
 | # | Item Original | Correção |
 |---|---|---|
-| 1 | "Integration Contract Analysis" listado como gap **P2** | ❌ **ERRO REMOVIDO** — a skill `integration-contract-analysis` já existia e já era consumida por `analysis-architect` (ver `catalog.yaml`). Não era gap real. |
+| 1 | "Integration Contract Analysis" listado como gap **P2** | ❌ **ERRO REMOVIDO** — a skill `integration-contract-analysis` já existia e já era consumida por `tech-solution-architect` (ver `catalog.yaml`). Não era gap real. |
 | 2 | Security/Performance descritos como **"MISSING" (0% cobertura)** | ⚠️ **IMPRECISO, CORRIGIDO** — `code-review-patterns` já cobria segurança/performance como *dimensões genéricas* de revisão. O gap real era ausência de **agent especialista dedicado** com profundidade OWASP/CVE/CWV, não zero cobertura. |
 | 3 | `agent-safety-guardrails` não foi checado como possível cobertura de Compliance | ✅ **CONFIRMADO GAP REAL** — essa skill cobre segurança do **próprio agent de IA** (prompt injection, blast radius), escopo diferente de compliance/audit da **aplicação sendo desenvolvida**. |
 
@@ -27,7 +27,7 @@
 | Compliance Guardrails | 🔴 P1 | ✅ **RESOLVIDO** | `compliance-guardrails.agent.md` | `compliance-governance-patterns/SKILL.md` |
 | Feature Planner (genérico) | 🟡 P2 | ✅ **RESOLVIDO** | `feature-planner.agent.md` | `task-decomposition-patterns/SKILL.md` |
 | Agentic Memory (write) | 🟡 P2 | ✅ **RESOLVIDO** | `agentic-memory-manager.agent.md` | Reaproveitou `agent-memory-policy` existente (R-003) |
-| ~~Integration Contract Analysis~~ | ~~🟡 P2~~ | ❌ **NÃO ERA GAP** | — já coberto por `analysis-architect` | já existia `integration-contract-analysis` |
+| ~~Integration Contract Analysis~~ | ~~🟡 P2~~ | ❌ **NÃO ERA GAP** | — já coberto por `tech-solution-architect` | já existia `integration-contract-analysis` |
 | DevOps Engineer | 🟠 P3 | ✅ **RESOLVIDO** | `devops-engineer.agent.md` | `devops-agent-patterns/SKILL.md` |
 | Debugger (genérico) | 🟠 P3 | ✅ **RESOLVIDO** | `debugger.agent.md` | Reaproveitou `code-tracing` existente (R-003) |
 | Code Style Enforcer | 🟠 P3 | ✅ **RESOLVIDO** | `code-style-enforcer.agent.md` | Reaproveitou `code-review-patterns` existente |
@@ -428,7 +428,7 @@ Total: **26 agents** identificados
 | 2 | `prompt-structuring` | Governança | Refinement | ✅ Auxiliar |
 | 3 | `requirements-analyst` | Planning | Analyst | ✅ Entrada |
 | 4 | `deep-search` | Planning | Researcher | ✅ Pesquisa |
-| 5 | `analysis-architect` | Architecture | Architect | ✅ Design |
+| 5 | `tech-solution-architect` | Architecture | Architect | ✅ Design |
 | 6 | `code-knowledge-graph` | Architecture | Graph Builder | ✅ Mapeamento |
 | 7 | `business-rules-extractor` | Architecture | Rules Extractor | ✅ Documentação |
 | 8 | `refactor-planner` | Architecture | Planner | ✅ Estratégia |
@@ -473,7 +473,7 @@ Total: **26 agents** identificados
 | Perfil do Mercado | Projeto | Status |
 |------------------|---------|--------|
 | ✅ Planner / Decomposer | `refactor-planner` | **Cobertura Parcial** (refactor-focused, não genérico) |
-| ✅ Architect | `analysis-architect` | **Completo** |
+| ✅ Architect | `tech-solution-architect` | **Completo** |
 | ✅ Coder | `spring-boot`, `spring-reactive`, `angular` | **Completo** (3 stacks) |
 | ✅ Reviewer | `code-review` | **Completo** |
 | ✅ Debugger / Tester | `test-strategy`, `test-implementation`, `test-fix` | **Completo** |
@@ -487,7 +487,7 @@ Total: **26 agents** identificados
 | ✅ Guardrails / Compliance | ❌ **FALTA** | **GAP** |
 | ✅ Business Rules Extractor | `business-rules-extractor` | **Completo** |
 | ✅ Code Knowledge Graph | `code-knowledge-graph` | **Completo** |
-| ✅ Impact Architect | `analysis-architect` | **Cobertura Parcial** (análise genérica) |
+| ✅ Impact Architect | `tech-solution-architect` | **Cobertura Parcial** (análise genérica) |
 | ✅ Refactor Planner | `refactor-planner` | **Completo** |
 | ✅ Test Strategy | `test-strategy` | **Completo** |
 | ✅ Bug Triage | `bug-triage` | **Completo** |
@@ -557,11 +557,11 @@ Total: **26 agents** identificados
 
 | Aspecto | Detalhe |
 |---------|---------|
-| **Status Atual** | Existe `analysis-architect` mas é genérico. Falta especialização em **integration contracts** (OpenAPI, AsyncAPI, gRPC, GraphQL) |
+| **Status Atual** | Existe `tech-solution-architect` mas é genérico. Falta especialização em **integration contracts** (OpenAPI, AsyncAPI, gRPC, GraphQL) |
 | **Impacto** | BREAKING change detection não validado automaticamente contra consumidores |
 | **Referência de Mercado** | Microsoft (B1/B2/B3 methodology), integration contract analysis patterns |
 | **Necessário Para** | API versioning strategy, multi-consumer impact assessment, compatibility validation |
-| **Recomendação** | Estender `analysis-architect` com `integration-contract-analysis` skill ou novo agent especializado |
+| **Recomendação** | Estender `tech-solution-architect` com `integration-contract-analysis` skill ou novo agent especializado |
 
 #### 7. **Debugger / Auto-Fixer — PARTIAL**
 
@@ -694,7 +694,7 @@ Cobre:
   - AsyncAPI compatibility validation
   - gRPC method changes
   - GraphQL schema evolution
-Integração: Usada por analysis-architect e code-review
+Integração: Usada por tech-solution-architect e code-review
 ```
 
 #### **Ação 6: Criar Agentic Memory Agent**

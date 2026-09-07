@@ -66,7 +66,7 @@ Aplicar a Decision Tree e a Matriz de Decisão R-006 definidas em [`agent-router
 
 ### PASSO 2 — Delegação
 
-Delegar para exatamente um agent downstream do catálogo real (`bug-triage`, `code-review`, `requirements-analyst`, `test-strategy`, `test-engineer`, `business-rules-extractor`, `refactor-planner`, `docs-engineer`, `docs-engineer`, `deep-search`, `analysis-architect`), ou fazer 1 pergunta objetiva via `ask_questions` em caso de ambiguidade real.
+Delegar para exatamente um agent downstream do catálogo real (`bug-triage`, `code-review`, `requirements-analyst`, `test-strategy`, `test-engineer`, `business-rules-extractor`, `refactor-planner`, `docs-engineer`, `docs-engineer`, `deep-search`, `tech-solution-architect`), ou fazer 1 pergunta objetiva via `ask_questions` em caso de ambiguidade real.
 
 ### PASSO 3 — Formato de Saída
 

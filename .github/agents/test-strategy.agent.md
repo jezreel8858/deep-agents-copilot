@@ -46,7 +46,7 @@ Pedido recebido?
 |  |- Sim -> pedir clarificação objetiva
 |  \- Não
 \- Exige análise de impacto de integração?
-   |- Sim -> delegar para @analysis-architect (tier B1 para impacto local)
+   |- Sim -> delegar para @tech-solution-architect (tier B1 para impacto local)
    \- Não -> finalizar estratégia e prioridade
 ```
 

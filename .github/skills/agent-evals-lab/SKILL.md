@@ -122,7 +122,7 @@ casos_canonicos = [
   },
   {
     "input": "Analise o impacto de mudar a assinatura de processarPagamento()",
-    "agent_esperado": "analysis-architect",
+    "agent_esperado": "tech-solution-architect",
     "threshold": 0.90
   },
   {

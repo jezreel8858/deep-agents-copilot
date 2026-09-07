@@ -159,6 +159,6 @@ O retorno **DEVE** ser executado via tool `run_subagent` com `agentName: "agent-
 ## 🔗 Combina Com
 
 - **Upstream**: `@agent-router`, `@deep-search`, `@tech-solution-architect`.
-- **Downstream**: `@refactor-planner`, `@analysis-architect`, `@agent-router`.
+- **Downstream**: `@refactor-planner`, `@tech-solution-architect`, `@agent-router`.
 - **Commands**: `/plan`, `/deep-search`.
 

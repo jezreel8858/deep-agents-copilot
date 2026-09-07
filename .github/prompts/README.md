@@ -53,7 +53,7 @@ Prompts operacionais para workflow de execução no chat.
 |---------|---------|-----------|-----------|
 | `/add-project-context` | `.github/prompts/add-project-context.prompt.md` | Auto-carregar contexto estruturado de um projeto (intent + RRF) com descoberta de stack e criação de artefatos | **N×** (1/projeto) |
 | `/del-project-context` | `.github/prompts/del-project-context.prompt.md` | Remover contexto de um projeto do binding e cache (operação destrutiva, com confirmação) | **Conforme necessário** |
-| `/connect-integration-graphs` | `.github/prompts/connect-integration-graphs.prompt.md` | ⭐ **(NEW)** Audita e conecta integrações cross-repo entre projetos já registrados — levanta contratos/endpoints (`@analysis-architect`), confirma no grafo existente restrito ao fluxo de integração (`@code-knowledge-graph`) e aplica as fronteiras (`manifesto.boundaries`) que faltam em `.codegraphrc.json` até fechar todo gap. | **Conforme necessário** |
+| `/connect-integration-graphs` | `.github/prompts/connect-integration-graphs.prompt.md` | ⭐ **(NEW)** Audita e conecta integrações cross-repo entre projetos já registrados — levanta contratos/endpoints (`@tech-solution-architect`), confirma no grafo existente restrito ao fluxo de integração (`@code-knowledge-graph`) e aplica as fronteiras (`manifesto.boundaries`) que faltam em `.codegraphrc.json` até fechar todo gap. | **Conforme necessário** |
 | `/visualize-graph` | `.github/prompts/visualize-graph.prompt.md` | ⭐ **(NEW)** Compila e abre o visualizador web interativo do grafo de conhecimento multi-repo (Material 3, 2D/3D, multi-select, filtros de isolados/papéis/camadas e pontes REST). | **Conforme necessário** |
 
 ---

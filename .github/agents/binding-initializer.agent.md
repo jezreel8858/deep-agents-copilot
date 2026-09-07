@@ -308,7 +308,7 @@ Projetos, stacks e adapters serão configurados depois via /add-project-context.
    - Agent **não regenera automaticamente**: `catalog.yaml` real tende a divergir do
      esqueleto inicial (adapters adicionados, `governance_artefacts`, customizações) —
      sobrescrever destruiria conteúdo evoluído organicamente.
-   - Agent informa o que já existe e orienta edição manual pontual, ou aciona `docs-curator`
+   - Agent informa o que já existe e orienta edição manual pontual, ou aciona `docs-engineer`
      para curadoria assistida (nunca regeneração cega a partir do esqueleto).
 
 ## Combina Com

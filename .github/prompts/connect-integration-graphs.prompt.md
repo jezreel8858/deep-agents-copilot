@@ -65,7 +65,7 @@ source_docs:
 - ❌ NÃO editar `.codegraphrc.json` de nenhum projeto sem confirmação explícita via `ask_questions` (R-009) — é mudança estrutural em projeto(s) externo(s).
 - ❌ NÃO afirmar que uma integração existe sem evidência dupla: (a) declarada no levantamento de contrato (FASE 1) **e** (b) confirmada pela aresta real no grafo (FASE 2) — divergência é gap de evidência, não integração fechada.
 - ✅ APENAS consultar contratos/endpoints/grafo existentes e propor/aplicar as fronteiras que fecham gaps reais.
-- ✅ SEMPRE delegar levantamento de contrato/integração a `@analysis-architect` e consulta/validação de grafo a `@code-knowledge-graph` via `run_subagent` — nunca duplicar a lógica desses agents aqui (R-003).
+- ✅ SEMPRE delegar levantamento de contrato/integração a `@tech-solution-architect` e consulta/validação de grafo a `@code-knowledge-graph` via `run_subagent` — nunca duplicar a lógica desses agents aqui (R-003).
 
 ---
 
@@ -179,7 +179,7 @@ Resultado final: <N> gaps fechados / <N> gaps remanescentes (com próximo passo 
 ## ✅ Checklist Antes de Apresentar
 
 - [ ] Todos os projetos registrados (merge `catalog.yaml` + `catalog.local.yaml`) foram considerados no levantamento — ou apenas o subconjunto explicitamente informado no argumento.
-- [ ] Levantamento de integração delegado a `@analysis-architect` com evidência (arquivo:linha) por conclusão.
+- [ ] Levantamento de integração delegado a `@tech-solution-architect` com evidência (arquivo:linha) por conclusão.
 - [ ] Varredura de grafo restrita apenas aos arquivos/símbolos do fluxo de integração (nunca full-scan) e delegada a `@code-knowledge-graph`.
 - [ ] Cache `code-graph:*` reaproveitado quando válido (sem reconstrução redundante — RNF-002).
 - [ ] Gaps de fronteira (`manifesto.boundaries`) apresentados via `ask_questions` antes de qualquer escrita em `.codegraphrc.json`.
@@ -206,14 +206,14 @@ Resultado final: <N> gaps fechados / <N> gaps remanescentes (com próximo passo 
 ```
 
 - `/add-project-context` → pré-requisito: os projetos precisam estar registrados em `catalog.local.yaml` antes desta varredura; a FASE 4.1 daquele prompt já cobre a pergunta de integração no momento do registro de **um** projeto novo — este prompt audita/fecha o que ficou pendente para **todo** o conjunto já registrado.
-- `@analysis-architect` → consumido via `run_subagent` para o levantamento de contratos/integrações (FASE 1).
+- `@tech-solution-architect` → consumido via `run_subagent` para o levantamento de contratos/integrações (FASE 1).
 - `@code-knowledge-graph` → consumido via `run_subagent` para consulta e validação restrita do grafo já existente (FASE 2/3).
 - `/validate` → depois de fechar as pontes, validar a conformidade estrutural do ecossistema como um todo.
 
 ---
 
 > **Notas de manutenção**: este prompt não introduz lógica nova de análise de contrato nem de
-> motor de grafo — apenas orquestra `@analysis-architect` e `@code-knowledge-graph`, já
+> motor de grafo — apenas orquestra `@tech-solution-architect` e `@code-knowledge-graph`, já
 > especializados nesses dois domínios, evitando duplicação (R-003). Projetos sem `path_externo`
 > acessível no momento da execução são reportados como gap remanescente, nunca ignorados
 > silenciosamente.

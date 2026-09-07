@@ -36,8 +36,8 @@ Em fluxos multi-agent com handoff (R-042 — Anti Sticky-Session), o usuário pe
 **Toda resposta de TODO agent — sem exceção, inclusive downstream em `task_mode` — abre com a linha `Agente Ativo: <name-do-agent>` antes de qualquer outro conteúdo.** Isso vale mesmo quando não há handoff neste turno (o agent apenas continua respondendo). Se a resposta é resultado de um handoff/re-triagem recebido neste turno, uma segunda linha declara a transição: `Handoff: <agent-origem> → <agent-atual> (motivo: <motivo>)` — equivalente direto ao `HandoffOutputItem` do OpenAI Agents SDK.
 
 ```markdown
-Agente Ativo: test-implementation
-Handoff: test-strategy → test-implementation (motivo: estratégia mapeada — pronto para implementar)
+Agente Ativo: test-engineer
+Handoff: test-strategy → test-engineer (motivo: estratégia mapeada — pronto para implementar)
 
 [... restante da resposta no formato de saída do perfil do agent ...]
 ```
@@ -271,7 +271,7 @@ Já normatizado por R-016/R-020 e pelas seções 1-4 desta skill: confiança dec
 
 **Regra de ouro:** a Camada 1 nunca muda entre perfis. A Camada 2 pode e deve variar — forçar um router no template rico de 5 seções (ou um analista no bloco compacto de decisão) é *format mismatch* contra a pesquisa acima.
 
-### Checklist ao Criar/Revisar Agent (agent-factory / skill-factory)
+### Checklist ao Criar/Revisar Agent (governance-factory)
 
 - [ ] Perfil identificado: Router | Analista | Especialista-Recomendação | Operacional.
 - [ ] Camada 1 (universal) presente no "Formato de Saída" do agent.

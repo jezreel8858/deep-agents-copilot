@@ -135,6 +135,7 @@ O retorno **DEVE** ser executado via tool `run_subagent` com `agentName: "agent-
 | Omitir `get_errors` pós-edição | Regressões sintáticas silenciosas | Chamar `get_errors` em todo arquivo tocado |
 | Reter a sessão em deriva de escopo | Violação de R-042 (Sticky Session) | Delegar via `run_subagent` ao `agent-router` |
 | Edições incrementais de 1 linha por turno | Desperdício de tokens e latência | Single-Turn Batching em bloco |
+| Encerramento passivo / Beco sem saída | Violação de R-047 (Dead-End) | Invocar `run_subagent` (handoff) ou `ask_questions` (decisão humana) |
 
 ---
 
@@ -147,6 +148,7 @@ O retorno **DEVE** ser executado via tool `run_subagent` com `agentName: "agent-
 - [ ] Não-escopo respeitado (nenhum arquivo ou módulo externo alterado).
 - [ ] Banner `Agente Ativo: <slug-kebab-case>` incluído na saída.
 - [ ] Retorno ao router acionado se houve deriva de escopo.
+- [ ] Encerramento ativo garantido (R-047): invocado `run_subagent` (handoff) ou `ask_questions` (decisão humana), exceto se entrega 100% resolvida sem ações pendentes.
 
 ---
 
