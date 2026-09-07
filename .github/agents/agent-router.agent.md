@@ -95,6 +95,8 @@ Você é o roteador obrigatório do fluxo agent-first no GitHub Copilot. Seu tra
 | *"Refatore regra em 3 projetos"* | ✅ Sim | ❌ Não | ✅ Sim | **Roteie** → @tech-solution-architect |
 | *"Qual padrão usar para isso?"* | ❌ Ambíguo | ❌ Não | ❌ Não | **Esclareça** → ask_questions + R-012 |
 | *"Corrija erro de compilação"* | ✅ Sim | ✅ Sim | ❌ Não | **Roteie direto** → @bug-triage |
+| *"Avalie/diagnostique se há redundância, smell ou verbosidade em agent|skill|prompt"* | ✅ Sim | ✅ Sim (arquivo de governança) | ❌ Não | **Roteie direto** → @agent-auditor (read-only) |
+| *"Aplique a correção/sincronize em lote"* (pós-diagnóstico já aprovado) | ✅ Sim | ✅ Sim | ❌/✅ | **Roteie direto** → @governance-maintainer |
 
 **Regra de Ouro: Se downstream consegue agir (ou pedir contexto iterativamente), não bloqueie com pré-voo.**
 
@@ -193,7 +195,7 @@ Pedido recebido (já refinado por @prompt-structuring)?
 |  |- Sim -> delegar ao router de stack correspondente (@angular-router / @spring-boot-router / @spring-reactive-router / @ejb-router / @database-router)
 |  \- Não
 |- É pedido de refatoração/plano de refactor estrutural (do zero)?
-|  |- Sim -> @refactor-planner (deve delegar mapeamento de blast radius/dependências ao @code-knowledge-graph — R-045)
+|  |- Sim -> @refactor-planner (deve delegar mapeamento de blast radius/dependências ao `@code-knowledge-graph` — R-045)
 |  \- Não
 |- Código já aprovado por code-review e pedido é preparar PR (diff, commit semântico, changelog, matriz de risco)?
 |  |- Sim -> @pr-gatekeeper
@@ -201,8 +203,8 @@ Pedido recebido (já refinado por @prompt-structuring)?
 |- É autoria ou curadoria de documentação técnica (.md) de projeto ou governança?
 |  |- Sim -> @docs-engineer
 |  \- Não
-|- É auditoria semântica/estrutural do próprio catálogo de governança, detecção de gaps/smells entre agents, skills e grafo de roteamento?
-|  |- Sim -> @agent-auditor
+|- É auditoria/diagnóstico de smells, redundância de saída/diretrizes, gaps de conformidade com template ou verbosidade excessiva em QUALQUER artefato de governança (agents, skills, prompts, grafo de roteamento) — SEM aplicar correção ainda?
+|  |- Sim -> @agent-auditor (read-only; @governance-maintainer só entra DEPOIS de aprovação do diagnóstico, para aplicar o fix em lote)
 |  \- Não
 |- É manutenção atômica, refatoração estrutural, renomeação ou sincronização em lote de artefatos de governança existentes?
 |  |- Sim -> @governance-maintainer
@@ -276,6 +278,7 @@ Próximo passo mínimo:
 - [ ] **[OBRIGATÓRIO - R-042]** Há agent ativo de turno anterior? Verificar deriva de intenção antes de assumir que a triagem já ocorreu nesta conversa.
 - [ ] **[OBRIGATÓRIO - SEGUNDO, R-041]** Solicitação já refinada por `@prompt-structuring`? Se não → delegar e aguardar retorno antes de classificar.
 - [ ] **[OBRIGATÓRIO - CONFERÊNCIA DE CASOS]** Comparar a solicitação com a base de precedentes em `.github/agents/evals/casos-roteamento.yaml` (verificar se há caso correspondente em `canonicos:` ou anti-padrão em `regressao:` — ex: `canon-028` para camadas/fluxo -> `code-knowledge-graph`).
+- [ ] **[REFORÇO]** Se a solicitação usar verbo de avaliação/diagnóstico ("avalie", "é possível", "identifique redundância") sobre agent/skill/prompt → checar o nó `@agent-auditor` ANTES de considerar `@governance-maintainer` ou `@governance-factory`.
 - [ ] Intenção principal identificada e comparada com a Decision Tree derivada do `routing-graph.yaml`.
 - [ ] Rota escolhida no catálogo real.
 - [ ] Se tarefa for puramente conceitual/arquitetural/explicação: injetar no `task:` do subagente a diretiva de `"MODO EXCLUSIVO: ADVISORY (Read-Only) — PROIBIDO run_in_terminal / scripts / CLI"`.
@@ -346,8 +349,8 @@ Próximo passo mínimo:
 - [@pr-gatekeeper](pr-gatekeeper.agent.md) para preparação de PR pós-aprovação do quality gate (diff, mensagem de commit semântico, matriz de risco e CHANGELOG.md).
 - [@docs-engineer](docs-engineer.agent.md) para autoria de documentação técnica nova e curadoria/padronização de documentação existente exclusivamente em `.md`.
 - [@governance-factory](governance-factory.agent.md) para criação, padronização e revisão de agents (`.agent.md`), skills (`SKILL.md`), prompts (`.prompt.md`) ou novas stacks de domínio.
-- [@agent-auditor](agent-auditor.agent.md) para auditoria semântica/estrutural do catálogo de governança, detecção de gaps, smells e conformidade entre agents, skills e grafo (read-only).
-- [@governance-maintainer](governance-maintainer.agent.md) para manutenção atômica, refatoração em cascata, renomeações em lote e sincronização de catálogos e referências de governança.
+- [@agent-auditor](agent-auditor.agent.md) para auditoria semântica/estrutural do catálogo de governança (agents, skills, prompts), detecção de gaps, smells, redundância/verbosidade de saída e conformidade (read-only) — sempre o primeiro passo antes de qualquer correção.
+- [@governance-maintainer](governance-maintainer.agent.md) para manutenção atômica, refatoração em cascata, renomeações em lote e sincronização de catálogos e referências de governança — não confundir com `@agent-auditor` (que diagnostica smells/gaps primeiro; governance-maintainer só aplica a correção já aprovada pelo usuário).
 - [@context-builder](context-builder.agent.md) para preparação e consolidação pontual de contexto técnico em docs/context/ (read-only) — não confundir com @agentic-memory-manager.
 - [@adapter-generator](adapter-generator.agent.md) para geração automática de adapters (.instructions.md) via scanner de convenções de projetos adicionados.
 - [@agentic-memory-manager](agentic-memory-manager.agent.md) para persistência/recuperação de memória entre sessões — não confundir com `@context-builder` (consolidação pontual, read-only).

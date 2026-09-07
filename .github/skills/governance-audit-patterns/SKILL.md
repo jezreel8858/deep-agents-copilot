@@ -6,8 +6,9 @@ description: >
   desalinhamento contratual (perfil ↔ tools ↔ skills ↔ catálogo),
   violação do protocolo de batching (R-046 / Single-Turn Batching / limiar de 5 arquivos),
   desvios de sintaxe e variáveis de prompts, não conformidade com a spec de skills
-  (progressive disclosure, gatilhos em 3ª pessoa), diretrizes redundantes e
-  gaps de taxonomia. Base de conhecimento normativa do agent-auditor.
+  (progressive disclosure, gatilhos em 3ª pessoa), diretrizes redundantes,
+  gaps de taxonomia, conflito de responsabilidade entre agents, prompts e skills
+  (fronteira decisão vs conhecimento vs atalho) e hipertrofia instrucional e redundância de saída em runtime (output bloat, banners multicamada). Base de conhecimento normativa do agent-auditor.
 tier: 1
 category: governance
 triggers:
@@ -25,6 +26,11 @@ triggers:
   - "auditar skills"
   - "auditar R-046"
   - "conformidade de catalogo"
+  - "conflito de responsabilidade"
+  - "sobreposição agent prompt skill"
+  - "output bloat"
+  - "redundância de saída em runtime"
+  - "hipertrofia instrucional"
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
@@ -186,6 +192,40 @@ Consolida, a partir de pesquisa de mercado (2025/2026), Anthropic Open Spec (dez
 | Severidade | **Bloqueador** se ausência de frontmatter N1 ou quebra de R-015 no índice; **Alta** se código inline > 8 linhas (R-026) ou ausência de blocos ✅/❌; **Sugestão** se refinamento estilístico de gatilhos |
 | Remediação | `@governance-factory` reestrutura a skill conformando-a aos 3 níveis de *Progressive Disclosure* e extraindo códigos longos para snippets |
 
+### 2.12 — Conflito de Responsabilidade Cross-Artefato (Agents vs Prompts vs Skills)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Sobreposição de responsabilidade funcional entre um `.agent.md`, uma `SKILL.md` e/ou um `.prompt.md` que tratam do MESMO domínio/ação sem fronteira clara de papel: *(a)* um `.prompt.md` reimplementa lógica de decisão/fluxo que deveria pertencer ao agent (deixando de ser um "alias fino" que apenas invoca `@agent`); *(b)* uma `SKILL.md` contém instruções de orquestração/roteamento/decisão (verbos como "delegar", "rotear", "decidir entre X ou Y") em vez de conhecimento declarativo reutilizável — skills não devem tomar decisão de fluxo; *(c)* um `.agent.md` embute bloco extenso de conhecimento de domínio que deveria estar extraído como skill reutilizável (relacionado mas distinto do smell 2.1, que é duplicação entre agents — aqui é agent carregando peso que é papel de skill); *(d)* dois ou mais artefatos de tipos DIFERENTES (agent + skill, ou agent + prompt, ou skill + prompt) descrevem a MESMA responsabilidade com fronteiras redundantes, deixando ambíguo qual arquivo é a fonte de verdade operacional para aquele domínio. |
+| Como detectar | Cruzar o propósito declarado (`description`) do `.agent.md` contra as skills que ele referencia em `skills:`/`source_docs:` e contra os `.prompt.md` que o invocam (`agent: '<nome>'` no frontmatter do prompt ou lógica duplicada no corpo); `grep_search` por verbos de fluxo/decisão ("delegar", "rotear", "decidir", "classificar intenção") dentro de `SKILL.md` — presença desses verbos como instrução operacional (não como exemplo) é sinal de invasão de papel; comparar percentual de lógica decisória duplicada entre prompt e agent (>30% de sobreposição de fluxo é sinal forte de que o prompt deixou de ser alias fino). |
+| Origem (TrustAgent) | Extrínseco — desenho arquitetural do sistema multi-agent (fronteiras de papel mal definidas entre as 3 camadas de artefato: agent=decisão, skill=conhecimento, prompt=atalho de invocação) |
+| Severidade | **Alta** se a sobreposição ativa gera ambiguidade real sobre qual artefato é a fonte de verdade operacional (2 artefatos podem ser invocados para o mesmo efeito com comportamento potencialmente divergente); **Sugestão** se é apenas duplicação leve de descrição/propósito sem impacto funcional comprovado. |
+| Remediação | `@governance-factory` redefine a fronteira de responsabilidade: prompt volta a ser "alias fino" (apenas invoca o agent, sem lógica própria); skill perde qualquer instrução de fluxo/decisão e vira puro conhecimento declarativo; agent mantém a decisão/orquestração. Consolidar ou remover o artefato redundante quando a sobreposição for total. |
+
+### 2.13 — Hipertrofia Instrucional e Redundância de Saída em Runtime (Output Bloat / Multi-Layer Redundancy)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Artefato (`.agent.md`, `.prompt.md` ou `SKILL.md`) que prescreve instruções prolixas ou formato de saída inflado em tempo de execução: *(a)* **Redundância Multicamada:** fluxo que instrui o modelo a imprimir os mesmos dados em múltiplas seções consecutivas (ex.: banner repetido, resumo preliminar, tabela detalhada e re-resumo final contendo os mesmos atributos); *(b)* **Overhead Cosmético:** prescrição de decorações ASCII pesadas, caixas de diálogo decorativas ou múltiplos banners visuais que poluem o histórico de chat e consomem janela de contexto desnecessariamente; *(c)* **Mismatch de Perfil (`agent-contracts` § 8):** agent do tipo Router ou Operacional instruído a emitir relatórios narrativos longos em vez de payload determinístico/compacto, ou agent Analista instruído a emitir prosa antes/depois de tabelas sem valor analítico novo; *(d)* **Violação de Postura Sênior (`R-029`):** prompts instruindo introduções genéricas ("Com certeza, vou analisar..."), conclusões redundantes ("Espero ter ajudado...") ou eco integral do contexto lido; *(e)* **Tamanho Desproporcional do Artefato:** prompt/agent com mais de 300 linhas de diretrizes cuja complexidade operacional real não justifica a densidade instrucional (prompt bloat). |
+| Como detectar | Inspecionar a seção `Formato de Saída` de `.agent.md` e `.prompt.md`; contar blocos de exibição previstos; verificar repetição de variáveis/dados em mais de um bloco de saída; cruzar o perfil taxonômico do agent contra a tabela de templates de `agent-contracts` § 8; verificar presença de instruções mandatórias de ASCII art ou introduções de cortesia. |
+| Origem (TrustAgent) | Intrínseco — falha no design instrucional do artefato, resultando em poluição de contexto, alta latência de streaming e consumo ineficiente de tokens/créditos de chat. |
+| Severidade | **Alta** se há redundância multicamada grave (mesmos dados repetidos 3+ vezes) ou saída inflada que degrade sensivelmente a janela de contexto da sessão; **Sugestão** para pequenos ajustes de concisão, eliminação de frases de cortesia ou refinamento estético de saída. |
+| Remediação | `@governance-factory` refatora a seção `Formato de Saída` e as diretrizes do artefato: consolida saídas dispersas em uma única apresentação densa (tabela ou checklist compacto), remove decorações cosméticas redundantes e alinha o template estritamente ao perfil correspondente em `agent-contracts` § 8 e `R-029`. |
+
+**Matriz de Fronteiras §2.13 (Anti-Sobreposição):**
+
+```text
+[Smell 2.1]  --> Duplicação ESTÁTICA de texto ENTRE 3+ arquivos do repositório.
+[Smell 2.4]  --> Duplicação de REGRA NORMATIVA entre CLAUDE.md e copilot-instructions.
+[Smell 2.8]  --> Ineficiência de TOOL CALLS no FILESYSTEM (R-046 / Single-Turn Batching).
+[Smell 2.9]  --> Ausência ESTRUTURAL da seção "Formato de Saída" no .agent.md (presença do bloco).
+[Smell 2.10] --> Erro de SINTAXE em variáveis de prompt (${file}, argument-hint).
+[Smell 2.11] --> Limite de CÓDIGO INLINE no corpo da skill (≤ 8 linhas via R-026).
+[Smell 2.12] --> Fronteira de AUTORIDADE/PAPEL funcional (decisão vs conhecimento vs atalho).
+-----------------------------------------------------------------------------------------
+[Smell 2.13] --> QUALIDADE, CONCISÃO E ECONOMIA DE TOKENS DO PAYLOAD DE CHAT (runtime output).
+```
+
 ---
 
 ## 3) Severidade — Reaproveitamento da Taxonomia Existente
@@ -209,7 +249,7 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 
 | Smell | Local(is) afetado(s) | Severidade | Remediação sugerida | Agent a acionar |
 |---|---|---|---|---|
-| <2.1..2.11> | <arquivo(s)> | Bloqueador/Alto/Sugestão | <ação objetiva> | <@governance-factory/@docs-engineer> |
+| <2.1..2.13> | <arquivo(s)> | Bloqueador/Alto/Sugestão | <ação objetiva> | <@governance-factory/@docs-engineer> |
 
 ## Resumo por Severidade
 - Bloqueador: N
@@ -222,7 +262,7 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 
 ## 6) Checklist de Conformidade da Auditoria
 
-- [ ] Todo achado classificado estritamente em uma das 11 categorias de smell (§2.1..§2.11).
+- [ ] Todo achado classificado estritamente em uma das 13 categorias de smell (§2.1..§2.13).
 - [ ] Severidade reaproveitada de `code-review-patterns` (Bloqueador/Alto/Sugestão).
 - [ ] Origem classificada como intrínseca ou extrínseca (TrustAgent) quando relevante.
 - [ ] Remediação aponta agent executor real do catálogo (nunca "corrigir diretamente" — agent de auditoria é estritamente read-only).
@@ -230,11 +270,13 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 - [ ] Validações de tooling e perfil cruzadas com a Matriz Canônica de Conformidade (§2.7.1).
 - [ ] Protocolo de Single-Turn Batching e limiar de 5 arquivos (R-046) verificado nos executores (§2.8).
 - [ ] Conformidade de templates de Agent (§2.9), Prompt (§2.10) e Skill (§2.11) validada.
+- [ ] Conflito de responsabilidade cross-artefato (agents vs prompts vs skills) verificado — fronteira decisão/conhecimento/atalho respeitada (§2.12).
+- [ ] Hipertrofia instrucional e redundância de saída em runtime verificada — sem banners multicamada, overhead cosmético ou mismatch de perfil vs `agent-contracts` §8 (§2.13).
 
 ## 7) Anti-padrões
 
 - ❌ Agent de auditoria aplicar a correção diretamente (deve ser read-only — só análise e recomendação).
-- ❌ Inventar categoria de smell fora das 11 catalogadas nesta skill.
+- ❌ Inventar categoria de smell fora das 13 catalogadas nesta skill.
 - ❌ Duplicar taxonomia de severidade ou checklist de segurança já existentes em outras skills.
 - ❌ Reportar achado sem apontar agent executor de remediação (relatório inacionável).
 - ❌ Classificar achados como Bloqueadores sem critério estrutural comprovado.
