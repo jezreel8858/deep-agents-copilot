@@ -26,7 +26,7 @@
         "tavily-mcp@latest"
       ],
       "env": {
-        "TAVILY_API_KEY": "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",
+        "TAVILY_API_KEY": "",
         "PATH": "C:\\Program Files\\nodejs;%PATH%",
         "NODE_TLS_REJECT_UNAUTHORIZED": "0"
       },
