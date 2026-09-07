@@ -111,6 +111,10 @@ nos:
     tipo: domain_router
     descricao: "Supervisor hierárquico do domínio Java Legado EJB — despacha para os 7 especialistas registrados em .github/agents/backend/ejb/ejb-catalog.yaml"
 
+  - id: database-router
+    tipo: domain_router
+    descricao: "Supervisor hierárquico do domínio de Banco de Dados — despacha para os 6 especialistas Oracle e Informix registrados em .github/agents/backend/database/database-catalog.yaml"
+
   - id: security-reviewer
     tipo: downstream
     descricao: "Revisão especializada de segurança de aplicação (OWASP Top 10:2025, ASVS 5.0, SCA/CVE, secrets) — read-only; distinto de agent-safety-guardrails (segurança do próprio agent de IA)"
@@ -747,6 +751,32 @@ arestas:
         - "openejb"
         - "arquillian"
       sinal_r006: "É qualquer solicitação do ecossistema Java Legado EJB? (despacha para o catálogo de 7 especialistas backend em .github/agents/backend/ejb/ejb-catalog.yaml)"
+
+  # Supervisor e roteador de domínio Banco de Dados (Hierarchical Sub-Router)
+  - de: agent-router
+    para: database-router
+    prioridade: 1.6
+    threshold_score: 0.85
+    nivel_routing: rule-based
+    condicoes:
+      keywords:
+        - "database-router"
+        - "oracle"
+        - "informix"
+        - "plsql"
+        - "pl/sql"
+        - "spl"
+        - "stored procedure"
+        - "procedure oracle"
+        - "procedure informix"
+        - "explain plan"
+        - "dbms_xplan"
+        - "set explain"
+        - "sqexplain"
+        - "flyway oracle"
+        - "flyway informix"
+        - "lock mode row"
+      sinal_r006: "É solicitação especializada de banco de dados Oracle ou Informix? (despacha para o catálogo de especialistas em .github/agents/backend/database/database-catalog.yaml)"
 
   # Retorno universal (R-042) — qualquer downstream detecta deriva de intenção
   # e devolve controle ao router. Prioridade 0 = avaliada ANTES de qualquer

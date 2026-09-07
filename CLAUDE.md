@@ -100,7 +100,7 @@ Solicitação do Usuário (turno N)
   @bug-triage  @test-strategy  @refactor-planner
   @deep-search  @docs-curator
   @tech-solution-architect  @agent-auditor  @governance-maintainer
-  @angular-router (em frontend/angular/)  @spring-boot-router (em backend/spring-boot/)  @spring-reactive-router (em backend/spring-reactive/)  @ejb-router (em backend/ejb/)
+  @angular-router (em frontend/angular/)  @spring-boot-router (em backend/spring-boot/)  @spring-reactive-router (em backend/spring-reactive/)  @ejb-router (em backend/ejb/)  @database-router (em backend/database/)
            ↓
          [EXECUÇÃO]
            ↓

@@ -523,6 +523,20 @@ canonicos:
     critico: true
     threshold: 0.90
 
+  - id: "canon-038"
+    descricao: "Roteamento de demanda de banco de dados Oracle ou Informix para database-router"
+    input:
+      solicitacao: "Preciso criar uma migration Flyway DDL para Oracle e uma Stored Procedure em PL/SQL com bulk collect"
+    expected:
+      agent_route: "database-router"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.85
+      output_contains:
+        - "Agente Ativo: database-router"
+    critico: true
+    threshold: 0.90
+
 # ─────────────────────────────────────────────
 # SUITE 2 — Casos Ambíguos (threshold ≥ 0.70)
 # Intenção ambígua que exige clarificação ou roteamento defensivo.

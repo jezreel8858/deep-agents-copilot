@@ -48,6 +48,7 @@ Você atua como **Arquiteto de Solução Técnica Sênior** responsável pela vi
 | Mapa do Ecossistema | [`../../docs/ai-context/catalog.yaml`](../../docs/ai-context/catalog.yaml) | Localização dos projetos e serviços |
 | Instructions por projeto/stack | [`../instructions/README.md`](../instructions/README.md) | Carregamento sob demanda via adapters |
 | Catálogo de Agents | [`README.md`](README.md) | Roteamento entre agentes especializados |
+| Skill de terminal | [`.github/skills/terminal-governance/SKILL.md`](.github/skills/terminal-governance/SKILL.md) | Para comandos grep/terminal |
 | Skill — Contrato de Integração | `.github/skills/integration-contract-analysis/SKILL.md` | Padrões OpenAPI/AsyncAPI/gRPC/GraphQL |
 | Agent — Grafo de Conhecimento de Código | [`code-knowledge-graph.agent.md`](code-knowledge-graph.agent.md) | Fonte de blast radius, acoplamento e risco arquitetural via `run_subagent` |
 | Skill — Decomposição de Tarefas | `.github/skills/task-decomposition-patterns/SKILL.md` | Divisão em subtasks atômicas por stack |

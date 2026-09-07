@@ -68,7 +68,7 @@ Agent ativo de turno anterior? (R-042)
     ↓
 @bug-triage | @test-strategy | @refactor-planner |
 @tech-solution-architect | @docs-engineer | @code-review |
-@requirements-analyst | @angular-router | @spring-boot-router | @spring-reactive-router | @ejb-router |
+@requirements-analyst | @angular-router | @spring-boot-router | @spring-reactive-router | @ejb-router | @database-router |
 @deep-search
     ↓
 [Execução específica — em task_mode]
@@ -284,6 +284,7 @@ Projetos e adapters por-projeto NUNCA são commitados no repositório compartilh
 - `spring-boot-router` -> supervisor hierárquico e roteador do domínio Spring Boot — orquestra os 7 especialistas em `.github/agents/backend/spring-boot/` (arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer, test-fixer).
 - `spring-reactive-router` -> supervisor hierárquico e roteador do domínio Spring Reactive — orquestra os 7 especialistas em `.github/agents/backend/spring-reactive/` (arch-advisor, feature-developer, bug-fixer, resilience-tuner, unit-test-writer, integration-test-writer, test-fixer).
 - `ejb-router` -> supervisor hierárquico e roteador do domínio Java legado EJB — orquestra os 7 especialistas em `.github/agents/backend/ejb/` (arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer, test-fixer).
+- `database-router` -> supervisor hierárquico e roteador do domínio de Banco de Dados — orquestra os 6 especialistas em `.github/agents/backend/database/` (oracle-migration-dev, oracle-plsql-expert, oracle-query-tuner, informix-migration-dev, informix-spl-expert, informix-query-tuner).
 - `governance-factory` -> criar/revisar agent, skill, prompt ou nova stack via parâmetro `type` (na criação, delega compulsoriamente pesquisa prévia de mercado/skills ao `deep-search`).
 - `governance-maintainer` -> manutenção atômica, refatoração em cascata e sincronização em lote de artefatos de governança via context-mode e diffs cirúrgicos.
 - `binding-initializer` -> ⚡ inicializar `catalog.yaml` + `binding.md` + `catalog.local.yaml.example` para novo repositório (1 pergunta — R-034)
