@@ -115,7 +115,7 @@ Próximo passo mínimo:
 - [`@angular-router`](frontend/angular/angular-router.agent.md) para execução de suítes de testes frontend Angular (unit, component harness, fixer, E2E).
 - [`@spring-boot-router`](backend/spring-boot/spring-boot-router.agent.md) para execução de testes backend Spring Boot (JUnit 5, Mockito, Testcontainers).
 - [`@spring-reactive-router`](backend/spring-reactive/spring-reactive-router.agent.md) para execução de testes reativos WebFlux (StepVerifier, WebTestClient).
-- [`@analysis-architect`](analysis-architect.agent.md) para dependências de integração local (tier B1) e cross-sistema.
+- [`@tech-solution-architect`](tech-solution-architect.agent.md) para dependências de integração local (tier B1), Technical Blueprint e contratos OpenAPI.
 - [`@docs-engineer`](docs-engineer.agent.md) para consolidar documentação final.
 
 ## Retorno ao Router (R-042 — Anti Sticky-Session)

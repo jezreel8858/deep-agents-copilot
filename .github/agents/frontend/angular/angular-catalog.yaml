@@ -25,9 +25,9 @@ router:
 agents:
   angular-arch-advisor:
     id: "angular-arch-advisor"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "advisory"
-    domain: "Auditorias de código, arquitetura, performance Core Web Vitals, SSR e upgrades"
+    domain: "Arquitetura Angular, Standalone, Signals, SSR e Performance CWV"
     description: "Especialista analítico read-only: diagnósticos arquiteturais, CWV (INP/LCP), SSR/hydration, @defer e planos de upgrade/migração Angular."
     keywords:
       - "auditoria angular"
@@ -47,7 +47,6 @@ agents:
       - "ask_questions"
       - "run_subagent"
       - "context-mode/ctx_search"
-      - "context-mode/ctx_fetch_and_index"
     skills:
       - "angular-frontend-patterns"
       - "angular-performance-patterns"
@@ -88,6 +87,7 @@ agents:
       - "test-implementation-angular-vitest"
       - "terminal-governance"
       - "context-mode"
+      - "efficient-batch-code-modification"
 
   angular-bug-fixer:
     id: "angular-bug-fixer"
@@ -120,6 +120,7 @@ agents:
       - "test-implementation-angular-vitest"
       - "terminal-governance"
       - "context-mode"
+      - "efficient-batch-code-modification"
 
   angular-ui-stylist:
     id: "angular-ui-stylist"
@@ -153,6 +154,7 @@ agents:
       - "design-system-component-contracts"
       - "terminal-governance"
       - "context-mode"
+      - "efficient-batch-code-modification"
 
   angular-unit-test-writer:
     id: "angular-unit-test-writer"
@@ -184,6 +186,7 @@ agents:
       - "test-implementation-frontend"
       - "terminal-governance"
       - "context-mode"
+      - "efficient-batch-code-modification"
 
   angular-component-test-writer:
     id: "angular-component-test-writer"
@@ -215,6 +218,7 @@ agents:
       - "test-implementation-angular-jasmine"
       - "terminal-governance"
       - "context-mode"
+      - "efficient-batch-code-modification"
 
   angular-test-fixer:
     id: "angular-test-fixer"
@@ -245,6 +249,7 @@ agents:
       - "structured-intake-patterns"
       - "terminal-governance"
       - "context-mode"
+      - "efficient-batch-code-modification"
 
   angular-e2e-writer:
     id: "angular-e2e-writer"
@@ -276,4 +281,4 @@ agents:
       - "test-implementation-frontend"
       - "terminal-governance"
       - "context-mode"
-
+      - "efficient-batch-code-modification"

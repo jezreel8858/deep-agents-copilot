@@ -3,7 +3,7 @@
 > Fonte de verdade operacional: [`CLAUDE.md`](../CLAUDE.md).
 > Mapa de Adapters (compartilhado): [`docs/ai-context/catalog.yaml`](../docs/ai-context/catalog.yaml).
 > Mapa de Projetos (LOCAL/gitignored, R-043): [`docs/ai-context/catalog.local.yaml`](../docs/ai-context/catalog.local.yaml).
-> IDs normativos: consulte `R-001..R-044` em `CLAUDE.md`.
+> IDs normativos: consulte `R-001..R-046` em `CLAUDE.md`.
 
 ---
 
@@ -17,7 +17,7 @@
 
 | Tipo | Arquivo | Escopo | Conteúdo Permitido | Exemplos / Referências |
 |------|---------|--------|-------|---|
-| **Governança Global** | `CLAUDE.md` | 🌍 Multi-projeto, desacoplado | Regras R-001..R-041, princípios, fluxos genéricos | ❌ Nenhum projeto/tech específicos |
+| **Governança Global** | `CLAUDE.md` | 🌍 Multi-projeto, desacoplado | Regras R-001..R-046, princípios, fluxos genéricos | ❌ Nenhum projeto/tech específicos |
 | **Operacional** | `.github/copilot-instructions.md` | 🌍 Multi-projeto, desacoplado | Roteamento, agents, skills, estrutura genérica | ❌ Nenhum projeto/tech específicos (remeter a adapters) |
 | **Adapters** | `.github/instructions/*.instructions.md` | 🔧 Stack/domínio específico | Convenções, padrões, tools, paradigmas de tech/domínio **excluivos** | ✅ Projeto, linguagem, framework **específicos permitidos** |
 | **Contexto de Binding** | `docs/ai-context/catalog.yaml` + `docs/ai-context/binding.md` | 🔗 Mapa de instâncias | Lista concreta de adapters, projetos, mapeamento stack → adapter | ✅ Dados de instância permitidos |
@@ -67,7 +67,7 @@ Agent ativo de turno anterior? (R-042)
 [Rota decidida]
     ↓
 @bug-triage | @test-strategy | @refactor-planner |
-@analysis-architect | @docs-engineer | @code-review |
+@tech-solution-architect | @docs-engineer | @code-review |
 @requirements-analyst | @angular-router | @spring-boot-router | @spring-reactive-router | @ejb-router |
 @deep-search
     ↓
@@ -100,10 +100,10 @@ Esta matriz é **responsabilidade do roteador** — não é regra global.
 - **Sem commits/push autônomos**: gere apenas a mensagem via `/commit`. Nunca `git add/commit/push`.
 - **Sem instalação autônoma**: aponte a dependência e aguarde confirmação.
 - **Um comando por vez**: leia o output uma única vez.
-- **`get_errors` uma vez** por arquivo editado.
-- **Edições agrupadas**: todas as alterações de um arquivo em uma chamada.
+- **`get_errors` consolidado**: chame `get_errors` uma única vez ao final do lote com o array completo `filePaths`, nunca arquivo por arquivo.
+- **Edições agrupadas e em lote (`efficient-batch-code-modification` — R-046)**: todas as alterações de múltiplos arquivos devem ser emitidas em lote na mesma rodada de tool calls (*single-turn batching*). Diffs cirúrgicos mínimos com 2-3 linhas de contexto para unicidade.
 - **Não crie arquivos auxiliares** sem pedido explícito.
-- **Não releia arquivos** já no contexto da conversa.
+- **Não releia arquivos** já no contexto da conversa ou recém-editados.
 - **Pre-fetch automático pelo agent**: ao selecionar um agent, carregue automaticamente os `source_docs` declarados no `catalog.yaml` e anuncie o que foi anexado. Usuário pode rejeitar com "Sem pre-fetch".
 - **Execução via Context Mode (R-008 — Think in Code)**: Use **100% o `context-mode` MCP** para leitura, busca, escrita em lote, análise e remoção de arquivos (`ctx_execute`, `ctx_execute_file`, `ctx_index`, `ctx_search`). O processamento acontece no sandbox e apenas o resultado limpo entra na conversa. `read_file` e `replace_string_in_file` são reservados exclusivamente para edições cirúrgicas pontuais do editor. `run_in_terminal` é **FALLBACK de última instância** restrito exclusivamente a comandos de ciclo de vida (`git`, `npm install`, `mvn`, `pytest`) — comandos de varredura/leitura (`cat`, `grep`, `find`, scripts inline `node -e`) são terminantemente proibidos no terminal.
 - **Sem código inline em agents/skills/prompts (R-026)**: blocos com implementações > 8 linhas pertencem a `snippets/`, `templates/` ou `commands/`. Referencie por caminho ou declare em `source_docs:`.
@@ -279,12 +279,13 @@ Projetos e adapters por-projeto NUNCA são commitados no repositório compartilh
 - `refactor-planner` -> planejamento e decomposição macro de refatoração estrutural (delega execução aos especialistas de stack).
 - `docs-engineer` -> autoria e curadoria de documentação técnica em `.md` — modos `author`/`curate` (fusão de docs-writer + docs-curator).
 - `deep-search` -> triagem e roteamento de pesquisa interna e externa.
-- `analysis-architect` -> análise técnica unificada: impacto, risco, dependências, contratos e integrações cross-sistema (OpenAPI/AsyncAPI/gRPC/GraphQL); metodologia B1/B2/B3.
+- `tech-solution-architect` -> arquiteto de solução técnica: viabilidade, Technical Blueprint, contratos de API (OpenAPI), modelo de dados e divisão de tarefas por stack ([BACKEND_TASKS], [FRONTEND_TASKS]).
 - `angular-router` -> supervisor hierárquico e roteador do domínio Angular — orquestra os 8 especialistas em `.github/agents/frontend/angular/` (arch-advisor, feature-developer, bug-fixer, ui-stylist, unit-test, component-test, test-fixer, e2e-writer).
 - `spring-boot-router` -> supervisor hierárquico e roteador do domínio Spring Boot — orquestra os 7 especialistas em `.github/agents/backend/spring-boot/` (arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer, test-fixer).
 - `spring-reactive-router` -> supervisor hierárquico e roteador do domínio Spring Reactive — orquestra os 7 especialistas em `.github/agents/backend/spring-reactive/` (arch-advisor, feature-developer, bug-fixer, resilience-tuner, unit-test-writer, integration-test-writer, test-fixer).
 - `ejb-router` -> supervisor hierárquico e roteador do domínio Java legado EJB — orquestra os 7 especialistas em `.github/agents/backend/ejb/` (arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer, test-fixer).
 - `governance-factory` -> criar/revisar agent, skill, prompt ou nova stack via parâmetro `type` (na criação, delega compulsoriamente pesquisa prévia de mercado/skills ao `deep-search`).
+- `governance-maintainer` -> manutenção atômica, refatoração em cascata e sincronização em lote de artefatos de governança via context-mode e diffs cirúrgicos.
 - `binding-initializer` -> ⚡ inicializar `catalog.yaml` + `binding.md` + `catalog.local.yaml.example` para novo repositório (1 pergunta — R-034)
 - `adapter-generator` -> ⚡ gerar automaticamente adapters por-projeto em `.github/instructions/local/` (gitignored, R-043) via `/add-project-context`
 - `runtime-verifier` -> verificação de saúde do ambiente (build/dependências/serviços) antes de testes/codificadores; read-only.
@@ -298,6 +299,7 @@ Projetos e adapters por-projeto NUNCA são commitados no repositório compartilh
 - `context-compact` -> compactação pós-leitura e geração de resumos executáveis.
 - `context-builder` -> coleta e condensação de contexto técnico em `docs/context/`.
 - `refactoring-planning-patterns` -> planejamento de refatoração estrutural (Mikado, Branch by Abstraction, Strangler Fig, safety net).
+- `efficient-batch-code-modification` -> edição em lote, dry-run e diffs cirúrgicos para economia de tokens e créditos Copilot.
 
 **Pesquisa e Documentação:**
 - `tavily` -> pesquisa externa e documentação atualizada.

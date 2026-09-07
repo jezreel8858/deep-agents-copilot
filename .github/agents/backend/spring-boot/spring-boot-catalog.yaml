@@ -25,9 +25,9 @@ router:
 agents:
   spring-boot-arch-advisor:
     id: "spring-boot-arch-advisor"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "advisory"
-    domain: "Auditorias de código, arquitetura Clean/Hexagonal, versões Java/JDK LTS (21-25) e migrações"
+    domain: "Arquitetura Spring Boot, Clean Architecture, Java LTS, Virtual Threads e Migrações"
     description: "Especialista analítico read-only: Clean Architecture, Virtual Threads vs Reativo, Java/JDK upgrades, observabilidade e governança de dependências."
     keywords:
       - "auditoria spring"
@@ -46,7 +46,6 @@ agents:
       - "ask_questions"
       - "run_subagent"
       - "context-mode/ctx_search"
-      - "context-mode/ctx_fetch_and_index"
     skills:
       - "spring-boot-backend-patterns"
       - "java-jdk-backend-governance"
@@ -245,4 +244,3 @@ agents:
       - "structured-intake-patterns"
       - "terminal-governance"
       - "context-mode"
-

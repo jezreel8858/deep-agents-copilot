@@ -5,8 +5,10 @@ description:
   Carrega CLAUDE.md + copilot-instructions.md, valida conformidade R-001..R-040.
   Execute UMA ÚNICA VEZ no início da sessão ANTES de /add-project-context ou qualquer agent.
   NÃO REPITA na mesma sessão — faz 1x apenas.
+agent: 'agent'
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'list_dir', 'run_subagent', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_batch_execute', 'context-mode/ctx_search', 'context-mode/ctx_stats']
+argument-hint: ''
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
@@ -21,13 +23,25 @@ source_docs:
 
 Inicializa contexto obrigatório de governança. Execute 1x por sessão APENAS.
 
-> **PROPÓSITO**: PRÉ-REQUISITO para toda execução downstream. Carregar regras R-001..R-039, validar model, eliminar alucinação.
+> **Propósito**: PRÉ-REQUISITO para toda execução downstream. Carregar regras R-001..R-046, validar model, eliminar alucinação.
+> **Workspace**: `${workspaceFolder}`
 >
 > **FREQUÊNCIA**: ❌ 1x POR SESSÃO (nunca repita na mesma sessão)
 >
 > **ORDEM**: SEMPRE PRIMEIRO — antes de `/add-project-context` ou `@agent-router`
 >
 > **PRÓXIMO PASSO**: Após `/init-context` completar, execute `/add-project-context <projeto>` para cada projeto novo.
+
+---
+
+## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
+
+- ✅ **APENAS** carregar regras globais, checar binding context e auditar telemetria/ambiente de sessão.
+- ✅ **SEMPRE** verificar a existência de `catalog.yaml` e `binding.md` (R-034).
+- ❌ **NÃO** implementar código ou executar refatorações de aplicação.
+- ❌ **NÃO** repetir este comando múltiplas vezes na mesma sessão.
+
+---
 
 ---
 

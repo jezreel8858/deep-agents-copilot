@@ -21,9 +21,10 @@
 | Agent | `test-strategy` | Estratégia de testes, cobertura por risco e critérios de aceitação |
 | Agent | `refactor-planner` | Planejamento e decomposição macro de refatoração estrutural com blast radius e rollback (delega execução aos especialistas de stack) |
 | Agent | `deep-search` | 🔎 ***(NEW)*** Retriever/Researcher para pesquisa interna (repo + context-mode + terminal read-only) e externa (Tavily), com decomposição paralela de pesquisa composta |
-| Agent | `analysis-architect` | Análise técnica unificada: impacto local (tier B1), risco, dependências, contratos e integrações cross-sistema (OpenAPI/AsyncAPI/gRPC/GraphQL) com metodologia B1/B2/B3 |
+| Agent | `tech-solution-architect` | 📐 ***(v2.1.0)*** Arquiteto de solução técnica: viabilidade, Technical Blueprint, contratos OpenAPI/AsyncAPI, modelo de dados e divisão de tarefas em seções isoladas (`[BACKEND_TASKS]`, `[FRONTEND_TASKS]`) com metodologia B1/B2/B3 |
 | Agent | `agent-auditor` | 🧪 ***(NEW)*** Auditoria semântica de governança do próprio catálogo (agents/skills/prompts): detecta smells e gaps, classifica severidade e recomenda handoff para executores, sempre read-only |
 | Agent | `governance-factory` | 🏭 ***(v1.2.0)*** Criação/revisão de agent, skill, prompt ou nova stack via parâmetro `type`; na criação de qualquer artefato/stack, delega compulsoriamente pesquisa prévia de mercado/skills ao `deep-search` antes de materializar os arquivos |
+| Agent | `governance-maintainer` | 🛠️ ***(NEW)*** Especialista executor em manutenção atômica, refatoração estrutural e sincronização em lote de governança via context-mode e diffs cirúrgicos |
 | Agent | `context-builder` | Coletar, condensar e persistir contexto técnico em `docs/context/` |
 | Agent | `binding-initializer` | ⚡ ***(NEW)*** Criar `catalog.yaml` + `binding.md` para novo repositório (1 pergunta — Health Check R-034) |
 | Agent | `adapter-generator` | ⚡ ***(NEW)*** Gerar automaticamente adapters em `.github/instructions/` via `/add-project-context` |
@@ -59,12 +60,13 @@
 | Bug, erro, regressão | `bug-triage` |
 | Estratégia de testes por risco e matriz de cenários | `test-strategy` |
 | Planejamento de refactor | `refactor-planner` |
-| Impacto técnico local | `analysis-architect` (tier B1) |
+| Impacto técnico local ou Technical Blueprint | `tech-solution-architect` (tier B1) |
 | Curadoria/autoria de documentação | `docs-engineer` (`mode: curate`/`author`) |
 | Pesquisa interna aprofundada (repo/context-mode/terminal) ou pesquisa externa composta | `deep-search` |
-| Análise técnica, impacto, contratos, integrações cross-sistema | `analysis-architect` |
+| Análise técnica, blueprint, contratos OpenAPI, integrações cross-sistema | `tech-solution-architect` |
 | 🧪 Auditoria semântica de governança do catálogo (smells/gaps em agents, skills e prompts) | `agent-auditor` |
 | Criação/revisão de agent, skill, prompt ou nova stack (com pesquisa prévia via `@deep-search` na criação) | `governance-factory` (`type: agent\|skill\|prompt\|stack`) |
+| Manutenção atômica, refatoração em cascata ou sincronização em lote de governança | `governance-maintainer` |
 | Consolidação de contexto para execução posterior | `context-builder` |
 | ⚡ Binding context faltando (Health Check) | `binding-initializer` |
 | ⚡ Gerar adapters após /add-project-context | `adapter-generator` |

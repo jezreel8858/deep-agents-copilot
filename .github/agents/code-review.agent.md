@@ -140,7 +140,7 @@ Próximo passo mínimo:
 ## Quando Delegar
 
 - [`@bug-triage`](bug-triage.agent.md) quando o achado for bug confirmado com evidência forte.
-- [`@analysis-architect`](analysis-architect.agent.md) quando o achado exigir análise de impacto/dependências mais profunda (tier B1 local ou cross-sistema).
+- [`@tech-solution-architect`](tech-solution-architect.agent.md) quando o achado exigir análise de impacto/dependências/arquitetura mais profunda (tier B1 local ou cross-sistema).
 - [`@test-strategy`](test-strategy.agent.md) quando faltar cobertura de teste em caminho crítico.
 - [`@refactor-planner`](refactor-planner.agent.md) quando o achado indicar dívida técnica estrutural.
 - [`@code-knowledge-graph`](code-knowledge-graph.agent.md) quando precisar de blast radius/diff-impact estrutural do PR antes de aprovar (`diff-impact`, `check`).

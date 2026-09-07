@@ -296,7 +296,7 @@ Projetos, stacks e adapters serão configurados depois via /add-project-context.
    - Agent faz P1: "Qual o nome do seu ecossistema?"
    - Dev responde: "project"
    - `catalog.yaml` + `binding.md` esqueleto criados ✅
-   - Próximo: `/add-project-context D:\workspace\project-app`
+   - Próximo: `/add-project-context <workspace>/[PROJETO-APP]`
 
 2. **Cenário B (Manual):**
    - Dev digita: `inicializar binding` ou `criar esqueleto de governança`

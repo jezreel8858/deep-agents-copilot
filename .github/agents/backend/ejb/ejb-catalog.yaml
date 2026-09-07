@@ -25,9 +25,9 @@ router:
 agents:
   ejb-arch-advisor:
     id: "ejb-arch-advisor"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "advisory"
-    domain: "Auditorias de código, arquitetura EJB 2.x/3.x, empacotamento EAR/WAR/JAR, transações BMT/CMT e migração"
+    domain: "Arquitetura Java Legado EJB, Jakarta EE, Transações JTA e Planos de Modernização"
     description: "Especialista analítico read-only: arquitetura EJB 2.x/3.x, descritores de deployment XML (ejb-jar.xml, weblogic-ejb-jar.xml, jboss.xml), análise de transações CMT vs BMT, auditoria de empacotamento EAR/WAR/JAR e estratégias de modernização."
     keywords:
       - "arquitetura ejb"
@@ -46,7 +46,6 @@ agents:
       - "ask_questions"
       - "run_subagent"
       - "context-mode/ctx_search"
-      - "context-mode/ctx_fetch_and_index"
     skills:
       - "java-jdk-backend-governance"
       - "specialist-hybrid-advisory-implementation-patterns"
@@ -58,15 +57,15 @@ agents:
     id: "ejb-feature-developer"
     model: "Gemini 3.8 Flash"
     role: "implementer"
-    domain: "Desenvolvimento de Session Beans (@Stateless, @Stateful), MDB (@MessageDriven), JPA legada/EntityManager sob TDD"
-    description: "Desenvolvedor de features legadas: implementa SLSB (@Stateless), SFSB (@Stateful), MDBs (@MessageDriven) JMS, JPA legada com EntityManager e descritores XML sob TDD."
+    domain: "Desenvolvimento e manutenção de Session Beans (Stateless/Stateful), MDBs, interfaces remotas/locais e DTOs POJO"
+    description: "Desenvolvedor de features EJB: implementa @Stateless, @Stateful, @MessageDriven (JMS), DAOs JDBC/JPA e DTOs sob TDD com JUnit 4/5 e Mockito."
     keywords:
       - "feature ejb"
       - "stateless session bean"
       - "stateful session bean"
       - "message driven bean"
       - "mdb jms"
-      - "entitymanager ejb"
+      - "ejb local remote"
       - "tdd ejb"
     tools:
       - "read_file"
@@ -83,24 +82,24 @@ agents:
       - "context-mode/ctx_batch_execute"
       - "context-mode/ctx_index"
     skills:
-      - "test-implementation-backend"
-      - "agent-contracts"
+      - "java-jdk-backend-governance"
       - "terminal-governance"
       - "context-mode"
+      - "efficient-batch-code-modification"
 
   ejb-bug-fixer:
     id: "ejb-bug-fixer"
     model: "Gemini 3.8 Flash"
     role: "fixer"
-    domain: "Correções cirúrgicas de TransactionRolledbackException, deadlocks JTA, ClassCastException em JNDI e exaustão de pool"
-    description: "Especialista em resolução cirúrgica de bugs legados: diagnostica e resolve TransactionRolledbackException, deadlocks em transações aninhadas (REQUIRES_NEW), ClassCastException em JNDI e vazamentos de Stateful Beans com diff mínimo e teste de regressão."
+    domain: "Correções cirúrgicas de TransactionRolledbackLocalException, ConcurrentAccessTimeoutException, vazamentos de Stateful Beans e bugs de concorrência"
+    description: "Especialista em resolução rápida de bugs EJB: corrige falhas transacionais CMT/BMT, deadlocks de concorrência e exceptions de serialização com diff mínimo."
     keywords:
       - "bug ejb"
-      - "transactionrolledbackexception"
-      - "jta deadlock"
-      - "jndi classcastexception"
-      - "stateful leak"
       - "fix ejb"
+      - "transactionrolledbacklocalexception"
+      - "concurrentaccesstimeoutexception"
+      - "ejbtransactionrolledbackexception"
+      - "deadlock jta"
       - "corrigir erro ejb"
     tools:
       - "read_file"
@@ -116,24 +115,23 @@ agents:
       - "context-mode/ctx_batch_execute"
     skills:
       - "code-tracing"
-      - "test-implementation-backend"
       - "terminal-governance"
       - "context-mode"
+      - "efficient-batch-code-modification"
 
   ejb-perf-tuner:
     id: "ejb-perf-tuner"
     model: "Gemini 3.8 Flash"
     role: "performance"
-    domain: "Sizing de pool de Stateless e MDB, eliminação de transações longas, tuning de DataSource/JNDI e Garbage Collection"
-    description: "Especialista em tuning e performance EJB: calibra pools de Session Beans e MDBs, elimina transações JTA de longa duração, afina DataSources JNDI, mitiga retenção no L1 cache do EntityManager e otimiza JVM/GC."
+    domain: "Otimização de pooling de Stateless Beans, timeouts transacionais JTA, isolamento de transação e migração de Stateful para Stateless"
+    description: "Especialista em performance: dimensiona pools de EJBs, calibra @TransactionTimeout, elimina chamadas remotas redundantes (RMI/IIOP) e otimiza DAOs legados."
     keywords:
       - "performance ejb"
       - "pool stateless"
-      - "pool mdb"
-      - "transacao longa jta"
-      - "datasource jndi"
-      - "tuning ejb"
-      - "gc pause ejb"
+      - "tuning jta"
+      - "transaction timeout"
+      - "overhead rmi iiop"
+      - "otimizacao dao legado"
     tools:
       - "read_file"
       - "file_search"
@@ -150,20 +148,20 @@ agents:
       - "performance-engineering-patterns"
       - "terminal-governance"
       - "context-mode"
+      - "efficient-batch-code-modification"
 
   ejb-unit-test-writer:
     id: "ejb-unit-test-writer"
     model: "Gemini 3.8 Flash"
     role: "tester"
-    domain: "Testes unitários puros para EJBs com JUnit 4/5 + Mockito sem Application Server"
-    description: "Escreve testes unitários ultra-rápidos e isolados para Session Beans e MDBs como POJOs, mockando EntityManager, SessionContext e JNDI via Mockito sem overhead de container."
+    domain: "Testes unitários puros de lógica de negócio de EJBs como POJOs sem Application Server"
+    description: "Escreve testes unitários sem JNDI nem contêiner: testa Session Beans desacoplados instanciando classes POJO diretamente com JUnit 4/5 e Mockito."
     keywords:
-      - "unit test ejb"
-      - "junit 4 ejb"
-      - "junit 5 ejb"
-      - "mockito ejb"
       - "teste unitario ejb"
-      - "mock sessioncontext"
+      - "junit ejb"
+      - "mockito ejb"
+      - "testar session bean sem servidor"
+      - "mock jndi"
     tools:
       - "read_file"
       - "file_search"
@@ -179,23 +177,23 @@ agents:
       - "context-mode/ctx_batch_execute"
     skills:
       - "test-implementation-backend"
+      - "test-coverage-governance"
       - "terminal-governance"
       - "context-mode"
+      - "efficient-batch-code-modification"
 
   ejb-integration-test-writer:
     id: "ejb-integration-test-writer"
     model: "Gemini 3.8 Flash"
     role: "tester"
-    domain: "Testes de integração com OpenEJB/TomEE Embedded, Arquillian com ShrinkWrap e Testcontainers"
-    description: "Escreve testes integrados com container embutido (Apache OpenEJB/TomEE Embedded), Arquillian com pacotes ShrinkWrap (.jar/.war/.ear) e Testcontainers para banco e mensageria real."
+    domain: "Testes de integração com contêiner embarcado (OpenEJB/TomEE Embedded) ou Arquillian e Testcontainers"
+    description: "Escreve testes de integração com contêiner EJB real: valida injeção @EJB/@Resource, transações CMT/JTA, filas JMS com MDBs e JPA/EntityManager."
     keywords:
-      - "integration test ejb"
-      - "openejb"
-      - "tomee embedded"
-      - "arquillian"
-      - "shrinkwrap"
-      - "testcontainers ejb"
       - "teste integracao ejb"
+      - "openejb embedded"
+      - "tomee embedded"
+      - "arquillian ejb"
+      - "testcontainers banco legado"
     tools:
       - "read_file"
       - "file_search"
@@ -211,22 +209,23 @@ agents:
       - "context-mode/ctx_batch_execute"
     skills:
       - "test-implementation-backend"
+      - "test-coverage-governance"
       - "terminal-governance"
       - "context-mode"
+      - "efficient-batch-code-modification"
 
   ejb-test-fixer:
     id: "ejb-test-fixer"
     model: "Gemini 3.8 Flash"
     role: "fixer"
-    domain: "Diagnóstico e reparo de suítes de testes quebradas em builds legados Ant/Maven"
-    description: "Analisa logs de suítes de teste de projetos legados (Ant com junit task ou Maven Surefire), corrige falhas de setup de JNDI em testes, quebras de contexto embutido e fixtures desatualizadas."
+    domain: "Diagnóstico e resolução de suítes de teste de contêiner EJB quebradas no Maven/Ant"
+    description: "Diagnostica e corrige falhas em builds legados: NamingException em lookups JNDI, incompatibilidades de InitialContext, vazamentos de memória em suites de teste."
     keywords:
       - "fix teste ejb"
-      - "falha teste ant"
-      - "maven test ejb error"
-      - "broken test ejb"
-      - "openejb test failure"
-      - "corrigir teste ejb"
+      - "namingexception teste"
+      - "initialcontext failed"
+      - "falha teste arquillian"
+      - "corrigir teste legado"
     tools:
       - "read_file"
       - "file_search"
@@ -240,8 +239,7 @@ agents:
       - "context-mode/ctx_search"
       - "context-mode/ctx_batch_execute"
     skills:
-      - "test-implementation-backend"
       - "structured-intake-patterns"
       - "terminal-governance"
       - "context-mode"
-
+      - "efficient-batch-code-modification"

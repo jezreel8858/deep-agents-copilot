@@ -1,14 +1,34 @@
 ---
 name: ctx-insight
 description: Abre o dashboard de analytics do Context Mode com `ctx_insight` para observar uso de ferramentas e sessões.
+agent: 'agent'
 model: "Gemini 3.8 Flash"
 tools:
   - context-mode/ctx_insight
+argument-hint: '[port]'
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/context-mode/SKILL.md
 ---
 
-# /ctx-insight
+# `/ctx-insight`
 
 Atalho para abrir o painel Insight e revisar métricas da sua rotina no Context Mode.
+
+> **Propósito**: Inicializar o painel analítico local com métricas de consumo de ferramentas e sessões.
+> **Workspace**: `${workspaceFolder}`
+
+---
+
+## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
+
+- ✅ **APENAS** inicializar e disponibilizar a URL do painel analítico de sessões do Context Mode.
+- ✅ **SEMPRE** informar a porta e a URL de acesso local.
+- ❌ **NÃO** alterar configurações ou manipular dados da aplicação.
+- ❌ **NÃO** iniciar múltiplos servidores em concorrência na mesma porta.
+
+---
 
 ## Sintaxe
 

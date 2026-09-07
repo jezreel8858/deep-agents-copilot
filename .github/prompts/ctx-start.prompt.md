@@ -1,13 +1,33 @@
 ---
 name: ctx-start
 description: Inicializa e valida a sessão do Context Mode para garantir rastreabilidade e ingestão no dashboard.
+agent: 'agent'
 model: "Gemini 3.8 Flash"
 tools: ['context-mode/ctx_stats', 'context-mode/ctx_doctor', 'context-mode/ctx_execute']
+argument-hint: ''
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/context-mode/SKILL.md
 ---
 
-# /ctx-start
+# `/ctx-start`
 
 Garante que o Context Mode está ativo e pronto para uso com baixo custo de contexto.
+
+> **Propósito**: Inicializar e certificar a conectividade do Context Mode e o rastreamento no Dashboard.
+> **Workspace**: `${workspaceFolder}`
+
+---
+
+## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
+
+- ✅ **APENAS** inicializar a sessão do MCP Context Mode e validar sua conectividade básica.
+- ✅ **SEMPRE** emitir comando leve de sincronização para registrar telemetria.
+- ❌ **NÃO** executar scripts arbitrários fora da validação de saúde do MCP.
+- ❌ **NÃO** ignorar falhas de conexão não resolvidas após 1 tentativa (R-022).
+
+---
 
 ## Objetivo
 Validar conectividade MCP, bootstrap mínimo da sessão e disponibilidade de métricas para execução `ctx-first`.

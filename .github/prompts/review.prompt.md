@@ -4,8 +4,10 @@ description:
   Aciona o agent @code-review para revisar diff/PR/arquivo por qualidade,
   segurança, convenções, impacto e testes. Gera relatório por severidade.
   NÃO executa alterações.
+agent: 'agent'
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent']
+argument-hint: '[caminho-do-arquivo | diff]'
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
@@ -19,11 +21,24 @@ source_docs:
 
 Atalho manual on-demand para o agent [`@code-review`](../agents/code-review.agent.md) — revisão de código orientada por qualidade, convenções e impacto técnico.
 
-> **PROPÓSITO**: Analisar código (diff, PR ou arquivo) contra as convenções do projeto e identificar bugs, riscos, melhorias e gaps de teste, classificados por severidade.
+> **Propósito**: Analisar código (diff, PR ou arquivo) contra as convenções do projeto e identificar bugs, riscos, melhorias e gaps de teste, classificados por severidade.
+> **Arquivo Ativo**: `${file}`
+> **Workspace**: `${workspaceFolder}`
 >
 > **NÃO executa alterações** — apenas analisa e reporta (agent `@code-review` é read-only).
 >
 > A lógica completa (taxonomia de severidade, dimensões de análise, critérios de bloqueio, anti-padrões) vive em `code-review.agent.md` + `code-review-patterns/SKILL.md` — este prompt apenas dispara o fluxo manualmente, sem duplicar a regra (R-003).
+
+---
+
+## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
+
+- ✅ **APENAS** analisar código e emitir relatório de revisão estruturado por severidade (Bloqueador/Alto/Sugestão).
+- ✅ **SEMPRE** classificar os achados nas 6 dimensões canônicas (correção, segurança, convenções, impacto, testes, performance).
+- ❌ **NÃO** modificar ou corrigir arquivos de código diretamente (perfil read-only).
+- ❌ **NÃO** emitir sugestões fora do diff ou de escopo não afetado.
+
+---
 
 ---
 

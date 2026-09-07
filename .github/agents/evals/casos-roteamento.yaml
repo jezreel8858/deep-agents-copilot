@@ -84,14 +84,16 @@ canonicos:
     threshold: 0.90
 
   - id: "canon-006"
-    descricao: "Análise de impacto de mudança de assinatura"
+    descricao: "Análise de impacto e solução técnica de mudança de assinatura"
     input:
       solicitacao: "Analisar o impacto de mudar a assinatura do método processarPagamento() em PaymentService"
     expected:
-      agent_route: "analysis-architect"
+      agent_route: "tech-solution-architect"
       nivel_routing: "rule-based"
       confianca: "alta"
       score_minimo: 0.90
+      output_contains:
+        - "Delegado: @tech-solution-architect"
     critico: true
     threshold: 0.90
 
@@ -490,6 +492,37 @@ canonicos:
     critico: true
     threshold: 0.90
 
+  - id: "canon-036"
+    descricao: "Elaboração de Technical Blueprint com contratos de API e divisão de tarefas por stack"
+    input:
+      solicitacao: "Elaborar o Technical Blueprint para a nova feature de gestão de escalas, com contratos OpenAPI e divisão de tarefas backend e frontend"
+    expected:
+      agent_route: "tech-solution-architect"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.90
+      output_contains:
+        - "Delegado: @tech-solution-architect"
+    critico: true
+    threshold: 0.90
+
+  - id: "canon-037"
+    descricao: "Manutenção atômica e sincronização em lote de governança roteada para governance-maintainer"
+    input:
+      solicitacao: "Preciso atualizar e sincronizar em lote as referências de governança e catálogos após uma alteração estrutural"
+    expected:
+      agent_route: "governance-maintainer"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.90
+      output_contains:
+        - "Delegado: @governance-maintainer"
+    nao_confundir_com:
+      - "criar novo agent do zero"  # → governance-factory
+      - "auditar smells sem alterar" # → agent-auditor
+    critico: true
+    threshold: 0.90
+
 # ─────────────────────────────────────────────
 # SUITE 2 — Casos Ambíguos (threshold ≥ 0.70)
 # Intenção ambígua que exige clarificação ou roteamento defensivo.
@@ -656,7 +689,7 @@ regressao:
     expected:
       agent_route: "agent-router"
     nao_deve:
-      agent_route: "bug-triage|test-strategy|refactor-planner|analysis-architect|docs-engineer"
+      agent_route: "bug-triage|test-strategy|refactor-planner|tech-solution-architect|docs-engineer"
     critico: true
     threshold: 1.00
 

@@ -160,7 +160,7 @@ Nenhuma criação/revisão de artefato de governança é considerada completa se
 
 ## 7) Consumidores Mapeados
 
-- `governance-factory` — único consumidor; mantém especificidade por `type` (templates `research-agent.md`/`operational-agent.md` para `type: agent`, template `SKILL.md` para `type: skill`, template/naming `.prompt.md` para `type: prompt`, e topologia hierárquica §11 para `type: stack`), referencia esta skill para o fluxo genérico e checklist comum a todos os tipos.
+- `governance-factory` — único consumidor; mantém especificidade por `type` (templates `operational-agent.md`, `research-agent.md` e `agent-template.md` para `type: agent`, template `skill-template.md` para `type: skill`, template `prompt-template.md` para `type: prompt`, e topologia hierárquica §11 para `type: stack`), referencia esta skill para o fluxo genérico e checklist comum a todos os tipos.
 - **Futuro:** qualquer novo tipo de artefato de governança (ex.: `instructions-factory`, se vier a existir) herda o padrão sem reinventar o fluxo.
 
 ## 8) Referências
@@ -176,15 +176,16 @@ Nenhuma criação/revisão de artefato de governança é considerada completa se
 
 > Aplica-se quando `governance-factory` cria `type: agent` ou `type: prompt` (skills não têm campo `model:` — ver tabela §2). Fecha 2 gaps reais encontrados em auditoria (2026-09-01): (a) 15+ artefatos usavam array `["a","b"]` — campo não suporta lista, sempre falha; (b) slugs kebab-case (`claude-haiku-4.5`) não são reconhecidos pelo validador do IDE — o nome correto é o **display name oficial** (Title Case).
 
-### 9.1) Classificação de Perfil (escolha do tier — antes de qualquer validação técnica)
+### 9.1) Classificação de Perfil (escolha do modelo — antes de qualquer validação técnica)
 
-| Pergunta (aplicar em ordem — primeira que bater decide) | Tier | Custo (R-021) |
+A governança do repositório adota dois paradigmas fundamentais para a atribuição de modelos:
+
+| Paradigma | Perfil / Casos de Uso | Modelo |
 |---|---|---|
-| Só lê, roteia, ou preenche template a partir de fatos já extraídos, sem julgamento aberto? (scanner, template-fill, roteamento, checklist, validação) | **Gemini 3.8 Flash** | 0×/0.33× |
-| Implementa, refatora, planeja com risco, ou sintetiza análise técnica não-trivial? (specialists, planners, reviewers, extractors) | **Gemini 3.8 Flash** | 1× |
-| Decide arquitetura crítica, causa-raiz complexa cross-sistema, ou ação de alta irreversibilidade? (raro — só escalar se as 2 acima não bastarem) | **Claude Opus 5** | 3× |
+| **Prompt Procedural** (SLM / Alta Velocidade) | Execuções determinísticas, diretas e algorítmicas, sem planejamento abstrato ou análise deliberativa aberta (scanners, templates, geradores, roteadores de stack, implementadores TDD, fixers, test-writers, enforcers). **Escolha padrão em toda a base.** | **`"Gemini 3.8 Flash"`** |
+| **Prompt Decompositivo / Raciocínio Guiado** (Pensamento Profundo) | Análises deliberativas, orquestração central, exploração de múltiplos caminhos de decisão, trade-offs e avaliação crítica de riscos antes da resposta final (`agent-router`, `tech-solution-architect`, `refactor-planner`, `requirements-analyst`, `deep-search`, especialistas advisor de arquitetura). | **`"Claude Sonnet 5"`** |
 
-**Regra de ouro (redução de créditos):** nunca escalar tier acima do mínimo necessário — um agent operacional em Sonnet/Opus é desperdício de crédito sem ganho de qualidade (ver exemplos reais no catálogo: `adapter-generator`, `agent-router`, `binding-initializer` = Haiku; `analysis-architect`, `code-review`, `angular` = Sonnet).
+**Regra de ouro (redução de créditos):** nunca escalar para `"Claude Sonnet 5"` sem justificativa objetiva de raciocínio profundo, orquestração ou arquitetura complexa — um agent operacional ou procedural em Sonnet é desperdício de créditos sem ganho de qualidade.
 
 ### 9.2) Validação de Disponibilidade Real (obrigatória — antes de finalizar o artefato)
 
@@ -304,5 +305,3 @@ Ao criar a stack, o `governance-factory` DEVE atualizar atomicamente:
 2. **`.github/agents/routing-graph.yaml`**: adiciona o nó `domain_router` e as arestas bidirecionais de/para `agent-router`.
 3. **`.github/agents/agent-router.agent.md`**: adiciona o router na tabela de conhecimento, no branch da Decision Tree e na lista de delegação.
 4. **`.github/agents/README.md`**: adiciona o router na tabela de catálogo e no mapeamento de rotas rápidas.
-
-

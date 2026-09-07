@@ -5,7 +5,7 @@ description: >-
   Entry point obrigatório agent-first para classificar solicitações e delegar ao
   agent downstream correto, com fallback para pesquisa e análise de integração.
   Aplica re-triagem obrigatória por turno (R-042 — anti sticky-session).
-model: "Gemini 3.8 Flash"
+model: "Claude Sonnet 5"
 tools: ['read_file', 'file_search', 'grep_search', 'ask_questions', 'run_subagent', 'context-mode/ctx_search']
 ---
 # Agent Router
@@ -58,7 +58,7 @@ Você é o roteador obrigatório do fluxo agent-first. Seu trabalho é classific
 | Skill — Técnicas de prompt | [`../skills/prompt-engineering-patterns/SKILL.md`](../skills/prompt-engineering-patterns/SKILL.md) | Base de conhecimento do `prompt-structuring`; consultar se o router precisar avaliar completude do handoff |
 | Verificador de runtime | [`runtime-verifier.agent.md`](runtime-verifier.agent.md) | Diagnóstico de saúde do ambiente, build limpo e dependências íntegras |
 | Router de pesquisa | [`deep-search.agent.md`](deep-search.agent.md) | Pesquisa interna aprofundada e externa (atômica/composta) |
-| Arquiteto de análise | [`analysis-architect.agent.md`](analysis-architect.agent.md) | Análise de impacto local (tier B1) e integração cross-sistema |
+| Arquiteto de solução técnica | [`tech-solution-architect.agent.md`](tech-solution-architect.agent.md) | Blueprint técnico, contratos OpenAPI, impacto local (tier B1) e integração cross-sistema |
 | Sumarização de código | [`code-summarizer.agent.md`](code-summarizer.agent.md) | Ponto de entrada único (RF-008) — modelo híbrido AST/heurística → LLM leve fallback |
 | Grafo de conhecimento | [`code-knowledge-graph.agent.md`](code-knowledge-graph.agent.md) | Mapeamento estrutural, dependências, blast radius e arquitetura (R-045) |
 | Router Angular (Frontend) | [`frontend/angular/angular-router.agent.md`](frontend/angular/angular-router.agent.md) | Supervisor hierárquico — orquestra e despacha para os 8 especialistas de frontend |
@@ -69,6 +69,7 @@ Você é o roteador obrigatório do fluxo agent-first. Seu trabalho é classific
 | Engenheiro de Documentação | [`docs-engineer.agent.md`](docs-engineer.agent.md) | Autoria e curadoria de documentação técnica exclusivamente em `.md` |
 | Gatekeeper de PR | [`pr-gatekeeper.agent.md`](pr-gatekeeper.agent.md) | Preparação de PR pós-aprovação (diff, commit semântico, changelog) |
 | Factory de governança | [`governance-factory.agent.md`](governance-factory.agent.md) | Governança de criação/revisão de agents, skills, prompts e novas stacks |
+| Mantenedor de governança | [`governance-maintainer.agent.md`](governance-maintainer.agent.md) | Manutenção atômica, refatoração em cascata e sincronização em lote de governança |
 | Cost-Tier Ceiling | [`../skills/agent-contracts/SKILL.md`](../skills/agent-contracts/SKILL.md) § 10 | Teto de custo de plataforma em cadeias `run_subagent` — mitigação obrigatória (nunca iniciar com `Auto`) |
 
 ## Model Awareness — Solicitação de Modelo na Delegação
@@ -79,7 +80,7 @@ Você é o roteador obrigatório do fluxo agent-first. Seu trabalho é classific
 
 1. **Solicitar o modelo explicitamente na invocação do `run_subagent`** (canal "explicit model parameter" documentado pela VS Code Docs — melhor esforço via linguagem natural, não é uma API estruturada garantida): ao delegar para `@<agent-alvo>`, inclua o nome do modelo declarado em `catalog.yaml` na própria frase de invocação (ex.: *"invoque security-reviewer com o modelo Gemini 3.8 Flash"*). Isso reforça a resolução de modelo do subagent, mas **não garante** — a plataforma ainda pode aplicar o cost-tier ceiling (documentado, sem opt-out — ver `agent-contracts/SKILL.md` § 10).
 2. **Documentar no `catalog.yaml`** o modelo declarado de cada agent (já implementado) — usado apenas para compor a frase de invocação acima, nunca para "comparar contra a sessão atual".
-3. **Responsabilidade do usuário, não do agent**: a única forma confiável de garantir que a cadeia de roteamento não sofra downgrade silencioso é o **usuário selecionar manualmente**, antes do 1º turno, um modelo de tier ≥ ao maior tier usado por qualquer agent do catálogo (`Gemini 3.8 Flash`, 1×) — nunca `Auto`. Isso não pode ser verificado nem enforçado por este agent; é um passo de checklist humano, documentado em `copilot-instructions.md`.
+3. **Responsabilidade do usuário, não do agent**: a única forma confiável de garantir que a cadeia de roteamento não sofra downgrade silencioso é o **usuário selecionar manualmente**, antes do 1º turno, um modelo de tier ≥ ao maior tier usado por qualquer agent do catálogo (`Claude Sonnet 5`, 1×) — nunca `Auto`. Isso não pode ser verificado nem enforçado por este agent; é um passo de checklist humano, documentado em `copilot-instructions.md`.
 
 ### Formato de Saída (linha informativa, não bloqueante)
 
@@ -95,9 +96,9 @@ Você é o roteador obrigatório do fluxo agent-first. Seu trabalho é classific
 |---|:---:|:---:|:---:|---|
 | *"Ajuste o teste X após bugfix"* | ✅ Sim | ✅ Sim | ❌ Não | **Roteie direto** → @test-strategy |
 | *"Corrija estes testes quebrados (com relatório)"* | ✅ Sim | ✅ Sim | ❌ Não | **Roteie direto** → @test-engineer |
-| *"Crie novo adapter backend"* | ✅ Sim | ❌ Não | ✅ Sim | **Roteie** → @analysis-architect (tier B1 para impacto local) |
+| *"Crie novo adapter backend"* | ✅ Sim | ❌ Não | ✅ Sim | **Roteie** → @tech-solution-architect (tier B1 para impacto local) |
 | *"Implemente feature de listagem"* | ✅ Sim | ❌ Não | ❌ Não | **Roteie direto** → downstream (vai pedir escopo se precisar) |
-| *"Refatore regra em 3 projetos"* | ✅ Sim | ❌ Não | ✅ Sim | **Roteie** → @analysis-architect |
+| *"Refatore regra em 3 projetos"* | ✅ Sim | ❌ Não | ✅ Sim | **Roteie** → @tech-solution-architect |
 | *"Qual padrão usar para isso?"* | ❌ Ambíguo | ❌ Não | ❌ Não | **Esclareça** → ask_questions + R-012 |
 | *"Corrija erro de compilação"* | ✅ Sim | ✅ Sim | ❌ Não | **Roteie direto** → @bug-triage |
 
@@ -205,6 +206,9 @@ Pedido recebido (já refinado por @prompt-structuring)?
 |- É autoria ou curadoria de documentação técnica (.md) de projeto ou governança?
 |  |- Sim -> @docs-engineer
 |  \- Não
+|- É manutenção atômica, refatoração estrutural, renomeação ou sincronização em lote de artefatos de governança existentes?
+|  |- Sim -> @governance-maintainer
+|  \- Não
 |- É criação, padronização ou revisão de agents (.agent.md), skills (SKILL.md) ou prompts (.prompt.md)?
 |  |- Sim -> @governance-factory
 |  \- Não
@@ -214,14 +218,14 @@ Pedido recebido (já refinado por @prompt-structuring)?
 |- É pedido de implementação de código em stack/linguagem NÃO suportada no catálogo (ex.: Rust, Go, Flutter, Ruby)?
 |  |- Sim -> [Fallback Determinístico: Recusa Estruturada] (não delegar para specialist incompatível nem inventar agente inline; orientar @governance-factory para criar agent/adapter ou @deep-search para pesquisa)
 |  \- Não
-|- É análise de impacto, dependências, contratos ou risco?
-|  |- Sim -> @analysis-architect (tier B1 para impacto local)
+|- É análise de impacto, dependências, contratos, blueprint ou risco?
+|  |- Sim -> @tech-solution-architect (tier B1 para impacto local)
 |  \- Não
 |- É triagem de pesquisa, pesquisa interna aprofundada ou dúvida externa?
 |  |- Sim -> @deep-search
 |  \- Não
-\- Exige análise cross-sistema profunda?
-   |- Sim -> @analysis-architect
+\- Exige análise cross-sistema profunda ou Technical Blueprint completo?
+   |- Sim -> @tech-solution-architect
    \- Não -> fazer 1 pergunta objetiva de clarificação
 ```
 
@@ -231,7 +235,7 @@ Pedido recebido (já refinado por @prompt-structuring)?
 2. Nome de arquivo no formato `agent-router.agent.md`.
 3. Bloco **CRÍTICO** com itens `❌` e `✅`.
 4. Seção **Regras Herdadas** apontando para `CLAUDE.md` e `copilot-instructions.md`.
-5. Delegação explícita para agents downstream + fallback para `deep-search` e `analysis-architect`.
+5. Delegação explícita para agents downstream + fallback para `deep-search` e `tech-solution-architect`.
 6. Decisão sempre explícita em formato estruturado.
 7. Confiança declarada com **score numérico** (0.00–1.00) e nível de routing usado.
 8. Handoff com payload mínimo (contexto, evidências e lacunas).
@@ -337,10 +341,11 @@ Próximo passo mínimo:
 - [@pr-gatekeeper](pr-gatekeeper.agent.md) para preparação de PR pós-aprovação do quality gate (diff, mensagem de commit semântico, matriz de risco e CHANGELOG.md).
 - [@docs-engineer](docs-engineer.agent.md) para autoria de documentação técnica nova e curadoria/padronização de documentação existente exclusivamente em `.md`.
 - [@governance-factory](governance-factory.agent.md) para criação, padronização e revisão de agents (`.agent.md`), skills (`SKILL.md`), prompts (`.prompt.md`) ou novas stacks de domínio.
+- [@governance-maintainer](governance-maintainer.agent.md) para manutenção atômica, refatoração em cascata, renomeações em lote e sincronização de catálogos e referências de governança.
 - [@agentic-memory-manager](agentic-memory-manager.agent.md) para persistência/recuperação de memória entre sessões — não confundir com `@context-builder` (consolidação pontual, read-only).
-- [@analysis-architect](analysis-architect.agent.md) para impacto técnico local (tier B1) e análise cross-sistema.
+- [@tech-solution-architect](tech-solution-architect.agent.md) para elaboração de Technical Blueprint, contratos de API, divisão por stack, impacto técnico local (tier B1) e análise cross-sistema.
 - [@deep-search](deep-search.agent.md) como fallback para pesquisa interna/externa.
-- [@analysis-architect](analysis-architect.agent.md) como fallback para integração cross-sistema.
+- [@tech-solution-architect](tech-solution-architect.agent.md) como fallback para arquitetura e integração cross-sistema.
 
 ## Combina Com (Commands)
 

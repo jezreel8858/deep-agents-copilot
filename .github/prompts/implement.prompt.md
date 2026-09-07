@@ -1,14 +1,33 @@
 ---
 name: implement
 description: Executa plano aprovado fase a fase, marcando `- [x]` ao concluir e registrando checkpoints obrigatórios.
+agent: 'agent'
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'insert_edit_into_file', 'create_file', 'grep_search', 'file_search', 'get_errors', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file']
+argument-hint: '[caminho-do-plano | descrição-da-fase]'
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 
-# /implement
+# `/implement`
+
+> **Propósito**: Executar plano técnico aprovado fase a fase sob R-031 (zero-interrupção), marcando `- [x]` ao concluir.
+> **Arquivo Ativo**: `${file}`
+> **Workspace**: `${workspaceFolder}`
+
+---
+
+## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
+
+- ✅ **APENAS** executar as tarefas estritamente especificadas no plano aprovado.
+- ✅ **SEMPRE** aplicar Single-Turn Batching e limiar de 5 arquivos da skill `efficient-batch-code-modification` (R-046).
+- ✅ **SEMPRE** validar `get_errors` ao final de cada fase executada.
+- ❌ **NÃO** parar para pedir confirmações intermediárias (R-031) exceto por bloqueio absoluto (credencial exposta ou estado irrecuperável).
+- ❌ **NÃO** fazer commits autônomos ou alterar arquivos fora do plano aprovado.
+
+---
 
 Você foi encarregado de implementar um plano técnico aprovado. Planos contêm fases com mudanças específicas e critérios de sucesso.
 

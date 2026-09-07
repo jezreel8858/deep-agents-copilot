@@ -32,13 +32,32 @@ source_docs:
 
 # Terminal Governance
 
-Boas práticas obrigatórias para uso do terminal por agentes de IA (GitHub Copilot, Claude, Cursor). Cobre prevenção de poluição de contexto, truncamento de saída, comandos não-interativos, decisão sandbox vs terminal, execução em lote e padrões proibidos.
+## 0) Problema Resolvido & Princípios Fundamentais
 
-> **Aplica-se a**: todo agent ou prompt que declara `run_in_terminal` nas suas tools.
+> **Arquitetura da Skill (Anthropic Open Spec / Progressive Disclosure)**:
+> - **Nível 1 (Metadados)**: Frontmatter com `name`, `description` em 3ª pessoa, `tier: 1`, `category: tooling` e triggers.
+> - **Nível 2 (Corpo Operacional)**: Este arquivo `SKILL.md` contendo a hierarquia de decisão sandbox vs terminal, comandos proibidos e checklist de conformidade.
+> - **Nível 3 (Recursos Suplementares)**: Scripts e comandos de ciclo de vida permitidos.
+
+Esta skill resolve o problema de **poluição massiva de contexto, travamento de sessões por pagers interativos e estouro de orçamento de tokens** decorrentes do uso ingênuo ou irrestrito de comandos de terminal por agentes de IA.
 
 ---
 
-## 1) Princípio-base: Terminal é Fallback
+## 1) Quando Usar vs Quando NÃO Usar
+
+### ✅ Quando Usar
+- Em qualquer agent ou prompt que precise executar comandos de ciclo de vida (`git`, `npm install`, `mvn`, `pytest`).
+- Para verificar regras de truncamento de saída, pipes não-interativos e prevenção de pager (`--no-pager`).
+- Para decidir entre execução no sandbox Context Mode (`ctx_execute`) e execução no host.
+
+### ❌ Quando NÃO Usar
+- Para busca e varredura de arquivos — use `ctx_search`, `grep_search` ou `file_search`.
+- Para leitura ou transformação de arquivos grandes — use `ctx_execute_file` ou `ctx_batch_execute`.
+- Para inspeção exploratória de diretórios (`ls -R`, `find`) — use `list_dir` ou motor de grafo.
+
+---
+
+## 2) Princípio-base: Terminal é Fallback
 
 O terminal (`run_in_terminal`) é a **última opção** — não o padrão.
 
@@ -238,4 +257,14 @@ Nunca colar o output bruto integralmente. Sempre extrair apenas o que é relevan
 - `CLAUDE.md` R-008 (Execução preferencial) e R-035 (Terminal sem paginação interativa)
 - `.github/copilot-instructions.md` § 2.1 (context-mode — Regras Obrigatórias de Roteamento)
 - Skill `context-mode` — para quando ctx_execute/ctx_batch_execute substitui o terminal
+
+---
+
+## 11) Checklist de Conformidade
+
+- [ ] Pager interativo desativado (`--no-pager`, `GIT_PAGER=cat`, pipes com `cat`).
+- [ ] Saída limitada com flags (`head -n`, `grep`, `--max-count`).
+- [ ] Zero comandos proibidos executados no terminal (`curl`, `wget`, `find`, `node -e`).
+- [ ] Orçamento de tokens respeitado (≤ 50 linhas de saída esperada).
+- [ ] Confirmação de erro reportada no formato compacto de 3 linhas (R-020).
 

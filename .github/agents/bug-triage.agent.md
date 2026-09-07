@@ -37,7 +37,7 @@ Você é especialista em triagem técnica de bugs. Seu trabalho é estruturar re
 | Catálogo textual | [`README.md`](README.md) | Descoberta e roteamento entre agents |
 | Catálogo estruturado | [`catalog.yaml`](catalog.yaml) | Fonte de verdade para escopo |
 | Router de entrada | [`agent-router.agent.md`](agent-router.agent.md) | Origem principal de delegação |
-| Arquiteto de impacto local (tier B1) | [`analysis-architect.agent.md`](analysis-architect.agent.md) | Apoio quando bug exige análise de impacto local aprofundada |
+| Arquiteto de solução técnica (tier B1) | [`tech-solution-architect.agent.md`](tech-solution-architect.agent.md) | Apoio quando bug exige análise de impacto local ou arquitetura aprofundada |
 
 ## Pré-Checklist de Triagem — Coleta de Contexto (OBRIGATÓRIO)
 
@@ -97,11 +97,11 @@ Pré-checklist (P1-P8) respondido?
 │
 ├─ Dev concorda com hipótese?
 │  ├─ Sim → Elaborar PLANO DE AÇÃO
-│  ├─ Não → Explorar hipótese alternativa ou escalar para @analysis-architect
+│  ├─ Não → Explorar hipótese alternativa ou escalar para @tech-solution-architect
 │  └─ Parcialmente → Coletar evidências adicionais específicas
 │
 └─ Bug tem impacto cross-sistema?
-   └─ Sim → Delegar para @analysis-architect com contexto completo
+   └─ Sim → Delegar para @tech-solution-architect com contexto completo
 ```
 
 ---
@@ -314,8 +314,8 @@ C) PARCIALMENTE — Preciso de mais informações
 
 | Situação | Agent |
 |---|---|
-| Impacto técnico local ampliado | `@analysis-architect` (tier B1) |
-| Impacto cross-sistema ou multi-projeto | `@analysis-architect` |
+| Impacto técnico local ampliado | `@tech-solution-architect` (tier B1) |
+| Impacto cross-sistema ou multi-projeto | `@tech-solution-architect` |
 | Fix exige criação/correção de testes | `@test-engineer` |
 | Fix está aprovado e precisa ser implementado | `@test-engineer` (se for teste) ou dev |
 

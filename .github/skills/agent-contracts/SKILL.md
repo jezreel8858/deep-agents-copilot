@@ -264,7 +264,8 @@ Já normatizado por R-016/R-020 e pelas seções 1-4 desta skill: confiança dec
 | Perfil | Template | Agents exemplo | Racional (pesquisa) |
 |---|---|---|---|
 | Router/Triagem | Bloco de decisão compacto: Rota·Delegado·Motivo·Confiança·Score·Nível Routing·Entradas·Lacunas·Próximo Passo | `agent-router`, `prompt-structuring` | Orchestrator decide, não narra (Product School: planner→executor) |
-| Analista/Read-only | 5 seções: Abordagem·Componentes·Evidências·Riscos·Próximo Passo | `analysis-architect`, `bug-triage`, `business-rules-extractor` | "Data/Insight Agent" exige leitura humana rica — tabelas/bullets |
+| Analista/Read-only | 5 seções: Abordagem·Componentes·Evidências·Riscos·Próximo Passo | `tech-solution-architect`, `bug-triage` | "Data/Insight Agent" exige leitura humana rica — tabelas/bullets |
+| Analista / Híbrido Documental | 5 seções ou Documentação Gerada + Evidências rastreáveis | `business-rules-extractor` | Analisa código read-only e gera documentação estruturada em markdown (`docs/business-rules/`) |
 | Especialista de Recomendação | 5 seções + Trade-offs/Riscos explícitos (modo Advisory) | `angular-engineer`, `spring-boot-engineer`, `spring-reactive-engineer` | Mesma classe de Insight Agent, com recomendação técnica declarada |
 | Operacional/Executor | Resultado→Evidências→Validações→Próximo Passo (compacto, checklist) | `test-engineer`, `governance-factory`, `binding-initializer`, `adapter-generator`, `docs-engineer` | "Specialist Skills" tem output estreito e determinístico |
 
@@ -290,6 +291,7 @@ Já normatizado por R-016/R-020 e pelas seções 1-4 desta skill: confiança dec
 | **Todos os perfis (baseline universal)** | `read_file`, `grep_search`, `file_search`, `run_subagent` | — |
 | Router/Triagem | baseline + `list_dir` | `ask_questions` |
 | Analista/Read-only (pesquisa) | baseline + `list_dir` | `context-mode/ctx_search`, `context-mode/ctx_batch_execute` |
+| Analista / Híbrido Documental | baseline + `list_dir`, `create_file`, `insert_edit_into_file`, `get_errors` | `context-mode/*`, `ask_questions` |
 | Especialista de Recomendação | baseline + `list_dir`, `get_errors` | `context-mode/*`, ferramentas de pesquisa externa |
 | Operacional/Executor (cria/edita arquivos) | baseline + `insert_edit_into_file`, `create_file`, `list_dir`, `get_errors` | `ask_questions`, `run_in_terminal`, `context-mode/*` |
 

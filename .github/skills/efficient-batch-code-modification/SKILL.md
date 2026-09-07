@@ -1,0 +1,120 @@
+---
+name: efficient-batch-code-modification
+description: >
+  Diretrizes e padrões para execução de alterações de código em lote otimizadas
+  para consumo mínimo de tokens e créditos em sessões de AI Copilot — análise prévia
+  de impacto (dry-run), batching de tool calls em uma única rodada, minimal diffs cirúrgicos
+  e prevenção de loops de re-submissão de contexto.
+tier: 1
+category: process
+triggers:
+  - "efficient batch code modification"
+  - "edição em lote"
+  - "batch modification"
+  - "diff cirúrgico"
+  - "minimal diffs"
+  - "economia de créditos"
+  - "otimizar consumo de tokens"
+  - "dry-run de edição"
+  - "alterar múltiplos arquivos"
+  - "reduzir tool calls"
+  - "token budget"
+tools:
+  - "replace_string_in_file"
+  - "insert_edit_into_file"
+  - "create_file"
+  - "read_file"
+  - "grep_search"
+  - "get_errors"
+  - "context-mode/ctx_execute"
+  - "context-mode/ctx_execute_file"
+  - "context-mode/ctx_batch_execute"
+source_docs:
+  - "CLAUDE.md"
+  - ".github/copilot-instructions.md"
+---
+
+# Efficient Batch Code Modification (Edição em Lote com Economia de Tokens)
+
+Esta skill estabelece o protocolo operacional obrigatório para execução de alterações de código otimizadas para consumo de tokens e diffs mínimos em assistentes de IA (GitHub Copilot, Claude, Cursor). O objetivo principal é **eliminar o desperdício de créditos e evitar a re-submissão recursiva do contexto** durante tarefas multi-arquivo.
+
+---
+
+## 0. Hierarquia de Decisão de Ferramenta (Antes de Tudo)
+
+Antes de executar qualquer edição, o agente DEVE classificar o escopo da tarefa para escolher a ferramenta com menor custo de créditos:
+
+| Escopo da Modificação | Ferramenta Obrigatória | Mecanismo de Execução | Custo de Créditos |
+|---|---|---|:---:|
+| **1 a 4 arquivos** (edição pontual, contextos heterogêneos) | `replace_string_in_file` ou `insert_edit_into_file` (Editor) | Single-Turn Batching (todas as tool calls na mesma rodada) | Baixo (~1 tool call por arquivo) |
+| **5+ arquivos** OU **padrão repetitivo** em múltiplos arquivos (rename, atualização de campo, injeção de bullet em N agents/skills) | `ctx_execute`, `ctx_execute_file` ou `ctx_batch_execute` (Context-Mode) | Script inline (Node.js/Python) que lê, altera via regex/replace e salva em processo único no sandbox | **Mínimo (~zero créditos de LLM por arquivo, 1 única tool call)** |
+
+> ⚠️ **INCIDENTE PREVENIDO**: Executar 20+ chamadas de editor sequenciais ou em lote no chat reenvia histórico massivo a cada retorno de tool, podendo drenar centenas de créditos por refactor. Em operações massivas (>= 5 arquivos) ou padrões repetitivos, o uso de script via `ctx_execute`/`ctx_execute_file`/`ctx_batch_execute` é **COMPULSÓRIO**.
+
+---
+
+## 1. Diagnóstico: Por que Alterações em Cascata Consomem Tantos Créditos?
+
+Nos ambientes de AI Chat (VS Code / JetBrains Copilot):
+- **A cada rodada de ferramenta (*tool call* unitária)**, o cliente reenvia **todo o histórico da conversa**, os prompts de governança (`CLAUDE.md`, `copilot-instructions.md`) e os outputs das ferramentas anteriores.
+- Se uma tarefa toca 15 arquivos e o agente executa:
+  `read_file (1)` → *turno* → `replace (1)` → *turno* → `read_file (2)` → *turno* → `replace (2)` ...
+  O agente realiza **30+ turnos sequenciais**. Com um histórico médio de 25k tokens, são processados mais de **750.000 tokens de entrada**, drenando rapidamente centenas de créditos de modelos premium (Claude Sonnet / GPT-5).
+- **A Solução Canônica:** Pré-análise em memória (Dry-Run) + Execução em Lote Paralela (*Single-Turn Batching*) + Diffs Cirúrgicos.
+
+---
+
+## 2. As 3 Diretrizes Fundamentais
+
+### 2.1. Diretriz 1: Análise de Impacto Prévia (Dry-Run em Memória)
+
+Antes de invocar ferramentas de escrita (`ctx_execute`, `replace_string_in_file`, `insert_edit_into_file`, `create_file`):
+1. **Mapeamento Cirúrgico e Decisão de Ferramenta:** Inspecione a árvore e identifique de antemão todas as ocorrências necessárias (via `grep_search` focado ou leitura rápida dos arquivos conhecidos). **Decida automaticamente a ferramenta**: se >= 5 arquivos ou padrão repetitivo, prepare script para `ctx_execute`/`ctx_batch_execute`; se 1 a 4 arquivos pontuais, prepare tool calls do editor.
+2. **Resumo Compacto:** No planejamento mental ou resposta inicial, estruture a lista de arquivos afetados e os blocos específicos antes de tocar no disco.
+3. **Validação de Precondição:** Certifique-se de que os arquivos existem e não possuem conflitos óbvios antes de iniciar a primeira edição.
+
+### 2.2. Diretriz 2: Aplicação em Lote (Batch Tool Calls)
+
+1. **Paralelização de Edições:** Agrupe todas as edições necessárias de múltiplos arquivos na **mesma rodada de resposta** (*tool calls* simultâneas).
+   - ❌ **Anti-padrão (Sequencial):** Editar `arquivo1.ts`, esperar o output da tool no próximo turno, para só então chamar o editor para `arquivo2.ts`.
+   - ✅ **Padrão Canônico (Batch):** Emitir `replace_string_in_file(arquivo1)` E `replace_string_in_file(arquivo2)` E `replace_string_in_file(arquivo3)` na mesma mensagem.
+2. **Validação Agrupada (`get_errors` em lote):**
+   - ❌ **Anti-padrão:** Chamar `get_errors(arquivo1)`, depois `get_errors(arquivo2)`, depois `get_errors(arquivo3)` em turnos separados.
+   - ✅ **Padrão Canônico:** Chamar `get_errors(filePaths: [arquivo1, arquivo2, arquivo3, ...])` **uma única vez** ao final de todo o lote.
+3. **Zero Releitura Redundante:**
+   - Nunca use `read_file` imediatamente após um `replace_string_in_file` com o único intuito de "ver se ficou bom". O retorno da ferramenta de replace já confirma o sucesso ou falha da operação.
+
+### 2.3. Diretriz 3: Diffs Cirúrgicos (Minimal Diffs)
+
+1. **Escopo Mínimo de Substituição:**
+   - Substitua apenas o método, anotação, linha de import ou bloco específico.
+   - Contexto de busca (`oldString`): forneça de 2 a 3 linhas acima e abaixo para garantir unicidade, sem carregar blocos de 100 linhas desnecessárias.
+2. **Proibição de Reescrita Integral:**
+   - **NUNCA** reescreva arquivos inteiros do zero via `create_file` ou replace integral se a alteração afeta apenas 10% a 30% do arquivo.
+   - Reescrita total só é justificável se o arquivo for novo ou se >80% do seu conteúdo foi descartado.
+
+---
+
+## 3. Matriz Comparativa: Execução Ingênua vs. Batch de Editor vs. Context-Mode Script
+
+| Aspecto | Execução Ingênua (Anti-Padrão) | Batch de Editor (1 a 4 arquivos) | Context-Mode Script (>= 5 arquivos / Repetitivo) |
+|---|---|---|---|
+| **Mecanismo** | `replace` sequencial (1 por turno) | `replace` paralelo em lote único | Script Node/Python via `ctx_execute` |
+| **Tool Calls de Editor** | 20 a 50 chamadas sequenciais | 1 a 4 chamadas no mesmo turno | **0 chamadas de editor** (1 chamada MCP) |
+| **Turnos de Chat** | 20 a 30 turnos | 1 a 2 turnos | **1 único turno** |
+| **Consumo de Tokens** | 500k – 800k tokens (re-envio contínuo) | 60k – 100k tokens | **< 15k tokens** (processamento off-chat) |
+| **Consumo de Créditos** | 200 a 400 créditos (ou >900 em 25+ files) | 20 a 50 créditos | **~Zero créditos extras** por arquivo |
+| **Latência Total** | 3 a 5 minutos esperando turnos | 30 a 60 segundos | **< 5 segundos** |
+| **Risco de Erro/Alucinação** | Alto (contexto satura no caminho) | Baixo | **Mínimo** (determinístico via script) |
+
+---
+
+## 4. Checklist de Auto-Verificação para Agentes
+
+Antes de iniciar a gravação de alterações:
+- [ ] O mapeamento de todos os arquivos impactados já está claro na memória?
+- [ ] **Hierarquia de Ferramenta**: Se >= 5 arquivos ou padrão repetitivo, usei `ctx_execute`/`ctx_batch_execute` com script em vez de tool calls de editor unitárias?
+- [ ] Se < 5 arquivos pontuais, todas as chamadas de substituição para arquivos independentes foram agrupadas no mesmo turno (Single-Turn Batching)?
+- [ ] O `oldString` contém apenas o contexto estrito para ser unívoco (2-3 linhas)?
+- [ ] Evitei releituras desnecessárias de arquivos que eu mesmo acabei de editar?
+- [ ] O `get_errors` final foi consolidado em uma única chamada com o array completo `filePaths`?

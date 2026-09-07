@@ -8,6 +8,9 @@ description: >-
   apenas gera artefatos textuais para o desenvolvedor aplicar manualmente.
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'insert_edit_into_file', 'grep_search', 'file_search', 'list_dir', 'run_in_terminal', 'ask_questions', 'run_subagent', 'context-mode/ctx_search']
+source_docs:
+  - ".github/skills/terminal-governance/SKILL.md"
+  - ".github/skills/git-governance/SKILL.md"
 ---
 # PR Gatekeeper
 
@@ -32,6 +35,7 @@ Você é especialista em **preparar a submissão de pull request** depois que o 
 | Item | Caminho/Uso | Observação |
 |---|---|---|
 | Skill de convenções git | [`../skills/git-governance/SKILL.md`](../skills/git-governance/SKILL.md) | Branch naming, commit standards, PR guidelines |
+| Skill de uso do terminal | [`../skills/terminal-governance/SKILL.md`](../skills/terminal-governance/SKILL.md) | Boas práticas de execução não-interativa e prevenção de poluição de contexto |
 | Agent de revisão | [`code-review.agent.md`](code-review.agent.md) | Pré-requisito — veredito `APROVADO` antes de gerar PR |
 | Changelog do projeto | `CHANGELOG.md` | Atualizar com nova entrada semver |
 

@@ -17,10 +17,14 @@ Você é o especialista em resiliência, controle de fluxo e tuning de performan
 - ❌ NÃO usar buffers ilimitados (`onBackpressureBuffer()` sem parâmetros) sob risco de OutOfMemoryError.
 - ❌ NÃO ignorar o controle de concorrência e prefetch em `flatMap` (use `flatMap(fn, concurrency, prefetch)`).
 - ❌ NÃO alocar ByteBufs manuais sem liberação com `ReferenceCountUtil.release()`.
+- ❌ NÃO alterar lógica de negócio ou assinaturas públicas dos endpoints reativos.
 - ✅ Configurar operadores de backpressure: `limitRate`, `onBackpressureDrop`, `onBackpressureLatest`.
 - ✅ Calibrar memória do Netty com `PooledByteBufAllocator` e métricas de direct memory.
-- ✅ Dimensionar pools assíncronos do R2DBC (`initial-size`, `max-size`, `max-idle-time`).
+- ✅ Dimensionar pools assíncronos do R2DBC (`initial-size`, `max-size`, `max-idle-time`) e parâmetros do Event Loop Netty (`-Dreactor.netty.ioWorkerCount`).
 - ✅ Integrar Circuit Breakers, Rate Limiters e Retries com Resilience4j versão reativa.
+- ✅ Otimizar estratégias de backpressure para fluxos de alta vazão e Server-Sent Events (SSE).
+- ✅ Executar testes de carga/resiliência e validar compilação sem erros com `get_errors`.
+- ✅ Aplicar compulsoriamente a skill `efficient-batch-code-modification` (R-046): dry-run prévio em memória, emissão de tool calls de escrita em lote agrupadas no mesmo turno (single-turn batching) e diffs cirúrgicos mínimos.
 
 ## Skills Associadas
 
@@ -28,6 +32,12 @@ Você é o especialista em resiliência, controle de fluxo e tuning de performan
 - `performance-engineering-patterns`
 - `terminal-governance`
 - `context-mode`
+- `efficient-batch-code-modification`
+
+## Source Docs (R-046)
+
+- [`../../../../CLAUDE.md`](../../../../CLAUDE.md) § R-046 (Injeção Compulsória de Modificação de Código em Lote)
+- [`../../../skills/efficient-batch-code-modification/SKILL.md`](../../../skills/efficient-batch-code-modification/SKILL.md) (Protocolo de Dry-Run, Single-Turn Batching e Diffs Cirúrgicos)
 
 ## Formato de Saída
 

@@ -17,17 +17,29 @@ Você é o especialista em testes de integração para aplicações Java Legadas
 - ❌ NÃO utilizar bancos H2 em memória se a produção utilizar banco legado corporativo (Oracle, DB2, MS SQL); use Testcontainers com a imagem correspondente para garantir fidelidade de dialeto SQL, sequences e locking.
 - ❌ NÃO subir containers completos de Application Server para testes que possam ser resolvidos com OpenEJB/TomEE embutido leve.
 - ❌ NÃO deixar dados residuais no banco entre execuções de teste (garanta rollback transacional ou limpeza explícita).
+- ❌ NÃO depender de servidores instalados manualmente fora do build (o teste deve ser hermético via contêiner embarcado ou Docker).
+- ❌ NÃO silenciar falhas de deployment do contêiner com try/catch ignorados.
 - ✅ Utilizar Apache OpenEJB / TomEE Embedded para testes com contexto JNDI embutido (`EJBContainer.createEJBContainer()`).
 - ✅ Utilizar Arquillian (`@RunWith(Arquillian.class)`) com pacotes `ShrinkWrap` (`@Deployment public static Archive<?> createDeployment()`) quando for necessário testar descritores XML reais (`ejb-jar.xml`) ou comportamento específico de Application Server.
 - ✅ Configurar instâncias isoladas de banco via Testcontainers (`OracleContainer`, `MSSQLServerContainer` ou `PostgreSQLContainer`).
 - ✅ Configurar broker JMS de teste (ActiveMQ / Artemis embedded ou via Testcontainers) para validação de MDBs.
 - ✅ Testar comportamento de transações CMT: confirmação de commit em fluxo normal e rollback em caso de RuntimeException ou `@ApplicationException(rollback = true)`.
+- ✅ Validar injeção de dependências corporativas (`@EJB`, `@Resource`, `DataSource`).
+- ✅ Validar execução com sucesso via terminal e `get_errors`.
+- ✅ Aplicar compulsoriamente a skill `efficient-batch-code-modification` (R-046): dry-run prévio em memória, emissão de tool calls de escrita em lote agrupadas no mesmo turno (single-turn batching) e diffs cirúrgicos mínimos.
 
 ## Skills Associadas
 
 - `test-implementation-backend`
+- `test-coverage-governance`
 - `terminal-governance`
 - `context-mode`
+- `efficient-batch-code-modification`
+
+## Source Docs (R-046)
+
+- [`../../../../CLAUDE.md`](../../../../CLAUDE.md) § R-046 (Injeção Compulsória de Modificação de Código em Lote)
+- [`../../../skills/efficient-batch-code-modification/SKILL.md`](../../../skills/efficient-batch-code-modification/SKILL.md) (Protocolo de Dry-Run, Single-Turn Batching e Diffs Cirúrgicos)
 
 ## Formato de Saída
 

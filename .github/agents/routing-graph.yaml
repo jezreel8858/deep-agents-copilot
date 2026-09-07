@@ -64,9 +64,9 @@ nos:
     tipo: fallback
     descricao: "Pesquisa interna aprofundada e externa (atômica/composta) — fallback primário"
 
-  - id: analysis-architect
+  - id: tech-solution-architect
     tipo: fallback
-    descricao: "Análise técnica cross-projeto e integrações cross-sistema; absorve impacto local via tier B1"
+    descricao: "Arquiteto de solução técnica, blueprint, contratos de integração e divisão por stack; absorve impacto local via tier B1"
 
   - id: governance-factory
     tipo: downstream
@@ -74,6 +74,13 @@ nos:
       Fusão de agent-factory + skill-factory + prompt-factory: cria/revisa
       agent (.agent.md), skill (SKILL.md) ou prompt (.prompt.md) via
       parâmetro type, com atualização atômica do catálogo correspondente.
+
+  - id: governance-maintainer
+    tipo: downstream
+    descricao: >
+      Especialista executor em manutenção atômica, refatoração estrutural e sincronização
+      em lote de artefatos de governança (.github/agents, .github/skills, .github/prompts,
+      catálogos e grafo de roteamento) com single-turn batching e context-mode.
 
   - id: binding-initializer
     tipo: health_check
@@ -147,6 +154,10 @@ nos:
   - id: database-specialist
     tipo: downstream
     descricao: "Migrações de schema (Flyway/Liquibase/Alembic), otimização de query e integridade referencial; rollback sempre documentado"
+
+  - id: agent-auditor
+    tipo: downstream
+    descricao: "Auditor de governança em meta-nível para analisar smells e gaps no catálogo de agents/skills/prompts, validando templates canônicos, R-046/batching, especificações e alinhamento de perfil sem mutação direta, com recomendações e handoff para executores"
 
 # ─────────────────────────────────────────────
 # ARESTAS — condições de roteamento
@@ -377,7 +388,7 @@ arestas:
       sinal_r006: "É elicitação de requisito NOVO a partir de pedido ambíguo (ainda sem análise técnica)?"
       nao_confundir_com:
         - "extrair regra de negócio de código existente"  # → business-rules-extractor (reverso)
-        - "impacto técnico de mudança já definida"          # → analysis-architect (tier B1)
+        - "impacto técnico de mudança já definida"          # → tech-solution-architect (tier B1)
 
   # Sumarização de código-fonte agnóstica a linguagem (RF-008)
   - de: agent-router
@@ -397,7 +408,7 @@ arestas:
       nao_confundir_com:
         - "revisar/corrigir código"        # → bug-triage/code-review/refactor-planner
         - "extrair regra de negócio"       # → business-rules-extractor
-        - "implementar sumarização em lib" # → decisão técnica de governance-factory/analysis-architect, não roteamento
+        - "implementar sumarização em lib" # → decisão técnica de governance-factory/tech-solution-architect, não roteamento
 
   # Delegação interna: qualquer agent downstream pode invocar code-summarizer sob demanda (RF-002)
   - de: "*downstream"
@@ -435,7 +446,7 @@ arestas:
         - "sumarizar código"                       # → code-summarizer
         - "revisar/corrigir código"                # → bug-triage/code-review/refactor-planner
         - "implementação/feature de componente"    # → angular-engineer / spring-boot-engineer
-        - "acoplamento arquitetural entre sistemas" # → analysis-architect (cross-sistema/contratos)
+        - "acoplamento arquitetural entre sistemas" # → tech-solution-architect (cross-sistema/contratos)
 
   # Delegação interna: qualquer agent downstream pode invocar code-knowledge-graph sob demanda (RF-002)
   - de: "*downstream"
@@ -509,9 +520,9 @@ arestas:
         - "eliminar duplicação"
         - "reestruturar"
 
-  # Análise de impacto local (tier B1)
+  # Análise de impacto local (tier B1) / Blueprint de solução
   - de: agent-router
-    para: analysis-architect
+    para: tech-solution-architect
     prioridade: 4
     threshold_score: 0.90
     nivel_routing: rule-based
@@ -523,7 +534,11 @@ arestas:
         - "o que muda"
         - "quem é afetado"
         - "breaking change"
-      sinal_r006: "Impacto local -> usar analysis-architect em tier B1"
+        - "blueprint"
+        - "blueprint técnico"
+        - "technical blueprint"
+        - "desenho de arquitetura"
+      sinal_r006: "Impacto local ou elaboração de blueprint técnico -> usar tech-solution-architect em tier B1"
 
   # Documentação (autoria de conteúdo novo + curadoria de conteúdo existente — fusão docs-writer + docs-curator)
   - de: agent-router
@@ -573,9 +588,52 @@ arestas:
         - "ecossistema de agentes"
       sinal_r006: "type=agent | type=skill | type=prompt | type=stack — perguntar via ask_questions se ambíguo"
 
-  # Análise de integração cross-sistema + análise técnica geral (unificado em analysis-architect v2.0.0)
+  # Manutenção e sincronização em lote de governança (governance-maintainer)
   - de: agent-router
-    para: analysis-architect
+    para: governance-maintainer
+    prioridade: 6.1
+    threshold_score: 0.90
+    nivel_routing: rule-based
+    condicoes:
+      keywords:
+        - "manutenção de governança"
+        - "refatorar governança"
+        - "atualizar catálogo"
+        - "sincronizar agents"
+        - "renomear agent"
+        - "batch modification governança"
+        - "sincronizar referências"
+        - "alterar governança"
+      sinal_r006: "É manutenção/sincronização/refatoração em lote de artefatos existentes de governança (não criação de novo artefato do zero)?"
+      nao_confundir_com:
+        - "criar novo agent/skill/prompt/stack do zero"  # → governance-factory
+        - "auditar semântica do catálogo sem alterar"    # → agent-auditor
+
+  # Auditoria de governança, smells e conformidade (agent-auditor)
+  - de: agent-router
+    para: agent-auditor
+    prioridade: 6.2
+    threshold_score: 0.90
+    nivel_routing: rule-based
+    condicoes:
+      keywords:
+        - "auditar governança"
+        - "auditar catálogo"
+        - "auditar agents"
+        - "auditar prompts"
+        - "auditar skills"
+        - "governance smells"
+        - "conformidade de agents"
+        - "smell de governança"
+        - "auditar conformidade"
+      sinal_r006: "É auditoria semântica/estrutural do catálogo em meta-nível (read-only, sem mutação direta)?"
+      nao_confundir_com:
+        - "manutenção/sincronização em lote"             # → governance-maintainer (executor mutativo)
+        - "criar novo agent/skill/prompt/stack"           # → governance-factory (autor do zero)
+
+  # Análise de integração cross-sistema, contratos e Technical Blueprint (tech-solution-architect)
+  - de: agent-router
+    para: tech-solution-architect
     prioridade: 7
     threshold_score: 0.85
     nivel_routing: rule-based
@@ -590,6 +648,8 @@ arestas:
         - "blast radius"
         - "fluxo de dados cross-sistema"
         - "acoplamento entre serviços"
+        - "blueprint técnico"
+        - "divisão de tarefas por stack"
 
   # Supervisor e roteador de domínio Angular (Hierarchical Sub-Router)
   - de: agent-router
@@ -702,7 +762,7 @@ arestas:
       gatilho: >
         Mudança de verbo de ação (elicitar->implementar, revisar->codar,
         analisar->corrigir, planejar->executar) quando o agent ativo NÃO
-        cobre implementação (analysis-architect|bug-triage|
+        cobre implementação (tech-solution-architect|bug-triage|
         requirements-analyst|test-strategy|refactor-planner|deep-search)
         OU pedido de execução/código em stack fora da matriz de competência
         do agent ativo OU pedido de execução/código em agent estritamente
@@ -724,15 +784,15 @@ arestas:
       sinal: "Dúvida técnica, pesquisa interna aprofundada, pesquisa externa, benchmark de mercado"
       gatilho: "Intenção clara que exige investigação além do contexto imediato"
 
-  # Análise técnica genérica e cross-projeto — fallback secundário amplo
+  # Análise técnica genérica, blueprint e cross-projeto — fallback secundário amplo
   - de: agent-router
-    para: analysis-architect
+    para: tech-solution-architect
     prioridade: 9
     threshold_score: 0.70
     nivel_routing: semantic
     condicoes:
-      sinal: "Análise técnica genérica, impacto, requisitos, fluxos ou qualquer análise cross-sistema"
-      gatilho: "Escopo que envolve análise de impacto, contratos, dependências ou integrações"
+      sinal: "Análise técnica genérica, blueprint, impacto, requisitos, fluxos ou qualquer análise cross-sistema"
+      gatilho: "Escopo que envolve arquitetura, blueprint técnico, contratos, dependências ou integrações"
 
   # Verificação de saúde do ambiente antes de testes/codificadores
   - de: agent-router

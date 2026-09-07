@@ -6,6 +6,35 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.1.0] — 2026-09-06
+
+### Adicionado
+- **Regra Normativa R-046 (Injeção Compulsória de Modificação de Código em Lote)**: Formalizada em `CLAUDE.md` a obrigatoriedade da skill operacional `efficient-batch-code-modification` em toda tarefa que envolva escrita, refatoração ou alteração em massa de código, erradicando loops sequenciais de roundtrip e reenvio recursivo de contexto.
+- **Injeção Compulsória em `prompt-structuring` (R-046)**: Adicionado mecanismo no refinamento de prompt para injetar nativamente a constraint de dry-run prévio em memória, single-turn batching e diffs cirúrgicos em `<constraints>` para qualquer tarefa de código sem exigir intervenção manual do usuário.
+- **Novo Agente `@governance-maintainer` (v1.0.0)**: Especialista executor em manutenção atômica, refatoração estrutural e sincronização em lote de artefatos de governança (`.github/agents`, `.github/skills`, `.github/prompts`, catálogos e grafo de roteamento). Opera sob o protocolo de single-turn batching e priorização de context-mode sobre terminal.
+- **Nova Skill `efficient-batch-code-modification` (Tier 1, Process)**: Protocolo operacional para economia de tokens e créditos Copilot — análise prévia em memória (dry-run), tool calls de escrita emitidas em lote na mesma rodada e diffs cirúrgicos mínimos.
+
+### Evoluído
+- **Agents Executores de Código Alinhados a R-046**: Inclusão explícita de `efficient-batch-code-modification` em `source_docs`, `skills:` e diretrizes operacionais de 26 agents (database-specialist e 25 especialistas de domínio em frontend/angular, backend/spring-boot, backend/spring-reactive e backend/ejb).
+- **Evolução de `analysis-architect` para `tech-solution-architect` (v2.1.0)**:
+  - Adotado o padrão consolidado de mercado *Spec-First / Technical Blueprint* e *Context Firewall* (particionamento isolado `[BACKEND_TASKS]` e `[FRONTEND_TASKS]` para eliminar alucinações e perda de contexto downstream).
+  - Escopo: Viabilidade técnica, elaboração de Blueprint, contratos OpenAPI/AsyncAPI, modelo de dados (Flyway) e divisão de tarefas por stack antes do despacho aos Domain Routers.
+  - Sincronização atômica de governança (R-015/R-040): atualizados `catalog.yaml`, `routing-graph.yaml`, `agent-router.agent.md`, `casos-roteamento.yaml` (novo `canon-036`), `requirements-analyst.agent.md`, `feature-planner.agent.md`, `refactor-planner.agent.md`, `code-review.agent.md`, `test-strategy.agent.md`, `bug-triage.agent.md`, `code-knowledge-graph.agent.md`, `copilot-instructions.md`, `CLAUDE.md`, `README.md` e `.index.json`.
+  - Substituição do arquivo `analysis-architect.agent.md` por `tech-solution-architect.agent.md`.
+
+### Consolidado
+- **Consolidação Biparadigma de Modelos nos Agents e Prompts**:
+  - **Paradigma do Prompt Procedural (SLMs / Alta Velocidade — Padrão Base)**: Definido `"Gemini 3.8 Flash"` como escolha padrão em toda a base (54 agents e 16 prompts procedurais/determinísticos: implementadores TDD, fixers, test-writers, geradores de adapters, linters/enforcers, scanners e roteadores de domínio).
+  - **Paradigma do Prompt Decompositivo / Raciocínio Guiado (Pensamento Profundo)**: Reservado `"Claude Sonnet 5"` exclusivamente para perfis deliberativos de alta complexidade:
+    - **Orquestração e Triagem Central**: `@agent-router` (agent e prompt `/agent-router`).
+    - **Arquitetura Técnica & Blueprint**: `@tech-solution-architect`.
+    - **Planejamento Decompositivo & Rollback**: `@refactor-planner` e prompt `/plan`.
+    - **Elicitação & Decomposição Crítica de Requisitos**: `@requirements-analyst`.
+    - **Pesquisa Multi-hop & Síntese Deliberativa**: `@deep-search` (agent e prompt `/deep-search`).
+    - **Especialistas de Arquitetura Consultiva (Advisors)**: `@angular-arch-advisor`, `@spring-boot-arch-advisor`, `@spring-reactive-arch-advisor`, `@ejb-arch-advisor`.
+  - Sincronização atômica (R-015) em todos os catálogos (`catalog.yaml`, `angular-catalog.yaml`, `spring-boot-catalog.yaml`, `spring-reactive-catalog.yaml`, `ejb-catalog.yaml`) e na skill `governance-factory-patterns/SKILL.md` (§ 9.1).
+  - Validação via `get_errors` com 0 erros em todos os arquivos modificados.
+
 ## [2.0.0] — 2026-09-06
 
 ### Adicionado
@@ -113,7 +142,7 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
-
+## [1.3.0] — 2026-08-29
 
 ### Adicionado
 - **Agent `requirements-analyst`**: perfil de elicitação prospectiva para transformar pedido de negócio ambíguo em requisitos funcionais/não-funcionais estruturados e testáveis, com rastreabilidade da fonte; aplica mediação contra *solution-jumping* (Five Whys) antes de qualquer decisão técnica
@@ -128,27 +157,6 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ### Conformidade
 - Mantida separação de responsabilidades sem duplicação (R-003): `requirements-analyst` opera em requisito **novo/prospectivo**; `business-rules-extractor` permanece no fluxo **reverso** (código existente)
-
----
-
-## [1.3.0] — 2026-08-29
-
-### Adicionado
-- **Agent `docs-writer`**: Perfil documentador agnóstico de domínio — gera/atualiza documentação técnica em Markdown (Diátaxis, ADR/MADR, README, runbook, postmortem); produz exclusivamente arquivos `.md`; nunca alucina comportamento não verificado no código-fonte
-- **Skill `documentation-writing-patterns`** (Tier 2): base de conhecimento consolidada via pesquisa de mercado (Diátaxis, Google/Microsoft Style Guide, MADR, standard-readme, `llms.txt`, anti-alucinação Anthropic/Copilot/Cursor) — base do `docs-writer`
-- **`docs/ai-context/routing-graph.yaml`**: novo nó + aresta `agent-router → docs-writer` (R-040), com `nao_confundir_com` cruzado em relação a `docs-curator`
-- **`docs/ai-context/evals/casos-roteamento.yaml`**: `canon-012` (roteamento correto para `docs-writer`), `regr-008` e `regr-009` (não-confusão `docs-writer` × `docs-curator`) — suíte passa de 23 para 29 casos
-- **`agent-router.agent.md`**: nova ramificação na Decision Tree (escrita de doc nova vs. curadoria existente) — bump `version: 1.1.0 → 1.2.0`
-
-### Corrigido
-- **SYNC (auditoria de tools/perfis dos 21 agents)**: corrigido typo `@analysis-integration-architect` → `@analysis-architect` em 2 skills (`dependency-graph-mapping`, `integration-contract-analysis`) no `.index.json`
-- **SYNC**: `related_agents` de `context-mode`, `tavily`, `code-tracing` e `prompt-engineering-patterns` expandidos no `.index.json` para refletir `tools:` reais declaradas em cada agent
-- **SYNC**: seção "Docs Sempre Anexadas" (pre-fetch) completada em 8 agents (`research-router`, `agent-router`, `analysis-architect`, `impact-architect`, `refactor-planner`, `test-strategy`, `bug-triage`, `skill-factory`) — skills usadas nas `tools:` não estavam referenciadas no pre-fetch
-- **SYNC**: `catalog.yaml` (`related_skills`) alinhado ao pre-fetch de `impact-architect`, `refactor-planner` e `test-strategy`
-- **README.md**: consolidado para refletir estado real — 22 agents (antes citava 17), 37 skills (antes citava 29), remoção de referência ao agent já unificado `analysis-integration-architect`, contagem de casos de evals (23 → 29), diagrama Mermaid atualizado com `docs-writer`
-
-### Conformidade
-- Decisão de escopo registrada: **não** foi adicionado campo `profile:` no frontmatter dos agents — `agent-contracts/SKILL.md` § 8 já é fonte única de verdade para o mapeamento perfil → template de saída (evita duplicação — R-003)
 
 ---
 
@@ -201,4 +209,3 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 - Templates base: `catalog-base.yaml`, `binding-base.md`
 - Adapters: `spring-boot-backend.instructions.md` (Java/Spring), `angular-v21-frontend.instructions.md` (Angular 21)
 - Regras normativas R-001..R-039 em CLAUDE.md
-

@@ -5,12 +5,14 @@ description:
   para classificar a solicitação, garantir Health Check de binding (R-034) e
   Prompt Structuring (R-041), e delegar para o agent downstream correto.
   NÃO implementa código de domínio — apenas triagem e roteamento.
-model: "Gemini 3.8 Flash"
+agent: 'agent'
+model: "Claude Sonnet 5"
 tools: ['list_dir', 'read_file', 'file_search', 'grep_search', 'ask_questions', 'run_subagent', 'context-mode/ctx_search']
+argument-hint: '[solicitação-do-usuário]'
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - docs/ai-context/routing-graph.yaml
+  - .github/agents/routing-graph.yaml
   - .github/agents/agent-router.agent.md
 ---
 
@@ -18,11 +20,24 @@ source_docs:
 
 Atalho manual on-demand para o agent [`@agent-router`](../agents/agent-router.agent.md) — entry point obrigatório agent-first (R-037) do ecossistema.
 
-> **PROPÓSITO**: Invocar exatamente o mesmo comportamento que a menção `@agent-router` teria no chat — Health Check de binding (R-034), delegação obrigatória ao `@prompt-structuring` (R-041), classificação de intenção via Decision Tree e delegação ao downstream correto.
+> **Propósito**: Realizar triagem agent-first, Health Check (R-034), Prompt Structuring (R-041) e delegação ao agent downstream correto.
+> **Arquivo Ativo**: `${file}`
+> **Workspace**: `${workspaceFolder}`
 >
 > **NÃO implementa código de domínio** — apenas triagem e roteamento (agent `@agent-router` nunca executa a solução final).
 >
 > A lógica completa (catálogo, Decision Tree, matriz de decisão R-006, formato de saída, checklist) vive em `agent-router.agent.md` + `docs/ai-context/routing-graph.yaml` — este prompt apenas dispara o fluxo manualmente, sem duplicar a regra (R-003).
+
+---
+
+## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
+
+- ✅ **APENAS** classificar a intenção e delegar via `run_subagent` ao agent especialista adequado.
+- ✅ **SEMPRE** acionar o Health Check (R-034) e Prompt Structuring (R-041) antes da rota final.
+- ❌ **NÃO** implementar código ou resolver tarefas diretamente no router.
+- ❌ **NÃO** fazer bypass de roteamento para agents downstream sem triagem.
+
+---
 
 ---
 
@@ -47,7 +62,7 @@ Se a solicitação ainda não retornou refinada por `@prompt-structuring`, deleg
 
 ### PASSO 1 — Classificação de Intenção
 
-Aplicar a Decision Tree e a Matriz de Decisão R-006 definidas em [`agent-router.agent.md`](../agents/agent-router.agent.md), usando [`routing-graph.yaml`](../../docs/ai-context/routing-graph.yaml) como fonte estrutural de nós, arestas e thresholds.
+Aplicar a Decision Tree e a Matriz de Decisão R-006 definidas em [`agent-router.agent.md`](../agents/agent-router.agent.md), usando [`routing-graph.yaml`](../agents/routing-graph.yaml) como fonte estrutural de nós, arestas e thresholds.
 
 ### PASSO 2 — Delegação
 
@@ -79,4 +94,3 @@ Seguir exatamente o "Formato de Saída" do agent `@agent-router` (Rota, Delegado
 ---
 
 *v1.0 — agent-router prompt — 2026-08-30 (alias fino do agent @agent-router, sem duplicação de lógica — R-003)*
-

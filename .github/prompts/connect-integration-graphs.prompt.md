@@ -6,14 +6,16 @@ description:
   aos arquivos do fluxo de integração, e aplica as fronteiras (`manifesto.boundaries`) que
   faltam em `.codegraphrc.json` até fechar todo gap identificado. Requer projetos já
   registrados via `/add-project-context`; nunca escreve em `catalog.yaml` (compartilhado).
+agent: 'agent'
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'ask_questions', 'context-mode/ctx_search', 'context-mode/ctx_execute', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index']
+argument-hint: '[repositório-alvo]'
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
   - docs/ai-context/catalog.yaml
   - docs/ai-context/catalog.local.yaml.example
-  - .github/agents/analysis-architect.agent.md
+  - .github/agents/tech-solution-architect.agent.md
   - .github/agents/code-knowledge-graph.agent.md
   - .github/skills/integration-contract-analysis/SKILL.md
   - .github/skills/codegraph-optave-usage/SKILL.md
@@ -26,11 +28,23 @@ source_docs:
 > estruturalmente essa integração varrendo o grafo de conhecimento **já existente**, restrito somente
 > aos arquivos do fluxo de integração, e (3) aplicar as fronteiras (`manifesto.boundaries`) que
 > ainda faltam, até que nenhum grafo do ecossistema tenha gap de integração pendente.
+> **Workspace**: `${workspaceFolder}`
 >
 > **NÃO faz**: não implementa/corrige código de aplicação; não reconstrói grafo já cacheado; não
 > escreve em `docs/ai-context/catalog.yaml` (compartilhado, R-043); não é o fluxo de registro de
 > um projeto novo (isso é `/add-project-context`, FASE 4.1) — este prompt roda **depois**, sobre o
 > conjunto já registrado, para auditar/fechar o que a FASE 4.1 não perguntou/pegou naquele momento.
+
+---
+
+## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
+
+- ✅ **APENAS** mapear fronteiras de integração multi-repo (`manifesto.boundaries`) em `.codegraphrc.json`.
+- ✅ **SEMPRE** preservar isolamento local e respeitar o grafo construído pelo `@code-knowledge-graph`.
+- ❌ **NÃO** implementar código ou alterar endpoints em serviços da aplicação.
+- ❌ **NÃO** escrever em `docs/ai-context/catalog.yaml` (compartilhado, R-043).
+
+---
 
 ---
 
@@ -64,7 +78,7 @@ source_docs:
 
 ```
 run_subagent(
-  agentName: "analysis-architect",
+  agentName: "tech-solution-architect",
   description: "Levantar integrações expostas/consumidas do projeto <nome>",
   task: "Analisar contratos de integração (OpenAPI/AsyncAPI/gRPC/GraphQL, HTTP clients, filas)
          do projeto <nome> (path_externo em catalog.local.yaml). Retornar lista estruturada:

@@ -25,7 +25,32 @@ tools: []
 
 # Confidence & Fallback Policy
 
-## 1) Escala de Confiança (0.0 – 1.0)
+## 0) Problema Resolvido & Princípios Fundamentais
+
+> **Arquitetura da Skill (Anthropic Open Spec / Progressive Disclosure)**:
+> - **Nível 1 (Metadados)**: Frontmatter com `name`, `description` em 3ª pessoa, `tier: 1`, `category: governance` e triggers.
+> - **Nível 2 (Corpo Operacional)**: Este arquivo `SKILL.md` definindo fórmula de pontuação de confiança, faixas de threshold e protocolo de fallback.
+> - **Nível 3 (Recursos Suplementares)**: Casos de teste de roteamento em `evals/casos-roteamento.yaml`.
+
+Esta skill resolve o problema de **alucinação e deduções precipitadas ("solution-jumping")** por agentes de IA frente a pedidos ambíguos ou incompletos, estabelecendo uma métrica determinística de confiança (0.0 a 1.0) e protocolo compulsório de clarificação progressiva via `ask_questions` (R-027).
+
+---
+
+## 1) Quando Usar vs Quando NÃO Usar
+
+### ✅ Quando Usar
+- No `@agent-router` para calcular score de confiança da rota antes de delegar.
+- Em qualquer agent downstream ao receber uma solicitação com escopo vago ou requisitos incompletos.
+- Para definir o threshold mínimo de parada e disparo de perguntas objetivas (`ask_questions`).
+
+### ❌ Quando NÃO Usar
+- Em tarefas com intenção e escopo perfeitamente claros (score ≥ 0.90) — não criar atrito desnecessário.
+- Para adiar indefinidamente a execução por excesso de cautela (máximo 3 perguntas, R-012).
+- No agent `prompt-structuring`, que já possui seu próprio protocolo de loop controlado (R-041).
+
+---
+
+## 2) Escala de Confiança (0.0 – 1.0)
 
 | Score | Nível | Ação do Agent |
 |---|---|---|
@@ -197,4 +222,13 @@ routing_log:
 **Calibração de threshold**: deve ser orientada por `observed false-positive rates` dos logs reais — não por intuição. Revisar thresholds a cada 100 requests ou quando taxa de `ask_questions` ultrapassar 15%.
 
 **Regra de output** (obrigatória para o `agent-router`): declarar `Confidence Score: X.XX` e nível de routing usado em toda saída de roteamento — não apenas o qualitativo `alta|média|baixa`.
+
+---
+
+## 6) Checklist de Conformidade
+
+- [ ] Score de confiança calculado formalmente: (sinal × 0.4) + (contexto × 0.4) + (clareza × 0.2).
+- [ ] Score declarado explicitamente no cabeçalho ou metadados da resposta do router.
+- [ ] Fallback para `ask_questions` acionado compulsoriamente se score < 0.70.
+- [ ] Proibição absoluta de inferir intenção do usuário no escuro (R-027).
 

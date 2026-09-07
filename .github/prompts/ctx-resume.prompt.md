@@ -1,12 +1,35 @@
 ---
 name: ctx-resume
 description: Retoma contexto específico via `ctx_search(source:"checkpoint::<slug>")`. Cobre cenário de múltiplos chats abertos com checkpoints distintos — lista e seleciona o correto.
+agent: 'agent'
 model: "Gemini 3.8 Flash"
+tools:
+  - context-mode/ctx_search
+  - ask_questions
+argument-hint: '[<task-slug>]'
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/context-mode/SKILL.md
 ---
 
-# /ctx-resume
+# `/ctx-resume`
 
 Reidrata contexto antes de planejar, implementar ou validar. Cobre: mesmo chat, novo chat, e múltiplos chats simultâneos com checkpoints diferentes.
+
+> **Propósito**: Reidratar e restaurar o contexto de uma sessão anterior a partir de checkpoints salvos no FTS5.
+> **Workspace**: `${workspaceFolder}`
+
+---
+
+## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
+
+- ✅ **APENAS** buscar e reidratar os dados de checkpoints previamente salvos no FTS5.
+- ✅ **SEMPRE** listar opções claras via `ask_questions` quando o slug não for fornecido.
+- ❌ **NÃO** sobrescrever checkpoints existentes durante a retomada.
+- ❌ **NÃO** executar ações do plano antes que o usuário confirme a retomada do contexto.
+
+---
 
 ## Sintaxe
 

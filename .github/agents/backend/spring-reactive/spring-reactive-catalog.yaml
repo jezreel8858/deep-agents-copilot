@@ -25,9 +25,9 @@ router:
 agents:
   spring-reactive-arch-advisor:
     id: "spring-reactive-arch-advisor"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "advisory"
-    domain: "Dimensionamento de capacidade, compatibilidade R2DBC vs JDBC e topologia reativa"
+    domain: "Arquitetura Reativa, Spring WebFlux, Project Reactor e Dimensionamento de Netty"
     description: "Especialista analítico read-only: adequação reativa, dimensionamento de Netty event-loops, análise de gargalos em pipelines Reactor e mitigação de blocking calls."
     keywords:
       - "auditoria reativa"
@@ -45,7 +45,6 @@ agents:
       - "ask_questions"
       - "run_subagent"
       - "context-mode/ctx_search"
-      - "context-mode/ctx_fetch_and_index"
     skills:
       - "spring-reactive-webflux-patterns"
       - "java-jdk-backend-governance"
@@ -57,16 +56,15 @@ agents:
     id: "spring-reactive-feature-developer"
     model: "Gemini 3.8 Flash"
     role: "implementer"
-    domain: "Desenvolvimento não-bloqueante com Functional Endpoints, operadores Reactor e R2DBC via TDD com StepVerifier"
-    description: "Desenvolvedor reativo: constrói endpoints WebFlux, composição não-bloqueante com Mono/Flux, repositories R2DBC e DTOs reativos sob TDD estrito."
+    domain: "Desenvolvimento de endpoints reativos, pipelines funcionais WebFlux, R2DBC e DTOs Records via TDD"
+    description: "Desenvolvedor de features: cria RouterFunctions/Controllers reativos, pipelines não-bloqueantes com Mono/Flux, R2DBC e Records sob TDD."
     keywords:
       - "feature webflux"
-      - "mono"
-      - "flux"
-      - "routerfunction"
-      - "r2dbc repository"
+      - "endpoint reativo"
+      - "mono flux"
+      - "r2dbc"
       - "tdd reativo"
-      - "stepverifier"
+      - "routerfunction"
     tools:
       - "read_file"
       - "file_search"
@@ -83,23 +81,24 @@ agents:
       - "context-mode/ctx_index"
     skills:
       - "spring-reactive-implementation-patterns"
-      - "test-implementation-backend"
+      - "spring-reactive-webflux-patterns"
       - "terminal-governance"
       - "context-mode"
+      - "efficient-batch-code-modification"
 
   spring-reactive-bug-fixer:
     id: "spring-reactive-bug-fixer"
     model: "Gemini 3.8 Flash"
     role: "fixer"
-    domain: "Diagnóstico e eliminação de bloqueios no event-loop, race conditions e tratamento de erros reativos"
-    description: "Especialista em resolução de bugs reativos: detecta e elimina chamadas bloqueantes com BlockHound, trata erros em operadores (onErrorResume) e evita memory leaks."
+    domain: "Correções cirúrgicas de bloqueios acidentais em Event Loop, vazamentos de Subscription e falhas de fluxo reativo"
+    description: "Especialista em resolução rápida de bugs reativos: detecta e remove bloqueios acidentais no Netty, corrige onErrorResume e memory leaks de buffer com diff mínimo."
     keywords:
       - "bug webflux"
-      - "blockhound"
       - "bloqueio event loop"
-      - "onerrorresume"
-      - "fix reativo"
-      - "memory leak netty"
+      - "blockhunt"
+      - "vazamento reativo"
+      - "corrigir erro reativo"
+      - "fix flux"
     tools:
       - "read_file"
       - "file_search"
@@ -117,20 +116,21 @@ agents:
       - "spring-reactive-implementation-patterns"
       - "terminal-governance"
       - "context-mode"
+      - "efficient-batch-code-modification"
 
   spring-reactive-resilience-tuner:
     id: "spring-reactive-resilience-tuner"
     model: "Gemini 3.8 Flash"
     role: "performance"
-    domain: "Estratégias de backpressure, tuning de buffers Netty, pooling R2DBC e Circuit Breakers"
-    description: "Especialista em resiliência: configura limitRate, buffer/drop policies, otimiza PooledByteBufAllocator do Netty, pool R2DBC e integra Resilience4j reativo."
+    domain: "Ajuste de resiliência, backpressure, circuit breakers (Resilience4j), connection pool R2DBC e dimensionamento Netty"
+    description: "Especialista em resiliência: configura backpressure com onBackpressureDrop/Buffer, Circuit Breakers, rate limiters e dimensionamento de threads Netty."
     keywords:
       - "backpressure webflux"
-      - "limitrate"
-      - "buffer overflow"
-      - "resilience4j reativo"
-      - "netty memory"
+      - "resilience4j spring"
+      - "circuit breaker reativo"
+      - "performance netty"
       - "r2dbc pool"
+      - "tuning reativo"
     tools:
       - "read_file"
       - "file_search"
@@ -148,19 +148,20 @@ agents:
       - "performance-engineering-patterns"
       - "terminal-governance"
       - "context-mode"
+      - "efficient-batch-code-modification"
 
   spring-reactive-unit-test-writer:
     id: "spring-reactive-unit-test-writer"
     model: "Gemini 3.8 Flash"
     role: "tester"
-    domain: "Testes unitários de pipelines reativos com StepVerifier, Mono e Flux"
-    description: "Escreve testes de unidades reativas com StepVerifier, validando emissão de elementos (expectNext), sinais de erro e completude assíncrona."
+    domain: "Testes unitários de publishers assíncronos e pipelines reativos com StepVerifier e VirtualTimeScheduler"
+    description: "Escreve testes unitários com StepVerifier, valida emissão ordenada de sinais onNext/onError/onComplete e manipulação de tempo virtual sem IO real."
     keywords:
-      - "unit test webflux"
       - "stepverifier"
-      - "testar mono"
-      - "testar flux"
-      - "teste unitario reativo"
+      - "teste unitario webflux"
+      - "virtualtimescheduler"
+      - "testar mono flux"
+      - "teste reativo"
     tools:
       - "read_file"
       - "file_search"
@@ -179,19 +180,20 @@ agents:
       - "test-implementation-backend"
       - "terminal-governance"
       - "context-mode"
+      - "efficient-batch-code-modification"
 
   spring-reactive-integration-test-writer:
     id: "spring-reactive-integration-test-writer"
     model: "Gemini 3.8 Flash"
     role: "tester"
-    domain: "Testes de integração com WebTestClient, SSE, WebSocket e R2DBC com Testcontainers"
-    description: "Escreve testes integrados de endpoints reativos com WebTestClient, streaming de eventos em tempo real e persistência R2DBC não-bloqueante."
+    domain: "Testes integrados não-bloqueantes com WebTestClient, Testcontainers R2DBC e streaming SSE"
+    description: "Escreve testes de integração ponta a ponta com WebTestClient, valida contratos de endpoints reativos, streaming de dados e repositórios R2DBC reais."
     keywords:
-      - "integration test webflux"
       - "webtestclient"
-      - "sse test"
-      - "websocket reativo"
-      - "r2dbc testcontainers"
+      - "teste integracao webflux"
+      - "testcontainers r2dbc"
+      - "teste sse"
+      - "teste streaming reativo"
     tools:
       - "read_file"
       - "file_search"
@@ -210,18 +212,20 @@ agents:
       - "test-implementation-backend"
       - "terminal-governance"
       - "context-mode"
+      - "efficient-batch-code-modification"
 
   spring-reactive-test-fixer:
     id: "spring-reactive-test-fixer"
     model: "Gemini 3.8 Flash"
     role: "fixer"
-    domain: "Diagnóstico e autocorreção de falhas em testes reativos (timeouts assíncronos e streams pendentes)"
-    description: "Analisa falhas de StepVerifier, streams não completados, problemas de scheduler assíncrono e cancelamentos prematuros de subscrição."
+    domain: "Diagnóstico e resolução de suítes de teste reativas quebradas por timeouts, sinais inesperados ou race conditions"
+    description: "Analisa relatórios de falha de StepVerifier, corrige asserções fora de ordem, cancelamentos prematuros de subscription e timeouts em testes assíncronos."
     keywords:
       - "fix teste webflux"
       - "stepverifier timeout"
-      - "broken spec reactor"
-      - "corrigir teste reativo"
+      - "falha teste reativo"
+      - "corrigir teste flux"
+      - "assertionerror stepverifier"
     tools:
       - "read_file"
       - "file_search"
@@ -239,4 +243,4 @@ agents:
       - "structured-intake-patterns"
       - "terminal-governance"
       - "context-mode"
-
+      - "efficient-batch-code-modification"

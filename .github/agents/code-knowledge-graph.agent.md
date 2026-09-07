@@ -229,7 +229,7 @@ Próximo passo mínimo:
 | Destino | Delegar quando | Handoff mínimo |
 |---|---|---|
 | [`@code-summarizer`](code-summarizer.agent.md) | solicitante precisa também de um sumário textual de um arquivo (não apenas do grafo) | caminho do arquivo, project-id |
-| [`@analysis-architect`](analysis-architect.agent.md) | consumidor precisa de blast radius/dataflow/impacto (RF-015 e capacidades novas) para decisão técnica, ou precisa validar o Gate de Paridade Funcional (RNF-012) | project-id(s), comando(s) `codegraph` executados, cobertura reportada, status do gate |
+| [`@tech-solution-architect`](tech-solution-architect.agent.md) | consumidor precisa de blast radius/dataflow/impacto (RF-015 e capacidades novas) para decisão técnica ou blueprint, ou precisa validar o Gate de Paridade Funcional (RNF-012) | project-id(s), comando(s) `codegraph` executados, cobertura reportada, status do gate |
 | [`@refactor-planner`](refactor-planner.agent.md) | consumidor precisa de impacto de refatoração a partir do grafo já construído, incluindo blast radius e detecção de ciclo | project-id(s), resultado relevante |
 | [`@bug-triage`](bug-triage.agent.md) | consumidor precisa rastrear cadeia de chamadas a partir do grafo já construído | project-id(s), nó de origem, comando usado |
 | [`@debugger`](debugger.agent.md) | consumidor precisa navegar call graph/blast radius (`query`/`path`/`execution_flow`/`sequence`) para formular hipótese de causa raiz | símbolo/arquivo de origem, comando(s) desejado(s) |

@@ -108,8 +108,10 @@ Retorne a síntese com citações de fontes para o solicitante 'governance-facto
 |---|---|---|
 | Fluxo canônico de factory | [`../skills/governance-factory-patterns/SKILL.md`](../skills/governance-factory-patterns/SKILL.md) | Todos os tipos — Decision Tree §1, checklist §3, saída §4, seleção de modelo §9 |
 | Pesquisa prévia de diretrizes e skills | [`deep-search.agent.md`](deep-search.agent.md) | **Obrigatório antes de criar** qualquer agent, prompt ou skill |
-| Template de agent read-only | [`templates/research-agent.md`](templates/research-agent.md) | `type: agent` |
-| Template de agent operacional | `templates/operational-agent.md` | `type: agent` |
+| Template canônico de agent (unificado) | [`templates/agent-template.md`](templates/agent-template.md) | `type: agent` |
+| Template de agent operacional / procedural | [`templates/operational-agent.md`](templates/operational-agent.md) | `type: agent` |
+| Template de agent deliberativo / research | [`templates/research-agent.md`](templates/research-agent.md) | `type: agent` |
+| Template canônico de skill | [`../skills/templates/skill-template.md`](../skills/templates/skill-template.md) | `type: skill` |
 | Exemplo skill Tier 1 | `../skills/agent-contracts/SKILL.md` | `type: skill` |
 | Template de prompt | [`../prompts/templates/prompt-template.md`](../prompts/templates/prompt-template.md) | `type: prompt` |
 | Catálogo de agents | [`README.md`](README.md) + [`catalog.yaml`](catalog.yaml) | `type: agent` |
@@ -213,8 +215,8 @@ Executar o checklist genérico de `governance-factory-patterns` §3, mais:
 - [`deep-search.agent.md`](deep-search.agent.md) — subagente mandatório de pesquisa pré-criação.
 - [`../../CLAUDE.md`](../../CLAUDE.md)
 - [`README.md`](README.md) — catálogo de agents (`type: agent`)
-- [`templates/research-agent.md`](templates/research-agent.md) / `templates/operational-agent.md` — `type: agent`
-- `.github/skills/.index.json` + `.github/skills/README.md` — `type: skill`
+- [`templates/operational-agent.md`](templates/operational-agent.md) / [`templates/research-agent.md`](templates/research-agent.md) / [`templates/agent-template.md`](templates/agent-template.md) — `type: agent`
+- [`../skills/templates/skill-template.md`](../skills/templates/skill-template.md) + `.github/skills/.index.json` + `.github/skills/README.md` — `type: skill`
 - [`../prompts/templates/prompt-template.md`](../prompts/templates/prompt-template.md) + `../prompts/README.md` — `type: prompt`
 
 ## Diretrizes
@@ -241,7 +243,7 @@ Substitui `agent-factory` + `skill-factory` + `prompt-factory`, que já delegava
 ## Quando Delegar
 
 - [`@deep-search`](deep-search.agent.md) — **OBRIGATÓRIO na criação de QUALQUER agent, prompt ou skill**: pesquisa na web (quando disponível) e internamente sobre as melhores diretrizes, padrões e skills recomendadas antes de gerar o arquivo. O retorno da pesquisa volta diretamente ao solicitante `governance-factory` para prosseguir com a criação normal.
-- [`@analysis-architect`](analysis-architect.agent.md) — análise de integração.
+- [`@tech-solution-architect`](tech-solution-architect.agent.md) — análise de arquitetura e integração técnica.
 - [`@docs-engineer`](docs-engineer.agent.md) — curadoria/documentação ampla fora do escopo de governança de artefato.
 
 ## Retorno ao Router (R-042 — Anti Sticky-Session)
@@ -259,4 +261,27 @@ Se a solicitação pivotar de "criar/revisar artefato de governança" para "impl
 - `/validate` → checar aderência estrutural e consistência com catálogo.
 
 
+
+
+````
+This is the description of what the code block changes:
+<changeDescription>
+Corrige link de analysis-architect.agent.md para tech-solution-architect.agent.md que existe no diretório.
+</changeDescription>
+
+This is the code block that represents the suggested code change:
+```markdown
+// ...existing code ...
+## Quando Delegar
+
+- [`@deep-search`](deep-search.agent.md) — **OBRIGATÓRIO na criação de QUALQUER agent, prompt ou skill**: pesquisa na web (quando disponível) e internamente sobre as melhores diretrizes, padrões e skills recomendadas antes de gerar o arquivo. O retorno da pesquisa volta diretamente ao solicitante `governance-factory` para prosseguir com a criação normal.
+- [`@tech-solution-architect`](tech-solution-architect.agent.md) — análise de arquitetura e integração técnica.
+- [`@docs-engineer`](docs-engineer.agent.md) — curadoria/documentação ampla fora do escopo de governança de artefato.
+
+## Retorno ao Router (R-042 — Anti Sticky-Session)
+// ...existing code ...
+```
+<userPrompt>
+Provide the fully rewritten file, incorporating the suggested code change. You must produce the complete file.
+</userPrompt>
 
