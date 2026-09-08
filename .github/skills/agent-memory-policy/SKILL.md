@@ -73,6 +73,14 @@ episodica:
     - dados_sensiveis_ou_credenciais       # R-010
 ```
 
+### Tabela de Retenção e Pruning (TTL)
+
+| Namespace / Source | TTL | Estratégia de Pruning | Finalidade |
+|---|---|---|---|
+| `episodica-<projeto>` | 30 dias | Expirar entradas sem acesso recente | Decisões arquiteturais e preferências confirmadas |
+| `handoff-telemetry:*` | 7 dias | Pruning automático após 7 dias | Telemetria de transição, detecção de deriva e loops |
+| `session-cache:*` | 24 horas | Invalidação ao término da sessão | Contexto efêmero e dados intermediários de tool |
+
 ---
 
 ## 3) Memória Semântica — Boas Práticas
@@ -92,6 +100,26 @@ semantica:
 ```
 
 **Atalho**: declarar `source_docs` nos agents do catálogo é a forma mais simples de memória semântica — já é o padrão do ecossistema.
+
+### 3.1) Pipeline de Consolidação Semântica por Marco (/ctx-checkpoint)
+
+Para evitar que decisões de design críticas sejam descartadas pelo TTL de 7 dias da telemetria episódica, o sistema adota um pipeline de consolidação disparado por marcos explícitos (ex.: via prompt `/ctx-checkpoint`, ao concluir planos com `@refactor-planner`, ou fechamento de Technical Blueprint com `@tech-solution-architect`):
+
+1. **Gatilho de Marco**: O agent `@agentic-memory-manager` é acionado para revisar a telemetria recente (`source: "handoff-telemetry:<projeto>"`).
+2. **Filtro Anti-Poisoning**: Apenas registros marcados com tags de decisão aprovada (`[DECISION]`, `[SUCCESS]`) ou itens com validação explícita do usuário são candidatos a consolidação. Tentativas falhas (`[LOOP_LIMIT]`), desvios (`[INTENT_DRIFT]`) e código intermediário são descartados.
+3. **Deduplicação & Destilação**: Os fragmentos aprovados são resumidos em *átomos semânticos permanentes* (invariantes de arquitetura, contratos de integração e regras de domínio confirmadas).
+4. **Persistência Permanente**:
+   ```yaml
+   ctx_index:
+     source: "semantic:<projeto>"
+     ttl: null  # Permanente — sobrevive a múltiplos ciclos de TTL episódico
+     content: |
+       [DECISAO_CANONICA] <titulo-da-decisao>
+       - Contexto: <contexto-conciso>
+       - Decisao: <o-que-foi-adotado>
+       - Rationale: <por-que-foi-escolhido>
+       - AprovadoEm: <ISO-8601>
+   ```
 
 ---
 
@@ -187,4 +215,3 @@ Monitoramento via agent-observability-otel (span: invoke_agent)
 - `agent-observability-otel/SKILL.md` — rastreamento de drift comportamental: `.github/skills/agent-observability-otel/SKILL.md`
 - `agent-safety-guardrails/SKILL.md` — guardrails de segurança: `.github/skills/agent-safety-guardrails/SKILL.md`
 - `.github/agents/evals/casos-roteamento.yaml` — baseline de casos de teste: fonte de verdade para regressão
-

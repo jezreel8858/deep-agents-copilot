@@ -67,9 +67,9 @@ Estes valores **substituem** qualquer autoavaliação subjetiva nas seções Dec
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-044` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas `R-001..R-048` em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
-- Aplicar especialmente: `R-009`, `R-010`, `R-015`, `R-023`, `R-024`, `R-026`, `R-038`, `R-042`.
+- Aplicar especialmente: `R-009`, `R-010`, `R-015`, `R-023`, `R-024`, `R-026`, `R-038`, `R-042`, `R-048`.
 
 ## Catálogo / Conhecimento Base
 
@@ -208,6 +208,7 @@ Próximo passo mínimo:
 ## Diretrizes
 
 - Manter toda saída em texto objetivo, sem opinião ou sugestão de refatoração (fora de escopo).
+- **Consultas Cirúrgicas e Redução de Payload (R-048)**: em consultas de arquitetura/navegação via `@optave/codegraph`, preferir `--depth 1` e flags de tipo (`--kind class,interface`), omitindo corpos de método/implementação nas respostas ao usuário — expor apenas assinaturas/contratos. Se a saída for massiva (>50 nós), redirecionar o payload para `ctx_index`/`ctx_search` em vez de colar o grafo bruto no chat.
 - Sempre declarar explicitamente quando uma limitação de performance (RNF-006/RNF-007) não pôde ser avaliada por falta de threshold definido.
 - Reportar sempre as métricas de RF-010, mesmo quando a cobertura for menor que 80% — sinalizar como risco, nunca ocultar.
 - Preferir sempre reaproveitar cache; documentar por que um reprocessamento foi necessário quando ocorrer.
@@ -249,10 +250,3 @@ Próximo passo mínimo:
 Se a solicitação pivotar de "construir/consultar grafo de conhecimento de código" para implementar/corrigir/refatorar o código mapeado, retornar para `@agent-router` com handoff (`handoff-governance/SKILL.md` § 2.1, `motivo: "deriva_de_intencao"`).
 
 **Gatilho de deriva:** pedido de correção/refatoração do código mapeado (→ `@bug-triage`/`@refactor-planner`/stack specialist); pedido de expor o CLI/grafo diretamente a outro agent (bloquear, é violação de RF-011/RNF-004).
-
-## Combina Com (Commands)
-
-- `/add-project-context` → **caller obrigatório** (FASE 4, não opcional) — invoca este agent automaticamente logo após o registro do projeto (FASE 3), sem `ask_questions` de confirmação (RF-001).
-- `/plan` → mapear escopo de projetos/repositórios a incluir na construção do grafo.
-- `/implement` → executar construção do grafo sob demanda (RF-002) para 1 ou mais projetos identificados.
-- `/validate` → checar métricas RF-010 (cobertura, economia) e RNF-005 de um grafo já construído, incluindo o Gate de Paridade Funcional (RNF-012).

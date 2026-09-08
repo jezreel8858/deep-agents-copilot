@@ -62,6 +62,18 @@ Consolida, a partir de pesquisa de mercado (2025/2026), Anthropic Open Spec (dez
 | `code-review-patterns` (já existente) | Taxonomia de severidade tripla (**Bloqueador \| Alto \| Sugestão**) — reaproveitada nesta skill |
 | `agent-contracts/SKILL.md` §8-9 | Baseline de formato de saída por perfil e tooling mínimo por perfil |
 
+## 1.1) Arquitetura Two-Tier Hybrid (Quality Gate Estático + LLM Audit)
+
+Para maximizar a precisão, eliminar alucinações e economizar tokens, a governança adota o modelo **Two-Tier Hybrid**:
+
+1. **Tier 1 — Quality Gate Estático Determinístico (`tests/governance_audit/`)**:
+   - Execução ultrarrápida (< 2 segundos) no CI/CD ou localmente com **zero consumo de tokens**.
+   - Valida regras puramente estruturais: Smell 2.2 (gaps de frontmatter e `run_subagent`), Smell 2.6/2.14 (vazamento de path/R-044), Smell 2.7/2.7.1 (matriz de conformidade perfil ↔ tools), Smell 2.8 (protocolo R-046 em mutadores) e Smell 2.11 (código inline R-026).
+2. **Tier 2 — Auditoria Semântica Interpretativa (`@agent-auditor`)**:
+   - Consome os achados estruturais do Tier 1 como ponto de partida.
+   - Foca a capacidade do LLM nos aspectos essencialmente semânticos e contextuais: Smell 2.1 (sobreposição semântica), Smell 2.3 (regras sem enforcement), Smell 2.4 (duplicação entre camadas), Smell 2.5 (taxonomia), Smell 2.12 (conflito de autoridade) e Smell 2.13 (hipertrofia e concisão).
+   - Formula o plano de remediação acionável e delega via handoff.
+
 ## 2) Catálogo de Smells de Governança
 
 ### 2.1 — Anti-padrão Estrutural (Duplicação sem Skill Equivalente)
@@ -212,7 +224,17 @@ Consolida, a partir de pesquisa de mercado (2025/2026), Anthropic Open Spec (dez
 | Severidade | **Alta** se há redundância multicamada grave (mesmos dados repetidos 3+ vezes) ou saída inflada que degrade sensivelmente a janela de contexto da sessão; **Sugestão** para pequenos ajustes de concisão, eliminação de frases de cortesia ou refinamento estético de saída. |
 | Remediação | `@governance-factory` refatora a seção `Formato de Saída` e as diretrizes do artefato: consolida saídas dispersas em uma única apresentação densa (tabela ou checklist compacto), remove decorações cosméticas redundantes e alinha o template estritamente ao perfil correspondente em `agent-contracts` § 8 e `R-029`. |
 
-**Matriz de Fronteiras §2.13 (Anti-Sobreposição):**
+### 2.14 — Evidência Real Não-Anonimizada em Evals Minerados (Violação R-044 na Telemetria)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Caso de teste proposto ou injetado em `.github/agents/evals/casos-roteamento.yaml` (originário de mineração de telemetria `[INTENT_DRIFT]` ou `[LOOP_LIMIT]`) contendo nomes reais de repositórios, pacotes corporativos, classes reais (`OrderService`, `UsuarioController`), URLs de endpoints internos ou caminhos absolutos locais (`<drive>:\<caminho>`, `/<pasta>/...`). |
+| Como detectar | Inspeção do arquivo `casos-roteamento.yaml` com regex buscando caminhos de disco (`[A-Za-z]:\\`, `/home/`, `/Users/`), pacotes (`com\.[a-z0-9]+\.`), ou cruzando termos do prompt contra nomes de projetos reais conhecidos. |
+| Origem (TrustAgent) | Extrínseco — falha no pipeline de ingestão de dados da telemetria (falta de filtro sanitizador antes da persistência). |
+| Severidade | **Bloqueador** — violação direta das normas R-044 (Anonimização Obrigatória de Evidência Real) e R-038 (Genericidade Obrigatória). |
+| Remediação | `@governance-maintainer` sanitiza imediatamente o arquivo `casos-roteamento.yaml`, aplicando a genericização padrão (`[PROJETO-X]`, `ServicoExemploX`) e removendo quaisquer caminhos locais absolutos antes do commit. |
+
+**Matriz de Fronteiras §2.13 e §2.14 (Anti-Sobreposição):**
 
 ```text
 [Smell 2.1]  --> Duplicação ESTÁTICA de texto ENTRE 3+ arquivos do repositório.
@@ -222,8 +244,9 @@ Consolida, a partir de pesquisa de mercado (2025/2026), Anthropic Open Spec (dez
 [Smell 2.10] --> Erro de SINTAXE em variáveis de prompt (${file}, argument-hint).
 [Smell 2.11] --> Limite de CÓDIGO INLINE no corpo da skill (≤ 8 linhas via R-026).
 [Smell 2.12] --> Fronteira de AUTORIDADE/PAPEL funcional (decisão vs conhecimento vs atalho).
------------------------------------------------------------------------------------------
 [Smell 2.13] --> QUALIDADE, CONCISÃO E ECONOMIA DE TOKENS DO PAYLOAD DE CHAT (runtime output).
+-----------------------------------------------------------------------------------------
+[Smell 2.14] --> VAZAMENTO DE EVIDÊNCIA REAL/DADOS LOCAIS EM EVALS MINERADOS (R-044/R-038).
 ```
 
 ---
@@ -249,7 +272,7 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 
 | Smell | Local(is) afetado(s) | Severidade | Remediação sugerida | Agent a acionar |
 |---|---|---|---|---|
-| <2.1..2.13> | <arquivo(s)> | Bloqueador/Alto/Sugestão | <ação objetiva> | <@governance-factory/@docs-engineer> |
+| <2.1..2.14> | <arquivo(s)> | Bloqueador/Alto/Sugestão | <ação objetiva> | <@governance-factory/@docs-engineer/@governance-maintainer> |
 
 ## Resumo por Severidade
 - Bloqueador: N
@@ -262,7 +285,7 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 
 ## 6) Checklist de Conformidade da Auditoria
 
-- [ ] Todo achado classificado estritamente em uma das 13 categorias de smell (§2.1..§2.13).
+- [ ] Todo achado classificado estritamente em uma das 14 categorias de smell (§2.1..§2.14).
 - [ ] Severidade reaproveitada de `code-review-patterns` (Bloqueador/Alto/Sugestão).
 - [ ] Origem classificada como intrínseca ou extrínseca (TrustAgent) quando relevante.
 - [ ] Remediação aponta agent executor real do catálogo (nunca "corrigir diretamente" — agent de auditoria é estritamente read-only).
@@ -272,11 +295,12 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 - [ ] Conformidade de templates de Agent (§2.9), Prompt (§2.10) e Skill (§2.11) validada.
 - [ ] Conflito de responsabilidade cross-artefato (agents vs prompts vs skills) verificado — fronteira decisão/conhecimento/atalho respeitada (§2.12).
 - [ ] Hipertrofia instrucional e redundância de saída em runtime verificada — sem banners multicamada, overhead cosmético ou mismatch de perfil vs `agent-contracts` §8 (§2.13).
+- [ ] Casos de teste minerados da telemetria sanitizados conforme R-044 antes de persistência em `casos-roteamento.yaml` (§2.14).
 
 ## 7) Anti-padrões
 
 - ❌ Agent de auditoria aplicar a correção diretamente (deve ser read-only — só análise e recomendação).
-- ❌ Inventar categoria de smell fora das 13 catalogadas nesta skill.
+- ❌ Inventar categoria de smell fora das 14 catalogadas nesta skill.
 - ❌ Duplicar taxonomia de severidade ou checklist de segurança já existentes em outras skills.
 - ❌ Reportar achado sem apontar agent executor de remediação (relatório inacionável).
 - ❌ Classificar achados como Bloqueadores sem critério estrutural comprovado.

@@ -299,6 +299,8 @@ Localização: SEMPRE em ./.github/instructions/local/ DESTE repositório de gov
 ### Sucesso
 
 ```markdown
+Agente Ativo: adapter-generator
+
 Geração de Adapters: ✅ OK
 
 📊 Profil Detectado (Scanner READ-ONLY dos projetos externos):

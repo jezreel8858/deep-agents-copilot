@@ -51,6 +51,8 @@
 | Agent | `devops-engineer` | 🐳 ***(NEW)*** Revisa Dockerfile, Kubernetes, CI/CD e IaC por segurança/resiliência/boas práticas; read-only |
 | Agent | `debugger` | 🐛 ***(NEW)*** Investiga causa raiz a partir de stack trace/log — call graph, hipótese testável, reprodução mínima; não corrige, complementa `bug-triage` com investigação mais profunda |
 | Agent | `code-style-enforcer` | 🎨 ***(NEW)*** Verifica aderência a convenções de estilo documentadas no adapter de stack; nunca bloqueador, apenas sugestão |
+| Agent | `ddd-bounded-context-mapper` | 🗺️ ***(NEW)*** Mapeia Bounded Contexts (DDD) por domínio de negócio a partir de nomenclatura, detectando fronteiras invadidas e God Classes; read-only |
+| Agent | `adr-sentinel` | 📜 ***(NEW)*** Audita propostas técnicas, blueprints e diffs contra Architectural Decision Records (ADRs) documentados no projeto; read-only |
 
 ## 3) Roteamento Rápido
 
@@ -92,6 +94,8 @@
 | 🩺 Verificação de saúde do ambiente (build/deps/serviços) antes de testes/codificadores | `runtime-verifier` |
 | 📦 Preparação de PR pós-aprovação (diff, commit semântico SSOT, matriz de risco, changelog) | `pr-gatekeeper` |
 | 🗄️ Migrações de schema, otimização de query e integridade referencial | `database-specialist` |
+| 🗺️ Mapeamento semântico de Bounded Contexts (DDD) e God Classes | `ddd-bounded-context-mapper` |
+| 📜 Auditoria de propostas técnicas contra ADRs | `adr-sentinel` |
 
 ## 4) Pre-fetch Recomendado
 

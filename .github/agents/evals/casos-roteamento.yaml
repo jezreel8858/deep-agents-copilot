@@ -554,6 +554,40 @@ canonicos:
     critico: true
     threshold: 0.90
 
+  - id: "canon-040"
+    descricao: "Mapeamento de Bounded Contexts (DDD) e detecção de God Classes roteado para ddd-bounded-context-mapper"
+    input:
+      solicitacao: "Analise a nomenclatura dos pacotes e classes para mapear os Bounded Contexts por domínio de negócio e identificar God Classes"
+    expected:
+      agent_route: "ddd-bounded-context-mapper"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.90
+      output_contains:
+        - "Agente Ativo: ddd-bounded-context-mapper"
+    nao_confundir_com:
+      - "grafo estrutural de imports"        # → code-knowledge-graph
+      - "planejamento macro de refatoração"   # → refactor-planner
+    critico: true
+    threshold: 0.90
+
+  - id: "canon-041"
+    descricao: "Auditoria de proposta técnica ou código contra Architectural Decision Records (ADRs) roteada para adr-sentinel"
+    input:
+      solicitacao: "Audite o novo blueprint técnico contra as decisões registradas em docs/adr/ para verificar conformidade arquitetural"
+    expected:
+      agent_route: "adr-sentinel"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.90
+      output_contains:
+        - "Agente Ativo: adr-sentinel"
+    nao_confundir_com:
+      - "extrair regras de negócio do código" # → business-rules-extractor
+      - "redigir novo arquivo de ADR"         # → docs-engineer
+    critico: true
+    threshold: 0.90
+
 # ─────────────────────────────────────────────
 # SUITE 2 — Casos Ambíguos (threshold ≥ 0.70)
 # Intenção ambígua que exige clarificação ou roteamento defensivo.

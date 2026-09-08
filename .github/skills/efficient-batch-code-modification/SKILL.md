@@ -73,6 +73,13 @@ Antes de invocar ferramentas de escrita (`ctx_execute`, `replace_string_in_file`
 2. **Resumo Compacto:** No planejamento mental ou resposta inicial, estruture a lista de arquivos afetados e os blocos específicos antes de tocar no disco.
 3. **Validação de Precondição:** Certifique-se de que os arquivos existem e não possuem conflitos óbvios antes de iniciar a primeira edição.
 
+### 2.1.1. Leitura Prévia Cirúrgica (R-048)
+
+Antes de qualquer dry-run ou inspeção para batch edit, o agente NÃO DEVE ler arquivos inteiros (>100 linhas). O ciclo de vida acopla-se diretamente ao R-046:
+1. **Localização Exata**: Localize as âncoras e alvos via `grep_search`.
+2. **Leitura Paginada**: Utilize `read_file` informando `offset` e `limit` restritos à janela de modificação (60-80 linhas).
+3. **Processamento em Sandbox**: Se a inspeção for analítica/estrutural e o arquivo tiver mais de 300 linhas, delegue a derivação a `ctx_execute_file` sem trafegar o arquivo bruto na memória conversacional.
+
 ### 2.2. Diretriz 2: Aplicação em Lote (Batch Tool Calls)
 
 1. **Paralelização de Edições:** Agrupe todas as edições necessárias de múltiplos arquivos na **mesma rodada de resposta** (*tool calls* simultâneas).

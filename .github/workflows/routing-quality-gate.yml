@@ -1,0 +1,47 @@
+name: Agent Routing Quality Gate
+
+on:
+  pull_request:
+    paths:
+      - '.github/agents/**'
+      - '.github/skills/**'
+      - 'tests/routing_gate/**'
+      - 'tests/governance_audit/**'
+      - 'tests/operational_flow/**'
+      - 'README.md'
+      - 'CLAUDE.md'
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - '.github/agents/**'
+      - '.github/skills/**'
+      - 'tests/routing_gate/**'
+      - 'tests/governance_audit/**'
+      - 'tests/operational_flow/**'
+      - 'README.md'
+      - 'CLAUDE.md'
+
+jobs:
+  routing-quality-gate:
+    runs-on: ubuntu-latest
+    name: Verify Routing Graph and Governance Integrity
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest PyYAML
+
+      - name: Run Routing Quality Gate & Governance Smells Suite
+        run: pytest tests/routing_gate/ tests/governance_audit/ tests/operational_flow/ -v --tb=short
+

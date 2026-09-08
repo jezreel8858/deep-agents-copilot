@@ -162,6 +162,12 @@ nos:
   - id: agent-auditor
     tipo: downstream
     descricao: "Auditor de governança em meta-nível para analisar smells e gaps no catálogo de agents/skills/prompts, validando templates canônicos, R-046/batching, especificações e alinhamento de perfil sem mutação direta, com recomendações e handoff para executores"
+  - id: ddd-bounded-context-mapper
+    tipo: downstream
+    descricao: "Mapeamento semântico de Bounded Contexts (DDD), domínios de negócio e God Classes a partir de nomenclatura e pacotes; contraparte semântica do code-knowledge-graph; read-only"
+  - id: adr-sentinel
+    tipo: downstream
+    descricao: "Auditoria de conformidade arquitetural contra Architectural Decision Records (ADRs) documentados no projeto, identificando violações, decisões obsoletas e ADRs ausentes; read-only"
 
 # ─────────────────────────────────────────────
 # ARESTAS — condições de roteamento
@@ -876,6 +882,45 @@ arestas:
         - "índice de banco"
         - "rollback de migração"
         - "integridade referencial"
+  # Mapeamento semântico de Bounded Contexts (DDD), domínios de negócio e God Classes
+  - de: agent-router
+    para: ddd-bounded-context-mapper
+    prioridade: 4.8
+    threshold_score: 0.90
+    nivel_routing: rule-based
+    condicoes:
+      keywords:
+        - "bounded context"
+        - "ddd"
+        - "domínio de negócio"
+        - "fronteira de domínio"
+        - "god class"
+        - "segregação de microserviço"
+        - "acoplamento de domínio"
+        - "reverse ddd"
+      sinal_r006: "É mapeamento de Bounded Contexts (DDD), domínios de negócio semânticos por nomenclatura ou identificação de God Classes/fronteiras invadidas?"
+      nao_confundir_com:
+        - "grafo determinístico de imports/chamadas"  # → code-knowledge-graph
+        - "planejamento de refatoração estrutural"     # → refactor-planner
+  # Auditoria de conformidade arquitetural contra Architectural Decision Records (ADRs)
+  - de: agent-router
+    para: adr-sentinel
+    prioridade: 4.7
+    threshold_score: 0.90
+    nivel_routing: rule-based
+    condicoes:
+      keywords:
+        - "adr"
+        - "architectural decision record"
+        - "decisão arquitetural"
+        - "conformidade arquitetural"
+        - "adr obsoleto"
+        - "auditoria de adr"
+        - "violação de adr"
+      sinal_r006: "É auditoria de propostas técnicas, blueprints ou diffs contra Architectural Decision Records (ADRs) documentados do projeto?"
+      nao_confundir_com:
+        - "regras de negócio do código"   # → business-rules-extractor
+        - "autoria/redação de novo adr"    # → docs-engineer
 
 # ─────────────────────────────────────────────
 # POLÍTICA DE CASCATA

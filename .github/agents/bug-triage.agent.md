@@ -316,8 +316,8 @@ C) PARCIALMENTE — Preciso de mais informações
 |---|---|
 | Impacto técnico local ampliado | `@tech-solution-architect` (tier B1) |
 | Impacto cross-sistema ou multi-projeto | `@tech-solution-architect` |
-| Fix exige criação/correção de testes | `@test-engineer` |
-| Fix está aprovado e precisa ser implementado | `@test-engineer` (se for teste) ou dev |
+| Fix exige criação/estratégia de testes | `@test-strategy` |
+| Fix está aprovado e precisa ser implementado | `@agent-router` (despacho ao router de stack correspondente) |
 
 ## Retorno ao Router (R-042 — Anti Sticky-Session)
 
