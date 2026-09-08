@@ -23,7 +23,7 @@ class InsightsEngine:
     def build_payload(self) -> Dict[str, Any]:
         """Calcula os KPIs, time-series, fontes, decisões e cards de insight unificados."""
         kpis = self._compute_kpis()
-        insights = self._evaluate_insights(kpis)
+        insights = self._evaluate_insights(kpis) + self._evaluate_otel_insights()
         personas = self._build_executive_personas(kpis)
 
         return {
@@ -44,6 +44,7 @@ class InsightsEngine:
             "detailedEvents": self.events_summary.get("detailedEvents", []),
             "insightsActions": insights,
             "executivePersonas": personas,
+            "otelSpans": self.data.get("otelSpans", {}),
         }
 
     def _build_executive_personas(self, kpis: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -370,6 +371,44 @@ class InsightsEngine:
 
         return cards
 
+    def _evaluate_otel_insights(self) -> List[Dict[str, Any]]:
+        """Cards baseados em telemetria OTel real — só avaliados se houver spans capturados."""
+        otel = self.data.get("otelSpans", {})
+        cards: List[Dict[str, Any]] = []
+        if not otel or otel.get("spansCount", 0) == 0:
+            return cards
+
+        usage = otel.get("tokenUsage", {})
+        input_tok = usage.get("inputTokens", 0)
+        cache_read = usage.get("cacheReadTokens", 0)
+        if input_tok > 0:
+            cache_rate = round((cache_read / input_tok) * 100, 1)
+            cards.append({
+                "id": "otel-cache-hit-rate",
+                "severity": "positive" if cache_rate > 30 else "neutral",
+                "badge": "OTel · Cache",
+                "icon": "cached",
+                "metric": f"{cache_rate}% cache hit rate",
+                "evidence": f"{cache_read:,} de {input_tok:,} tokens de entrada vieram de cache (dado real, não estimado).",
+                "action": "Cache alto reduz custo real de input tokens — nenhuma ação necessária." if cache_rate > 30
+                          else "Cache baixo — considere reduzir variação de prompt/contexto entre chamadas.",
+                "roi": "Baseado em gen_ai.usage.cache_read.input_tokens (telemetria nativa OTel)."
+            })
+
+        by_service = otel.get("byService", {})
+        if "claude-code" in by_service and "copilot-chat" in by_service:
+            cards.append({
+                "id": "otel-dual-agent-usage",
+                "severity": "neutral",
+                "badge": "OTel · Multi-agent",
+                "icon": "hub",
+                "metric": f"{by_service.get('copilot-chat', 0)} spans Copilot vs {by_service.get('claude-code', 0)} spans Claude Code",
+                "evidence": "Uso simultâneo dos dois backends de agent detectado via service.name real.",
+                "action": "Nenhuma ação necessária — apenas visibilidade de qual agent está sendo mais utilizado.",
+                "roi": "Dado real de service.name (telemetria nativa), não heurística de regex."
+            })
+        return cards
+
 
 if __name__ == "__main__":
     from extractor import ContextDataExtractor
@@ -383,4 +422,3 @@ if __name__ == "__main__":
     print(f"\nTotal Insights Cards gerados: {len(payload['insightsActions'])}")
     for card in payload["insightsActions"]:
         print(f"  [{card['badge']}] {card['metric']}")
-

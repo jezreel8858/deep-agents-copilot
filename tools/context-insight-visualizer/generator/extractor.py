@@ -161,6 +161,9 @@ class ContextDataExtractor:
         session_dbs_data = self._read_session_databases()
         stats_pid_data = self._read_stats_pid_files()
         content_dbs_data = self._read_content_databases()
+        otel_data = self._read_otel_spans()
+        if otel_data["spansCount"] == 0:
+            self.warnings.append("Nenhum span OTel nativo encontrado (fallback: heurística de regex em uso).")
 
         if not self.sessions_dirs:
             self.warnings.append("Nenhum diretório de sessões do Context Mode localizado na máquina.")
@@ -181,6 +184,7 @@ class ContextDataExtractor:
             "eventsSummary": session_dbs_data.get("eventsSummary", {}),
             "statsPid": stats_pid_data,
             "content": content_dbs_data,
+            "otelSpans": otel_data,
         }
 
     def _read_session_databases(self) -> Dict[str, Any]:
@@ -653,6 +657,87 @@ class ContextDataExtractor:
             "timeSavedMin": time_saved_min,
         }
 
+    def _read_otel_spans(self) -> Dict[str, Any]:
+        """Lê spans OTel GenAI exportados nativamente pelo Copilot/Claude Code (best-effort,
+        sem assumir schema fixo — atributos ausentes são ignorados silenciosamente)."""
+        candidates = [
+            Path(__file__).resolve().parent.parent / "logs" / "otel-spans.jsonl",
+            Path.cwd() / "tools" / "context-insight-visualizer" / "logs" / "otel-spans.jsonl",
+        ]
+        path = next((p for p in candidates if p.exists()), None)
+        empty = {
+            "spansCount": 0, "byService": {}, "operationBreakdown": {},
+            "tokenUsage": {"inputTokens": 0, "outputTokens": 0, "cacheReadTokens": 0, "cacheCreationTokens": 0},
+            "modelBreakdown": [], "agentBreakdown": [],
+        }
+        if not path:
+            return empty
+
+        by_service: Dict[str, int] = {}
+        op_breakdown: Dict[str, int] = {}
+        model_agg: Dict[str, Dict[str, int]] = {}
+        agent_agg: Dict[str, int] = {}
+        input_tok = output_tok = cache_read_tok = cache_creation_tok = 0
+        spans_count = 0
+
+        try:
+            with open(path, "r", encoding="utf-8", errors="ignore") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        rec = json.loads(line)
+                    except Exception:
+                        continue
+
+                    spans_count += 1
+                    attrs = rec.get("attributes", {}) or {}
+                    resource = rec.get("resource", {}) or {}
+
+                    service = str(resource.get("service.name", "unknown"))
+                    by_service[service] = by_service.get(service, 0) + 1
+
+                    op = str(attrs.get("gen_ai.operation.name", "unknown"))
+                    op_breakdown[op] = op_breakdown.get(op, 0) + 1
+
+                    agent_name = attrs.get("gen_ai.agent.name")
+                    if agent_name:
+                        agent_agg[str(agent_name)] = agent_agg.get(str(agent_name), 0) + 1
+
+                    in_tok = attrs.get("gen_ai.usage.input_tokens") or 0
+                    out_tok = attrs.get("gen_ai.usage.output_tokens") or 0
+                    cr_tok = attrs.get("gen_ai.usage.cache_read.input_tokens") or 0
+                    cc_tok = attrs.get("gen_ai.usage.cache_creation.input_tokens") or 0
+                    input_tok += int(in_tok) if str(in_tok).isdigit() else 0
+                    output_tok += int(out_tok) if str(out_tok).isdigit() else 0
+                    cache_read_tok += int(cr_tok) if str(cr_tok).isdigit() else 0
+                    cache_creation_tok += int(cc_tok) if str(cc_tok).isdigit() else 0
+
+                    model = attrs.get("gen_ai.response.model") or attrs.get("gen_ai.request.model")
+                    if model:
+                        m_key = str(model)
+                        if m_key not in model_agg:
+                            model_agg[m_key] = {"model": m_key, "calls": 0, "inputTokens": 0, "outputTokens": 0}
+                        model_agg[m_key]["calls"] += 1
+                        model_agg[m_key]["inputTokens"] += int(in_tok) if str(in_tok).isdigit() else 0
+                        model_agg[m_key]["outputTokens"] += int(out_tok) if str(out_tok).isdigit() else 0
+        except Exception as ex:
+            self.warnings.append(f"Aviso ao ler otel-spans.jsonl: {str(ex)}")
+            return empty
+
+        return {
+            "spansCount": spans_count,
+            "byService": by_service,
+            "operationBreakdown": op_breakdown,
+            "tokenUsage": {
+                "inputTokens": input_tok, "outputTokens": output_tok,
+                "cacheReadTokens": cache_read_tok, "cacheCreationTokens": cache_creation_tok,
+            },
+            "modelBreakdown": sorted(model_agg.values(), key=lambda m: m["calls"], reverse=True),
+            "agentBreakdown": [{"agent": k, "count": v} for k, v in sorted(agent_agg.items(), key=lambda x: x[1], reverse=True)],
+        }
+
     def _read_stats_pid_files(self) -> Dict[str, Any]:
         """Lê e agrega os arquivos stats-pid-*.json do context-mode."""
         if not self.sessions_dirs:
@@ -785,4 +870,3 @@ if __name__ == "__main__":
     print(f"  Total Sessions: {len(result['sessions'])}")
     print(f"  Stats PID files: {result['meta']['statsPidCount']}")
     print(f"  Warnings: {len(result['meta']['warnings'])}")
-

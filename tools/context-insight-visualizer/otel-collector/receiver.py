@@ -23,6 +23,8 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
 OUT_PATH = Path(__file__).resolve().parent.parent / "logs" / "otel-spans.jsonl"
+DEBUG_RAW_PATH = Path(__file__).resolve().parent.parent / "logs" / "otel-debug-raw.jsonl"
+DEBUG_MODE = False  # ativado via --debug
 
 
 def _unwrap_anyvalue(value: dict) -> object:
@@ -42,14 +44,42 @@ def _flatten_attrs(attr_list: list) -> dict:
 
 
 class OTLPHandler(BaseHTTPRequestHandler):
+    def _capture_debug(self, raw_body: bytes, matched: bool, note: str = ""):
+        """Grava TODA requisição recebida, sem filtro — usado apenas para diagnóstico (--debug)."""
+        if not DEBUG_MODE:
+            return
+        try:
+            DEBUG_RAW_PATH.parent.mkdir(parents=True, exist_ok=True)
+            body_preview = raw_body[:3000].decode("utf-8", errors="replace")
+            with open(DEBUG_RAW_PATH, "a", encoding="utf-8") as f:
+                f.write(json.dumps({
+                    "capturedAt": datetime.now(timezone.utc).isoformat(),
+                    "method": self.command,
+                    "path": self.path,
+                    "headers": dict(self.headers.items()),
+                    "pathMatched": matched,
+                    "note": note,
+                    "bodyPreview": body_preview,
+                }) + "\n")
+        except Exception:
+            pass
+
+    def do_GET(self):
+        self._capture_debug(b"", matched=False, note="GET recebido (provável health-check da IDE)")
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"{}")
+
     def do_POST(self):
-        if not self.path.rstrip("/").endswith("/v1/traces"):
+        length = int(self.headers.get("Content-Length", 0))
+        raw = self.rfile.read(length)
+        matched = self.path.rstrip("/").endswith("/v1/traces")
+
+        if not matched:
+            self._capture_debug(raw, matched=False, note="Path não bateu com /v1/traces")
             self.send_response(404)
             self.end_headers()
             return
-
-        length = int(self.headers.get("Content-Length", 0))
-        raw = self.rfile.read(length)
 
         try:
             payload = json.loads(raw)  # http/json: ExportTraceServiceRequest em JSON
@@ -71,8 +101,9 @@ class OTLPHandler(BaseHTTPRequestHandler):
             if lines:
                 with open(OUT_PATH, "a", encoding="utf-8") as f:
                     f.write("\n".join(lines) + "\n")
-        except Exception:
-            pass  # receptor de telemetria nunca deve derrubar a sessão do Copilot
+            self._capture_debug(raw, matched=True, note=f"OK — {len(lines)} span(s) processado(s)")
+        except Exception as ex:
+            self._capture_debug(raw, matched=True, note=f"ERRO ao parsear JSON: {ex}")
 
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
@@ -80,15 +111,21 @@ class OTLPHandler(BaseHTTPRequestHandler):
         self.wfile.write(b"{}")
 
     def log_message(self, *args):
-        pass  # silencioso — não poluir stdout do desenvolvedor
+        if DEBUG_MODE:
+            print("[otel-receiver]", self.address_string(), "-", args[0] % args[1:] if len(args) > 1 else args[0])
 
 
 def main():
+    global DEBUG_MODE
     parser = argparse.ArgumentParser(description="Receptor OTLP local (http/json) — Context Insight Visualizer")
     parser.add_argument("--port", type=int, default=4318)
+    parser.add_argument("--debug", action="store_true", help="Grava TODA requisição recebida (raw) em otel-debug-raw.jsonl, sem filtro de path/parsing.")
     args = parser.parse_args()
+    DEBUG_MODE = args.debug
     print(f"[otel-receiver] Ouvindo em http://localhost:{args.port}/v1/traces")
     print(f"[otel-receiver] Gravando em: {OUT_PATH}")
+    if DEBUG_MODE:
+        print(f"[otel-receiver] MODO DEBUG ativo — capturando tudo em: {DEBUG_RAW_PATH}")
     HTTPServer(("0.0.0.0", args.port), OTLPHandler).serve_forever()
 
 
