@@ -9,6 +9,11 @@ description: >-
   e CLI local para build/indexação.
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'run_in_terminal', 'context-mode/ctx_search', 'context-mode/ctx_index', 'codegraph/query', 'codegraph/module_map', 'codegraph/fn_impact', 'codegraph/find_cycles', 'codegraph/context']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/codegraph-optave-usage/SKILL.md
+  - .github/skills/integration-contract-analysis/SKILL.md
 ---
 # Code Knowledge Graph
 

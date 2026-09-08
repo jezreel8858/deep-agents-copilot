@@ -9,6 +9,11 @@ description: >-
   com atualização atômica de catálogos (R-015).
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'insert_edit_into_file', 'create_file', 'grep_search', 'file_search', 'list_dir', 'get_errors', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute', 'context-mode/ctx_index', 'context-mode/ctx_execute_file']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/governance-factory-patterns/SKILL.md
+  - .github/skills/agent-contracts/SKILL.md
 ---
 # Governance Factory
 

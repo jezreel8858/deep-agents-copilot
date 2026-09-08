@@ -17,7 +17,7 @@ source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
   - .github/agents/bug-triage.agent.md
-  - .github/agents/test-engineer.agent.md
+  - .github/agents/test-strategy.agent.md
   - .github/agents/business-rules-extractor.agent.md
   - .github/agents/requirements-analyst.agent.md
 tools: ['ask_questions']

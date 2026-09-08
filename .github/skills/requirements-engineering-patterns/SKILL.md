@@ -6,6 +6,8 @@ description: >
   funcionais e não-funcionais a partir de pedidos de negócio ambíguos — antes de
   qualquer análise técnica de impacto ou plano de implementação. Base de
   conhecimento do agent `requirements-analyst`.
+tier: 2
+category: process
 triggers:
   - "levantar requisitos"
   - "requisito ambíguo"
@@ -15,6 +17,10 @@ triggers:
   - "requisito funcional"
   - "requisito não-funcional"
   - "escrever requisito"
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/agents/requirements-analyst.agent.md
 tools: []
 ---
 

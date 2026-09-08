@@ -6,6 +6,11 @@ description: >-
   corrige o código e delega para agents especializados quando necessário.
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_search']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/code-review-patterns/SKILL.md
+  - .github/skills/compliance-governance-patterns/SKILL.md
 ---
 # Code Review
 

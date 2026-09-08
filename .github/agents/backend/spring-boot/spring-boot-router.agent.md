@@ -7,6 +7,11 @@ description: >-
   (arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer e test-fixer).
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/agent-contracts/SKILL.md
+  - .github/skills/handoff-governance/SKILL.md
 ---
 
 # Backend Spring Boot Router

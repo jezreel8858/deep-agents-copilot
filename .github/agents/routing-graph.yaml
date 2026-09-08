@@ -169,6 +169,10 @@ nos:
     tipo: downstream
     descricao: "Auditoria de conformidade arquitetural contra Architectural Decision Records (ADRs) documentados no projeto, identificando violações, decisões obsoletas e ADRs ausentes; read-only"
 
+  - id: repo-hygiene-auditor
+    tipo: downstream
+    descricao: "Auditoria de higiene estrutural, documentação essencial (README/CONTRIBUTING/LICENSE), segurança de versionamento (.gitignore, .env) e práticas de CI/CD agnóstica de stack; read-only"
+
 # ─────────────────────────────────────────────
 # ARESTAS — condições de roteamento
 # Cada aresta define: origem, destino, sinais de ativação e threshold mínimo
@@ -921,6 +925,29 @@ arestas:
       nao_confundir_com:
         - "regras de negócio do código"   # → business-rules-extractor
         - "autoria/redação de novo adr"    # → docs-engineer
+
+  # Auditoria de higiene de repositório, documentação essencial e padrões de engenharia
+  - de: agent-router
+    para: repo-hygiene-auditor
+    prioridade: 4.85
+    threshold_score: 0.90
+    nivel_routing: rule-based
+    condicoes:
+      keywords:
+        - "higiene de repositório"
+        - "boas práticas de repositório"
+        - "documentação essencial"
+        - "readme ausente"
+        - "auditar repositório"
+        - "contributing"
+        - "license"
+        - "gitignore"
+        - "maturidade do repositório"
+      sinal_r006: "É auditoria de higiene de repositório, presença de documentação essencial (README/CONTRIBUTING/LICENSE) ou segurança de versionamento (.gitignore/.env)?"
+      nao_confundir_com:
+        - "governança interna de agentes de ia"  # → agent-auditor
+        - "revisão de diff de código"            # → code-review
+        - "redação de documentação"              # → docs-engineer
 
 # ─────────────────────────────────────────────
 # POLÍTICA DE CASCATA

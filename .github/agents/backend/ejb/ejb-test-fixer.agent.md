@@ -6,6 +6,11 @@ description: >-
   analisa builds Ant e Maven Surefire, corrige falhas de JNDI em testes, quebras de contexto embutido e fixtures.
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'insert_edit_into_file', 'get_errors', 'run_in_terminal', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/test-implementation-backend/SKILL.md
+  - .github/skills/code-tracing/SKILL.md
 ---
 
 # EJB Test Fixer

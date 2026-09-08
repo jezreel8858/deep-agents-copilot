@@ -7,6 +7,11 @@ description: >-
   tokens de design e fidelidade de interface.
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'insert_edit_into_file', 'get_errors', 'run_in_terminal', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/angular-responsive-ui-patterns/SKILL.md
+  - .github/skills/design-system-component-contracts/SKILL.md
 ---
 
 # Angular UI Stylist

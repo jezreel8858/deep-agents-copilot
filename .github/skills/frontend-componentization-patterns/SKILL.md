@@ -14,7 +14,7 @@ triggers:
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/skills/test-implementation-angular/SKILL.md
+  - .github/skills/test-implementation-frontend/SKILL.md
 tools: []
 ---
 

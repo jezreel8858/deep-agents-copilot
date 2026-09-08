@@ -14,6 +14,7 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ROUTING_GRAPH_PATH = REPO_ROOT / ".github" / "agents" / "routing-graph.yaml"
 CASOS_ROTEAMENTO_PATH = REPO_ROOT / ".github" / "agents" / "evals" / "casos-roteamento.yaml"
+CATALOG_PATH = REPO_ROOT / ".github" / "agents" / "catalog.yaml"
 AGENTS_DIR = REPO_ROOT / ".github" / "agents"
 
 # Nós especiais / legados aceitos na suíte histórica de evals
@@ -44,6 +45,15 @@ def existing_agent_ids():
     agent_files = list(AGENTS_DIR.glob("**/*.agent.md"))
     agent_ids = {p.stem.replace(".agent", "") for p in agent_files}
     return agent_ids
+
+
+@pytest.fixture(scope="module")
+def catalog_yaml():
+    assert CATALOG_PATH.exists(), f"Arquivo não encontrado: {CATALOG_PATH}"
+    with open(CATALOG_PATH, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    assert isinstance(data, dict), "catalog.yaml deve ser um dicionário YAML"
+    return data
 
 
 def test_routing_graph_schema(routing_graph):
@@ -165,3 +175,31 @@ def test_anti_dead_end_and_circuit_breaker(routing_graph):
         # Pelo menos uma aresta deve permitir retorno ou ser coberta pelo protocolo universal R-042
         assert node_id in routing_graph["nos"] or True
 
+def test_catalog_yaml_agents_have_mandatory_source_docs(catalog_yaml):
+    """Valida R-015 / R-040: 100% dos agents declarados em catalog.yaml devem possuir source_docs válido e sem links quebrados"""
+    agents = catalog_yaml.get("agents", {})
+    assert len(agents) >= 15, "catalog.yaml deve conter ao menos 15 agents"
+
+    broken_links: list[tuple[str, str]] = []
+    missing_docs: list[str] = []
+
+    for agent_id, data in agents.items():
+        source_docs = data.get("source_docs")
+        if not source_docs or not isinstance(source_docs, list) or len(source_docs) == 0:
+            missing_docs.append(agent_id)
+            continue
+
+        for doc in source_docs:
+            # Suporte a R-043: catalog.local.yaml é gitignored; no CI o template rastreado é .example
+            if str(doc).endswith("catalog.local.yaml") and (REPO_ROOT / "docs/ai-context/catalog.local.yaml.example").exists():
+                continue
+
+            target = REPO_ROOT / str(doc).lstrip("/")
+            if not target.exists():
+                broken_links.append((agent_id, str(doc)))
+
+    assert not missing_docs, f"Os seguintes agents em catalog.yaml não possuem 'source_docs': {missing_docs}"
+    assert not broken_links, (
+        f"Foram encontrados links quebrados em source_docs de catalog.yaml:\n"
+        + "\n".join(f"  - [{agent}]: {link}" for agent, link in broken_links)
+    )

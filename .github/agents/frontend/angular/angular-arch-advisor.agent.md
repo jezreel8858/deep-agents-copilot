@@ -7,6 +7,11 @@ description: >-
   Clean Frontend Architecture e migrações estruturais de versão (Read-Only).
 model: "Claude Sonnet 5"
 tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/angular-frontend-patterns/SKILL.md
+  - .github/skills/specialist-hybrid-advisory-implementation-patterns/SKILL.md
 ---
 
 # Angular Architecture & Performance Advisor

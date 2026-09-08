@@ -6,6 +6,11 @@ description: >-
   streaming em tempo real (Server-Sent Events / SSE, WebSocket) e persistência R2DBC com Testcontainers.
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'create_file', 'insert_edit_into_file', 'get_errors', 'run_in_terminal', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/test-implementation-spring-boot/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
 ---
 
 # Spring Reactive Integration Test Writer

@@ -7,6 +7,11 @@ description: >-
   modernização e estratégias seguras de migração/desacoplamento (Read-Only).
 model: "Claude Sonnet 5"
 tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/java-jdk-backend-governance/SKILL.md
+  - .github/skills/specialist-hybrid-advisory-implementation-patterns/SKILL.md
 ---
 
 # EJB Architecture Advisor

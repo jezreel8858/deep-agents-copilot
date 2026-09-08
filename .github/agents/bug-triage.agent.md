@@ -7,6 +7,11 @@ description:
   de rastreamento (Jira, GitHub Issues, Linear, CSV ou relato livre).
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'get_errors', 'run_in_terminal', 'ask_questions', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/code-tracing/SKILL.md
+  - .github/skills/structured-intake-patterns/SKILL.md
 ---
 
 # Bug Triage

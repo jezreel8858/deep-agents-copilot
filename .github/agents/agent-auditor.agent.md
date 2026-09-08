@@ -7,6 +7,11 @@ description: >-
   e alinhamento de perfil sem mutação direta, com recomendações e handoff para executores.
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/governance-audit-patterns/SKILL.md
+  - .github/skills/agent-contracts/SKILL.md
 ---
 
 # Agent Auditor

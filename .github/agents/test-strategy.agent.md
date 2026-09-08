@@ -5,6 +5,11 @@ description: >-
   testes automaticamente.
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'get_errors', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute_file']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/test-coverage-governance/SKILL.md
+  - .github/skills/task-decomposition-patterns/SKILL.md
 ---
 # Test Strategy
 

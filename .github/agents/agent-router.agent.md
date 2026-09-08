@@ -5,7 +5,12 @@ description: >-
   agent downstream correto, com fallback para pesquisa e análise de integração.
   Aplica re-triagem obrigatória por turno (R-042 — anti sticky-session).
 model: Claude Sonnet 5
-tools: ['read_file', 'file_search', 'grep_search', 'ask_questions', 'run_subagent', 'insert_edit_into_file', 'replace_string_in_file', 'create_file', 'apply_patch', 'get_terminal_output', 'open_file', 'run_in_terminal', 'get_errors', 'list_dir', 'validate_cves']
+tools: ['read_file', 'file_search', 'grep_search', 'ask_questions', 'run_subagent', 'insert_edit_into_file', 'replace_string_in_file', 'create_file', 'apply_patch', 'get_terminal_output', 'open_file', 'run_in_terminal', 'get_errors', 'list_dir', 'validate_cves', 'tavily/tavily_search', 'tavily/tavily_extract', 'tavily/tavily_crawl', 'tavily/tavily_map', 'tavily/tavily_research', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_fetch_and_index', 'context-mode/ctx_batch_execute', 'context-mode/ctx_stats', 'context-mode/ctx_doctor', 'context-mode/ctx_upgrade', 'context-mode/ctx_purge', 'context-mode/ctx_insight']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/agent-contracts/SKILL.md
+  - .github/skills/handoff-governance/SKILL.md
 ---
 # Agent Router
 **Versão:** 2.0.0
@@ -67,6 +72,7 @@ Você é o roteador obrigatório do fluxo agent-first no GitHub Copilot. Seu tra
 | Engenheiro de Documentação | [`docs-engineer.agent.md`](docs-engineer.agent.md) | Autoria e curadoria de documentação técnica exclusivamente em `.md` |
 | Mapeador Bounded Contexts (DDD) | [`ddd-bounded-context-mapper.agent.md`](ddd-bounded-context-mapper.agent.md) | Mapeamento semântico de domínios de negócio por nomenclatura, Bounded Contexts e God Classes |
 | Sentinel de ADRs | [`adr-sentinel.agent.md`](adr-sentinel.agent.md) | Auditoria de propostas técnicas, blueprints e diffs contra ADRs documentados do projeto |
+| Auditor de Higiene de Repo | [`repo-hygiene-auditor.agent.md`](repo-hygiene-auditor.agent.md) | Auditoria de higiene estrutural, documentação essencial (README/CONTRIBUTING) e práticas de CI |
 | Gatekeeper de PR | [`pr-gatekeeper.agent.md`](pr-gatekeeper.agent.md) | Preparação de PR pós-aprovação (diff, commit semântico, changelog) |
 | Factory de governança | [`governance-factory.agent.md`](governance-factory.agent.md) | Governança de criação/revisão de agents, skills, prompts e novas stacks |
 | Mantenedor de governança | [`governance-maintainer.agent.md`](governance-maintainer.agent.md) | Manutenção atômica, refatoração em cascata e sincronização em lote de governança |
@@ -229,6 +235,9 @@ Pedido recebido (já refinado por @prompt-structuring)?
 |- É auditoria de propostas técnicas, blueprints ou diffs contra Architectural Decision Records (ADRs) documentados do projeto?
 |  |- Sim -> @adr-sentinel
 |  \- Não
+|- É auditoria de higiene de repositório, presença de documentação essencial (README/CONTRIBUTING/LICENSE) ou segurança de versionamento (.gitignore/.env)?
+|  |- Sim -> @repo-hygiene-auditor
+|  \- Não
 |- É pedido de implementação de código em stack/linguagem NÃO suportada no catálogo (ex.: Rust, Go, Flutter, Ruby)?
 |  |- Sim -> [Fallback Determinístico: Recusa Estruturada]
 |  \- Não
@@ -364,6 +373,7 @@ Próximo passo mínimo:
 - [@agentic-memory-manager](agentic-memory-manager.agent.md) para persistência/recuperação de memória entre sessões — não confundir com `@context-builder` (consolidação pontual, read-only).
 - [@ddd-bounded-context-mapper](ddd-bounded-context-mapper.agent.md) para mapeamento semântico de domínios de negócio por nomenclatura, identificação de Bounded Contexts e God Classes.
 - [@adr-sentinel](adr-sentinel.agent.md) para auditoria de conformidade de blueprints, propostas e diffs contra Architectural Decision Records (ADRs) documentados.
+- [@repo-hygiene-auditor](repo-hygiene-auditor.agent.md) para auditoria de higiene estrutural, documentação essencial (README/CONTRIBUTING/LICENSE) e práticas de CI/CD.
 - [@tech-solution-architect](tech-solution-architect.agent.md) para elaboração de Technical Blueprint, contratos de API, divisão por stack, impacto técnico local (tier B1) e análise cross-sistema.
 - [@deep-search](deep-search.agent.md) como fallback para pesquisa interna/externa.
 - [@tech-solution-architect](tech-solution-architect.agent.md) como fallback para arquitetura e integração cross-sistema.

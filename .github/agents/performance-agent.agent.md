@@ -6,6 +6,11 @@ description: >-
   Nunca corrige, apenas analisa e reporta com evidência mensurável. Read-only.
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_search']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/performance-engineering-patterns/SKILL.md
+  - .github/skills/context-mode/SKILL.md
 ---
 # Performance Agent
 

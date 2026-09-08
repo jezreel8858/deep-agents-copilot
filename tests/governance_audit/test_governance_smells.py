@@ -43,6 +43,11 @@ def get_all_skill_files() -> list[Path]:
     return [p for p in SKILLS_DIR.glob("**/SKILL.md") if "templates" not in p.parts]
 
 
+def get_all_prompt_files() -> list[Path]:
+    """Retorna todos os arquivos .prompt.md sob .github/prompts/"""
+    return [p for p in PROMPTS_DIR.glob("*.prompt.md") if "templates" not in p.parts]
+
+
 # ─────────────────────────────────────────────────────────────
 # SMELL 2.2 — Gap de Perfil (Agent Incompleto)
 # ─────────────────────────────────────────────────────────────
@@ -202,3 +207,88 @@ def test_smell_2_11_skills_code_block_limits():
                     f"[{rel_path}] Bloco de código ({lang}) com {len(lines)} linhas excede o teto recomendado de snippets ({max_lines})"
                 )
 
+# ─────────────────────────────────────────────────────────────
+# SMELL 2.9 — Incompletude de Frontmatter & source_docs (R-015 / governance-factory-patterns)
+# ─────────────────────────────────────────────────────────────
+
+def test_smell_2_9_all_agents_have_mandatory_source_docs():
+    """Valida se 100% dos agents possuem a chave obrigatória 'source_docs:' com ao menos 1 documento"""
+    agent_files = get_all_agent_files()
+    assert len(agent_files) >= 15, "Deve existir ao menos 15 agents no catálogo"
+
+    for agent_file in agent_files:
+        content = agent_file.read_text(encoding="utf-8")
+        fm = parse_frontmatter(content)
+        rel_path = agent_file.relative_to(REPO_ROOT)
+
+        assert "source_docs" in fm, f"[{rel_path}] Ausência do campo obrigatório 'source_docs:' no frontmatter"
+        docs = fm.get("source_docs")
+        assert isinstance(docs, list) and len(docs) >= 1, (
+            f"[{rel_path}] 'source_docs' deve ser uma lista não vazia de documentos (atual: {docs})"
+        )
+
+
+def test_smell_2_9_all_prompts_have_mandatory_source_docs():
+    """Valida se 100% dos prompts possuem a chave obrigatória 'source_docs:' com ao menos 1 documento"""
+    prompt_files = get_all_prompt_files()
+    assert len(prompt_files) >= 5, "Deve existir ao menos 5 prompts no repositório"
+
+    for prompt_file in prompt_files:
+        content = prompt_file.read_text(encoding="utf-8")
+        fm = parse_frontmatter(content)
+        rel_path = prompt_file.relative_to(REPO_ROOT)
+
+        assert "source_docs" in fm, f"[{rel_path}] Ausência do campo obrigatório 'source_docs:' no frontmatter"
+        docs = fm.get("source_docs")
+        assert isinstance(docs, list) and len(docs) >= 1, (
+            f"[{rel_path}] 'source_docs' deve ser uma lista não vazia de documentos (atual: {docs})"
+        )
+
+
+def test_smell_2_9_all_skills_have_mandatory_source_docs():
+    """Valida se 100% das skills possuem a chave obrigatória 'source_docs:' com ao menos 1 documento"""
+    skill_files = get_all_skill_files()
+    assert len(skill_files) >= 10, "Deve existir ao menos 10 skills no repositório"
+
+    for skill_file in skill_files:
+        content = skill_file.read_text(encoding="utf-8")
+        fm = parse_frontmatter(content)
+        rel_path = skill_file.relative_to(REPO_ROOT)
+
+        assert "source_docs" in fm, f"[{rel_path}] Ausência do campo obrigatório 'source_docs:' no frontmatter"
+        docs = fm.get("source_docs")
+        assert isinstance(docs, list) and len(docs) >= 1, (
+            f"[{rel_path}] 'source_docs' deve ser uma lista não vazia de documentos (atual: {docs})"
+        )
+
+
+def test_smell_2_9_source_docs_referential_integrity():
+    """Valida que todos os caminhos declarados em source_docs de agents, prompts e skills existem no repositório"""
+    all_files = get_all_agent_files() + get_all_prompt_files() + get_all_skill_files()
+    broken_links: list[tuple[str, str]] = []
+
+    for file_path in all_files:
+        content = file_path.read_text(encoding="utf-8")
+        fm = parse_frontmatter(content)
+        rel_file = str(file_path.relative_to(REPO_ROOT))
+
+        docs = fm.get("source_docs", [])
+        if not isinstance(docs, list):
+            continue
+
+        for doc in docs:
+            # Suporte a R-043: catalog.local.yaml é gitignored; no CI o template rastreado é .example
+            if str(doc).endswith("catalog.local.yaml") and (REPO_ROOT / "docs/ai-context/catalog.local.yaml.example").exists():
+                continue
+
+            # Caminho pode ser relativo à raiz do repo ou ao próprio arquivo
+            target_repo = REPO_ROOT / str(doc).lstrip("/")
+            target_local = (file_path.parent / str(doc)).resolve()
+
+            if not target_repo.exists() and not target_local.exists():
+                broken_links.append((rel_file, str(doc)))
+
+    assert not broken_links, (
+        f"Foram encontrados {len(broken_links)} links quebrados em source_docs:\n"
+        + "\n".join(f"  - Em [{origem}]: {destino}" for origem, destino in broken_links)
+    )

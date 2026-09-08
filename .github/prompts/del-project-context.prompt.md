@@ -11,7 +11,7 @@ tools: ['read_file', 'insert_edit_into_file', 'file_search', 'list_dir', 'ask_qu
 argument-hint: '<nome-do-projeto>'
 source_docs:
   - CLAUDE.md
-  - docs/ai-context/catalog.local.yaml
+  - docs/ai-context/catalog.local.yaml.example
   - .github/instructions/README.md
 ---
 

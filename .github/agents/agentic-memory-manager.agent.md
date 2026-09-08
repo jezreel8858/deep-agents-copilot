@@ -7,6 +7,11 @@ description: >-
   sempre com aprovação humana explícita para mudanças procedimentais.
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'create_file', 'insert_edit_into_file', 'file_search', 'list_dir', 'grep_search', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_index', 'context-mode/ctx_execute']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/agent-memory-policy/SKILL.md
+  - .github/skills/context-mode/SKILL.md
 ---
 # Agentic Memory Manager
 

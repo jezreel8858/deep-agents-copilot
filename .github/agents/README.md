@@ -42,7 +42,6 @@
 | Agent | `requirements-analyst` | 🧾 ***(NEW)*** Elicita e estrutura requisitos funcionais/não-funcionais a partir de pedido de negócio ambíguo (EARS, INVEST, Gherkin, FURPS+); detecta *solution-jumping* via Five Whys; prospectivo (não confundir com `business-rules-extractor`, que é reverso) |
 | Agent | `code-summarizer` | 🗜️ ***(NEW)*** Ponto de entrada único para sumarização de código-fonte agnóstica a linguagem (RF-008); modelo híbrido — heurística/AST determinística primeiro, LLM leve como fallback; nunca substituído por chamada direta a lib de parsing |
 | Agent | `code-knowledge-graph` | 🕸️ Ponto de entrada único para construção/consulta do grafo de conhecimento de código-fonte cross-projeto. Motor único baseado na lib externa **`@optave/codegraph`** (CLI local e MCP Server enxuto, Node.js/TypeScript nativo, Tree-sitter/Rust, zero API keys/LLM). Suporta dataflow/CFG interprocedural, dead-code, complexity metrics, co-change analysis, detecção de ciclos e visualização interativa via `codegraph plot`. Skill de uso: `codegraph-optave-usage` |
-
 | Agent | `security-reviewer` | 🔒 ***(NEW)*** Revisa código de aplicação por segurança especializada (OWASP Top 10:2025, ASVS 5.0, SCA/CVE, secrets) — complementa `code-review` (dimensão genérica) com profundidade de security specialist; read-only |
 | Agent | `performance-agent` | ⚡ ***(NEW)*** Revisa código por performance especializada — Core Web Vitals (frontend), N+1/latência (backend), otimização de query (banco); read-only |
 | Agent | `compliance-guardrails` | 🛡️ ***(NEW)*** Avalia conformidade regulatória de aplicação (SOC 2, GDPR/LGPD, HIPAA, ISO 27001) — audit trails, least privilege, retenção de dado pessoal; distinto de `agent-safety-guardrails` (segurança do próprio agent de IA); read-only |
@@ -53,6 +52,7 @@
 | Agent | `code-style-enforcer` | 🎨 ***(NEW)*** Verifica aderência a convenções de estilo documentadas no adapter de stack; nunca bloqueador, apenas sugestão |
 | Agent | `ddd-bounded-context-mapper` | 🗺️ ***(NEW)*** Mapeia Bounded Contexts (DDD) por domínio de negócio a partir de nomenclatura, detectando fronteiras invadidas e God Classes; read-only |
 | Agent | `adr-sentinel` | 📜 ***(NEW)*** Audita propostas técnicas, blueprints e diffs contra Architectural Decision Records (ADRs) documentados no projeto; read-only |
+| Agent | `repo-hygiene-auditor` | 🧹 ***(NEW)*** Audita higiene estrutural, documentação essencial (README/CONTRIBUTING/LICENSE) e práticas de CI/CD; read-only |
 
 ## 3) Roteamento Rápido
 
@@ -96,6 +96,7 @@
 | 🗄️ Migrações de schema, otimização de query e integridade referencial | `database-specialist` |
 | 🗺️ Mapeamento semântico de Bounded Contexts (DDD) e God Classes | `ddd-bounded-context-mapper` |
 | 📜 Auditoria de propostas técnicas contra ADRs | `adr-sentinel` |
+| 🧹 Auditoria de higiene de repositório e documentação essencial | `repo-hygiene-auditor` |
 
 ## 4) Pre-fetch Recomendado
 
