@@ -24,7 +24,11 @@ from extractor import (
     SUBAGENT_PATTERNS,
 )
 from insights_engine import InsightsEngine
-from template_bundler import TemplateBundler
+import importlib.util
+_spec = importlib.util.spec_from_file_location("context_insight_template_bundler", generator_dir / "template_bundler.py")
+_mod = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_mod)
+TemplateBundler = _mod.TemplateBundler
 
 
 def test_load_known_agents_contains_canonical():

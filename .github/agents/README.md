@@ -53,6 +53,7 @@
 | Agent | `code-style-enforcer` | 🎨 ***(NEW)*** Verifica aderência a convenções de estilo documentadas no adapter de stack; nunca bloqueador, apenas sugestão |
 | Agent | `ddd-bounded-context-mapper` | 🗺️ ***(NEW)*** Mapeia Bounded Contexts (DDD) por domínio de negócio a partir de nomenclatura, detectando fronteiras invadidas e God Classes; read-only |
 | Agent | `adr-sentinel` | 📜 ***(NEW)*** Audita propostas técnicas, blueprints e diffs contra Architectural Decision Records (ADRs) documentados no projeto; read-only |
+| Agent | `repo-hygiene-auditor` | 🧹 ***(NEW)*** Audita higiene estrutural, documentação essencial (README/CONTRIBUTING/LICENSE) e práticas de CI/CD; read-only |
 
 ## 3) Roteamento Rápido
 
@@ -96,6 +97,7 @@
 | 🗄️ Migrações de schema, otimização de query e integridade referencial | `database-specialist` |
 | 🗺️ Mapeamento semântico de Bounded Contexts (DDD) e God Classes | `ddd-bounded-context-mapper` |
 | 📜 Auditoria de propostas técnicas contra ADRs | `adr-sentinel` |
+| 🧹 Auditoria de higiene de repositório e documentação essencial | `repo-hygiene-auditor` |
 
 ## 4) Pre-fetch Recomendado
 

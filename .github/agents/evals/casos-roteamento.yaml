@@ -588,6 +588,24 @@ canonicos:
     critico: true
     threshold: 0.90
 
+  - id: "canon-042"
+    descricao: "Auditoria de higiene de repositório, documentação essencial e boas práticas de engenharia roteada para repo-hygiene-auditor"
+    input:
+      solicitacao: "Audite o repositório para verificar presença de README, CONTRIBUTING, LICENSE, .gitignore e boas práticas de engenharia"
+    expected:
+      agent_route: "repo-hygiene-auditor"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.90
+      output_contains:
+        - "Agente Ativo: repo-hygiene-auditor"
+    nao_confundir_com:
+      - "auditoria de governança interna de agentes de IA" # → agent-auditor
+      - "revisão de diff de código"                       # → code-review
+      - "redigir novo documento"                           # → docs-engineer
+    critico: true
+    threshold: 0.90
+
 # ─────────────────────────────────────────────
 # SUITE 2 — Casos Ambíguos (threshold ≥ 0.70)
 # Intenção ambígua que exige clarificação ou roteamento defensivo.

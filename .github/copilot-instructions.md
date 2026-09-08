@@ -304,6 +304,7 @@ Projetos e adapters por-projeto NUNCA são commitados no repositório compartilh
 - `database-specialist` -> migrações de schema, otimização de query e integridade referencial.
 - `ddd-bounded-context-mapper` -> mapeamento semântico de domínios de negócio por nomenclatura, Bounded Contexts e God Classes (read-only).
 - `adr-sentinel` -> auditoria de propostas técnicas, blueprints e diffs contra Architectural Decision Records (ADRs) documentados (read-only).
+- `repo-hygiene-auditor` -> auditoria de higiene estrutural, documentação essencial (README/CONTRIBUTING) e práticas de CI/CD (read-only).
 
 ### Skills atuais
 

@@ -95,15 +95,31 @@ def test_readme_mermaid_syntax_and_integrity(all_existing_agents):
                 assert w in all_existing_agents, f"Diagrama #{idx} em README.md cita agent desconhecido: '{w}'"
 
 
-def test_readme_fluxo_operacional_covers_key_architectural_agents(all_existing_agents):
-    """Garante que o diagrama de Fluxo Operacional cobre os novos agentes arquiteturais chave"""
+def test_readme_diagrams_cover_all_routing_graph_agents(routing_graph):
+    """Garante que 100% dos agents downstream e fallback declarados no routing-graph.yaml
+    estão devidamente representados nos diagramas do README.md (Fluxo Operacional e Mapa de Perfis)."""
     content = README_PATH.read_text(encoding="utf-8")
     blocks = re.findall(r'```mermaid[\r\n]+(.*?)[\r\n]+```', content, re.DOTALL)
+    assert len(blocks) >= 2, "README.md deve conter ao menos 2 diagramas Mermaid"
     fluxo_op = blocks[0]
+    mapa_perfis = blocks[1]
 
-    assert "ddd-bounded-context-mapper" in fluxo_op
-    assert "adr-sentinel" in fluxo_op
-    assert "governance-maintainer" in fluxo_op
+    # Coleta todos os nós downstream e fallback que devem constar na visão arquitetural
+    graph_agents = [
+        node["id"]
+        for node in routing_graph.get("nos", [])
+        if node.get("tipo") in {"downstream", "fallback"}
+    ]
+
+    missing_in_fluxo = [a for a in graph_agents if a not in fluxo_op]
+    assert not missing_in_fluxo, (
+        f"Diagrama 'Fluxo operacional' no README.md não cobre os seguintes agents do grafo: {missing_in_fluxo}"
+    )
+
+    missing_in_mapa = [a for a in graph_agents if a not in mapa_perfis]
+    assert not missing_in_mapa, (
+        f"Diagrama 'Mapa de Perfis' no README.md não cobre os seguintes agents do grafo: {missing_in_mapa}"
+    )
 
 
 def test_when_delegating_targets_are_real_agents(all_existing_agents):
