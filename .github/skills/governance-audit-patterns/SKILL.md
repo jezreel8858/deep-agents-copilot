@@ -39,7 +39,6 @@ source_docs:
   - .github/skills/agent-safety-guardrails/SKILL.md
   - .github/skills/governance-factory-patterns/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
-  - docs/plan/categorizacao-agents-mercado.md
 tools: []
 ---
 

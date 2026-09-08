@@ -31,8 +31,8 @@ tools:
   - "context-mode/ctx_purge"
   - "context-mode/ctx_insight"
 source_docs:
-  - "../../../CLAUDE.md"
-  - "../../../.github/copilot-instructions.md"
+  - "CLAUDE.md"
+  - ".github/copilot-instructions.md"
 ---
 
 # context-mode — Operação de alto rendimento

@@ -271,7 +271,6 @@ agents:
       - ".github/skills/tavily/SKILL.md"
       - ".github/skills/context-mode/SKILL.md"
       - ".github/skills/prompt-engineering-patterns/SKILL.md"
-      - "docs/plan/plano-otimizacao-catalogo-agents.md"
     related_agents:
       - "agent-router"
       - "tech-solution-architect"
@@ -310,7 +309,6 @@ agents:
       - ".github/skills/context-mode/SKILL.md"
       - ".github/skills/terminal-governance/SKILL.md"
       - ".github/skills/prompt-engineering-patterns/SKILL.md"
-      - "docs/plan/plano-otimizacao-catalogo-agents.md"
     estimated_time_minutes: 25
 
   tech-solution-architect:
@@ -414,7 +412,6 @@ agents:
       - ".github/agents/catalog.yaml"
       - ".github/skills/governance-audit-patterns/SKILL.md"
       - ".github/skills/agent-contracts/SKILL.md"
-      - "docs/plan/plano-otimizacao-catalogo-agents.md"
     related_agents:
       - "agent-router"
       - "governance-factory"
@@ -443,7 +440,6 @@ agents:
       - ".github/agents/catalog.yaml"
       - ".github/skills/governance-audit-patterns/SKILL.md"
       - ".github/skills/agent-contracts/SKILL.md"
-      - "docs/plan/plano-otimizacao-catalogo-agents.md"
       - ".github/agents/routing-graph.yaml"
       - ".github/agents/evals/casos-roteamento.yaml"
     estimated_time_minutes: 30
@@ -956,7 +952,6 @@ agents:
       - ".github/copilot-instructions.md"
       - ".github/agents/README.md"
       - ".github/agents/catalog.yaml"
-      - "docs/requirements/REQ-sumarizacao-codigo-context-mode.md"
       - "docs/ai-context/catalog.yaml"
     related_agents:
       - "agent-router"
@@ -987,7 +982,6 @@ agents:
       - ".github/agents/code-summarizer.agent.md"
       - ".github/agents/README.md"
       - ".github/agents/catalog.yaml"
-      - "docs/requirements/REQ-sumarizacao-codigo-context-mode.md"
       - "docs/ai-context/catalog.yaml"
       - ".github/skills/context-mode/SKILL.md"
     estimated_time_minutes: 20

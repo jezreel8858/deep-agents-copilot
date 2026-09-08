@@ -18,9 +18,9 @@ triggers:
   - "escanear projeto"
 
 source_docs:
-  - "../../../.github/prompts/add-project-context.prompt.md"
-  - "../../../.github/agents/adapter-generator.agent.md"
-  - "../../../docs/ai-context/catalog.yaml"
+  - ".github/prompts/add-project-context.prompt.md"
+  - ".github/agents/adapter-generator.agent.md"
+  - "docs/ai-context/catalog.yaml"
 
 capabilities:
   - name: "scan_project_structure"

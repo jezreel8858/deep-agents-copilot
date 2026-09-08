@@ -277,6 +277,10 @@ def test_smell_2_9_source_docs_referential_integrity():
             continue
 
         for doc in docs:
+            # Suporte a R-043: catalog.local.yaml é gitignored; no CI o template rastreado é .example
+            if str(doc).endswith("catalog.local.yaml") and (REPO_ROOT / "docs/ai-context/catalog.local.yaml.example").exists():
+                continue
+
             # Caminho pode ser relativo à raiz do repo ou ao próprio arquivo
             target_repo = REPO_ROOT / str(doc).lstrip("/")
             target_local = (file_path.parent / str(doc)).resolve()

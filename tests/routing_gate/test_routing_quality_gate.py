@@ -190,6 +190,10 @@ def test_catalog_yaml_agents_have_mandatory_source_docs(catalog_yaml):
             continue
 
         for doc in source_docs:
+            # Suporte a R-043: catalog.local.yaml é gitignored; no CI o template rastreado é .example
+            if str(doc).endswith("catalog.local.yaml") and (REPO_ROOT / "docs/ai-context/catalog.local.yaml.example").exists():
+                continue
+
             target = REPO_ROOT / str(doc).lstrip("/")
             if not target.exists():
                 broken_links.append((agent_id, str(doc)))

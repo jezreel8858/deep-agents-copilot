@@ -16,8 +16,8 @@ triggers:
   - "dead code"
   - "call graph"
 source_docs:
-  - "../../../CLAUDE.md"
-  - "../../../.github/copilot-instructions.md"
+  - "CLAUDE.md"
+  - ".github/copilot-instructions.md"
 ---
 
 # codegraph-optave-usage — Motor de grafo de conhecimento de código
@@ -125,7 +125,7 @@ O arquivo `.codegraphrc.json` (ou `.codegraph/config.json`) na raiz do projeto p
 | `ignoreAdditionalDirs` | `string[]` | Diretórios adicionais ignorados **em complemento** à lista padrão (não substitui) |
 | `extensions` | `string[]` | Restringe parsing às extensões informadas; se omitido, usa o conjunto padrão das 34 linguagens |
 
-**Templates prontos por stack** (`docs/agent-context/templates/codegraph/`): `angular.codegraphrc.json` (Angular + Capacitor), `spring-boot.codegraphrc.json`, `spring-reactive.codegraphrc.json` (herda base Spring Boot + geradores openapi/reactor) e `ejb-legacy.codegraphrc.json`. Ver detalhes em [`docs/agent-context/codegraph-guia-uso.md`](../../../docs/agent-context/codegraph-guia-uso.md) §7.
+**Templates prontos por stack** (`docs/agent-context/templates/codegraph/`): `angular.codegraphrc.json` (Angular + Capacitor), `spring-boot.codegraphrc.json`, `spring-reactive.codegraphrc.json` (herda base Spring Boot + geradores openapi/reactor) e `ejb-legacy.codegraphrc.json`. Ver detalhes em [`docs/agent-context/codegraph-guia-uso.md`](docs/agent-context/codegraph-guia-uso.md) §7.
 
 ### 5.1) Fronteiras Arquiteturais (`manifesto.boundaries`)
 Define camadas e regras de dependência entre módulos:
