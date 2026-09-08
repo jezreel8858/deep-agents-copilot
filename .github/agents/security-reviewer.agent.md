@@ -7,6 +7,11 @@ description: >-
   profundidade de security specialist. Read-only.
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_search']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/security-review-patterns/SKILL.md
+  - .github/skills/compliance-governance-patterns/SKILL.md
 ---
 # Security Reviewer
 

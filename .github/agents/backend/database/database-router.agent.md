@@ -7,6 +7,11 @@ description: >-
   (oracle-migration-dev, oracle-plsql-expert, oracle-query-tuner, informix-migration-dev, informix-spl-expert e informix-query-tuner).
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/agent-contracts/SKILL.md
+  - .github/skills/handoff-governance/SKILL.md
 ---
 
 # Backend Database Router

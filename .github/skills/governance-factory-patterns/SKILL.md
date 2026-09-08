@@ -82,7 +82,7 @@ Reportar no Formato de Saída (§4 desta skill)
 | Model | ✅ | — | ✅ (se aplicável) | ✅ (no router e nos especialistas) |
 | Tools (com `run_subagent` obrigatório — R-042) | ✅ | opcional | opcional | ✅ (em todos os agents) |
 | Triggers (PT-BR) | — | ✅ | — | — |
-| Source_docs | recomendado | ✅ | recomendado | ✅ |
+| Source_docs | ✅ obrigatório | ✅ | ✅ obrigatório | ✅ |
 | Registro em índice/catálogo | `catalog.yaml` + `README.md` | `.index.json` + `README.md` | `README.md` de prompts | `catalog.yaml` + `routing-graph.yaml` + `agent-router.agent.md` + `README.md` |
 
 ## 3) Checklist Genérico de Qualidade Estrutural
@@ -94,6 +94,7 @@ Reportar no Formato de Saída (§4 desta skill)
 - [ ] Catálogo/índice atualizado **na mesma entrega** (R-015 — nunca "depois").
 - [ ] README correspondente atualizado **na mesma entrega**.
 - [ ] Se `agent`: `run_subagent` presente no frontmatter `tools:` (bloqueante — R-042); seção "Retorno ao Router" declarada; banner "Agente Ativo" presente no Formato de Saída.
+- [ ] Se `agent`/`prompt`: `source_docs` presente no frontmatter apontando para as skills/regras que são DEPENDÊNCIA FUNCIONAL REAL do agent (não apenas afinidade temática) — reutilizar o Gate de Autocrítica §3.1 para validar isso.
 - [ ] Se `skill`: `tier`, `category`, `triggers` em PT-BR presentes; `source_docs` aponta para arquivos reais (não inventados).
 - [ ] Se `prompt`: nomenclatura `.prompt.md`, frontmatter mínimo (`description`, `model` quando aplicável), separação de responsabilidade clara com `.instructions.md` (não duplicar regra já coberta por adapter).
 - [ ] Se `stack`: diretório isolado criado em `.github/agents/<camada>/<stack>/` contendo `<stack>-catalog.yaml`, `<stack>-router.agent.md` e pacote canônico de especialistas (.agent.md) — ver §11.
@@ -128,6 +129,7 @@ Validações:
 - README atualizado atomicamente: ✅/❌
 - [se agent] run_subagent presente (R-042): ✅/❌
 - [se agent] Seção "Retorno ao Router" presente: ✅/❌
+- [se agent/prompt] source_docs presente e funcionalmente justificado: ✅/❌
 - [se skill] tier/category/triggers presentes: ✅/❌
 - [se agent/prompt/stack] model: string única, Title Case oficial, validado via get_errors (§9): ✅/❌
 - [se stack] Sub-catálogo local e supervisor configurados (§11): ✅/❌

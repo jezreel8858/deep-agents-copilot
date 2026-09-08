@@ -6,6 +6,11 @@ description: >-
   Arquillian com ShrinkWrap (.jar/.war/.ear) e Testcontainers para banco de dados e mensageria JMS real.
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'create_file', 'insert_edit_into_file', 'get_errors', 'run_in_terminal', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/test-implementation-backend/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
 ---
 
 # EJB Integration Test Writer

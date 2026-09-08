@@ -9,6 +9,11 @@ description: >-
   em seguida ao agent-router para roteamento downstream.
 model: "Gemini 3.8 Flash"
 tools: ['ask_questions', 'run_subagent']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/prompt-engineering-patterns/SKILL.md
+  - .github/skills/agent-contracts/SKILL.md
 ---
 # Prompt Structuring
 

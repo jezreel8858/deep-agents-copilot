@@ -22,7 +22,7 @@ tools:
 source_docs:
   - "CLAUDE.md"
   - ".github/copilot-instructions.md"
-  - ".github/agents/analysis-integration-architect.agent.md"
+  - ".github/agents/tech-solution-architect.agent.md"
 ---
 
 # Skill: Análise de Contrato de Integração

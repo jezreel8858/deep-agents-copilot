@@ -6,6 +6,11 @@ description: >-
   services transacionais, entidades Jakarta Persistence e DTOs Records seguindo o workflow TDD estrito.
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'create_file', 'insert_edit_into_file', 'get_errors', 'run_in_terminal', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/spring-boot-implementation-patterns/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 
 # Spring Boot Feature Developer

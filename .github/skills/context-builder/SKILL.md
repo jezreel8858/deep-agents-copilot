@@ -17,11 +17,11 @@ triggers:
   - "catalog"
   - "prompt de entrada"
 source_docs:
-  - "../../../CLAUDE.md"
-  - "../../../docs/ai-context/catalog.yaml"
-  - "../../../.github/copilot-instructions.md"
-  - "../../../.github/agents/context-builder.agent.md"
-  - "../../../.github/skills/context-mode/SKILL.md"
+  - "CLAUDE.md"
+  - "docs/ai-context/catalog.yaml"
+  - ".github/copilot-instructions.md"
+  - ".github/agents/context-builder.agent.md"
+  - ".github/skills/context-mode/SKILL.md"
 tools:
   - "context-mode"
 ---

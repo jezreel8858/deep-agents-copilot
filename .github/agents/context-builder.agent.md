@@ -6,6 +6,11 @@ description: >-
   referência de escopo.
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'create_file', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute_file']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/context-builder/SKILL.md
+  - .github/skills/context-mode/SKILL.md
 ---
 # Construtor de Contexto
 

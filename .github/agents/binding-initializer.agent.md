@@ -7,6 +7,11 @@ description:
   Projetos são adicionados depois via `/add-project-context`.
 model: "Gemini 3.8 Flash"
 tools: ['ask_questions', 'read_file', 'create_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/project-scanner/SKILL.md
+  - .github/skills/project-context-builder/SKILL.md
 ---
 
 # Inicializador de Binding Context

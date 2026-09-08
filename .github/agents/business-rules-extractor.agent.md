@@ -8,6 +8,11 @@ description: >
   documentadas).
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'create_file', 'insert_edit_into_file', 'get_errors', 'ask_questions', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/business-rules-governance/SKILL.md
+  - .github/skills/documentation-writing-patterns/SKILL.md
 ---
 # Business Rules Extractor
 

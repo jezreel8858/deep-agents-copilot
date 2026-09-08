@@ -513,8 +513,8 @@ agents:
       - "CLAUDE.md"
       - ".github/copilot-instructions.md"
       - ".github/agents/README.md"
-      - "docs/ai-context/catalog-base.yaml"
-      - "docs/ai-context/binding-base.md"
+      - "docs/ai-context/catalog.yaml"
+      - "docs/ai-context/binding.md"
     related_agents:
       - "adapter-generator"
       - "agent-router"
@@ -538,8 +538,8 @@ agents:
       - ".github/copilot-instructions.md"
       - ".github/agents/binding-initializer.agent.md"
       - ".github/skills/project-scanner/SKILL.md"
-      - "docs/ai-context/catalog-base.yaml"
-      - "docs/ai-context/binding-base.md"
+      - "docs/ai-context/catalog.yaml"
+      - "docs/ai-context/binding.md"
     estimated_time_minutes: 10
 
   adapter-generator:

@@ -7,6 +7,11 @@ description: >-
   code-review (dimensão "convenções" genérica) com verificação sistemática.
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/code-review-patterns/SKILL.md
+  - .github/skills/repository-hygiene-patterns/SKILL.md
 ---
 # Code Style Enforcer
 

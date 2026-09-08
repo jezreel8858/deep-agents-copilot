@@ -6,6 +6,11 @@ description: >-
   dimensiona pool HikariCP, configura cache multi-nível (Caffeine L1 + Redis L2) e otimiza GC/ZGC.
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'insert_edit_into_file', 'get_errors', 'run_in_terminal', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/spring-boot-performance-patterns/SKILL.md
+  - .github/skills/performance-engineering-patterns/SKILL.md
 ---
 
 # Spring Boot Performance Tuner

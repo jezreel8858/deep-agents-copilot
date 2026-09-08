@@ -8,6 +8,11 @@ description: >-
   código existente).
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/task-decomposition-patterns/SKILL.md
+  - .github/skills/requirements-engineering-patterns/SKILL.md
 ---
 # Feature Planner
 

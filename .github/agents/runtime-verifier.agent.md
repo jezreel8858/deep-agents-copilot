@@ -8,6 +8,11 @@ description: >-
   Read-only por definição: nunca corrige, apenas diagnostica e reporta bloqueio.
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_execute']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/terminal-governance/SKILL.md
+  - .github/skills/git-governance/SKILL.md
 ---
 # Runtime Verifier
 

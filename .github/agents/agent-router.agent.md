@@ -5,7 +5,12 @@ description: >-
   agent downstream correto, com fallback para pesquisa e análise de integração.
   Aplica re-triagem obrigatória por turno (R-042 — anti sticky-session).
 model: Claude Sonnet 5
-tools: ['read_file', 'file_search', 'grep_search', 'ask_questions', 'run_subagent', 'insert_edit_into_file', 'replace_string_in_file', 'create_file', 'apply_patch', 'get_terminal_output', 'open_file', 'run_in_terminal', 'get_errors', 'list_dir', 'validate_cves']
+tools: ['read_file', 'file_search', 'grep_search', 'ask_questions', 'run_subagent', 'insert_edit_into_file', 'replace_string_in_file', 'create_file', 'apply_patch', 'get_terminal_output', 'open_file', 'run_in_terminal', 'get_errors', 'list_dir', 'validate_cves', 'tavily/tavily_search', 'tavily/tavily_extract', 'tavily/tavily_crawl', 'tavily/tavily_map', 'tavily/tavily_research', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_fetch_and_index', 'context-mode/ctx_batch_execute', 'context-mode/ctx_stats', 'context-mode/ctx_doctor', 'context-mode/ctx_upgrade', 'context-mode/ctx_purge', 'context-mode/ctx_insight']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/agent-contracts/SKILL.md
+  - .github/skills/handoff-governance/SKILL.md
 ---
 # Agent Router
 **Versão:** 2.0.0

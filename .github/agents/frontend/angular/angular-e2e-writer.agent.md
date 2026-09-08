@@ -7,6 +7,11 @@ description: >-
   e asserções web-first resilientes.
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'create_file', 'insert_edit_into_file', 'get_errors', 'run_in_terminal', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/test-implementation-frontend/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
 ---
 
 # Angular E2E Writer

@@ -17,12 +17,12 @@ triggers:
   - "sintetizar contexto"
 tools: ["context-mode"]
 source_docs:
-  - "../../../CLAUDE.md"
-  - "../../../docs/ai-context/catalog.yaml"
-  - "../../../.github/copilot-instructions.md"
-  - "../../../.github/agents/context-builder.agent.md"
-  - "../../../.github/skills/context-builder/SKILL.md"
-  - "../../../.github/skills/context-mode/SKILL.md"
+  - "CLAUDE.md"
+  - "docs/ai-context/catalog.yaml"
+  - ".github/copilot-instructions.md"
+  - ".github/agents/context-builder.agent.md"
+  - ".github/skills/context-builder/SKILL.md"
+  - ".github/skills/context-mode/SKILL.md"
 ---
 
 # context-compact — Compactação de contexto pós-leitura

@@ -24,13 +24,9 @@ triggers:
   - "timeline"
   - "mindmap"
 source_docs:
-  - "https://mermaid.js.org/"
-  - "https://mermaid.js.org/syntax/flowchart.html"
-  - "https://mermaid.js.org/syntax/sequenceDiagram.html"
-  - "https://mermaid.js.org/syntax/classDiagram.html"
-  - "https://mermaid.live/"
-  - "https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams"
-  - "https://docs.kroki.io/kroki/formats/mermaid/"
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/documentation-writing-patterns/SKILL.md
 tools: []
 ---
 

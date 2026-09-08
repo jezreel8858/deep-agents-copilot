@@ -9,6 +9,11 @@ description: >-
   e curadoria/consolidação de conteúdo já existente.
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'insert_edit_into_file', 'create_file', 'grep_search', 'file_search', 'list_dir', 'ask_questions', 'get_errors', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/documentation-writing-patterns/SKILL.md
+  - .github/skills/mermaid-diagrams/SKILL.md
 ---
 # Docs Engineer
 
