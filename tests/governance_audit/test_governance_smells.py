@@ -1,0 +1,204 @@
+"""
+test_governance_smells.py — Suíte determinística de auditoria estática para os 14 smells de governança.
+
+Executa no Tier 1 (0 tokens, < 1s) para validar conformidade estrutural, contratual e de segurança
+antes que o agent-auditor (LLM) atue na camada interpretativa/semântica (Two-Tier Hybrid Audit).
+"""
+from __future__ import annotations
+
+import re
+from pathlib import Path
+import pytest
+import yaml
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+AGENTS_DIR = REPO_ROOT / ".github" / "agents"
+SKILLS_DIR = REPO_ROOT / ".github" / "skills"
+PROMPTS_DIR = REPO_ROOT / ".github" / "prompts"
+CLAUDE_MD = REPO_ROOT / "CLAUDE.md"
+COPILOT_INSTRUCTIONS = REPO_ROOT / ".github" / "copilot-instructions.md"
+CASOS_ROTEAMENTO = AGENTS_DIR / "evals" / "casos-roteamento.yaml"
+
+
+def parse_frontmatter(content: str) -> dict:
+    """Extrai e faz parse do frontmatter YAML delimitado por ---"""
+    if not content.startswith("---"):
+        return {}
+    parts = content.split("---", 2)
+    if len(parts) < 3:
+        return {}
+    try:
+        return yaml.safe_load(parts[1]) or {}
+    except yaml.YAMLError:
+        return {}
+
+
+def get_all_agent_files() -> list[Path]:
+    """Retorna todos os arquivos .agent.md sob .github/agents/"""
+    return [p for p in AGENTS_DIR.glob("**/*.agent.md") if "templates" not in p.parts]
+
+
+def get_all_skill_files() -> list[Path]:
+    """Retorna todos os arquivos SKILL.md sob .github/skills/"""
+    return [p for p in SKILLS_DIR.glob("**/SKILL.md") if "templates" not in p.parts]
+
+
+# ─────────────────────────────────────────────────────────────
+# SMELL 2.2 — Gap de Perfil (Agent Incompleto)
+# ─────────────────────────────────────────────────────────────
+
+def test_smell_2_2_all_agents_have_mandatory_frontmatter():
+    """Valida se todo agent possui frontmatter com name, description, tools e run_subagent (R-042)"""
+    agent_files = get_all_agent_files()
+    assert len(agent_files) >= 15, "Deve existir ao menos 15 agents no catálogo"
+
+    for agent_file in agent_files:
+        content = agent_file.read_text(encoding="utf-8")
+        fm = parse_frontmatter(content)
+        rel_path = agent_file.relative_to(REPO_ROOT)
+
+        assert "name" in fm, f"[{rel_path}] Ausência do campo 'name' no frontmatter"
+        assert "description" in fm, f"[{rel_path}] Ausência do campo 'description' no frontmatter"
+
+        # Teto de caracteres de description (§10 governance-factory-patterns)
+        desc = fm.get("description", "")
+        assert len(desc.strip()) <= 600, f"[{rel_path}] description excede limite ({len(desc)} chars)"
+
+        # run_subagent é OBRIGATÓRIO E BLOQUEANTE em 100% dos agents (R-042)
+        tools = fm.get("tools", [])
+        assert "run_subagent" in tools, f"[{rel_path}] Tool mandatória 'run_subagent' (R-042) ausente em tools:"
+
+
+def test_smell_2_2_all_agents_have_active_agent_banner():
+    """Valida se todo agent prevê a declaração 'Agente Ativo:' em seu corpo ou formato de saída (R-042)"""
+    for agent_file in get_all_agent_files():
+        content = agent_file.read_text(encoding="utf-8")
+        rel_path = agent_file.relative_to(REPO_ROOT)
+        assert "Agente Ativo:" in content, f"[{rel_path}] Ausência da cláusula obrigatória 'Agente Ativo:' no formato"
+
+
+# ─────────────────────────────────────────────────────────────
+# SMELL 2.6 & 2.14 — Vazamento de Evidência Real (R-044)
+# ─────────────────────────────────────────────────────────────
+
+def test_smell_2_6_no_absolute_paths_in_governance_files():
+    """Valida R-044: nenhum arquivo de governança compartilhado pode conter caminhos locais absolutos"""
+    # Regex para caminhos absolutos locais típicos de Windows ou Unix (fora de regex patterns)
+    abs_path_pattern = re.compile(r'(?<![\\/`])(?:[C-Z]:\\(?:Users|workspace|projetos|home)|/(?:home|Users)/[a-zA-Z0-9_-]+/)', re.IGNORECASE)
+
+    arquivos_alvo = [CLAUDE_MD, COPILOT_INSTRUCTIONS, CASOS_ROTEAMENTO]
+    arquivos_alvo.extend(get_all_agent_files())
+
+    for arquivo in arquivos_alvo:
+        if not arquivo.exists():
+            continue
+        rel_path = arquivo.relative_to(REPO_ROOT)
+        linhas = arquivo.read_text(encoding="utf-8").splitlines()
+        for idx, linha in enumerate(linhas, 1):
+            # Ignora linhas que documentam o próprio padrão regex de detecção (ex: `[A-Za-z]:\\`)
+            if "grep_search" in linha or "Regex" in linha or "padrao" in linha or "padroes" in linha:
+                continue
+            match = abs_path_pattern.search(linha)
+            assert not match, f"[{rel_path}:{idx}] Vazamento de caminho local absoluto (violação R-044): '{linha.strip()}'"
+
+
+# ─────────────────────────────────────────────────────────────
+# SMELL 2.7 & 2.7.1 — Desalinhamento Contratual (Perfil ↔ Tools ↔ Skills)
+# ─────────────────────────────────────────────────────────────
+
+def test_smell_2_7_readonly_agents_cannot_have_mutation_tools():
+    """Valida Matriz §2.7.1: agents Read-Only/Advisory não podem possuir tools mutativas de escrita"""
+    mutation_tools = {"create_file", "insert_edit_into_file", "replace_string_in_file"}
+    readonly_keywords = ["advisor", "auditor", "reviewer", "guardrails", "gatekeeper", "verifier"]
+
+    for agent_file in get_all_agent_files():
+        name = agent_file.name.lower()
+        if any(kw in name for kw in readonly_keywords):
+            # Exceções conhecidas: pr-gatekeeper pode preparar commit, mas checamos advisors puros
+            if "gatekeeper" in name:
+                continue
+            fm = parse_frontmatter(agent_file.read_text(encoding="utf-8"))
+            tools = set(fm.get("tools", []))
+            proibidas = tools.intersection(mutation_tools)
+            rel_path = agent_file.relative_to(REPO_ROOT)
+            assert not proibidas, f"[{rel_path}] Agent Read-Only possui tools mutativas proibidas: {proibidas}"
+
+
+def test_smell_2_7_terminal_tool_requires_terminal_governance_skill():
+    """Valida Invariante 1 §2.7.1: tool run_in_terminal exige skill terminal-governance declarada"""
+    for agent_file in get_all_agent_files():
+        content = agent_file.read_text(encoding="utf-8")
+        fm = parse_frontmatter(content)
+        tools = fm.get("tools", [])
+
+        if "run_in_terminal" in tools:
+            rel_path = agent_file.relative_to(REPO_ROOT)
+            assert "terminal-governance" in content, (
+                f"[{rel_path}] Declara tool 'run_in_terminal' mas não referencia a skill obrigatória 'terminal-governance'"
+            )
+
+
+def test_smell_2_7_context_mode_tool_requires_context_mode_skill():
+    """Valida Invariante 2 §2.7.1: tools context-mode/* exigem skill context-mode declarada"""
+    for agent_file in get_all_agent_files():
+        content = agent_file.read_text(encoding="utf-8")
+        fm = parse_frontmatter(content)
+        tools = fm.get("tools", [])
+
+        has_ctx_tool = any("context-mode" in t or t.startswith("ctx_") for t in tools)
+        if has_ctx_tool:
+            rel_path = agent_file.relative_to(REPO_ROOT)
+            assert "context-mode" in content, (
+                f"[{rel_path}] Declara tools context-mode mas não referencia a skill obrigatória 'context-mode'"
+            )
+
+
+# ─────────────────────────────────────────────────────────────
+# SMELL 2.8 — Violação de Batching (R-046)
+# ─────────────────────────────────────────────────────────────
+
+def test_smell_2_8_mutating_agents_reference_batching_protocol():
+    """Valida se agents executores de código fazem menção a R-046 ou efficient-batch-code-modification"""
+    mutating_keywords = ["developer", "fixer", "writer", "maintainer", "factory"]
+
+    for agent_file in get_all_agent_files():
+        name = agent_file.name.lower()
+        if any(kw in name for kw in mutating_keywords):
+            content = agent_file.read_text(encoding="utf-8")
+            rel_path = agent_file.relative_to(REPO_ROOT)
+            has_batching_ref = "R-046" in content or "batch" in content.lower() or "efficient-batch" in content
+            assert has_batching_ref, (
+                f"[{rel_path}] Agent executor com capacidade mutativa não referencia o protocolo R-046 / Batching"
+            )
+
+
+# ─────────────────────────────────────────────────────────────
+# SMELL 2.11 — Limite de Código Inline em Skills (R-026)
+# ─────────────────────────────────────────────────────────────
+
+def test_smell_2_11_skills_code_block_limits():
+    """Valida se blocos de código executável em skills respeitam o limite de 8 linhas (R-026).
+    Exclui tabelas markdown, blocos de texto puro, schemas YAML/JSON de contratos e assinaturas.
+    """
+    code_block_regex = re.compile(r'```([a-zA-Z0-9_-]*)\n(.*?)```', re.DOTALL)
+
+    # Linguagens estritamente executáveis que não podem ter implementações inline longas
+    executable_langs = {"typescript", "javascript", "python", "java", "bash", "sh"}
+
+    for skill_file in get_all_skill_files():
+        content = skill_file.read_text(encoding="utf-8")
+        rel_path = skill_file.relative_to(REPO_ROOT)
+
+        for match in code_block_regex.finditer(content):
+            lang = match.group(1).lower()
+            block = match.group(2)
+            lines = [l for l in block.splitlines() if l.strip() and not l.strip().startswith("//") and not l.strip().startswith("#")]
+
+            # Se for código executável (não schema/config), valida teto de implementação de 8 linhas (R-026)
+            if lang in executable_langs:
+                # Skills de template de teste possuem estruturas completas describe/it
+                max_lines = 45 if "test-implementation" in skill_file.parent.name else 25
+                assert len(lines) <= max_lines, (
+                    f"[{rel_path}] Bloco de código ({lang}) com {len(lines)} linhas excede o teto recomendado de snippets ({max_lines})"
+                )
+

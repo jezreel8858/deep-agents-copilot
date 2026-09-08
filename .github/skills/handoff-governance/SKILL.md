@@ -89,11 +89,11 @@ handoff_payload:
 
 ### 2.1) Schema Formal — Campos Obrigatórios e Identidade do Emissor
 
-Todo handoff deve usar este schema tipado (versão 1.0), validável via `yaml-governance`:
+Todo handoff deve usar este schema tipado (versão 1.1), validável via `yaml-governance`:
 
 ```yaml
 handoff_payload:
-  versao: "1.0"                           # string — versão do schema de handoff
+  versao: "1.1"                           # string — versão do schema de handoff (v1.1: extensão aditiva retrocompatível)
   para: "<nome-exato-do-agent>"           # string — enum do catálogo de agents
   motivo: "<1 linha clara>"               # string — razão objetiva da delegação
   emissor:                                # identidade do agent delegante (P10)
@@ -101,6 +101,11 @@ handoff_payload:
     versao: "<versao-semantica>"          # ex.: "1.1.0"
     modelo_llm: "<modelo-usado>"          # ex.: "Gemini 3.8 Flash"
     timestamp: "<ISO-8601>"              # ex.: "2026-08-28T14:23:00Z"
+  roteamento_grafo:                       # extensão aditiva (v1.1) — topologia e transição de estado, opcional
+    current_node: "<nome-do-agent-atual>" # string — alias explícito do nó emissor
+    next_node: "<nome-exato-do-agent>"    # string — alias explícito do nó receptor (idêntico a 'para')
+    shared_memory_keys:                   # opcional: chaves semânticas para indexação/recuperação via context-mode
+      - "<source-ou-tag-no-context-mode>"
   origem_contexto:                        # metadados de sub-rotina e retorno lateral (R-042 Call Stack)
     parent_agent: "<nome-do-agent-pai>"   # opcional: agent que originou a chamada em sub-rotina
     task_id: "<id-da-tarefa>"             # opcional: identificador único da sub-tarefa
@@ -119,6 +124,8 @@ handoff_payload:
     - "<passo>"
   nao_retornar_para: true
 ```
+
+> **Retrocompatibilidade**: consumidores v1.0 continuam lendo `para`/`emissor`/`contexto` sem quebra. `roteamento_grafo` é OPCIONAL e destinado a handoffs que exigem persistência de rastro além da janela de contexto atual (via `ctx_index`, camada auxiliar — nunca substitui o banner de visibilidade em chat).
 
 > **Correlação OTel**: os campos `emissor.nome`, `emissor.modelo_llm` e `timestamp` mapeiam diretamente para atributos `gen_ai.agent.name`, `gen_ai.request.model` e `timestamp` do span `invoke_agent` — use `agent-observability-otel` para rastrear handoffs em pipelines instrumentados.
 >
@@ -140,6 +147,55 @@ handoff_payload:
 | Payload com schema crítico | Usar `yaml-governance` para validar `handoff_payload` antes de prosseguir |
 
 **Regra mínima**: todo agent que recebe um handoff deve confirmar explicitamente no início da resposta quais entradas foram recebidas e consideradas válidas.
+
+---
+
+### 2.3) Indexação Semântica de Telemetria (FTS5 / BM25)
+
+Para habilitar rastreabilidade sem poluição de contexto no chat, transições de handoff podem ser indexadas via `context-mode` MCP (`ctx_index`) para auditoria e recuperação semântica:
+
+| Tag | Finalidade | Gatilho / Momento |
+|---|---|---|
+| `[HANDOFF]` | Registro padrão de transição de responsabilidade | Disparo de `run_subagent` com payload v1.1 |
+| `[INTENT_DRIFT]` | Detecção de deriva de intenção do usuário (R-042) | Retorno ao `@agent-router` com `motivo: "deriva_de_intencao"` |
+| `[LOOP_LIMIT]` | Esgotamento do teto de iterações de auto-refinamento | Limite atingido em `@prompt-structuring` (R-041, máx. 5 loops) |
+| `[SUCCESS]` | Conclusão bem-sucedida de sub-rotina ou entrega | Retorno conclusivo ao agent solicitante (`parent_agent`) ou usuário |
+
+**Formato Canônico de Indexação:**
+
+```yaml
+telemetry_entry:
+  source: "handoff-telemetry:<projeto>"
+  tag: "[HANDOFF] | [INTENT_DRIFT] | [LOOP_LIMIT] | [SUCCESS]"
+  timestamp: "<ISO-8601>"
+  de: "<agent-emissor>"
+  para: "<agent-receptor>"
+  motivo: "<motivo-objetivo>"
+  task_id: "<id-da-tarefa-ou-sessao>"
+```
+
+> **Consulta e Pruning**: consulte via `ctx_search(queries: ["[INTENT_DRIFT]"], source: "handoff-telemetry:<projeto>")`. O ciclo de vida desta telemetria segue a política de retenção episódica (TTL 7 dias, conforme `agent-memory-policy`).
+
+---
+
+### 2.4) Intake Guardrail & Circuit Breaker em Runtime
+
+Para mitigar riscos de *Excessive Agency* (OWASP Agentic AI) e loops de execução não intencionais entre agentes (A → B → A), todo fluxo de handoff deve operar sob dois mecanismos de contenção em runtime:
+
+#### 1. Intake Guardrail (Passo 0 no Agent Receptor)
+Todo agent acionado como subagente via `run_subagent` DEVE executar uma verificação declarativa de entrada antes de qualquer processamento de domínio:
+- **Campos Obrigatórios**: validar presença de `emissor.nome`, `motivo` e `contexto.solicitacao_original` no payload.
+- **Tratamento de Payload Inválido**: se o payload omitir os campos obrigatórios, o agent receptor NÃO tenta deduzir a intenção; rejeita imediatamente e devolve erro estruturado ao `@agent-router`:
+  ```yaml
+  handoff_rejeitado:
+    motivo: "payload_invalido_campos_ausentes"
+    campos_faltantes: ["emissor", "contexto"]
+  ```
+
+#### 2. Circuit Breaker Stateful (Prevenção de Loops e Profundidade de Pilha)
+- **Call Stack Depth**: subagentes encadeados em sub-rotinas (`call_type: "subroutine"`) devem monitorar a profundidade acumulada em `origem_contexto.call_stack_depth`.
+- **Teto Rígido**: `MAX_DEPTH = 3`. Se `call_stack_depth >= 3`, o Circuit Breaker é desarmado: o agent interrompe qualquer delegação subsequente e força o retorno imediato ao `parent_agent` ou `@agent-router` com `motivo: "circuit_breaker_max_depth_exceeded"`.
+- **Detecção de Ciclos Imediatos (Anti-Ping-Pong)**: se o nó de destino proposto for idêntico ao `parent_agent` imediato sem que nenhum artefato ou descoberta nova tenha sido gerada, o handoff é bloqueado com `motivo: "circuit_breaker_cycle_detected"`.
 
 ---
 

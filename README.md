@@ -18,8 +18,8 @@ Objetivo:
 
 **Fonte de Verdade Operacional:**
 
-- **[`CLAUDE.md`](CLAUDE.md)** — Regras normativas (R-001..R-046), princípios e fluxos genéricos
-- **[`.github/copilot-instructions.md`](.github/copilot-instructions.md)** — Execução operacional e roteamento de agents
+- **[`CLAUDE.md`](CLAUDE.md)** — Regras normativas (R-001..R-048), princípios e fluxos genéricos
+- **[Instruções do Copilot](.github/copilot-instructions.md)** — Roteamento rápido, autonomy rules e Context Mode
 
 **Características:**
 - Sem referência a projetos específicos
@@ -349,4 +349,3 @@ graph TB
 ---
 
 **Governança reutilizável. Multi-projeto. Zero-dependência.**
-

@@ -5,7 +5,7 @@ description: >-
   agent downstream correto, com fallback para pesquisa e análise de integração.
   Aplica re-triagem obrigatória por turno (R-042 — anti sticky-session).
 model: Claude Sonnet 5
-tools: ['read_file', 'file_search', 'grep_search', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_execute', 'context-mode/ctx_index', 'context-mode/ctx_batch_execute', 'insert_edit_into_file', 'replace_string_in_file', 'create_file', 'apply_patch', 'get_terminal_output', 'open_file', 'run_in_terminal', 'get_errors', 'list_dir', 'validate_cves']
+tools: ['read_file', 'file_search', 'grep_search', 'ask_questions', 'run_subagent', 'insert_edit_into_file', 'replace_string_in_file', 'create_file', 'apply_patch', 'get_terminal_output', 'open_file', 'run_in_terminal', 'get_errors', 'list_dir', 'validate_cves']
 ---
 # Agent Router
 **Versão:** 2.0.0
@@ -31,8 +31,9 @@ Você é o roteador obrigatório do fluxo agent-first no GitHub Copilot. Seu tra
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-045` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas `R-001..R-048` em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
+- Governança de terminal (fallback de última instância): [`../skills/terminal-governance/SKILL.md`](../skills/terminal-governance/SKILL.md).
 
 ## Catálogo / Conhecimento Base
 

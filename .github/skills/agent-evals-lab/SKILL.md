@@ -280,3 +280,51 @@ on_change:
   - "docs/ai-context/routing-graph.yaml"
 run: pytest tests/evals/ --tb=short  # usando casos-roteamento.yaml como dataset
 ```
+
+---
+
+## 10) Mineração Contínua de Regressões (Data-Driven Evals)
+
+Ciclo de retroalimentação contínua (*evals flywheel*): transforma falhas de roteamento e desvios operacionais reais capturados na telemetria FTS5 do Context Mode em novos casos de teste formais em `casos-roteamento.yaml`.
+
+### 10.1) Consulta de Telemetria
+
+A mineração é executada sob demanda (ex.: auditoria periódica pelo `agent-auditor` ou rotina de curadoria de qualidade) utilizando as tags padronizadas de telemetria:
+
+```json
+// Recupera turnos onde houve falha de roteamento, deriva de intenção ou loop operacional
+{
+  "queries": ["[INTENT_DRIFT]", "[LOOP_LIMIT]"],
+  "source": "handoff-telemetry:*"
+}
+```
+
+### 10.2) Protocolo de Extração e Estruturação
+
+1. **Isolamento de Contexto**: A partir dos registros recuperados, identificar:
+   - Prompt ou solicitação original que causou a falha/deriva;
+   - Agente emissor e rota que falhou;
+   - Agente receptor correto identificado após resolução humana ou re-roteamento;
+   - Lição aprendida e motivo da deriva.
+
+2. **Formatação do Caso de Regressão**:
+   - Adicionar novo caso sob a seção `regressao` de `.github/agents/evals/casos-roteamento.yaml`:
+     ```yaml
+     - id: "regr-XXX"
+       solicitacao: "<texto do prompt minerado devidamente anonimizado>"
+       rota_esperada: "<rota_correta>"
+       agente_esperado: "<@agente_correto>"
+       threshold: 1.00
+       critico: true
+       contexto: "<motivo da falha original minerada do log e lição aprendida>"
+     ```
+
+### 10.3) Portão de Sanitização Obrigatório (R-044)
+
+**⚠️ REGRA BLOQUEANTE**: Nenhum caso minerado de telemetria pode ser gravado em `casos-roteamento.yaml` sem passar pelo filtro rigoroso de anonimização da norma **R-044**:
+- Nomes de projetos/repositórios reais → genericizar para `[PROJETO-X]`.
+- Nomes de classes, métodos e variáveis do domínio do usuário → genericizar para `ServicoExemploX`, `operacaoExemploX`.
+- Caminhos absolutos do filesystem local (`<drive>:\<caminho>`, `/<pasta>/...`) → `<workspace>/[PROJETO-X]/...` ou suprimir.
+- Credenciais, tokens ou dados pessoais (PII/R-010) eventualmente presentes no trace → remoção obrigatória.
+
+
