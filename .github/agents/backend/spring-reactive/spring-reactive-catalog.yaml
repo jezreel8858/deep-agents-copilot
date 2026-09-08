@@ -226,6 +226,8 @@ agents:
       - "falha teste reativo"
       - "corrigir teste flux"
       - "assertionerror stepverifier"
+    max_iteracoes: 3
+    escalonamento: "Após 3 tentativas sem sucesso, retornar ao @agent-router via ask_questions (motivo: 'loop_limite_atingido') — nunca repetir indefinidamente"
     tools:
       - "read_file"
       - "file_search"

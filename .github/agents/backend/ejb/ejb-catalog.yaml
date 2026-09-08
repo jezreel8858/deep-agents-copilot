@@ -226,6 +226,8 @@ agents:
       - "initialcontext failed"
       - "falha teste arquillian"
       - "corrigir teste legado"
+    max_iteracoes: 3
+    escalonamento: "Após 3 tentativas sem sucesso, retornar ao @agent-router via ask_questions (motivo: 'loop_limite_atingido') — nunca repetir indefinidamente"
     tools:
       - "read_file"
       - "file_search"

@@ -4,10 +4,9 @@ description: >-
   Entry point obrigatório agent-first para classificar solicitações e delegar ao
   agent downstream correto, com fallback para pesquisa e análise de integração.
   Aplica re-triagem obrigatória por turno (R-042 — anti sticky-session).
-model: "Claude Sonnet 5"
-tools: ['read_file', 'file_search', 'grep_search', 'ask_questions', 'run_subagent', 'context-mode/ctx_search']
+model: Claude Sonnet 5
+tools: ['read_file', 'file_search', 'grep_search', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_execute', 'context-mode/ctx_index', 'context-mode/ctx_batch_execute', 'insert_edit_into_file', 'replace_string_in_file', 'create_file', 'apply_patch', 'get_terminal_output', 'open_file', 'run_in_terminal', 'get_errors', 'list_dir', 'validate_cves']
 ---
-
 # Agent Router
 **Versão:** 2.0.0
 
@@ -363,4 +362,3 @@ Próximo passo mínimo:
 - `/plan` -> classificar intenção e decidir rota.
 - `/implement` -> acionar downstream correto.
 - `/validate` -> confirmar consistência do roteamento.
-

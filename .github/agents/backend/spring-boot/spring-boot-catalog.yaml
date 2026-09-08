@@ -227,6 +227,8 @@ agents:
       - "broken test spring"
       - "corrigir teste java"
       - "mvn test error"
+    max_iteracoes: 3
+    escalonamento: "Após 3 tentativas sem sucesso, retornar ao @agent-router via ask_questions (motivo: 'loop_limite_atingido') — nunca repetir indefinidamente"
     tools:
       - "read_file"
       - "file_search"
