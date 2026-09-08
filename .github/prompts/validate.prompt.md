@@ -1,14 +1,31 @@
 ---
 name: validate
 description: Valida implementação contra plano aprovado, verifica critérios de sucesso e identifica desvios.
-model: "Claude Haiku 4.5"
+agent: 'agent'
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'grep_search', 'file_search', 'run_in_terminal', 'get_errors', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
+argument-hint: '[caminho-do-plano | escopo-de-validação]'
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---
 
-# /validate
+# `/validate`
+
+> **Propósito**: Validar a implementação contra o plano técnico aprovado, checando critérios de aceite e desvios.
+> **Arquivo Ativo**: `${file}`
+> **Workspace**: `${workspaceFolder}`
+
+---
+
+## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
+
+- ✅ **APENAS** comparar o código real contra os critérios de sucesso do plano aprovado.
+- ✅ **SEMPRE** rodar suíte de testes relevante e checar `get_errors` com relatório de conformidade.
+- ❌ **NÃO** modificar arquivos de aplicação durante a validação (perfil estritamente analítico e de auditoria).
+- ❌ **NÃO** aprovar validação com falhas de compilação ou testes quebrados pendentes.
+
+---
 
 Você foi encarregado de validar que um plano foi implementado corretamente, verificando critérios e identificando desvios.
 

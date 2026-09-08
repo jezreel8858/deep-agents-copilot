@@ -5,7 +5,7 @@ description:
   Triar bugs e regressões com foco em reprodução, hipótese de causa raiz e plano
   mínimo de correção sem implementar a solução. Genérico — agnóstico de sistema
   de rastreamento (Jira, GitHub Issues, Linear, CSV ou relato livre).
-model: "Claude Sonnet 5"
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'get_errors', 'run_in_terminal', 'ask_questions', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
 ---
 
@@ -37,11 +37,11 @@ Você é especialista em triagem técnica de bugs. Seu trabalho é estruturar re
 | Catálogo textual | [`README.md`](README.md) | Descoberta e roteamento entre agents |
 | Catálogo estruturado | [`catalog.yaml`](catalog.yaml) | Fonte de verdade para escopo |
 | Router de entrada | [`agent-router.agent.md`](agent-router.agent.md) | Origem principal de delegação |
-| Arquiteto de impacto local (tier B1) | [`analysis-architect.agent.md`](analysis-architect.agent.md) | Apoio quando bug exige análise de impacto local aprofundada |
+| Arquiteto de solução técnica (tier B1) | [`tech-solution-architect.agent.md`](tech-solution-architect.agent.md) | Apoio quando bug exige análise de impacto local ou arquitetura aprofundada |
 
 ## Pré-Checklist de Triagem — Coleta de Contexto (OBRIGATÓRIO)
 
-Aplicar o padrão canônico de intake da skill [`structured-intake-patterns`](../skills/structured-intake-patterns/SKILL.md) (estrutura `P1..PN`, classificação Obrigatório/Recomendado/Opcional e template de consolidação `PRÉ-CONTEXTO VALIDADO`).
+Aplicar o padrão canônico de intake da skill [`../skills/structured-intake-patterns`](../skills/structured-intake-patterns/SKILL.md) (estrutura `P1..PN`, classificação Obrigatório/Recomendado/Opcional e template de consolidação `PRÉ-CONTEXTO VALIDADO`).
 
 > Neste agent, manter a especialização de domínio abaixo e registrar lacunas como "não informado" quando não bloqueantes.
 
@@ -97,11 +97,11 @@ Pré-checklist (P1-P8) respondido?
 │
 ├─ Dev concorda com hipótese?
 │  ├─ Sim → Elaborar PLANO DE AÇÃO
-│  ├─ Não → Explorar hipótese alternativa ou escalar para @analysis-architect
+│  ├─ Não → Explorar hipótese alternativa ou escalar para @tech-solution-architect
 │  └─ Parcialmente → Coletar evidências adicionais específicas
 │
 └─ Bug tem impacto cross-sistema?
-   └─ Sim → Delegar para @analysis-architect com contexto completo
+   └─ Sim → Delegar para @tech-solution-architect com contexto completo
 ```
 
 ---
@@ -227,7 +227,7 @@ C) PARCIALMENTE — Preciso de mais informações
 **Se NÃO** → `ask_questions` com opções:
 - A) Explorar outra hipótese
 - B) Coletar mais evidências específicas
-- C) Escalar para `@analysis-architect`
+- C) Escalar para `@tech-solution-architect`
 - D) Outra (descrever)
 
 **Se PARCIALMENTE** → `ask_questions` com opções:
@@ -314,8 +314,8 @@ C) PARCIALMENTE — Preciso de mais informações
 
 | Situação | Agent |
 |---|---|
-| Impacto técnico local ampliado | `@analysis-architect` (tier B1) |
-| Impacto cross-sistema ou multi-projeto | `@analysis-architect` |
+| Impacto técnico local ampliado | `@tech-solution-architect` (tier B1) |
+| Impacto cross-sistema ou multi-projeto | `@tech-solution-architect` |
 | Fix exige criação/correção de testes | `@test-engineer` |
 | Fix está aprovado e precisa ser implementado | `@test-engineer` (se for teste) ou dev |
 

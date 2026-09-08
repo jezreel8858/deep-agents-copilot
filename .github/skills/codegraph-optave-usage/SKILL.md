@@ -33,7 +33,7 @@ Skill genérica para operar `@optave/codegraph` (repo `optave/ops-codegraph-tool
 ## 1.1) Governança de Acesso: Operador Exclusivo (@code-knowledge-graph — R-045 / RNF-004)
 
 - **Operador único**: os comandos desta skill (`codegraph build`, `codegraph query`, `codegraph fn-impact`, etc.) são de competência e execução **EXCLUSIVAS** do agent `@code-knowledge-graph`.
-- **Proibição universal**: NENHUM outro agent (specialists híbridos como `angular-engineer`, `spring-boot-engineer`, `spring-reactive-engineer`, analistas como `analysis-architect`, ou routers) está autorizado a executar o CLI `codegraph` diretamente via terminal (`run_in_terminal`) ou acessar `.codegraph/graph.db`.
+- **Proibição universal**: NENHUM outro agent (specialists híbridos como `angular-engineer`, `spring-boot-engineer`, `spring-reactive-engineer`, analistas como `tech-solution-architect`, ou routers) está autorizado a executar o CLI `codegraph` diretamente via terminal (`run_in_terminal`) ou acessar `.codegraph/graph.db`.
 - **Canal de consumo**: qualquer agent que necessite de mapeamento estrutural de dependências, arquitetura, chamadas ou blast radius DEVE invocar compulsoriamente `@code-knowledge-graph` via `run_subagent(agentName: 'code-knowledge-graph', ...)`.
 
 ## 2) Instalação e verificação

@@ -1,31 +1,36 @@
 ---
 name: del-project-context
-type: governance-cleanup
-input_type: project-name
-output_type: audit-log
-model: "Gemini 3.8 Flash"
-
 description:
   Remove contexto estruturado de um projeto do overlay local (catalog.local.yaml,
   gitignored — R-043) e do cache Context Mode. Operação destrutiva com validação
   prévia, confirmação e rollback via Git. NUNCA toca docs/ai-context/catalog.yaml
   (compartilhado/commitado).
-
-triggers:
-  - "/del-project-context"
-  - "remover projeto"
-  - "deletar binding"
-  - "limpar contexto"
-  - "desvincular projeto"
-
-dependencies:
-  - project-context-builder
-  - yaml-governance
-
+agent: 'agent'
+model: "Gemini 3.8 Flash"
+tools: ['read_file', 'insert_edit_into_file', 'file_search', 'list_dir', 'ask_questions', 'run_subagent']
+argument-hint: '<nome-do-projeto>'
 source_docs:
-  - "CLAUDE.md"
-  - "docs/ai-context/catalog.local.yaml"
-  - ".github/instructions/README.md"
+  - CLAUDE.md
+  - docs/ai-context/catalog.local.yaml
+  - .github/instructions/README.md
+---
+
+# `/del-project-context`
+
+> **Propósito**: Remover o registro de um projeto no overlay local `catalog.local.yaml` e seu adapter em `.github/instructions/local/`.
+> **Workspace**: `${workspaceFolder}`
+> **Projeto Alvo**: `${input:nomeDoProjeto}`
+
+---
+
+## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
+
+- ✅ **APENAS** remover o projeto especificado de `catalog.local.yaml` e deletar seu adapter correspondente em `.github/instructions/local/`.
+- ✅ **SEMPRE** solicitar confirmação humana explícita antes de executar a exclusão.
+- ❌ **NÃO** tocar em `docs/ai-context/catalog.yaml` (compartilhado/commitado, R-043).
+- ❌ **NÃO** excluir código-fonte ou diretórios do projeto real externo.
+
+---
 
 workflow:
   1: "User fornece nome do projeto"

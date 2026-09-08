@@ -104,7 +104,7 @@
 .heatmap-bar-label {
   font-size: 9px;
   color: var(--md-sys-color-on-surface-variant);
-  font-family: var(--font-family-mono);
+  font-family: var(--font-family-mono), monospace;
 }
 
 .heatmap-footer-labels {
@@ -112,8 +112,84 @@
   justify-content: space-between;
   font-size: 10px;
   color: var(--md-sys-color-on-surface-variant);
-  font-family: var(--font-family-mono);
+  font-family: var(--font-family-mono), monospace;
   margin-top: 4px;
+}
+
+/* ── Invocações de Agentes & Subagentes (Espelha o estilo When You Code) ── */
+.agent-blocks-container {
+  display: flex;
+  gap: 6px;
+  align-items: flex-end;
+  height: 90px;
+  padding: 8px 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--md-sys-color-outline-variant) transparent;
+}
+
+.agent-blocks-container::-webkit-scrollbar {
+  height: 4px;
+}
+
+.agent-blocks-container::-webkit-scrollbar-thumb {
+  background: var(--md-sys-color-outline-variant);
+  border-radius: 2px;
+}
+
+.agent-bar-col {
+  flex: 1;
+  min-width: 32px;
+  max-width: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+  justify-content: flex-end;
+  cursor: pointer;
+  position: relative;
+}
+
+.agent-bar-fill-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border-radius: 2px;
+  overflow: hidden;
+  min-height: 2px;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.agent-bar-col:hover .agent-bar-fill-wrap {
+  filter: brightness(1.25);
+  transform: translateY(-2px);
+}
+
+.agent-bar-fill-direct {
+  width: 100%;
+  border-radius: 2px 2px 0 0;
+  background-color: var(--md-sys-color-cyan);
+  transition: height 0.3s ease;
+}
+
+.agent-bar-fill-subagent {
+  width: 100%;
+  border-radius: 0 0 2px 2px;
+  background-color: var(--md-sys-color-primary);
+  transition: height 0.3s ease;
+}
+
+.agent-bar-label {
+  font-size: 9px;
+  color: var(--md-sys-color-on-surface-variant);
+  font-family: var(--font-family-mono), monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  text-align: center;
 }
 
 /* ── Activity Time-series SVG Chart ── */
@@ -151,7 +227,7 @@
 .tool-name {
   font-weight: 500;
   color: #f1f5f9;
-  font-family: var(--font-family-mono);
+  font-family: var(--font-family-mono), monospace;
 }
 
 .tool-count {

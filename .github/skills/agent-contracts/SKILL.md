@@ -36,8 +36,8 @@ Em fluxos multi-agent com handoff (R-042 — Anti Sticky-Session), o usuário pe
 **Toda resposta de TODO agent — sem exceção, inclusive downstream em `task_mode` — abre com a linha `Agente Ativo: <name-do-agent>` antes de qualquer outro conteúdo.** Isso vale mesmo quando não há handoff neste turno (o agent apenas continua respondendo). Se a resposta é resultado de um handoff/re-triagem recebido neste turno, uma segunda linha declara a transição: `Handoff: <agent-origem> → <agent-atual> (motivo: <motivo>)` — equivalente direto ao `HandoffOutputItem` do OpenAI Agents SDK.
 
 ```markdown
-Agente Ativo: test-implementation
-Handoff: test-strategy → test-implementation (motivo: estratégia mapeada — pronto para implementar)
+Agente Ativo: test-engineer
+Handoff: test-strategy → test-engineer (motivo: estratégia mapeada — pronto para implementar)
 
 [... restante da resposta no formato de saída do perfil do agent ...]
 ```
@@ -264,13 +264,14 @@ Já normatizado por R-016/R-020 e pelas seções 1-4 desta skill: confiança dec
 | Perfil | Template | Agents exemplo | Racional (pesquisa) |
 |---|---|---|---|
 | Router/Triagem | Bloco de decisão compacto: Rota·Delegado·Motivo·Confiança·Score·Nível Routing·Entradas·Lacunas·Próximo Passo | `agent-router`, `prompt-structuring` | Orchestrator decide, não narra (Product School: planner→executor) |
-| Analista/Read-only | 5 seções: Abordagem·Componentes·Evidências·Riscos·Próximo Passo | `analysis-architect`, `bug-triage`, `business-rules-extractor` | "Data/Insight Agent" exige leitura humana rica — tabelas/bullets |
+| Analista/Read-only | 5 seções: Abordagem·Componentes·Evidências·Riscos·Próximo Passo | `tech-solution-architect`, `bug-triage` | "Data/Insight Agent" exige leitura humana rica — tabelas/bullets |
+| Analista / Híbrido Documental | 5 seções ou Documentação Gerada + Evidências rastreáveis | `business-rules-extractor` | Analisa código read-only e gera documentação estruturada em markdown (`docs/business-rules/`) |
 | Especialista de Recomendação | 5 seções + Trade-offs/Riscos explícitos (modo Advisory) | `angular-engineer`, `spring-boot-engineer`, `spring-reactive-engineer` | Mesma classe de Insight Agent, com recomendação técnica declarada |
 | Operacional/Executor | Resultado→Evidências→Validações→Próximo Passo (compacto, checklist) | `test-engineer`, `governance-factory`, `binding-initializer`, `adapter-generator`, `docs-engineer` | "Specialist Skills" tem output estreito e determinístico |
 
 **Regra de ouro:** a Camada 1 nunca muda entre perfis. A Camada 2 pode e deve variar — forçar um router no template rico de 5 seções (ou um analista no bloco compacto de decisão) é *format mismatch* contra a pesquisa acima.
 
-### Checklist ao Criar/Revisar Agent (agent-factory / skill-factory)
+### Checklist ao Criar/Revisar Agent (governance-factory)
 
 - [ ] Perfil identificado: Router | Analista | Especialista-Recomendação | Operacional.
 - [ ] Camada 1 (universal) presente no "Formato de Saída" do agent.
@@ -290,6 +291,7 @@ Já normatizado por R-016/R-020 e pelas seções 1-4 desta skill: confiança dec
 | **Todos os perfis (baseline universal)** | `read_file`, `grep_search`, `file_search`, `run_subagent` | — |
 | Router/Triagem | baseline + `list_dir` | `ask_questions` |
 | Analista/Read-only (pesquisa) | baseline + `list_dir` | `context-mode/ctx_search`, `context-mode/ctx_batch_execute` |
+| Analista / Híbrido Documental | baseline + `list_dir`, `create_file`, `insert_edit_into_file`, `get_errors` | `context-mode/*`, `ask_questions` |
 | Especialista de Recomendação | baseline + `list_dir`, `get_errors` | `context-mode/*`, ferramentas de pesquisa externa |
 | Operacional/Executor (cria/edita arquivos) | baseline + `insert_edit_into_file`, `create_file`, `list_dir`, `get_errors` | `ask_questions`, `run_in_terminal`, `context-mode/*` |
 
@@ -317,7 +319,7 @@ Já normatizado por R-016/R-020 e pelas seções 1-4 desta skill: confiança dec
 - Product School, "AI Agent Orchestration Patterns for Reliable Products", 2026 — https://productschool.com/blog/artificial-intelligence/ai-agent-orchestration-patterns
 - arXiv:2506.12508, "Orchestrating Multi-Agent Intelligence..." (Reporter Agent normaliza outputs distintos em relatório final), 2025/2026.
 
-## 10) Model Enforcement em Cadeias de Subagent (Cost-Tier Ceiling — R-036)
+## 10) Gestão de Modelos em Cadeias de Subagent (Cost-Tier Ceiling)
 
 ### Problema de Mercado (confirmado 2026)
 
@@ -331,23 +333,22 @@ O `model:` declarado no frontmatter de um `.agent.md` **é respeitado** pela pla
 
 | Prioridade | Fonte | Observação |
 |---|---|---|
-| 1 (mais alta) | Parâmetro explícito de modelo passado na própria invocação do `run_subagent` (linguagem natural: *"invoque X com o modelo Claude Sonnet 5"*) | Único mecanismo de **reforço ativo** disponível para o agent chamador |
-| 2 | `model:` no frontmatter do `.agent.md` do subagent — aceita nome único **ou lista priorizada** (`["Claude Sonnet 5", "GPT-5.1"]`) para fallback em caso de indisponibilidade | O que este projeto já declara em todo agent |
+| 1 (mais alta) | Parâmetro explícito de modelo passado na própria invocação do `run_subagent` (linguagem natural: *"invoque X com o modelo Gemini 3.8 Flash"*) | Único mecanismo de **reforço ativo** disponível para o agent chamador |
+| 2 | `model:` no frontmatter do `.agent.md` do subagent — aceita nome único **ou lista priorizada** (`["Gemini 3.8 Flash", "GPT-5.1"]`) para fallback em caso de indisponibilidade | O que este projeto já declara em todo agent |
 | 3 (fallback) | Modelo da conversa pai (sessão) | Aplicado quando 1 e 2 falham/excedem o teto |
 
 **Nenhuma das 3 prioridades acima escapa do cost-tier ceiling.** Mesmo a prioridade 1 (explícita) é descartada se exceder o multiplicador do turno pai.
 
 ### Por que "Auto" é o principal risco (não apenas um detalhe)
 
-O modo `Auto` do model picker resolve, **a cada turno**, para um modelo real (faixa 0×–1×: GPT-5 mini, GPT-4.1, Sonnet 4, Sonnet 3.5, etc.) com base em disponibilidade/saúde do sistema — **não** na complexidade da tarefa. Se a cota de requests premium do usuário se esgota, `Auto` **sempre** cai para um modelo 0×. Isso significa que o teto de custo da cadeia inteira de subagents fica **não determinístico por turno** — o mesmo fluxo `@agent-router → security-reviewer` pode funcionar corretamente em um turno (Auto resolveu para Sonnet 4, 1×) e silenciosamente rebaixar `security-reviewer` (declarado `Claude Sonnet 5`, 1×) em outro turno (Auto resolveu para GPT-5 mini, 0×).
+O modo `Auto` do model picker resolve, **a cada turno**, para um modelo real (faixa 0×–1×: GPT-5 mini, GPT-4.1, Sonnet 4, Sonnet 3.5, etc.) com base em disponibilidade/saúde do sistema — **não** na complexidade da tarefa. Se a cota de requests premium do usuário se esgota, `Auto` **sempre** cai para um modelo 0×. Isso significa que o teto de custo da cadeia inteira de subagents fica **não determinístico por turno** — o mesmo fluxo `@agent-router → security-reviewer` pode funcionar corretamente em um turno (Auto resolveu para Sonnet 4, 1×) e silenciosamente rebaixar `security-reviewer` (declarado `Gemini 3.8 Flash`, 1×) em outro turno (Auto resolveu para GPT-5 mini, 0×).
 
 ### Mitigação Obrigatória (checklist — nenhuma resolve tecnicamente o teto, apenas evitam cair nele)
 
-- [ ] **Nunca iniciar o fluxo `@agent-router` com `Auto` selecionado.** Selecionar manualmente, antes do primeiro turno, um modelo cujo tier ≥ o maior tier usado por qualquer agent do catálogo que possa ser alcançado na cadeia de roteamento (neste projeto: `Claude Sonnet 5`, 1×).
+- [ ] **Nunca iniciar o fluxo `@agent-router` com `Auto` selecionado.** Selecionar manualmente, antes do primeiro turno, um modelo cujo tier ≥ o maior tier usado por qualquer agent do catálogo que possa ser alcançado na cadeia de roteamento (neste projeto: `Gemini 3.8 Flash`, 1×).
 - [ ] Verificar que `chat.customAgentInSubagent.enabled` está habilitado nas configurações do VS Code — sem essa flag, agents customizados podem nem ser honrados como subagents (comportamento gated desde a v1.109).
 - [ ] Ao criar/revisar um agent que delegará para outro de tier mais alto via `run_subagent`, instruir explicitamente no corpo do agent chamador para **solicitar o modelo por nome na própria invocação** (prioridade 1 da tabela acima) — reforço, não substituto do `model:` do subagent.
-- [ ] Preferir `model:` como **lista priorizada** (ex.: `["Claude Sonnet 5", "Claude Sonnet 4.5"]`) em vez de string única, quando o agent tiver alternativas aceitáveis — evita fallback direto ao modelo do turno pai por indisponibilidade pontual do modelo primário.
-- [ ] Tratar o Health Check R-036 (`ask_questions` Expected vs. Current) como a **última linha de defesa**, não a solução — ele valida o agent sendo iniciado diretamente, mas não garante que subagents mais adiante na cadeia não sejam rebaixados pelo teto.
+- [ ] Preferir `model:` como **lista priorizada** (ex.: `["Gemini 3.8 Flash", "Claude Sonnet 4.5"]`) em vez de string única, quando o agent tiver alternativas aceitáveis — evita fallback direto ao modelo do turno pai por indisponibilidade pontual do modelo primário.
 
 ### Model Gate via `ask_questions` — Tentado e Confirmado Inviável (2026-09-01)
 
@@ -359,13 +360,12 @@ Este projeto tentou responder "dá para automatizar isso com uma trava ativa, em
 2. **VS Code Copilot Chat não injeta essa informação para custom agents.** Não existe tool/API pública que exponha "modelo real de execução desta invocação" a um `.agent.md`. A única forma documentada de descobrir é via debug log/trace de rede da extensão — inacessível ao próprio modelo.
 3. **`ask_questions` não altera o picker de modelo da UI.** É um canal de texto para coletar preferência do usuário; a troca real do modelo exige clique manual no dropdown — fora do loop de tool-calling do agent.
 4. **Mesmo o canal de maior prioridade (parâmetro explícito no `run_subagent`) não é uma API garantida.** `microsoft/vscode#298380` ("Allow runSubagent tool to specify a language model") confirma que suporte formal e estruturado a esse parâmetro no schema da tool é **feature request ainda aberta** em 2026 — hoje funciona apenas como interpretação de linguagem natural pelo modelo (melhor esforço, não determinístico).
-5. **Evidência empírica reforça (mas não é a causa principal)**: em Haiku 4.5, o Gate nunca disparou (router ignorou a lógica condicional). Após upgrade para Claude Sonnet 5, o Gate **ainda** não disparou — confirmando que o problema não era tier/instruction-following, era ausência estrutural do dado necessário para a comparação.
+5. **Evidência empírica reforça (mas não é a causa principal)**: em Haiku 4.5, o Gate nunca disparou (router ignorou a lógica condicional). Após upgrade para Gemini 3.8 Flash, o Gate **ainda** não disparou — confirmando que o problema não era tier/instruction-following, era ausência estrutural do dado necessário para a comparação.
 
 **O que substitui o Gate (v1.8.0 — "Model Awareness", best-effort, honesto sobre suas limitações):**
 
 - Router menciona o modelo declarado do agent-alvo (`catalog.yaml`) na própria frase de invocação do `run_subagent` — reforça a prioridade 1 de resolução, mas não garante nem verifica.
 - Responsabilidade de garantir tier ≥ maior tier do catálogo antes do 1º turno é **explicitamente do usuário**, documentada, **não enforçável pelo agent**.
-- R-036 original (Health Check `Expected` vs `Current` para invocação direta) tem a **mesma limitação estrutural** — nunca foi de fato verificável; permanece como diretriz documental, não trava ativa.
 
 **Lição para novos agents**: se a lógica de um agent depender de "saber em qual modelo estou rodando" ou "qual modelo está rodando outro componente da cadeia", **pare e valide se esse dado existe antes de prometer enforcement** — reforçar o texto da instrução não resolve ausência de dado, por mais alto que seja o tier do modelo usado.
 

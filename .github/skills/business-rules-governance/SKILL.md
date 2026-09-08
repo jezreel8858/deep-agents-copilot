@@ -34,7 +34,7 @@ source_docs:
 
 Padrões para extração, documentação e validação de regras de negócio a partir de qualquer código-fonte. O objetivo central é transformar lógica implícita no código em regras explícitas e rastreáveis — servindo como **ground truth** para validar refatorações e evitar regressões silenciosas.
 
-> **Aplica-se a**: `@business-rules-extractor`, `@refactor-planner`, `@analysis-architect`, `@docs-engineer` e qualquer agent que precise rastrear ou validar comportamento de negócio.
+> **Aplica-se a**: `@business-rules-extractor`, `@refactor-planner`, `@tech-solution-architect`, `@docs-engineer` e qualquer agent que precise rastrear ou validar comportamento de negócio.
 
 ---
 

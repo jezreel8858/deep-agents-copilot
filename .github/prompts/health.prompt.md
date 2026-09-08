@@ -4,8 +4,10 @@ description:
   Verifica saúde completa da infraestrutura de governança. Valida catalog.yaml,
   .index.json, binding context, agents acessíveis e sincronização entre arquivos.
   Vai além do /ctx-doctor (que cobre apenas Context Mode MCP).
-model: "Claude Haiku 4.5"
+agent: 'agent'
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'list_dir', 'file_search', 'run_in_terminal', 'run_subagent']
+argument-hint: '[--quick | categoria]'
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
@@ -18,7 +20,21 @@ source_docs:
 
 Diagnóstico completo da infraestrutura de governança.
 
+> **Propósito**: Executar diagnóstico abrangente da governança: arquivos, catálogos, binding, sincronização e integridade estrutural.
+> **Workspace**: `${workspaceFolder}`
+>
 > **DIFERENÇA vs `/ctx-doctor`**: `/ctx-doctor` verifica apenas o MCP Context Mode. `/health` verifica toda a estrutura de governança: arquivos, sincronização, YAML, binding.
+
+---
+
+## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
+
+- ✅ **APENAS** inspecionar e relatar o status de saúde da governança em 7 categorias.
+- ✅ **SEMPRE** sinalizar divergências entre arquivos e catálogos estruturados.
+- ❌ **NÃO** alterar arquivos ou configurações sem aprovação humana prévia.
+- ❌ **NÃO** ignorar falhas de binding ou catálogos ausentes.
+
+---
 
 ---
 

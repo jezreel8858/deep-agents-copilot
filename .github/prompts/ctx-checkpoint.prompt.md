@@ -1,14 +1,34 @@
 ---
 name: ctx-checkpoint
 description: Grava snapshot de sessão no Context Mode via `ctx_index` (persistência cross-session) para retomada com `/ctx-resume`.
-model: "Claude Haiku 4.5"
+agent: 'agent'
+model: "Gemini 3.8 Flash"
 tools:
   - context-mode/ctx_index
+argument-hint: ''
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/context-mode/SKILL.md
 ---
 
-# /ctx-checkpoint
+# `/ctx-checkpoint`
 
 Persiste o estado da sessão atual antes de pausar, trocar de tarefa ou fechar sessão.
+
+> **Propósito**: Gravar snapshot de sessão no Context Mode via `ctx_index` para persistência e recuperação cross-session.
+> **Workspace**: `${workspaceFolder}`
+
+---
+
+## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
+
+- ✅ **APENAS** persistir o snapshot condensado da sessão atual no FTS5 ContentStore via `ctx_index`.
+- ✅ **SEMPRE** analisar a conversa e extrair os campos estruturados (`lastStep`, `nextStep`, `completedActions`, `decisions`).
+- ❌ **NÃO** gravar conteúdo bruto não filtrado no FTS5.
+- ❌ **NÃO** modificar arquivos de código durante o checkpoint.
+
+---
 
 ## Quando usar
 

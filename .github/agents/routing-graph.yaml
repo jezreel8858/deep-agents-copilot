@@ -3,7 +3,7 @@ description: >
   Grafo de roteamento declarado — fonte de verdade estrutural para o agent-router.
   Nós = agents disponíveis; arestas = condições de roteamento (keywords, sinais R-006, score threshold).
   A Decision Tree em agent-router.agent.md é documentação derivada deste arquivo.
-last_updated: "2026-09-02 (v6 — sincronizado com catalog.yaml pos-fusao/gaps: test-implementation+test-fix->test-engineer, docs-writer+docs-curator->docs-engineer, agent-factory+skill-factory->governance-factory; 3 nos/arestas novos: runtime-verifier, pr-gatekeeper, database-specialist; total 34 agents. v5 anterior preservado no historico do arquivo)"
+last_updated: "2026-09-06 (v7 — sincronizado: expurgo @analysis-architect, R-047 anti-dead-end, arestas context-builder e adapter-generator, protocolo de call stack parent_agent)"
 
 # ─────────────────────────────────────────────
 # NÓS — agents disponíveis no catálogo
@@ -26,16 +26,7 @@ nos:
 
   - id: test-strategy
     tipo: downstream
-    descricao: "Planejamento e estratégia de testes"
-
-
-  - id: test-engineer
-    tipo: downstream
-    descricao: >
-      Fusão de test-implementation + test-fix: implementa suítes novas
-      (mode create), corrige testes quebrados (mode fix) e expande
-      cobertura por gap (mode coverage). Nunca roda a suíte completa
-      autonomamente no mode fix.
+    descricao: "Planejamento e estratégia de testes por risco e matriz de cenários"
 
   - id: business-rules-extractor
     tipo: downstream
@@ -73,9 +64,9 @@ nos:
     tipo: fallback
     descricao: "Pesquisa interna aprofundada e externa (atômica/composta) — fallback primário"
 
-  - id: analysis-architect
+  - id: tech-solution-architect
     tipo: fallback
-    descricao: "Análise técnica cross-projeto e integrações cross-sistema; absorve impacto local via tier B1"
+    descricao: "Arquiteto de solução técnica, blueprint, contratos de integração e divisão por stack; absorve impacto local via tier B1"
 
   - id: governance-factory
     tipo: downstream
@@ -83,6 +74,13 @@ nos:
       Fusão de agent-factory + skill-factory + prompt-factory: cria/revisa
       agent (.agent.md), skill (SKILL.md) ou prompt (.prompt.md) via
       parâmetro type, com atualização atômica do catálogo correspondente.
+
+  - id: governance-maintainer
+    tipo: downstream
+    descricao: >
+      Especialista executor em manutenção atômica, refatoração estrutural e sincronização
+      em lote de artefatos de governança (.github/agents, .github/skills, .github/prompts,
+      catálogos e grafo de roteamento) com single-turn batching e context-mode.
 
   - id: binding-initializer
     tipo: health_check
@@ -96,17 +94,26 @@ nos:
     tipo: downstream
     descricao: "Coleta e consolidação de contexto técnico"
 
-  - id: angular-engineer
-    tipo: specialist_hybrid
-    descricao: "Especialista Angular enterprise — perfil híbrido v2.1.0: Advisory (arquitetura, reatividade, performance, segurança, acessibilidade, upgrade) E Implementação (feature/bugfix com testing-first, diff mínimo); retorna ao agent-router só se sair do domínio Angular"
+  - id: angular-router
+    tipo: domain_router
+    descricao: "Supervisor hierárquico do domínio Angular — despacha para os 8 especialistas registrados em .github/agents/frontend/angular/angular-catalog.yaml"
 
-  - id: spring-boot-engineer
-    tipo: specialist_hybrid
-    descricao: "Especialista backend Spring Boot enterprise — perfil híbrido v2.1.0: Advisory (arquitetura, Java/JDK, observabilidade, segurança, migração) E Implementação (feature/bugfix com testing-first, diff mínimo); retorna ao agent-router só se sair do domínio Spring Boot"
 
-  - id: spring-reactive-engineer
-    tipo: specialist_hybrid
-    descricao: "Especialista backend reativo Spring WebFlux/Reactor — perfil híbrido v2.1.0: Advisory (capacidade, resiliência, backpressure, observabilidade) E Implementação (feature/bugfix com testing-first, sem bloqueio de event-loop); retorna ao agent-router só se sair do domínio reativo"
+  - id: spring-boot-router
+    tipo: domain_router
+    descricao: "Supervisor hierárquico do domínio Spring Boot — despacha para os 7 especialistas registrados em .github/agents/backend/spring-boot/spring-boot-catalog.yaml"
+
+  - id: spring-reactive-router
+    tipo: domain_router
+    descricao: "Supervisor hierárquico do domínio Spring Reactive — despacha para os 7 especialistas registrados em .github/agents/backend/spring-reactive/spring-reactive-catalog.yaml"
+
+  - id: ejb-router
+    tipo: domain_router
+    descricao: "Supervisor hierárquico do domínio Java Legado EJB — despacha para os 7 especialistas registrados em .github/agents/backend/ejb/ejb-catalog.yaml"
+
+  - id: database-router
+    tipo: domain_router
+    descricao: "Supervisor hierárquico do domínio de Banco de Dados — despacha para os 6 especialistas Oracle e Informix registrados em .github/agents/backend/database/database-catalog.yaml"
 
   - id: security-reviewer
     tipo: downstream
@@ -151,6 +158,10 @@ nos:
   - id: database-specialist
     tipo: downstream
     descricao: "Migrações de schema (Flyway/Liquibase/Alembic), otimização de query e integridade referencial; rollback sempre documentado"
+
+  - id: agent-auditor
+    tipo: downstream
+    descricao: "Auditor de governança em meta-nível para analisar smells e gaps no catálogo de agents/skills/prompts, validando templates canônicos, R-046/batching, especificações e alinhamento de perfil sem mutação direta, com recomendações e handoff para executores"
 
 # ─────────────────────────────────────────────
 # ARESTAS — condições de roteamento
@@ -217,7 +228,7 @@ arestas:
       sinal_r006: "É revisão preventiva de qualidade ANTES do merge (não bug já ocorrido)?"
       nao_confundir_com:
         - "bug em produção"        # → bug-triage (algo já quebrou)
-        - "impacto de mudar X"     # → analysis-architect (tier B1 local)
+        - "impacto de mudar X"     # → tech-solution-architect (tier B1 local)
 
   # Revisão especializada de segurança (OWASP/CVE/secrets)
   - de: agent-router
@@ -381,7 +392,7 @@ arestas:
       sinal_r006: "É elicitação de requisito NOVO a partir de pedido ambíguo (ainda sem análise técnica)?"
       nao_confundir_com:
         - "extrair regra de negócio de código existente"  # → business-rules-extractor (reverso)
-        - "impacto técnico de mudança já definida"          # → analysis-architect (tier B1)
+        - "impacto técnico de mudança já definida"          # → tech-solution-architect (tier B1)
 
   # Sumarização de código-fonte agnóstica a linguagem (RF-008)
   - de: agent-router
@@ -401,7 +412,7 @@ arestas:
       nao_confundir_com:
         - "revisar/corrigir código"        # → bug-triage/code-review/refactor-planner
         - "extrair regra de negócio"       # → business-rules-extractor
-        - "implementar sumarização em lib" # → decisão técnica de governance-factory/analysis-architect, não roteamento
+        - "implementar sumarização em lib" # → decisão técnica de governance-factory/tech-solution-architect, não roteamento
 
   # Delegação interna: qualquer agent downstream pode invocar code-summarizer sob demanda (RF-002)
   - de: "*downstream"
@@ -411,7 +422,7 @@ arestas:
     nivel_routing: rule-based
     condicoes:
       sinal: "Agent downstream identificou arquivo-fonte grande (>300 linhas OU >20KB) necessário ao contexto da tarefa (RF-002/RNF-002)"
-      gatilho: "Delegação interna via run_subagent antes de anexar conteúdo bruto ao contexto — nunca chamada direta a lib de parsing"
+      gatilho: "Delegação interna via run_subagent antes de anexar conteúdo bruto ao contexto — nunca chamada direta a lib de parsing por outros agents (RNF-007)"
 
   # Grafo de conhecimento de código-fonte cross-projeto (RF-001/RF-002/RF-011)
   - de: agent-router
@@ -439,7 +450,7 @@ arestas:
         - "sumarizar código"                       # → code-summarizer
         - "revisar/corrigir código"                # → bug-triage/code-review/refactor-planner
         - "implementação/feature de componente"    # → angular-engineer / spring-boot-engineer
-        - "acoplamento arquitetural entre sistemas" # → analysis-architect (cross-sistema/contratos)
+        - "acoplamento arquitetural entre sistemas" # → tech-solution-architect (cross-sistema/contratos)
 
   # Delegação interna: qualquer agent downstream pode invocar code-knowledge-graph sob demanda (RF-002)
   - de: "*downstream"
@@ -451,7 +462,7 @@ arestas:
       sinal: "Agent downstream precisa de relação estrutural entre símbolos de código (ex.: quem chama esta função, quais classes implementam esta interface) não disponível no grafo cacheado (RF-002)"
       gatilho: "Delegação interna via run_subagent — nunca chamada direta a lib de parsing/grafo"
 
-  # Estratégia de testes
+  # Estratégia de testes (Fluxo 1 Gateway Cross-Cutting + Planejamento Geral)
   - de: agent-router
     para: test-strategy
     prioridade: 2
@@ -464,34 +475,25 @@ arestas:
         - "cobertura"
         - "cenários de teste"
         - "matriz de testes"
-      sinal_r006: "É estratégia/plano de testes?"
+        - "matriz de riscos"
+        - "casos de borda"
+        - "feature cross-cutting"
+      sinal_r006: "É estratégia/plano de testes OU feature nova multi-camada (backend + frontend) exigindo matriz de riscos unificada antes da codificação?"
       nao_confundir_com:
-        - "implementar testes"  # → test-engineer (mode create)
-        - "corrigir testes"     # → test-engineer (mode fix)
+        - "executar testes angular"        # → angular-router
+        - "executar testes spring boot"    # → spring-boot-router
+        - "executar testes reativos"       # → spring-reactive-router
+        - "executar testes ejb"            # → ejb-router
 
-  # Implementação/correção/expansão de cobertura de testes (fusão test-implementation + test-fix)
-  - de: agent-router
-    para: test-engineer
-    prioridade: 2
-    threshold_score: 0.90
+  # Delegação interna: Routers de domínio consultam test-strategy para mapear cenários antes de codar (Fluxo 2 TDD)
+  - de: "angular-router | spring-boot-router | spring-reactive-router | ejb-router"
+    para: test-strategy
+    prioridade: 0.5
+    threshold_score: 1.00
     nivel_routing: rule-based
     condicoes:
-      keywords:
-        - "implementar testes"
-        - "criar testes"
-        - "escrever testes"
-        - "adicionar cobertura"
-        - "junit"
-        - "jasmine"
-        - "vitest"
-        - "pytest"
-        - "testes quebrados"
-        - "testes falhando"
-        - "broken test"
-        - "corrigir teste"
-        - "test failure"
-        - "flaky test"
-      sinal_r006: "mode=create (implementar/criar novo teste) | mode=fix (relatório de falhas presente, ou ask_questions para obtê-lo) | mode=coverage (gap de cobertura já identificado)"
+      sinal: "Supervisor de domínio identifica regra de negócio com casos de borda complexos antes de acionar test-writers"
+      gatilho: "Delegação interna via run_subagent para obter matriz estruturada de cenários"
 
   # Extração de regras de negócio
   - de: agent-router
@@ -522,9 +524,9 @@ arestas:
         - "eliminar duplicação"
         - "reestruturar"
 
-  # Análise de impacto local (tier B1)
+  # Análise de impacto local (tier B1) / Blueprint de solução
   - de: agent-router
-    para: analysis-architect
+    para: tech-solution-architect
     prioridade: 4
     threshold_score: 0.90
     nivel_routing: rule-based
@@ -536,7 +538,11 @@ arestas:
         - "o que muda"
         - "quem é afetado"
         - "breaking change"
-      sinal_r006: "Impacto local -> usar analysis-architect em tier B1"
+        - "blueprint"
+        - "blueprint técnico"
+        - "technical blueprint"
+        - "desenho de arquitetura"
+      sinal_r006: "Impacto local ou elaboração de blueprint técnico -> usar tech-solution-architect em tier B1"
 
   # Documentação (autoria de conteúdo novo + curadoria de conteúdo existente — fusão docs-writer + docs-curator)
   - de: agent-router
@@ -562,7 +568,7 @@ arestas:
         - "postmortem"
       sinal_r006: "mode=author (conteúdo novo) | mode=curate (consolidação/padronização de conteúdo já existente)"
 
-  # Governance factory (fusão agent-factory + skill-factory + prompt-factory)
+  # Governance factory (fusão agent-factory + skill-factory + prompt-factory + stack-ecosystem)
   - de: agent-router
     para: governance-factory
     prioridade: 6
@@ -580,11 +586,58 @@ arestas:
         - "criar prompt"
         - "novo prompt"
         - "revisar prompt"
-      sinal_r006: "type=agent | type=skill | type=prompt — perguntar via ask_questions se ambíguo"
+        - "criar stack"
+        - "nova stack"
+        - "ecossistema stack"
+        - "ecossistema de agentes"
+      sinal_r006: "type=agent | type=skill | type=prompt | type=stack — perguntar via ask_questions se ambíguo"
 
-  # Análise de integração cross-sistema + análise técnica geral (unificado em analysis-architect v2.0.0)
+  # Manutenção e sincronização em lote de governança (governance-maintainer)
   - de: agent-router
-    para: analysis-architect
+    para: governance-maintainer
+    prioridade: 6.1
+    threshold_score: 0.90
+    nivel_routing: rule-based
+    condicoes:
+      keywords:
+        - "manutenção de governança"
+        - "refatorar governança"
+        - "atualizar catálogo"
+        - "sincronizar agents"
+        - "renomear agent"
+        - "batch modification governança"
+        - "sincronizar referências"
+        - "alterar governança"
+      sinal_r006: "É manutenção/sincronização/refatoração em lote de artefatos existentes de governança (não criação de novo artefato do zero)?"
+      nao_confundir_com:
+        - "criar novo agent/skill/prompt/stack do zero"  # → governance-factory
+        - "auditar semântica do catálogo sem alterar"    # → agent-auditor
+
+  # Auditoria de governança, smells e conformidade (agent-auditor)
+  - de: agent-router
+    para: agent-auditor
+    prioridade: 6.2
+    threshold_score: 0.90
+    nivel_routing: rule-based
+    condicoes:
+      keywords:
+        - "auditar governança"
+        - "auditar catálogo"
+        - "auditar agents"
+        - "auditar prompts"
+        - "auditar skills"
+        - "governance smells"
+        - "conformidade de agents"
+        - "smell de governança"
+        - "auditar conformidade"
+      sinal_r006: "É auditoria semântica/estrutural do catálogo em meta-nível (read-only, sem mutação direta)?"
+      nao_confundir_com:
+        - "manutenção/sincronização em lote"             # → governance-maintainer (executor mutativo)
+        - "criar novo agent/skill/prompt/stack"           # → governance-factory (autor do zero)
+
+  # Análise de integração cross-sistema, contratos e Technical Blueprint (tech-solution-architect)
+  - de: agent-router
+    para: tech-solution-architect
     prioridade: 7
     threshold_score: 0.85
     nivel_routing: rule-based
@@ -599,50 +652,131 @@ arestas:
         - "blast radius"
         - "fluxo de dados cross-sistema"
         - "acoplamento entre serviços"
+        - "blueprint técnico"
+        - "divisão de tarefas por stack"
 
-  # Especialistas de recomendação de stack (perfil híbrido v2.0.0 — Advisory + Implementação)
+  # Supervisor e roteador de domínio Angular (Hierarchical Sub-Router)
   - de: agent-router
-    para: angular-engineer
-    prioridade: 1.6
+    para: angular-router
+    prioridade: 1.5
     threshold_score: 0.85
     nivel_routing: rule-based
     condicoes:
       keywords:
         - "angular"
+        - "angular router"
+        - "frontend angular"
         - "componente angular"
         - "standalone"
         - "signals"
         - "rxjs"
         - "core web vitals angular"
-      sinal_r006: "É análise/recomendação OU implementação de feature/bugfix em Angular?"
+        - "auditoria angular"
+        - "upgrade angular"
+        - "feature angular"
+        - "bug angular"
+        - "fix angular"
+        - "scss angular"
+        - "layout angular"
+        - "responsivo angular"
+        - "a11y angular"
+        - "testes angular"
+        - "angular component test"
+        - "testbed"
+        - "component harness"
+        - "vitest angular"
+        - "karma angular"
+        - "angular e2e"
+        - "playwright angular"
+      sinal_r006: "É qualquer solicitação do ecossistema Angular? (despacha para o catálogo de 8 especialistas de frontend em .github/agents/frontend/angular/angular-catalog.yaml)"
 
+  # Supervisor e roteador de domínio Spring Boot (Hierarchical Sub-Router)
   - de: agent-router
-    para: spring-boot-engineer
+    para: spring-boot-router
     prioridade: 1.6
     threshold_score: 0.85
     nivel_routing: rule-based
     condicoes:
       keywords:
         - "spring boot"
+        - "spring-boot-router"
         - "java lts"
         - "jdk"
         - "actuator"
         - "migracao spring"
-      sinal_r006: "É análise/recomendação OU implementação de feature/bugfix em Spring Boot?"
+        - "jpa"
+        - "jakarta persistence"
+        - "hikaricp"
+        - "junit 5"
+      sinal_r006: "É qualquer solicitação do ecossistema Spring Boot? (despacha para o catálogo de 7 especialistas backend em .github/agents/backend/spring-boot/spring-boot-catalog.yaml)"
 
+  # Supervisor e roteador de domínio Spring Reactive (Hierarchical Sub-Router)
   - de: agent-router
-    para: spring-reactive-engineer
+    para: spring-reactive-router
     prioridade: 1.6
     threshold_score: 0.85
     nivel_routing: rule-based
     condicoes:
       keywords:
         - "spring webflux"
+        - "spring-reactive-router"
         - "project reactor"
         - "backend reativo"
         - "backpressure"
         - "reactive streams"
-      sinal_r006: "É análise/recomendação OU implementação de feature/bugfix reativo (WebFlux/Reactor)?"
+        - "r2dbc"
+        - "stepverifier"
+        - "webtestclient"
+        - "blockhound"
+      sinal_r006: "É qualquer solicitação do ecossistema reativo WebFlux/Reactor? (despacha para o catálogo de 7 especialistas reativos em .github/agents/backend/spring-reactive/spring-reactive-catalog.yaml)"
+
+  # Supervisor e roteador de domínio Java Legado EJB (Hierarchical Sub-Router)
+  - de: agent-router
+    para: ejb-router
+    prioridade: 1.6
+    threshold_score: 0.85
+    nivel_routing: rule-based
+    condicoes:
+      keywords:
+        - "ejb"
+        - "ejb-router"
+        - "stateless"
+        - "stateful"
+        - "message driven bean"
+        - "mdb"
+        - "jta"
+        - "cmt"
+        - "bmt"
+        - "ear"
+        - "openejb"
+        - "arquillian"
+      sinal_r006: "É qualquer solicitação do ecossistema Java Legado EJB? (despacha para o catálogo de 7 especialistas backend em .github/agents/backend/ejb/ejb-catalog.yaml)"
+
+  # Supervisor e roteador de domínio Banco de Dados (Hierarchical Sub-Router)
+  - de: agent-router
+    para: database-router
+    prioridade: 1.6
+    threshold_score: 0.85
+    nivel_routing: rule-based
+    condicoes:
+      keywords:
+        - "database-router"
+        - "oracle"
+        - "informix"
+        - "plsql"
+        - "pl/sql"
+        - "spl"
+        - "stored procedure"
+        - "procedure oracle"
+        - "procedure informix"
+        - "explain plan"
+        - "dbms_xplan"
+        - "set explain"
+        - "sqexplain"
+        - "flyway oracle"
+        - "flyway informix"
+        - "lock mode row"
+      sinal_r006: "É solicitação especializada de banco de dados Oracle ou Informix? (despacha para o catálogo de especialistas em .github/agents/backend/database/database-catalog.yaml)"
 
   # Retorno universal (R-042) — qualquer downstream detecta deriva de intenção
   # e devolve controle ao router. Prioridade 0 = avaliada ANTES de qualquer
@@ -658,7 +792,7 @@ arestas:
       gatilho: >
         Mudança de verbo de ação (elicitar->implementar, revisar->codar,
         analisar->corrigir, planejar->executar) quando o agent ativo NÃO
-        cobre implementação (analysis-architect|bug-triage|
+        cobre implementação (tech-solution-architect|bug-triage|
         requirements-analyst|test-strategy|refactor-planner|deep-search)
         OU pedido de execução/código em stack fora da matriz de competência
         do agent ativo OU pedido de execução/código em agent estritamente
@@ -680,15 +814,15 @@ arestas:
       sinal: "Dúvida técnica, pesquisa interna aprofundada, pesquisa externa, benchmark de mercado"
       gatilho: "Intenção clara que exige investigação além do contexto imediato"
 
-  # Análise técnica genérica e cross-projeto — fallback secundário amplo
+  # Análise técnica genérica, blueprint e cross-projeto — fallback secundário amplo
   - de: agent-router
-    para: analysis-architect
+    para: tech-solution-architect
     prioridade: 9
     threshold_score: 0.70
     nivel_routing: semantic
     condicoes:
-      sinal: "Análise técnica genérica, impacto, requisitos, fluxos ou qualquer análise cross-sistema"
-      gatilho: "Escopo que envolve análise de impacto, contratos, dependências ou integrações"
+      sinal: "Análise técnica genérica, blueprint, impacto, requisitos, fluxos ou qualquer análise cross-sistema"
+      gatilho: "Escopo que envolve arquitetura, blueprint técnico, contratos, dependências ou integrações"
 
   # Verificação de saúde do ambiente antes de testes/codificadores
   - de: agent-router

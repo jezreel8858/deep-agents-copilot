@@ -35,7 +35,7 @@ Gap de mercado identificado em `docs/plan/categorizacao-agents-mercado.md` §5.1
 | Future AGI, "Evaluating LLM Self-Reflection Loops" (2026) | "Single-shot critique: one pass, draft → critique → rewrite → commit. Cheap and bounded." Recomenda **limite explícito de rounds** para não thrashing (4+ rounds sem convergência). |
 | Zylos AI (2026) | Multi-agent debate custa 2-5× o compute — desproporcional para tarefas de baixo/médio risco. |
 
-**Decisão de arquitetura para este projeto:** dado R-011 (sem overengineering) e a arquitetura hub-and-spoke já estabelecida (R-042), a Reflection é implementada como **passo interno do próprio agent Executor** (self-reflection, 1 round, grounded quando possível) — **não** como um agent `reflection-critic` separado. Um critic separado já existe para artefatos de alto risco: `code-review` (diff/PR) e `analysis-architect`/`bug-triage` cobrem o papel de "critic externo" quando o artefato é código de produção.
+**Decisão de arquitetura para este projeto:** dado R-011 (sem overengineering) e a arquitetura hub-and-spoke já estabelecida (R-042), a Reflection é implementada como **passo interno do próprio agent Executor** (self-reflection, 1 round, grounded quando possível) — **não** como um agent `reflection-critic` separado. Um critic separado já existe para artefatos de alto risco: `code-review` (diff/PR) e `tech-solution-architect`/`bug-triage` cobrem o papel de "critic externo" quando o artefato é código de produção.
 
 ## 2) Padrão Canônico — Single-Shot Reflection (1 Round)
 
@@ -56,7 +56,7 @@ Gap de mercado identificado em `docs/plan/categorizacao-agents-mercado.md` §5.1
 | Cenário | Aplicar Reflection? | Formato |
 |---|---|---|
 | Artefato de baixo risco, reversível (doc `.md`, teste unitário isolado) | Sim — self-reflection, 1 round | Checklist objetivo do próprio agent |
-| Artefato de alto risco, difícil de reverter (mudança de contrato, decisão de arquitetura) | Não neste padrão — usar critic separado já existente (`code-review`, `analysis-architect`) | Handoff explícito, não self-reflection |
+| Artefato de alto risco, difícil de reverter (mudança de contrato, decisão de arquitetura) | Não neste padrão — usar critic separado já existente (`code-review`, `tech-solution-architect`) | Handoff explícito, não self-reflection |
 | Falha grounded já disponível (teste rodou e falhou, lint apontou erro) | Sim — sempre corrigir antes de reportar (isso já é regra implícita em vários agents; esta skill formaliza o nome do padrão) | Corrigir e re-executar validação 1×, então reportar |
 | Artefato de governança gerado referencia outro artefato como "dependente/consumidor" (ex.: agent X consome skill Y) | Sim — confirmar que a referência é dependência funcional real, não só rótulo semântico (ver `governance-factory-patterns` § 3.1) | Gate de autocrítica semântica, 1 round, antes do checklist estrutural |
 

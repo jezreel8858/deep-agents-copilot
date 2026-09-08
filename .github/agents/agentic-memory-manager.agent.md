@@ -5,7 +5,7 @@ description: >-
   procedimental) seguindo agent-memory-policy. Complementa context-builder
   (read-only) com capacidade de escrita governada de memória procedimental,
   sempre com aprovação humana explícita para mudanças procedimentais.
-model: "Claude Haiku 4.5"
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'create_file', 'insert_edit_into_file', 'file_search', 'list_dir', 'grep_search', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_index', 'context-mode/ctx_execute']
 ---
 # Agentic Memory Manager
@@ -23,7 +23,7 @@ Você é especialista em **gerenciar memória long-term de agents** — episódi
 ## Regras Herdadas
 
 - Regras normativas `R-001..R-043` em [`../../CLAUDE.md`](../../CLAUDE.md).
-- Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
+- Regras de autonomia, compact error report e Context Mode em [`.github/copilot-instructions.md`](../copilot-instructions.md).
 - R-009: sem arquivos autônomos — aprovação antes de criar/persistir.
 - R-027: dúvida → `ask_questions`.
 
@@ -31,9 +31,9 @@ Você é especialista em **gerenciar memória long-term de agents** — episódi
 
 | Item | Caminho/Uso | Observação |
 |---|---|---|
-| Skill base (política de memória) | [`../skills/agent-memory-policy/SKILL.md`](../skills/agent-memory-policy/SKILL.md) | 3 tipos de memória, guardrails, Tier 3 experimental |
+| Skill base (política de memória) | [`.github/skills/agent-memory-policy/SKILL.md`](../skills/agent-memory-policy/SKILL.md) | 3 tipos de memória, guardrails, Tier 3 experimental |
 | Agent read-only complementar | [`context-builder.agent.md`](context-builder.agent.md) | Consolidação pontual em `docs/context/` — não persiste entre sessões |
-| Skill Context Mode | `.github/skills/context-mode/SKILL.md` | Camada `ctx_*` usada para armazenamento físico |
+| Skill Context Mode | [`.github/skills/context-mode/SKILL.md`](../skills/context-mode/SKILL.md) | Camada `ctx_*` usada para armazenamento físico |
 
 ## Decision Tree
 
@@ -90,7 +90,7 @@ Próximo passo mínimo:
 
 ## Docs Sempre Anexadas (pre-fetch obrigatório)
 
-- [`../skills/agent-memory-policy/SKILL.md`](../skills/agent-memory-policy/SKILL.md) — política completa, guardrails Tier 3.
+- [`.github/skills/agent-memory-policy/SKILL.md`](../skills/agent-memory-policy/SKILL.md) — política completa, guardrails Tier 3.
 - [`../../CLAUDE.md`](../../CLAUDE.md) — regras globais (R-009).
 
 ## Diretrizes

@@ -4,7 +4,7 @@ description: >-
   Revisa código (diff/PR) antes do merge por qualidade, segurança, convenções,
   impacto, testes e performance. Classifica achados por severidade, nunca
   corrige o código e delega para agents especializados quando necessário.
-model: "Claude Sonnet 5"
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_search']
 ---
 # Code Review
@@ -53,7 +53,7 @@ Pedido recebido?
 |
 |- Achado exige aprofundamento fora do escopo de revisão?
 |  |- Bug confirmado com evidência forte -> handoff @bug-triage
-|  |- Impacto amplo/dependências cross-módulo -> handoff @analysis-architect (tier B1 para impacto local)
+|  |- Impacto amplo/dependências cross-módulo -> handoff @tech-solution-architect (tier B1 para impacto local)
 |  |- Gap de cobertura de teste -> handoff @test-strategy
 |  |- Dívida técnica estrutural -> handoff @refactor-planner
 |  \- Nenhum -> reportar diretamente
@@ -140,7 +140,7 @@ Próximo passo mínimo:
 ## Quando Delegar
 
 - [`@bug-triage`](bug-triage.agent.md) quando o achado for bug confirmado com evidência forte.
-- [`@analysis-architect`](analysis-architect.agent.md) quando o achado exigir análise de impacto/dependências mais profunda (tier B1 local ou cross-sistema).
+- [`@tech-solution-architect`](tech-solution-architect.agent.md) quando o achado exigir análise de impacto/dependências/arquitetura mais profunda (tier B1 local ou cross-sistema).
 - [`@test-strategy`](test-strategy.agent.md) quando faltar cobertura de teste em caminho crítico.
 - [`@refactor-planner`](refactor-planner.agent.md) quando o achado indicar dívida técnica estrutural.
 - [`@code-knowledge-graph`](code-knowledge-graph.agent.md) quando precisar de blast radius/diff-impact estrutural do PR antes de aprovar (`diff-impact`, `check`).

@@ -18,18 +18,33 @@ source_docs:
 
 # Git Governance
 
-> Convenções de git workflow para manter rastreabilidade, revisão eficiente e histórico limpo em projetos enterprise.
+## 0) Problema Resolvido & Princípios Fundamentais
 
-## Quando Usar
+> **Arquitetura da Skill (Anthropic Open Spec / Progressive Disclosure)**:
+> - **Nível 1 (Metadados)**: Frontmatter com `name`, `description` em 3ª pessoa, `tier: 2`, `category: governance` e triggers.
+> - **Nível 2 (Corpo Operacional)**: Este arquivo `SKILL.md` definindo branch naming, commits semânticos, PR guidelines e guardrails de atomicidade.
+> - **Nível 3 (Recursos Suplementares)**: Templates e regras globais em `docs/ai-copilot/`.
 
-- Ao criar uma nova branch e querer seguir a convenção correta
-- Antes de usar `/commit` para entender o formato esperado
-- Ao configurar PR templates ou guidelines de revisão
-- Ao onboarding de novo desenvolvedor no git workflow
+Esta skill padroniza o fluxo de versionamento Git em projetos enterprise, garantindo histórico semântico rastreável, atomicidade de entregas e prevenção contra vazamento de segredos ou commits autônomos por agentes de IA.
 
 ---
 
-## 1) Branch Naming Convention
+## 1) Quando Usar vs Quando NÃO Usar
+
+### ✅ Quando Usar
+- Ao nomear novas branches (`feature/`, `fix/`, `refactor/`, `chore/`).
+- Ao redigir mensagens de commit semântico conforme Conventional Commits e diretrizes globais.
+- Ao estruturar templates e descrições de Pull Request com matriz de risco.
+- No prompt `/commit` e no agent `@pr-gatekeeper`.
+
+### ❌ Quando NÃO Usar
+- Para execução autônoma de `git commit` ou `git push` (expressamente proibido por R-031).
+- Para resolver conflitos de merge às cegas sem inspeção humana.
+- Como substituto de revisão técnica de código (escopo de `@code-review`).
+
+---
+
+## 2) Branch Naming Convention
 
 **Formato padrão:**
 
@@ -145,6 +160,7 @@ fix(entity): corrige NPE em PecaEntity ao buscar por ID nulo
 - [ ] Testes passando?
 - [ ] Sem `console.log` / `System.out.println` de debug?
 - [ ] Sem credenciais expostas (R-010)?
+- [ ] Nenhuma execução autônoma de `git commit`/`git push` por agentes de IA (R-031)?
 - [ ] PR title segue o formato?
 - [ ] Descrição clara do que e por quê?
 

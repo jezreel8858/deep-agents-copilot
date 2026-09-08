@@ -4,7 +4,7 @@ description: >-
   Gera automaticamente adapters por-projeto em `.github/instructions/local/`
   (gitignored, R-043) via scanner read-only de stack e arquitetura. Opera em
   modos scan, generate-one e batch, integrando-se a `/add-project-context`.
-model: "Claude Haiku 4.5"
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'create_file', 'file_search', 'list_dir', 'get_errors', 'grep_search', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
 ---
 # Gerador de Adapters

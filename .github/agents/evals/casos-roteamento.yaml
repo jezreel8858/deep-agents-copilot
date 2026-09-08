@@ -5,7 +5,7 @@ description: >
   em toda PR que altere agent-router.agent.md ou routing-graph.yaml (análogo ao R-015).
   Compatível com DeepEval (Apache 2.0) e pytest via estrutura de casos padronizados.
 last_updated: "2026-09-04 (v9 — adicionado canon-030 e regr-023: delegação interna mandatória refactor-planner → code-knowledge-graph para mapeamento de dependências/blast radius R-045)"
-responsavel: "agent-evals-lab + docs-engineer + test-engineer"
+responsavel: "agent-evals-lab + docs-engineer + test-strategy"
 
 # ─────────────────────────────────────────────
 # SUITE 1 — Casos Canônicos (threshold ≥ 0.90)
@@ -43,31 +43,31 @@ canonicos:
     threshold: 0.90
 
   - id: "canon-003"
-    descricao: "Implementação de testes com stack definida (test-engineer, mode create)"
+    descricao: "Implementação de testes com stack definida (Spring Boot JUnit 5 + Mockito -> spring-boot-router)"
     input:
       solicitacao: "Implementar testes unitários para UserService com JUnit 5 + Mockito"
     expected:
-      agent_route: "test-engineer"
+      agent_route: "spring-boot-router"
       nivel_routing: "rule-based"
       confianca: "alta"
       score_minimo: 0.90
       output_contains:
-        - "Modo: create"
+        - "Delegado: @spring-boot-router"
     critico: true
     threshold: 0.90
 
   - id: "canon-004"
-    descricao: "Testes quebrados com relatório (test-engineer, mode fix)"
+    descricao: "Testes quebrados com relatório em Spring Boot (spring-boot-router -> test-fixer)"
     input:
       solicitacao: "Estes 3 testes estão falhando: UserServiceTest, OrderTest, PaymentTest — veja o relatório anexo"
       contexto_disponivel: "relatório de falhas presente"
     expected:
-      agent_route: "test-engineer"
+      agent_route: "spring-boot-router"
       nivel_routing: "rule-based"
       confianca: "alta"
       score_minimo: 0.90
       output_contains:
-        - "Modo: fix"
+        - "Delegado: @spring-boot-router"
     critico: true
     threshold: 0.90
 
@@ -84,14 +84,16 @@ canonicos:
     threshold: 0.90
 
   - id: "canon-006"
-    descricao: "Análise de impacto de mudança de assinatura"
+    descricao: "Análise de impacto e solução técnica de mudança de assinatura"
     input:
       solicitacao: "Analisar o impacto de mudar a assinatura do método processarPagamento() em PaymentService"
     expected:
-      agent_route: "analysis-architect"
+      agent_route: "tech-solution-architect"
       nivel_routing: "rule-based"
       confianca: "alta"
       score_minimo: 0.90
+      output_contains:
+        - "Delegado: @tech-solution-architect"
     critico: true
     threshold: 0.90
 
@@ -226,8 +228,8 @@ canonicos:
   - id: "canon-019"
     descricao: "Delegação interna downstream → code-summarizer (RF-002): agent especialista de stack detecta arquivo > 300 linhas/20KB e delega via run_subagent, valida aresta *downstream → code-summarizer de routing-graph.yaml"
     input:
-      agent_solicitante: "spring-boot-engineer"
-      solicitacao_simulada: "spring-boot-engineer está lendo PedidoService.java (412 linhas, 24KB) para responder a uma tarefa e identifica que excede o threshold RF-002 antes de anexar o conteúdo ao contexto"
+      agent_solicitante: "spring-boot-router"
+      solicitacao_simulada: "spring-boot-feature-developer está lendo PedidoService.java (412 linhas, 24KB) para responder a uma tarefa e identifica que excede o threshold RF-002 antes de anexar o conteúdo ao contexto"
     expected:
       agent_route: "code-summarizer"
       via: "run_subagent"
@@ -338,12 +340,12 @@ canonicos:
     input:
       solicitacao: "O plano de refactor do módulo Spring Boot de pagamentos já foi aprovado — pode executar a Fase 1 agora"
     expected:
-      agent_route: "spring-boot-engineer"
+      agent_route: "spring-boot-router"
       nivel_routing: "rule-based"
       confianca: "alta"
       score_minimo: 0.90
       output_contains:
-        - "Delegado: @spring-boot-engineer"
+        - "Delegado: @spring-boot-router"
     nao_confundir_com:
       - "criar plano de refactor do zero"  # → refactor-planner
     critico: true
@@ -412,6 +414,143 @@ canonicos:
         - "Agente Ativo: code-knowledge-graph"
     nao_deve:
       comportamento: "refactor-planner varrer arquivos manualmente com grep/find/list_dir ou inferir relações sem consultar o grafo (viola R-045 / RNF-004)"
+    critico: true
+    threshold: 0.90
+
+  - id: "canon-031"
+    descricao: "Testes especializados de componentes Angular com TestBed e Component Harnesses roteados para angular-router"
+    input:
+      solicitacao: "Implementar testes de componente Angular usando TestBed e Component Harnesses para o EscalaListComponent"
+    expected:
+      agent_route: "angular-router"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.85
+      output_contains:
+        - "Agente Ativo: angular-router"
+        - "angular-component-test-writer"
+    critico: true
+    threshold: 0.90
+
+  - id: "canon-032"
+    descricao: "Auditoria arquitetural e otimização de Core Web Vitals Angular roteada para angular-router (arch-advisor)"
+    input:
+      solicitacao: "Fazer auditoria de performance e diagnóstico de INP/LCP nas rotas Angular sem alterar código"
+    expected:
+      agent_route: "angular-router"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.85
+      output_contains:
+        - "Agente Ativo: angular-router"
+        - "angular-arch-advisor"
+    critico: true
+    threshold: 0.90
+
+  - id: "canon-033"
+    descricao: "Estilização SCSS, layout responsivo mobile-first e acessibilidade WCAG roteados para angular-router (ui-stylist)"
+    input:
+      solicitacao: "Ajustar SCSS e acessibilidade WCAG 2.2 no componente de navegação para telas mobile"
+    expected:
+      agent_route: "angular-router"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.85
+      output_contains:
+        - "Agente Ativo: angular-router"
+        - "angular-ui-stylist"
+    critico: true
+    threshold: 0.90
+
+  - id: "canon-034"
+    descricao: "Implementação de nova feature standalone com NgRx Signal Store via TDD roteada para angular-router (feature-developer)"
+    input:
+      solicitacao: "Criar componente standalone de filtro com NgRx Signal Store e testes unitários prévios"
+    expected:
+      agent_route: "angular-router"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.85
+      output_contains:
+        - "Agente Ativo: angular-router"
+        - "angular-feature-developer"
+    critico: true
+    threshold: 0.90
+
+  - id: "canon-035"
+    descricao: "Correção cirúrgica de runtime error Angular com diff mínimo roteada para angular-router (bug-fixer)"
+    input:
+      solicitacao: "Corrigir ExpressionChangedAfterItHasBeenCheckedError na linha 42 do EscalaDetailComponent"
+    expected:
+      agent_route: "angular-router"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.85
+      output_contains:
+        - "Agente Ativo: angular-router"
+        - "angular-bug-fixer"
+    critico: true
+    threshold: 0.90
+
+  - id: "canon-036"
+    descricao: "Elaboração de Technical Blueprint com contratos de API e divisão de tarefas por stack"
+    input:
+      solicitacao: "Elaborar o Technical Blueprint para a nova feature de gestão de escalas, com contratos OpenAPI e divisão de tarefas backend e frontend"
+    expected:
+      agent_route: "tech-solution-architect"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.90
+      output_contains:
+        - "Delegado: @tech-solution-architect"
+    critico: true
+    threshold: 0.90
+
+  - id: "canon-037"
+    descricao: "Manutenção atômica e sincronização em lote de governança roteada para governance-maintainer"
+    input:
+      solicitacao: "Preciso atualizar e sincronizar em lote as referências de governança e catálogos após uma alteração estrutural"
+    expected:
+      agent_route: "governance-maintainer"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.90
+      output_contains:
+        - "Delegado: @governance-maintainer"
+    nao_confundir_com:
+      - "criar novo agent do zero"  # → governance-factory
+      - "auditar smells sem alterar" # → agent-auditor
+    critico: true
+    threshold: 0.90
+
+  - id: "canon-038"
+    descricao: "Roteamento de demanda de banco de dados Oracle ou Informix para database-router"
+    input:
+      solicitacao: "Preciso criar uma migration Flyway DDL para Oracle e uma Stored Procedure em PL/SQL com bulk collect"
+    expected:
+      agent_route: "database-router"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.85
+      output_contains:
+        - "Agente Ativo: database-router"
+    critico: true
+    threshold: 0.90
+
+  - id: "canon-039"
+    descricao: "Auditoria semântica e estrutural do catálogo de governança roteada para agent-auditor"
+    input:
+      solicitacao: "Auditar a governança do repositório procurando smells, referências quebradas e gaps no grafo de roteamento"
+    expected:
+      agent_route: "agent-auditor"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.90
+      output_contains:
+        - "Agente Ativo: agent-auditor"
+    nao_confundir_com:
+      - "manutenção/sincronização em lote"  # → governance-maintainer
+      - "criar novo agent do zero"           # → governance-factory
     critico: true
     threshold: 0.90
 
@@ -581,7 +720,7 @@ regressao:
     expected:
       agent_route: "agent-router"
     nao_deve:
-      agent_route: "bug-triage|test-strategy|refactor-planner|analysis-architect|docs-engineer"
+      agent_route: "bug-triage|test-strategy|refactor-planner|tech-solution-architect|docs-engineer"
     critico: true
     threshold: 1.00
 
@@ -729,7 +868,7 @@ regressao:
     expected:
       turno_2_deteccao: "intent_drift_detected (stack fora da matriz de competência do agent ativo)"
       turno_2_handoff: "angular-engineer -> agent-router (motivo: deriva_de_intencao)"
-      turno_2_agent_route_final: "spring-boot-engineer (via re-triagem do agent-router)"
+      turno_2_agent_route_final: "spring-boot-router (via re-triagem do agent-router)"
     nao_deve:
       turno_2_agent_route: "angular-engineer implementando código Spring Boot diretamente"
     critico: true
@@ -757,7 +896,7 @@ regressao:
     input:
       solicitacao: "Avalie a estratégia de migração Java 17 para 21 no meu serviço Spring Boot, sem codar ainda"
     expected:
-      agent_route: "spring-boot-engineer"
+      agent_route: "spring-boot-router"
       nivel_routing: "rule-based"
       confianca: "alta"
       score_minimo: 0.85
@@ -770,7 +909,7 @@ regressao:
     input:
       solicitacao: "Corrija o bug no PedidoService.java:87 — NullPointerException ao calcular frete, causa raiz já identificada"
     expected:
-      agent_route: "spring-boot-engineer"
+      agent_route: "spring-boot-router"
       nivel_routing: "rule-based"
       confianca: "alta"
       score_minimo: 0.85
@@ -784,7 +923,7 @@ regressao:
     input:
       solicitacao: "Adequação de WebFlux para meu cenário de alta concorrência — só recomendação, sem implementar"
     expected:
-      agent_route: "spring-reactive-engineer"
+      agent_route: "spring-reactive-router"
       nivel_routing: "rule-based"
       confianca: "alta"
       score_minimo: 0.85
@@ -816,7 +955,7 @@ regressao:
       output_contains:
         - "governance-factory"
       nao_deve:
-        agent_route: "spring-boot-engineer|angular-engineer|spring-reactive-engineer"
+        agent_route: "spring-boot-router|angular-router|spring-reactive-router"
         comportamento: "invocar agente inline de gap detection ou alucinar implementação em Rust"
     critico: true
     threshold: 1.00

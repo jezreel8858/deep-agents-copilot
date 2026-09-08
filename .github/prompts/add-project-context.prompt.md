@@ -5,8 +5,10 @@ description:
   Orquestra descoberta estruturada de projeto com Intent Classification + Multi-Query RRF.
   Análise estática offline → geração automática de YAML/Markdown → validação e binding atômico.
   Execute UMA VEZ POR PROJETO (reutilizável). PRÉ-REQUISITO `/init-context` já executado.
+agent: 'agent'
 model: "Gemini 3.8 Flash"
 tools: ['file_search', 'grep_search', 'read_file', 'run_in_terminal', 'run_subagent', 'ask_questions', 'context-mode/ctx_search']
+argument-hint: '<caminho-absoluto-do-projeto>'
 source_docs:
   - .github/skills/yaml-governance/SKILL.md
   - .github/skills/context-builder/SKILL.md
@@ -22,7 +24,9 @@ source_docs:
 
 Auto-carregar contexto estruturado de um projeto com Intent Classification + Multi-Query RRF.
 
-> **PROPÓSITO**: Plugar projeto externo ao contexto de governança — scanner + geração de artefatos de binding
+> **Propósito**: Plugar projeto externo ao contexto de governança — scanner + geração de artefatos de binding local.
+> **Workspace**: `${workspaceFolder}`
+> **Projeto Alvo**: `${input:caminhoDoProjeto}`
 >
 > **FREQUÊNCIA**: ✅ N VEZES (1x por projeto)
 >
@@ -33,6 +37,17 @@ Auto-carregar contexto estruturado de um projeto com Intent Classification + Mul
 > **⛔ GUARDRAIL**: Todos os artefatos gerados ficam NESTE repositório de governança.
 >                  Nenhum arquivo é criado ou modificado nos projetos externos.
 >                  Projeto/adapter são LOCAIS (gitignored, R-043) — nunca commitados.
+
+---
+
+## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
+
+- ✅ **APENAS** analisar o projeto externo indicado em modo read-only e gerar o adapter local em `.github/instructions/local/`.
+- ✅ **SEMPRE** atualizar o overlay local `catalog.local.yaml` (gitignored, R-043) — **nunca** `catalog.yaml`.
+- ❌ **NÃO** modificar nenhum arquivo dentro do projeto externo escaneado.
+- ❌ **NÃO** commitar caminhos de arquivos locais ou segredos no repositório de governança (R-044).
+
+---
 >
 > **Se você é o Copilot**: Execute as FASES 1 → 2 → 3 → 4 → 4.1 sequencialmente conforme descrito abaixo. **FASE 4 (grafo de conhecimento) é OBRIGATÓRIA** — nunca opcional, nunca pulada. FASE 4.1 (integrações multi-projeto) executa automaticamente quando houver >1 projeto registrado.
 
@@ -418,7 +433,7 @@ Deseja também iniciar a sumarização de código-fonte via agent especialista a
 
 ```
 [FASE 1 ✅] run_subagent(adapter-generator, modo=scan) — projeto externo, somente leitura
-├─ Projeto escaneado: D:\workspace\[meu-projeto] (read-only)
+├─ Projeto escaneado: <workspace>/[PROJETO] (read-only)
 ├─ Linguagem: Java 17
 ├─ Framework: Spring Boot 3
 ├─ Stack: Spring Boot 3 + Hibernate + JUnit 5
@@ -535,7 +550,7 @@ Antes de confirmar `"Proceder? (y/n)"` em Fase 2:
 
 ## ✅ Checklist: Copilot Executou Corretamente?
 
-Após invocar `/add-project-context D:\workspace\[meu-projeto]`, verifique:
+Após invocar `/add-project-context <workspace>/[PROJETO]`, verifique:
 
 - [ ] **FASE 1**: Copilot invocou `run_subagent(agentName: "adapter-generator", task: "modo=scan...")` (nunca escaneou inline) e apresentou descobertas (Stack, Frameworks, Estrutura, Codestyle)?
 - [ ] **FASE 2.1**: Solicitou ou inferiu o caminho do projeto corretamente?

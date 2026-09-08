@@ -5,8 +5,10 @@ description:
   global (docs/ai-copilot/global-git-commit-instructions.md). Analisa arquivos,
   aplica guardrail de secrets, verifica atomicidade, estrutura por complexidade
   (simples vs complexo) e produz mensagem pronta. NÃO executa git add/commit/push.
+agent: 'agent'
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent']
+argument-hint: '[contexto-opcional-da-mudança]'
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
@@ -19,8 +21,23 @@ source_docs:
 
 Gera mensagem de commit convencional pronta para uso, estruturada conforme as **Diretrizes Globais** (`docs/ai-copilot/global-git-commit-instructions.md`).
 
+> **Propósito**: Analisar o diff/stage e gerar mensagem de commit semântico padronizada em PT-BR.
+> **Arquivo Ativo**: `${file}`
+> **Workspace**: `${workspaceFolder}`
+>
 > **REGRA ABSOLUTA (R-031)**: Este prompt apenas **analisa o diff e gera a mensagem formatada**.
 > NUNCA executa `git add`, `git commit` ou `git push` — decisão e execução são sempre do desenvolvedor.
+
+---
+
+## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
+
+- ✅ **APENAS** analisar git diff/log e gerar texto de mensagem de commit convencional.
+- ✅ **SEMPRE** verificar guardrail de segredos e credenciais antes de emitir a mensagem.
+- ❌ **NÃO** executar `git add`, `git commit` ou `git push` de forma autônoma.
+- ❌ **NÃO** commitar arquivos contendo tokens, chaves privadas ou caminhos locais absolutos (R-044).
+
+---
 
 ---
 
@@ -234,8 +251,9 @@ Apresentar a saída em duas partes claras:
 - Skill de Governança Git: [`.github/skills/git-governance/SKILL.md`](../skills/git-governance/SKILL.md)
 - Padrão Conventional Commits v1.0.0: https://www.conventionalcommits.org/
 - Regra de Formatação 50/72 (Chris Beams): https://cbea.ms/git-commit/
+- SSOT Normativa: este prompt define o template e regras canônicas de commit também consumidos por `@pr-gatekeeper` ([`.github/agents/pr-gatekeeper.agent.md`](../agents/pr-gatekeeper.agent.md)) no fechamento de PRs.
 
 ---
 
-*v1.2 — commit prompt — 2026-09-04 (alinhamento integral com global-git-commit-instructions.md)*
+*v1.3 — commit prompt — 2026-09-07 (SSOT consolidada com @pr-gatekeeper e alinhamento com global-git-commit-instructions.md)*
 

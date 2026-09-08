@@ -72,6 +72,7 @@ function switchView(viewName) {
   // Renderizadores específicos sob demanda
   if (viewName === "dashboard") {
     renderWhenYouCode();
+    renderAgentInvocations();
     renderActivityChart();
     renderToolUsage();
     renderMcpTools();
@@ -106,6 +107,7 @@ document.addEventListener("DOMContentLoaded", function() {
   populateKpis();
   populateProjectSelect();
   renderWhenYouCode();
+  renderAgentInvocations();
   renderActivityChart();
   renderToolUsage();
   renderMcpTools();

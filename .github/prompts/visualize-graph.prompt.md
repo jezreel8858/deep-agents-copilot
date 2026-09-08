@@ -4,8 +4,10 @@ description:
   Gera e abre a visualização interativa do grafo de conhecimento multi-repo em Angular Material 3
   (2D/3D), integrando AST de código, classificação de acoplamento, filtros arquiteturais
   (isolados/órfãos, papéis, camadas, multi-select de repositórios) e pontes de integração REST.
+agent: 'agent'
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'file_search', 'list_dir', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_execute']
+argument-hint: '[--diff <ref> | --bridges <file>]'
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
@@ -16,10 +18,20 @@ source_docs:
 
 # `/visualize-graph`
 
-> **Propósito**: compilar e abrir a visualização interativa unificada do Grafo de Conhecimento Multi-Repo
-> com interface Angular Material 3, alternância entre Canvas 2D de alta performance (com auto-freeze de física)
-> e WebGL 3D acelerado por GPU (Three.js), filtros avançados de conectividade (nós isolados/órfãos, papéis
-> arquiteturais, camadas e seleção múltipla de repositórios) e rastreamento de pontes REST cross-repo.
+> **Propósito**: Compilar e abrir a visualização interativa unificada do Grafo de Conhecimento Multi-Repo
+> com interface Angular Material 3, alternância 2D/3D e análise de blast radius.
+> **Workspace**: `${workspaceFolder}`
+
+---
+
+## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
+
+- ✅ **APENAS** compilar e abrir a visualização interativa do grafo local.
+- ✅ **SEMPRE** utilizar dados reais dos bancos SQLite `.codegraph/graph.db`.
+- ❌ **NÃO** alterar a estrutura de arquivos da aplicação ou do repositório durante a visualização.
+- ❌ **NÃO** executar rebuild de grafos desnecessariamente quando já indexados.
+
+---
 
 ---
 

@@ -3,7 +3,7 @@
 > Fonte de verdade operacional: [`CLAUDE.md`](../CLAUDE.md).
 > Mapa de Adapters (compartilhado): [`docs/ai-context/catalog.yaml`](../docs/ai-context/catalog.yaml).
 > Mapa de Projetos (LOCAL/gitignored, R-043): [`docs/ai-context/catalog.local.yaml`](../docs/ai-context/catalog.local.yaml).
-> IDs normativos: consulte `R-001..R-044` em `CLAUDE.md`.
+> IDs normativos: consulte `R-001..R-047` em `CLAUDE.md`.
 
 ---
 
@@ -17,7 +17,7 @@
 
 | Tipo | Arquivo | Escopo | Conteúdo Permitido | Exemplos / Referências |
 |------|---------|--------|-------|---|
-| **Governança Global** | `CLAUDE.md` | 🌍 Multi-projeto, desacoplado | Regras R-001..R-041, princípios, fluxos genéricos | ❌ Nenhum projeto/tech específicos |
+| **Governança Global** | `CLAUDE.md` | 🌍 Multi-projeto, desacoplado | Regras R-001..R-047, princípios, fluxos genéricos | ❌ Nenhum projeto/tech específicos |
 | **Operacional** | `.github/copilot-instructions.md` | 🌍 Multi-projeto, desacoplado | Roteamento, agents, skills, estrutura genérica | ❌ Nenhum projeto/tech específicos (remeter a adapters) |
 | **Adapters** | `.github/instructions/*.instructions.md` | 🔧 Stack/domínio específico | Convenções, padrões, tools, paradigmas de tech/domínio **excluivos** | ✅ Projeto, linguagem, framework **específicos permitidos** |
 | **Contexto de Binding** | `docs/ai-context/catalog.yaml` + `docs/ai-context/binding.md` | 🔗 Mapa de instâncias | Lista concreta de adapters, projetos, mapeamento stack → adapter | ✅ Dados de instância permitidos |
@@ -67,8 +67,8 @@ Agent ativo de turno anterior? (R-042)
 [Rota decidida]
     ↓
 @bug-triage | @test-strategy | @refactor-planner |
-@analysis-architect | @docs-engineer | @code-review |
-@requirements-analyst | @angular-engineer | @spring-boot-engineer | @spring-reactive-engineer |
+@tech-solution-architect | @docs-engineer | @code-review |
+@requirements-analyst | @angular-router | @spring-boot-router | @spring-reactive-router | @ejb-router | @database-router |
 @deep-search
     ↓
 [Execução específica — em task_mode]
@@ -92,29 +92,38 @@ Esta matriz é **responsabilidade do roteador** — não é regra global.
 
 ## 2) 🛑 Regras de Autonomia (não negociáveis)
 
+### ✅ Sempre
+
 - **Agent Router First (R-037)**: TODA solicitação começa com `@agent-router`. Pular router é violação de governança.
-- **Re-triagem Obrigatória por Turno (R-042 — Anti Sticky-Session)**: R-037 aplica-se a CADA novo turno, não só ao primeiro. Agent downstream ativo deve checar deriva de intenção (mudança de verbo de ação, stack fora de competência, pedido de execução em agent read-only) a cada mensagem; ao detectar deriva, retorna IMEDIATAMENTE ao `@agent-router` (payload `handoff-governance` § 2.1, `motivo: "deriva_de_intencao"`) — nunca prossegue silenciosamente fora do escopo. **Visibilidade obrigatória**: TODO agent (não apenas o `agent-router`) abre toda resposta com `Agente Ativo: <name>`; se houve handoff/re-triagem neste turno, adiciona `Handoff: <origem> → <destino> (motivo: ...)` — padrão de mercado (OpenAI Agents SDK `HandoffOutputItem`, LangGraph `active_agent` streaming; detalhes em `agent-contracts/SKILL.md` § 0). **Pré-requisito de tooling**: o handoff só é efetivo via tool `run_subagent`; por isso `run_subagent` é obrigatório e bloqueante no frontmatter `tools:` de todo agent (`agent-contracts/SKILL.md` § 9).
+- **Re-triagem Obrigatória por Turno (R-042 — Anti Sticky-Session)**: R-037 aplica-se a CADA novo turno, não só ao primeiro. Agent downstream ativo deve checar deriva de intenção (mudança de verbo de ação, stack fora de competência, pedido de execução em agent read-only) a cada mensagem; ao detectar deriva, retorna IMEDIATAMENTE ao `@agent-router` (payload `handoff-governance` § 2.1, `motivo: "deriva_de_intencao"`) — nunca prossegue silenciosamente fora do escopo. *Exceção de ação in-scope*: mudança de verbo não constitui deriva se a ação já constar em "Quando Delegar" do agent ativo (ex.: pesquisa externa via `@deep-search` solicitada a `@tech-solution-architect` ativo é sub-tarefa, não deriva; controle retorna ao agent ativo com call stack `origem_contexto.parent_agent`). **Visibilidade obrigatória**: TODO agent (não apenas o `agent-router`) abre toda resposta com `Agente Ativo: <name>`; se houve handoff/re-triagem neste turno, adiciona `Handoff: <origem> → <destino> (motivo: ...)` — padrão de mercado (OpenAI Agents SDK `HandoffOutputItem`, LangGraph `active_agent` streaming; detalhes em `agent-contracts/SKILL.md` § 0). **Pré-requisito de tooling**: o handoff só é efetivo via tool `run_subagent`; por isso `run_subagent` é obrigatório e bloqueante no frontmatter `tools:` de todo agent (`agent-contracts/SKILL.md` § 9).
 - **Prompt Structuring Obrigatório (R-041)**: após o Health Check (R-034), o `@agent-router` SEMPRE delega ao `@prompt-structuring` antes de classificar intenção. Esse é o **único** agent do catálogo autorizado a operar em loop de auto-refinamento, limitado a **5 iterações** — ao atingir o limite, prossegue compulsoriamente com o melhor prompt disponível e retorna ao `@agent-router`. Nenhum outro agent pode adotar esse padrão de loop.
-- **Não gere documentação automaticamente (R-033)**: nunca gere documentos `.md` se não for solicitado ou sem a aprovação por `ask_questions`.
-- **Sem loops de correção**: se falhar, PARE, explique e aguarde aprovação.
-- **Sem commits/push autônomos**: gere apenas a mensagem via `/commit`. Nunca `git add/commit/push`.
-- **Sem instalação autônoma**: aponte a dependência e aguarde confirmação.
-- **Um comando por vez**: leia o output uma única vez.
-- **`get_errors` uma vez** por arquivo editado.
-- **Edições agrupadas**: todas as alterações de um arquivo em uma chamada.
-- **Não crie arquivos auxiliares** sem pedido explícito.
-- **Não releia arquivos** já no contexto da conversa.
-- **Pre-fetch automático pelo agent**: ao selecionar um agent, carregue automaticamente os `source_docs` declarados no `catalog.yaml` e anuncie o que foi anexado. Usuário pode rejeitar com "Sem pre-fetch".
+- **Grafo de Roteamento (R-040)**: o roteamento de agents DEVE ser declarado como dado estruturado em `.github/agents/routing-graph.yaml`. A Decision Tree em prosa é documentação derivada. Toda nova rota exige: *(a)* entrada no grafo; *(b)* atualização da Decision Tree; *(c)* novo caso em `.github/agents/evals/casos-roteamento.yaml`.
 - **Execução via Context Mode (R-008 — Think in Code)**: Use **100% o `context-mode` MCP** para leitura, busca, escrita em lote, análise e remoção de arquivos (`ctx_execute`, `ctx_execute_file`, `ctx_index`, `ctx_search`). O processamento acontece no sandbox e apenas o resultado limpo entra na conversa. `read_file` e `replace_string_in_file` são reservados exclusivamente para edições cirúrgicas pontuais do editor. `run_in_terminal` é **FALLBACK de última instância** restrito exclusivamente a comandos de ciclo de vida (`git`, `npm install`, `mvn`, `pytest`) — comandos de varredura/leitura (`cat`, `grep`, `find`, scripts inline `node -e`) são terminantemente proibidos no terminal.
-- **Sem código inline em agents/skills/prompts (R-026)**: blocos com implementações > 8 linhas pertencem a `snippets/`, `templates/` ou `commands/`. Referencie por caminho ou declare em `source_docs:`.
-- **Clarificação Obrigatória (R-027)**: qualquer dúvida → `ask_questions` com opções descritivas + última opção aberta. **Proibido inferir ou deduzir** intenção.
+- **Pre-fetch automático pelo agent**: ao selecionar um agent, carregue automaticamente os `source_docs` declarados no `catalog.yaml` e anuncie o que foi anexado. Usuário pode rejeitar com "Sem pre-fetch".
+- **Um comando por vez**: leia o output uma única vez.
+- **`get_errors` consolidado**: chame `get_errors` uma única vez ao final do lote com o array completo `filePaths`, nunca arquivo por arquivo.
+- **Edições agrupadas e em lote (`efficient-batch-code-modification` — R-046)**: todas as alterações de múltiplos arquivos devem ser emitidas em lote na mesma rodada de tool calls (*single-turn batching*). Diffs cirúrgicos mínimos com 2-3 linhas de contexto para unicidade.
+- **Fluxo contínuo sem becos sem saída (`R-047`)**: nenhum agent do catálogo pode encerrar resposta apenas com texto descritivo sugerindo "próximo passo"; deve obrigatoriamente acionar `run_subagent` (handoff a outro agent) OU `ask_questions` (decisão/aprovação humana), salvo resposta 100% conclusiva sem pendências.
+- **Plano Auto-Implementável (R-031)**: plano aprovado → execução integral sem interrupção. Pré-voo: escopo + contingências inline `[fallback: X]` + critério de falha tolerável. Parada permitida APENAS por: commit autônomo, credencial exposta, ou estado irrecuperável. Relatório final substitui checkpoints intermediários.
 - **Estrutura de Resposta (R-028)**: toda implementação abre com resumo em 5 seções (Abordagem · Componentes · Código · Passos Cruciais · Impacto).
 - **Postura Senior Engineer (R-029)**: bullets/tabelas > parágrafos · código limpo sem narrativa inline · tom direto sem filler de IA.
-- **Plano Auto-Implementável (R-031)**: plano aprovado → execução integral sem interrupção. Pré-voo: escopo + contingências inline `[fallback: X]` + critério de falha tolerável. Parada permitida APENAS por: commit autônomo, credencial exposta, ou estado irrecuperável. Relatório final substitui checkpoints intermediários.
+- **Sem código inline em agents/skills/prompts (R-026)**: blocos com implementações > 8 linhas pertencem a `snippets/`, `templates/` ou `commands/`. Referencie por caminho ou declare em `source_docs:`.
 - **Genericidade Obrigatória (R-038)**: toda documentação em `.github/` **DEVE ser genérica**. Sem projetos específicos, tecnologias exclusivas ou convenções de domínio. Se é específico → vai para `.github/instructions/*.instructions.md` (adapter). Teste: substitua projeto por `[PROJETO]` e tech por `[TECH]` — continua válido?
 - **Anonimização de Evidência Real (R-044)**: agents que analisam repositórios reais (`code-knowledge-graph`, `business-rules-extractor`, `context-builder`, `project-scanner`) **NUNCA** persistem nomes de repositório/classe/método/pacote/caminho real em changelog, README ou `.agent.md` commitado — genericize (`[PROJETO-X]`, `ServicoExemploX`, `com.exemplo.*`) ANTES de escrever. Métricas numéricas agregadas podem permanecer reais. Evidência real crua só é permitida na resposta efêmera do chat. Ver checklist em `CLAUDE.md` § R-044.
+
+### ⚠️ Pergunte primeiro
+
+- **Clarificação Obrigatória (R-027)**: qualquer dúvida → `ask_questions` com opções descritivas + última opção aberta. **Proibido inferir ou deduzir** intenção.
+- **Não gere documentação automaticamente (R-033)**: nunca gere documentos `.md` se não for solicitado ou sem a aprovação por `ask_questions`.
+- **Sem instalação autônoma**: aponte a dependência e aguarde confirmação.
+
+### 🚫 Nunca
+
+- **Sem commits/push autônomos**: gere apenas a mensagem via `/commit`. Nunca `git add/commit/push`.
+- **Sem loops de correção**: se falhar, PARE, explique e aguarde aprovação.
+- **Não crie arquivos auxiliares** sem pedido explícito.
+- **Não releia arquivos** já no contexto da conversa ou recém-editados.
 - **Exclusividade do Motor de Grafo (@code-knowledge-graph — R-045 / RNF-004)**: O CLI `@optave/codegraph` e o banco `.codegraph/graph.db` são recursos de uso e execução **EXCLUSIVOS** do agent `@code-knowledge-graph`. NENHUM outro agent tem permissão para rodar comandos `codegraph *` diretamente no terminal ou varrer diretórios manualmente (`list_dir`, `read_dir`) para mapear arquitetura, camadas, chamadas ou dependências. Toda análise estrutural DEVE ser delegada compulsoriamente via `run_subagent(agentName: 'code-knowledge-graph', ...)`. Agents especialistas operam em modo Advisory de forma estritamente analítica e read-only — `run_in_terminal` é restrito ao modo Implementação (testing-first).
-- **Grafo de Roteamento (R-040)**: o roteamento de agents DEVE ser declarado como dado estruturado em `docs/ai-context/routing-graph.yaml`. A Decision Tree em prosa é documentação derivada. Toda nova rota exige: *(a)* entrada no grafo; *(b)* atualização da Decision Tree; *(c)* novo caso em `.github/agents/evals/casos-roteamento.yaml`.
 
 ### 2.1) context-mode — Regras Obrigatórias de Roteamento (JetBrains Copilot)
 
@@ -192,24 +201,9 @@ Se múltiplos erros: agrupe, liste no máximo 5; resto: `(+N erros similares)`.
 
 ---
 
-## 3) 🧠 Model Routing Signal (R-021) + Conformidade (R-036)
+## 3) 🧠 Model Routing Signal (R-021)
 
-**Pré-requisito OBRIGATÓRIO**: 
-
-1. **Antes de QUALQUER agent (incluindo router)**, execute R-036 (verificar conformidade com frontmatter).
-2. **Se houver mismatch**, resolva PRIMEIRO (troque de modelo).
-3. **Depois**: `@agent-router` → classificar intenção e delegar.
-
-**Health Check Model:**
-
-```
-[Model Check] Expected: <model-frontmatter> | Current: <model-sessão> | Status: ?
-
-❌ MISMATCH? → Troque modelo ANTES de invocar qualquer agent.
-✅ MATCH? → Prossiga com @agent-router (obrigatório).
-```
-
-Após confirmar conformidade, avalie o tipo da tarefa e emita o sinal abaixo quando exigir modelo **1× ou superior**:
+Avalie o tipo da tarefa e emita o sinal abaixo quando exigir modelo **1× ou superior**:
 
 > 🧠 **Modelo recomendado: `<Claude Sonnet / GPT-5>`**
 > **Motivo:** `<razão em 1 linha>`
@@ -226,7 +220,7 @@ Após confirmar conformidade, avalie o tipo da tarefa e emita o sinal abaixo qua
 
 ---
 
-## 4.1) 🏥 Health Check — Binding Context (R-034)
+## 4) 🏥 Health Check — Binding Context (R-034)
 
 **GATILHO AUTOMÁTICO**: Ao iniciar trabalho em novo repositório, Copilot DEVE verificar:
 
@@ -276,68 +270,6 @@ Projetos e adapters por-projeto NUNCA são commitados no repositório compartilh
 
 ---
 
-## 4.2) 🔧 Health Check — Model Enforcement (R-036)
-
-**GATILHO AUTOMÁTICO**: Ao iniciar execução de agent/prompt/skill com frontmatter `model:`, Copilot DEVE verificar **ANTES** de qualquer ação:
-
-```
-[Model Check] Expected: <model-frontmatter> | Current: <model-sessão> | Status: ?
-```
-
-**Se modelos NÃO COINCIDEM** (ex: Agent pede `Claude Sonnet 4.5` mas chat está em `Claude Haiku`):
-
-1. ⚠️ **ALERTAR ao usuário** via `ask_questions`:
-
-```
-Detecção de MISMATCH de Modelo
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✗ ESPERADO (frontmatter): Claude Sonnet 4.5
-✓ ATUAL (sessão):         Claude Haiku
-
-Escolha uma ação:
-```
-
-2. **3 Opções via `ask_questions`**:
-   - **A)** Trocar para modelo correto (`Claude Sonnet 4.5`)
-   - **B)** Continuar com modelo atual (aceitar risco de perda de qualidade)
-   - **C)** Cancelar execução
-
-3. **Se usuário escolhe A:**
-   - Copilot recomenda: "⚙️ Troque em Settings → Model → `Claude Sonnet 4.5`, ou use `/switch-model Claude-Sonnet-4.5` se disponível"
-   - **AGUARDE** trocar manualmente e retome
-   - Não prosseguir até conformidade
-
-4. **Se usuário escolhe B:**
-   - Registrar: `⚠️ CONTINUANDO COM MISMATCH (Claude Haiku ao invés de Claude Sonnet 4.5) — QoS REDUZIDA`
-   - Executar com aviso em cabeçalho do resultado
-   - Não repetir a verificação nesta sessão
-
-5. **Se usuário escolhe C:**
-   - Cancelar: `❌ Execução cancelada. Troque o modelo e execute novamente.`
-   - Bloquear qualquer progresso
-
-**Regra**: Sem exceções — model mismatch impacta QoS, segurança e correção. R-036 é verificação **obrigatória** ANTES de qualquer implementação/análise.
-
----
-
-### ⚠️ Limitação de Plataforma — Cost-Tier Ceiling em Cadeias de Subagent
-
-**O Health Check acima cobre apenas o agent iniciado diretamente pelo usuário.** Ao delegar via `run_subagent` (fluxo multi-agent, R-042), a plataforma VS Code Copilot Chat aplica um **teto de custo independente**: um subagent nunca resolve para um modelo com multiplicador **maior** do que o modelo que está processando o turno/sessão pai — mesmo que o `.agent.md` do subagent declare `model:` corretamente. Se exceder, ocorre **downgrade silencioso** (comportamento oficial documentado, não é bug deste projeto).
-
-**Por que `Auto` é o principal risco**: o modo `Auto` resolve, a cada turno, para um modelo real (0×–1×) com base em disponibilidade/saúde do sistema — não na complexidade da tarefa — e sempre cai para 0× quando a cota premium se esgota. Isso torna o teto de custo da cadeia inteira **não determinístico por turno**.
-
-**Mitigação obrigatória (nenhuma resolve o teto tecnicamente, apenas evita cair nele):**
-
-1. ❌ **Nunca iniciar o fluxo `@agent-router` com `Auto` selecionado.**
-2. ✅ Selecionar manualmente, **antes do 1º turno**, um modelo de tier ≥ ao maior tier usado por qualquer agent do catálogo (atualmente `Claude Sonnet 5`, 1×) — garante que nenhum subagent na cadeia de roteamento seja rebaixado.
-3. ✅ Verificar que `chat.customAgentInSubagent.enabled` está habilitado nas configurações do VS Code — sem essa flag, agents customizados podem nem ser honrados como subagents.
-4. ✅ Ao delegar para agent de tier mais alto, o agent chamador PODE solicitar o modelo explicitamente na própria invocação do `run_subagent` (canal "explicit model parameter", documentado, melhor esforço — **não é uma API estruturada garantida**: `microsoft/vscode#298380` confirma que suporte formal a esse parâmetro no schema do `runSubagent` é feature request ainda **aberta** em 2026) — reforço, não substituto do `model:` do subagent.
-
-**⚠️ Model Gate testado e confirmado INVIÁVEL (2026-09-01)**: uma trava ativa que compararia o tier da sessão atual com o tier do agent-alvo via `ask_questions` foi implementada, testada 2× em produção e **removida** — nenhum agent, em nenhum tier (testado com Claude Haiku 4.5 e Claude Sonnet 5), tem acesso confiável a "qual modelo está realmente executando esta sessão agora". Pesquisa confirmou: LLMs não têm essa informação a menos que injetada explicitamente no system prompt pela plataforma (o que VS Code Copilot Chat não faz para custom agents — GitHub Community Discussion #168899 documenta o próprio Copilot recusando revelar essa informação, alegando "não sei, é segredo"). `ask_questions` também não altera o picker de modelo da UI. **A mitigação real é 100% responsabilidade do usuário** (itens 1-2 acima), não pode ser verificada nem enforçada pelo agent. Ver `agent-router.agent.md` § "Model Awareness" e `agent-contracts/SKILL.md` § 10 para a análise completa.
-
-**Detalhamento técnico completo, fontes oficiais e checklist expandido**: `agent-contracts/SKILL.md` § 10.
-
----
 
 ### Agents atuais
 
@@ -351,17 +283,19 @@ Escolha uma ação:
 - `bug-triage` -> triagem de bugs e regressões.
 - `code-review` -> revisão de código (diff/PR) antes do merge, por severidade (read-only).
 - `requirements-analyst` -> elicitação e estruturação de requisitos funcionais e não-funcionais a partir de pedido de negócio ambíguo.
-- `test-strategy` -> estratégia de testes.
-- `test-engineer` -> implementação de testes (unit/integration/E2E), correção de testes quebrados e expansão de cobertura — modos `create`/`fix`/`coverage` (fusão de test-implementation + test-fix).
+- `test-strategy` -> estratégia de testes, cobertura por risco e matriz de cenários de teste.
 - `business-rules-extractor` -> extração de regras de negócio de código-fonte e documentação em `.md`; validação de refatorações contra regras documentadas.
 - `refactor-planner` -> planejamento e decomposição macro de refatoração estrutural (delega execução aos especialistas de stack).
 - `docs-engineer` -> autoria e curadoria de documentação técnica em `.md` — modos `author`/`curate` (fusão de docs-writer + docs-curator).
 - `deep-search` -> triagem e roteamento de pesquisa interna e externa.
-- `analysis-architect` -> análise técnica unificada: impacto, risco, dependências, contratos e integrações cross-sistema (OpenAPI/AsyncAPI/gRPC/GraphQL); metodologia B1/B2/B3.
-- `angular-engineer` -> especialista Angular com perfil híbrido: análise/recomendação (arquitetura, reatividade, performance, segurança, acessibilidade, testes, upgrade) E implementação de feature/bugfix (testing-first, diff mínimo).
-- `spring-boot-engineer` -> especialista Spring Boot com perfil híbrido: análise/recomendação (arquitetura, Java/JDK, performance, observabilidade, segurança, migração) E implementação de feature/bugfix (virtual threads vs reativo, testing-first).
-- `spring-reactive-engineer` -> especialista Spring WebFlux/Reactor com perfil híbrido: análise/recomendação (capacidade, resiliência, backpressure, observabilidade) E implementação de feature/bugfix (sem bloqueio de event-loop, testing-first).
-- `governance-factory` -> criar/revisar agent, skill ou prompt via parâmetro `type` (fusão de agent-factory + skill-factory + prompt-factory; na criação, delega compulsoriamente pesquisa prévia de mercado/skills ao `deep-search`).
+- `tech-solution-architect` -> arquiteto de solução técnica: viabilidade, Technical Blueprint, contratos de API (OpenAPI), modelo de dados e divisão de tarefas por stack ([BACKEND_TASKS], [FRONTEND_TASKS]).
+- `angular-router` -> supervisor hierárquico e roteador do domínio Angular — orquestra os 8 especialistas em `.github/agents/frontend/angular/` (arch-advisor, feature-developer, bug-fixer, ui-stylist, unit-test, component-test, test-fixer, e2e-writer).
+- `spring-boot-router` -> supervisor hierárquico e roteador do domínio Spring Boot — orquestra os 7 especialistas em `.github/agents/backend/spring-boot/` (arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer, test-fixer).
+- `spring-reactive-router` -> supervisor hierárquico e roteador do domínio Spring Reactive — orquestra os 7 especialistas em `.github/agents/backend/spring-reactive/` (arch-advisor, feature-developer, bug-fixer, resilience-tuner, unit-test-writer, integration-test-writer, test-fixer).
+- `ejb-router` -> supervisor hierárquico e roteador do domínio Java legado EJB — orquestra os 7 especialistas em `.github/agents/backend/ejb/` (arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer, test-fixer).
+- `database-router` -> supervisor hierárquico e roteador do domínio de Banco de Dados — orquestra os 6 especialistas em `.github/agents/backend/database/` (oracle-migration-dev, oracle-plsql-expert, oracle-query-tuner, informix-migration-dev, informix-spl-expert, informix-query-tuner).
+- `governance-factory` -> criar/revisar agent, skill, prompt ou nova stack via parâmetro `type` (na criação, delega compulsoriamente pesquisa prévia de mercado/skills ao `deep-search`).
+- `governance-maintainer` -> manutenção atômica, refatoração em cascata e sincronização em lote de artefatos de governança via context-mode e diffs cirúrgicos.
 - `binding-initializer` -> ⚡ inicializar `catalog.yaml` + `binding.md` + `catalog.local.yaml.example` para novo repositório (1 pergunta — R-034)
 - `adapter-generator` -> ⚡ gerar automaticamente adapters por-projeto em `.github/instructions/local/` (gitignored, R-043) via `/add-project-context`
 - `runtime-verifier` -> verificação de saúde do ambiente (build/dependências/serviços) antes de testes/codificadores; read-only.
@@ -375,6 +309,7 @@ Escolha uma ação:
 - `context-compact` -> compactação pós-leitura e geração de resumos executáveis.
 - `context-builder` -> coleta e condensação de contexto técnico em `docs/context/`.
 - `refactoring-planning-patterns` -> planejamento de refatoração estrutural (Mikado, Branch by Abstraction, Strangler Fig, safety net).
+- `efficient-batch-code-modification` -> edição em lote, dry-run e diffs cirúrgicos para economia de tokens e créditos Copilot.
 
 **Pesquisa e Documentação:**
 - `tavily` -> pesquisa externa e documentação atualizada.
@@ -505,7 +440,7 @@ Cada adapter na raiz de `.github/instructions/` deve:
 ## 7) Índices de Governança
 
 - **Adapters/Binding:** `docs/ai-context/catalog.yaml` (manifest de carregamento hierárquico)
-- **Grafo de Roteamento (R-040):** `docs/ai-context/routing-graph.yaml` (fonte estrutural — nós, arestas, cascata)
+- **Grafo de Roteamento (R-040):** `.github/agents/routing-graph.yaml` (fonte estrutural — nós, arestas, cascata)
 - **Suíte de Evals:** `.github/agents/evals/casos-roteamento.yaml` (quality gate de regressão de roteamento)
 - **Instructions:** `.github/instructions/README.md` + `.github/instructions/*.instructions.md`
 - **Agents:** `.github/agents/README.md` + `.github/agents/catalog.yaml`

@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "hooks": {
+    "postToolUse": [
+      {
+        "type": "command",
+        "bash": "node tools/context-insight-visualizer/hooks/record-subagent.js",
+        "powershell": "node tools/context-insight-visualizer/hooks/record-subagent.js",
+        "cwd": "."
+      }
+    ],
+    "PostToolUse": [
+      {
+        "type": "command",
+        "bash": "node tools/context-insight-visualizer/hooks/record-subagent.js",
+        "powershell": "node tools/context-insight-visualizer/hooks/record-subagent.js",
+        "cwd": "."
+      }
+    ]
+  }
+}
+

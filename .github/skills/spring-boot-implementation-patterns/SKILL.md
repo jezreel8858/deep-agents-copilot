@@ -16,7 +16,7 @@ triggers:
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/agents/spring-boot-engineer.agent.md
+  - .github/agents/backend/spring-boot/spring-boot-router.agent.md
   - .github/skills/spring-boot-backend-patterns/SKILL.md
   - .github/instructions/spring-boot-backend.instructions.md
 tools: []
@@ -40,7 +40,7 @@ tools: []
 
 ## Workflow — Feature Nova
 
-1. Confirmar escopo/critério de aceite (handoff de `@requirements-analyst`/`@analysis-architect` se houver).
+1. Confirmar escopo/critério de aceite (handoff de `@requirements-analyst`/`@tech-solution-architect` se houver).
 2. Escrever teste (unitário e, se aplicável, `@DataJpaTest`/slice) antes da implementação (testing-first).
 3. Implementar seguindo o adapter do projeto (`spring-boot-backend.instructions.md`): `@Entity`/`@Builder`, `XxxService`+`XxxServiceImpl`, `@RequiredArgsConstructor` com `private final`, controller com `@ResponseStatus` explícito.
 4. Nunca retornar `Entity` diretamente do controller — sempre DTO de borda.

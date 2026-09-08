@@ -5,7 +5,7 @@ description: >-
   de stack do projeto (ESLint/Checkstyle/Pylint/Prettier). Nunca corrige,
   apenas identifica violações de convenção documentada. Complementa
   code-review (dimensão "convenções" genérica) com verificação sistemática.
-model: "Claude Haiku 4.5"
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent']
 ---
 # Code Style Enforcer

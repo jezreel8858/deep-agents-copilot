@@ -228,6 +228,40 @@ describe('[Nome]Component', () => {
 - [ ] Happy path + edge cases + error path testados
 - [ ] `restoreMocks: true` configurado no vitest.config.ts
 
+### 2.2) Component Harnesses (`@angular/cdk/testing`)
+
+O uso de Component Harnesses desacopla os testes da estrutura interna do DOM do componente (evitando quebras por mudanças em classes CSS ou tags):
+
+```typescript
+import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+import { MatButtonHarness } from '@angular/material/button/testing';
+import { HarnessLoader } from '@angular/cdk/testing';
+
+describe('[Nome]Component com Harness', () => {
+  let loader: HarnessLoader;
+  let fixture: ComponentFixture<[Nome]Component>;
+
+  beforeEach(async () => {
+    // ... TestBed setup ...
+    fixture = TestBed.createComponent([Nome]Component);
+    loader = TestbedHarnessEnvironment.loader(fixture);
+    fixture.detectChanges();
+  });
+
+  it('deve disparar clique via Harness', async () => {
+    const botaoSalvar = await loader.getHarness(
+      MatButtonHarness.with({ text: 'Salvar' })
+    );
+
+    expect(await botaoSalvar.isDisabled()).toBe(false);
+    await botaoSalvar.click();
+
+    await fixture.whenStable();
+    // asserções de efeito...
+  });
+});
+```
+
 ---
 
 ## 3) Mocking — vi.fn() e vi.spyOn()
@@ -610,6 +644,44 @@ ng generate @angular/core:migrate-to-vitest
 
 # Alternativa via AnalogJS
 ng generate @analogjs/vitest-angular:setup
+```
+
+---
+
+## 11.1) Diagnóstico e Correção de Falhas (Test Fixer)
+
+Diretrizes cirúrgicas para correção de testes quebrados em Angular (sem alterar regras de produção):
+
+| Sintoma do Erro | Causa Provável | Ação de Correção |
+|---|---|---|
+| `AssertionError: expected spy to have been called` | Efeito/Signal assíncrono não processado | Adicionar `await fixture.whenStable()` ou `TestBed.flushEffects()` antes do `expect` |
+| `Cannot read properties of undefined (reading 'subscribe')` | Mock de Service não retorna Observable | Configurar mock com `of(valor)` do RxJS: `vi.fn().mockReturnValue(of(dados))` |
+| `NG0100: ExpressionChangedAfterItHasBeenCheckedError` | Mutação de estado síncrona pós-renderização | Revisar fluxo de atualização ou disparar `fixture.detectChanges()` imediatamente após evento |
+| `Error: Expected 1 matching element, found 0` | Renderização dependente de `@if` assíncrono | Aguardar Promise/Signal resolver (`await fixture.whenStable()`) antes de consultar o DOM |
+| `TypeError: vi.spyOn is not a function` | Configuração de Vitest sem `globals: true` | Importar `vi` de `'vitest'` ou habilitar `globals: true` no `vitest.config.ts` |
+
+---
+
+## 11.2) Testes E2E com Playwright em Aplicações Angular
+
+Para validação de jornadas completas de usuário com browsers reais:
+
+```typescript
+// e2e/specs/login.spec.ts
+import { test, expect } from '@playwright/test';
+
+test('deve autenticar e redirecionar para tela principal', async ({ page }) => {
+  await page.goto('/login');
+
+  // Seletores semânticos resilientes
+  await page.getByTestId('input-email').fill('usuario@exemplo.com');
+  await page.getByTestId('input-senha').fill('senha123');
+  await page.getByRole('button', { name: 'Entrar' }).click();
+
+  // Asserção web-first com auto-wait
+  await expect(page).toHaveURL('/dashboard');
+  await expect(page.getByTestId('painel-resumo')).toBeVisible();
+});
 ```
 
 ---

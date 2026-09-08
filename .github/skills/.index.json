@@ -25,20 +25,19 @@
       "related_agents": [
         "@agent-router",
         "@deep-search",
-        "@analysis-architect",
+        "@tech-solution-architect",
         "@bug-triage",
         "@refactor-planner",
         "@business-rules-extractor",
         "@docs-engineer",
         "@context-builder",
         "@test-strategy",
-        "@test-engineer",
         "@governance-factory",
         "@binding-initializer",
         "@adapter-generator",
-        "@angular-engineer",
-        "@spring-boot-engineer",
-        "@spring-reactive-engineer"
+        "@angular-router",
+        "@spring-boot-router",
+        "@spring-reactive-router"
       ]
     },
     {
@@ -52,7 +51,7 @@
       "related_agents": [
         "@context-builder",
         "@deep-search",
-        "@analysis-architect"
+        "@tech-solution-architect"
       ]
     },
     {
@@ -66,7 +65,7 @@
       "related_agents": [
         "@context-builder",
         "@deep-search",
-        "@analysis-architect"
+        "@tech-solution-architect"
       ]
     },
     {
@@ -78,7 +77,7 @@
         "sonarqube-monitor"
       ],
       "related_agents": [
-        "@analysis-architect"
+        "@tech-solution-architect"
       ]
     },
     {
@@ -88,10 +87,10 @@
       "path": ".github/skills/tavily/SKILL.md",
       "related_agents": [
         "@deep-search",
-        "@analysis-architect",
-        "@angular-engineer",
-        "@spring-boot-engineer",
-        "@spring-reactive-engineer"
+        "@tech-solution-architect",
+        "@angular-router",
+        "@spring-boot-router",
+        "@spring-reactive-router"
       ]
     },
     {
@@ -101,7 +100,7 @@
       "path": ".github/skills/mermaid-diagrams/SKILL.md",
       "related_agents": [
         "@deep-search",
-        "@analysis-architect"
+        "@tech-solution-architect"
       ]
     },
     {
@@ -116,7 +115,7 @@
         "@agent-router",
         "@governance-factory",
         "@docs-engineer",
-        "@analysis-architect"
+        "@tech-solution-architect"
       ]
     },
     {
@@ -130,7 +129,7 @@
       "related_agents": [
         "@agent-router",
         "@deep-search",
-        "@analysis-architect"
+        "@tech-solution-architect"
       ]
     },
     {
@@ -145,7 +144,7 @@
       "related_agents": [
         "@agent-router",
         "@bug-triage",
-        "@analysis-architect",
+        "@tech-solution-architect",
         "@deep-search"
       ]
     },
@@ -159,7 +158,7 @@
       ],
       "related_agents": [
         "@governance-factory",
-        "@analysis-architect",
+        "@tech-solution-architect",
         "@bug-triage",
         "@docs-engineer"
       ]
@@ -175,7 +174,7 @@
       ],
       "related_agents": [
         "@agent-router",
-        "@analysis-architect",
+        "@tech-solution-architect",
         "@context-builder"
       ]
     },
@@ -191,7 +190,7 @@
       "related_agents": [
         "@governance-factory",
         "@test-strategy",
-        "@analysis-architect",
+        "@tech-solution-architect",
         "@agent-router"
       ]
     },
@@ -208,7 +207,7 @@
       ],
       "related_agents": [
         "@agent-router",
-        "@analysis-architect",
+        "@tech-solution-architect",
         "@deep-search"
       ]
     },
@@ -220,7 +219,6 @@
       "description": "Padrões agnósticos de framework para backend — pirâmide de testes, AAA, isolamento, nomenclatura",
       "path": ".github/skills/test-implementation-backend/SKILL.md",
       "related_agents": [
-        "@test-engineer",
         "@test-strategy"
       ]
     },
@@ -233,7 +231,6 @@
       "description": "Padrões específicos JUnit 5, Mockito, @WebMvcTest, @DataJpaTest, mvn test",
       "path": ".github/skills/test-implementation-spring-boot/SKILL.md",
       "related_agents": [
-        "@test-engineer",
         "@test-strategy"
       ]
     },
@@ -243,9 +240,8 @@
       "category": "testing",
       "scope": "generico",
       "description": "Padrões agnósticos de framework para frontend — componentes, mocks, E2E, data-testid",
-      "path": ".github/skills/test-implementation-angular/SKILL.md",
+      "path": ".github/skills/test-implementation-frontend/SKILL.md",
       "related_agents": [
-        "@test-engineer",
         "@test-strategy"
       ]
     },
@@ -258,7 +254,6 @@
       "description": "Padrões específicos TestBed, Jasmine spies, fakeAsync, Signals, ng test",
       "path": ".github/skills/test-implementation-angular-jasmine/SKILL.md",
       "related_agents": [
-        "@test-engineer",
         "@test-strategy"
       ]
     },
@@ -271,7 +266,6 @@
       "description": "Padrões específicos pytest, fixtures, MagicMock, pytest-mock, coverage.py",
       "path": ".github/skills/test-implementation-python/SKILL.md",
       "related_agents": [
-        "@test-engineer",
         "@test-strategy"
       ]
     },
@@ -282,7 +276,6 @@
       "description": "Estratégia agnóstica de cobertura, métricas por risco, interpretação de reports",
       "path": ".github/skills/test-coverage-governance/SKILL.md",
       "related_agents": [
-        "@test-engineer",
         "@test-strategy"
       ]
     },
@@ -303,7 +296,7 @@
       "path": ".github/skills/project-context-builder/SKILL.md",
       "related_agents": [
         "@context-builder",
-        "@analysis-architect"
+        "@tech-solution-architect"
       ]
     },
     {
@@ -315,7 +308,6 @@
       "description": "Setup nativo Angular 20+ (runner:vitest), vi.fn/vi.spyOn, zoneless async/await, Signals, coverage v8, migração de Jasmine/Karma",
       "path": ".github/skills/test-implementation-angular-vitest/SKILL.md",
       "related_agents": [
-        "@test-engineer",
         "@test-strategy"
       ]
     },
@@ -340,7 +332,7 @@
       ],
       "related_agents": [
         "@bug-triage",
-        "@test-engineer",
+        "@test-strategy",
         "@adapter-generator",
         "@context-builder"
       ]
@@ -359,10 +351,10 @@
       ],
       "related_agents": [
         "@bug-triage",
-        "@test-engineer",
+        "@test-strategy",
         "@refactor-planner",
         "@business-rules-extractor",
-        "@analysis-architect"
+        "@tech-solution-architect"
       ]
     },
     {
@@ -382,7 +374,7 @@
         "@business-rules-extractor",
         "@refactor-planner",
         "@docs-engineer",
-        "@analysis-architect"
+        "@tech-solution-architect"
       ]
     },
     {
@@ -399,7 +391,7 @@
         "context-mode/ctx_execute"
       ],
       "related_agents": [
-        "@analysis-architect",
+        "@tech-solution-architect",
         "@refactor-planner"
       ]
     },
@@ -426,8 +418,8 @@
       "description": "Padrões genéricos de componentização frontend para reduzir acoplamento, aumentar reutilização e melhorar manutenibilidade.",
       "path": ".github/skills/frontend-componentization-patterns/SKILL.md",
       "related_agents": [
-        "@angular-engineer",
-        "@analysis-architect",
+        "@angular-router",
+        "@tech-solution-architect",
         "@test-strategy"
       ]
     },
@@ -438,8 +430,8 @@
       "description": "Boas práticas e patterns de codificação Angular para componentes modernos, templates, reatividade, segurança e consistência arquitetural.",
       "path": ".github/skills/angular-frontend-patterns/SKILL.md",
       "related_agents": [
-        "@angular-engineer",
-        "@analysis-architect",
+        "@angular-router",
+        "@tech-solution-architect",
         "@test-strategy"
       ]
     },
@@ -450,8 +442,8 @@
       "description": "Diretrizes de responsividade para Angular: mobile-first, breakpoints, layout fluido, container queries, imagens responsivas e validação multi-viewport.",
       "path": ".github/skills/angular-responsive-ui-patterns/SKILL.md",
       "related_agents": [
-        "@angular-engineer",
-        "@analysis-architect",
+        "@angular-router",
+        "@tech-solution-architect",
         "@test-strategy"
       ]
     },
@@ -462,8 +454,8 @@
       "description": "Diretrizes enterprise para contratos de componentes (tokens, variantes/estados, inputs/outputs, compatibilidade, semver, depreciação, breaking change e acessibilidade).",
       "path": ".github/skills/design-system-component-contracts/SKILL.md",
       "related_agents": [
-        "@angular-engineer",
-        "@analysis-architect",
+        "@angular-router",
+        "@tech-solution-architect",
         "@test-strategy"
       ]
     },
@@ -474,8 +466,8 @@
       "description": "Diretrizes enterprise para análise e recomendação de arquitetura, operação e evolução de serviços backend com Spring Boot, sem implementação direta.",
       "path": ".github/skills/spring-boot-backend-patterns/SKILL.md",
       "related_agents": [
-        "@spring-boot-engineer",
-        "@analysis-architect"
+        "@spring-boot-router",
+        "@tech-solution-architect"
       ]
     },
     {
@@ -485,8 +477,8 @@
       "description": "Diretrizes enterprise para análise e recomendação de arquiteturas reativas com Spring WebFlux e Project Reactor, com foco em resiliência, capacidade e operação.",
       "path": ".github/skills/spring-reactive-webflux-patterns/SKILL.md",
       "related_agents": [
-        "@spring-reactive-engineer",
-        "@analysis-architect"
+        "@spring-reactive-router",
+        "@tech-solution-architect"
       ]
     },
     {
@@ -496,9 +488,9 @@
       "description": "Governança de versões Java/JDK em backend: LTS, compatibilidade de ecossistema, segurança, performance e migração.",
       "path": ".github/skills/java-jdk-backend-governance/SKILL.md",
       "related_agents": [
-        "@spring-boot-engineer",
-        "@spring-reactive-engineer",
-        "@analysis-architect"
+        "@spring-boot-router",
+        "@spring-reactive-router",
+        "@tech-solution-architect"
       ]
     },
     {
@@ -520,7 +512,7 @@
       "related_agents": [
         "@code-review",
         "@bug-triage",
-        "@analysis-architect"
+        "@tech-solution-architect"
       ]
     },
     {
@@ -531,7 +523,7 @@
       "path": ".github/skills/requirements-engineering-patterns/SKILL.md",
       "related_agents": [
         "@requirements-analyst",
-        "@analysis-architect"
+        "@tech-solution-architect"
       ]
     },
     {
@@ -541,7 +533,7 @@
       "description": "Padrões de mercado (2026) para IMPLEMENTAR features/bugs em Angular — fronteira Signals/RxJS, testing-first, checklist de PR. Contraparte de execução de angular-frontend-patterns.",
       "path": ".github/skills/angular-implementation-patterns/SKILL.md",
       "related_agents": [
-        "@angular-engineer"
+        "@angular-router"
       ]
     },
     {
@@ -551,7 +543,7 @@
       "description": "Padrões de mercado (2026) para IMPLEMENTAR features/bugs em Spring Boot — virtual threads vs reativo, N+1/OSIV, DTOs de borda, testing-first. Contraparte de execução de spring-boot-backend-patterns.",
       "path": ".github/skills/spring-boot-implementation-patterns/SKILL.md",
       "related_agents": [
-        "@spring-boot-engineer"
+        "@spring-boot-router"
       ]
     },
     {
@@ -561,7 +553,7 @@
       "description": "Padrões de mercado (2026) para IMPLEMENTAR features/bugs em Spring WebFlux/Reactor — composição não-bloqueante, tratamento de erro por operador, StepVerifier/WebTestClient. Contraparte de execução de spring-reactive-webflux-patterns.",
       "path": ".github/skills/spring-reactive-implementation-patterns/SKILL.md",
       "related_agents": [
-        "@spring-reactive-engineer"
+        "@spring-reactive-router"
       ]
     },
     {
@@ -572,7 +564,7 @@
       "path": ".github/skills/structured-intake-patterns/SKILL.md",
       "related_agents": [
         "@bug-triage",
-        "@test-engineer",
+        "@test-strategy",
         "@business-rules-extractor",
         "@requirements-analyst"
       ]
@@ -584,7 +576,8 @@
       "description": "Fluxo canônico Factory Pattern (criar/revisar/auditar), checklist de qualidade estrutural e formato de saída com validações ✅/❌ parametrizável por tipo de artefato (agent/skill/prompt).",
       "path": ".github/skills/governance-factory-patterns/SKILL.md",
       "related_agents": [
-        "@governance-factory"
+        "@governance-factory",
+        "@governance-maintainer"
       ]
     },
     {
@@ -594,16 +587,16 @@
       "description": "Template canônico do perfil híbrido (Advisory + Implementação) para specialists de stack técnico — desambiguação de modo, formatos de saída e checklist unificado.",
       "path": ".github/skills/specialist-hybrid-advisory-implementation-patterns/SKILL.md",
       "related_agents": [
-        "@angular-engineer",
-        "@spring-boot-engineer",
-        "@spring-reactive-engineer"
+        "@angular-router",
+        "@spring-boot-router",
+        "@spring-reactive-router"
       ]
     },
     {
       "name": "governance-audit-patterns",
       "tier": 1,
       "category": "governance",
-      "description": "Catálogo consolidado de agent/governance smells (anti-padrão estrutural, gap de perfil, gap de diretriz, diretriz redundante, gap de cobertura de categoria) com sintoma, detecção, severidade e remediação — base do agent agent-auditor.",
+      "description": "Catálogo consolidado de agent/governance smells (anti-padrão estrutural, gap de perfil, desalinhamento contratual perfil ↔ tools ↔ skills ↔ catálogo, gap de diretriz, diretriz redundante, gap de cobertura de categoria, vazamento de evidência real R-044) com sintoma, detecção, severidade e remediação — base do agent agent-auditor.",
       "path": ".github/skills/governance-audit-patterns/SKILL.md",
       "related_agents": [
         "@agent-auditor"
@@ -617,7 +610,7 @@
       "path": ".github/skills/reflection-self-critique-patterns/SKILL.md",
       "related_agents": [
         "@docs-engineer",
-        "@test-engineer"
+        "@test-strategy"
       ]
     },
     {
@@ -657,7 +650,8 @@
       "description": "Estratégias de decomposição sequencial/hierárquica/paralela, granularidade ideal (2-3 níveis) e validação de dependências para planejamento de feature nova — base do agent feature-planner, distinto de refactor-planner (refatoração de código existente).",
       "path": ".github/skills/task-decomposition-patterns/SKILL.md",
       "related_agents": [
-        "@feature-planner"
+        "@feature-planner",
+        "@tech-solution-architect"
       ]
     },
     {
@@ -686,9 +680,9 @@
       "category": "quality",
       "path": ".github/skills/angular-performance-patterns/SKILL.md",
       "related_agents": [
-        "@angular-engineer",
+        "@angular-router",
         "@performance-agent",
-        "@analysis-architect"
+        "@tech-solution-architect"
       ]
     },
     {
@@ -697,9 +691,9 @@
       "category": "quality",
       "path": ".github/skills/spring-boot-performance-patterns/SKILL.md",
       "related_agents": [
-        "@spring-boot-engineer",
+        "@spring-boot-router",
         "@performance-agent",
-        "@analysis-architect"
+        "@tech-solution-architect"
       ]
     },
     {
@@ -708,9 +702,9 @@
       "category": "quality",
       "path": ".github/skills/spring-reactive-performance-patterns/SKILL.md",
       "related_agents": [
-        "@spring-reactive-engineer",
+        "@spring-reactive-router",
         "@performance-agent",
-        "@analysis-architect"
+        "@tech-solution-architect"
       ]
     },
     {
@@ -720,15 +714,39 @@
       "path": ".github/skills/refactoring-planning-patterns/SKILL.md",
       "related_agents": [
         "@refactor-planner",
-        "@analysis-architect",
+        "@tech-solution-architect",
         "@code-knowledge-graph"
+      ]
+    },
+    {
+      "name": "efficient-batch-code-modification",
+      "tier": 1,
+      "category": "process",
+      "description": "Diretrizes e padrões para execução de alterações de código em lote otimizadas para consumo mínimo de tokens e créditos no Copilot — análise prévia (dry-run), batching de tool calls em uma única rodada e minimal diffs cirúrgicos.",
+      "path": ".github/skills/efficient-batch-code-modification/SKILL.md",
+      "tools": [
+        "replace_string_in_file",
+        "insert_edit_into_file",
+        "create_file",
+        "get_errors"
+      ],
+      "related_agents": [
+        "@governance-maintainer",
+        "@governance-factory",
+        "@prompt-structuring",
+        "@database-specialist",
+        "@refactor-planner",
+        "@angular-router",
+        "@spring-boot-router",
+        "@spring-reactive-router",
+        "@ejb-router"
       ]
     }
   ],
   "metadata": {
-    "total_agents": 34,
-    "total_skills": 53,
-    "last_updated": "2026-09-03T00:00:00Z",
-    "changelog": "2026-09-03 (35) — Criada skill codegraph-optave-usage documentando @optave/codegraph (github.com/optave/ops-codegraph-tool) como motor único de substituição do script legado motor-legado consumido pelo agent code-knowledge-graph. Decisão de negócio do usuário: migração TOTAL (não híbrida), com aceite explícito de gaps sem equivalente (RabbitMQ, SOAP cross-repo, classificação de coupling, risco por sensibilidade de dado, viewer HTML interativo, resolução cross-repo REST) — documentados como aviso explícito na skill, não omitidos. Orientação CLI via run_in_terminal preferencial sobre MCP (34 tools expostas; se usado, habilitar apenas subconjunto mínimo por R-024). total_skills 52->53. | 2026-09-02 (34) — Revisão de pre-fetch/skills dos agents angular/spring-boot/spring-reactive: corrigidas 3 entradas duplicadas em .index.json (angular-frontend-patterns, spring-boot-backend-patterns, spring-reactive-webflux-patterns — cada uma tinha 2 blocos conflitantes, um deles com related_agents referenciando o agent obsoleto @impact-architect, fundido em @analysis-architect em 2026-08-31). Descrições unificadas com o frontmatter real do SKILL.md; related_agents deduplicado (união, sem @impact-architect). total_skills 55->52 entradas (nomes únicos inalterados, 52). total_agents corrigido 35->34 (sincronização pendente da fusão test-engineer/docs-engineer/governance-factory de 2026-09-02). | 2026-09-01 (14) — A pedido do usuário ('revise o levantamento feito pelo Haiku... crie todos os agents identificados'), criadas 5 novas skills após pesquisa web (Tavily: OWASP Top 10:2025/ASVS 5.0/Agentic AI Security 2026, Core Web Vitals/N+1 2026, SOC 2/GDPR/LGPD 2026, task decomposition 2026): security-review-patterns, performance-engineering-patterns, compliance-governance-patterns, task-decomposition-patterns, devops-agent-patterns — base de conhecimento para os 9 novos agents (security-reviewer, performance-agent, compliance-guardrails, feature-planner, agentic-memory-manager, devops-engineer, debugger, code-style-enforcer, refactor-executor). agent-memory-policy e code-tracing (já existentes) reaproveitados sem duplicação (R-003) para agentic-memory-manager e debugger respectivamente. total_skills 47->52 (corrigido de inconsistência histórica 45/49 para contagem real de pastas). total_agents 26->35. | 2026-09-01 (13) — Removida a skill dependency-graph-mapping (Tier 2) do índice: capacidades absorvidas pelo agent code-knowledge-graph, apos Gate de Paridade Funcional (RNF-012) validado 9/9 com evidencia de execucao real. total_skills 50->49. | 2026-08-31 (12) — Análise de gaps de mercado (docs/plan/categorizacao-agents-mercado.md §5) validada via pesquisa Tavily: Reflection puro e Fan-out/Parallelization NÃO justificam novo agent standalone (evita over-delegation/overengineering, R-011). Implementados como capacidades: (a) skill nova reflection-self-critique-patterns (Tier 2, process) consumida por docs-writer e test-implementation (self-reflection 1 round grounded antes de reportar sucesso); (b) capacidade 'Fan-out — Análise Paralela' adicionada diretamente a analysis-architect (Decision Tree + payload via handoff-governance), sem skill dedicada (1 único consumidor). total_skills 49->50. | 2026-08-31 (11) — Fase 3 do plano de otimização aplicada: removidos `research-router` e `impact-architect`; roteamento consolidado em `deep-search` (pesquisa interna/externa) e `analysis-architect` (impacto local tier B1 + cross-sistema). Atualizados `agent-router`, referências cruzadas no catálogo, README, routing-graph e casos de roteamento de forma atômica (R-015/R-040). — Criado agent requirements-analyst + skill requirements-engineering-patterns (ISO/IEC/IEEE 29148, EARS, INVEST, Gherkin/BDD, FURPS+, anti solution-jumping via Five Whys) consolidada de pesquisa de mercado. Perfil prospectivo (pedido ambíguo → requisito estruturado), distinto de business-rules-extractor (reverso: código → regra). Registrado em .index.json, README.md, agents/catalog.yaml, agents/README.md, routing-graph.yaml e casos-roteamento.yaml (R-015/R-040). | 2026-08-29 (3) — Criado agent code-review + skill code-review-patterns (taxonomia bloqueador/alta/sugestão, dimensões correção/segurança/convenções/impacto/testes/performance, critérios de bloqueio de merge, anti-padrões de review fatigue) consolidada de conhecimento de mercado (Google Eng Practices, OWASP, CodeRabbit/Qodo/Sourcery/DeepSource). Prompt /review reduzido a alias fino do agent (R-003). Registrado em .index.json, README.md, agents/catalog.yaml, agents/README.md, routing-graph.yaml e casos-roteamento.yaml (R-015/R-040)."
+    "total_agents": 35,
+    "total_skills": 54,
+    "last_updated": "2026-09-06T00:00:00Z",
+    "changelog": "2026-09-06 (39) — Regra R-046 e injeção compulsória da skill efficient-batch-code-modification em prompt-structuring e em todos os agents implementadores de código (frontend/angular, backend/spring-boot, backend/spring-reactive, backend/ejb e database-specialist). | 2026-09-06 (38) — Criado agent governance-maintainer (v1.0.0) especialista em manutenção atômica, refatoração estrutural e sincronização em lote de artefatos de governança via context-mode e efficient-batch-code-modification; total_agents 34->35. | 2026-09-06 (37) — Criada skill efficient-batch-code-modification (Tier 1, process) orientando dry-run prévio em memória, single-turn batching de tool calls e diffs cirúrgicos mínimos para eliminar re-submissão recursiva de contexto e mitigar consumo excessivo de créditos Copilot em alterações multi-arquivo; total_skills 53->54. | 2026-09-06 (36) — Evolução oficial do agent analysis-architect para tech-solution-architect (v2.1.0): elaboração de Technical Blueprint com contratos de API (OpenAPI), modelo de dados e divisão de tarefas particionada por stack ([BACKEND_TASKS], [FRONTEND_TASKS]) para viabilizar o padrão Context Firewall; total_agents mantido em 34. | 2026-09-03 (35) — Criada skill codegraph-optave-usage documentando @optave/codegraph (github.com/optave/ops-codegraph-tool) como motor único de substituição do script legado motor-legado consumido pelo agent code-knowledge-graph. Decisão de negócio do usuário: migração TOTAL (não híbrida), com aceite explícito de gaps sem equivalente (RabbitMQ, SOAP cross-repo, classificação de coupling, risco por sensibilidade de dado, viewer HTML interativo, resolução cross-repo REST) — documentados como aviso explícito na skill, não omitidos. Orientação CLI via run_in_terminal preferencial sobre MCP (34 tools expostas; se usado, habilitar apenas subconjunto mínimo por R-024). total_skills 52->53. | 2026-09-02 (34) — Revisão de pre-fetch/skills dos agents angular/spring-boot/spring-reactive: corrigidas 3 entradas duplicadas em .index.json (angular-frontend-patterns, spring-boot-backend-patterns, spring-reactive-webflux-patterns — cada uma tinha 2 blocos conflitantes, um deles com related_agents referenciando o agent obsoleto @impact-architect, fundido em @analysis-architect em 2026-08-31). Descrições unificadas com o frontmatter real do SKILL.md; related_agents deduplicado (união, sem @impact-architect). total_skills 55->52 entradas (nomes únicos inalterados, 52). total_agents corrigido 35->34 (sincronização pendente da fusão test-engineer/docs-engineer/governance-factory de 2026-09-02). | 2026-09-01 (14) — A pedido do usuário ('revise o levantamento feito pelo Haiku... crie todos os agents identificados'), criadas 5 novas skills após pesquisa web (Tavily: OWASP Top 10:2025/ASVS 5.0/Agentic AI Security 2026, Core Web Vitals/N+1 2026, SOC 2/GDPR/LGPD 2026, task decomposition 2026): security-review-patterns, performance-engineering-patterns, compliance-governance-patterns, task-decomposition-patterns, devops-agent-patterns — base de conhecimento para os 9 novos agents (security-reviewer, performance-agent, compliance-guardrails, feature-planner, agentic-memory-manager, devops-engineer, debugger, code-style-enforcer, refactor-executor). agent-memory-policy e code-tracing (já existentes) reaproveitados sem duplicação (R-003) para agentic-memory-manager e debugger respectivamente. total_skills 47->52 (corrigido de inconsistência histórica 45/49 para contagem real de pastas). total_agents 26->35. | 2026-09-01 (13) — Removida a skill dependency-graph-mapping (Tier 2) do índice: capacidades absorvidas pelo agent code-knowledge-graph, apos Gate de Paridade Funcional (RNF-012) validado 9/9 com evidencia de execucao real. total_skills 50->49. | 2026-08-31 (12) — Análise de gaps de mercado (docs/plan/categorizacao-agents-mercado.md §5) validada via pesquisa Tavily: Reflection puro e Fan-out/Parallelization NÃO justificam novo agent standalone (evita over-delegation/overengineering, R-011). Implementados como capacidades: (a) skill nova reflection-self-critique-patterns (Tier 2, process) consumida por docs-writer e test-implementation (self-reflection 1 round grounded antes de reportar sucesso); (b) capacidade 'Fan-out — Análise Paralela' adicionada diretamente a analysis-architect (Decision Tree + payload via handoff-governance), sem skill dedicada (1 único consumidor). total_skills 49->50. | 2026-08-31 (11) — Fase 3 do plano de otimização aplicada: removidos `research-router` e `impact-architect`; roteamento consolidado em `deep-search` (pesquisa interna/externa) e `analysis-architect` (impacto local tier B1 + cross-sistema). Atualizados `agent-router`, referências cruzadas no catálogo, README, routing-graph e casos de roteamento de forma atômica (R-015/R-040). — Criado agent requirements-analyst + skill requirements-engineering-patterns (ISO/IEC/IEEE 29148, EARS, INVEST, Gherkin/BDD, FURPS+, anti solution-jumping via Five Whys) consolidada de pesquisa de mercado. Perfil prospectivo (pedido ambíguo → requisito estruturado), distinto de business-rules-extractor (reverso: código → regra). Registrado em .index.json, README.md, agents/catalog.yaml, agents/README.md, routing-graph.yaml e casos-roteamento.yaml (R-015/R-040).\""
   }
 }

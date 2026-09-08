@@ -9,3 +9,6 @@ __pycache__/
 *.pyc
 .pytest_cache/
 
+# Logs de telemetria OTel
+logs/otel-spans.jsonl
+logs/otel-debug-raw.jsonl

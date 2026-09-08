@@ -1,14 +1,34 @@
 ---
 name: ctx-status
 description: Exibe estatísticas de consumo do Context Mode usando `ctx_stats` para diagnosticar uso de contexto e economia.
-model: "Claude Haiku 4.5"
+agent: 'agent'
+model: "Gemini 3.8 Flash"
 tools:
   - context-mode/ctx_stats
+argument-hint: ''
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/context-mode/SKILL.md
 ---
 
-# /ctx-status
+# `/ctx-status`
 
 Atalho para obter um snapshot rápido de consumo de contexto da sessão atual.
+
+> **Propósito**: Coletar e exibir indicadores consolidado de consumo de tokens e bytes do Context Mode MCP.
+> **Workspace**: `${workspaceFolder}`
+
+---
+
+## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
+
+- ✅ **APENAS** coletar e exibir estatísticas consolidadas de consumo do Context Mode.
+- ✅ **SEMPRE** apresentar resumo de bytes, chamadas e savings ratio.
+- ❌ **NÃO** modificar o banco de dados do FTS5 ou resetar telemetria.
+- ❌ **NÃO** poluir o chat com dumps excessivos além do resumo formatado.
+
+---
 
 ## Sintaxe
 

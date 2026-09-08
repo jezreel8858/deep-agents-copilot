@@ -99,8 +99,13 @@ handoff_payload:
   emissor:                                # identidade do agent delegante (P10)
     nome: "<nome-do-agent-atual>"
     versao: "<versao-semantica>"          # ex.: "1.1.0"
-    modelo_llm: "<modelo-usado>"          # ex.: "Claude Haiku 4.5"
+    modelo_llm: "<modelo-usado>"          # ex.: "Gemini 3.8 Flash"
     timestamp: "<ISO-8601>"              # ex.: "2026-08-28T14:23:00Z"
+  origem_contexto:                        # metadados de sub-rotina e retorno lateral (R-042 Call Stack)
+    parent_agent: "<nome-do-agent-pai>"   # opcional: agent que originou a chamada em sub-rotina
+    task_id: "<id-da-tarefa>"             # opcional: identificador único da sub-tarefa
+    call_type: "subroutine"               # opcional: enum [subroutine | permanent_transfer]
+    return_to_parent: true                # opcional: boolean — se true, agent receptor DEVE retornar ao parent_agent
   contexto:
     solicitacao_original: "<texto>"
     trabalho_realizado: "<resumo>"
@@ -116,6 +121,8 @@ handoff_payload:
 ```
 
 > **Correlação OTel**: os campos `emissor.nome`, `emissor.modelo_llm` e `timestamp` mapeiam diretamente para atributos `gen_ai.agent.name`, `gen_ai.request.model` e `timestamp` do span `invoke_agent` — use `agent-observability-otel` para rastrear handoffs em pipelines instrumentados.
+>
+> **Protocolo de Retorno Lateral / Call Stack (`call_type: "subroutine"`)**: quando um agent invoca outro como sub-rotina com `call_type: "subroutine"` e `return_to_parent: true`, o agent receptor (ex.: `@deep-search`) opera em escopo delimitado e DEVE, ao concluir sua análise ou síntese, invocar `run_subagent(agentName: parent_agent, ...)` devolvendo os dados diretamente ao agent solicitante, em vez de finalizar no chat ou devolver ao `@agent-router` por falsa deriva de intenção.
 
 ---
 
@@ -142,16 +149,16 @@ handoff_payload:
 @agent-router (triagem)
        │
        ├──→ @bug-triage (bug reportado)
-       │         └──→ @analysis-architect (bug tem impacto sistêmico)
+       │         └──→ @tech-solution-architect (bug tem impacto sistêmico)
        │
        ├──→ @test-strategy (planejar testes)
        │         └──→ @test-engineer (executar suítes)
        │
        ├──→ @refactor-planner (planejar refatoração)
-       │         └──→ @analysis-architect (análise de impacto necessária antes)
+       │         └──→ @tech-solution-architect (análise de impacto necessária antes)
        │
        ├──→ @deep-search (pesquisa técnica interna/externa)
-       │         └──→ @analysis-architect (análise cross-projeto)
+       │         └──→ @tech-solution-architect (análise cross-projeto)
        │
        └──→ @docs-engineer (documentar resultado)
 ```
@@ -181,8 +188,8 @@ Agent receptor confirma:
 
 | Situação | Escalonamento |
 |---|---|
-| Bug com impacto sistêmico desconhecido | `@bug-triage` → `@analysis-architect` |
-| Refatoração sem análise de dependências | `@refactor-planner` → `@analysis-architect` |
+| Bug com impacto sistêmico desconhecido | `@bug-triage` → `@tech-solution-architect` |
+| Refatoração sem análise de dependências | `@refactor-planner` → `@tech-solution-architect` |
 | Implementação sem estratégia definida | `@test-engineer` → `@test-strategy` primeiro |
 | Dúvida técnica que precisa de pesquisa | Qualquer agent → `@deep-search` |
 | Documentação a atualizar após mudança | Qualquer agent → `@docs-engineer` |

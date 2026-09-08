@@ -7,7 +7,7 @@ description: >-
   puramente determinístico — nunca invoca LLM. Motor único: lib externa
   `@optave/codegraph` via MCP Server enxuto (Least-Tools) para consultas
   e CLI local para build/indexação.
-model: Gemini 3.8 Flash
+model: "Gemini 3.8 Flash"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'run_in_terminal', 'context-mode/ctx_search', 'context-mode/ctx_index', 'codegraph/query', 'codegraph/module_map', 'codegraph/fn_impact', 'codegraph/find_cycles', 'codegraph/context']
 ---
 # Code Knowledge Graph
@@ -93,7 +93,7 @@ Estes valores **substituem** qualquer autoavaliação subjetiva nas seções Dec
 - `codegraph roles --role dead -T --json` → dead code.
 - Ver tabela completa de comandos na skill `codegraph-optave-usage` §4.
 
-> **Nota de compatibilidade:** o schema `Node{id,type,projectId,name,filePath,language,metadata}` / `Edge{id,type,sourceId,targetId,confidence,coupling,metadata}` normativo das versões ≤3.3.0 **não é mais produzido por este agent**. Consumidores downstream (`@analysis-architect`, `@bug-triage`, `@refactor-planner`) que dependiam desse schema via `ctx_search`/`code-graph:*` devem passar a interpretar a saída bruta dos comandos `codegraph` (texto/JSON por comando, sem schema unificado) — consumo diferente, sem camada de adaptação nesta versão (aceito conscientemente na decisão de migração total).
+> **Nota de compatibilidade:** o schema `Node{id,type,projectId,name,filePath,language,metadata}` / `Edge{id,type,sourceId,targetId,confidence,coupling,metadata}` normativo das versões ≤3.3.0 **não é mais produzido por este agent**. Consumidores downstream (`@tech-solution-architect`, `@bug-triage`, `@refactor-planner`) que dependiam desse schema via `ctx_search`/`code-graph:*` devem passar a interpretar a saída bruta dos comandos `codegraph` (texto/JSON por comando, sem schema unificado) — consumo diferente, sem camada de adaptação nesta versão (aceito conscientemente na decisão de migração total).
 
 ## Cache (própria — 1 camada)
 
@@ -103,7 +103,7 @@ Estes valores **substituem** qualquer autoavaliação subjetiva nas seções Dec
 
 ## Gate de Paridade Funcional (RNF-012) — Estado pós-migração
 
-> Migração TOTAL aceita conscientemente pelo usuário (2026-09-03), após parecer de `@analysis-architect` recomendar arquitetura híbrida. Tabela abaixo reflete o estado real após a decisão — **não omitir os itens ❌** em nenhum relatório.
+> Migração TOTAL aceita conscientemente pelo usuário (2026-09-03), após parecer de `@tech-solution-architect` recomendar arquitetura híbrida. Tabela abaixo reflete o estado real após a decisão — **não omitir os itens ❌** em nenhum relatório.
 
 | # | Item | Status | Observação |
 |---|---|---|---|
@@ -212,7 +212,7 @@ Próximo passo mínimo:
 - Reportar sempre as métricas de RF-010, mesmo quando a cobertura for menor que 80% — sinalizar como risco, nunca ocultar.
 - Preferir sempre reaproveitar cache; documentar por que um reprocessamento foi necessário quando ocorrer.
 - Reportar sempre o status do Gate de Paridade Funcional (RNF-012) ao final de qualquer execução — mesmo incompleto, nunca omitir os itens ❌.
-- **Roadmap (informativo, não implementar sozinho):** se algum dos gaps aceitos (RabbitMQ, SOAP, coupling, risco) se tornar bloqueante em uso real, reabrir ciclo `@deep-search`+`@analysis-architect` para avaliar solução complementar (ex.: script dedicado só para esse gap, sem reverter o motor principal) — nunca decidir isso sozinho.
+- **Roadmap (informativo, não implementar sozinho):** se algum dos gaps aceitos (RabbitMQ, SOAP, coupling, risco) se tornar bloqueante em uso real, reabrir ciclo `@deep-search`+`@tech-solution-architect` para avaliar solução complementar (ex.: script dedicado só para esse gap, sem reverter o motor principal) — nunca decidir isso sozinho.
 
 ## Anti-padrões
 
@@ -229,7 +229,7 @@ Próximo passo mínimo:
 | Destino | Delegar quando | Handoff mínimo |
 |---|---|---|
 | [`@code-summarizer`](code-summarizer.agent.md) | solicitante precisa também de um sumário textual de um arquivo (não apenas do grafo) | caminho do arquivo, project-id |
-| [`@analysis-architect`](analysis-architect.agent.md) | consumidor precisa de blast radius/dataflow/impacto (RF-015 e capacidades novas) para decisão técnica, ou precisa validar o Gate de Paridade Funcional (RNF-012) | project-id(s), comando(s) `codegraph` executados, cobertura reportada, status do gate |
+| [`@tech-solution-architect`](tech-solution-architect.agent.md) | consumidor precisa de blast radius/dataflow/impacto (RF-015 e capacidades novas) para decisão técnica ou blueprint, ou precisa validar o Gate de Paridade Funcional (RNF-012) | project-id(s), comando(s) `codegraph` executados, cobertura reportada, status do gate |
 | [`@refactor-planner`](refactor-planner.agent.md) | consumidor precisa de impacto de refatoração a partir do grafo já construído, incluindo blast radius e detecção de ciclo | project-id(s), resultado relevante |
 | [`@bug-triage`](bug-triage.agent.md) | consumidor precisa rastrear cadeia de chamadas a partir do grafo já construído | project-id(s), nó de origem, comando usado |
 | [`@debugger`](debugger.agent.md) | consumidor precisa navegar call graph/blast radius (`query`/`path`/`execution_flow`/`sequence`) para formular hipótese de causa raiz | símbolo/arquivo de origem, comando(s) desejado(s) |
@@ -237,8 +237,8 @@ Próximo passo mínimo:
 | [`@code-style-enforcer`](code-style-enforcer.agent.md) | consumidor precisa de complexidade (`complexity`) ou papel do símbolo (`node_roles`) antes de classificar achado de estilo | símbolo/arquivo alvo |
 | [`@performance-agent`](performance-agent.agent.md) | consumidor precisa rastrear dataflow/complexity/execution_flow para localizar hotspots reais | símbolo/arquivo alvo, sintoma de performance |
 | [`@security-reviewer`](security-reviewer.agent.md) | consumidor precisa rastrear dataflow interprocedural ou chamadas dinâmicas suspeitas (`ast_query`) para taint analysis | símbolo/arquivo alvo, padrão suspeito |
-| [`@test-engineer`](test-engineer.agent.md) | consumidor precisa identificar símbolos sem cobertura (`node_roles --role dead`) e priorizar por complexidade/risco | escopo de arquivos/classes candidatos |
-| [`@angular-engineer`](angular-engineer.agent.md) / [`@spring-boot-engineer`](spring-boot-engineer.agent.md) / [`@spring-reactive-engineer`](spring-reactive-engineer.agent.md) | consumidor (perfil híbrido) precisa medir blast radius (`fn-impact`/`diff-impact`) antes de alterar símbolo compartilhado durante implementação | símbolo/arquivo alvo, comando desejado |
+| [`@test-strategy`](test-strategy.agent.md) | consumidor precisa identificar símbolos sem cobertura (`node_roles --role dead`) e priorizar por complexidade/risco | escopo de arquivos/classes candidatos |
+| [`@angular-router`](frontend/angular/angular-router.agent.md) / [`@spring-boot-router`](backend/spring-boot/spring-boot-router.agent.md) / [`@spring-reactive-router`](backend/spring-reactive/spring-reactive-router.agent.md) | consumidor (perfil híbrido) precisa medir blast radius (`fn-impact`/`diff-impact`) antes de alterar símbolo compartilhado durante implementação | símbolo/arquivo alvo, comando desejado |
 | [`@governance-factory`](governance-factory.agent.md) | qualquer ajuste estrutural deste próprio agent (rename, nova ferramenta, etc.) | proposta de mudança + justificativa |
 | [`@deep-search`](deep-search.agent.md) | um dos gaps aceitos precisar de solução complementar futura (verificação de nova lib/abordagem) | gap específico, evidência de bloqueio real em uso |
 

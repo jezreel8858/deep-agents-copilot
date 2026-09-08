@@ -163,6 +163,21 @@
         "timeSavedMin": { "type": "number" }
       }
     },
+    "agentInvocations": {
+      "type": "array",
+      "description": "Frequência de invocação de agentes e subagentes.",
+      "items": {
+        "type": "object",
+        "required": ["agent", "total", "direct", "subagent"],
+        "properties": {
+          "agent": { "type": "string", "description": "Nome canônico do agente." },
+          "total": { "type": "number", "description": "Total de invocações (diretas + subagente)." },
+          "direct": { "type": "number", "description": "Quantidade de invocações diretas." },
+          "subagent": { "type": "number", "description": "Quantidade de invocações via subagente." },
+          "percentage": { "type": "number", "description": "Percentual relativo ao total ou ao topo." }
+        }
+      }
+    },
     "insightsActions": {
       "type": "array",
       "description": "Cards de insights avaliados deterministicamente pelo motor de regras.",
@@ -203,7 +218,43 @@
     "executivePersonas": {
       "type": "array",
       "description": "Cartões de personas executivas com ROI e métricas por papel."
+    },
+    "otelSpans": {
+      "type": "object",
+      "description": "Telemetria nativa OTel GenAI exportada pelo Copilot/Claude Code (fonte opcional, opt-in por máquina).",
+      "properties": {
+        "spansCount": { "type": "number" },
+        "byService": { "type": "object", "description": "Contagem por service.name (copilot-chat/github-copilot/claude-code)." },
+        "operationBreakdown": { "type": "object", "description": "Contagem por gen_ai.operation.name (chat/invoke_agent/execute_tool/execute_hook)." },
+        "tokenUsage": {
+          "type": "object",
+          "properties": {
+            "inputTokens": { "type": "number" },
+            "outputTokens": { "type": "number" },
+            "cacheReadTokens": { "type": "number" },
+            "cacheCreationTokens": { "type": "number" }
+          }
+        },
+        "modelBreakdown": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "model": { "type": "string" },
+              "calls": { "type": "number" },
+              "inputTokens": { "type": "number" },
+              "outputTokens": { "type": "number" }
+            }
+          }
+        },
+        "agentBreakdown": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": { "agent": { "type": "string" }, "count": { "type": "number" } }
+          }
+        }
+      }
     }
   }
 }
-

@@ -119,6 +119,27 @@ Se a pasta padrão `~/.claude/context-mode/` não for encontrada, o extrator bus
 
 ---
 
+## 📡 Telemetria Nativa OTel (Copilot/Claude Code) — Opcional
+
+Fonte adicional **opt-in por máquina**, complementar (não substitui) a extração por heurística de regex.
+
+### Habilitar
+1. `python tools/context-insight-visualizer/otel-collector/receiver.py` (mantenha rodando em background).
+2. JetBrains: `Settings > Tools > GitHub Copilot > Chat > Open Telemetry`:
+   - `Enable OpenTelemetry export`: ✅
+   - `Exporter type`: `otlp-http`
+   - `OTLP protocol`: `http/json`
+   - `OTLP endpoint`: `http://localhost:4318`
+   - `Capture prompt/response content`: **manter desligado** (R-044 — evita PII em `logs/otel-spans.jsonl`)
+
+### Limitação conhecida
+Cobre spans dos agentes **Copilot** e **Claude Code** dentro do JetBrains (ambos exigem o endpoint OTLP — o "Output file" nativo da IDE não cobre o agente Claude Code). Formato de atributos ainda não documentado oficialmente 1:1 para o plugin JetBrains — parser é *best-effort* com fallback silencioso.
+
+### Privacidade
+`logs/otel-spans.jsonl` é gitignored. Nunca habilite `Capture prompt/response content` neste repositório.
+
+---
+
 ## 🔒 Governança e Privacidade (R-038 e R-044)
 
 - **Anonimização Ativa**: Caminhos absolutos do sistema operacional e identificadores de usuário são higienizados na extração, exibindo apenas o nome base dos diretórios de projeto.

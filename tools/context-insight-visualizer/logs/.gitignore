@@ -1,0 +1,5 @@
+# Ignora arquivos de log locais de telemetria de subagentes
+*.jsonl
+*.log
+!.gitkeep
+

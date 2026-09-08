@@ -1,14 +1,34 @@
 ---
 name: ctx-doctor
 description: Diagnostica o Context Mode usando `ctx_doctor` para validar instalação, hooks e conectividade.
-model: "Claude Haiku 4.5"
+agent: 'agent'
+model: "Gemini 3.8 Flash"
 tools:
   - context-mode/ctx_doctor
+argument-hint: ''
+source_docs:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/context-mode/SKILL.md
 ---
 
-# /ctx-doctor
+# `/ctx-doctor`
 
 Atalho para executar diagnóstico rápido do Context Mode antes de troubleshooting mais profundo.
+
+> **Propósito**: Validar instalação, hooks e conectividade do servidor Context Mode MCP.
+> **Workspace**: `${workspaceFolder}`
+
+---
+
+## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
+
+- ✅ **APENAS** executar o diagnóstico de saúde e conectividade do MCP Context Mode.
+- ✅ **SEMPRE** exibir a saída completa exatamente como retornada pelo runtime.
+- ❌ **NÃO** executar reparos destrutivos sem aprovação.
+- ❌ **NÃO** mascarar alertas ou falhas reportadas pelo `ctx_doctor`.
+
+---
 
 ## Sintaxe
 

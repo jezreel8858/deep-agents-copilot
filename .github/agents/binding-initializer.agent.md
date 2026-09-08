@@ -5,7 +5,7 @@ description:
   `catalog.yaml` e `binding.md` via Health Check (R-034), coleta o nome do
   ecossistema via `ask_questions` (1 pergunta) e gera o esqueleto dos artefatos.
   Projetos são adicionados depois via `/add-project-context`.
-model: "Claude Haiku 4.5"
+model: "Gemini 3.8 Flash"
 tools: ['ask_questions', 'read_file', 'create_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
 ---
 
@@ -296,7 +296,7 @@ Projetos, stacks e adapters serão configurados depois via /add-project-context.
    - Agent faz P1: "Qual o nome do seu ecossistema?"
    - Dev responde: "project"
    - `catalog.yaml` + `binding.md` esqueleto criados ✅
-   - Próximo: `/add-project-context D:\workspace\project-app`
+   - Próximo: `/add-project-context <workspace>/[PROJETO-APP]`
 
 2. **Cenário B (Manual):**
    - Dev digita: `inicializar binding` ou `criar esqueleto de governança`
@@ -308,7 +308,7 @@ Projetos, stacks e adapters serão configurados depois via /add-project-context.
    - Agent **não regenera automaticamente**: `catalog.yaml` real tende a divergir do
      esqueleto inicial (adapters adicionados, `governance_artefacts`, customizações) —
      sobrescrever destruiria conteúdo evoluído organicamente.
-   - Agent informa o que já existe e orienta edição manual pontual, ou aciona `docs-curator`
+   - Agent informa o que já existe e orienta edição manual pontual, ou aciona `docs-engineer`
      para curadoria assistida (nunca regeneração cega a partir do esqueleto).
 
 ## Combina Com
