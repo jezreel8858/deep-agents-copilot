@@ -65,6 +65,8 @@ Você é o roteador obrigatório do fluxo agent-first no GitHub Copilot. Seu tra
 | Router de Banco de Dados | [`backend/database/database-router.agent.md`](backend/database/database-router.agent.md) | Supervisor hierárquico — despacha para 6 especialistas Oracle/Informix (migração, PL/SQL/SPL, query tuning) |
 | Especialista Banco de Dados (fallback) | [`database-specialist.agent.md`](database-specialist.agent.md) | Fallback genérico para SGBDs fora de Oracle/Informix (Flyway/Liquibase/Alembic) |
 | Engenheiro de Documentação | [`docs-engineer.agent.md`](docs-engineer.agent.md) | Autoria e curadoria de documentação técnica exclusivamente em `.md` |
+| Mapeador Bounded Contexts (DDD) | [`ddd-bounded-context-mapper.agent.md`](ddd-bounded-context-mapper.agent.md) | Mapeamento semântico de domínios de negócio por nomenclatura, Bounded Contexts e God Classes |
+| Sentinel de ADRs | [`adr-sentinel.agent.md`](adr-sentinel.agent.md) | Auditoria de propostas técnicas, blueprints e diffs contra ADRs documentados do projeto |
 | Gatekeeper de PR | [`pr-gatekeeper.agent.md`](pr-gatekeeper.agent.md) | Preparação de PR pós-aprovação (diff, commit semântico, changelog) |
 | Factory de governança | [`governance-factory.agent.md`](governance-factory.agent.md) | Governança de criação/revisão de agents, skills, prompts e novas stacks |
 | Mantenedor de governança | [`governance-maintainer.agent.md`](governance-maintainer.agent.md) | Manutenção atômica, refatoração em cascata e sincronização em lote de governança |
@@ -89,7 +91,7 @@ Você é o roteador obrigatório do fluxo agent-first no GitHub Copilot. Seu tra
 | Tipo de Solicitação | Intenção Clara? | Código-Alvo Presente? | Governa Multi-Projeto? | Ação |
 |---|:---:|:---:|:---:|---|
 | *"Ajuste o teste X após bugfix"* | ✅ Sim | ✅ Sim | ❌ Não | **Roteie direto** → @test-strategy |
-| *"Corrija estes testes quebrados (com relatório)"* | ✅ Sim | ✅ Sim | ❌ Não | **Roteie direto** → @test-engineer |
+| *"Corrija estes testes quebrados (com relatório)"* | ✅ Sim | ✅ Sim | ❌ Não | **Roteie direto** → @test-strategy |
 | *"Crie novo adapter backend"* | ✅ Sim | ❌ Não | ✅ Sim | **Roteie** → @tech-solution-architect (tier B1 para impacto local) |
 | *"Implemente feature de listagem"* | ✅ Sim | ❌ Não | ❌ Não | **Roteie direto** → downstream (vai pedir escopo se precisar) |
 | *"Refatore regra em 3 projetos"* | ✅ Sim | ❌ Não | ✅ Sim | **Roteie** → @tech-solution-architect |
@@ -220,6 +222,12 @@ Pedido recebido (já refinado por @prompt-structuring)?
 |  \- Não
 |- É persistência/recuperação de memória entre sessões (não consolidação pontual)?
 |  |- Sim -> @agentic-memory-manager
+|  \- Não
+|- É mapeamento de Bounded Contexts (DDD), domínios de negócio semânticos por nomenclatura ou identificação de God Classes/fronteiras invadidas?
+|  |- Sim -> @ddd-bounded-context-mapper
+|  \- Não
+|- É auditoria de propostas técnicas, blueprints ou diffs contra Architectural Decision Records (ADRs) documentados do projeto?
+|  |- Sim -> @adr-sentinel
 |  \- Não
 |- É pedido de implementação de código em stack/linguagem NÃO suportada no catálogo (ex.: Rust, Go, Flutter, Ruby)?
 |  |- Sim -> [Fallback Determinístico: Recusa Estruturada]
@@ -354,6 +362,8 @@ Próximo passo mínimo:
 - [@context-builder](context-builder.agent.md) para preparação e consolidação pontual de contexto técnico em docs/context/ (read-only) — não confundir com @agentic-memory-manager.
 - [@adapter-generator](adapter-generator.agent.md) para geração automática de adapters (.instructions.md) via scanner de convenções de projetos adicionados.
 - [@agentic-memory-manager](agentic-memory-manager.agent.md) para persistência/recuperação de memória entre sessões — não confundir com `@context-builder` (consolidação pontual, read-only).
+- [@ddd-bounded-context-mapper](ddd-bounded-context-mapper.agent.md) para mapeamento semântico de domínios de negócio por nomenclatura, identificação de Bounded Contexts e God Classes.
+- [@adr-sentinel](adr-sentinel.agent.md) para auditoria de conformidade de blueprints, propostas e diffs contra Architectural Decision Records (ADRs) documentados.
 - [@tech-solution-architect](tech-solution-architect.agent.md) para elaboração de Technical Blueprint, contratos de API, divisão por stack, impacto técnico local (tier B1) e análise cross-sistema.
 - [@deep-search](deep-search.agent.md) como fallback para pesquisa interna/externa.
 - [@tech-solution-architect](tech-solution-architect.agent.md) como fallback para arquitetura e integração cross-sistema.

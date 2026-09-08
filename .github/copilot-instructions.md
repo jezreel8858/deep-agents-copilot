@@ -302,6 +302,8 @@ Projetos e adapters por-projeto NUNCA são commitados no repositório compartilh
 - `runtime-verifier` -> verificação de saúde do ambiente (build/dependências/serviços) antes de testes/codificadores; read-only.
 - `pr-gatekeeper` -> preparação de PR pós-aprovação (diff, commit semântico, matriz de risco, changelog); nunca commit/push autônomo.
 - `database-specialist` -> migrações de schema, otimização de query e integridade referencial.
+- `ddd-bounded-context-mapper` -> mapeamento semântico de domínios de negócio por nomenclatura, Bounded Contexts e God Classes (read-only).
+- `adr-sentinel` -> auditoria de propostas técnicas, blueprints e diffs contra Architectural Decision Records (ADRs) documentados (read-only).
 
 ### Skills atuais
 

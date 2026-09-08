@@ -114,18 +114,18 @@ flowchart TD
     P --> E
 
     E --> G1["🎯 Planning/Analysis\nrequirements-analyst · deep-search\nfeature-planner"]
-    E --> G2["📐 Architecture/Design\ntech-solution-architect · code-knowledge-graph\nbusiness-rules-extractor · refactor-planner"]
-    E --> G3["💻 Implementation (Specialists)\nangular-engineer · spring-boot-engineer\nspring-reactive-engineer · database-specialist\ncode-summarizer"]
-    E --> G4["✅ Quality/Validation\nbug-triage · debugger · test-strategy\ntest-engineer · code-review · code-style-enforcer\nsecurity-reviewer · performance-agent\ndevops-engineer · runtime-verifier"]
+    E --> G2["📐 Architecture/Design\ntech-solution-architect · code-knowledge-graph\nbusiness-rules-extractor · refactor-planner\nddd-bounded-context-mapper · adr-sentinel"]
+    E --> G3["💻 Implementation (Domain Routers & Specialists)\nangular-router · spring-boot-router · spring-reactive-router\nejb-router · database-router · database-specialist\ncode-summarizer"]
+    E --> G4["✅ Quality/Validation\nbug-triage · debugger · test-strategy\ncode-review · code-style-enforcer · security-reviewer\nperformance-agent · devops-engineer · runtime-verifier"]
     E --> G5["📚 Documentation/Learning\ndocs-engineer · context-builder"]
     E --> G6["🔄 Governance/Orchestration\ngovernance-factory · governance-maintainer\nagent-auditor · binding-initializer\nadapter-generator · agentic-memory-manager\ncompliance-guardrails · pr-gatekeeper"]
 
     G1 & G2 & G3 & G4 & G5 & G6 --> K["Resultado\n(turno N)"]
     K --> L["/commit\nmensagem gerada"]
-    K -. "turno N+1: deriva de intenção\ndetectada (R-042)" .-> E
+    K -.->|"turno N+1: deriva de intenção (R-042)"| E
 ```
 
-> 33 agents catalogados, agrupados em 6 perfis de mercado — ver [§ Cobertura de Mercado](#cobertura-de-mercado--perfis-de-agents) para o diagrama detalhado por agent e a análise de aderência às práticas consolidadas.
+> 36 agents catalogados, agrupados em 6 perfis de mercado — ver [§ Cobertura de Mercado](#cobertura-de-mercado--perfis-de-agents) para o diagrama detalhado por agent e a análise de aderência às práticas consolidadas.
 
 ### Para Adicionar Novo Adapter
 
@@ -162,13 +162,13 @@ Frameworks de referência (Claude Code/Agent SDK da Anthropic, Microsoft Agent F
 | Categoria de Mercado | Perfis Esperados | Cobertos Neste Projeto | Cobertura |
 |---|---|---|---|
 | 🎯 Planning & Analysis | Planner, PM/Analyst, Researcher | `requirements-analyst`, `deep-search`, `feature-planner` | ✅ 100% |
-| 📐 Architecture & Design | Architect, Impact Analyzer, Rules Extractor, Refactor Planner | `tech-solution-architect`, `code-knowledge-graph`, `business-rules-extractor`, `refactor-planner` | ✅ 100% |
-| 💻 Implementation | Coder por stack, Debugger, DB Specialist | `angular-engineer`, `spring-boot-engineer`, `spring-reactive-engineer`, `database-specialist`, `code-summarizer` | ✅ 100% |
-| ✅ Quality & Validation | Test Strategy/Impl, Reviewer, Security, Performance, QA, Runtime | `bug-triage`, `debugger`, `test-strategy`, `test-engineer`, `code-review`, `code-style-enforcer`, `security-reviewer`, `performance-agent`, `devops-engineer`, `runtime-verifier` | ✅ 100% |
+| 📐 Architecture & Design | Architect, Impact Analyzer, Rules Extractor, Refactor Planner, DDD, ADR | `tech-solution-architect`, `code-knowledge-graph`, `business-rules-extractor`, `refactor-planner`, `ddd-bounded-context-mapper`, `adr-sentinel` | ✅ 100% |
+| 💻 Implementation | Coder por stack, Debugger, DB Specialist | `angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `database-router`, `database-specialist`, `code-summarizer` | ✅ 100% |
+| ✅ Quality & Validation | Test Strategy/Impl, Reviewer, Security, Performance, QA, Runtime | `bug-triage`, `debugger`, `test-strategy`, `code-review`, `code-style-enforcer`, `security-reviewer`, `performance-agent`, `devops-engineer`, `runtime-verifier` | ✅ 100% |
 | 📚 Documentation & Learning | Docs Engineer, Context Builder | `docs-engineer`, `context-builder` | ✅ 100% |
 | 🔄 Governance & Orchestration | Router, Memory Manager, Guardrails, Factories, Gatekeeper, Maintainer | `agent-router`, `prompt-structuring`, `governance-factory`, `governance-maintainer`, `agent-auditor`, `binding-initializer`, `adapter-generator`, `agentic-memory-manager`, `compliance-guardrails`, `pr-gatekeeper` | ✅ 100% |
 
-**Resultado**: **34 agents ativos**, cobrindo **~95% dos 22 perfis consolidados de mercado** — nível de maturidade comparável ao modelo de referência SpecWeave (11 agents core, expandido aqui com granularidade enterprise adicional em segurança/performance/compliance/banco de dados).
+**Resultado**: **36 agents ativos**, cobrindo **~95% dos 22 perfis consolidados de mercado** — nível de maturidade comparável ao modelo de referência SpecWeave (11 agents core, expandido aqui com granularidade enterprise adicional em segurança/performance/compliance/banco de dados).
 
 ### Mapa de Agents por Perfil (Mermaid)
 
@@ -187,15 +187,19 @@ graph TB
         B2[code-knowledge-graph]
         B3[business-rules-extractor]
         B4[refactor-planner]
+        B5["ddd-bounded-context-mapper 🗺️"]
+        B6["adr-sentinel 📜"]
     end
 
-    subgraph CAT3["💻 IMPLEMENTATION — Specialists Híbridos"]
+    subgraph CAT3["💻 IMPLEMENTATION — Domain Routers &amp; Specialists"]
         direction TB
-        C1[angular-engineer]
-        C2[spring-boot-engineer]
-        C3[spring-reactive-engineer]
-        C4[database-specialist]
-        C5[code-summarizer]
+        C1[angular-router]
+        C2[spring-boot-router]
+        C3[spring-reactive-router]
+        C4[ejb-router]
+        C5[database-router]
+        C6[database-specialist]
+        C7[code-summarizer]
     end
 
     subgraph CAT4["✅ QUALITY &amp; VALIDATION"]
@@ -203,13 +207,12 @@ graph TB
         D1[bug-triage]
         D2[debugger]
         D3[test-strategy]
-        D4[test-engineer]
-        D5[code-review]
-        D6[code-style-enforcer]
-        D7["security-reviewer 🔒"]
-        D8["performance-agent ⚡"]
-        D9["devops-engineer 🐳"]
-        D10["runtime-verifier 🩺"]
+        D4[code-review]
+        D5[code-style-enforcer]
+        D6["security-reviewer 🔒"]
+        D7["performance-agent ⚡"]
+        D8["devops-engineer 🐳"]
+        D9["runtime-verifier 🩺"]
     end
 
     subgraph CAT5["📚 DOCUMENTATION &amp; LEARNING"]
@@ -229,6 +232,7 @@ graph TB
         F7["agentic-memory-manager 🧠"]
         F8["compliance-guardrails 🛡️"]
         F9["pr-gatekeeper 📦"]
+        F10["governance-maintainer 🛠️"]
     end
 
     F1 -.orquestra.-> CAT1
@@ -304,13 +308,13 @@ graph TB
 ### Agents (33 catalogados — ver [§ Cobertura de Mercado](#cobertura-de-mercado--perfis-de-agents) para o mapa completo)
 - ✅ `agent-router` v1.5.0 — PASSO 0.3 de re-triagem por deriva de intenção (R-042), output com campo `Agente Ativo`, roteamento direto para todos os 32 agents downstream
 - ✅ `prompt-structuring` — passo mandatório pós-Health Check (R-041), loop de auto-refinamento (máx. 5 iterações)
-- ✅ 31 agents downstream especializados, agrupados por função:
+- ✅ 34 agents downstream especializados, agrupados por função:
   - **Planejamento/Análise:** `requirements-analyst`, `deep-search`, `feature-planner`
-  - **Arquitetura/Design:** `tech-solution-architect`, `code-knowledge-graph`, `business-rules-extractor`, `refactor-planner`
-  - **Implementação (Specialists híbridos):** `angular-engineer`, `spring-boot-engineer`, `spring-reactive-engineer`, `database-specialist`, `code-summarizer`
-  - **Qualidade/Validação:** `bug-triage`, `debugger`, `test-strategy`, `test-engineer` (fusão `test-implementation` + `test-fix`), `code-review`, `code-style-enforcer`, `security-reviewer`, `performance-agent`, `devops-engineer`, `runtime-verifier`
-  - **Documentação:** `docs-engineer` (fusão `docs-writer` + `docs-curator` — modos `author`/`curate`), `context-builder`
-  - **Governança de Agents/Skills/Prompts/Memória/Entrega:** `governance-factory` (fusão `agent-factory` + `skill-factory` + `prompt-factory`), `governance-maintainer`, `agent-auditor`, `binding-initializer`, `adapter-generator`, `agentic-memory-manager`, `compliance-guardrails`, `pr-gatekeeper`
+  - **Arquitetura/Design:** `tech-solution-architect`, `code-knowledge-graph`, `business-rules-extractor`, `refactor-planner`, `ddd-bounded-context-mapper`, `adr-sentinel`
+  - **Implementação (Domain Routers & Specialists):** `angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `database-router`, `database-specialist`, `code-summarizer`
+  - **Qualidade/Validação:** `bug-triage`, `debugger`, `test-strategy`, `code-review`, `code-style-enforcer`, `security-reviewer`, `performance-agent`, `devops-engineer`, `runtime-verifier`
+  - **Documentação:** `docs-engineer` (modos `author`/`curate`), `context-builder`
+  - **Governança de Agents/Skills/Prompts/Memória/Entrega:** `governance-factory`, `governance-maintainer`, `agent-auditor`, `binding-initializer`, `adapter-generator`, `agentic-memory-manager`, `compliance-guardrails`, `pr-gatekeeper`
 
 ### Skills (54 indexadas)
 - ✅ Tier 1 (Core): `context-mode`, `efficient-batch-code-modification`, `agent-contracts`, `handoff-governance`, `confidence-fallback-policy`, `agent-safety-guardrails`, `terminal-governance`, `code-tracing`, `business-rules-governance`, `java-jdk-backend-governance`

@@ -7,6 +7,8 @@ on:
       - '.github/skills/**'
       - 'tests/routing_gate/**'
       - 'tests/governance_audit/**'
+      - 'tests/operational_flow/**'
+      - 'README.md'
       - 'CLAUDE.md'
   push:
     branches:
@@ -17,6 +19,8 @@ on:
       - '.github/skills/**'
       - 'tests/routing_gate/**'
       - 'tests/governance_audit/**'
+      - 'tests/operational_flow/**'
+      - 'README.md'
       - 'CLAUDE.md'
 
 jobs:
@@ -39,5 +43,5 @@ jobs:
           pip install pytest PyYAML
 
       - name: Run Routing Quality Gate & Governance Smells Suite
-        run: pytest tests/routing_gate/ tests/governance_audit/ -v --tb=short
+        run: pytest tests/routing_gate/ tests/governance_audit/ tests/operational_flow/ -v --tb=short
 

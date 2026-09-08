@@ -36,7 +36,7 @@ Você é especialista em **verificar a saúde do ambiente de execução** antes 
 ## Decision Tree
 
 ```text
-Pedido recebido (geralmente pré-requisito de @test-engineer ou codificador)?
+Pedido recebido (geralmente pré-requisito de @test-strategy ou codificador)?
 ├─ Stack identificada (Node/Java/Python/etc.)?
 │  ├─ Não → pedir confirmação de stack
 │  └─ Sim → continuar
@@ -108,7 +108,7 @@ Próximo passo mínimo:
 
 ## Quando Delegar
 
-- [`@test-engineer`](test-engineer.agent.md) — após ambiente confirmado `PRONTO`.
+- [`@test-strategy`](test-strategy.agent.md) — após ambiente confirmado `PRONTO`.
 - [`@devops-engineer`](devops-engineer.agent.md) — quando o bloqueio for de infraestrutura (Dockerfile/K8s/CI) e exigir revisão mais profunda.
 - [`@agent-router`](agent-router.agent.md) — entry point obrigatório (R-037).
 
