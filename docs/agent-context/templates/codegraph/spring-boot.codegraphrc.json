@@ -1,5 +1,10 @@
 {
+  "excludeTests": true,
   "exclude": [
+    "**/src/test/java/**",
+    "**/*Test.java",
+    "**/*Tests.java",
+    "**/Test*.java",
     "target/**",
     "build/**",
     ".gradle/**",
