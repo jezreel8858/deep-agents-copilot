@@ -347,10 +347,14 @@ workflows:
         nome: "technical_blueprint_and_contracts"
         agent: "tech-solution-architect"
         checkpoint_humano: "ask_questions (aprovacao_blueprint)"
-        particionamento_escopo: ["frontend_only", "backend_only", "fullstack"]
+        particionamento_escopo: ["frontend_only", "backend_only", "fullstack", "database_only"]
+        sub_rotinas_permitidas: ["database-specialist"]
+        tasks_backend_tag_obrigatoria: "stack (spring-boot|spring-reactive|ejb) por item, nunca lista plana"
       - etapa: 4
         nome: "test_strategy_and_risk_matrix"
         agent: "test-strategy"
+        threshold_cobertura_por_risco: "test-coverage-governance/SKILL.md § 1 (90 critico | 80 integracao | 70 controller)"
+        casos_borda_seguranca_obrigatorios: true
       - etapa: 5
         nome: "tdd_domain_implementation"
         agent: "domain-router | specialists"
@@ -361,6 +365,8 @@ workflows:
         agent: "code-review | pr-gatekeeper"
         sub_rotinas_permitidas: ["security-reviewer"]
         owasp_security_gate: true
+        max_tentativas_remediacao_seguranca: 2
+        escalonamento_seguranca: "ask_questions (revisao_manual_pareada)"
 
   - id: WORKFLOW-GOVERNANCE-MAINTENANCE
     nome: "Auditoria, Padronização e Manutenção de Governança"

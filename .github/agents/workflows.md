@@ -348,10 +348,16 @@ flowchart TD
 
     TestStrat --> TDD["<b>5. Implementação Domain-Driven TDD</b><br/>Agentes: Domain Routers & Specialists<br/>Ação: Contract-First (Red -> Green -> Refactor)"]
 
+    Arch --> CheckDBFeature{"Exige novas<br/>tabelas/colunas?"}
+    CheckDBFeature -- "Sim" --> DBFeature["<b>3c. Migração de Schema</b><br/>Agente: @database-specialist<br/>Ação: DDL idempotente + rollback documentado"]
+    DBFeature --> CheckScope
+
     TDD --> SecReview["<b>6a. Security Review (OWASP)</b><br/>Agente: @security-reviewer<br/>Ação: Verificação de injeções, IDOR, auth e inputs"]
 
     SecReview --> CheckSec{"Aprovado em<br/>Segurança?"}
-    CheckSec -- "Vulnerabilidade" --> TDD
+    CheckSec -- "Vulnerabilidade (tentativa N/2)" --> CheckSecCap{"Tentativas<br/>remediação < 2?"}
+    CheckSecCap -- "Sim" --> TDD
+    CheckSecCap -- "Não (teto esgotado)" --> SecEscalate["<b>6b. Escalonamento de Segurança</b><br/>ask_questions: revisão manual pareada com dev"]
     CheckSec -- "Limpo" --> Gate["<b>6. Quality Gate & PR Preparation</b><br/>Agentes: @code-review → @pr-gatekeeper<br/>Ação: Revisão geral de diff e geração de PR semântico"]
 
     Gate --> EndFeat(["✅ Feature Concluída com Sucesso"])
@@ -382,11 +388,16 @@ workflow_state:
   blueprint:
     contrato_openapi: "<caminho/openapi.yaml ou inline>"
     tabelas_banco: ["<tabela_a>", "<tabela_b>"]
-    tasks_backend: ["Task 1", "Task 2"]
+    exige_migracao_ddl: false
+    tasks_backend:
+      - descricao: "Task 1"
+        stack: "spring-boot | spring-reactive | ejb"
     tasks_frontend: ["Task 1", "Task 2"]
   matriz_riscos_testes:
     casos_borda: ["Payload vazio", "Timeout", "Duplicidade"]
-    cobertura_alvo: 80
+    casos_borda_seguranca: ["SQL injection", "IDOR", "Auth bypass"]
+    threshold_aplicavel: "90 (critico) | 80 (integracao) | 70 (controller)"
+  tentativas_remediacao_seguranca: 0  # teto: 2 (Estado 6b)
   status_implementacao:
     backend_concluido: true
     frontend_concluido: true

@@ -31,7 +31,7 @@ Você é especialista em **decompor requisitos de feature nova em plano de execu
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-043` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas `R-001..R-050` em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 - R-018: planejamento paralelo — etapas independentes marcadas `[P]`, dependentes `[S]`.
 - R-027: dúvida → `ask_questions`. Proibido inferir intenção.
