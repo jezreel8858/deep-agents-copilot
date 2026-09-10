@@ -16,7 +16,7 @@ Em caso de conflito, siga esta ordem:
 3. User
 4. Arquivos locais deste repositório (`CLAUDE.md`, `.github/*`)
 
-## 3) Regras Normativas (R-001..R-049)
+## 3) Regras Normativas (R-001..R-051)
 
 - **R-001 (Escopo)**: altere apenas o que foi solicitado.
 - **R-002 (Mudança mínima)**: prefira alterações pequenas, reversíveis e rastreáveis.

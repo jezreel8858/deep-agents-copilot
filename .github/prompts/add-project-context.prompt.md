@@ -87,7 +87,7 @@ Auto-carregar contexto estruturado de um projeto com Intent Classification + Mul
 Este prompt carrega automaticamente (conforme frontmatter `source_docs`):
 - ✅ `.github/skills/yaml-governance/SKILL.md` — governança YAML obrigatória
 - ✅ `.github/skills/context-builder/SKILL.md` — estruturas de contexto
-- ✅ `CLAUDE.md` — regras normativas `R-001..R-039`
+- ✅ `CLAUDE.md` — regras normativas `R-001..R-051`
 - ✅ `.github/copilot-instructions.md` — roteamento rápido e autonomia
 
 **Pre-requisito**: Se algum arquivo não foi anexado automaticamente, o Copilot DEVE alertar "⚠️ Pre-fetch incompleto" e carregá-los manualmente.

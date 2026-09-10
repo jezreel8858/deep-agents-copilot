@@ -48,7 +48,7 @@ Você é o roteador obrigatório do fluxo agent-first no GitHub Copilot. Seu tra
 ## Catálogo / Conhecimento Base
 
 **Infraestrutura do Projeto (sempre presente — agente assume acesso direto):**
-- [`../../CLAUDE.md`](../../CLAUDE.md) — regras globais + IDs normativos (R-001..R-045)
+- [`../../CLAUDE.md`](../../CLAUDE.md) — regras globais + IDs normativos (R-001..R-051)
 - [`../copilot-instructions.md`](../copilot-instructions.md) — regras operacionais locais do GitHub Copilot
 - [`catalog.yaml`](catalog.yaml) — catálogo estruturado de agents (verdade para roteamento)
 - [`routing-graph.yaml`](routing-graph.yaml) — **grafo declarado de roteamento** (fonte de verdade estrutural — nós, arestas, condições e política de cascata); a Decision Tree abaixo é documentação derivada deste arquivo

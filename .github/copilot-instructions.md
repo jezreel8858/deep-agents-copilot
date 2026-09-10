@@ -3,7 +3,7 @@
 > Fonte de verdade operacional: [`CLAUDE.md`](../CLAUDE.md).
 > Mapa de Adapters (compartilhado): [`docs/ai-context/catalog.yaml`](../docs/ai-context/catalog.yaml).
 > Mapa de Projetos (LOCAL/gitignored, R-043): [`docs/ai-context/catalog.local.yaml`](../docs/ai-context/catalog.local.yaml).
-> IDs normativos: consulte `R-001..R-049` em `CLAUDE.md`.
+> IDs normativos: consulte `R-001..R-051` em `CLAUDE.md`.
 
 ---
 
@@ -17,7 +17,7 @@
 
 | Tipo | Arquivo | Escopo | Conteúdo Permitido | Exemplos / Referências |
 |------|---------|--------|-------|---|
-| **Governança Global** | `CLAUDE.md` | 🌍 Multi-projeto, desacoplado | Regras R-001..R-049, princípios, fluxos genéricos | ❌ Nenhum projeto/tech específicos |
+| **Governança Global** | `CLAUDE.md` | 🌍 Multi-projeto, desacoplado | Regras R-001..R-051, princípios, fluxos genéricos | ❌ Nenhum projeto/tech específicos |
 | **Operacional** | `.github/copilot-instructions.md` | 🌍 Multi-projeto, desacoplado | Roteamento, agents, skills, estrutura genérica | ❌ Nenhum projeto/tech específicos (remeter a adapters) |
 | **Adapters** | `.github/instructions/*.instructions.md` | 🔧 Stack/domínio específico | Convenções, padrões, tools, paradigmas de tech/domínio **excluivos** | ✅ Projeto, linguagem, framework **específicos permitidos** |
 | **Contexto de Binding** | `docs/ai-context/catalog.yaml` + `docs/ai-context/binding.md` | 🔗 Mapa de instâncias | Lista concreta de adapters, projetos, mapeamento stack → adapter | ✅ Dados de instância permitidos |
