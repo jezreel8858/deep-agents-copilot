@@ -38,6 +38,7 @@ Em fluxos multi-agent com handoff (R-042 — Anti Sticky-Session), o usuário pe
 ```markdown
 Agente Ativo: test-engineer
 Handoff: test-strategy → test-engineer (motivo: estratégia mapeada — pronto para implementar)
+Skills Carregadas: test-implementation-spring-boot, test-coverage-governance, context-mode
 
 [... restante da resposta no formato de saída do perfil do agent ...]
 ```
@@ -46,6 +47,7 @@ Quando **não** há handoff neste turno (agent continua em `task_mode`), a linha
 
 ```markdown
 Agente Ativo: spring-boot-engineer
+Skills Carregadas: spring-boot-implementation-patterns, test-implementation-spring-boot, terminal-governance, context-mode
 
 [... restante da resposta ...]
 ```
@@ -276,7 +278,7 @@ Todo agent deve seguir política de context assembly para otimizar custo, latên
 ### Modelo de 2 Camadas
 
 **Camada 1 — Contrato Universal (obrigatório em TODO agent, nunca varia):**
-Já normatizado por R-016/R-020 e pelas seções 1-4 desta skill: confiança declarada, evidências rastreáveis (arquivo/símbolo/comando) e próximo passo mínimo. Esta camada é o que garante interoperabilidade — evita o risco de "handoff incompatível" documentado pelo JetBrains.
+Já normatizado por R-016/R-020 e pelas seções 1-4 desta skill: banner de identidade (`Agente Ativo:`/`Handoff:`/`Skills Carregadas:` — § 0), confiança declarada, evidências rastreáveis (arquivo/símbolo/comando) e próximo passo mínimo. Esta camada é o que garante interoperabilidade — evita o risco de "handoff incompatível" documentado pelo JetBrains.
 
 **Camada 2 — Template Narrativo por Perfil (varia conforme o papel do agent):**
 
