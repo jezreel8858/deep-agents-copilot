@@ -248,3 +248,32 @@ def test_handoff_governance_supports_workflow_tracking():
     assert "workflow_id:" in content
     assert "etapa_atual:" in content
     assert "proximos_agentes_permitidos:" in content
+
+
+def test_workflows_support_fast_chaining_circuit_breaker_and_multi_project():
+    """Valida que workflows.md documenta Fast-Chaining (R-050.1), Circuit Breaker/Rollback (R-050.2)
+    e Multi-Project Target Tracking (R-050.3)."""
+    content = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    assert "Fast-Chaining" in content, "workflows.md deve especificar o protocolo de Fast-Chaining"
+    assert "Circuit Breaker" in content, "workflows.md deve especificar o Circuit Breaker"
+    assert "projeto_alvo" in content, "workflows.md deve especificar o rastreamento de projeto_alvo"
+    assert "carry_over_state" in content, "workflows.md deve especificar a transferência de estado no chaining"
+
+
+def test_handoff_governance_v13_schema():
+    """Valida que handoff-governance/SKILL.md formaliza a v1.3 com projeto_alvo e chaining."""
+    content = HANDOFF_SKILL_PATH.read_text(encoding="utf-8")
+    assert 'versao: "1.3"' in content, "SKILL.md deve declarar versao 1.3 do schema"
+    assert "projeto_alvo:" in content, "SKILL.md deve conter projeto_alvo no workflow_tracking"
+    assert "chaining:" in content, "SKILL.md deve conter chaining no workflow_tracking"
+    assert "root_path:" in content, "SKILL.md deve declarar root_path do projeto alvo"
+
+
+def test_agent_router_fast_chaining_and_target_project():
+    """Valida que agent-router.agent.md formaliza o Fast-Chaining e a resolução de projeto-alvo."""
+    router_path = AGENTS_DIR / "agent-router.agent.md"
+    content = router_path.read_text(encoding="utf-8")
+    assert "Fast-Chaining" in content, "agent-router deve conter regra de Fast-Chaining"
+    assert "workflow_tracking.projeto_alvo" in content, "agent-router deve resolver projeto_alvo"
+
+

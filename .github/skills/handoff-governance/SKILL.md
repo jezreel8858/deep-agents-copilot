@@ -89,11 +89,11 @@ handoff_payload:
 
 ### 2.1) Schema Formal — Campos Obrigatórios e Identidade do Emissor
 
-Todo handoff deve usar este schema tipado (versão 1.1), validável via `yaml-governance`:
+Todo handoff deve usar este schema tipado (versão 1.3), validável via `yaml-governance`:
 
 ```yaml
 handoff_payload:
-  versao: "1.1"                           # string — versão do schema de handoff (v1.1: extensão aditiva retrocompatível)
+  versao: "1.3"                           # string — versão do schema de handoff (v1.3: projeto_alvo e chaining)
   para: "<nome-exato-do-agent>"           # string — enum do catálogo de agents
   motivo: "<1 linha clara>"               # string — razão objetiva da delegação
   emissor:                                # identidade do agent delegante (P10)
@@ -111,7 +111,7 @@ handoff_payload:
     task_id: "<id-da-tarefa>"             # opcional: identificador único da sub-tarefa
     call_type: "subroutine"               # opcional: enum [subroutine | permanent_transfer]
     return_to_parent: true                # opcional: boolean — se true, agent receptor DEVE retornar ao parent_agent
-  workflow_tracking:                      # extensão aditiva (v1.2) — rastreamento de pipeline determinístico (R-050)
+  workflow_tracking:                      # extensão aditiva (v1.2/v1.3) — rastreamento de pipeline determinístico (R-050)
     workflow_id: "<id-do-workflow>"       # opcional: enum [WORKFLOW-BUG-FIX | WORKFLOW-REFACTORING | WORKFLOW-TECHNICAL-ANALYSIS | WORKFLOW-FEATURE-DEVELOPMENT | WORKFLOW-GOVERNANCE-MAINTENANCE]
     etapa_atual: 1                        # opcional: integer — 1-based da etapa corrente
     total_etapas: 5                       # opcional: integer — total de estados do workflow
@@ -119,6 +119,17 @@ handoff_payload:
     proximos_agentes_permitidos:          # opcional: lista de agents autorizados na transição seguinte
       - "<nome-do-proximo-agent>"
     politica_desvio: "strict"             # opcional: enum [strict | adaptive] — strict veda pular estados sem deriva R-042
+    projeto_alvo:                         # extensão v1.3 — isolamento e contexto de workspace multi-projeto (R-050.3)
+      id: "<id-do-projeto>"               # ex.: "[PROJETO-ALVO]" ou "governance-core"
+      root_path: "<caminho-absoluto>"     # ex.: "<workspace>/<project>"
+      adapter_ref: "<caminho-adapter>"    # ex.: ".github/instructions/local/[PROJETO-ALVO].instructions.md"
+    chaining:                             # extensão v1.3 — encadeamento de workflows e herança de diagnóstico (R-050.1)
+      origem_workflow_id: "<id-origem>"   # ex.: "WORKFLOW-TECHNICAL-ANALYSIS" se veio de análise prévia
+      proposta_referenciada: "<id-prop>"  # ex.: "PROPOSTA-1" ou "PROPOSTA-2"
+      carry_over_state:                   # metadados e arquivos herdados do workflow anterior
+        arquivos_afetados:
+          - "<caminho-do-arquivo>"
+        diagnostico_previo: "<resumo do diagnóstico anterior para não re-analisar>"
   contexto:
     solicitacao_original: "<texto>"
     trabalho_realizado: "<resumo>"

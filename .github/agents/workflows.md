@@ -61,9 +61,12 @@ flowchart TD
 
     Fix --> GreenTest["<b>4. Green Test & Linter</b><br/>Agente: runtime-verifier / test-fixer<br/>Ação: Executa suíte; aciona test-fixer se falhar (máx 3x)"]
 
-    GreenTest --> QualityGate["<b>5. Quality Gate & Resumo</b><br/>Agente: @code-review / @pr-gatekeeper<br/>Ação: Validação de segurança/diff e preparação de PR"]
+    GreenTest --> CheckPass{"Testes passaram<br/>dentro do teto 3x?"}
+    CheckPass -- "Sim" --> QualityGate["<b>5. Quality Gate & Resumo</b><br/>Agente: @code-review / @pr-gatekeeper<br/>Ação: Validação de segurança/diff e preparação de PR"]
+    CheckPass -- "Não (Falha Persistente)" --> CircuitBreaker["<b>4b. Circuit Breaker & Rollback</b><br/>Agente: runtime-verifier<br/>Ação: Reversão de diff sujo + Escalation humana (ask_questions)"]
 
     QualityGate --> EndBug(["✅ Concluído com Sucesso"])
+    CircuitBreaker --> EndFail(["🛑 Interrompido com Reversão Segura"])
 ```
 
 #### Cadeia Sequencial e Papéis:
@@ -80,6 +83,7 @@ flowchart TD
 4. **Estado 4 — Verificação Green Test & Linter (`runtime-verifier`)**:
    - *Entrada*: Código alterado e suíte de testes.
    - *Saída*: Confirmação de 100% dos testes passando e `get_errors` limpo em lote único (R-046). Se quebrar, aciona `@test-fixer` (máx. 3 iterações).
+   - *Estado 4b — Circuit Breaker & Rollback*: Se após 3 tentativas os testes não passarem, o `runtime-verifier` reverte compulsoriamente os diffs alterados (workspace clean) e escala para intervenção humana via `ask_questions`.
 5. **Estado 5 — Quality Gate & Resumo (`@code-review` / `@pr-gatekeeper`)**:
    - *Entrada*: Diff final e evidências de teste.
    - *Saída*: Resumo estruturado em 5 seções (R-028) ou preparação de PR via `@pr-gatekeeper`.
@@ -104,7 +108,11 @@ flowchart TD
 
     Execution --> Validation["<b>5. Validação de Ground Truth & Não-Regressão</b><br/>Agente: @business-rules-extractor (Validate) + @code-review<br/>Ação: Validação contra regras do Estado 1 e quality gate"]
 
-    Validation --> EndRefactor(["✅ Concluído com Sucesso"])
+    Validation --> CheckRefactor{"Regras e testes<br/>100% preservados?"}
+    CheckRefactor -- "Sim" --> EndRefactor(["✅ Concluído com Sucesso"])
+    CheckRefactor -- "Não (Violação de Regra)" --> RefactorRollback["<b>5b. Rollback Automático do Plano</b><br/>Agente: @refactor-planner<br/>Ação: Reversão ao snapshot anterior + Relatório de divergência"]
+    RefactorRollback --> EndRefactorFail(["🛑 Refatoração Revertida com Segurança"])
+```
 ```
 
 #### Cadeia Sequencial e Papéis:
@@ -319,5 +327,86 @@ Para que o usuário nunca fique no escuro quanto ao fluxo em andamento, o `@agen
 - [⏳] **Etapa 2: Checkpoint de Aprovação Humana** → `ask_questions` *(Pendente: aprovação explícita do plano)*
 - [⏳] **Etapa 3: Execução Governada em Lote** → `@governance-maintainer` / `@governance-factory` *(Pendente: sincronização em lote R-046)*
 ```
+
+---
+
+## 7. Protocolo de Encadeamento de Workflows (Workflow Chaining & State Carry-Over — R-050.1)
+
+### 7.1 O Problema da Perda de Contexto Pós-Diagnóstico
+Quando um workflow analítico (`WORKFLOW-TECHNICAL-ANALYSIS`) conclui seu relatório (ex.: *"Identificadas 3 oportunidades de melhoria no módulo de agendamento do projeto [PROJETO-ALVO]"*), o usuário naturalmente responde no turno seguinte com uma ordem direta:
+> *"Pode implementar a sugestão 1 e 2"* ou *"Aprovado, aplique a refatoração proposta"*.
+
+Sem um protocolo explícito de encadeamento:
+- O `@agent-router` (ao reavaliar no turno N+1 sob R-042) recebe uma frase curta fora de contexto ("implemente a 1").
+- O roteador poderia classificar a frase como "ambígua" e desviá-la erroneamente para o `@prompt-structuring`.
+- Mesmo se roteasse para um desenvolvedor, o agente downstream começaria do zero sem saber quais arquivos e linhas o especialista acabou de diagnosticar.
+
+### 7.2 Regra de Fast-Chaining (Transição com Herança de Estado)
+1. **Estruturação da Saída no Estado 3 (Análise)**: O especialista analítico SEMPRE rotula suas recomendações com identificadores formais (`[PROPOSTA-1]`, `[PROPOSTA-2]`) e indica o workflow de destino recomendado (`proximo_workflow: "WORKFLOW-REFACTORING"` ou `"WORKFLOW-FEATURE-DEVELOPMENT"`).
+2. **Reconhecimento pelo `@agent-router` (Passo 0.4 - Fast-Chaining)**: Quando a mensagem do usuário for uma aprovação, seleção ou comando de execução baseado na análise do turno anterior (ex.: *"implemente a 1"*, *"aplique a melhoria"*, *"siga com o plano"*), o roteador:
+   - **Bypassa 100% o `@prompt-structuring`**.
+   - Identifica o workflow executivo correspondente (`WORKFLOW-REFACTORING` para melhorias de código existente, `WORKFLOW-FEATURE-DEVELOPMENT` para novas features, `WORKFLOW-BUG-FIX` se foi diagnóstico de erro).
+   - Injeta o `carry_over_state` no `workflow_tracking.chaining` do handoff, transferindo os artefatos, classes e regras já mapeadas diretamente para a Etapa 1 do novo workflow.
+
+```mermaid
+flowchart LR
+    W3["WORKFLOW-TECHNICAL-ANALYSIS<br/>(Estado 3: Recomendações [PROPOSTA-1..N])"] --> UserApprove{"Usuário:<br/>'Aprovado, implemente a 1'"}
+    UserApprove --> RouterChain["@agent-router<br/>(Fast-Chaining Check)"]
+    RouterChain -- "Bypass @prompt-structuring<br/>com carry_over_state" --> W2["⚡ WORKFLOW-REFACTORING<br/>(Etapa 1 direta com arquivos mapeados)"]
+    RouterChain -- "Se for nova feature" --> W4["⚡ WORKFLOW-FEATURE-DEVELOPMENT<br/>(Etapa 2 direta com requisitos da análise)"]
+```
+
+---
+
+## 8. Circuit Breaker, Tolerância a Falhas e Estados de Rollback (R-050.2)
+
+### 8.1 Prevenção de Loops e Corrupção de Workspace
+Nenhum workflow mutativo pode deixar o repositório em estado quebrado, sujo ou entrar em loops infinitos de autocorreção.
+
+1. **Orçamento Rígido de Autocorreção (Circuit Breaker)**:
+   - Em `WORKFLOW-BUG-FIX` (Etapa 4), o `@test-fixer` possui um teto absoluto de **3 tentativas** para corrigir testes quebrados.
+   - Se os testes não passarem na 3ª tentativa, o fluxo **NÃO** prossegue para o Quality Gate nem continua tentando cegamente.
+2. **Ativação Compulsória do Estado de Rollback (Estado 4b / 5b)**:
+   - O agente (`runtime-verifier` ou `@refactor-planner`) executa imediatamente a reversão dos diffs modificados nesta sessão (restauração do workspace ao estado limpo pré-execução).
+   - O agente gera um relatório compacto de falha (3 linhas: Causa, Local, Ação sugerida) e aciona `ask_questions` para decisão humana:
+     - *Opção A: Ajustar a estratégia de teste manualmente.*
+     - *Opção B: Revisar hipótese de causa raiz.*
+     - *Opção C: Cancelar a tarefa mantendo o workspace limpo.*
+3. **Rollback em Refatoração (Estado 5b)**:
+   - Se o `@business-rules-extractor` detectar no Estado 5 que qualquer regra de negócio do ground truth (Estado 1) foi alterada ou violada, o plano de rollback desenhado no Estado 3 é acionado automaticamente antes de qualquer aprovação humana.
+
+---
+
+## 9. Rastreamento Multi-Projeto no `workflow_tracking` (`projeto_alvo` — R-050.3)
+
+### 9.1 O Desafio de Repositórios Externos Conectados
+Em ecossistemas multi-projeto onde este repositório (`deep-agents-copilot`) atua como base de governança central e outros projetos (ex.: `[PROJETO-ALVO]`) são repositórios de produto conectados:
+- O agente downstream precisa saber a raiz exata do projeto (`project_root`).
+- O agente deve carregar as instruções específicas do projeto (`.github/instructions/local/<projeto>.instructions.md` — R-043).
+- É terminantemente proibido criar arquivos de código da aplicação dentro do repositório de governança (R-034/R-043).
+
+### 9.2 Schema de `projeto_alvo` no Handoff (v1.3)
+Todo handoff executivo transporta o contexto do projeto resolvido no `workflow_tracking`:
+
+```yaml
+workflow_tracking:
+  workflow_id: "WORKFLOW-TECHNICAL-ANALYSIS"
+  etapa_atual: 1
+  total_etapas: 3
+  nome_etapa: "advisory_dispatch"
+  projeto_alvo:
+    id: "[PROJETO-ALVO]"
+    root_path: "<workspace>/[PROJETO-ALVO]"
+    adapter_ref: ".github/instructions/local/[PROJETO-ALVO].instructions.md"
+  chaining:
+    origem_workflow_id: null       # ou "WORKFLOW-TECHNICAL-ANALYSIS" se veio de chaining
+    proposta_referenciada: null    # ex.: "PROPOSTA-1"
+    carry_over_state:
+      arquivos_afetados:
+        - "src/app/features/exemplo/exemplo-list.component.ts"
+      diagnostico_previo: "3 memory leaks detectados em subscriptions manuais sem takeUntil"
+```
+Com esse bloco, qualquer especialista na cadeia sequencial sabe exatamente onde ler, onde testar e quais convenções de stack aplicar, sem ambiguidades.
+
 
 

@@ -36,11 +36,11 @@ O motor `@optave/codegraph` fornece parsing via AST real (motor nativo) para 34 
 - ✅ SEMPRE checar cache `code-graph:*` (deste próprio agent) antes de reprocessar qualquer projeto.
 - ✅ SEMPRE medir e reportar cobertura de nós/arestas e economia de bytes/tokens a cada construção (RF-010).
 - ✅ **CONSULTAS VIA MCP ENXUTO (Least-Tools & Multi-Repo)**: Uma vez que o banco `.codegraph/graph.db` exista, realizar as consultas prioritariamente via tools MCP nativas (`query`, `module_map`, `fn_impact`, `find_cycles`, `context`), reduzindo o consumo de tokens e eliminando poluição de shell.
-  - Multi-repositório: use o parâmetro `repo` (ex: `repo: "worship-scale-app"`) ou filtre por `file` quando o workspace possuir múltiplos projetos registrados.
-  - Exemplo `query`: `query(name: "MembrosStore", repo: "worship-scale-app")` — o parâmetro `name` é OBRIGATÓRIO.
-  - Exemplo `module_map`: `module_map(limit: 20, repo: "worship-scale-app")`.
-  - Exemplo `fn_impact`: `fn_impact(name: "nomeDaFuncao", repo: "worship-scale-app")`.
-  - Exemplo `find_cycles`: `find_cycles(repo: "worship-scale-app")`.
+  - Multi-repositório: use o parâmetro `repo` (ex: `repo: "[PROJETO-ALVO]"`) ou filtre por `file` quando o workspace possuir múltiplos projetos registrados.
+  - Exemplo `query`: `query(name: "ExemploStore", repo: "[PROJETO-ALVO]")` — o parâmetro `name` é OBRIGATÓRIO.
+  - Exemplo `module_map`: `module_map(limit: 20, repo: "[PROJETO-ALVO]")`.
+  - Exemplo `fn_impact`: `fn_impact(name: "nomeDaFuncao", repo: "[PROJETO-ALVO]")`.
+  - Exemplo `find_cycles`: `find_cycles(repo: "[PROJETO-ALVO]")`.
 - ✅ SEMPRE indexar o resultado consolidado via `ctx_index` (`code-graph:<project-id>:<hash>`) ao término da construção — sem essa indexação o grafo não fica disponível para `ctx_search` durante o restante da sessão.
 - ✅ SEMPRE aplicar `no_tests: true` (ou `-T`) em consultas de impacto/blast-radius, salvo pedido explícito de incluir testes.
 
@@ -119,7 +119,7 @@ Estes valores **substituem** qualquer autoavaliação subjetiva nas seções Dec
 | 4 | Dependências circulares verificadas | ✅ | `codegraph cycles` |
 | 5 | Blast radius calculado | ✅ | `codegraph fn-impact` / `codegraph diff-impact` (superior ao anterior: inclui co-change/git diff) |
 | 6 | Acoplamento classificado (Tight/Loose/Circular/Eventual) | ❌ **Gap aceito** | Sem taxonomia equivalente; "architecture boundaries" do `@optave/codegraph` é enforcement de regra, não classificação de força de acoplamento |
-| 7 | Visualização interativa gerada | ✅ | **Corrigido (2026-09-03)**: `codegraph plot` gera HTML standalone via `vis-network`, com clustering/color-by/size-by/overlay — validado em execução real (worship-scale-app: 148 nós renderizados via seed top-fanin, ~100KB). Não é o Cytoscape.js customizado do motor anterior (sem cores por `coupling`/realce de ciclo específico), mas cobre o requisito de visualização interativa |
+| 7 | Visualização interativa gerada | ✅ | **Corrigido (2026-09-03)**: `codegraph plot` gera HTML standalone via `vis-network`, com clustering/color-by/size-by/overlay — validado em execução real ([PROJETO-EXEMPLO]: 148 nós renderizados via seed top-fanin, ~100KB). Não é o Cytoscape.js customizado do motor anterior (sem cores por `coupling`/realce de ciclo específico), mas cobre o requisito de visualização interativa |
 | 8 | Dados sensíveis (PII/financeiro) rastreados separadamente | ❌ **Gap aceito** | Sem classificação de sensibilidade de dado |
 | 9 | Nós de nível controller/service construídos | ⚠️ Não nativo | Motor trabalha em nível função/classe/arquivo; não distingue `controller`/`service` como tipo de nó dedicado |
 | — | Cross-repo SOAP/JAX-WS (capacidade extra do motor anterior, RF-025) | ❌ **Gap aceito** | Sem equivalente |

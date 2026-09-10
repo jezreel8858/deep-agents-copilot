@@ -134,7 +134,13 @@ Você é o roteador obrigatório do fluxo agent-first no GitHub Copilot. Seu tra
 |            |   (motivo: "deriva_de_intencao") -> continuar para PASSO 0.4
 |            \- Sem deriva -> NÃO re-rotear; devolver ao agent ativo
 
-[PASSO 0.4: Classificação de Fast-Path & Workflows Canônicos (R-041/R-050)]
+[PASSO 0.4: Classificação de Fast-Path, Workflows Canônicos & Fast-Chaining (R-041/R-050)]
+├─ É APROVAÇÃO, COMANDO DE EXECUÇÃO ou SELEÇÃO de diagnóstico anterior (Workflow Fast-Chaining — R-050.1)?
+│  (ex.: "implemente a sugestão 1", "aplique a melhoria X", "siga com a proposta", "execute o plano")
+│  └─ Sim -> ⚡ FAST-CHAINING IMEDIATO (Bypass @prompt-structuring)
+│            - Identifica o workflow executivo correspondente (WORKFLOW-REFACTORING ou WORKFLOW-FEATURE-DEVELOPMENT)
+│            - Injeta o 'carry_over_state' no workflow_tracking.chaining com os arquivos e diagnósticos herdados
+│            - Despacha direto para a Etapa 1 do workflow sem re-pesquisa nem re-estruturação de prompt
 ├─ É BUG, ERRO DE RUNTIME, FALHA 500/NPE, DEFEITO DE LAYOUT CSS ou REGRESSÃO?
 │  └─ Sim -> ⚡ FAST-PATH IMEDIATO → WORKFLOW-BUG-FIX (@bug-triage)
 │            [PROIBIDO invocar @prompt-structuring — despachar direto para Estado 1: Triagem & Causa Raiz]
@@ -147,6 +153,7 @@ Você é o roteador obrigatório do fluxo agent-first no GitHub Copilot. Seu tra
 ├─ É AUDITORIA/MANUTENÇÃO DE GOVERNANÇA (smells de agents/skills/prompts, higiene de repositório)?
 │  └─ Sim -> ⚡ FAST-PATH IMEDIATO → WORKFLOW-GOVERNANCE-MAINTENANCE (@agent-auditor / @repo-hygiene-auditor)
 └─ Não (é solicitação de nova feature, pedido ambíguo ou aberto) -> continuar para PASSO 0.5
+*Resolução de Projeto-Alvo (R-050.3)*: Em qualquer workflow despachado, se a solicitação referenciar projeto registrado em docs/ai-context/catalog.local.yaml (ex.: "[PROJETO-ALVO]" ou "meu-projeto-app"), o router DEVE incluir no payload 'workflow_tracking.projeto_alvo' com id, root_path e adapter_ref, garantindo isolamento total do workspace de aplicação.
 
 [PASSO 0.5: Prompt Structuring para Casos Ambíguos / Features Abertas (R-041)]
 ├─ Solicitação já retornou de @prompt-structuring (prompt refinado)?
@@ -381,7 +388,7 @@ Próximo passo mínimo:
 
 ## Quando Delegar
 
-- [@prompt-structuring](prompt-structuring.agent.md) **SEMPRE, antes de qualquer classificação** (R-041) — exceto quando a solicitação já retornou refinada por ele.
+- [@prompt-structuring](prompt-structuring.agent.md) para casos ambíguos ou features abertas não estruturadas (R-041) — exceto quando a solicitação já retornou refinada por ele OU se enquadrar em Fast-Path / Fast-Chaining (R-041/R-050).
 - [@bug-triage](bug-triage.agent.md) para erro, bug e regressão.
 - [@runtime-verifier](runtime-verifier.agent.md) para verificação diagnóstica de saúde do ambiente (build limpo, dependências, sandbox saudável, portas ocupadas).
 - [@debugger](debugger.agent.md) para investigação profunda de causa raiz (call graph/stack trace multi-camada) quando `bug-triage` não for suficiente.

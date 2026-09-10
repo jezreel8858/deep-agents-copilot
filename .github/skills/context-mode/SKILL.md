@@ -73,7 +73,7 @@ Skill para operar `ctx_*` com mínimo consumo de contexto: coletar em lote, proc
 
 Para evitar que agents leiam arquivos repetidamente ou recorram ao terminal (`find`, `grep`, scripts Node), projetos registrados devem ter sua pasta de código (`src/` ou equivalente) indexada no Knowledge Base (FTS5):
 
-- **Chave canônica (`source`)**: `code:<project-id>` (ex.: `code:worship-scale-app`).
+- **Chave canônica (`source`)**: `code:<project-id>` (ex.: `code:deep-agents-copilot`).
 - **Caminho (`path`)**: subpasta de código real (ex.: `<raiz>/src`), **nunca a raiz cega do projeto** (para evitar `.git`, `node_modules`, `dist`, `.angular`).
 - **Exclusões obrigatórias (`exclude`)**: `["**/*.spec.ts", "**/*Test.java", "**/assets/**", "**/environments/**", "**/dist/**", "**/node_modules/**"]`.
 - **Hard cap de arquivos (`maxFiles`)**: padrão seguro `200` para proteger contra blow-up do FTS5.
