@@ -394,9 +394,16 @@ workflows:
         agents_permitidos: ["governance-maintainer", "governance-factory"]
         protocolo: "efficient-batch-code-modification"
         sincronizacao_quadrupla_r015: true
+        sincronizacao_por_tipo:
+          agent: ["catalog.yaml", "routing-graph.yaml", "evals/casos-roteamento.yaml", "agent-router.agent.md", "README.md"]
+          skill: [".index.json", "skills/README.md", "source_docs_consumidores"]
+          prompt: ["prompts/README.md"]
+        max_tentativas_autofix: 3
       - etapa: 4
         nome: "tier1_governance_quality_gate"
         validacao_automatizada: "pytest (smells, routing, isolation)"
+        validacao_comportamental: "agent-evals-lab (60 casos casos-roteamento.yaml)"
+        escalonamento_apos_teto: "ask_questions (revisao_manual_diff)"
 
 # ─────────────────────────────────────────────
 # ARESTAS — condições de roteamento

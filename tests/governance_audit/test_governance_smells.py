@@ -1,5 +1,5 @@
 """
-test_governance_smells.py — Suíte determinística de auditoria estática para os 14 smells de governança.
+test_governance_smells.py — Suíte determinística de auditoria estática para os 15 smells de governança.
 
 Executa no Tier 1 (0 tokens, < 1s) para validar conformidade estrutural, contratual e de segurança
 antes que o agent-auditor (LLM) atue na camada interpretativa/semântica (Two-Tier Hybrid Audit).
@@ -346,4 +346,38 @@ def test_smell_2_9_source_docs_referential_integrity():
     assert not broken_links, (
         f"Foram encontrados {len(broken_links)} links quebrados em source_docs:\n"
         + "\n".join(f"  - Em [{origem}]: {destino}" for origem, destino in broken_links)
+    )
+
+
+# ─────────────────────────────────────────────────────────────
+# SMELL 2.15 — Citação de Range Normativo Desatualizado (Drift de R-0XX)
+# ─────────────────────────────────────────────────────────────
+
+def _get_latest_normative_rule_number() -> int:
+    """Extrai o maior número de regra R-0XX declarado em CLAUDE.md § 3 (dinâmico, nunca hardcoded)."""
+    content = CLAUDE_MD.read_text(encoding="utf-8")
+    rule_numbers = [int(n) for n in re.findall(r"\*\*R-(\d{3})", content)]
+    assert rule_numbers, "Nenhuma regra R-0XX encontrada em CLAUDE.md"
+    return max(rule_numbers)
+
+
+def test_smell_2_15_no_stale_normative_rule_range():
+    """Smell 2.15: nenhum agent com seção 'Regras Herdadas' deve citar um range
+    R-001..R-0XX inferior ao maior R-0XX vigente em CLAUDE.md (drift de sincronização —
+    achado sistêmico de 2026-09: 44/44 agents estavam desatualizados antes da correção)."""
+    latest = _get_latest_normative_rule_number()
+    stale = []
+    for agent_file in get_all_agent_files():
+        content = agent_file.read_text(encoding="utf-8")
+        match = re.search(r"R-001\.\.R-(\d{3})", content)
+        if not match:
+            continue
+        cited = int(match.group(1))
+        if cited < latest:
+            stale.append((agent_file.relative_to(REPO_ROOT), cited))
+
+    assert not stale, (
+        f"Smell 2.15: {len(stale)} agent(s) citam range normativo desatualizado "
+        f"(esperado R-001..R-{latest:03d}):\n"
+        + "\n".join(f"  - {path}: R-001..R-{val:03d}" for path, val in stale)
     )

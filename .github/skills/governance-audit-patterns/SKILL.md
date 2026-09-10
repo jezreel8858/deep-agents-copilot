@@ -250,6 +250,16 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 
 ---
 
+### 2.15 — Citação de Range Normativo Desatualizado (Drift de R-0XX)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Seção `## Regras Herdadas` de um `.agent.md` cita um range `R-001..R-0XX` onde `XX` é menor que a última regra normativa vigente em `CLAUDE.md` (atualmente R-050) — o agent não referencia formalmente as regras mais recentes, mesmo herdando-as implicitamente via link ao arquivo completo |
+| Como detectar | Regex `R-001\.\.R-(\d{3})` em cada `.github/agents/**/*.agent.md`; comparar o valor capturado contra o maior `R-0XX` declarado em `CLAUDE.md` § 3; qualquer valor menor é um achado. Ver Tier 1: `test_smell_2_15_no_stale_normative_rule_range` |
+| Origem (TrustAgent) | Extrínseco — `CLAUDE.md` evolui (novas regras) mas os agents consumidores não são atualizados na mesma entrega (violação de R-015 a posteriori) |
+| Severidade | Baixa individualmente, mas **Alta em agregado** quando sistêmica (evidência real: 44/44 agents com a seção encontrados desatualizados simultaneamente em auditoria de 2026-09 — sinal de ausência de processo de sincronização, não de um lapso isolado) |
+| Remediação | Batch update via `@governance-maintainer`: script `ctx_execute` com match-verificado por arquivo (ler → contar ocorrências == 1 → substituir → escrever), nunca `insert_edit_into_file` em arquivos grandes/YAML sensível a indentação (incidente documentado: corrompeu `workflows.md` e `routing-graph.yaml` na auditoria de 2026-09 ao tentar edições multi-linha sem ancoragem precisa) |
+
 ## 3) Severidade — Reaproveitamento da Taxonomia Existente
 
 Esta skill **reaproveita** (não recria) a taxonomia de `code-review-patterns`:

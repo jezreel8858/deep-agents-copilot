@@ -41,7 +41,7 @@ Pedido recebido?
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-044` em [`../../CLAUDE.md`](../../CLAUDE.md), especialmente **R-033** (nunca gerar `.md` sem solicitação/aprovação).
+- Regras normativas `R-001..R-050` em [`../../CLAUDE.md`](../../CLAUDE.md), especialmente **R-033** (nunca gerar `.md` sem solicitação/aprovação).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 
 ## Catálogo / Conhecimento Base

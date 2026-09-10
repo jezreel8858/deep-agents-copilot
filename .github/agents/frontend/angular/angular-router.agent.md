@@ -38,7 +38,7 @@ Você é o supervisor de domínio e roteador especializado de frontend Angular. 
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-045` em [`../../../../CLAUDE.md`](../../../../CLAUDE.md).
+- Regras normativas `R-001..R-050` em [`../../../../CLAUDE.md`](../../../../CLAUDE.md).
 - Sub-catálogo Angular em [`angular-catalog.yaml`](./angular-catalog.yaml).
 
 ## Skills Associadas

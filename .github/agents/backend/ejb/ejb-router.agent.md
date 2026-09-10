@@ -37,7 +37,7 @@ Você é o supervisor de domínio e roteador especializado em backend Java Legad
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-045` em [`../../../../CLAUDE.md`](../../../../CLAUDE.md).
+- Regras normativas `R-001..R-050` em [`../../../../CLAUDE.md`](../../../../CLAUDE.md).
 - Sub-catálogo EJB em [`ejb-catalog.yaml`](./ejb-catalog.yaml).
 
 ## Skills Associadas

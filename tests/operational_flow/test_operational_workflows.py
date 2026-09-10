@@ -40,6 +40,17 @@ READONLY_ADVISORY_AGENTS = {
     "performance-agent",
     "code-style-enforcer",
     "runtime-verifier",
+    # Ampliação carry-forward (auditoria Workflow 3 — 2026-09): especialistas read-only
+    # despachados por WORKFLOW-TECHNICAL-ANALYSIS sem cobertura de teste equivalente.
+    "code-knowledge-graph",
+    "devops-engineer",
+    "tech-solution-architect",
+    "angular-arch-advisor",
+    "spring-boot-arch-advisor",
+    "spring-reactive-arch-advisor",
+    "ejb-arch-advisor",
+    "oracle-query-tuner",
+    "informix-query-tuner",
 }
 
 

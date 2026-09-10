@@ -437,27 +437,34 @@ flowchart TD
 
     GateGov --> CheckGov{"Suíte de Governança<br/>100% verde?"}
     CheckGov -- "Sim" --> EndDone(["✅ Governança Atualizada & Consistente"])
-    CheckGov -- "Falha" --> AutoFix["Autocorreção cirúrgica pelo @governance-maintainer"]
+    CheckGov -- "Falha (tentativa N/3)" --> CheckAutoFixCap{"Tentativas<br/>autofix < 3?"}
+    CheckAutoFixCap -- "Sim" --> AutoFix["Autocorreção cirúrgica pelo @governance-maintainer"]
     AutoFix --> GateGov
+    CheckAutoFixCap -- "Não (teto esgotado)" --> GovEscalate["<b>4b. Escalonamento</b><br/>ask_questions: revisão manual do diff"]
 ```
 
 #### Cadeia Sequencial e Papéis:
 1. **Estado 1 — Diagnóstico Read-Only ou Pesquisa Prévia**:
-   - *Diagnóstico de Smells*: O `@agent-auditor` executa auditoria estática e comportamental contra os 14 smells canônicos de governança.
+   - *Diagnóstico de Smells*: O `@agent-auditor` executa auditoria estática e comportamental contra os 15 smells canônicos de governança.
    - *Auditoria de Higiene*: O `@repo-hygiene-auditor` audita a saúde do repositório, licença e segurança de versionamento.
    - *Pesquisa Prévia Compulsória (Criação de Artefatos / Stack)*: O `@governance-factory` delega compulsoriamente ao `@deep-search` a investigação de mercado antes de escrever novos prompts, skills ou agents.
 2. **Estado 2 — Modelagem e Checkpoint de Aprovação Humana**:
    - Apresentação objetiva dos achados ou especificações do novo artefato.
    - *Estado 2b (Checkpoint Humano)*: Toda manutenção estrutural ou criação de stack exige autorização explícita via `ask_questions` antes de qualquer alteração física nos catálogos.
-3. **Estado 3 — Execução e Sincronização Quádrupla em Lote (R-015 / R-046)**:
+3. **Estado 3 — Execução e Sincronização em Lote por Tipo de Artefato (R-015 / R-046)**:
    - O `@governance-maintainer` aplica as alterações em lote único (*Single-Turn Batching*) utilizando o `context-mode` MCP no sandbox para zero desperdício de tokens.
-   - Na criação de novos agents ou stacks, aplica compulsoriamente a **Sincronização Quádrupla Atômica (R-015)**: atualiza `catalog.yaml`, `routing-graph.yaml`, `agent-router.agent.md` e `README.md` na mesma entrega.
+   - **Sincronização Atômica por Tipo (R-015 — gap corrigido)**: o conjunto de arquivos sincronizados depende do tipo de artefato, nunca uma lista fixa de 4 arquivos:
+     - **Novo Agent**: `catalog.yaml` + `routing-graph.yaml` (nós/arestas) + **novo caso em `.github/agents/evals/casos-roteamento.yaml`** (exigência formal de R-040, antes omitida desta lista) + `agent-router.agent.md` (Decision Tree derivada) + `.github/agents/README.md`.
+     - **Nova Skill**: `.github/skills/.index.json` + `.github/skills/README.md` + `source_docs:` dos agents consumidores.
+     - **Novo Prompt**: `.github/prompts/README.md`.
+     - **Nova Stack**: todos os itens acima aplicados ao sub-catálogo de domínio (`*-catalog.yaml`) + domain router correspondente.
 4. **Estado 4 — Quality Gate de Governança (Tier 1 Automático)**:
    - Execução determinística dos testes de governança:
-     - `test_governance_smells.py` (conformidade com templates e 14 smells).
+     - `test_governance_smells.py` (conformidade com templates e 15 smells).
      - `test_local_project_isolation.py` (100% isolamento de projetos locais — R-038/R-043/R-044).
      - `test_routing_quality_gate.py` (integridade do grafo e alcançabilidade).
-   - Havendo qualquer regressão, o `@governance-maintainer` autocorrige a inconsistência antes de entregar o relatório final ao usuário.
+   - **Suíte de Evals Comportamental**: para nova rota/agent, valida adicionalmente contra os 60 casos de `.github/agents/evals/casos-roteamento.yaml` (`agent-evals-lab`) — regressão estrutural (pytest) não substitui regressão comportamental de roteamento.
+   - **Circuit Breaker (Estado 4b)**: teto de **3 tentativas** de autocorreção. Havendo regressão, o `@governance-maintainer` autocorrige a inconsistência; se a 3ª tentativa ainda falhar, escala via `ask_questions` para revisão manual do diff — nunca autocorreção indefinida.
 
 #### Typed State Bag (`workflow_state`):
 ```yaml
@@ -476,8 +483,12 @@ workflow_state:
   plano_manutencao_lote:
     - arquivo: ".github/agents/catalog.yaml"
       acao: "atualizar_versao_e_source_docs"
+  sincronizacao_por_tipo:
+    tipo_artefato: "agent | skill | prompt | stack"
+    inclui_evals_casos_roteamento: true  # obrigatorio para novo agent/rota (R-040)
   status_aprovacao_humana: "aprovado"
   quality_gate_tier1: "100_passando"
+  tentativas_autofix: 0  # teto: 3 (Estado 4b)
 ```
 
 ---

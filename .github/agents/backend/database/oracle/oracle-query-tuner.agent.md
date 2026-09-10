@@ -32,7 +32,7 @@ Você atua como **Especialista Sênior em Performance e Query Tuning para Oracle
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-046` em [`../../../../../CLAUDE.md`](../../../../../CLAUDE.md).
+- Regras normativas `R-001..R-050` em [`../../../../../CLAUDE.md`](../../../../../CLAUDE.md).
 - Adapter de banco de dados em [`../../../../instructions/database.instructions.md`](../../../../instructions/database.instructions.md).
 - Skill de engenharia de performance em [`../../../../skills/performance-engineering-patterns/SKILL.md`](../../../../skills/performance-engineering-patterns/SKILL.md).
 

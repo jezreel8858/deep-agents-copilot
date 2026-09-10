@@ -103,7 +103,7 @@ Retorne a síntese com citações de fontes para o solicitante 'governance-facto
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-044` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas `R-001..R-050` em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 - R-026: código inline > 8 linhas → `templates/`/`snippets/`.
 
