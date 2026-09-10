@@ -2,7 +2,7 @@
 name: init-context
 description:
   ⚠️ PRÉ-REQUISITO OBRIGATÓRIO — Inicializa contexto de governança global para TODA sessão.
-  Carrega CLAUDE.md + copilot-instructions.md, valida conformidade R-001..R-040.
+  Carrega CLAUDE.md + copilot-instructions.md, valida conformidade R-001..R-051.
   Execute UMA ÚNICA VEZ no início da sessão ANTES de /add-project-context ou qualquer agent.
   NÃO REPITA na mesma sessão — faz 1x apenas.
 agent: 'agent'
@@ -24,7 +24,7 @@ source_docs:
 
 Inicializa contexto obrigatório de governança. Execute 1x por sessão APENAS.
 
-> **Propósito**: PRÉ-REQUISITO para toda execução downstream. Carregar regras R-001..R-046, validar model, eliminar alucinação.
+> **Propósito**: PRÉ-REQUISITO para toda execução downstream. Carregar regras R-001..R-051, validar model, eliminar alucinação.
 > **Workspace**: `${workspaceFolder}`
 >
 > **FREQUÊNCIA**: ❌ 1x POR SESSÃO (nunca repita na mesma sessão)
@@ -50,7 +50,7 @@ Inicializa contexto obrigatório de governança. Execute 1x por sessão APENAS.
 
 Este prompt carrega **automaticamente** (conforme frontmatter `source_docs`):
 
-- ✅ **`CLAUDE.md`** — Governança global, regras normativas R-001..R-039
+- ✅ **`CLAUDE.md`** — Governança global, regras normativas R-001..R-051
 - ✅ **`.github/copilot-instructions.md`** — Roteamento rápido, agents, skills, binding
 
 **Validação**: Se algum arquivo não foi anexado, Copilot **DEVE** alertar e carregá-lo manualmente.
@@ -199,7 +199,7 @@ O nível de detalhe é verificado em memória conforme a existência de binding 
 **Linha de progresso emitida:**
 
 ```
-[4/8] Regras: ✅ R-001..R-040 ativas (<recorrente: top 5 em memória | 1ª vez: catálogo completo>)
+[4/8] Regras: ✅ R-001..R-051 ativas (<recorrente: top 5 em memória | 1ª vez: catálogo completo>)
 ```
 
 Depois, prosseguir para PASSO 5.
@@ -304,10 +304,10 @@ Ao concluir `/init-context`, Copilot exibe o bloco consolidado com todos os dado
 
 | Verificação | Status / Detalhes |
 |---|---|
-| **Diretrizes Base (PASSO 1)** | ✅ `CLAUDE.md` + `.github/copilot-instructions.md` carregados (regras R-001..R-046) |
+| **Diretrizes Base (PASSO 1)** | ✅ `CLAUDE.md` + `.github/copilot-instructions.md` carregados (regras R-001..R-051) |
 | **Ambiente (Fingerprint, PASSO 2)** | ✅ `<SO>` · Shell: `<shell>` · Python: `<versão|ausente>` · Node: `<versão|ausente>` · Java: `<versão|ausente>` · Codegraph: `<versão|ausente>` (registrado em `catalog.local.yaml`) |
 | **Modelo Ativo (PASSO 3)** | ✅ `<model-atual>` (sessão ativa, R-021) |
-| **Regras Críticas (PASSO 4)** | ✅ R-001..R-040 ativas (exibição contextual: `<recorrente \| 1ª vez>`) |
+| **Regras Críticas (PASSO 4)** | ✅ R-001..R-051 ativas (exibição contextual: `<recorrente \| 1ª vez>`) |
 | **Binding Context (PASSO 5)** | ✅ `./docs/ai-context/` DESTE repo · `<n>` projetos no overlay local · `<n>` adapters disponíveis |
 | **Herança de Instruções (PASSO 6)** | ✅ `<n-com-extends>` configurados · `<n-sem-extends>` sem `extends:` |
 | **Context Mode Session (PASSO 7)** | ✅ Ativo · `<Total calls>` chamadas registradas (dashboard rastreável) |

@@ -99,7 +99,7 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 
 | Campo | Conteúdo |
 |---|---|
-| Sintoma | Regra normativa `R-001..R-046` declarada em `CLAUDE.md` mas nunca referenciada por nenhum agent/skill; ou referenciada em prosa mas sem nenhum checklist/mecanismo que a torne verificável |
+| Sintoma | Regra normativa `R-001..R-051` declarada em `CLAUDE.md` mas nunca referenciada por nenhum agent/skill; ou referenciada em prosa mas sem nenhum checklist/mecanismo que a torne verificável |
 | Como detectar | `grep_search` de cada `R-0XX` em `.github/agents/` + `.github/skills/`; contagem zero ou "referência solta sem checklist correspondente" |
 | Origem (TrustAgent) | Extrínseco — desalinhamento entre política declarada (environment/governance) e comportamento do agent |
 | Severidade | Alta (regra sem enforcement é regra decorativa) |
@@ -254,7 +254,7 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 
 | Campo | Conteúdo |
 |---|---|
-| Sintoma | Seção `## Regras Herdadas` de um `.agent.md` cita um range `R-001..R-0XX` onde `XX` é menor que a última regra normativa vigente em `CLAUDE.md` (atualmente R-050) — o agent não referencia formalmente as regras mais recentes, mesmo herdando-as implicitamente via link ao arquivo completo |
+| Sintoma | Seção `## Regras Herdadas` de um `.agent.md` cita um range `R-001..R-0XX` onde `XX` é menor que a última regra normativa vigente em `CLAUDE.md` (atualmente R-051) — o agent não referencia formalmente as regras mais recentes, mesmo herdando-as implicitamente via link ao arquivo completo |
 | Como detectar | Regex `R-001\.\.R-(\d{3})` em cada `.github/agents/**/*.agent.md`; comparar o valor capturado contra o maior `R-0XX` declarado em `CLAUDE.md` § 3; qualquer valor menor é um achado. Ver Tier 1: `test_smell_2_15_no_stale_normative_rule_range` |
 | Origem (TrustAgent) | Extrínseco — `CLAUDE.md` evolui (novas regras) mas os agents consumidores não são atualizados na mesma entrega (violação de R-015 a posteriori) |
 | Severidade | Baixa individualmente, mas **Alta em agregado** quando sistêmica (evidência real: 44/44 agents com a seção encontrados desatualizados simultaneamente em auditoria de 2026-09 — sinal de ausência de processo de sincronização, não de um lapso isolado) |

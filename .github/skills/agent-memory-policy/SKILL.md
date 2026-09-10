@@ -165,7 +165,7 @@ Monitoramento via agent-observability-otel (span: invoke_agent)
 
 | Seção | Razão |
 |---|---|
-| Regras normativas R-001..R-040 em `CLAUDE.md` | Governança global — requer decisão explícita |
+| Regras normativas R-001..R-051 em `CLAUDE.md` | Governança global — requer decisão explícita |
 | Bloco `CRÍTICO` de qualquer `.agent.md` | Define escopo do agent — mudança é breaking change |
 | Seção `Regras Herdadas` de agents | Garante rastreabilidade para `CLAUDE.md` |
 | Qualquer regra de segurança ou autonomia | Previne violação de R-010 e `agent-safety-guardrails` |

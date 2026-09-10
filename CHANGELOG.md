@@ -6,6 +6,30 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.3.0] — 2026-09-10
+
+### Adicionado
+- **Regra Normativa R-051 (Proteção Anti-Corrupção em Edição de Arquivo Único Grande/Estruturado)**: Formalizada em `CLAUDE.md` e `efficient-batch-code-modification/SKILL.md` (§ 5). Veda o uso de `insert_edit_into_file` em arquivos com mais de 200 linhas, formato YAML/JSON ou consumidos por CI/testes, exigindo o Padrão de Edição Segura Verificada (leitura integral, contagem unívoca de ocorrência da âncora, all-or-nothing write e releitura de confirmação).
+- **Snippet Canônico de Edição Segura (`safe-single-file-edit-pattern.js`)**: Materializado em `.github/skills/efficient-batch-code-modification/snippets/safe-single-file-edit-pattern.js` como template reutilizável para context-mode (`ctx_execute`), em estrita conformidade com R-026 (código real fora do corpo da skill).
+- **Novos Smells de Governança (16 Smells Canônicos)**:
+  - **Smell 2.15 (Citação de Range Normativo Desatualizado — Drift de R-0XX)**: Formalizada em `governance-audit-patterns/SKILL.md` e amparada por teste determinístico no Tier 1 (`test_smell_2_15_no_stale_normative_rule_range`), que lê dinamicamente o maior R-0XX de `CLAUDE.md` e bloqueia desatualizações nos agents.
+  - **Smell 2.16 (Agent Mutativo Sem Skill de Edição Segura Referenciada)**: Formalizada em `governance-audit-patterns/SKILL.md` e amparada por teste determinístico no Tier 1 (`test_smell_2_16_mutating_agents_reference_safe_editing_skill`), exigindo que todo agent com tools mutativas referencie `efficient-batch-code-modification`.
+- **Transparência de Base de Conhecimento — Terceira Linha do Banner Universal (`Skills Carregadas`)**: Estendido o Banner Universal de Identidade em `CLAUDE.md` (R-042), `agent-contracts/SKILL.md` (§ 0 e § 8), `.github/copilot-instructions.md` e `handoff-governance/SKILL.md` (§ 5.2) para exibir compulsoriamente a linha `Skills Carregadas: <skill-1>, ...` em cada resposta, garantindo visibilidade no chat sobre quais skills foram pre-fetched e consultadas a cada turno.
+
+### Evoluído
+- **Auditoria e Refinamento Profundo dos 5 Workflows Canônicos (`workflows.md` e `routing-graph.yaml`)**:
+  - **Resolução de Papéis Genéricos (`specialist-<papel>`)**: Formalizada convenção em `workflows.md` § 1.3 mapeando papéis agnósticos de stack (fixer, tester, stylist, implementer, advisory) para os agentes concretos dos sub-catálogos locais (`angular-catalog.yaml`, `spring-boot-catalog.yaml`, `spring-reactive-catalog.yaml`, `ejb-catalog.yaml`).
+  - **Princípio Arquitetural de Separação Declarador/Executor em Circuit Breakers**: Formalizado em `workflows.md` § 5 (Invariante #6) e § 8.1. Agentes estritamente read-only (`runtime-verifier`, `refactor-planner`) apenas detectam e declaram vereditos de bloqueio; a execução física de reversão atômica (`git checkout`/`git restore`) é sempre executada pelo especialista de implementação correspondente via `run_subagent`.
+  - **WF1 (`WORKFLOW-BUG-FIX`)**: Repro Gate com teto de 2 tentativas e estado terminal Não-Reproduzível; distinção entre testes unitários puros vs testes exigindo contexto de framework/DOM; checkpoint de segurança condicional (R-048.1) para correções que toquem autenticação/identidade.
+  - **WF2 (`WORKFLOW-REFACTORING`)**: Safety net com cobertura orientada a risco (`test-coverage-governance/SKILL.md`) em substituição ao threshold plano de 80%; checkpoint de aprovação humana para breaking change, schema ou blast radius grande; limite de escala do DAG Mikado em 15 nós; rollback atômico e incremental decidido pelo planner e executado pelos specialists.
+  - **WF3 (`WORKFLOW-TECHNICAL-ANALYSIS`)**: Inclusão de `devops-engineer` e `code-style-enforcer` no dispatch analítico; suporte a Fan-out/Fan-in multidimensional (`[P]`); teto de profundidade em sub-rotinas (`MAX_DEPTH = 3`); escape hatch formal para análises sem achados (`"nenhuma_proposta_necessaria_conformidade_validada"`).
+  - **WF4 (`WORKFLOW-FEATURE-DEVELOPMENT`)**: Sequenciamento de requisitos (`@requirements-analyst`) e decomposição (`@feature-planner`); sub-rotina de banco (`@database-specialist`); particionamento com tags de stack; shift-left de testes de segurança em TDD; circuit breaker de 2 tentativas no loop de remediação de segurança.
+  - **WF5 (`WORKFLOW-GOVERNANCE-MAINTENANCE`)**: Sincronização atômica estruturada por tipo de artefato, corrigindo a omissão de `evals/casos-roteamento.yaml` para novos agents (R-040); circuit breaker de 3 tentativas no loop de autofix.
+- **Sincronização de Ranges Normativos**: Atualizados 100% dos 44 agents com seção de regras herdadas e todos os prompts e catálogos para a numeração consolidada `R-001..R-051`.
+- **Expansão de Isolamento Read-Only**: `READONLY_ADVISORY_AGENTS` expandido de 8 para 17 agents em `test_operational_workflows.py`, blindando especialistas consultivos contra tools mutativas.
+
+---
+
 ## [2.2.0] — 2026-09-10
 
 ### Adicionado

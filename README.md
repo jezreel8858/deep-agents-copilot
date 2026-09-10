@@ -18,7 +18,7 @@ Objetivo:
 
 **Fonte de Verdade Operacional:**
 
-- **[`CLAUDE.md`](CLAUDE.md)** — Regras normativas (R-001..R-048), princípios e fluxos genéricos
+- **[`CLAUDE.md`](CLAUDE.md)** — Regras normativas (R-001..R-051), princípios e fluxos genéricos
 - **[Instruções do Copilot](.github/copilot-instructions.md)** — Roteamento rápido, autonomy rules e Context Mode
 
 **Características:**
@@ -283,6 +283,7 @@ graph TB
 - **Governança Global:** [`CLAUDE.md`](CLAUDE.md)
 - **Operacional:** [`.github/copilot-instructions.md`](.github/copilot-instructions.md)
 - **Catalog de Adapters + Artefatos:** [`docs/ai-context/catalog.yaml`](docs/ai-context/catalog.yaml)
+- **Workflows Operacionais Determinísticos (R-050):** [`.github/agents/workflows.md`](.github/agents/workflows.md)
 - **Grafo de Roteamento (R-040):** [`.github/agents/routing-graph.yaml`](.github/agents/routing-graph.yaml)
 - **Suíte de Evals:** [`.github/agents/evals/casos-roteamento.yaml`](.github/agents/evals/casos-roteamento.yaml)
 - **Cobertura de Mercado — Perfis de Agents:** [`docs/ai-context/agent-profiles-taxonomy.md`](docs/ai-context/agent-profiles-taxonomy.md)
@@ -293,10 +294,10 @@ graph TB
 
 ---
 
-## Status Atual (2026-09-02)
+## Status Atual (2026-09-10)
 
 ### Governança Global
-- ✅ Regras normativas consolidadas (`CLAUDE.md` — R-001..R-043)
+- ✅ Regras normativas consolidadas (`CLAUDE.md` — R-001..R-051)
 - ✅ Roteamento operacional (`copilot-instructions.md`)
 - ✅ Genericidade explícita em todas as regras globais (R-038)
 - ✅ Re-triagem obrigatória por turno (R-042 — anti sticky-session), fechando o gap de agent downstream que perdia a inteligência de roteamento após o 1º turno
