@@ -38,7 +38,7 @@ Opera em dois modos:
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-039` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas `R-001..R-050` em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 
 ## Catálogo / Conhecimento Base

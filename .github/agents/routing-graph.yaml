@@ -177,6 +177,18 @@ nos:
 # WORKFLOWS — Máquinas de Estado Canônicas (R-050)
 # Define os 5 workflows operacionais determinísticos e suas sequências estritas
 # ─────────────────────────────────────────────
+convencao_papeis_genericos:
+  descricao: >
+    Nomes "specialist-<papel>" usados em estados.*.agent sao aliases genericos
+    resolvidos pelo domain router ativo (angular-router|spring-boot-router|
+    spring-reactive-router|ejb-router) para o id concreto do seu sub-catalogo
+    que declara a tag role: correspondente (fixer|tester|stylist|implementer|
+    advisory|performance). Tabela completa de resolucao por stack em
+    workflows.md secao 1.3. Nunca invocar run_subagent com o nome generico
+    literal; match de proximos_agentes_permitidos em politica_desvio strict
+    ocorre pela tag role:, nao pela string literal.
+  excecao: "database-specialist e agente unico cross-stack, sempre referenciado por nome literal (nunca generico)"
+
 workflows:
   - id: WORKFLOW-BUG-FIX
     nome: "Resolução de Bugs, Defeitos de Layout e Regressões"
@@ -201,19 +213,23 @@ workflows:
         agent: "bug-triage"
         sub_rotinas_permitidas: ["debugger", "code-knowledge-graph"]
         repro_gate: "debugger (tracepoint) | ask_questions"
+        max_tentativas_repro_gate: 2
+        escalonamento_nao_reproduzivel: "ask_questions (prosseguir_com_hipotese | aguardar_evidencia | encerrar_nao_reproduzivel)"
       - etapa: 2
         nome: "red_test_and_layout_reproduction"
-        agent: "specialist-unit-test-writer | specialist-component-test-writer | specialist-ui-stylist"
+        agent: "specialist-unit-test-writer | specialist-component-test-writer | specialist-integration-test-writer | specialist-ui-stylist"
         pre_flight: "runtime-verifier (baseline check)"
+        nota: "integration-test-writer obrigatorio quando o bug so reproduz com contexto de framework (Spring/R2DBC/Testcontainers); component-test-writer para DOM real (Angular)"
       - etapa: 3
         nome: "surgical_bug_fix"
         agent: "specialist-bug-fixer | specialist-ui-stylist"
         sub_rotinas_permitidas: ["database-specialist"]
+        security_checkpoint_condicional: "R-048.1 (tech-solution-architect + security-reviewer) obrigatorio se o diff tocar autenticacao/credenciais/identidade, antes de aplicar o fix"
       - etapa: 4
         nome: "green_test_and_linter_validation"
         agent: "runtime-verifier | specialist-test-fixer"
         max_retries: 3
-        circuit_breaker: "runtime-verifier (rollback_and_escalate)"
+        circuit_breaker: "runtime-verifier (declara_veredito_readonly, nunca reverte) -> specialist-bug-fixer|specialist-test-fixer (executa_revert_via_git) -> ask_questions"
       - etapa: 5
         nome: "quality_gate_and_pr"
         agent: "code-review | pr-gatekeeper"
@@ -240,21 +256,25 @@ workflows:
         agent: "code-knowledge-graph"
         sub_rotinas_permitidas: ["tech-solution-architect"]
         safety_net_gate: "specialist-unit-test-writer (golden master check)"
+        threshold_cobertura_por_risco: "test-coverage-governance/SKILL.md § 1 (90 critico | 80 integracao | 70 controller)"
       - etapa: 3
         nome: "refactor_plan_and_safety_net"
         agent: "refactor-planner"
         co_agentes: ["test-strategy"]
         estrategia_decomposicao: "mikado_method"
         sub_rotinas_permitidas: ["database-specialist"]
+        checkpoint_aprovacao_condicional: "ask_questions se breaking_change|schema|blast_radius_grande; contextual/implicita (R-031) se escopo local"
+        limite_escala_dag: 15
       - etapa: 4
         nome: "incremental_batch_execution"
         agent: "domain-router | specialist-feature-developer"
         protocolo: "efficient-batch-code-modification"
+        gate_out_por_no: "compilacao_limpa + testes_verdes + diff_minimo"
       - etapa: 5
         nome: "ground_truth_validation_and_review"
         agent: "business-rules-extractor"
         co_agentes: ["code-review"]
-        circuit_breaker: "refactor-planner (automatic_rollback)"
+        circuit_breaker: "refactor-planner (decide_escopo_readonly) -> domain-router/specialist por no (executa_revert)"
 
   - id: WORKFLOW-TECHNICAL-ANALYSIS
     nome: "Análise Técnica, Diagnóstico e Auditoria Especializada"

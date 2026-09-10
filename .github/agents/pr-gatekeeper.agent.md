@@ -28,7 +28,7 @@ Você é especialista em **preparar a submissão de pull request** depois que o 
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-044` em [`../../CLAUDE.md`](../../CLAUDE.md) — especialmente a proibição de commit/push autônomo.
+- Regras normativas `R-001..R-050` em [`../../CLAUDE.md`](../../CLAUDE.md) — especialmente a proibição de commit/push autônomo.
 - Regras de autonomia em [`../copilot-instructions.md`](../copilot-instructions.md).
 - R-035: leitura de comandos git sem paginador (`git --no-pager`).
 

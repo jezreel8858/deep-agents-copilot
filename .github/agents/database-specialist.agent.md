@@ -29,7 +29,7 @@ Você é especialista em banco de dados relacional e NoSQL — migrações de sc
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-046` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas `R-001..R-050` em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 - R-046: injeção compulsória de batching e protocolo da skill `efficient-batch-code-modification`.
 - Sem instalação autônoma de dependência (ex.: driver de banco) — apontar e aguardar confirmação.
