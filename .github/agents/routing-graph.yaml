@@ -309,13 +309,18 @@ workflows:
           - "ejb-arch-advisor"
           - "oracle-query-tuner"
           - "informix-query-tuner"
+          - "devops-engineer"
+          - "code-style-enforcer"
+        suporte_fan_out: "handoff-governance/SKILL.md § 5.1 se [P] R-018 e 2+ categorias independentes"
       - etapa: 2
         nome: "deterministic_read_only_collection"
         modo: "advisory_read_only"
         sub_rotinas_permitidas: ["tech-solution-architect", "code-knowledge-graph", "deep-search"]
+        max_depth_subrotina: 3
       - etapa: 3
         nome: "synthesis_and_next_step"
         saida_estruturada: "tabela_propostas_acionaveis"
+        escape_hatch_sem_achados: "nenhuma_proposta_necessaria_conformidade_validada"
         suporte_fast_chaining: true
         regra_conclusao: "R-047"
 

@@ -29,7 +29,7 @@ Você é especialista em **revisão de segurança de aplicação** — código, 
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-043` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas `R-001..R-050` em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 - R-010: nunca expor credenciais, tokens ou dados sensíveis — nem no relatório de achados.
 
