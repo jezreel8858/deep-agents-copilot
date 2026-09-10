@@ -1,5 +1,5 @@
 """
-test_governance_smells.py — Suíte determinística de auditoria estática para os 16 smells de governança.
+test_governance_smells.py — Suíte determinística de auditoria estática para os 17 smells de governança.
 
 Executa no Tier 1 (0 tokens, < 1s) para validar conformidade estrutural, contratual e de segurança
 antes que o agent-auditor (LLM) atue na camada interpretativa/semântica (Two-Tier Hybrid Audit).
@@ -409,4 +409,46 @@ def test_smell_2_16_mutating_agents_reference_safe_editing_skill():
         f"Smell 2.16: {len(gaps)} agent(s) com tools mutativas nao referenciam "
         f"'{skill_ref}' em source_docs/skills:\n"
         + "\n".join(f"  - {p}" for p in gaps)
+    )
+
+
+# ─────────────────────────────────────────────────────────────
+# SMELL 2.17 — Comando Git Sem Desativação de Pager (R-035)
+# ─────────────────────────────────────────────────────────────
+
+def test_smell_2_17_no_bare_git_pager_commands_in_prompts_and_governance():
+    """Smell 2.17: nenhum prompt (.prompt.md) ou skill de terminal deve conter comandos
+    executáveis git (diff|log|show|branch|tag) sem desativação explícita de pager
+    (--no-pager, GIT_PAGER=cat ou pipe | cat), prevenindo travamento do terminal (R-035)."""
+    paged_git_pattern = re.compile(r"^\s*git\s+(diff|log|show|branch|tag)\b")
+    safe_flags = ("--no-pager", "GIT_PAGER", "| cat", "| head")
+    violations = []
+
+    # Valida prompts
+    for prompt_file in get_all_prompt_files():
+        p_content = prompt_file.read_text(encoding="utf-8")
+        for line_no, line in enumerate(p_content.splitlines(), start=1):
+            trimmed = line.strip()
+            if paged_git_pattern.match(trimmed):
+                if not any(flag in trimmed for flag in safe_flags):
+                    violations.append((prompt_file.relative_to(REPO_ROOT), line_no, trimmed))
+
+    # Valida skill terminal-governance
+    tg_file = SKILLS_DIR / "terminal-governance" / "SKILL.md"
+    if tg_file.exists():
+        tg_content = tg_file.read_text(encoding="utf-8")
+        in_problematic_table = False
+        for line_no, line in enumerate(tg_content.splitlines(), start=1):
+            if "## 4) Comandos Não-Interativos" in line or "## 6) Padrões Proibidos" in line:
+                in_problematic_table = True
+            elif line.startswith("## ") and in_problematic_table:
+                in_problematic_table = False
+            if not in_problematic_table and paged_git_pattern.match(line.strip()):
+                if not any(flag in line for flag in safe_flags):
+                    violations.append((tg_file.relative_to(REPO_ROOT), line_no, line.strip()))
+
+    assert not violations, (
+        f"Smell 2.17: {len(violations)} comando(s) git desprovido(s) de desativação de pager "
+        f"encontrado(s) em prompts/governança (R-035):\n"
+        + "\n".join(f"  - {path}:{num} -> {cmd}" for path, num, cmd in violations)
     )

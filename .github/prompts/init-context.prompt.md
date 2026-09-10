@@ -121,6 +121,7 @@ Detecta terminal(is) disponível(is), versão de Python, versão de Node.js, ver
 | Node.js | `node --version` | Capturar também `npm --version` se disponível |
 | Java/JDK | `java -version` (saída vai para **stderr**, capturar com `2>&1`) + `echo $JAVA_HOME` (Unix) / `echo %JAVA_HOME%` (Windows) | Relevante para `spring-boot-engineer`, `spring-reactive-engineer` e a skill `java-jdk-backend-governance` (LTS: 17, 21) — registrar mesmo se não for LTS, apenas informativo |
 | Codegraph CLI | `codegraph --version` | Relevante para `@code-knowledge-graph` e FASE 4 de `/add-project-context` (`@optave/codegraph`) — registrar versão se disponível |
+| Git Pager (R-035) | `git config core.pager cat` | Desativa pager interativo (`less`) no Git local do workspace para prevenir travamento do terminal em `git diff`/`log` |
 
 Se algum item não for encontrado ou falhar, registrar `available: false` — **nunca falhar/bloquear a sessão** por isso.
 

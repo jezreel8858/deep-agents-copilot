@@ -111,7 +111,8 @@ pytest 2>&1 | grep -E "FAILED|ERROR" | head -60
 # Git log — limitar quantidade de commits
 git --no-pager log --oneline -20
 
-# Git diff — limitar linhas
+# Git diff — inspecionar arquivo ou limitar linhas (sempre com --no-pager)
+git --no-pager diff <arquivo> | head -60
 git --no-pager diff --stat | head -40
 
 # Listagem de arquivos — limitar profundidade
@@ -141,14 +142,22 @@ Todo comando git deve usar `--no-pager` ou equivalente. Pager interativo **bloqu
 
 | Comando problemático | Substituto seguro |
 |---|---|
+| `git diff <arquivo>` (sem `--no-pager`) | `git --no-pager diff <arquivo>` (ou `\| head -60`) |
+| `git diff` (resumo) | `git --no-pager diff --stat` |
 | `git log` | `git --no-pager log --oneline -20` |
-| `git diff` | `git --no-pager diff --stat` |
-| `git show` | `GIT_PAGER=cat git show HEAD --stat` |
+| `git show` | `git --no-pager show HEAD --stat` (ou `GIT_PAGER=cat git show ...`) |
+| `git branch` / `git tag` | `git --no-pager branch` / `git --no-pager tag` |
 | `git blame` | `git --no-pager blame arquivo -L 1,30` |
 | `less arquivo` | `cat arquivo \| head -50` |
 | `more arquivo` | `cat arquivo \| head -50` |
 | `man comando` | Consultar docs ou Tavily |
 | `top` / `htop` | `ps aux \| grep processo \| head -10` |
+
+**Salvaguarda no nível do Git (executar 1x por repositório ou globalmente):**
+```bash
+git config core.pager cat
+```
+Isso garante que, mesmo se o comando git for acidentalmente digitado sem `--no-pager`, o Git invocará `cat` em vez de `less`, nunca travando o terminal em modo interativo.
 
 **Variável de ambiente global para sessão:**
 ```bash

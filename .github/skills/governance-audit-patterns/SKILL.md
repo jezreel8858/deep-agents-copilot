@@ -270,6 +270,16 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 | Severidade | **Bloqueador** (mesmo risco de corrupção documentado em R-051, incidente real de 2026-09 que corrompeu `workflows.md`/`routing-graph.yaml` três vezes) |
 | Remediação | Adicionar `.github/skills/efficient-batch-code-modification/SKILL.md` a `source_docs:` (ou `skills:` no sub-catálogo) do agent afetado via `@governance-maintainer` |
 
+### 2.17 — Comando Git Sem Desativação de Pager (Violação R-035)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Arquivo de prompt (`.prompt.md`) ou skill de terminal contém exemplo de comando git (`git diff`, `git log`, `git show`, `git branch`, `git tag`) desprovido de flag não-interativa (`--no-pager` ou `GIT_PAGER=cat` ou pipe `\| cat`), induzindo os agents a executar comandos paginados interativos que travam a sessão indefinidamente em "Processing..." |
+| Como detectar | Varredura estática por comandos `git (diff\|log\|show\|branch\|tag)` em `.github/prompts/*.prompt.md` e skills; verificar ausência de `--no-pager`, `GIT_PAGER` ou pipe seguro. Ver Tier 1: `test_smell_2_17_no_bare_git_pager_commands_in_prompts_and_governance` |
+| Origem (TrustAgent) | Intrínseco — documentação e prompts de governança exemplificam comandos interativos sem prever o comportamento de pager em terminais não-TTY |
+| Severidade | **Bloqueador** (trava a execução do terminal do IDE à espera de `q` no pager `less`, exigindo intervenção manual do usuário) |
+| Remediação | Substituir o comando no arquivo por sua forma canônica não-interativa (`git --no-pager diff ...`, `git --no-pager log ...`) e assegurar `git config core.pager cat` no repositório |
+
 ## 3) Severidade — Reaproveitamento da Taxonomia Existente
 
 Esta skill **reaproveita** (não recria) a taxonomia de `code-review-patterns`:

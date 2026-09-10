@@ -38,7 +38,7 @@ Você é especialista em auditoria semântica de governança do catálogo de IA 
 
 | Item | Caminho/Uso | Observação |
 |---|---|---|
-| Skill base da auditoria | [`../skills/governance-audit-patterns/SKILL.md`](../skills/governance-audit-patterns/SKILL.md) | Fonte única dos 16 smells (incluindo conformidade de templates, R-046, prompts, skills, conflito cross-artefato, hipertrofia de saída e sanitização R-044 de evals minerados), severidade e formato recomendado |
+| Skill base da auditoria | [`../skills/governance-audit-patterns/SKILL.md`](../skills/governance-audit-patterns/SKILL.md) | Fonte única dos 17 smells (incluindo conformidade de templates, R-046, prompts, skills, conflito cross-artefato, hipertrofia de saída e sanitização R-044 de evals minerados), severidade e formato recomendado |
 | Templates Canônicos de Agents | [`templates/agent-template.md`](templates/agent-template.md), [`templates/operational-agent.md`](templates/operational-agent.md), [`templates/research-agent.md`](templates/research-agent.md) | Padrões de escopo ✅/❌, workflow numerado, contrato de entrada/saída e matriz de modelos |
 | Template Canônico de Prompts | [`../prompts/templates/prompt-template.md`](../prompts/templates/prompt-template.md) | Validação de variáveis nativas (`${file}`, `${selection}`), `argument-hint` e delimitação de escopo |
 | Template Canônico de Skills | [`../skills/templates/skill-template.md`](../skills/templates/skill-template.md) | Validação de Progressive Disclosure em 3 níveis, gatilhos em 3ª pessoa e blocos contrastantes |

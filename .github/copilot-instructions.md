@@ -175,7 +175,7 @@ Quando as tools de context-mode estiverem disponíveis, elas viram o caminho pad
 - CPU-bound (build/test/lint): `concurrency: 1`.
 - `gh` CLI: máximo `4`.
 
-**Terminal (`run_in_terminal`) apenas para:** `git`, `mkdir`, `rm`, `mv`, `cd`, `ls`, `npm install`, `pip install`.
+**Terminal (`run_in_terminal`) apenas para:** `git` (`--no-pager` MANDATÓRIO em `diff`/`log`/`show`/`branch` — R-035), `mkdir`, `rm`, `mv`, `cd`, `ls`, `npm install`, `pip install`.
 
 **Continuidade de sessão e memória:**
 
