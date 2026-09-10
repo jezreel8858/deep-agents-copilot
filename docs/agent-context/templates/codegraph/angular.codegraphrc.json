@@ -1,4 +1,5 @@
 {
+  "excludeTests": true,
   "exclude": [
     "dist/**",
     ".angular/**",

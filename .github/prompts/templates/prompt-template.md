@@ -4,6 +4,7 @@ description: '<Ação imperativa em 1 linha — ex.: Analisa e refatora o arquiv
 agent: 'agent'
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'get_errors']
+# Se run_in_terminal for declarado em tools, é OBRIGATÓRIO incluir .github/skills/terminal-governance/SKILL.md em source_docs (R-049).
 argument-hint: '[caminho-do-arquivo | contexto-opcional]'
 source_docs:
   - CLAUDE.md

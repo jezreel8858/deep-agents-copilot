@@ -12,6 +12,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/tavily/SKILL.md
   - .github/skills/context-mode/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
 ---
 
 # deep-search
@@ -32,7 +33,7 @@ Retriever/Researcher especializado para investigação técnica e documental no 
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-042` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 
 ## Catálogo / Conhecimento Base

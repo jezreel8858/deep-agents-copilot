@@ -3,7 +3,7 @@
 > Fonte de verdade operacional: [`CLAUDE.md`](../CLAUDE.md).
 > Mapa de Adapters (compartilhado): [`docs/ai-context/catalog.yaml`](../docs/ai-context/catalog.yaml).
 > Mapa de Projetos (LOCAL/gitignored, R-043): [`docs/ai-context/catalog.local.yaml`](../docs/ai-context/catalog.local.yaml).
-> IDs normativos: consulte `R-001..R-047` em `CLAUDE.md`.
+> IDs normativos: consulte `R-001..R-049` em `CLAUDE.md`.
 
 ---
 
@@ -17,7 +17,7 @@
 
 | Tipo | Arquivo | Escopo | Conteúdo Permitido | Exemplos / Referências |
 |------|---------|--------|-------|---|
-| **Governança Global** | `CLAUDE.md` | 🌍 Multi-projeto, desacoplado | Regras R-001..R-047, princípios, fluxos genéricos | ❌ Nenhum projeto/tech específicos |
+| **Governança Global** | `CLAUDE.md` | 🌍 Multi-projeto, desacoplado | Regras R-001..R-049, princípios, fluxos genéricos | ❌ Nenhum projeto/tech específicos |
 | **Operacional** | `.github/copilot-instructions.md` | 🌍 Multi-projeto, desacoplado | Roteamento, agents, skills, estrutura genérica | ❌ Nenhum projeto/tech específicos (remeter a adapters) |
 | **Adapters** | `.github/instructions/*.instructions.md` | 🔧 Stack/domínio específico | Convenções, padrões, tools, paradigmas de tech/domínio **excluivos** | ✅ Projeto, linguagem, framework **específicos permitidos** |
 | **Contexto de Binding** | `docs/ai-context/catalog.yaml` + `docs/ai-context/binding.md` | 🔗 Mapa de instâncias | Lista concreta de adapters, projetos, mapeamento stack → adapter | ✅ Dados de instância permitidos |
@@ -52,7 +52,7 @@
 ```
 Solicitação (turno N)
     ↓
-@agent-router (triagem)
+@agent-router (triagem inicial & Health Check R-034)
     ↓
 Agent ativo de turno anterior? (R-042)
     ├─ Não -> triagem normal
@@ -60,22 +60,22 @@ Agent ativo de turno anterior? (R-042)
               ├─ Sem deriva -> devolve ao agent ativo (sem re-rotear)
               └─ Deriva -> handoff (motivo: "deriva_de_intencao") -> triagem completa
     ↓
-@prompt-structuring (R-041 — obrigatório, loop máx. 5 iterações)
+[CLASSIFICAÇÃO DE WORKFLOW & FAST-PATH (R-041/R-050)]
+    ├─ Fast-Path Determinístico (Bug / Layout / Refatoração com alvo / Análise direta / Governança)
+    │   └─ Ingressa IMEDIATAMENTE no respectivo Workflow Canônico (R-050) — zero desvio
+    └─ Caso Ambíguo / Feature Aberta / Pedido não estruturado
+        └─ @prompt-structuring (R-041 — loop máx. 5 iterações) → retorno obrigatório a @agent-router
     ↓
-@agent-router (retomada com prompt refinado; declara "Agente Ativo")
-    ↓
-[Rota decidida]
-    ↓
-@bug-triage | @test-strategy | @refactor-planner |
-@tech-solution-architect | @docs-engineer | @code-review |
-@requirements-analyst | @angular-router | @spring-boot-router | @spring-reactive-router | @ejb-router | @database-router |
-@deep-search
-    ↓
-[Execução específica — em task_mode]
+[Execução Sequencial no Workflow Canônico (R-050)]
+    ├─ WORKFLOW-BUG-FIX: @bug-triage → red-test → bug-fixer → green-test → quality-gate
+    ├─ WORKFLOW-REFACTORING: rules → @code-knowledge-graph → @refactor-planner → batch-exec → validation
+    ├─ WORKFLOW-TECHNICAL-ANALYSIS: scope → deterministic analysis → report
+    ├─ WORKFLOW-FEATURE-DEVELOPMENT: requirements → blueprint → test-strategy → TDD → gate
+    └─ WORKFLOW-GOVERNANCE-MAINTENANCE: audit → human approval → batch execution
     ↓ (toda resposta abre com "Agente Ativo: <name>" — visibilidade de fluxo, agent-contracts § 0)
 Turno seguinte muda de fase/escopo? (R-042)
     ├─ Sim -> agent ativo retorna a @agent-router (handoff de deriva; resposta seguinte mostra "Handoff: <origem> → <destino>")
-    └─ Não -> agent ativo continua respondendo (reafirma "Agente Ativo: <mesmo-name>")
+    └─ Não -> agent ativo continua respondendo no workflow (reafirma "Agente Ativo: <mesmo-name>")
 ```
 
 ---
@@ -96,10 +96,12 @@ Esta matriz é **responsabilidade do roteador** — não é regra global.
 
 - **Agent Router First (R-037)**: TODA solicitação começa com `@agent-router`. Pular router é violação de governança.
 - **Re-triagem Obrigatória por Turno (R-042 — Anti Sticky-Session)**: R-037 aplica-se a CADA novo turno, não só ao primeiro. Agent downstream ativo deve checar deriva de intenção (mudança de verbo de ação, stack fora de competência, pedido de execução em agent read-only) a cada mensagem; ao detectar deriva, retorna IMEDIATAMENTE ao `@agent-router` (payload `handoff-governance` § 2.1, `motivo: "deriva_de_intencao"`) — nunca prossegue silenciosamente fora do escopo. *Exceção de ação in-scope*: mudança de verbo não constitui deriva se a ação já constar em "Quando Delegar" do agent ativo (ex.: pesquisa externa via `@deep-search` solicitada a `@tech-solution-architect` ativo é sub-tarefa, não deriva; controle retorna ao agent ativo com call stack `origem_contexto.parent_agent`). **Visibilidade obrigatória**: TODO agent (não apenas o `agent-router`) abre toda resposta com `Agente Ativo: <name>`; se houve handoff/re-triagem neste turno, adiciona `Handoff: <origem> → <destino> (motivo: ...)` — padrão de mercado (OpenAI Agents SDK `HandoffOutputItem`, LangGraph `active_agent` streaming; detalhes em `agent-contracts/SKILL.md` § 0). **Pré-requisito de tooling**: o handoff só é efetivo via tool `run_subagent`; por isso `run_subagent` é obrigatório e bloqueante no frontmatter `tools:` de todo agent (`agent-contracts/SKILL.md` § 9). Persistência estruturada opcional do handoff (schema `handoff-governance` v1.1, campo `roteamento_grafo`) via `ctx_index` é permitida como camada auxiliar de auditoria/memória entre sessões, mas NUNCA substitui o banner nem é lida de forma bloqueante a cada turno do `@agent-router`.
-- **Prompt Structuring Obrigatório (R-041)**: após o Health Check (R-034), o `@agent-router` SEMPRE delega ao `@prompt-structuring` antes de classificar intenção. Esse é o **único** agent do catálogo autorizado a operar em loop de auto-refinamento, limitado a **5 iterações** — ao atingir o limite, prossegue compulsoriamente com o melhor prompt disponível e retorna ao `@agent-router`. Nenhum outro agent pode adotar esse padrão de loop.
+- **Prompt Structuring & Fast-Path Determinístico (R-041)**: após o Health Check (R-034), o `@agent-router` avalia se a solicitação possui gatilho determinístico para Fast-Path (`WORKFLOW-BUG-FIX`, `WORKFLOW-REFACTORING`, `WORKFLOW-TECHNICAL-ANALYSIS`, `WORKFLOW-GOVERNANCE-MAINTENANCE`). Em caso positivo, o Fast-Path bypassa `@prompt-structuring` diretamente para a etapa 1 do workflow. Se o pedido for ambíguo, aberto ou uma feature de alto nível não estruturada, delega compulsoriamente ao `@prompt-structuring` (loop máx. 5 iterações), que SEMPRE retorna ao `@agent-router`.
+- **Workflows Operacionais Determinísticos (R-050)**: toda tarefa de desenvolvimento segue rigorosamente a máquina de estados de um dos 5 Workflows Canônicos (`WORKFLOW-BUG-FIX`, `WORKFLOW-REFACTORING`, `WORKFLOW-TECHNICAL-ANALYSIS`, `WORKFLOW-FEATURE-DEVELOPMENT`, `WORKFLOW-GOVERNANCE-MAINTENANCE`). **Visibilidade Obrigatória no Chat (Anti-Cegueira)**: toda resposta do router e avanço de etapa por downstream DEVE renderizar o bloco visual `### 🗺️ Pipeline de Execução do Workflow (<total> etapas)` com marcadores `[✅]` (Concluído), `[▶]` (Em Andamento), `[⏳]` (Pendente), mapeando explicitamente agentes e etapas até a conclusão. Proibido pular etapas, omitir testes de caracterização em refatoração ou gerar becos sem saída descritivos sem handoff ou aprovação humana (R-047).
 - **Grafo de Roteamento (R-040)**: o roteamento de agents DEVE ser declarado como dado estruturado em `.github/agents/routing-graph.yaml`. A Decision Tree em prosa é documentação derivada. Toda nova rota exige: *(a)* entrada no grafo; *(b)* atualização da Decision Tree; *(c)* novo caso em `.github/agents/evals/casos-roteamento.yaml`.
 - **Execução via Context Mode (R-008 — Think in Code)**: Use **100% o `context-mode` MCP** para leitura, busca, escrita em lote, análise e remoção de arquivos (`ctx_execute`, `ctx_execute_file`, `ctx_index`, `ctx_search`). O processamento acontece no sandbox e apenas o resultado limpo entra na conversa. `read_file` e `replace_string_in_file` são reservados exclusivamente para edições cirúrgicas pontuais do editor. `run_in_terminal` é **FALLBACK de última instância** restrito exclusivamente a comandos de ciclo de vida (`git`, `npm install`, `mvn`, `pytest`) — comandos de varredura/leitura (`cat`, `grep`, `find`, scripts inline `node -e`) são terminantemente proibidos no terminal.
-- **Pre-fetch automático pelo agent**: ao selecionar um agent, carregue automaticamente os `source_docs` declarados no `catalog.yaml` e anuncie o que foi anexado. Usuário pode rejeitar com "Sem pre-fetch".
+- **Vinculação Compulsória de Governança de Terminal em Tooling (R-049)**: Todo agent (`*.agent.md`), prompt (`*.prompt.md`) ou entrada de catálogo que declare a ferramenta `run_in_terminal` em `tools:` DEVE compulsoriamente referenciar `.github/skills/terminal-governance/SKILL.md` em `source_docs:` (ou na seção `skills:` em sub-catálogos locais). É expressamente vedada a concessão de execução em terminal desprovida de vinculação com a respectiva skill de governança.
+- **Pre-fetch automático pelo agent**: ao selecionar um agent, carregue automaticamente os `source_docs` declarados no `catalog.yaml` e anuncie o que foi anexado via a linha `Skills Carregadas:` do banner universal (R-042, `agent-contracts/SKILL.md` § 0) — nunca em prosa solta ou omitido. Usuário pode rejeitar com "Sem pre-fetch".
 - **Um comando por vez**: leia o output uma única vez.
 - **`get_errors` consolidado**: chame `get_errors` uma única vez ao final do lote com o array completo `filePaths`, nunca arquivo por arquivo.
 - **Edições agrupadas e em lote (`efficient-batch-code-modification` — R-046)**: todas as alterações de múltiplos arquivos devem ser emitidas em lote na mesma rodada de tool calls (*single-turn batching*). Diffs cirúrgicos mínimos com 2-3 linhas de contexto para unicidade.
@@ -124,6 +126,7 @@ Esta matriz é **responsabilidade do roteador** — não é regra global.
 - **Não crie arquivos auxiliares** sem pedido explícito.
 - **Não releia arquivos** já no contexto da conversa ou recém-editados.
 - **Exclusividade do Motor de Grafo (@code-knowledge-graph — R-045 / RNF-004)**: O CLI `@optave/codegraph` e o banco `.codegraph/graph.db` são recursos de uso e execução **EXCLUSIVOS** do agent `@code-knowledge-graph`. NENHUM outro agent tem permissão para rodar comandos `codegraph *` diretamente no terminal ou varrer diretórios manualmente (`list_dir`, `read_dir`) para mapear arquitetura, camadas, chamadas ou dependências. Toda análise estrutural DEVE ser delegada compulsoriamente via `run_subagent(agentName: 'code-knowledge-graph', ...)`. Agents especialistas operam em modo Advisory de forma estritamente analítica e read-only — `run_in_terminal` é restrito ao modo Implementação (testing-first).
+- **Terminal sem Governança (R-049)**: nunca declarar `run_in_terminal` em `tools:` de novos agents ou prompts sem incluir `.github/skills/terminal-governance/SKILL.md` em `source_docs:` (ou `skills:` nos sub-catálogos locais).
 
 ### 2.1) context-mode — Regras Obrigatórias de Roteamento (JetBrains Copilot)
 

@@ -32,7 +32,7 @@ Você é especialista em **higiene de repositório, documentação essencial e m
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-048` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 - R-038: manter a avaliação estritamente genérica e agnóstica de ecossistema de linguagem/framework.
 

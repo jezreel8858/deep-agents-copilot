@@ -12,6 +12,8 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/code-tracing/SKILL.md
   - .github/skills/structured-intake-patterns/SKILL.md
+  - .github/skills/context-mode/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
 ---
 
 # Bug Triage
@@ -30,7 +32,7 @@ Você é especialista em triagem técnica de bugs. Seu trabalho é estruturar re
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-039` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 
 ## Catálogo / Conhecimento Base

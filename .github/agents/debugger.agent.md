@@ -28,7 +28,7 @@ Você é especialista em **investigar causa raiz de comportamento inesperado** �
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-043` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 - R-020: falha compacta — Causa/Local/Ação sugerida em 3 linhas.
 

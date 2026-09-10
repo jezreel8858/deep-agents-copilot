@@ -123,10 +123,11 @@ def test_casos_roteamento_targets_exist(casos_roteamento, routing_graph):
                 expected.get("agent_route")
                 or expected.get("agente_esperado")
                 or expected.get("turno_2_agent_route")
+                or expected.get("turno_1_agent_route")
             )
 
-            # Casos comportamentais ou multi-turno declaram 'comportamento' ou 'turno_2_deteccao'
-            if target_agent is None and ("comportamento" in expected or "turno_2_deteccao" in expected):
+            # Casos comportamentais ou multi-turno declaram 'comportamento', 'turno_2_deteccao' ou 'etapa_obrigatoria'
+            if target_agent is None and ("comportamento" in expected or "turno_2_deteccao" in expected or "etapa_obrigatoria" in expected):
                 continue
 
             assert target_agent is not None, f"Caso '{caso_id}' não declara rota nem comportamento esperado"

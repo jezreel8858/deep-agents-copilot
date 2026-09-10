@@ -1,5 +1,5 @@
 """
-test_governance_smells.py — Suíte determinística de auditoria estática para os 14 smells de governança.
+test_governance_smells.py — Suíte determinística de auditoria estática para os 16 smells de governança.
 
 Executa no Tier 1 (0 tokens, < 1s) para validar conformidade estrutural, contratual e de segurança
 antes que o agent-auditor (LLM) atue na camada interpretativa/semântica (Two-Tier Hybrid Audit).
@@ -46,6 +46,11 @@ def get_all_skill_files() -> list[Path]:
 def get_all_prompt_files() -> list[Path]:
     """Retorna todos os arquivos .prompt.md sob .github/prompts/"""
     return [p for p in PROMPTS_DIR.glob("*.prompt.md") if "templates" not in p.parts]
+
+
+def get_all_catalog_files() -> list[Path]:
+    """Retorna todos os arquivos *catalog*.yaml sob .github/agents/"""
+    return [p for p in AGENTS_DIR.glob("**/*catalog*.yaml")]
 
 
 # ─────────────────────────────────────────────────────────────
@@ -130,17 +135,67 @@ def test_smell_2_7_readonly_agents_cannot_have_mutation_tools():
 
 
 def test_smell_2_7_terminal_tool_requires_terminal_governance_skill():
-    """Valida Invariante 1 §2.7.1: tool run_in_terminal exige skill terminal-governance declarada"""
+    """Valida Invariante 1 §2.7.1 e R-049: tool run_in_terminal exige skill terminal-governance declarada em source_docs/skills"""
+    target_skill = "terminal-governance"
+
+    # 1. Agents (*.agent.md)
     for agent_file in get_all_agent_files():
         content = agent_file.read_text(encoding="utf-8")
         fm = parse_frontmatter(content)
         tools = fm.get("tools", [])
+        if isinstance(tools, str):
+            tools = [tools]
 
         if "run_in_terminal" in tools:
             rel_path = agent_file.relative_to(REPO_ROOT)
-            assert "terminal-governance" in content, (
-                f"[{rel_path}] Declara tool 'run_in_terminal' mas não referencia a skill obrigatória 'terminal-governance'"
+            source_docs = fm.get("source_docs", []) or []
+            if isinstance(source_docs, str):
+                source_docs = [source_docs]
+            has_term_gov = any(target_skill in str(doc) for doc in source_docs)
+            assert has_term_gov, (
+                f"[{rel_path}] Declara tool 'run_in_terminal' mas não referencia a skill obrigatória 'terminal-governance' em source_docs (R-049)"
             )
+
+    # 2. Prompts (*.prompt.md)
+    for prompt_file in get_all_prompt_files():
+        content = prompt_file.read_text(encoding="utf-8")
+        fm = parse_frontmatter(content)
+        tools = fm.get("tools", [])
+        if isinstance(tools, str):
+            tools = [tools]
+
+        if "run_in_terminal" in tools:
+            rel_path = prompt_file.relative_to(REPO_ROOT)
+            source_docs = fm.get("source_docs", []) or []
+            if isinstance(source_docs, str):
+                source_docs = [source_docs]
+            has_term_gov = any(target_skill in str(doc) for doc in source_docs)
+            assert has_term_gov, (
+                f"[{rel_path}] Prompt declara tool 'run_in_terminal' mas não referencia 'terminal-governance' em source_docs (R-049)"
+            )
+
+    # 3. Catálogos (*catalog*.yaml)
+    for catalog_file in get_all_catalog_files():
+        rel_path = catalog_file.relative_to(REPO_ROOT)
+        data = yaml.safe_load(catalog_file.read_text(encoding="utf-8")) or {}
+        agents = data.get("agents", {}) if isinstance(data, dict) else {}
+        for agent_id, agent_data in agents.items():
+            if not isinstance(agent_data, dict):
+                continue
+            tools = agent_data.get("tools", [])
+            if "run_in_terminal" in tools:
+                source_docs = agent_data.get("source_docs", []) or []
+                skills = agent_data.get("skills", []) or []
+                has_term_gov = any(target_skill in str(d) for d in source_docs) or any(target_skill in str(s) for s in skills)
+                if not has_term_gov:
+                    agent_matches = list(catalog_file.parent.glob(f"**/{agent_id}.agent.md"))
+                    if agent_matches:
+                        agent_fm = parse_frontmatter(agent_matches[0].read_text(encoding="utf-8"))
+                        agent_docs = agent_fm.get("source_docs", []) or []
+                        has_term_gov = any(target_skill in str(d) for d in agent_docs)
+                assert has_term_gov, (
+                    f"[{rel_path}#{agent_id}] Declara tool 'run_in_terminal' mas não referencia 'terminal-governance' em source_docs ou skills (R-049)"
+                )
 
 
 def test_smell_2_7_context_mode_tool_requires_context_mode_skill():
@@ -291,4 +346,67 @@ def test_smell_2_9_source_docs_referential_integrity():
     assert not broken_links, (
         f"Foram encontrados {len(broken_links)} links quebrados em source_docs:\n"
         + "\n".join(f"  - Em [{origem}]: {destino}" for origem, destino in broken_links)
+    )
+
+
+# ─────────────────────────────────────────────────────────────
+# SMELL 2.15 — Citação de Range Normativo Desatualizado (Drift de R-0XX)
+# ─────────────────────────────────────────────────────────────
+
+def _get_latest_normative_rule_number() -> int:
+    """Extrai o maior número de regra R-0XX declarado em CLAUDE.md § 3 (dinâmico, nunca hardcoded)."""
+    content = CLAUDE_MD.read_text(encoding="utf-8")
+    rule_numbers = [int(n) for n in re.findall(r"\*\*R-(\d{3})", content)]
+    assert rule_numbers, "Nenhuma regra R-0XX encontrada em CLAUDE.md"
+    return max(rule_numbers)
+
+
+def test_smell_2_15_no_stale_normative_rule_range():
+    """Smell 2.15: nenhum agent com seção 'Regras Herdadas' deve citar um range
+    R-001..R-0XX inferior ao maior R-0XX vigente em CLAUDE.md (drift de sincronização —
+    achado sistêmico de 2026-09: 44/44 agents estavam desatualizados antes da correção)."""
+    latest = _get_latest_normative_rule_number()
+    stale = []
+    for agent_file in get_all_agent_files():
+        content = agent_file.read_text(encoding="utf-8")
+        match = re.search(r"R-001\.\.R-(\d{3})", content)
+        if not match:
+            continue
+        cited = int(match.group(1))
+        if cited < latest:
+            stale.append((agent_file.relative_to(REPO_ROOT), cited))
+
+    assert not stale, (
+        f"Smell 2.15: {len(stale)} agent(s) citam range normativo desatualizado "
+        f"(esperado R-001..R-{latest:03d}):\n"
+        + "\n".join(f"  - {path}: R-001..R-{val:03d}" for path, val in stale)
+    )
+
+
+# ─────────────────────────────────────────────────────────────
+# SMELL 2.16 — Agent Mutativo Sem Skill de Edição Segura Referenciada (R-051)
+# ─────────────────────────────────────────────────────────────
+
+def test_smell_2_16_mutating_agents_reference_safe_editing_skill():
+    """Smell 2.16: todo agent com insert_edit_into_file/replace_string_in_file em tools:
+    deve referenciar efficient-batch-code-modification (guardrail anti-corrupção R-051)."""
+    mutation_tools = {"insert_edit_into_file", "replace_string_in_file"}
+    skill_ref = "efficient-batch-code-modification"
+    gaps = []
+    for agent_file in get_all_agent_files():
+        content = agent_file.read_text(encoding="utf-8")
+        tools_match = re.search(r"tools:\s*(\[[^\]]*\])", content)
+        if not tools_match:
+            continue
+        tools_text = tools_match.group(1)
+        has_mutation = any(t in tools_text for t in mutation_tools)
+        if not has_mutation:
+            continue
+        if skill_ref not in content:
+            gaps.append(agent_file.relative_to(REPO_ROOT))
+
+    assert not gaps, (
+        f"Smell 2.16: {len(gaps)} agent(s) com tools mutativas nao referenciam "
+        f"'{skill_ref}' em source_docs/skills:\n"
+        + "\n".join(f"  - {p}" for p in gaps)
     )

@@ -14,6 +14,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/governance-factory-patterns/SKILL.md
   - .github/skills/agent-contracts/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 # Governance Factory
 
@@ -103,7 +104,7 @@ Retorne a síntese com citações de fontes para o solicitante 'governance-facto
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-044` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 - R-026: código inline > 8 linhas → `templates/`/`snippets/`.
 
@@ -127,7 +128,7 @@ Retorne a síntese com citações de fontes para o solicitante 'governance-facto
 
 ### `type: agent`
 
-- Frontmatter `name`, `description`, `model` (Title Case oficial), `tools` (com `run_subagent` obrigatório).
+- Frontmatter `name`, `description`, `model` (Title Case oficial), `tools` (com `run_subagent` obrigatório por R-042; se `run_in_terminal` presente, inclusão compulsória de `terminal-governance` em `source_docs` por R-049).
 - Ordem de seções: objetivo → CRÍTICO → Regras Herdadas → Catálogo → Decision Tree → Padrões → Formato Saída → Checklist → Docs Sempre Anexadas → Diretrizes → Anti-padrões → Quando Delegar → Retorno ao Router → Combina Com.
 - Atualizar `README.md` + `catalog.yaml` na mesma entrega.
 
@@ -147,7 +148,7 @@ Seções: Quando Usar → Como Usar (máx. 8 linhas código inline) → Checklis
 
 ### `type: prompt`
 
-- Frontmatter `name`, `description` (obrigatório), `model`, `tools` (menor privilégio), `source_docs`.
+- Frontmatter `name`, `description` (obrigatório), `model`, `tools` (menor privilégio; se `run_in_terminal` presente, inclusão compulsória de `terminal-governance` em `source_docs` por R-049), `source_docs`.
 - H1 com `/nome-do-comando`; body: Uso → CRÍTICO → Fluxo/Processo → Regras Críticas → Combina Com.
 - Nome de arquivo: kebab-case + verbo-objeto + `.prompt.md`. Atualizar `README.md` de prompts.
 
@@ -213,6 +214,7 @@ Executar o checklist genérico de `governance-factory-patterns` §3, mais:
 - [ ] Se `type: stack`: quádrupla sincronização global executada (`catalog.yaml`, `routing-graph.yaml`, `agent-router.agent.md`, `README.md`).
 - [ ] Catálogo(s) correspondente(s) ao tipo mapeado para atualização atômica (R-015).
 - [ ] `model:` (quando presente) validado via `get_errors`.
+- [ ] Se `run_in_terminal` for declarado em `tools:` (agent, prompt ou stack): inclusão compulsória de `.github/skills/terminal-governance/SKILL.md` em `source_docs` (ou `skills:` locais) (R-049).
 
 ## Docs Sempre Anexadas (pre-fetch obrigatório)
 
@@ -233,6 +235,7 @@ Executar o checklist genérico de `governance-factory-patterns` §3, mais:
 ## Anti-padrões
 
 - Criar novo agent, prompt ou skill sem antes delegar a pesquisa de diretrizes e skills ao `@deep-search`.
+- Declarar `run_in_terminal` em `tools:` sem incluir compulsoriamente `.github/skills/terminal-governance/SKILL.md` em `source_docs` (ou `skills:` locais) (violação R-049).
 - Descartar ou ignorar os achados e recomendações retornadas pelo `@deep-search` ao estruturar o artefato.
 - Criar artefato sem confirmar o `type` primeiro.
 - Criar/revisar sem atualizar o(s) catálogo(s) correspondente(s) ao tipo (viola R-015).

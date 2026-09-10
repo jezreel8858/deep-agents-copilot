@@ -12,6 +12,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/agent-memory-policy/SKILL.md
   - .github/skills/context-mode/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 # Agentic Memory Manager
 
@@ -27,7 +28,7 @@ Você é especialista em **gerenciar memória long-term de agents** — episódi
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-043` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`.github/copilot-instructions.md`](../copilot-instructions.md).
 - R-009: sem arquivos autônomos — aprovação antes de criar/persistir.
 - R-027: dúvida → `ask_questions`.

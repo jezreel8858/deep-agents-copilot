@@ -37,7 +37,7 @@ Você é o supervisor de domínio e roteador especializado de backend Spring Boo
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-045` em [`../../../../CLAUDE.md`](../../../../CLAUDE.md).
+- Regras normativas `R-001..R-051` em [`../../../../CLAUDE.md`](../../../../CLAUDE.md).
 - Sub-catálogo Spring Boot em [`spring-boot-catalog.yaml`](./spring-boot-catalog.yaml).
 
 ## Skills Associadas

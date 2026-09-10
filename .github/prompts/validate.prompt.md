@@ -8,6 +8,7 @@ argument-hint: '[caminho-do-plano | escopo-de-validação]'
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
+  - .github/skills/terminal-governance/SKILL.md
 ---
 
 # `/validate`

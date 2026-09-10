@@ -12,6 +12,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/test-implementation-angular-jasmine/SKILL.md
   - .github/skills/code-tracing/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
 ---
 
 # Angular Test Fixer

@@ -1,5 +1,12 @@
 {
+  "excludeTests": true,
   "exclude": [
+    "**/test/**",
+    "**/testing/**",
+    "**/src-test/**",
+    "**/*Test.java",
+    "**/*Tests.java",
+    "**/Test*.java",
     "**/*_Stub.java",
     "**/*_Tie.java",
     "**/*_Skel.java",

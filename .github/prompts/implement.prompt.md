@@ -9,6 +9,7 @@ source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
 ---
 
 # `/implement`

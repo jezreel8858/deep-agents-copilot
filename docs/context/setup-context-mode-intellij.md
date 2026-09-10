@@ -45,11 +45,11 @@ O arquivo de configuração do Copilot deve ser ajustado para operar de forma **
       ],
       "env": {
         "SOURCE": "jetbrains-copilot",
-        "IDEA_INITIAL_DIRECTORY": "D:/workspace/eco-sistema-app",
-        "CONTEXT_MODE_PROJECT_DIR": "D:/workspace/eco-sistema-app",
-        "CONTEXT_MODE_DIR": "C:\\Users\\F0132808\\.config\\JetBrains\\context-mode",
-        "INSIGHT_SESSION_DIR": "C:\\Users\\F0132808\\.config\\JetBrains\\context-mode\\sessions",
-        "INSIGHT_CONTENT_DIR": "C:\\Users\\F0132808\\.config\\JetBrains\\context-mode\\content",
+        "IDEA_INITIAL_DIRECTORY": "<workspace>/[PROJETO-EXEMPLO]",
+        "CONTEXT_MODE_PROJECT_DIR": "<workspace>/[PROJETO-EXEMPLO]",
+        "CONTEXT_MODE_DIR": "C:\\Users\\{username}\\.config\\JetBrains\\context-mode",
+        "INSIGHT_SESSION_DIR": "C:\\Users\\{username}\\.config\\JetBrains\\context-mode\\sessions",
+        "INSIGHT_CONTENT_DIR": "C:\\Users\\{username}\\.config\\JetBrains\\context-mode\\content",
         "CONTEXT_MODE_IDLE_TIMEOUT_MS": "0"
       }
     }

@@ -37,7 +37,7 @@ Você é o supervisor de domínio e roteador especializado em Banco de Dados (Or
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-046` em [`../../../../CLAUDE.md`](../../../../CLAUDE.md).
+- Regras normativas `R-001..R-051` em [`../../../../CLAUDE.md`](../../../../CLAUDE.md).
 - Sub-catálogo Database em [`database-catalog.yaml`](./database-catalog.yaml).
 
 ## Skills Associadas

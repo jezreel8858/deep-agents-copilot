@@ -12,6 +12,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/code-review-patterns/SKILL.md
   - .github/skills/repository-hygiene-patterns/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
 ---
 # Code Style Enforcer
 
@@ -27,7 +28,7 @@ Você é especialista em **verificar aderência de código às convenções de e
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-043` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia em [`../copilot-instructions.md`](../copilot-instructions.md).
 
 ## Catálogo / Conhecimento Base

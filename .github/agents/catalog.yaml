@@ -136,6 +136,7 @@ agents:
       - ".github/copilot-instructions.md"
       - ".github/agents/bug-triage.agent.md"
       - ".github/skills/terminal-governance/SKILL.md"
+      - ".github/skills/context-mode/SKILL.md"
       - ".github/skills/code-tracing/SKILL.md"
     estimated_time_minutes: 25
 

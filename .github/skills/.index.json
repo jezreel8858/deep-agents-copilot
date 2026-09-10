@@ -722,7 +722,7 @@
       "name": "efficient-batch-code-modification",
       "tier": 1,
       "category": "process",
-      "description": "Diretrizes e padrões para execução de alterações de código em lote otimizadas para consumo mínimo de tokens e créditos no Copilot — análise prévia (dry-run), batching de tool calls em uma única rodada e minimal diffs cirúrgicos.",
+      "description": "Diretrizes e padrões para execução de alterações de código em lote otimizadas para consumo mínimo de tokens e créditos no Copilot — análise prévia (dry-run), batching de tool calls em uma única rodada, minimal diffs cirúrgicos e proteção anti-corrupção em edição de arquivo único grande/estruturado via padrão verificado (R-051).",
       "path": ".github/skills/efficient-batch-code-modification/SKILL.md",
       "tools": [
         "replace_string_in_file",

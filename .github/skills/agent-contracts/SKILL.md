@@ -38,6 +38,7 @@ Em fluxos multi-agent com handoff (R-042 — Anti Sticky-Session), o usuário pe
 ```markdown
 Agente Ativo: test-engineer
 Handoff: test-strategy → test-engineer (motivo: estratégia mapeada — pronto para implementar)
+Skills Carregadas: test-implementation-spring-boot, test-coverage-governance, context-mode
 
 [... restante da resposta no formato de saída do perfil do agent ...]
 ```
@@ -46,6 +47,7 @@ Quando **não** há handoff neste turno (agent continua em `task_mode`), a linha
 
 ```markdown
 Agente Ativo: spring-boot-engineer
+Skills Carregadas: spring-boot-implementation-patterns, test-implementation-spring-boot, terminal-governance, context-mode
 
 [... restante da resposta ...]
 ```
@@ -56,10 +58,29 @@ Agente Ativo: spring-boot-engineer
 - O `@agent-router` já declara `Agente Ativo` + `Transição` no seu próprio Formato de Saída (ver `agent-router.agent.md`) — mas isso só cobre o turno em que o router responde. Nos turnos seguintes, quando o downstream responde sozinho em `task_mode` (R-042), é o **próprio downstream** quem precisa reafirmar o banner.
 - Um agent sem essa linha quebra a paridade com o padrão de mercado (OpenAI Agents SDK, LangGraph) e torna o fluxo indistinguível de um "black box" de agent único.
 
+### 0.1) Roadmap Visual de Execução de Workflow (R-050 — Anti-Cegueira)
+
+Quando a solicitação for vinculada a um dos **5 Workflows Canônicos** (`WORKFLOW-BUG-FIX`, `WORKFLOW-REFACTORING`, `WORKFLOW-TECHNICAL-ANALYSIS`, `WORKFLOW-FEATURE-DEVELOPMENT`, `WORKFLOW-GOVERNANCE-MAINTENANCE`), o `@agent-router` (ao despachar o workflow) e cada agente downstream (ao reportar sua etapa ou avanço) **DEVEM compulsoriamente** renderizar o bloco visual `### 🗺️ Pipeline de Execução: <WORKFLOW-ID>` com as etapas e marcadores de estado:
+
+```markdown
+### 🗺️ Pipeline de Execução: WORKFLOW-BUG-FIX (5 etapas)
+- [✅] **Etapa 1: Triagem & Causa Raiz** → `@bug-triage` *(Concluído: causa raiz isolada)*
+- [▶] **Etapa 2: Red Test de Caracterização** → `specialist-unit-test-writer` *(Em Andamento: criando teste falhando)*
+- [⏳] **Etapa 3: Correção Cirúrgica Mínima** → `specialist-bug-fixer` *(Pendente)*
+- [⏳] **Etapa 4: Validação Green Test & Linter** → `runtime-verifier` *(Pendente)*
+- [⏳] **Etapa 5: Quality Gate & Resumo** → `@code-review` / `@pr-gatekeeper` *(Pendente)*
+```
+
+**Marcadores de Status:**
+- `[✅]` **Concluído**: Etapa concluída com entrega de artefato.
+- `[▶]` **Em Andamento**: Etapa sendo executada pelo agente ativo no turno atual.
+- `[⏳]` **Pendente**: Etapa futura a ser acionada na sequência.
+
 ### Checklist de Conformidade
 
 - [ ] Toda resposta abre com `Agente Ativo: <name>` — sem exceção, mesmo sem handoff.
 - [ ] Handoff/re-triagem recebido neste turno → segunda linha `Handoff: <origem> → <destino> (motivo: ...)`.
+- [ ] Se vinculado a workflow canônico (R-050) → renderizar o bloco visual `### 🗺️ Pipeline de Execução: <WORKFLOW-ID>` com marcadores `[✅]`, `[▶]`, `[⏳]`.
 - [ ] `<name>` corresponde exatamente ao campo `name:` do frontmatter do agent.
 - [ ] Seção "Retorno ao Router" de cada agent referencia este banner (ver `agents/templates/operational-agent.md` e `agents/templates/research-agent.md`).
 
@@ -257,7 +278,7 @@ Todo agent deve seguir política de context assembly para otimizar custo, latên
 ### Modelo de 2 Camadas
 
 **Camada 1 — Contrato Universal (obrigatório em TODO agent, nunca varia):**
-Já normatizado por R-016/R-020 e pelas seções 1-4 desta skill: confiança declarada, evidências rastreáveis (arquivo/símbolo/comando) e próximo passo mínimo. Esta camada é o que garante interoperabilidade — evita o risco de "handoff incompatível" documentado pelo JetBrains.
+Já normatizado por R-016/R-020 e pelas seções 1-4 desta skill: banner de identidade (`Agente Ativo:`/`Handoff:`/`Skills Carregadas:` — § 0), confiança declarada, evidências rastreáveis (arquivo/símbolo/comando) e próximo passo mínimo. Esta camada é o que garante interoperabilidade — evita o risco de "handoff incompatível" documentado pelo JetBrains.
 
 **Camada 2 — Template Narrativo por Perfil (varia conforme o papel do agent):**
 

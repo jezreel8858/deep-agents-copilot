@@ -32,7 +32,7 @@ Você é o desenvolvedor especialista em lógica procedural de banco de dados em
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-046` em [`../../../../../CLAUDE.md`](../../../../../CLAUDE.md).
+- Regras normativas `R-001..R-051` em [`../../../../../CLAUDE.md`](../../../../../CLAUDE.md).
 - Adapter de banco de dados em [`../../../../instructions/database.instructions.md`](../../../../instructions/database.instructions.md).
 - Regras de terminal em [`../../../../skills/terminal-governance/SKILL.md`](../../../../skills/terminal-governance/SKILL.md).
 

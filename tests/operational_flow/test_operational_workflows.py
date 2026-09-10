@@ -40,6 +40,17 @@ READONLY_ADVISORY_AGENTS = {
     "performance-agent",
     "code-style-enforcer",
     "runtime-verifier",
+    # Ampliação carry-forward (auditoria Workflow 3 — 2026-09): especialistas read-only
+    # despachados por WORKFLOW-TECHNICAL-ANALYSIS sem cobertura de teste equivalente.
+    "code-knowledge-graph",
+    "devops-engineer",
+    "tech-solution-architect",
+    "angular-arch-advisor",
+    "spring-boot-arch-advisor",
+    "spring-reactive-arch-advisor",
+    "ejb-arch-advisor",
+    "oracle-query-tuner",
+    "informix-query-tuner",
 }
 
 
@@ -196,4 +207,181 @@ def test_readonly_advisory_agents_do_not_contain_mutation_tools(all_existing_age
             tools = tools_match.group(1)
             for m_tool in mutation_tools:
                 assert m_tool not in tools, f"Agent Read-Only '{agent_id}' possui tool mutativa: '{m_tool}'"
+
+
+WORKFLOWS_MD_PATH = AGENTS_DIR / "workflows.md"
+CLAUDE_MD_PATH = REPO_ROOT / "CLAUDE.md"
+HANDOFF_SKILL_PATH = REPO_ROOT / ".github" / "skills" / "handoff-governance" / "SKILL.md"
+CANONICAL_WORKFLOW_IDS = {
+    "WORKFLOW-BUG-FIX",
+    "WORKFLOW-REFACTORING",
+    "WORKFLOW-TECHNICAL-ANALYSIS",
+    "WORKFLOW-FEATURE-DEVELOPMENT",
+    "WORKFLOW-GOVERNANCE-MAINTENANCE",
+}
+def test_workflows_specification_file_exists_and_covers_all_five():
+    """Valida que workflows.md existe, possui sintaxe válida e cobre os 5 workflows canônicos (R-050)."""
+    assert WORKFLOWS_MD_PATH.exists(), f"Arquivo de especificação não encontrado: {WORKFLOWS_MD_PATH}"
+    content = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    for wf_id in CANONICAL_WORKFLOW_IDS:
+        assert wf_id in content, f"workflows.md deve especificar o workflow: {wf_id}"
+    assert "workflow_tracking" in content, "workflows.md deve documentar o bloco workflow_tracking de handoff"
+def test_routing_graph_declares_all_five_workflows(routing_graph):
+    """Valida que routing-graph.yaml declara o bloco 'workflows' com os 5 pipelines e estados finitos."""
+    assert "workflows" in routing_graph, "routing-graph.yaml deve conter bloco 'workflows' (R-050)"
+    declared_wf_ids = {wf["id"] for wf in routing_graph["workflows"]}
+    assert CANONICAL_WORKFLOW_IDS.issubset(declared_wf_ids), (
+        f"routing-graph.yaml deve conter todos os 5 workflows canônicos. Declarados: {declared_wf_ids}"
+    )
+    for wf in routing_graph["workflows"]:
+        assert "estados" in wf, f"Workflow {wf['id']} deve declarar lista de estados"
+        assert len(wf["estados"]) >= 3, f"Workflow {wf['id']} deve ter ao menos 3 etapas de execução"
+        assert "gatilhos" in wf, f"Workflow {wf['id']} deve listar gatilhos de ativação"
+def test_fast_path_bypass_in_prompt_structuring_edge(routing_graph):
+    """Valida que a aresta de prompt-structuring possui gatilho de fast_path_bypass configurado."""
+    structuring_edge = next(
+        (a for a in routing_graph["arestas"] if a.get("para") == "prompt-structuring"),
+        None,
+    )
+    assert structuring_edge is not None, "Aresta para prompt-structuring não encontrada"
+    condicoes = structuring_edge.get("condicoes", {})
+    assert "fast_path_bypass" in condicoes, "Aresta prompt-structuring deve declarar 'fast_path_bypass'"
+def test_r050_and_r041_normative_rules_in_claude_md():
+    """Valida que CLAUDE.md possui R-050 formalizada e R-041 com Fast-Path determinístico."""
+    content = CLAUDE_MD_PATH.read_text(encoding="utf-8")
+    assert "R-050" in content, "CLAUDE.md deve formalizar a regra R-050"
+    assert "WORKFLOW-BUG-FIX" in content, "CLAUDE.md R-050 deve declarar WORKFLOW-BUG-FIX"
+    assert "Fast-Path" in content, "CLAUDE.md deve documentar a política de Fast-Path"
+def test_handoff_governance_supports_workflow_tracking():
+    """Valida que handoff-governance/SKILL.md inclui o schema de workflow_tracking."""
+    content = HANDOFF_SKILL_PATH.read_text(encoding="utf-8")
+    assert "workflow_tracking:" in content
+    assert "workflow_id:" in content
+    assert "etapa_atual:" in content
+    assert "proximos_agentes_permitidos:" in content
+
+
+def test_workflows_support_fast_chaining_circuit_breaker_and_multi_project():
+    """Valida que workflows.md documenta Fast-Chaining (R-050.1), Circuit Breaker/Rollback (R-050.2)
+    e Multi-Project Target Tracking (R-050.3)."""
+    content = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    assert "Fast-Chaining" in content, "workflows.md deve especificar o protocolo de Fast-Chaining"
+    assert "Circuit Breaker" in content, "workflows.md deve especificar o Circuit Breaker"
+    assert "projeto_alvo" in content, "workflows.md deve especificar o rastreamento de projeto_alvo"
+    assert "carry_over_state" in content, "workflows.md deve especificar a transferência de estado no chaining"
+
+
+def test_handoff_governance_v13_schema():
+    """Valida que handoff-governance/SKILL.md formaliza a v1.3 com projeto_alvo e chaining."""
+    content = HANDOFF_SKILL_PATH.read_text(encoding="utf-8")
+    assert 'versao: "1.3"' in content, "SKILL.md deve declarar versao 1.3 do schema"
+    assert "projeto_alvo:" in content, "SKILL.md deve conter projeto_alvo no workflow_tracking"
+    assert "chaining:" in content, "SKILL.md deve conter chaining no workflow_tracking"
+    assert "root_path:" in content, "SKILL.md deve declarar root_path do projeto alvo"
+
+
+def test_agent_router_fast_chaining_and_target_project():
+    """Valida que agent-router.agent.md formaliza o Fast-Chaining e a resolução de projeto-alvo."""
+    router_path = AGENTS_DIR / "agent-router.agent.md"
+    content = router_path.read_text(encoding="utf-8")
+    assert "Fast-Chaining" in content, "agent-router deve conter regra de Fast-Chaining"
+    assert "workflow_tracking.projeto_alvo" in content, "agent-router deve resolver projeto_alvo"
+
+
+def test_workflow_bug_fix_edge_scenarios_and_state_bag(routing_graph):
+    """Valida que WORKFLOW-BUG-FIX cobre cenários de layout, DDL, repro gate, baseline e typed state bag."""
+    content_wf = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    assert "Repro Gate" in content_wf, "workflows.md deve especificar o Repro Gate para bugs intermitentes"
+    assert "Layout Spec" in content_wf, "workflows.md deve especificar a ramificação de Layout/CSS"
+    assert "Migração DDL" in content_wf, "workflows.md deve cobrir dependência de DDL via database-specialist"
+    assert "workflow_state:" in content_wf, "workflows.md deve definir o Typed State Bag do Workflow 1"
+
+    # Validação estrutural no routing-graph.yaml
+    wf1 = next((wf for wf in routing_graph.get("workflows", []) if wf["id"] == "WORKFLOW-BUG-FIX"), None)
+    assert wf1 is not None, "WORKFLOW-BUG-FIX deve existir no routing-graph.yaml"
+    estados = wf1.get("estados", [])
+    assert any("ui-stylist" in e.get("agent", "") for e in estados), "Workflow 1 deve incluir ui-stylist para layout"
+    assert any("database-specialist" in str(e.get("sub_rotinas_permitidas", [])) for e in estados), "Workflow 1 deve suportar database-specialist"
+
+def test_workflow_refactoring_edge_scenarios_and_state_bag(routing_graph):
+    """Valida que WORKFLOW-REFACTORING cobre cenários de Golden Master, Breaking Changes,
+    Expand and Contract (BD), Árvore Mikado e Typed State Bag."""
+    content_wf = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    assert "Golden Master" in content_wf, "workflows.md deve especificar Golden Master Safety Net para código legado"
+    assert "Contract & Deprecation Plan" in content_wf, "workflows.md deve cobrir gate de breaking change"
+    assert "Expand and Contract" in content_wf, "workflows.md deve cobrir refatoração de schema de banco"
+    assert "Mikado Method" in content_wf, "workflows.md deve documentar decomposição Mikado"
+    assert "alvo_refatoracao:" in content_wf, "workflows.md deve definir o Typed State Bag do Workflow 2"
+
+    # Validação estrutural no routing-graph.yaml
+    wf2 = next((wf for wf in routing_graph.get("workflows", []) if wf["id"] == "WORKFLOW-REFACTORING"), None)
+    assert wf2 is not None, "WORKFLOW-REFACTORING deve existir no routing-graph.yaml"
+    estados = wf2.get("estados", [])
+    assert any("golden master" in str(e.get("safety_net_gate", "")) for e in estados), "Workflow 2 deve ter safety_net_gate"
+    assert any("tech-solution-architect" in str(e.get("sub_rotinas_permitidas", [])) for e in estados), "Workflow 2 deve ter sub-rotina de contratos"
+    assert any("database-specialist" in str(e.get("sub_rotinas_permitidas", [])) for e in estados), "Workflow 2 deve suportar database-specialist"
+    assert any("mikado_method" in str(e.get("estrategia_decomposicao", "")) for e in estados), "Workflow 2 deve declarar mikado_method"
+
+def test_workflow_technical_analysis_edge_scenarios_and_proposals(routing_graph):
+    """Valida que WORKFLOW-TECHNICAL-ANALYSIS cobre arquitetura de stack (Angular, Spring, EJB),
+    análise composta, tabela de propostas acionáveis para Fast-Chaining e Typed State Bag."""
+    content_wf = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    assert "angular-arch-advisor" in content_wf, "workflows.md deve incluir angular-arch-advisor"
+    assert "spring-boot-arch-advisor" in content_wf, "workflows.md deve incluir spring-boot-arch-advisor"
+    assert "Sub-rotina Analítica Composta" in content_wf, "workflows.md deve especificar análise composta"
+    assert "Tabela Mandatória de Propostas Acionáveis" in content_wf, "workflows.md deve exigir tabela de propostas"
+    assert "propostas_acionaveis:" in content_wf, "workflows.md deve definir propostas_acionaveis no State Bag"
+
+    # Validação estrutural no routing-graph.yaml
+    wf3 = next((wf for wf in routing_graph.get("workflows", []) if wf["id"] == "WORKFLOW-TECHNICAL-ANALYSIS"), None)
+    assert wf3 is not None, "WORKFLOW-TECHNICAL-ANALYSIS deve existir no routing-graph.yaml"
+    estados = wf3.get("estados", [])
+    etapa1 = next((e for e in estados if e["etapa"] == 1), {})
+    permitidos = etapa1.get("agents_permitidos", [])
+    assert "angular-arch-advisor" in permitidos, "Workflow 3 deve permitir angular-arch-advisor"
+    assert "spring-boot-arch-advisor" in permitidos, "Workflow 3 deve permitir spring-boot-arch-advisor"
+    assert "oracle-query-tuner" in permitidos, "Workflow 3 deve permitir query tuners"
+
+def test_workflow_feature_development_edge_scenarios_and_state_bag(routing_graph):
+    """Valida que WORKFLOW-FEATURE-DEVELOPMENT cobre particionamento de escopo (Fullstack/Back/Front),
+    Checkpoint de Blueprint, Contract-First TDD, Security Gate (OWASP) e Typed State Bag."""
+    content_wf = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    assert "Checkpoint de Blueprint" in content_wf, "workflows.md deve exigir Checkpoint de Blueprint"
+    assert "Contract-First" in content_wf, "workflows.md deve exigir Contract-First TDD"
+    assert "Security Review (OWASP)" in content_wf, "workflows.md deve incluir security-reviewer no gate"
+    assert "feature_id:" in content_wf, "workflows.md deve definir Typed State Bag do Workflow 4"
+
+    # Validação estrutural no routing-graph.yaml
+    wf4 = next((wf for wf in routing_graph.get("workflows", []) if wf["id"] == "WORKFLOW-FEATURE-DEVELOPMENT"), None)
+    assert wf4 is not None, "WORKFLOW-FEATURE-DEVELOPMENT deve existir no routing-graph.yaml"
+    estados = wf4.get("estados", [])
+    etapa3 = next((e for e in estados if e["etapa"] == 3), {})
+    assert "aprovacao_blueprint" in str(etapa3.get("checkpoint_humano", "")), "Workflow 4 deve ter checkpoint_humano na etapa 3"
+    assert "fullstack" in str(etapa3.get("particionamento_escopo", [])), "Workflow 4 deve suportar particionamento de escopo"
+
+    etapa6 = next((e for e in estados if e["etapa"] == 6), {})
+    assert "security-reviewer" in str(etapa6.get("sub_rotinas_permitidas", [])), "Workflow 4 deve ter security-reviewer no gate"
+
+def test_workflow_governance_maintenance_edge_scenarios_and_state_bag(routing_graph):
+    """Valida que WORKFLOW-GOVERNANCE-MAINTENANCE cobre pesquisa prévia de mercado via deep-search,
+    Checkpoint de Aprovação Humana, Sincronização Quádrupla SSOT (R-015), Quality Gate Tier 1 e State Bag."""
+    content_wf = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    assert "Pesquisa Prévia de Mercado" in content_wf, "workflows.md deve especificar pesquisa prévia"
+    assert "Checkpoint de Aprovação" in content_wf, "workflows.md deve exigir aprovação humana"
+    assert "Sincronização Quádrupla SSOT" in content_wf, "workflows.md deve exigir sincronização quádrupla R-015"
+    assert "Quality Gate de Governança (Tier 1)" in content_wf, "workflows.md deve incluir gate de testes de governança"
+    assert "tipo_demanda:" in content_wf, "workflows.md deve definir Typed State Bag do Workflow 5"
+
+    # Validação estrutural no routing-graph.yaml
+    wf5 = next((wf for wf in routing_graph.get("workflows", []) if wf["id"] == "WORKFLOW-GOVERNANCE-MAINTENANCE"), None)
+    assert wf5 is not None, "WORKFLOW-GOVERNANCE-MAINTENANCE deve existir no routing-graph.yaml"
+    estados = wf5.get("estados", [])
+    etapa1 = next((e for e in estados if e["etapa"] == 1), {})
+    assert "deep-search" in str(etapa1.get("sub_rotinas_permitidas", [])), "Workflow 5 deve permitir deep-search na etapa 1"
+
+    etapa3 = next((e for e in estados if e["etapa"] == 3), {})
+    assert etapa3.get("sincronizacao_quadrupla_r015") is True, "Workflow 5 deve declarar sincronizacao_quadrupla_r015"
+
+    etapa4 = next((e for e in estados if e["etapa"] == 4), {})
+    assert "pytest" in str(etapa4.get("validacao_automatizada", "")), "Workflow 5 deve ter validação automatizada na etapa 4"
 

@@ -139,10 +139,10 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 
 | Campo | Conteúdo |
 |---|---|
-| Sintoma | Inconsistência entre papel/perfil declarado do agent e as ferramentas ou competências atribuídas: *(a)* agent Read-Only / Advisory contendo tools mutativas de escrita (`create_file`, `insert_edit_into_file`); *(b)* agent com `run_in_terminal` sem declarar skill mandatória `terminal-governance`; *(c)* agent com MCP `context-mode/*` sem declarar skill `context-mode`; *(d)* agent implementer/fixer/tester sem ferramentas de validação (`get_errors`); *(e)* agent sem `run_subagent` no frontmatter (viola R-042); *(f)* divergência atômica (R-015) onde `tools:` ou `skills:` do arquivo `.agent.md` divergem do `catalog.yaml` ou `<stack>-catalog.yaml`. |
+| Sintoma | Inconsistência entre papel/perfil declarado do agent e as ferramentas ou competências atribuídas: *(a)* agent Read-Only / Advisory contendo tools mutativas de escrita (`create_file`, `insert_edit_into_file`); *(b)* agent ou prompt com `run_in_terminal` sem declarar skill mandatória `terminal-governance` em `source_docs` (ou `skills:` em sub-catálogo) (Tools/Source_Docs Inconsistency — R-049); *(c)* agent com MCP `context-mode/*` sem declarar skill `context-mode`; *(d)* agent implementer/fixer/tester sem ferramentas de validação (`get_errors`); *(e)* agent sem `run_subagent` no frontmatter (viola R-042); *(f)* divergência atômica (R-015) onde `tools:` ou `skills:` do arquivo `.agent.md` divergem do `catalog.yaml` ou `<stack>-catalog.yaml`. |
 | Como detectar | Execução da **Matriz Canônica de Conformidade (§2.7.1)** cruzando cada `.agent.md` contra seu catálogo e regras de `agent-contracts/SKILL.md` § 8-9 |
 | Origem (TrustAgent) | Intrínseco — violação de integridade entre contrato do agente (brain/tools) e habilidades declaradas (skills/memory) |
-| Severidade | **Bloqueador** se: tool mutativa em agent read-only; falta de `run_subagent` (R-042); ou uso de terminal sem `terminal-governance`.<br>**Alta** se: divergência entre `.agent.md` e `catalog.yaml` (R-015); falta de `get_errors` em agent implementer; ou MCP `context-mode` sem skill correspondente.<br>**Sugestão** se: skills de domínio complementares ausentes. |
+| Severidade | **Bloqueador** se: tool mutativa em agent read-only; falta de `run_subagent` (R-042); ou uso de terminal sem `terminal-governance` em `source_docs`/`skills` (R-049).<br>**Alta** se: divergência entre `.agent.md` e `catalog.yaml` (R-015); falta de `get_errors` em agent implementer; ou MCP `context-mode` sem skill correspondente.<br>**Sugestão** se: skills de domínio complementares ausentes. |
 | Remediação | `@governance-factory` revisa o `.agent.md` e sincroniza o `catalog.yaml` / sub-catálogo na mesma entrega (R-015) |
 
 ### 2.7.1 — Matriz Canônica de Conformidade (Perfil ↔ Tools ↔ Skills)
@@ -156,7 +156,7 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 | **Domain Router / Supervisor**<br>*(ex.: `*-router`)* | `read_file`, `file_search`, `grep_search`, `list_dir`, `ask_questions`, `run_subagent`, `context-mode/ctx_search` | ❌ `create_file`, `insert_edit_into_file`, `run_in_terminal` | `agent-contracts`, `handoff-governance` |
 
 #### Invariantes Transversais de Tooling:
-1. **Tool `run_in_terminal` presente** ➔ **OBRIGATÓRIO** declarar a skill `terminal-governance` nas `skills:` e `source_docs:` do `.agent.md` e em `catalog.yaml`.
+1. **Tool `run_in_terminal` presente** ➔ **OBRIGATÓRIO** declarar a skill `terminal-governance` nas `skills:` e/ou `source_docs:` de `.agent.md`, `.prompt.md` e em `catalog.yaml` / sub-catálogos locais (R-049).
 2. **Tools `context-mode/*` presentes** ➔ **OBRIGATÓRIO** declarar a skill `context-mode` nas `skills:` e `source_docs:` do `.agent.md` e em `catalog.yaml`.
 3. **Tool `run_subagent`** ➔ **OBRIGATÓRIO E BLOQUEANTE** em 100% dos agents (R-042).
 4. **Sincronismo R-015** ➔ As ferramentas declaradas no frontmatter `tools:` e as skills em `skills:` do `.agent.md` DEVEM ser idênticas às declaradas no `catalog.yaml` (ou `<stack>-catalog.yaml`).
@@ -187,7 +187,7 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 
 | Campo | Conteúdo |
 |---|---|
-| Sintoma | Arquivo `.prompt.md` que diverge de `.github/prompts/templates/prompt-template.md`: *(a)* ausência de `argument-hint` no frontmatter quando o comando aceita parâmetros dinâmicos; *(b)* uso de variáveis ad-hoc ou incorretas em vez das variáveis nativas do VS Code Copilot (`${file}`, `${selection}`, `${workspaceFolder}`, `${input:param}`); *(c)* ausência do bloco delimitador `## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO`; *(d)* ausência de checklist de pré-apresentação ou formato de saída estruturado; *(e)* nomenclatura fora do padrão kebab-case `<verbo>-<objeto>.prompt.md`. |
+| Sintoma | Arquivo `.prompt.md` que diverge de `.github/prompts/templates/prompt-template.md`: *(a)* ausência de `argument-hint` no frontmatter quando o comando aceita parâmetros dinâmicos; *(b)* uso de variáveis ad-hoc ou incorretas em vez das variáveis nativas do VS Code Copilot (`${file}`, `${selection}`, `${workspaceFolder}`, `${input:param}`); *(c)* ausência do bloco delimitador `## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO`; *(d)* ausência de checklist de pré-apresentação ou formato de saída estruturado; *(e)* nomenclatura fora do padrão kebab-case `<verbo>-<objeto>.prompt.md`; *(f)* prompt que declara `run_in_terminal` em `tools:` sem incluir `.github/skills/terminal-governance/SKILL.md` em `source_docs:` (R-049). |
 | Como detectar | Inspeção do frontmatter e corpo dos prompts em `.github/prompts/*.prompt.md` contra o template canônico |
 | Origem (TrustAgent) | Intrínseco — quebra de compatibilidade com a runtime de prompts do VS Code Copilot |
 | Severidade | **Alta** se ausência de variáveis nativas onde esperado ou falta de escopo estrito; **Sugestão** se falta de `argument-hint` ou detalhamento cosmético |
@@ -250,6 +250,26 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 
 ---
 
+### 2.15 — Citação de Range Normativo Desatualizado (Drift de R-0XX)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Seção `## Regras Herdadas` de um `.agent.md` cita um range `R-001..R-0XX` onde `XX` é menor que a última regra normativa vigente em `CLAUDE.md` (atualmente R-050) — o agent não referencia formalmente as regras mais recentes, mesmo herdando-as implicitamente via link ao arquivo completo |
+| Como detectar | Regex `R-001\.\.R-(\d{3})` em cada `.github/agents/**/*.agent.md`; comparar o valor capturado contra o maior `R-0XX` declarado em `CLAUDE.md` § 3; qualquer valor menor é um achado. Ver Tier 1: `test_smell_2_15_no_stale_normative_rule_range` |
+| Origem (TrustAgent) | Extrínseco — `CLAUDE.md` evolui (novas regras) mas os agents consumidores não são atualizados na mesma entrega (violação de R-015 a posteriori) |
+| Severidade | Baixa individualmente, mas **Alta em agregado** quando sistêmica (evidência real: 44/44 agents com a seção encontrados desatualizados simultaneamente em auditoria de 2026-09 — sinal de ausência de processo de sincronização, não de um lapso isolado) |
+| Remediação | Batch update via `@governance-maintainer`: script `ctx_execute` com match-verificado por arquivo (ler → contar ocorrências == 1 → substituir → escrever), nunca `insert_edit_into_file` em arquivos grandes/YAML sensível a indentação (incidente documentado: corrompeu `workflows.md` e `routing-graph.yaml` na auditoria de 2026-09 ao tentar edições multi-linha sem ancoragem precisa) |
+
+### 2.16 — Agent Mutativo Sem Skill de Edição Segura Referenciada (R-051)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Agent com `insert_edit_into_file` e/ou `replace_string_in_file` no frontmatter `tools:` não referencia `efficient-batch-code-modification` em `source_docs:`/`skills:` — fica sem o guardrail que previne corrupção de arquivo único grande/estruturado (R-051) |
+| Como detectar | Para cada `.agent.md` com `insert_edit_into_file` ou `replace_string_in_file` em `tools:`, verificar se `efficient-batch-code-modification` aparece em `source_docs:` ou nas listas `skills:` de sub-catálogos. Ver Tier 1: `test_smell_2_16_mutating_agents_reference_safe_editing_skill` |
+| Origem (TrustAgent) | Intrínseco — agent herda tool de mutação sem herdar o protocolo de segurança correspondente |
+| Severidade | **Bloqueador** (mesmo risco de corrupção documentado em R-051, incidente real de 2026-09 que corrompeu `workflows.md`/`routing-graph.yaml` três vezes) |
+| Remediação | Adicionar `.github/skills/efficient-batch-code-modification/SKILL.md` a `source_docs:` (ou `skills:` no sub-catálogo) do agent afetado via `@governance-maintainer` |
+
 ## 3) Severidade — Reaproveitamento da Taxonomia Existente
 
 Esta skill **reaproveita** (não recria) a taxonomia de `code-review-patterns`:
@@ -289,7 +309,7 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 - [ ] Origem classificada como intrínseca ou extrínseca (TrustAgent) quando relevante.
 - [ ] Remediação aponta agent executor real do catálogo (nunca "corrigir diretamente" — agent de auditoria é estritamente read-only).
 - [ ] Achados de segurança cruzados com `agent-safety-guardrails`, não recriados.
-- [ ] Validações de tooling e perfil cruzadas com a Matriz Canônica de Conformidade (§2.7.1).
+- [ ] Validações de tooling e perfil cruzadas com a Matriz Canônica de Conformidade (§2.7.1) e invariante de terminal em source_docs/skills (R-049).
 - [ ] Protocolo de Single-Turn Batching e limiar de 5 arquivos (R-046) verificado nos executores (§2.8).
 - [ ] Conformidade de templates de Agent (§2.9), Prompt (§2.10) e Skill (§2.11) validada.
 - [ ] Conflito de responsabilidade cross-artefato (agents vs prompts vs skills) verificado — fronteira decisão/conhecimento/atalho respeitada (§2.12).

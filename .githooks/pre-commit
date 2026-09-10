@@ -64,6 +64,19 @@ if [ -n "$staged_gov_files" ]; then
   done <<< "$staged_gov_files"
 fi
 
+# 5) Bloqueio de nomes de projetos locais externos em arquivos staged (R-044)
+if [ -f "docs/ai-context/catalog.local.yaml" ]; then
+  local_ids=$(grep -E '^\s*-\s*id:' docs/ai-context/catalog.local.yaml | awk -F'"' '{print $2}' | grep -v 'deep-agents-copilot' || true)
+  for proj_id in $local_ids; do
+    [ -z "$proj_id" ] && continue
+    if git diff --cached | grep -qiE "^\+.*$proj_id"; then
+      echo "❌ [R-044] Bloqueado: diff staged contém referência nominal ao projeto local '$proj_id'."
+      echo "   → Genericize para [PROJETO-ALVO] ou [PROJETO-EXEMPLO]. Ver CLAUDE.md § R-044."
+      blocked=1
+    fi
+  done
+fi
+
 if [ "$blocked" -ne 0 ]; then
   echo ""
   echo "Commit abortado — violação de R-043/R-044. Ver CLAUDE.md § R-043 / § R-044."

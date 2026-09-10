@@ -80,7 +80,7 @@ Reportar no Formato de Saída (§4 desta skill)
 | Descrição objetiva (frontmatter) — ≤ 500 caracteres, ver §10 | ✅ | ✅ | ✅ | ✅ (no sub-catálogo e no router) |
 | Tier/Categoria | — | ✅ | — | — |
 | Model | ✅ | — | ✅ (se aplicável) | ✅ (no router e nos especialistas) |
-| Tools (com `run_subagent` obrigatório — R-042) | ✅ | opcional | opcional | ✅ (em todos os agents) |
+| Tools (com `run_subagent` obrigatório — R-042; se `run_in_terminal` presente, `terminal-governance` em `source_docs` é obrigatório — R-049) | ✅ | opcional | opcional | ✅ (em todos os agents) |
 | Triggers (PT-BR) | — | ✅ | — | — |
 | Source_docs | ✅ obrigatório | ✅ | ✅ obrigatório | ✅ |
 | Registro em índice/catálogo | `catalog.yaml` + `README.md` | `.index.json` + `README.md` | `README.md` de prompts | `catalog.yaml` + `routing-graph.yaml` + `agent-router.agent.md` + `README.md` |
@@ -95,6 +95,7 @@ Reportar no Formato de Saída (§4 desta skill)
 - [ ] README correspondente atualizado **na mesma entrega**.
 - [ ] Se `agent`: `run_subagent` presente no frontmatter `tools:` (bloqueante — R-042); seção "Retorno ao Router" declarada; banner "Agente Ativo" presente no Formato de Saída.
 - [ ] Se `agent`/`prompt`: `source_docs` presente no frontmatter apontando para as skills/regras que são DEPENDÊNCIA FUNCIONAL REAL do agent (não apenas afinidade temática) — reutilizar o Gate de Autocrítica §3.1 para validar isso.
+- [ ] Se `run_in_terminal` for declarado em `tools:` (agent, prompt ou especialista de stack): inclusão COMPULSÓRIA de `.github/skills/terminal-governance/SKILL.md` em `source_docs:` (ou na seção `skills:` do sub-catálogo local da stack) para assegurar governança de terminal (R-049).
 - [ ] Se `skill`: `tier`, `category`, `triggers` em PT-BR presentes; `source_docs` aponta para arquivos reais (não inventados).
 - [ ] Se `prompt`: nomenclatura `.prompt.md`, frontmatter mínimo (`description`, `model` quando aplicável), separação de responsabilidade clara com `.instructions.md` (não duplicar regra já coberta por adapter).
 - [ ] Se `stack`: diretório isolado criado em `.github/agents/<camada>/<stack>/` contendo `<stack>-catalog.yaml`, `<stack>-router.agent.md` e pacote canônico de especialistas (.agent.md) — ver §11.
@@ -130,6 +131,7 @@ Validações:
 - [se agent] run_subagent presente (R-042): ✅/❌
 - [se agent] Seção "Retorno ao Router" presente: ✅/❌
 - [se agent/prompt] source_docs presente e funcionalmente justificado: ✅/❌
+- [se tools contém run_in_terminal] terminal-governance em source_docs/skills (R-049): ✅/❌
 - [se skill] tier/category/triggers presentes: ✅/❌
 - [se agent/prompt/stack] model: string única, Title Case oficial, validado via get_errors (§9): ✅/❌
 - [se stack] Sub-catálogo local e supervisor configurados (§11): ✅/❌
@@ -154,6 +156,7 @@ Nenhuma criação/revisão de artefato de governança é considerada completa se
 - ❌ Criar especialistas de uma nova stack espalhados na raiz `.github/agents/` em vez de isolados em pasta dedicada com sub-catálogo (causa explosão de nós no catálogo central).
 - ❌ Duplicar artefato existente por não ter buscado por escopo semântico (só buscar por nome exato é insuficiente).
 - ❌ Agent criado sem `run_subagent` no frontmatter (estruturalmente incapaz de cumprir R-042).
+- ❌ Declarar a ferramenta `run_in_terminal` em `tools:` de agent, prompt ou especialista de stack sem vincular compulsoriamente `.github/skills/terminal-governance/SKILL.md` em `source_docs` ou `skills:` (viola R-049).
 - ❌ Skill criada sem `triggers` em PT-BR ou com `source_docs` apontando para arquivo inexistente.
 - ❌ Reinventar o fluxo de Decision Tree em vez de referenciar esta skill — risco de drift entre os 4 `type` (agent/skill/prompt/stack) do `governance-factory`.
 - ❌ Registrar referência cruzada a outra skill/agent (ex.: "consumidor de X") sem confirmar dependência funcional real — pular o gate §3.1 e validar só a estrutura (achado real: `deep-search` registrado como consumidor de `reflection-self-critique-patterns` sem uso funcional).
@@ -279,7 +282,7 @@ A criação de um novo ecossistema de stack (ex.: EJB, React, Python FastAPI) se
 
 ### 11.2) Sub-catálogo Local (`<stack>-catalog.yaml`)
 - Define metadados do domínio (`domain: "<camada>-<stack>"`), papel do supervisor (`router: id: "<stack>-router"`) e dicionário dos especialistas (`agents:`).
-- Cada especialista declara: `id`, `model`, `role` (advisory, implementer, fixer, performance, tester), `domain`, `description` (≤ 400 caracteres), `keywords`, `tools` (com `run_subagent`) e `skills`.
+- Cada especialista declara: `id`, `model`, `role` (advisory, implementer, fixer, performance, tester), `domain`, `description` (≤ 400 caracteres), `keywords`, `tools` (com `run_subagent`; se `run_in_terminal` presente, `terminal-governance` em `skills`/`source_docs` por R-049) e `skills`.
 
 ### 11.3) Supervisor de Domínio (`<stack>-router.agent.md`)
 - Nome: `<stack>-router`

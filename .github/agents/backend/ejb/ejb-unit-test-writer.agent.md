@@ -11,6 +11,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/test-implementation-backend/SKILL.md
   - .github/skills/test-coverage-governance/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
 ---
 
 # EJB Unit Test Writer

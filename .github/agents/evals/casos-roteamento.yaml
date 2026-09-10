@@ -606,6 +606,38 @@ canonicos:
     critico: true
     threshold: 0.90
 
+  - id: "canon-043"
+    descricao: "Defeito de layout e erro de runtime roteado via Fast-Path para WORKFLOW-BUG-FIX (@bug-triage)"
+    input:
+      solicitacao: "A tela de escalas está com layout quebrado no mobile e disparando NullPointerException no console ao rolar"
+    expected:
+      agent_route: "bug-triage"
+      workflow: "WORKFLOW-BUG-FIX"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.90
+      output_contains:
+        - "Agente Ativo: bug-triage"
+        - "Workflow: WORKFLOW-BUG-FIX"
+    critico: true
+    threshold: 0.90
+
+  - id: "canon-044"
+    descricao: "Refatoração estrutural com alvo explícito roteada via Fast-Path para WORKFLOW-REFACTORING (@refactor-planner)"
+    input:
+      solicitacao: "Refatorar o serviço EscalaGeneratorService para extrair as regras RN001 a RN006 em classes de validação isoladas"
+    expected:
+      agent_route: "refactor-planner"
+      workflow: "WORKFLOW-REFACTORING"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.90
+      output_contains:
+        - "Agente Ativo: refactor-planner"
+        - "Workflow: WORKFLOW-REFACTORING"
+    critico: true
+    threshold: 0.90
+
 # ─────────────────────────────────────────────
 # SUITE 2 — Casos Ambíguos (threshold ≥ 0.70)
 # Intenção ambígua que exige clarificação ou roteamento defensivo.
@@ -1034,6 +1066,46 @@ regressao:
       via: "run_subagent"
     nao_deve:
       comportamento: "refactor-planner executar list_dir/grep_search/file_search para mapear relações de código por conta própria"
+    critico: true
+    threshold: 1.00
+
+  - id: "regr-024"
+    descricao: "REGRESSÃO: problema relatado pelo usuário como falha ('faço login normal, mas login federado não reconhece credencial cadastrada') NUNCA deve pular @bug-triage direto para investigação/implementação sob o turno do agent-router, mesmo que a conversa evolua para uma feature"
+    input:
+      turno_1:
+        solicitacao: "Quando fiz o login a primeira vez fiz o cadastro normal, mas ao tentar acessar com outro provedor não funciona com a credencial cadastrada — qual o problema?"
+      turno_2:
+        solicitacao_apos_ask_questions: "Criar funcionalidade de vincular credencial no app"
+    expected:
+      turno_1_agent_route: "bug-triage"
+      turno_2_banner_obrigatorio: "Agente Ativo: <especialista> declarado ANTES de qualquer tool call de investigação/edição (R-048)"
+    nao_deve:
+      comportamento: "agent-router encadear dezenas de tool calls sob o próprio turno sem declarar handoff prévio, anunciando handoff apenas retroativamente no relatório final"
+    critico: true
+    threshold: 1.00
+
+  - id: "regr-025"
+    descricao: "REGRESSÃO: mudança em lógica de autenticação/identidade (serviços de auth, vinculação de credenciais, alteração de credencial) NUNCA deve ser implementada sem checkpoint de viabilidade/segurança prévio — tratamento equivalente a regras de segurança de persistência (R-048.1)"
+    input:
+      solicitacao: "Implementar vinculação de credencial a conta autenticada via provedor federado"
+    expected:
+      etapa_obrigatoria: "handoff explícito para @tech-solution-architect (viabilidade) e, se disponível, @security-reviewer, ANTES de qualquer edição/criação de arquivos no módulo de autenticação"
+    nao_deve:
+      comportamento: "editar serviços de autenticação ou criar componentes de interface de credencial diretamente sem declarar o checkpoint de segurança no handoff"
+    critico: true
+    threshold: 1.00
+
+  - id: "regr-026"
+    descricao: "REGRESSÃO: relato de bug, erro 500, NPE ou problema de layout CSS NUNCA deve ser desviado para @prompt-structuring — deve acionar compulsoriamente o Fast-Path determinístico para WORKFLOW-BUG-FIX (@bug-triage) (R-041/R-050)"
+    input:
+      solicitacao: "O botão de salvar escala está quebrado com erro 500 ao clicar no mobile e o layout da toolbar ficou desalinhado"
+    expected:
+      agent_route: "bug-triage"
+      workflow: "WORKFLOW-BUG-FIX"
+      fast_path_bypass: true
+      etapa_inicial: "triage_and_root_cause"
+    nao_deve:
+      comportamento: "agent-router delegar para prompt-structuring para reformatar o prompt ou fazer perguntas de clarificação antes da triagem do bug"
     critico: true
     threshold: 1.00
 

@@ -11,6 +11,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/spring-reactive-performance-patterns/SKILL.md
   - .github/skills/performance-engineering-patterns/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
 ---
 
 # Spring Reactive Resilience Tuner
