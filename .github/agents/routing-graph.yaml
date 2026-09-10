@@ -174,6 +174,161 @@ nos:
     descricao: "Auditoria de higiene estrutural, documentação essencial (README/CONTRIBUTING/LICENSE), segurança de versionamento (.gitignore, .env) e práticas de CI/CD agnóstica de stack; read-only"
 
 # ─────────────────────────────────────────────
+# WORKFLOWS — Máquinas de Estado Canônicas (R-050)
+# Define os 5 workflows operacionais determinísticos e suas sequências estritas
+# ─────────────────────────────────────────────
+workflows:
+  - id: WORKFLOW-BUG-FIX
+    nome: "Resolução de Bugs, Defeitos de Layout e Regressões"
+    regra: "R-050"
+    fast_path: true
+    gatilhos:
+      - "bug"
+      - "erro"
+      - "falha"
+      - "500"
+      - "NPE"
+      - "não funciona"
+      - "quebrou"
+      - "layout quebrado"
+      - "desalinhado"
+      - "CSS quebrado"
+      - "NullPointerException"
+      - "regressão"
+    estados:
+      - etapa: 1
+        nome: "triage_and_root_cause"
+        agent: "bug-triage"
+        sub_rotinas_permitidas: ["debugger", "code-knowledge-graph"]
+      - etapa: 2
+        nome: "red_test_reproduction"
+        agent: "specialist-unit-test-writer | specialist-component-test-writer"
+      - etapa: 3
+        nome: "surgical_bug_fix"
+        agent: "specialist-bug-fixer"
+      - etapa: 4
+        nome: "green_test_and_linter_validation"
+        agent: "runtime-verifier | specialist-test-fixer"
+      - etapa: 5
+        nome: "quality_gate_and_pr"
+        agent: "code-review | pr-gatekeeper"
+
+  - id: WORKFLOW-REFACTORING
+    nome: "Refatoração Estrutural, Modernização e Desacoplamento"
+    regra: "R-050"
+    fast_path: true
+    gatilhos:
+      - "refatorar"
+      - "refatoração"
+      - "desacoplar"
+      - "clean architecture"
+      - "eliminar god class"
+      - "modularizar"
+      - "remover duplicação"
+    estados:
+      - etapa: 1
+        nome: "ground_truth_rules_extraction"
+        agent: "business-rules-extractor"
+      - etapa: 2
+        nome: "blast_radius_and_graph_mapping"
+        agent: "code-knowledge-graph"
+      - etapa: 3
+        nome: "refactor_plan_and_safety_net"
+        agent: "refactor-planner"
+        co_agentes: ["test-strategy"]
+      - etapa: 4
+        nome: "incremental_batch_execution"
+        agent: "domain-router | specialist-feature-developer"
+      - etapa: 5
+        nome: "ground_truth_validation_and_review"
+        agent: "business-rules-extractor"
+        co_agentes: ["code-review"]
+
+  - id: WORKFLOW-TECHNICAL-ANALYSIS
+    nome: "Análise Técnica, Diagnóstico e Auditoria Especializada"
+    regra: "R-050"
+    fast_path: true
+    gatilhos:
+      - "analisar"
+      - "diagnosticar"
+      - "como funciona"
+      - "mapear arquitetura"
+      - "verificar segurança"
+      - "avaliar performance"
+      - "conformidade adr"
+      - "bounded context"
+    estados:
+      - etapa: 1
+        nome: "specialist_analyst_dispatch"
+        agents_permitidos:
+          - "code-knowledge-graph"
+          - "ddd-bounded-context-mapper"
+          - "adr-sentinel"
+          - "security-reviewer"
+          - "performance-agent"
+          - "compliance-guardrails"
+          - "tech-solution-architect"
+      - etapa: 2
+        nome: "deterministic_read_only_collection"
+        modo: "advisory_read_only"
+      - etapa: 3
+        nome: "synthesis_and_next_step"
+        regra_conclusao: "R-047"
+
+  - id: WORKFLOW-FEATURE-DEVELOPMENT
+    nome: "Nova Feature e Evolução Funcional E2E"
+    regra: "R-050"
+    fast_path: false
+    gatilhos:
+      - "criar feature"
+      - "nova funcionalidade"
+      - "implementar endpoint"
+      - "adicionar tela"
+      - "novo módulo"
+    estados:
+      - etapa: 1
+        nome: "prompt_structuring_refinement"
+        agent: "prompt-structuring"
+        condicao: "se_ambiguo_ou_alto_nivel"
+      - etapa: 2
+        nome: "requirements_elicitation"
+        agent: "requirements-analyst | feature-planner"
+      - etapa: 3
+        nome: "technical_blueprint_and_contracts"
+        agent: "tech-solution-architect"
+      - etapa: 4
+        nome: "test_strategy_and_risk_matrix"
+        agent: "test-strategy"
+      - etapa: 5
+        nome: "tdd_domain_implementation"
+        agent: "domain-router | specialists"
+      - etapa: 6
+        nome: "quality_gate_and_pr_preparation"
+        agent: "code-review | pr-gatekeeper"
+
+  - id: WORKFLOW-GOVERNANCE-MAINTENANCE
+    nome: "Auditoria, Padronização e Manutenção de Governança"
+    regra: "R-050"
+    fast_path: true
+    gatilhos:
+      - "auditar governança"
+      - "novo agent"
+      - "nova skill"
+      - "manutenção de catálogo"
+      - "corrigir smell de agent"
+      - "higiene de repositório"
+    estados:
+      - etapa: 1
+        nome: "read_only_audit_and_diagnosis"
+        agents_permitidos: ["agent-auditor", "repo-hygiene-auditor"]
+      - etapa: 2
+        nome: "human_approval_checkpoint"
+        mecanismo: "ask_questions"
+      - etapa: 3
+        nome: "governed_batch_execution"
+        agents_permitidos: ["governance-maintainer", "governance-factory"]
+
+# ─────────────────────────────────────────────
 # ARESTAS — condições de roteamento
 # Cada aresta define: origem, destino, sinais de ativação e threshold mínimo
 # ─────────────────────────────────────────────
@@ -189,16 +344,21 @@ arestas:
       regra: "R-034"
       gatilho: "docs/ai-context/catalog.yaml ausente OU docs/ai-context/binding.md ausente"
 
-  # Prompt structuring obrigatório (pré-classificação) — exceção R-041
+  # Prompt structuring (pré-classificação para casos ambíguos/abertos) — exceção R-041
   - de: agent-router
     para: prompt-structuring
     prioridade: 0.5
-    threshold_score: 0  # null — passo mandatório, não usa score numérico
+    threshold_score: 0  # null — passo condicionado por fast-path
     nivel_routing: rule-based
     condicoes:
       tipo: mandatory_pre_step
       regra: "R-041"
-      gatilho: "Sempre, após Health Check (R-034) e antes de qualquer classificação de intenção — exceto quando a solicitação já retornou refinada por prompt-structuring"
+      gatilho: "Após Health Check (R-034) para solicitações ambíguas, abertas ou features novas não estruturadas"
+      fast_path_bypass:
+        - "WORKFLOW-BUG-FIX (bugs, erros 500, NPE, problemas de layout e regressões)"
+        - "WORKFLOW-REFACTORING (refatorações com alvo definido)"
+        - "WORKFLOW-TECHNICAL-ANALYSIS (análises e diagnósticos diretos)"
+        - "WORKFLOW-GOVERNANCE-MAINTENANCE (auditoria e higiene)"
       loop_maximo: 5
       retorno_obrigatorio: agent-router
 

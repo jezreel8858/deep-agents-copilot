@@ -606,6 +606,38 @@ canonicos:
     critico: true
     threshold: 0.90
 
+  - id: "canon-043"
+    descricao: "Defeito de layout e erro de runtime roteado via Fast-Path para WORKFLOW-BUG-FIX (@bug-triage)"
+    input:
+      solicitacao: "A tela de escalas está com layout quebrado no mobile e disparando NullPointerException no console ao rolar"
+    expected:
+      agent_route: "bug-triage"
+      workflow: "WORKFLOW-BUG-FIX"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.90
+      output_contains:
+        - "Agente Ativo: bug-triage"
+        - "Workflow: WORKFLOW-BUG-FIX"
+    critico: true
+    threshold: 0.90
+
+  - id: "canon-044"
+    descricao: "Refatoração estrutural com alvo explícito roteada via Fast-Path para WORKFLOW-REFACTORING (@refactor-planner)"
+    input:
+      solicitacao: "Refatorar o serviço EscalaGeneratorService para extrair as regras RN001 a RN006 em classes de validação isoladas"
+    expected:
+      agent_route: "refactor-planner"
+      workflow: "WORKFLOW-REFACTORING"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.90
+      output_contains:
+        - "Agente Ativo: refactor-planner"
+        - "Workflow: WORKFLOW-REFACTORING"
+    critico: true
+    threshold: 0.90
+
 # ─────────────────────────────────────────────
 # SUITE 2 — Casos Ambíguos (threshold ≥ 0.70)
 # Intenção ambígua que exige clarificação ou roteamento defensivo.
@@ -1060,6 +1092,20 @@ regressao:
       etapa_obrigatoria: "handoff explícito para @tech-solution-architect (viabilidade) e, se disponível, @security-reviewer, ANTES de qualquer edição/criação de arquivos no módulo de autenticação"
     nao_deve:
       comportamento: "editar serviços de autenticação ou criar componentes de interface de credencial diretamente sem declarar o checkpoint de segurança no handoff"
+    critico: true
+    threshold: 1.00
+
+  - id: "regr-026"
+    descricao: "REGRESSÃO: relato de bug, erro 500, NPE ou problema de layout CSS NUNCA deve ser desviado para @prompt-structuring — deve acionar compulsoriamente o Fast-Path determinístico para WORKFLOW-BUG-FIX (@bug-triage) (R-041/R-050)"
+    input:
+      solicitacao: "O botão de salvar escala está quebrado com erro 500 ao clicar no mobile e o layout da toolbar ficou desalinhado"
+    expected:
+      agent_route: "bug-triage"
+      workflow: "WORKFLOW-BUG-FIX"
+      fast_path_bypass: true
+      etapa_inicial: "triage_and_root_cause"
+    nao_deve:
+      comportamento: "agent-router delegar para prompt-structuring para reformatar o prompt ou fazer perguntas de clarificação antes da triagem do bug"
     critico: true
     threshold: 1.00
 

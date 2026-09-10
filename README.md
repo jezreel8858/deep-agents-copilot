@@ -110,15 +110,17 @@ flowchart TD
     C --> D["/add-project-context\n1x por projeto"]
     B -- Sim --> D
     D --> E["@agent-router\nR-037 — entry point"]
-    E --> P["prompt-structuring\nR-041 — loop máx. 5x"]
+    E --> FP{"Fast-Path (R-050)\nBug/Refactor/Análise?"}
+    FP -- "Não (Ambíguo/Aberto)" --> P["prompt-structuring\nR-041 — loop máx. 5x"]
     P --> E
+    FP -- "Sim (Fast-Path R-050)" --> WF["Workflows Canônicos\n(Pipelines Determinísticos)"]
 
-    E --> G1["🎯 Planning/Analysis\nrequirements-analyst · deep-search\nfeature-planner"]
-    E --> G2["📐 Architecture/Design\ntech-solution-architect · code-knowledge-graph\nbusiness-rules-extractor · refactor-planner\nddd-bounded-context-mapper · adr-sentinel"]
-    E --> G3["💻 Implementation (Domain Routers & Specialists)\nangular-router · spring-boot-router · spring-reactive-router\nejb-router · database-router · database-specialist\ncode-summarizer"]
-    E --> G4["✅ Quality/Validation\nbug-triage · debugger · test-strategy\ncode-review · code-style-enforcer · security-reviewer\nperformance-agent · devops-engineer · runtime-verifier\nrepo-hygiene-auditor"]
-    E --> G5["📚 Documentation/Learning\ndocs-engineer · context-builder"]
-    E --> G6["🔄 Governance/Orchestration\ngovernance-factory · governance-maintainer\nagent-auditor · binding-initializer\nadapter-generator · agentic-memory-manager\ncompliance-guardrails · pr-gatekeeper"]
+    E & WF --> G1["🎯 Planning/Analysis\nrequirements-analyst · deep-search\nfeature-planner"]
+    E & WF --> G2["📐 Architecture/Design\ntech-solution-architect · code-knowledge-graph\nbusiness-rules-extractor · refactor-planner\nddd-bounded-context-mapper · adr-sentinel"]
+    E & WF --> G3["💻 Implementation (Domain Routers & Specialists)\nangular-router · spring-boot-router · spring-reactive-router\nejb-router · database-router · database-specialist\ncode-summarizer"]
+    E & WF --> G4["✅ Quality/Validation\nbug-triage · debugger · test-strategy\ncode-review · code-style-enforcer · security-reviewer\nperformance-agent · devops-engineer · runtime-verifier\nrepo-hygiene-auditor"]
+    E & WF --> G5["📚 Documentation/Learning\ndocs-engineer · context-builder"]
+    E & WF --> G6["🔄 Governance/Orchestration\ngovernance-factory · governance-maintainer\nagent-auditor · binding-initializer\nadapter-generator · agentic-memory-manager\ncompliance-guardrails · pr-gatekeeper"]
 
     G1 & G2 & G3 & G4 & G5 & G6 --> K["Resultado\n(turno N)"]
     K --> L["/commit\nmensagem gerada"]

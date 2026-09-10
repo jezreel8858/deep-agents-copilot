@@ -6,6 +6,28 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.2.0] — 2026-09-10
+
+### Adicionado
+- **Regra Normativa R-050 (Workflows Operacionais Determinísticos — Pipelines de Estado Finito)**: Formalizada em `CLAUDE.md` a obrigatoriedade de vincular e executar toda solicitação técnica através de um dos 5 Workflows Canônicos:
+  1. `WORKFLOW-BUG-FIX` (Bugs, Erros 500/NPE, Falhas de Layout e Regressões em 5 etapas).
+  2. `WORKFLOW-REFACTORING` (Refatoração Estrutural, Modernização e Desacoplamento em 5 etapas).
+  3. `WORKFLOW-TECHNICAL-ANALYSIS` (Análise Técnica, Diagnóstico e Auditoria Especializada em 3 etapas).
+  4. `WORKFLOW-FEATURE-DEVELOPMENT` (Nova Feature e Evolução Funcional E2E em 6 etapas).
+  5. `WORKFLOW-GOVERNANCE-MAINTENANCE` (Auditoria, Padronização e Manutenção de Governança em 3 etapas).
+- **Especificação Canônica dos 5 Workflows (`.github/agents/workflows.md`)**: Novo artefato canônico com diagramas Mermaid em `flowchart TD`, matrizes de entrada/saída, regras de não-desvio e invariantes de execução.
+- **Roadmap Visual de Execução no Chat (Anti-Cegueira de Fluxo)**: Padronizada no `@agent-router`, `agent-contracts` (§ 0.1) e `workflows.md` (§ 6) a exibição compulsória do bloco visual `### 🗺️ Pipeline de Execução do Workflow (<total> etapas)` com marcadores `[✅]` (Concluído), `[▶]` (Em Andamento) e `[⏳]` (Pendente) para eliminar a cegueira do usuário durante o fluxo.
+- **Extensão de Handoff v1.2 (`workflow_tracking`)**: Adicionado ao schema formal de `handoff-governance` o bloco `workflow_tracking` (`workflow_id`, `etapa_atual`, `total_etapas`, `nome_etapa`, `proximos_agentes_permitidos`, `politica_desvio: "strict"`).
+- **Testes de Conformidade de Workflows**: 5 novos testes determinísticos em `tests/operational_flow/test_operational_workflows.py` validando os 5 workflows, integridade de `workflows.md`, declaração no grafo e suporte ao rastreamento de handoff.
+- **Novos Casos na Suíte de Evals**: `canon-043` (layout e erro runtime), `canon-044` (refactor com alvo) e `regr-026` (bloqueio de desvio de bugs para `prompt-structuring`) em `.github/agents/evals/casos-roteamento.yaml`.
+
+### Evoluído
+- **Regra Normativa R-041 (Fast-Path Determinístico)**: Ajustada em `CLAUDE.md`, `copilot-instructions.md`, `routing-graph.yaml` e `agent-router.agent.md` para permitir que solicitações com intenções operacionais evidentes (bugs, refatoração com alvo, diagnósticos diretos) bypassam o `@prompt-structuring` diretamente para a etapa 1 do workflow, eliminando latência e perguntas redundantes.
+- **Agent Router (`@agent-router` v2.0.0)**: Inserido Passo 0.4 (Classificação de Fast-Path) antes do Passo 0.5 e inclusão de `Workflow:` e `Etapa do Workflow:` no Formato de Saída.
+- **Grafo Estrutural (`routing-graph.yaml`)**: Adicionado bloco de primeira classe `workflows:` declarando estados finitos e inclusão de `fast_path_bypass` na aresta de `prompt-structuring`.
+
+---
+
 ## [2.1.0] — 2026-09-06
 
 ### Adicionado

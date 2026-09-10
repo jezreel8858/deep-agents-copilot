@@ -197,3 +197,54 @@ def test_readonly_advisory_agents_do_not_contain_mutation_tools(all_existing_age
             for m_tool in mutation_tools:
                 assert m_tool not in tools, f"Agent Read-Only '{agent_id}' possui tool mutativa: '{m_tool}'"
 
+
+WORKFLOWS_MD_PATH = AGENTS_DIR / "workflows.md"
+CLAUDE_MD_PATH = REPO_ROOT / "CLAUDE.md"
+HANDOFF_SKILL_PATH = REPO_ROOT / ".github" / "skills" / "handoff-governance" / "SKILL.md"
+CANONICAL_WORKFLOW_IDS = {
+    "WORKFLOW-BUG-FIX",
+    "WORKFLOW-REFACTORING",
+    "WORKFLOW-TECHNICAL-ANALYSIS",
+    "WORKFLOW-FEATURE-DEVELOPMENT",
+    "WORKFLOW-GOVERNANCE-MAINTENANCE",
+}
+def test_workflows_specification_file_exists_and_covers_all_five():
+    """Valida que workflows.md existe, possui sintaxe válida e cobre os 5 workflows canônicos (R-050)."""
+    assert WORKFLOWS_MD_PATH.exists(), f"Arquivo de especificação não encontrado: {WORKFLOWS_MD_PATH}"
+    content = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    for wf_id in CANONICAL_WORKFLOW_IDS:
+        assert wf_id in content, f"workflows.md deve especificar o workflow: {wf_id}"
+    assert "workflow_tracking" in content, "workflows.md deve documentar o bloco workflow_tracking de handoff"
+def test_routing_graph_declares_all_five_workflows(routing_graph):
+    """Valida que routing-graph.yaml declara o bloco 'workflows' com os 5 pipelines e estados finitos."""
+    assert "workflows" in routing_graph, "routing-graph.yaml deve conter bloco 'workflows' (R-050)"
+    declared_wf_ids = {wf["id"] for wf in routing_graph["workflows"]}
+    assert CANONICAL_WORKFLOW_IDS.issubset(declared_wf_ids), (
+        f"routing-graph.yaml deve conter todos os 5 workflows canônicos. Declarados: {declared_wf_ids}"
+    )
+    for wf in routing_graph["workflows"]:
+        assert "estados" in wf, f"Workflow {wf['id']} deve declarar lista de estados"
+        assert len(wf["estados"]) >= 3, f"Workflow {wf['id']} deve ter ao menos 3 etapas de execução"
+        assert "gatilhos" in wf, f"Workflow {wf['id']} deve listar gatilhos de ativação"
+def test_fast_path_bypass_in_prompt_structuring_edge(routing_graph):
+    """Valida que a aresta de prompt-structuring possui gatilho de fast_path_bypass configurado."""
+    structuring_edge = next(
+        (a for a in routing_graph["arestas"] if a.get("para") == "prompt-structuring"),
+        None,
+    )
+    assert structuring_edge is not None, "Aresta para prompt-structuring não encontrada"
+    condicoes = structuring_edge.get("condicoes", {})
+    assert "fast_path_bypass" in condicoes, "Aresta prompt-structuring deve declarar 'fast_path_bypass'"
+def test_r050_and_r041_normative_rules_in_claude_md():
+    """Valida que CLAUDE.md possui R-050 formalizada e R-041 com Fast-Path determinístico."""
+    content = CLAUDE_MD_PATH.read_text(encoding="utf-8")
+    assert "R-050" in content, "CLAUDE.md deve formalizar a regra R-050"
+    assert "WORKFLOW-BUG-FIX" in content, "CLAUDE.md R-050 deve declarar WORKFLOW-BUG-FIX"
+    assert "Fast-Path" in content, "CLAUDE.md deve documentar a política de Fast-Path"
+def test_handoff_governance_supports_workflow_tracking():
+    """Valida que handoff-governance/SKILL.md inclui o schema de workflow_tracking."""
+    content = HANDOFF_SKILL_PATH.read_text(encoding="utf-8")
+    assert "workflow_tracking:" in content
+    assert "workflow_id:" in content
+    assert "etapa_atual:" in content
+    assert "proximos_agentes_permitidos:" in content

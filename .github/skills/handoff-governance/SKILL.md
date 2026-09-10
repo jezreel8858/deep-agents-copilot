@@ -111,6 +111,14 @@ handoff_payload:
     task_id: "<id-da-tarefa>"             # opcional: identificador único da sub-tarefa
     call_type: "subroutine"               # opcional: enum [subroutine | permanent_transfer]
     return_to_parent: true                # opcional: boolean — se true, agent receptor DEVE retornar ao parent_agent
+  workflow_tracking:                      # extensão aditiva (v1.2) — rastreamento de pipeline determinístico (R-050)
+    workflow_id: "<id-do-workflow>"       # opcional: enum [WORKFLOW-BUG-FIX | WORKFLOW-REFACTORING | WORKFLOW-TECHNICAL-ANALYSIS | WORKFLOW-FEATURE-DEVELOPMENT | WORKFLOW-GOVERNANCE-MAINTENANCE]
+    etapa_atual: 1                        # opcional: integer — 1-based da etapa corrente
+    total_etapas: 5                       # opcional: integer — total de estados do workflow
+    nome_etapa: "<nome-da-etapa>"         # opcional: string — identificador da etapa em workflows.md
+    proximos_agentes_permitidos:          # opcional: lista de agents autorizados na transição seguinte
+      - "<nome-do-proximo-agent>"
+    politica_desvio: "strict"             # opcional: enum [strict | adaptive] — strict veda pular estados sem deriva R-042
   contexto:
     solicitacao_original: "<texto>"
     trabalho_realizado: "<resumo>"
