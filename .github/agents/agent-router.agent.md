@@ -12,6 +12,7 @@ source_docs:
   - .github/skills/agent-contracts/SKILL.md
   - .github/skills/handoff-governance/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 # Agent Router
 **Versão:** 2.0.0
@@ -40,7 +41,7 @@ Você é o roteador obrigatório do fluxo agent-first no GitHub Copilot. Seu tra
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-050` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 - Governança de terminal (fallback de última instância): [`../skills/terminal-governance/SKILL.md`](../skills/terminal-governance/SKILL.md).
 

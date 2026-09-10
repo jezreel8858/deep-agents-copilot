@@ -29,7 +29,7 @@ Você é especialista em **revisar código antes do merge** — diff, PR ou arqu
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-050` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 - R-035: leitura de comandos git sem paginador (`git --no-pager`).
 

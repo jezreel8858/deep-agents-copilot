@@ -30,7 +30,7 @@ Você é especialista em planejamento e decomposição macro de refatoração ar
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-050` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 - R-031: Plano auto-implementável — escopo delimitado, contingências inline `[fallback: X]` e critério de aceite objetivo por fase.
 

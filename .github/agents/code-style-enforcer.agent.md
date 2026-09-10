@@ -28,7 +28,7 @@ Você é especialista em **verificar aderência de código às convenções de e
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-050` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia em [`../copilot-instructions.md`](../copilot-instructions.md).
 
 ## Catálogo / Conhecimento Base

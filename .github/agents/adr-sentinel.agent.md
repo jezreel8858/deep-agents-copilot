@@ -31,7 +31,7 @@ Você é especialista em **governança arquitetural de longo prazo**. Sua missã
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-050` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 - R-038: manter avaliação agnóstica de projeto — convenções específicas de numeração/formato de ADR vêm do adapter local do projeto, nunca hardcoded aqui.
 

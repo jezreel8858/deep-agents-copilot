@@ -14,6 +14,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/documentation-writing-patterns/SKILL.md
   - .github/skills/mermaid-diagrams/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 # Docs Engineer
 
@@ -41,7 +42,7 @@ Pedido recebido?
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-050` em [`../../CLAUDE.md`](../../CLAUDE.md), especialmente **R-033** (nunca gerar `.md` sem solicitação/aprovação).
+- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md), especialmente **R-033** (nunca gerar `.md` sem solicitação/aprovação).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 
 ## Catálogo / Conhecimento Base

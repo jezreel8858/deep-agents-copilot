@@ -3,8 +3,9 @@ name: efficient-batch-code-modification
 description: >
   Diretrizes e padrões para execução de alterações de código em lote otimizadas
   para consumo mínimo de tokens e créditos em sessões de AI Copilot — análise prévia
-  de impacto (dry-run), batching de tool calls em uma única rodada, minimal diffs cirúrgicos
-  e prevenção de loops de re-submissão de contexto.
+  de impacto (dry-run), batching de tool calls em uma única rodada, minimal diffs cirúrgicos,
+  prevenção de loops de re-submissão de contexto e proteção anti-corrupção em edição de
+  arquivo único grande/estruturado via padrão verificado (R-051).
 tier: 1
 category: process
 triggers:
@@ -125,3 +126,37 @@ Antes de iniciar a gravação de alterações:
 - [ ] O `oldString` contém apenas o contexto estrito para ser unívoco (2-3 linhas)?
 - [ ] Evitei releituras desnecessárias de arquivos que eu mesmo acabei de editar?
 - [ ] O `get_errors` final foi consolidado em uma única chamada com o array completo `filePaths`?
+- [ ] Arquivo-alvo > 200 linhas, `.yaml`/`.yml`/`.json`, ou consumido por CI? Se sim, apliquei o padrão verificado da § 5 (R-051) em vez de `insert_edit_into_file`?
+
+---
+
+## 5. Proteção Anti-Corrupção em Arquivo Único Grande/Estruturado (R-051)
+
+> ⚠️ **INCIDENTE REAL (2026-09)**: durante uma auditoria de workflows, `insert_edit_into_file` foi usado para inserir um pequeno bloco em `workflows.md` (~600 linhas, Markdown+Mermaid) e em `routing-graph.yaml` (~1200 linhas, YAML). Em três ocasiões distintas, a tool truncou o arquivo para menos de 20 linhas — descartando quase todo o conteúdo — sem que a mensagem de retorno indicasse falha de forma confiável. Isso exigiu rollback manual via IDE (Local History/git) pelo desenvolvedor, gerando custo real de créditos e retrabalho.
+
+### 5.1 Regra (R-051): Quando `insert_edit_into_file` é Proibido
+
+Independentemente do número de arquivos (mesmo 1 único arquivo), se o **arquivo-alvo** atender a QUALQUER destes critérios:
+
+| Critério | Gatilho |
+|---|---|
+| Tamanho | Mais de **200 linhas** |
+| Formato | Extensão `.yaml`, `.yml` ou `.json` (sintaxe sensível a indentação/estrutura) |
+| Consumo | Arquivo lido/parseado diretamente por testes automatizados ou pipeline de CI |
+
+...então `insert_edit_into_file` é **ANTI-PADRÃO BLOQUEANTE**. O agente DEVE usar o **Padrão de Edição Segura Verificada** via `context-mode` (`ctx_execute`): ler o arquivo inteiro → contar ocorrências exatas do texto-âncora em memória → abortar se != 1 → só então escrever (`fs.writeFileSync`) → reler do disco para confirmar. Template de referência (R-026 — código real fora do corpo da skill): [`snippets/safe-single-file-edit-pattern.js`](snippets/safe-single-file-edit-pattern.js).
+
+### 5.2 Regra Complementar: Nunca Confiar Cegamente no Retorno da Tool
+
+Mesmo com `replace_string_in_file` (fora do escopo de proibição acima), o agente:
+1. **NÃO deve presumir sucesso** só porque a tool não reportou erro — para arquivos consumidos por CI/testes, confirme com uma leitura independente (`read_file`, `ctx_execute` ou `get_errors`) antes de prosseguir para a próxima edição.
+2. **NÃO deve presumir falha** só porque a tool reportou erro — verifique o estado real do arquivo antes de tentar novamente; foram observados falsos-negativos (a edição aplicou corretamente apesar da mensagem de "não encontrado").
+3. Após qualquer sequência de edições em arquivo grande/estruturado, rode uma validação estrutural mínima antes de considerar a tarefa concluída: `yaml.safe_load` para YAML, contagem de colchetes/chaves balanceados para blocos Mermaid, ou equivalente para o formato do arquivo.
+
+### 5.3 Checklist Rápido
+
+- [ ] Arquivo-alvo tem > 200 linhas OU é `.yaml`/`.yml`/`.json` OU é consumido por testes/CI?
+  - [ ] **Sim** → usar exclusivamente o padrão verificado (`ctx_execute` + `snippets/safe-single-file-edit-pattern.js`); `insert_edit_into_file` proibido.
+  - [ ] **Não** → `replace_string_in_file`/`insert_edit_into_file` permitidos, mas ainda seguindo 5.2.
+- [ ] Após escrever, reli o arquivo (ou rodei validação de sintaxe) para confirmar o resultado real?
+

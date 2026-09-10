@@ -30,7 +30,7 @@ Você é especialista em **elicitação e estruturação de requisitos** — tra
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-050` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 - R-027: clarificação obrigatória via `ask_questions` — proibido inferir ou deduzir requisito.
 

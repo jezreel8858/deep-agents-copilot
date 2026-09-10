@@ -46,7 +46,7 @@ Estes 4 valores **substituem** qualquer autoavaliação subjetiva de "preservei 
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-050` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 - Aplicar especialmente: `R-009`, `R-010`, `R-015`, `R-024`, `R-026`, `R-038`, `R-042`.
 

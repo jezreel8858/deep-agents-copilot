@@ -63,7 +63,7 @@ Você é um agente operacional especializado em gerar automaticamente arquivos a
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-050` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia + Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 - Genericidade obrigatória (R-038): adapters em `.github/instructions/` devem ser genéricos por stack, não por projeto específico.
 

@@ -260,6 +260,16 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 | Severidade | Baixa individualmente, mas **Alta em agregado** quando sistêmica (evidência real: 44/44 agents com a seção encontrados desatualizados simultaneamente em auditoria de 2026-09 — sinal de ausência de processo de sincronização, não de um lapso isolado) |
 | Remediação | Batch update via `@governance-maintainer`: script `ctx_execute` com match-verificado por arquivo (ler → contar ocorrências == 1 → substituir → escrever), nunca `insert_edit_into_file` em arquivos grandes/YAML sensível a indentação (incidente documentado: corrompeu `workflows.md` e `routing-graph.yaml` na auditoria de 2026-09 ao tentar edições multi-linha sem ancoragem precisa) |
 
+### 2.16 — Agent Mutativo Sem Skill de Edição Segura Referenciada (R-051)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Agent com `insert_edit_into_file` e/ou `replace_string_in_file` no frontmatter `tools:` não referencia `efficient-batch-code-modification` em `source_docs:`/`skills:` — fica sem o guardrail que previne corrupção de arquivo único grande/estruturado (R-051) |
+| Como detectar | Para cada `.agent.md` com `insert_edit_into_file` ou `replace_string_in_file` em `tools:`, verificar se `efficient-batch-code-modification` aparece em `source_docs:` ou nas listas `skills:` de sub-catálogos. Ver Tier 1: `test_smell_2_16_mutating_agents_reference_safe_editing_skill` |
+| Origem (TrustAgent) | Intrínseco — agent herda tool de mutação sem herdar o protocolo de segurança correspondente |
+| Severidade | **Bloqueador** (mesmo risco de corrupção documentado em R-051, incidente real de 2026-09 que corrompeu `workflows.md`/`routing-graph.yaml` três vezes) |
+| Remediação | Adicionar `.github/skills/efficient-batch-code-modification/SKILL.md` a `source_docs:` (ou `skills:` no sub-catálogo) do agent afetado via `@governance-maintainer` |
+
 ## 3) Severidade — Reaproveitamento da Taxonomia Existente
 
 Esta skill **reaproveita** (não recria) a taxonomia de `code-review-patterns`:

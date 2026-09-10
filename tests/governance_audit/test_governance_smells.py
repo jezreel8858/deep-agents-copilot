@@ -1,5 +1,5 @@
 """
-test_governance_smells.py — Suíte determinística de auditoria estática para os 15 smells de governança.
+test_governance_smells.py — Suíte determinística de auditoria estática para os 16 smells de governança.
 
 Executa no Tier 1 (0 tokens, < 1s) para validar conformidade estrutural, contratual e de segurança
 antes que o agent-auditor (LLM) atue na camada interpretativa/semântica (Two-Tier Hybrid Audit).
@@ -380,4 +380,33 @@ def test_smell_2_15_no_stale_normative_rule_range():
         f"Smell 2.15: {len(stale)} agent(s) citam range normativo desatualizado "
         f"(esperado R-001..R-{latest:03d}):\n"
         + "\n".join(f"  - {path}: R-001..R-{val:03d}" for path, val in stale)
+    )
+
+
+# ─────────────────────────────────────────────────────────────
+# SMELL 2.16 — Agent Mutativo Sem Skill de Edição Segura Referenciada (R-051)
+# ─────────────────────────────────────────────────────────────
+
+def test_smell_2_16_mutating_agents_reference_safe_editing_skill():
+    """Smell 2.16: todo agent com insert_edit_into_file/replace_string_in_file em tools:
+    deve referenciar efficient-batch-code-modification (guardrail anti-corrupção R-051)."""
+    mutation_tools = {"insert_edit_into_file", "replace_string_in_file"}
+    skill_ref = "efficient-batch-code-modification"
+    gaps = []
+    for agent_file in get_all_agent_files():
+        content = agent_file.read_text(encoding="utf-8")
+        tools_match = re.search(r"tools:\s*(\[[^\]]*\])", content)
+        if not tools_match:
+            continue
+        tools_text = tools_match.group(1)
+        has_mutation = any(t in tools_text for t in mutation_tools)
+        if not has_mutation:
+            continue
+        if skill_ref not in content:
+            gaps.append(agent_file.relative_to(REPO_ROOT))
+
+    assert not gaps, (
+        f"Smell 2.16: {len(gaps)} agent(s) com tools mutativas nao referenciam "
+        f"'{skill_ref}' em source_docs/skills:\n"
+        + "\n".join(f"  - {p}" for p in gaps)
     )
