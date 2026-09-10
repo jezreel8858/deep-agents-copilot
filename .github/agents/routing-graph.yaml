@@ -3,7 +3,7 @@ description: >
   Grafo de roteamento declarado — fonte de verdade estrutural para o agent-router.
   Nós = agents disponíveis; arestas = condições de roteamento (keywords, sinais R-006, score threshold).
   A Decision Tree em agent-router.agent.md é documentação derivada deste arquivo.
-last_updated: "2026-09-06 (v7 — sincronizado: expurgo @analysis-architect, R-047 anti-dead-end, arestas context-builder e adapter-generator, protocolo de call stack parent_agent)"
+last_updated: "2026-09-09 (v8 — adicionado gate R-048/R-048.1: banner obrigatório pós-ask_questions e checkpoint de segurança para mudanças em autenticação/identidade)"
 
 # ─────────────────────────────────────────────
 # NÓS — agents disponíveis no catálogo
@@ -215,11 +215,34 @@ arestas:
         - "regressão"
         - "falha em produção"
         - "não funciona"
+        - "não consigo acessar"
+        - "quebrou"
         - "exception"
         - "NPE"
         - "500"
         - "stack trace"
-      sinal_r006: "É bug/erro/regressão?"
+      sinal_r006: "É bug/erro/regressão OU um problema relatado pelo usuário (mesmo que a solução final vire feature nova — R-048)?"
+
+  # Gate de segurança para mudanças em autenticação/identidade (R-048.1)
+  - de: agent-router
+    para: tech-solution-architect
+    prioridade: 0.95
+    threshold_score: 0.90
+    nivel_routing: rule-based
+    condicoes:
+      tipo: security_gate
+      regra: "R-048.1"
+      keywords:
+        - "vincular credencial"
+        - "alterar credencial"
+        - "provedor de identidade"
+        - "login federado"
+        - "auth linking"
+        - "serviço de autenticação"
+        - "autenticação federada"
+      sinal_r006: "Mudança toca autenticação/identidade (serviços de auth, linking de provedores, alteração de credencial, sessão/token)? Tratar como security-sensitive, equivalente a regras de segurança de persistência/banco"
+      gatilho: "Checkpoint obrigatório via run_subagent para tech-solution-architect (viabilidade) e, se disponível, security-reviewer, ANTES de qualquer implementação"
+      proibido: "Implementar diretamente sem declarar este checkpoint no handoff"
 
   # Revisão de código antes do merge
   - de: agent-router
@@ -813,6 +836,18 @@ arestas:
         esta ativo).
       aplica_a: "todos os nos tipo downstream e specialist_hybrid"
       acao: "handoff imediato para agent-router com motivo: deriva_de_intencao"
+
+  # Banner obrigatório pós-ask_questions antes de qualquer execução (R-048 — anti execução silenciosa)
+  - de: agent-router
+    para: "*downstream"
+    prioridade: 0.1
+    threshold_score: 0
+    nivel_routing: rule-based
+    condicoes:
+      tipo: mandatory_visibility_checkpoint
+      regra: "R-048"
+      gatilho: "Imediatamente após resposta de ask_questions que define implementação/correção — antes de qualquer tool call de código"
+      acao: "Emitir bloco Agente Ativo/Rota/Confiança declarando o especialista ANTES de investigar/editar; proibido anunciar handoff apenas no relatório final"
 
   # Pesquisa interna/externa — fallback primário
   - de: agent-router
