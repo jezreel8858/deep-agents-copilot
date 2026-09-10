@@ -44,26 +44,38 @@ flowchart TD
 
 ### 3.1 WORKFLOW 1: `WORKFLOW-BUG-FIX` (Resolução de Bugs, Falhas de Layout e Regressões)
 
-- **Objetivo**: Identificar a causa raiz, reproduzir via teste automatizado isolado (Red Test), aplicar correção cirúrgica mínima (Green Test) e validar não-regressão.
+- **Objetivo**: Identificar a causa raiz, reproduzir via teste automatizado isolado (Red Test) ou layout spec, aplicar correção cirúrgica mínima (Green Test) e validar não-regressão.
 - **Gatilhos de Fast-Path**: `"bug"`, `"erro"`, `"falha"`, `"500"`, `"NPE"`, `"não funciona"`, `"quebrou"`, `"layout quebrado"`, `"desalinhado"`, `"CSS quebrado"`, `"NullPointerException"`, `"regressão"`.
 - **Política R-041**: **Bypass Total** de `@prompt-structuring`. Não reformatar prompt; o relato técnico é despachado imediatamente.
 
 ```mermaid
 flowchart TD
-    Start(["⚡ Solicitação de Bug (Fast-Path)"]) --> Triage["<b>1. Triagem & Isolamento</b><br/>Agente: @bug-triage<br/>Ação: Reprodução mínima e isolamento de escopo"]
+    Start(["⚡ Solicitação de Bug (Fast-Path)"]) --> Triage["<b>1. Triagem & Isolamento</b><br/>Agente: @bug-triage<br/>Ação: Análise de sintomas, logs e reprodução"]
 
-    Triage --> CheckDiag{"Causa raiz<br/>multi-camada?"}
+    Triage --> CheckRepro{"Reprodução clara<br/>e determinística?"}
+    CheckRepro -- "Não (Intermitente/Sem Logs)" --> ReproGate["<b>1b. Repro Gate & Probe</b><br/>Agente: @debugger / ask_questions<br/>Ação: Logpoint em runtime ou coleta de payload mínimo"]
+    ReproGate --> Triage
+    CheckRepro -- "Sim" --> CheckDiag{"Causa raiz<br/>multi-camada?"}
+
     CheckDiag -- "Sim" --> Diagnosis["<b>Diagnóstico Profundo</b><br/>Agente: @debugger / @code-knowledge-graph<br/>Ação: Inspeção de call graph e stack trace"]
-    CheckDiag -- "Não" --> RedTest["<b>2. Red Test (TDD)</b><br/>Agente: specialist-unit-test-writer / component-test<br/>Ação: Cria teste automatizado que falha comprovando o bug"]
-    Diagnosis --> RedTest
+    CheckDiag -- "Não" --> CheckKind{"Tipo de Defeito"}
+    Diagnosis --> CheckKind
 
-    RedTest --> Fix["<b>3. Correção Cirúrgica Mínima</b><br/>Agente: specialist-bug-fixer<br/>Ação: Diff cirúrgico mínimo (R-002 e R-046)"]
+    CheckKind -- "Lógica / Runtime / Exception" --> BaselineLogic["<b>Pré-voo de Teste</b><br/>Agente: runtime-verifier<br/>Ação: Confirma suíte vizinha limpa"]
+    BaselineLogic --> RedTest["<b>2. Red Test (TDD)</b><br/>Agente: specialist-unit-test / component-test<br/>Ação: Teste automatizado que falha comprovando o bug"]
 
-    Fix --> GreenTest["<b>4. Green Test & Linter</b><br/>Agente: runtime-verifier / test-fixer<br/>Ação: Executa suíte; aciona test-fixer se falhar (máx 3x)"]
+    CheckKind -- "Layout / CSS / Visual" --> LayoutSpec["<b>2. Layout Spec & WCAG</b><br/>Agente: specialist-ui-stylist / component-test<br/>Ação: Spec de classes/DOM e checagem de tokens"]
+
+    RedTest & LayoutSpec --> CheckDB{"Exige ajuste<br/>de Schema/DDL?"}
+    CheckDB -- "Sim" --> DBMigration["<b>3a. Migração DDL Idempotente</b><br/>Agente: @database-specialist<br/>Ação: Script Flyway/DDL idempotente"]
+    CheckDB -- "Não" --> Fix["<b>3. Correção Cirúrgica Mínima</b><br/>Agente: specialist-bug-fixer / ui-stylist<br/>Ação: Diff cirúrgico mínimo (R-002 e R-046)"]
+    DBMigration --> Fix
+
+    Fix --> GreenTest["<b>4. Green Test & Linter</b><br/>Agente: runtime-verifier / test-fixer<br/>Ação: Suíte verde e linter limpo (máx 3x)"]
 
     GreenTest --> CheckPass{"Testes passaram<br/>dentro do teto 3x?"}
     CheckPass -- "Sim" --> QualityGate["<b>5. Quality Gate & Resumo</b><br/>Agente: @code-review / @pr-gatekeeper<br/>Ação: Validação de segurança/diff e preparação de PR"]
-    CheckPass -- "Não (Falha Persistente)" --> CircuitBreaker["<b>4b. Circuit Breaker & Rollback</b><br/>Agente: runtime-verifier<br/>Ação: Reversão de diff sujo + Escalation humana (ask_questions)"]
+    CheckPass -- "Não (Falha Persistente)" --> CircuitBreaker["<b>4b. Circuit Breaker & Rollback</b><br/>Agente: runtime-verifier<br/>Ação: Reversão atômica de diff + Escalation humana (ask_questions)"]
 
     QualityGate --> EndBug(["✅ Concluído com Sucesso"])
     CircuitBreaker --> EndFail(["🛑 Interrompido com Reversão Segura"])
@@ -73,13 +85,15 @@ flowchart TD
 1. **Estado 1 — Triagem & Hipótese (`@bug-triage`)**:
    - *Entrada*: Sintoma relatado, logs, stack trace ou print/descrição de layout.
    - *Saída*: Hipótese de causa raiz, componente afetado e passos de reprodução.
-   - *Sub-rotina*: Se envolver call graph multi-camada complexo, invoca `@debugger` com `call_type: "subroutine"`.
-2. **Estado 2 — Teste de Caracterização / Regressão (`specialist-unit-test-writer` / `component-test`)**:
-   - *Entrada*: Hipótese de causa raiz e componente alvo.
-   - *Saída*: Novo caso de teste unitário ou de componente no formato "deve [comportamento correto] quando [cenário de bug]" que falhe comprovando o defeito.
-3. **Estado 3 — Correção Cirúrgica Mínima (`specialist-bug-fixer`)**:
-   - *Entrada*: Arquivo alvo e teste falhando.
-   - *Saída*: Diff cirúrgico mínimo (2 a 3 linhas de contexto), sem alterar código não relacionado.
+   - *Sub-rotina 1a (Diagnóstico Profundo)*: Se envolver call graph multi-camada complexo, invoca `@debugger` com `call_type: "subroutine"`.
+   - *Sub-rotina 1b (Repro Gate)*: Se o bug for intermitente ou faltar evidência mínima, o `@bug-triage` NÃO avança cegamente para o Estado 2. Ele aciona o `@debugger` com logpoint/tracepoint (`logExpression` com `suspendPolicy=NONE`) ou dispara `ask_questions` (R-027) com 1 pergunta solicitando o payload/passos mínimos.
+2. **Estado 2 — Caracterização e Reprodução Automatizada**:
+   - *Cenário A (Lógica / Runtime / Regra)*: `specialist-unit-test-writer` ou `component-test-writer` cria teste automatizado que falha comprovando o defeito. Antes disso, um pré-voo de baseline confirma que o ambiente de teste executa limpo nos testes vizinhos para evitar falsos positivos de flaky tests pré-existentes.
+   - *Cenário B (Layout / CSS / Estilo / Responsividade)*: `specialist-ui-stylist` e `component-test-writer` mapeiam seletores CSS, variáveis de design tokens, regras responsivas e classes condicionais (`@if`), gerando teste de componente com asserção de estado visual/DOM ou inspeção estrita de conformidade WCAG 2.2 AA.
+3. **Estado 3 — Correção Cirúrgica Mínima (`specialist-bug-fixer` ou `specialist-ui-stylist`)**:
+   - *Entrada*: Arquivo alvo e teste falhando ou layout spec.
+   - *Sub-rotina 3a (Dependência de Banco/DDL)*: Se a falha envolver truncamento de dados, coluna ausente ou constraint de banco, o `@database-specialist` gera previamente o script de migração DDL idempotente antes de tocar no código de aplicação.
+   - *Saída*: Diff cirúrgico mínimo (2 a 3 linhas de contexto), sem alterar código não relacionado (R-002 e R-046).
 4. **Estado 4 — Verificação Green Test & Linter (`runtime-verifier`)**:
    - *Entrada*: Código alterado e suíte de testes.
    - *Saída*: Confirmação de 100% dos testes passando e `get_errors` limpo em lote único (R-046). Se quebrar, aciona `@test-fixer` (máx. 3 iterações).
@@ -88,12 +102,29 @@ flowchart TD
    - *Entrada*: Diff final e evidências de teste.
    - *Saída*: Resumo estruturado em 5 seções (R-028) ou preparação de PR via `@pr-gatekeeper`.
 
+#### Typed State Bag (`workflow_state`):
+```yaml
+workflow_state:
+  tipo_bug: "runtime_exception | layout_css | business_logic | database_constraint"
+  sintoma: "<descrição do sintoma observado>"
+  causa_raiz: "<classe.metodo:linha e mecanismo da falha>"
+  arquivos_alvo:
+    - "<caminho/arquivo.ext>"
+  teste_regressao:
+    arquivo: "<caminho/arquivo.spec.ext>"
+    nome_teste: "deve <comportamento> quando <cenário>"
+    comando_execucao: "<comando de teste>"
+  status_red_test: "confirmado_falha | layout_spec_validado"
+  exige_migracao_ddl: false
+  tentativas_correcao: 1
+```
+
 ---
 
 ### 3.2 WORKFLOW 2: `WORKFLOW-REFACTORING` (Refatoração Estrutural e Modernização)
 
-- **Objetivo**: Modificar a estrutura interna do código sem alterar seu comportamento observável, amparado por testes de caracterização (Golden Master), análise de blast radius via grafo e plano incremental com rollback.
-- **Gatilhos de Fast-Path**: `"refatorar"`, `"refatoração"`, `"desacoplar"`, `"eliminar god class"`, `"clean architecture"`, `"modularizar"`, `"remover duplicação"`.
+- **Objetivo**: Modificar a estrutura interna do código sem alterar seu comportamento observável, amparado por testes de caracterização (Golden Master), análise de blast radius via grafo, plano incremental Mikado com rollback atômico e validação estrita contra ground truth de regras de negócio.
+- **Gatilhos de Fast-Path**: `"refatorar"`, `"refatoração"`, `"desacoplar"`, `"eliminar god class"`, `"clean architecture"`, `"modularizar"`, `"remover duplicação"`, `"extrair interface"`.
 - **Política R-041**: **Bypass** se o alvo estiver claro. Se o pedido for genérico ("melhore a arquitetura"), aciona `@prompt-structuring`.
 
 ```mermaid
@@ -102,124 +133,281 @@ flowchart TD
 
     GroundTruth --> BlastRadius["<b>2. Blast Radius & Dependências</b><br/>Agente: @code-knowledge-graph (R-045)<br/>Ação: Mapeia callers, callees, ciclos e acoplamento"]
 
-    BlastRadius --> SafetyNetPlan["<b>3. Plano Macro & Safety Net</b><br/>Agente: @refactor-planner + @test-strategy<br/>Ação: Plano Mikado/Strangler + testes de caracterização"]
+    BlastRadius --> CheckContract{"Afeta APIs públicas<br/>ou Consumidores?"}
+    CheckContract -- "Sim" --> ContractGate["<b>2a. Contract & Deprecation Plan</b><br/>Agente: @tech-solution-architect<br/>Ação: Branch by Abstraction / Parallel Run"]
+    CheckContract -- "Não" --> CheckSafetyNet{"Cobertura de Testes<br/>suficiente (>=80%)?"}
+    ContractGate --> CheckSafetyNet
 
-    SafetyNetPlan --> Execution["<b>4. Execução Incremental em Lote</b><br/>Agente: Domain Router / Specialist Developer<br/>Ação: Execução em lote único com diffs cirúrgicos (R-046)"]
+    CheckSafetyNet -- "Não (Código Legado Sem Teste)" --> GoldenMaster["<b>2b. Golden Master Safety Net</b><br/>Agente: specialist-unit-test-writer<br/>Ação: Cria testes de caracterização capturando comportamento atual"]
+    CheckSafetyNet -- "Sim" --> SafetyNetPlan["<b>3. Plano Macro Mikado</b><br/>Agente: @refactor-planner + @test-strategy<br/>Ação: Árvore Mikado em micro-etapas + pontos de rollback"]
+    GoldenMaster --> SafetyNetPlan
+
+    SafetyNetPlan --> CheckDBSchema{"Exige refatoração<br/>de Schema/Banco?"}
+    CheckDBSchema -- "Sim" --> ExpandContract["<b>3b. Expand and Contract</b><br/>Agente: @database-specialist<br/>Ação: Adição de novas colunas/tabelas paralelas"]
+    CheckDBSchema -- "Não" --> Execution["<b>4. Execução Incremental em Lote</b><br/>Agente: Domain Router / Specialist Developer<br/>Ação: Execução em micro-lotes com diffs cirúrgicos (R-046)"]
+    ExpandContract --> Execution
 
     Execution --> Validation["<b>5. Validação de Ground Truth & Não-Regressão</b><br/>Agente: @business-rules-extractor (Validate) + @code-review<br/>Ação: Validação contra regras do Estado 1 e quality gate"]
 
     Validation --> CheckRefactor{"Regras e testes<br/>100% preservados?"}
     CheckRefactor -- "Sim" --> EndRefactor(["✅ Concluído com Sucesso"])
-    CheckRefactor -- "Não (Violação de Regra)" --> RefactorRollback["<b>5b. Rollback Automático do Plano</b><br/>Agente: @refactor-planner<br/>Ação: Reversão ao snapshot anterior + Relatório de divergência"]
+    CheckRefactor -- "Não (Violação de Regra)" --> RefactorRollback["<b>5b. Rollback Automático do Plano</b><br/>Agente: @refactor-planner<br/>Ação: Reversão atômica ao snapshot pré-execução + Relatório 3-linhas"]
     RefactorRollback --> EndRefactorFail(["🛑 Refatoração Revertida com Segurança"])
 ```
-```
 
 #### Cadeia Sequencial e Papéis:
-1. **Estado 1 — Mapeamento de Regras Vigentes (`@business-rules-extractor`)**: Extrai regras de negócio do código atual em arquivos `.md` estruturados (modo Extract), servindo como baseline de verdade.
-2. **Estado 2 — Blast Radius & Dependências (`@code-knowledge-graph`)**: Executa análise estrita determinística (R-045) via `@optave/codegraph` para identificar dependências transitivas, acoplamento e pontos de quebra. Proibido varredura manual.
-3. **Estado 3 — Plano Macro & Safety Net (`@refactor-planner` + `@test-strategy`)**: Elabora plano estruturado (Mikado Method / Branch by Abstraction / Strangler Fig) com pontos de rollback e garante que testes de caracterização protejam o comportamento existente.
-4. **Estado 4 — Execução Incremental em Lote (`domain router / specialists`)**: Aplica as alterações respeitando o protocolo R-046 (Single-Turn Batching / context-mode para 5+ arquivos).
-5. **Estado 5 — Validação de Não-Regressão (`@business-rules-extractor` + `@code-review`)**: Executa modo Validate contra as regras documentadas no Estado 1 e emite parecer de revisão.
+1. **Estado 1 — Mapeamento de Regras Vigentes (`@business-rules-extractor`)**: Extrai regras de negócio do código atual em arquivos `.md` estruturados (modo Extract), servindo como baseline de verdade inegociável.
+2. **Estado 2 — Blast Radius & Análise de Contratos (`@code-knowledge-graph`)**: Executa análise estrita determinística (R-045) via `@optave/codegraph` para identificar dependências transitivas, acoplamento e pontos de quebra. Proibido varredura manual.
+   - *Sub-rotina 2a (Contract & Deprecation Gate)*: Se a refatoração atingir métodos públicos ou contratos consumidos por múltiplos módulos, o `@tech-solution-architect` desenha a transição suave (Branch by Abstraction / Deprecation prévia).
+   - *Sub-rotina 2b (Golden Master / Safety Net Gate)*: Se a área a ser refatorada não possuir cobertura automatizada mínima (>= 80%), o `specialist-unit-test-writer` DEVE escrever testes de caracterização que congelem o comportamento existente antes de qualquer alteração estrutural.
+3. **Estado 3 — Plano Macro Mikado & Estratégia de Rollback (`@refactor-planner` + `@test-strategy`)**:
+   - Decompõe a meta usando a técnica **Mikado Method**: gera a árvore de pré-requisitos (folhas primeiro, raiz por último) em micro-passos independentes.
+   - *Sub-rotina 3b (Database Expand and Contract)*: Se a refatoração envolver schema de banco, o `@database-specialist` orquestra a evolução em fases paralelas (Expand -> Migrate -> Contract), nunca DDL destrutivo direto.
+4. **Estado 4 — Execução Incremental em Lote (`domain router / specialists`)**: Aplica as alterações respeitando o protocolo R-046 (Single-Turn Batching / context-mode para 5+ arquivos) em micro-lotes validados pela suíte de caracterização.
+5. **Estado 5 — Validação de Não-Regressão e Compliance (`@business-rules-extractor` + `@code-review`)**:
+   - O `@business-rules-extractor` executa o modo Validate comparando o código final com as regras documentadas no Estado 1.
+   - *Estado 5b — Rollback Automático do Plano*: Se qualquer regra de negócio for violada ou os testes de caracterização falharem, o `@refactor-planner` aciona imediatamente a reversão ao snapshot limpo pré-execução, gerando relatório de divergência e escalando para decisão humana via `ask_questions`.
+
+#### Typed State Bag (`workflow_state`):
+```yaml
+workflow_state:
+  alvo_refatoracao: "<classe, metodo ou modulo alvo>"
+  padrao_estrategico: "mikado_method | branch_by_abstraction | strangler_fig"
+  ground_truth_regras_doc: "docs/business-rules/regras-<alvo>.md"
+  blast_radius_metricas:
+    total_callers: 14
+    total_callees: 6
+    tem_ciclo: false
+    tem_breaking_change: false
+  safety_net_cobertura:
+    testes_caracterizacao_presentes: true
+    arquivos_testes_golden_master:
+      - "<caminho/arquivo.spec.ext>"
+  micro_etapas_planejadas:
+    - etapa_idx: 1
+      descricao: "<micro-passo mikado>"
+      status: "pendente | concluido"
+  status_validacao_regras: "100_preservadas | violacao_detectada"
+  snapshot_reversao: "<tag_de_reversao_ou_stash>"
+```
 
 ---
 
-### 3.3 WORKFLOW 3: `WORKFLOW-TECHNICAL-ANALYSIS` (Análise Técnica, Diagnóstico e Auditoria)
+### 3.3 WORKFLOW 3: `WORKFLOW-TECHNICAL-ANALYSIS` (Análise Técnica, Diagnóstico e Auditoria Especializada)
 
-- **Objetivo**: Conduzir investigações conceituais, diagnósticos de segurança, performance, conformidade de domínio ou levantamento de arquitetura de forma estritamente analítica e não mutativa.
-- **Gatilhos de Fast-Path**: `"analisar"`, `"diagnosticar"`, `"como funciona"`, `"mapear arquitetura"`, `"verificar segurança"`, `"avaliar performance"`, `"conformidade adr"`, `"bounded context"`.
-- **Política R-041**: **Bypass Total**. Direcionamento imediato ao especialista analítico.
+- **Objetivo**: Conduzir investigações conceituais, diagnósticos de segurança, performance, conformidade de domínio, arquitetura de telas/fluxos por stack técnica ou levantamento de arquitetura de forma estritamente analítica e não mutativa, concluindo com propostas acionáveis para Fast-Chaining.
+- **Gatilhos de Fast-Path**: `"analisar"`, `"diagnosticar"`, `"como funciona"`, `"mapear arquitetura"`, `"verificar segurança"`, `"avaliar performance"`, `"conformidade adr"`, `"bounded context"`, `"analisar tela"`, `"analisar fluxo"`, `"identificar melhorias"`.
+- **Política R-041**: **Bypass Total** de `@prompt-structuring`. Direcionamento imediato ao especialista analítico.
 
 ```mermaid
-flowchart LR
-    Start["Fast-Path Análise"] --> RouterSelect["@agent-router\n(Seleção Especializada)"]
+flowchart TD
+    Start(["⚡ Fast-Path Análise Técnica"]) --> RouterSelect["<b>1. Triagem & Despacho Analítico</b><br/>Agente: @agent-router<br/>Ação: Seleciona especialista de domínio ou stack"]
 
-    RouterSelect --> A1["@code-knowledge-graph\n(Grafo, Fluxo e Camadas)"]
-    RouterSelect --> A2["@ddd-bounded-context-mapper\n(Domínios e God Classes)"]
-    RouterSelect --> A3["@adr-sentinel\n(Conformidade Arquitetural)"]
-    RouterSelect --> A4["@security-reviewer\n(OWASP, CVE, Secrets)"]
-    RouterSelect --> A5["@performance-agent\n(CWV, N+1, Profiling)"]
-    RouterSelect --> A6["@compliance-guardrails\n(LGPD, SOC 2, HIPAA)"]
-    RouterSelect --> A7["@tech-solution-architect\n(Blueprint & Contratos)"]
+    RouterSelect --> CatGlobal{"Categoria de Análise"}
 
-    A1 & A2 & A3 & A4 & A5 & A6 & A7 --> Collect["Coleta Determinística\n(Modo Advisory / Read-Only)"]
-    Collect --> Synth["Síntese Técnica &\nPróximo Passo Mínimo (R-047)"]
+    CatGlobal -- "Arquitetura Global / Domínio" --> A1["@code-knowledge-graph / @ddd-bounded-context-mapper / @adr-sentinel"]
+    CatGlobal -- "Segurança & Compliance" --> A2["@security-reviewer / @compliance-guardrails"]
+    CatGlobal -- "Performance & Otimização" --> A3["@performance-agent / @oracle-query-tuner / @informix-query-tuner"]
+    CatGlobal -- "Arquitetura de Tela / Frontend" --> A4["@angular-router → @angular-arch-advisor (Read-Only)"]
+    CatGlobal -- "Arquitetura de Serviço / Backend" --> A5["@spring-boot-router / @spring-reactive-router / @ejb-router (Advisors)"]
+    CatGlobal -- "Solução Cross-Stack / Contratos" --> A6["@tech-solution-architect"]
+
+    A1 & A2 & A3 & A4 & A5 & A6 --> Collect["<b>2. Coleta Determinística Read-Only</b><br/>Agente: Especialista Ativo<br/>Ação: Inspeção via AST/Grafo/context-mode sem mutação"]
+
+    Collect --> CheckComposed{"Exige Sub-rotina<br/>Multidisciplinar?"}
+    CheckComposed -- "Sim" --> SubAnalytic["<b>2b. Sub-rotina Analítica Composta</b><br/>Agente: sub-agente especialista em sub-rotina<br/>Ação: Análise complementar com return_to_parent"]
+    SubAnalytic --> Collect
+    CheckComposed -- "Não" --> Synth["<b>3. Síntese Técnica & Propostas Acionáveis</b><br/>Agente: Especialista Ativo<br/>Ação: Relatório com evidências e tabela [PROPOSTA-1..N]"]
+
+    Synth --> ChainingDecision{"Usuário decide<br/>implementar?"}
+    ChainingDecision -- "Sim ('implemente a 1')" --> FastChaining["⚡ Fast-Chaining R-050.1 → WORKFLOW-REFACTORING ou FEATURE"]
+    ChainingDecision -- "Dúvida / Ajuste" --> AskUser["Esclarecimento via ask_questions (R-047)"]
 ```
 
 #### Cadeia Sequencial e Papéis:
-1. **Estado 1 — Despacho para Especialista Analítico**: O router direciona sem desvios para o agente cujo domínio cobre a pergunta.
-2. **Estado 2 — Coleta & Diagnóstico Determinístico**: O agente opera estritamente em modo Read-Only / Advisory, utilizando ferramentas analíticas (AST, grafo, inspections, search) sem aplicar mutações de código.
-3. **Estado 3 — Síntese e Próximo Passo Acionável (R-047)**: Emissão de relatório técnico estruturado com evidências de arquivo/linha, encerrando com sugestão de handoff para planejamento ou pergunta humana objetiva via `ask_questions`.
+1. **Estado 1 — Despacho para Especialista Analítico**: O router direciona sem desvios para o agente cujo domínio ou stack cobre a pergunta:
+   - *Arquitetura Estrutural & Grafo*: `@code-knowledge-graph` (dependências/ciclos), `@ddd-bounded-context-mapper` (domínios/God Classes), `@adr-sentinel` (conformidade arquitetural).
+   - *Segurança & Governança*: `@security-reviewer` (OWASP/CVE/secrets), `@compliance-guardrails` (LGPD/SOC 2).
+   - *Engenharia de Performance*: `@performance-agent` (CWV/N+1/profiling), `@oracle-query-tuner` / `@informix-query-tuner` (planos de execução SQL).
+   - *Arquitetura de Telas & Fluxos por Stack*: `@angular-arch-advisor` (reatividade Signals, memory leaks, OnPush, SSR), `@spring-boot-arch-advisor` (Virtual Threads, JPA/Hibernate, clean architecture), `@spring-reactive-arch-advisor` (WebFlux, backpressure, event-loop non-blocking), `@ejb-arch-advisor` (transações JTA, Stateless pools).
+   - *Viabilidade Técnica & Contratos*: `@tech-solution-architect` (Technical Blueprint, OpenAPI, modelo de dados).
+2. **Estado 2 — Coleta & Diagnóstico Determinístico (Guardrail de Imutabilidade)**:
+   - O agente opera estritamente em modo Read-Only / Advisory: **proibido o uso de ferramentas mutativas** (`create_file`, `replace_string_in_file`, `insert_edit_into_file`).
+   - Todo achado DEVE citar `arquivo:linha` (R-044) e usar o `context-mode` MCP (`ctx_execute_file` / `ctx_search`) para evitar saturação da janela de contexto.
+   - *Sub-rotina 2b (Análise Composta)*: Se a investigação exigir visão multidisciplinar (ex.: arquiteto consultando especialista de banco), aciona sub-rotina com `call_type: "subroutine"` e `return_to_parent: true`.
+3. **Estado 3 — Síntese e Propostas Acionáveis para Fast-Chaining (R-047 / R-050.1)**:
+   - Emissão de relatório técnico estruturado (Abordagem · Diagnóstico · Evidências com `arquivo:linha` · Impacto).
+   - **Tabela Mandatória de Propostas Acionáveis**: O relatório DEVE concluir com a listagem formal numerada (`[PROPOSTA-1]`, `[PROPOSTA-2]`) indicando o tipo de esforço, arquivos-alvo e o workflow de destino recomendado (`WORKFLOW-REFACTORING`, `WORKFLOW-FEATURE-DEVELOPMENT` ou `WORKFLOW-BUG-FIX`).
+   - Encerramento ativo com pergunta ao usuário via `ask_questions` (R-047), habilitando o **Fast-Chaining (R-050.1)** imediato no turno seguinte.
+
+#### Typed State Bag (`workflow_state`):
+```yaml
+workflow_state:
+  tipo_analise: "arquitetura_stack | seguranca_owasp | performance_cwv | grafo_blast_radius | ddd_bounded_context | conformidade_adr"
+  escopo_alvo:
+    modulo_ou_tela: "<nome-do-modulo-ou-tela>"
+    arquivos_analisados:
+      - "<caminho/arquivo.ext:linha>"
+  diagnostico_sumario: "<resumo dos achados em 1-3 linhas>"
+  propostas_acionaveis:
+    - id: "PROPOSTA-1"
+      titulo: "<titulo-da-melhoria>"
+      tipo: "refactoring | feature | bug_fix"
+      arquivos_afetados:
+        - "<caminho/arquivo.ext>"
+      proximo_workflow: "WORKFLOW-REFACTORING"
+```
 
 ---
 
-### 3.4 WORKFLOW 4: `WORKFLOW-FEATURE-DEVELOPMENT` (Nova Feature / Evolução Funcional E2E)
+### 3.4 WORKFLOW 4: `WORKFLOW-FEATURE-DEVELOPMENT` (Nova Feature e Evolução Funcional E2E)
 
-- **Objetivo**: Elicitar requisitos, conceber arquitetura técnica, desenhar contratos de API, definir matriz de testes por risco e implementar sob workflow TDD estrito.
-- **Gatilhos**: `"criar feature"`, `"nova funcionalidade"`, `"implementar endpoint"`, `"adicionar tela"`, `"novo módulo"`.
-- **Política R-041**: **Ativação Obrigatória** de `@prompt-structuring` caso a solicitação seja de alto nível ou ambígua.
+- **Objetivo**: Elicitar requisitos, conceber arquitetura técnica, desenhar contratos de API (OpenAPI), definir matriz de testes por risco, aprovar blueprint com desenvolvedor e implementar sob workflow TDD estrito com validação de segurança OWASP.
+- **Gatilhos**: `"criar feature"`, `"nova funcionalidade"`, `"implementar endpoint"`, `"adicionar tela"`, `"novo módulo"`, `"evoluir fluxo"`.
+- **Política R-041**: **Ativação Obrigatória** de `@prompt-structuring` caso a solicitação seja de alto nível ou ambígua. Bypassa caso venha de Fast-Chaining pós-diagnóstico com proposta aprovada.
 
 ```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Desenvolvedor
-    participant Router as @agent-router
-    participant Struct as @prompt-structuring
-    participant Req as @requirements-analyst
-    participant Arch as @tech-solution-architect
-    participant TestStrat as @test-strategy
-    participant Domain as Domain Routers & Specialists
-    participant Gate as @code-review / @pr-gatekeeper
+flowchart TD
+    Start(["🚀 Solicitação de Feature Nova"]) --> CheckAmbiguity{"Pedido aberto<br/>ou ambíguo?"}
 
-    User->>Router: Solicitação de nova feature
-    Router->>Struct: Refinar prompt (R-041 — se ambíguo)
-    Struct-->>Router: Prompt estruturado (<task>/<context>/<constraints>)
-    Router->>Req: Elicitar requisitos (EARS/INVEST/BDD)
-    Req->>Arch: Requisitos aprovados
-    Arch->>Arch: Technical Blueprint & Contratos OpenAPI
-    Arch->>TestStrat: Divisão [BACKEND_TASKS] e [FRONTEND_TASKS]
-    TestStrat->>Domain: Matriz de Riscos & Casos de Borda
-    Domain->>Domain: Implementação TDD (Red -> Green -> Refactor)
-    Domain->>Gate: Código e testes concluídos
-    Gate-->>User: Relatório Final & PR estruturado
+    CheckAmbiguity -- "Sim" --> Struct["<b>1. Prompt Structuring</b><br/>Agente: @prompt-structuring<br/>Ação: Refinamento canônico (loop máx 5x)"]
+    CheckAmbiguity -- "Não (Já Estruturado/Fast-Chaining)" --> Req
+    Struct --> Req["<b>2. Elicitação de Requisitos</b><br/>Agente: @requirements-analyst / @feature-planner<br/>Ação: Requisitos funcionais BDD/EARS e não-funcionais"]
+
+    Req --> Arch["<b>3. Technical Blueprint & Contratos</b><br/>Agente: @tech-solution-architect<br/>Ação: OpenAPI v3, modelo de dados e divisão por stack"]
+
+    Arch --> CheckScope{"Escopo da Feature"}
+    CheckScope -- "Fullstack" --> SplitFull["Divisão [BACKEND_TASKS] e [FRONTEND_TASKS]"]
+    CheckScope -- "Backend Only" --> SplitBack["Definição de Endpoints & Persistência"]
+    CheckScope -- "Frontend Only" --> SplitFront["Definição de Telas & Mock API DTOs"]
+
+    SplitFull & SplitBack & SplitFront --> BlueprintGate{"<b>3b. Checkpoint de Blueprint</b><br/>Aprovação humana via ask_questions"}
+
+    BlueprintGate -- "Revisar" --> Arch
+    BlueprintGate -- "Aprovado" --> TestStrat["<b>4. Estratégia de Testes por Risco</b><br/>Agente: @test-strategy<br/>Ação: Matriz de riscos, casos de borda e cobertura alvo"]
+
+    TestStrat --> TDD["<b>5. Implementação Domain-Driven TDD</b><br/>Agentes: Domain Routers & Specialists<br/>Ação: Contract-First (Red -> Green -> Refactor)"]
+
+    TDD --> SecReview["<b>6a. Security Review (OWASP)</b><br/>Agente: @security-reviewer<br/>Ação: Verificação de injeções, IDOR, auth e inputs"]
+
+    SecReview --> CheckSec{"Aprovado em<br/>Segurança?"}
+    CheckSec -- "Vulnerabilidade" --> TDD
+    CheckSec -- "Limpo" --> Gate["<b>6. Quality Gate & PR Preparation</b><br/>Agentes: @code-review → @pr-gatekeeper<br/>Ação: Revisão geral de diff e geração de PR semântico"]
+
+    Gate --> EndFeat(["✅ Feature Concluída com Sucesso"])
 ```
 
 #### Cadeia Sequencial e Papéis:
 1. **Estado 1 — Estruturação de Prompt (`@prompt-structuring`)**: Transforma pedidos abertos no formato canônico `<task>/<context>/<constraints>/<output_format>`.
-2. **Estado 2 — Elicitação de Requisitos (`@requirements-analyst` / `@feature-planner`)**: Detalha regras funcionais e não-funcionais com critérios de aceitação objetivos.
-3. **Estado 3 — Technical Blueprint (`@tech-solution-architect`)**: Modela contratos de integração (OpenAPI), esquema de banco de dados e divisão de tarefas por stack.
-4. **Estado 4 — Estratégia de Testes (`@test-strategy`)**: Mapeia casos de borda e cobertura recomendada por nível de risco antes de codificar.
-5. **Estado 5 — Implementação Domain TDD (`domain routers & specialists`)**: Construção de código orientada por testes (primeiro o teste unitário/componente, depois a implementação).
-6. **Estado 6 — Quality Gate & PR (`@code-review` -> `@pr-gatekeeper`)**: Revisão final de conformidade, convenções e emissão de diff semântico.
+2. **Estado 2 — Elicitação de Requisitos (`@requirements-analyst` / `@feature-planner`)**: Detalha regras funcionais (BDD/EARS) e não-funcionais com critérios de aceitação objetivos, prevenindo *solution-jumping*.
+3. **Estado 3 — Technical Blueprint & Contratos (`@tech-solution-architect`)**:
+   - Modela contratos de integração (OpenAPI v3), esquema de banco de dados e divisão de tarefas por stack.
+   - Particionamento de escopo: isola se a demanda é **Fullstack**, **Backend-Only** ou **Frontend-Only**.
+   - *Estado 3b (Checkpoint de Blueprint)*: Apresenta o blueprint estruturado e aguarda autorização humana explícita via `ask_questions` antes de iniciar qualquer codificação.
+4. **Estado 4 — Estratégia de Testes por Risco (`@test-strategy`)**: Mapeia casos de borda, matriz de risco e cobertura recomendada (mínimo 80%) antes de codificar.
+5. **Estado 5 — Implementação Domain TDD (`domain routers & specialists`)**:
+   - Padrão **Contract-First**: o contrato OpenAPI / DTO é a SSOT.
+   - Execução estrita TDD: primeiro o teste automatizado (Red), depois a implementação (Green), seguida da refatoração limpa com diffs cirúrgicos em lote (R-046).
+6. **Estado 6 — Quality Gate, Segurança & PR (`@security-reviewer`, `@code-review` e `@pr-gatekeeper`)**:
+   - *Sub-rotina 6a (Security Gate)*: O `@security-reviewer` audita novos endpoints contra OWASP Top 10 (SQL Injection, IDOR, Broken Authentication, sanitização).
+   - O `@code-review` realiza a revisão de conformidade e boas práticas.
+   - O `@pr-gatekeeper` gera a mensagem de commit semântico, descrição estruturada de PR e atualiza o CHANGELOG.md (sem push autônomo — R-031).
+
+#### Typed State Bag (`workflow_state`):
+```yaml
+workflow_state:
+  feature_id: "<slug-da-feature>"
+  escopo_stack: "frontend_only | backend_only | fullstack"
+  requisitos_doc: "docs/requirements/REQ-<feature>.md"
+  blueprint:
+    contrato_openapi: "<caminho/openapi.yaml ou inline>"
+    tabelas_banco: ["<tabela_a>", "<tabela_b>"]
+    tasks_backend: ["Task 1", "Task 2"]
+    tasks_frontend: ["Task 1", "Task 2"]
+  matriz_riscos_testes:
+    casos_borda: ["Payload vazio", "Timeout", "Duplicidade"]
+    cobertura_alvo: 80
+  status_implementacao:
+    backend_concluido: true
+    frontend_concluido: true
+  security_gate_status: "aprovado | vulnerabilidade_detectada"
+```
 
 ---
 
 ### 3.5 WORKFLOW 5: `WORKFLOW-GOVERNANCE-MAINTENANCE` (Governança e Manutenção do Ecossistema)
 
-- **Objetivo**: Auditar, padronizar, expandir e manter o catálogo de agents, skills, prompts e convenções do repositório de governança.
-- **Gatilhos de Fast-Path**: `"auditar governança"`, `"novo agent"`, `"nova skill"`, `"manutenção de catálogo"`, `"corrigir smell de agent"`, `"higiene de repositório"`.
-- **Política R-041**: **Bypass** direto para diagnóstico ou factory.
+- **Objetivo**: Auditar, padronizar, expandir e manter o catálogo de agents, skills, prompts e convenções do repositório de governança com pesquisa prévia compulsória, checkpoints humanos para mutações estruturais, execução atômica em lote (R-046) e validação final via suíte determinística de testes.
+- **Gatilhos de Fast-Path**: `"auditar governança"`, `"novo agent"`, `"nova skill"`, `"novo prompt"`, `"nova stack"`, `"manutenção de catálogo"`, `"corrigir smell de agent"`, `"higiene de repositório"`.
+- **Política R-041**: **Bypass Total** de `@prompt-structuring`. Direcionamento imediato para auditoria ou factory.
 
 ```mermaid
 flowchart TD
-    ReqGov["Demanda de Governança"] --> RouterGov["@agent-router"]
-    RouterGov --> AuditCheck{"Tipo de Operação"}
+    ReqGov(["⚡ Demanda de Governança (Fast-Path)"]) --> RouterGov["<b>1. Triagem & Despacho de Governança</b><br/>Agente: @agent-router<br/>Ação: Classifica tipo de manutenção ou autoria"]
 
-    AuditCheck -- "Diagnóstico de Smells / Gaps" --> Auditor["@agent-auditor\n(Read-Only — R-046)"]
-    AuditCheck -- "Higiene / CI-CD / Licença" --> Hygiene["@repo-hygiene-auditor\n(Read-Only)"]
-    AuditCheck -- "Criação de Novo Artefato" --> Factory["@governance-factory\n(Delega pesquisa ao @deep-search)"]
+    RouterGov --> GovCheck{"Tipo de Operação"}
 
-    Auditor & Hygiene --> HumanGate{"Aprovação Humana\nvia ask_questions"}
-    HumanGate -- "Aprovado" --> Maintainer["@governance-maintainer\n(Execução em Lote R-046)"]
-    HumanGate -- "Rejeitado" --> EndCancel["Ajuste de Escopo / Fim"]
-    Factory --> EndDone["Artefatos Criados & Catálogo Atualizado"]
-    Maintainer --> EndDone
+    GovCheck -- "Diagnóstico de Smells / Gaps" --> Auditor["<b>1a. Auditoria de Smells (Tier 2)</b><br/>Agente: @agent-auditor (Read-Only)<br/>Ação: Análise de conformidade e R-046"]
+    GovCheck -- "Higiene / CI-CD / Licença" --> Hygiene["<b>1b. Auditoria de Higiene</b><br/>Agente: @repo-hygiene-auditor (Read-Only)<br/>Ação: README, CONTRIBUTING, .gitignore"]
+    GovCheck -- "Criação de Novo Artefato / Stack" --> PreSearch["<b>1c. Pesquisa Prévia de Mercado</b><br/>Agente: @deep-search (sub-rotina)<br/>Ação: Sintetiza padrões consolidados de mercado"]
+
+    PreSearch --> Factory["<b>2a. Modelagem de Artefato / Stack</b><br/>Agente: @governance-factory<br/>Ação: Geração com templates canônicos (R-015)"]
+
+    Auditor & Hygiene --> PlanReport["<b>2. Relatório de Gaps & Plano em Lote</b><br/>Apresentação do plano de remediação"]
+
+    PlanReport --> HumanGate{"<b>2b. Checkpoint de Aprovação</b><br/>Humana via ask_questions"}
+
+    HumanGate -- "Aprovado" --> Maintainer["<b>3. Execução em Lote no Sandbox</b><br/>Agente: @governance-maintainer<br/>Ação: Batching atômico via context-mode (R-046)"]
+    HumanGate -- "Rejeitado" --> EndCancel(["🛑 Ajuste de Escopo / Cancelado"])
+
+    Factory --> MaintainerSync["<b>3b. Sincronização Quádrupla SSOT</b><br/>Atualização atômica de catálogos e grafos (R-015)"]
+    MaintainerSync --> GateGov["<b>4. Quality Gate de Governança (Tier 1)</b><br/>Validação via pytest: smells, routing e isolamento"]
+    Maintainer --> GateGov
+
+    GateGov --> CheckGov{"Suíte de Governança<br/>100% verde?"}
+    CheckGov -- "Sim" --> EndDone(["✅ Governança Atualizada & Consistente"])
+    CheckGov -- "Falha" --> AutoFix["Autocorreção cirúrgica pelo @governance-maintainer"]
+    AutoFix --> GateGov
 ```
 
 #### Cadeia Sequencial e Papéis:
-1. **Estado 1 — Diagnóstico Read-Only (`@agent-auditor` / `@repo-hygiene-auditor`)**: Avalia conformidade com templates canônicos, R-046, R-049 e detecta inconsistências sem alterar arquivos.
-2. **Estado 2 — Checkpoint de Aprovação Humana (`ask_questions`)**: Apresenta as inconsistências e aguarda autorização explícita do plano de correção.
-3. **Estado 3 — Execução Governada em Lote (`@governance-maintainer` / `@governance-factory`)**: Aplica as alterações estruturais em lote único no sandbox ou gera novos artefatos sincronizando os catálogos na mesma entrega (R-015).
+1. **Estado 1 — Diagnóstico Read-Only ou Pesquisa Prévia**:
+   - *Diagnóstico de Smells*: O `@agent-auditor` executa auditoria estática e comportamental contra os 14 smells canônicos de governança.
+   - *Auditoria de Higiene*: O `@repo-hygiene-auditor` audita a saúde do repositório, licença e segurança de versionamento.
+   - *Pesquisa Prévia Compulsória (Criação de Artefatos / Stack)*: O `@governance-factory` delega compulsoriamente ao `@deep-search` a investigação de mercado antes de escrever novos prompts, skills ou agents.
+2. **Estado 2 — Modelagem e Checkpoint de Aprovação Humana**:
+   - Apresentação objetiva dos achados ou especificações do novo artefato.
+   - *Estado 2b (Checkpoint Humano)*: Toda manutenção estrutural ou criação de stack exige autorização explícita via `ask_questions` antes de qualquer alteração física nos catálogos.
+3. **Estado 3 — Execução e Sincronização Quádrupla em Lote (R-015 / R-046)**:
+   - O `@governance-maintainer` aplica as alterações em lote único (*Single-Turn Batching*) utilizando o `context-mode` MCP no sandbox para zero desperdício de tokens.
+   - Na criação de novos agents ou stacks, aplica compulsoriamente a **Sincronização Quádrupla Atômica (R-015)**: atualiza `catalog.yaml`, `routing-graph.yaml`, `agent-router.agent.md` e `README.md` na mesma entrega.
+4. **Estado 4 — Quality Gate de Governança (Tier 1 Automático)**:
+   - Execução determinística dos testes de governança:
+     - `test_governance_smells.py` (conformidade com templates e 14 smells).
+     - `test_local_project_isolation.py` (100% isolamento de projetos locais — R-038/R-043/R-044).
+     - `test_routing_quality_gate.py` (integridade do grafo e alcançabilidade).
+   - Havendo qualquer regressão, o `@governance-maintainer` autocorrige a inconsistência antes de entregar o relatório final ao usuário.
+
+#### Typed State Bag (`workflow_state`):
+```yaml
+workflow_state:
+  tipo_demanda: "auditoria_smells | higiene_repo | criacao_artefato | nova_stack | refatoracao_cascata"
+  artefatos_alvo:
+    - "<caminho/artefato.ext>"
+  diagnostico_smells:
+    total_achados: 3
+    smells_detectados:
+      - "smell-2.2-active-agent-banner"
+      - "smell-2.6-absolute-path"
+  pesquisa_previa_deep_search:
+    realizada: true
+    sintese_diretrizes: "<resumo dos padrões de mercado>"
+  plano_manutencao_lote:
+    - arquivo: ".github/agents/catalog.yaml"
+      acao: "atualizar_versao_e_source_docs"
+  status_aprovacao_humana: "aprovado"
+  quality_gate_tier1: "100_passando"
+```
 
 ---
 

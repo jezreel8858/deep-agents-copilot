@@ -200,15 +200,20 @@ workflows:
         nome: "triage_and_root_cause"
         agent: "bug-triage"
         sub_rotinas_permitidas: ["debugger", "code-knowledge-graph"]
+        repro_gate: "debugger (tracepoint) | ask_questions"
       - etapa: 2
-        nome: "red_test_reproduction"
-        agent: "specialist-unit-test-writer | specialist-component-test-writer"
+        nome: "red_test_and_layout_reproduction"
+        agent: "specialist-unit-test-writer | specialist-component-test-writer | specialist-ui-stylist"
+        pre_flight: "runtime-verifier (baseline check)"
       - etapa: 3
         nome: "surgical_bug_fix"
-        agent: "specialist-bug-fixer"
+        agent: "specialist-bug-fixer | specialist-ui-stylist"
+        sub_rotinas_permitidas: ["database-specialist"]
       - etapa: 4
         nome: "green_test_and_linter_validation"
         agent: "runtime-verifier | specialist-test-fixer"
+        max_retries: 3
+        circuit_breaker: "runtime-verifier (rollback_and_escalate)"
       - etapa: 5
         nome: "quality_gate_and_pr"
         agent: "code-review | pr-gatekeeper"
@@ -225,6 +230,7 @@ workflows:
       - "eliminar god class"
       - "modularizar"
       - "remover duplicação"
+      - "extrair interface"
     estados:
       - etapa: 1
         nome: "ground_truth_rules_extraction"
@@ -232,17 +238,23 @@ workflows:
       - etapa: 2
         nome: "blast_radius_and_graph_mapping"
         agent: "code-knowledge-graph"
+        sub_rotinas_permitidas: ["tech-solution-architect"]
+        safety_net_gate: "specialist-unit-test-writer (golden master check)"
       - etapa: 3
         nome: "refactor_plan_and_safety_net"
         agent: "refactor-planner"
         co_agentes: ["test-strategy"]
+        estrategia_decomposicao: "mikado_method"
+        sub_rotinas_permitidas: ["database-specialist"]
       - etapa: 4
         nome: "incremental_batch_execution"
         agent: "domain-router | specialist-feature-developer"
+        protocolo: "efficient-batch-code-modification"
       - etapa: 5
         nome: "ground_truth_validation_and_review"
         agent: "business-rules-extractor"
         co_agentes: ["code-review"]
+        circuit_breaker: "refactor-planner (automatic_rollback)"
 
   - id: WORKFLOW-TECHNICAL-ANALYSIS
     nome: "Análise Técnica, Diagnóstico e Auditoria Especializada"
@@ -257,6 +269,9 @@ workflows:
       - "avaliar performance"
       - "conformidade adr"
       - "bounded context"
+      - "analisar tela"
+      - "analisar fluxo"
+      - "identificar melhorias"
     estados:
       - etapa: 1
         nome: "specialist_analyst_dispatch"
@@ -268,11 +283,20 @@ workflows:
           - "performance-agent"
           - "compliance-guardrails"
           - "tech-solution-architect"
+          - "angular-arch-advisor"
+          - "spring-boot-arch-advisor"
+          - "spring-reactive-arch-advisor"
+          - "ejb-arch-advisor"
+          - "oracle-query-tuner"
+          - "informix-query-tuner"
       - etapa: 2
         nome: "deterministic_read_only_collection"
         modo: "advisory_read_only"
+        sub_rotinas_permitidas: ["tech-solution-architect", "code-knowledge-graph", "deep-search"]
       - etapa: 3
         nome: "synthesis_and_next_step"
+        saida_estruturada: "tabela_propostas_acionaveis"
+        suporte_fast_chaining: true
         regra_conclusao: "R-047"
 
   - id: WORKFLOW-FEATURE-DEVELOPMENT
@@ -285,6 +309,7 @@ workflows:
       - "implementar endpoint"
       - "adicionar tela"
       - "novo módulo"
+      - "evoluir fluxo"
     estados:
       - etapa: 1
         nome: "prompt_structuring_refinement"
@@ -296,15 +321,21 @@ workflows:
       - etapa: 3
         nome: "technical_blueprint_and_contracts"
         agent: "tech-solution-architect"
+        checkpoint_humano: "ask_questions (aprovacao_blueprint)"
+        particionamento_escopo: ["frontend_only", "backend_only", "fullstack"]
       - etapa: 4
         nome: "test_strategy_and_risk_matrix"
         agent: "test-strategy"
       - etapa: 5
         nome: "tdd_domain_implementation"
         agent: "domain-router | specialists"
+        padrao: "contract_first_tdd"
+        protocolo: "efficient-batch-code-modification"
       - etapa: 6
         nome: "quality_gate_and_pr_preparation"
         agent: "code-review | pr-gatekeeper"
+        sub_rotinas_permitidas: ["security-reviewer"]
+        owasp_security_gate: true
 
   - id: WORKFLOW-GOVERNANCE-MAINTENANCE
     nome: "Auditoria, Padronização e Manutenção de Governança"
@@ -314,19 +345,27 @@ workflows:
       - "auditar governança"
       - "novo agent"
       - "nova skill"
+      - "novo prompt"
+      - "nova stack"
       - "manutenção de catálogo"
       - "corrigir smell de agent"
       - "higiene de repositório"
     estados:
       - etapa: 1
         nome: "read_only_audit_and_diagnosis"
-        agents_permitidos: ["agent-auditor", "repo-hygiene-auditor"]
+        agents_permitidos: ["agent-auditor", "repo-hygiene-auditor", "governance-factory"]
+        sub_rotinas_permitidas: ["deep-search"]
       - etapa: 2
         nome: "human_approval_checkpoint"
         mecanismo: "ask_questions"
       - etapa: 3
         nome: "governed_batch_execution"
         agents_permitidos: ["governance-maintainer", "governance-factory"]
+        protocolo: "efficient-batch-code-modification"
+        sincronizacao_quadrupla_r015: true
+      - etapa: 4
+        nome: "tier1_governance_quality_gate"
+        validacao_automatizada: "pytest (smells, routing, isolation)"
 
 # ─────────────────────────────────────────────
 # ARESTAS — condições de roteamento
