@@ -11,6 +11,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/test-implementation-spring-boot/SKILL.md
   - .github/skills/code-tracing/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
 ---
 
 # Spring Reactive Test Fixer

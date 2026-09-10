@@ -3,7 +3,7 @@
 > Fonte de verdade operacional: [`CLAUDE.md`](../CLAUDE.md).
 > Mapa de Adapters (compartilhado): [`docs/ai-context/catalog.yaml`](../docs/ai-context/catalog.yaml).
 > Mapa de Projetos (LOCAL/gitignored, R-043): [`docs/ai-context/catalog.local.yaml`](../docs/ai-context/catalog.local.yaml).
-> IDs normativos: consulte `R-001..R-047` em `CLAUDE.md`.
+> IDs normativos: consulte `R-001..R-049` em `CLAUDE.md`.
 
 ---
 
@@ -17,7 +17,7 @@
 
 | Tipo | Arquivo | Escopo | Conteúdo Permitido | Exemplos / Referências |
 |------|---------|--------|-------|---|
-| **Governança Global** | `CLAUDE.md` | 🌍 Multi-projeto, desacoplado | Regras R-001..R-047, princípios, fluxos genéricos | ❌ Nenhum projeto/tech específicos |
+| **Governança Global** | `CLAUDE.md` | 🌍 Multi-projeto, desacoplado | Regras R-001..R-049, princípios, fluxos genéricos | ❌ Nenhum projeto/tech específicos |
 | **Operacional** | `.github/copilot-instructions.md` | 🌍 Multi-projeto, desacoplado | Roteamento, agents, skills, estrutura genérica | ❌ Nenhum projeto/tech específicos (remeter a adapters) |
 | **Adapters** | `.github/instructions/*.instructions.md` | 🔧 Stack/domínio específico | Convenções, padrões, tools, paradigmas de tech/domínio **excluivos** | ✅ Projeto, linguagem, framework **específicos permitidos** |
 | **Contexto de Binding** | `docs/ai-context/catalog.yaml` + `docs/ai-context/binding.md` | 🔗 Mapa de instâncias | Lista concreta de adapters, projetos, mapeamento stack → adapter | ✅ Dados de instância permitidos |
@@ -99,6 +99,7 @@ Esta matriz é **responsabilidade do roteador** — não é regra global.
 - **Prompt Structuring Obrigatório (R-041)**: após o Health Check (R-034), o `@agent-router` SEMPRE delega ao `@prompt-structuring` antes de classificar intenção. Esse é o **único** agent do catálogo autorizado a operar em loop de auto-refinamento, limitado a **5 iterações** — ao atingir o limite, prossegue compulsoriamente com o melhor prompt disponível e retorna ao `@agent-router`. Nenhum outro agent pode adotar esse padrão de loop.
 - **Grafo de Roteamento (R-040)**: o roteamento de agents DEVE ser declarado como dado estruturado em `.github/agents/routing-graph.yaml`. A Decision Tree em prosa é documentação derivada. Toda nova rota exige: *(a)* entrada no grafo; *(b)* atualização da Decision Tree; *(c)* novo caso em `.github/agents/evals/casos-roteamento.yaml`.
 - **Execução via Context Mode (R-008 — Think in Code)**: Use **100% o `context-mode` MCP** para leitura, busca, escrita em lote, análise e remoção de arquivos (`ctx_execute`, `ctx_execute_file`, `ctx_index`, `ctx_search`). O processamento acontece no sandbox e apenas o resultado limpo entra na conversa. `read_file` e `replace_string_in_file` são reservados exclusivamente para edições cirúrgicas pontuais do editor. `run_in_terminal` é **FALLBACK de última instância** restrito exclusivamente a comandos de ciclo de vida (`git`, `npm install`, `mvn`, `pytest`) — comandos de varredura/leitura (`cat`, `grep`, `find`, scripts inline `node -e`) são terminantemente proibidos no terminal.
+- **Vinculação Compulsória de Governança de Terminal em Tooling (R-049)**: Todo agent (`*.agent.md`), prompt (`*.prompt.md`) ou entrada de catálogo que declare a ferramenta `run_in_terminal` em `tools:` DEVE compulsoriamente referenciar `.github/skills/terminal-governance/SKILL.md` em `source_docs:` (ou na seção `skills:` em sub-catálogos locais). É expressamente vedada a concessão de execução em terminal desprovida de vinculação com a respectiva skill de governança.
 - **Pre-fetch automático pelo agent**: ao selecionar um agent, carregue automaticamente os `source_docs` declarados no `catalog.yaml` e anuncie o que foi anexado. Usuário pode rejeitar com "Sem pre-fetch".
 - **Um comando por vez**: leia o output uma única vez.
 - **`get_errors` consolidado**: chame `get_errors` uma única vez ao final do lote com o array completo `filePaths`, nunca arquivo por arquivo.
@@ -124,6 +125,7 @@ Esta matriz é **responsabilidade do roteador** — não é regra global.
 - **Não crie arquivos auxiliares** sem pedido explícito.
 - **Não releia arquivos** já no contexto da conversa ou recém-editados.
 - **Exclusividade do Motor de Grafo (@code-knowledge-graph — R-045 / RNF-004)**: O CLI `@optave/codegraph` e o banco `.codegraph/graph.db` são recursos de uso e execução **EXCLUSIVOS** do agent `@code-knowledge-graph`. NENHUM outro agent tem permissão para rodar comandos `codegraph *` diretamente no terminal ou varrer diretórios manualmente (`list_dir`, `read_dir`) para mapear arquitetura, camadas, chamadas ou dependências. Toda análise estrutural DEVE ser delegada compulsoriamente via `run_subagent(agentName: 'code-knowledge-graph', ...)`. Agents especialistas operam em modo Advisory de forma estritamente analítica e read-only — `run_in_terminal` é restrito ao modo Implementação (testing-first).
+- **Terminal sem Governança (R-049)**: nunca declarar `run_in_terminal` em `tools:` de novos agents ou prompts sem incluir `.github/skills/terminal-governance/SKILL.md` em `source_docs:` (ou `skills:` nos sub-catálogos locais).
 
 ### 2.1) context-mode — Regras Obrigatórias de Roteamento (JetBrains Copilot)
 

@@ -12,6 +12,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/angular-implementation-patterns/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
 ---
 
 # Angular Feature Developer

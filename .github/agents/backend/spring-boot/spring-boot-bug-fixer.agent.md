@@ -11,6 +11,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/code-tracing/SKILL.md
   - .github/skills/spring-boot-implementation-patterns/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
 ---
 
 # Spring Boot Bug Fixer

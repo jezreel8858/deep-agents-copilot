@@ -48,6 +48,11 @@ def get_all_prompt_files() -> list[Path]:
     return [p for p in PROMPTS_DIR.glob("*.prompt.md") if "templates" not in p.parts]
 
 
+def get_all_catalog_files() -> list[Path]:
+    """Retorna todos os arquivos *catalog*.yaml sob .github/agents/"""
+    return [p for p in AGENTS_DIR.glob("**/*catalog*.yaml")]
+
+
 # ─────────────────────────────────────────────────────────────
 # SMELL 2.2 — Gap de Perfil (Agent Incompleto)
 # ─────────────────────────────────────────────────────────────
@@ -130,17 +135,67 @@ def test_smell_2_7_readonly_agents_cannot_have_mutation_tools():
 
 
 def test_smell_2_7_terminal_tool_requires_terminal_governance_skill():
-    """Valida Invariante 1 §2.7.1: tool run_in_terminal exige skill terminal-governance declarada"""
+    """Valida Invariante 1 §2.7.1 e R-049: tool run_in_terminal exige skill terminal-governance declarada em source_docs/skills"""
+    target_skill = "terminal-governance"
+
+    # 1. Agents (*.agent.md)
     for agent_file in get_all_agent_files():
         content = agent_file.read_text(encoding="utf-8")
         fm = parse_frontmatter(content)
         tools = fm.get("tools", [])
+        if isinstance(tools, str):
+            tools = [tools]
 
         if "run_in_terminal" in tools:
             rel_path = agent_file.relative_to(REPO_ROOT)
-            assert "terminal-governance" in content, (
-                f"[{rel_path}] Declara tool 'run_in_terminal' mas não referencia a skill obrigatória 'terminal-governance'"
+            source_docs = fm.get("source_docs", []) or []
+            if isinstance(source_docs, str):
+                source_docs = [source_docs]
+            has_term_gov = any(target_skill in str(doc) for doc in source_docs)
+            assert has_term_gov, (
+                f"[{rel_path}] Declara tool 'run_in_terminal' mas não referencia a skill obrigatória 'terminal-governance' em source_docs (R-049)"
             )
+
+    # 2. Prompts (*.prompt.md)
+    for prompt_file in get_all_prompt_files():
+        content = prompt_file.read_text(encoding="utf-8")
+        fm = parse_frontmatter(content)
+        tools = fm.get("tools", [])
+        if isinstance(tools, str):
+            tools = [tools]
+
+        if "run_in_terminal" in tools:
+            rel_path = prompt_file.relative_to(REPO_ROOT)
+            source_docs = fm.get("source_docs", []) or []
+            if isinstance(source_docs, str):
+                source_docs = [source_docs]
+            has_term_gov = any(target_skill in str(doc) for doc in source_docs)
+            assert has_term_gov, (
+                f"[{rel_path}] Prompt declara tool 'run_in_terminal' mas não referencia 'terminal-governance' em source_docs (R-049)"
+            )
+
+    # 3. Catálogos (*catalog*.yaml)
+    for catalog_file in get_all_catalog_files():
+        rel_path = catalog_file.relative_to(REPO_ROOT)
+        data = yaml.safe_load(catalog_file.read_text(encoding="utf-8")) or {}
+        agents = data.get("agents", {}) if isinstance(data, dict) else {}
+        for agent_id, agent_data in agents.items():
+            if not isinstance(agent_data, dict):
+                continue
+            tools = agent_data.get("tools", [])
+            if "run_in_terminal" in tools:
+                source_docs = agent_data.get("source_docs", []) or []
+                skills = agent_data.get("skills", []) or []
+                has_term_gov = any(target_skill in str(d) for d in source_docs) or any(target_skill in str(s) for s in skills)
+                if not has_term_gov:
+                    agent_matches = list(catalog_file.parent.glob(f"**/{agent_id}.agent.md"))
+                    if agent_matches:
+                        agent_fm = parse_frontmatter(agent_matches[0].read_text(encoding="utf-8"))
+                        agent_docs = agent_fm.get("source_docs", []) or []
+                        has_term_gov = any(target_skill in str(d) for d in agent_docs)
+                assert has_term_gov, (
+                    f"[{rel_path}#{agent_id}] Declara tool 'run_in_terminal' mas não referencia 'terminal-governance' em source_docs ou skills (R-049)"
+                )
 
 
 def test_smell_2_7_context_mode_tool_requires_context_mode_skill():

@@ -12,6 +12,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/code-review-patterns/SKILL.md
   - .github/skills/repository-hygiene-patterns/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
 ---
 # Code Style Enforcer
 

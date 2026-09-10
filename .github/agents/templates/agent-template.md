@@ -7,6 +7,7 @@ description: >-
 # - "Claude Sonnet 5"  -> Perfil Decompositivo / Deliberativo / Raciocínio Guiado (arquitetura, planejamento, routers centrais)
 model: "Gemini 3.8 Flash"
 # Tools: Princípio de menor privilégio. run_subagent é OBRIGATÓRIO por R-042.
+# Se run_in_terminal for declarado em tools, é OBRIGATÓRIO incluir .github/skills/terminal-governance/SKILL.md em source_docs (R-049).
 # Operacional: ['read_file', 'insert_edit_into_file', 'create_file', 'grep_search', 'file_search', 'list_dir', 'get_errors', 'run_subagent']
 # Read-Only / Analítico: ['read_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'mcp_context-mode_ctx_search']
 tools: ['read_file', 'insert_edit_into_file', 'create_file', 'grep_search', 'file_search', 'list_dir', 'get_errors', 'run_subagent']

@@ -12,6 +12,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/tavily/SKILL.md
   - .github/skills/context-mode/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
 ---
 
 # deep-search

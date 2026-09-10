@@ -12,6 +12,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/angular-responsive-ui-patterns/SKILL.md
   - .github/skills/design-system-component-contracts/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
 ---
 
 # Angular UI Stylist

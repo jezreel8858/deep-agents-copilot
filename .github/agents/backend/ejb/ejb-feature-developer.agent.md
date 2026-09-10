@@ -11,6 +11,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/java-jdk-backend-governance/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
 ---
 
 # EJB Feature Developer

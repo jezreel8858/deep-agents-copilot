@@ -14,6 +14,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/codegraph-optave-usage/SKILL.md
   - .github/skills/integration-contract-analysis/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
 ---
 # Code Knowledge Graph
 

@@ -11,6 +11,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/agent-contracts/SKILL.md
   - .github/skills/handoff-governance/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
 ---
 # Agent Router
 **Versão:** 2.0.0

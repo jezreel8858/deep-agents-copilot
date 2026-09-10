@@ -14,6 +14,7 @@ source_docs:
   - docs/ai-context/catalog.yaml
   - tools/codegraph-visualizer/README.md
   - tools/codegraph-visualizer/bridges.json
+  - .github/skills/terminal-governance/SKILL.md
 ---
 
 # `/visualize-graph`

@@ -16,6 +16,7 @@ source_docs:
   - .github/agents/deep-search.agent.md
   - .github/skills/tavily/SKILL.md
   - .github/skills/context-mode/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
 ---
 
 # `/deep-search`

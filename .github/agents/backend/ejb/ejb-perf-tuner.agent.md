@@ -11,6 +11,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/performance-engineering-patterns/SKILL.md
   - .github/skills/java-jdk-backend-governance/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
 ---
 
 # EJB Performance Tuner

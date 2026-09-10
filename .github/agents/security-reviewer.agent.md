@@ -12,6 +12,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/security-review-patterns/SKILL.md
   - .github/skills/compliance-governance-patterns/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
 ---
 # Security Reviewer
 
