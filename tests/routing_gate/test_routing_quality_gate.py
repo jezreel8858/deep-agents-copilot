@@ -18,7 +18,7 @@ CATALOG_PATH = REPO_ROOT / ".github" / "agents" / "catalog.yaml"
 AGENTS_DIR = REPO_ROOT / ".github" / "agents"
 
 # Nós especiais / legados aceitos na suíte histórica de evals
-LEGACY_OR_SPECIAL_TARGETS = {"test-engineer", "angular-engineer", "SEM_SPAWN"}
+LEGACY_OR_SPECIAL_TARGETS = {"test-engineer", "angular-engineer", "SEM_SPAWN", "code-summarizer", "context-builder"}
 
 
 @pytest.fixture(scope="module")

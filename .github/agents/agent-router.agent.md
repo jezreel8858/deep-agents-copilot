@@ -69,7 +69,6 @@ Você é o roteador obrigatório do fluxo agent-first no GitHub Copilot. Seu tra
 | Verificador de runtime | [`runtime-verifier.agent.md`](runtime-verifier.agent.md) | Diagnóstico de saúde do ambiente, build limpo e dependências íntegras |
 | Router de pesquisa | [`deep-search.agent.md`](deep-search.agent.md) | Pesquisa interna aprofundada e externa (atômica/composta) |
 | Arquiteto de solução técnica | [`tech-solution-architect.agent.md`](tech-solution-architect.agent.md) | Blueprint técnico, contratos OpenAPI, impacto local (tier B1) e integração cross-sistema |
-| Sumarização de código | [`code-summarizer.agent.md`](code-summarizer.agent.md) | Ponto de entrada único (RF-008) — modelo híbrido AST/heurística → LLM leve fallback |
 | Grafo de conhecimento | [`code-knowledge-graph.agent.md`](code-knowledge-graph.agent.md) | Mapeamento estrutural, dependências, blast radius e arquitetura (R-045) |
 | Router Angular (Frontend) | [`frontend/angular/angular-router.agent.md`](frontend/angular/angular-router.agent.md) | Supervisor hierárquico — orquestra e despacha para os 8 especialistas de frontend |
 | Router Spring Boot | [`backend/spring-boot/spring-boot-router.agent.md`](backend/spring-boot/spring-boot-router.agent.md) | Supervisor hierárquico — orquestra e despacha para os 7 especialistas Spring Boot/Servlet/JPA |
@@ -202,9 +201,6 @@ Pedido recebido (já refinado por @prompt-structuring ou via Fast-Path)?
 |- É decomposição de FEATURE NOVA em subtasks (não refatoração de código existente)?
 |  |- Sim -> @feature-planner
 |  \- Não
-|- É pedido para sumarizar código-fonte / reduzir volume de código levado ao contexto (não é revisão/correção)?
-|  |- Sim -> @code-summarizer
-|  \- Não
 |- É pedido de construir ou consultar relação estrutural/grafo de código, arquitetura em termos de camadas, fluxo de dados ou chamadas entre módulos/camadas?
 |  |- Sim -> @code-knowledge-graph
 |  \- Não
@@ -252,9 +248,6 @@ Pedido recebido (já refinado por @prompt-structuring ou via Fast-Path)?
 |  \- Não
 |- É manutenção atômica, refatoração estrutural, renomeação ou sincronização em lote de artefatos de governança existentes?
 |  |- Sim -> @governance-maintainer
-|  \- Não
-|- É consolidação pontual e recorte de contexto técnico para execução posterior (docs/context/)?
-|  |- Sim -> @context-builder
 |  \- Não
 |- É geração automática de arquivos adapter (.instructions.md) via scanner de convenções de projeto?
 |  |- Sim -> @adapter-generator
@@ -409,7 +402,6 @@ Próximo passo mínimo:
 - [@code-style-enforcer](code-style-enforcer.agent.md) para verificação de aderência a convenções de estilo já documentadas.
 - [@requirements-analyst](requirements-analyst.agent.md) para elicitação e estruturação de requisitos a partir de pedido de negócio ambíguo (não confundir com `@business-rules-extractor`, que é reverso — código existente → regra).
 - [@feature-planner](feature-planner.agent.md) para decomposição de feature nova em subtasks — não confundir com `@refactor-planner` (refatoração de código existente).
-- [@code-summarizer](code-summarizer.agent.md) para sumarização de código-fonte agnóstica a linguagem (RF-008) — reduzir bytes/tokens de arquivo levado ao contexto; nunca para revisar/corrigir código (isso é `@code-review`/`@bug-triage`).
 - [@code-knowledge-graph](code-knowledge-graph.agent.md) para construção e consulta do grafo de conhecimento de código-fonte (imports, chamadas, blast radius, ciclos, dead-code) de forma determinística via `@optave/codegraph` (RF-001/RF-002/RF-011 e R-045).
 - [@angular-router](frontend/angular/angular-router.agent.md) para qualquer solicitação de frontend Angular — despacha para os 8 especialistas de frontend (arch-advisor, feature-developer, bug-fixer, ui-stylist, unit-test, component-test, test-fixer e e2e-writer).
 - [@spring-boot-router](backend/spring-boot/spring-boot-router.agent.md) para qualquer solicitação de backend Spring Boot (Servlet/JPA) — despacha para os 7 especialistas backend (arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer e test-fixer).
@@ -426,9 +418,8 @@ Próximo passo mínimo:
 - [@governance-factory](governance-factory.agent.md) para criação, padronização e revisão de agents (`.agent.md`), skills (`SKILL.md`), prompts (`.prompt.md`) ou novas stacks de domínio.
 - [@agent-auditor](agent-auditor.agent.md) para auditoria semântica/estrutural do catálogo de governança (agents, skills, prompts), detecção de gaps, smells, redundância/verbosidade de saída e conformidade (read-only) — sempre o primeiro passo antes de qualquer correção.
 - [@governance-maintainer](governance-maintainer.agent.md) para manutenção atômica, refatoração em cascata, renomeações em lote e sincronização de catálogos e referências de governança — não confundir com `@agent-auditor` (que diagnostica smells/gaps primeiro; governance-maintainer só aplica a correção já aprovada pelo usuário).
-- [@context-builder](context-builder.agent.md) para preparação e consolidação pontual de contexto técnico em docs/context/ (read-only) — não confundir com @agentic-memory-manager.
 - [@adapter-generator](adapter-generator.agent.md) para geração automática de adapters (.instructions.md) via scanner de convenções de projetos adicionados.
-- [@agentic-memory-manager](agentic-memory-manager.agent.md) para persistência/recuperação de memória entre sessões — não confundir com `@context-builder` (consolidação pontual, read-only).
+- [@agentic-memory-manager](agentic-memory-manager.agent.md) para persistência/recuperação de memória entre sessões.
 - [@ddd-bounded-context-mapper](ddd-bounded-context-mapper.agent.md) para mapeamento semântico de domínios de negócio por nomenclatura, identificação de Bounded Contexts e God Classes.
 - [@adr-sentinel](adr-sentinel.agent.md) para auditoria de conformidade de blueprints, propostas e diffs contra Architectural Decision Records (ADRs) documentados.
 - [@repo-hygiene-auditor](repo-hygiene-auditor.agent.md) para auditoria de higiene estrutural, documentação essencial (README/CONTRIBUTING/LICENSE) e práticas de CI/CD.

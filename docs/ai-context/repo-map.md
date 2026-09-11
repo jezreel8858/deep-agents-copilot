@@ -69,7 +69,6 @@ deep-agents-copilot/
 │   │   │
 │   │   ├── evals/                               # Suíte de regressão de roteamento
 │   │   │   ├── casos-roteamento.yaml            # Casos canônicos, ambíguos e regressões
-│   │   │   └── casos-code-summarizer.yaml
 │   │   │
 │   │   ├── frontend/angular/                    # Domínio Frontend Angular
 │   │   │   ├── angular-catalog.yaml             # Sub-catálogo dos 8 especialistas Angular
@@ -121,6 +120,5 @@ deep-agents-copilot/
     ├── governance_audit/                        # Auditoria de regras e smells de governança
     ├── routing_gate/                            # Quality gate de roteamento
     ├── operational_flow/                        # Testes de workflows operacionais
-    └── code-summarizer/                         # Testes do summarizer
 ```
 

@@ -11,7 +11,7 @@ tools: ['file_search', 'grep_search', 'read_file', 'run_in_terminal', 'run_subag
 argument-hint: '<caminho-absoluto-do-projeto>'
 source_docs:
   - .github/skills/yaml-governance/SKILL.md
-  - .github/skills/context-builder/SKILL.md
+  - .github/skills/context-mode/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
   - CLAUDE.md
   - .github/copilot-instructions.md
@@ -86,7 +86,7 @@ Auto-carregar contexto estruturado de um projeto com Intent Classification + Mul
 
 Este prompt carrega automaticamente (conforme frontmatter `source_docs`):
 - ✅ `.github/skills/yaml-governance/SKILL.md` — governança YAML obrigatória
-- ✅ `.github/skills/context-builder/SKILL.md` — estruturas de contexto
+- ✅ `.github/skills/context-mode/SKILL.md` — estruturas de contexto
 - ✅ `CLAUDE.md` — regras normativas globais
 - ✅ `.github/copilot-instructions.md` — roteamento rápido e autonomia
 
@@ -418,7 +418,7 @@ O Copilot aplica mudanças **atomicamente por plano validado** (sem depender de 
    > "Projeto '<nome-projeto>' foi registrado e seu grafo de conhecimento já está indexado. Deseja também iniciar a sumarização de código-fonte via agent especialista agora? (A) Sim, agora (B) Não, decidir depois"
 3. **Se houver resultado prévio** → exibir aviso compacto de 1 linha, sem reabrir `ask_questions`:
    > `ℹ️ Projeto '<nome-projeto>' já possui sumarização anterior — invoque o agent especialista sob demanda se precisar de um resumo atualizado.`
-4. Se usuário escolher (A) → `run_subagent(agentName: "code-summarizer", description: "Sumarizar projeto <nome>", task: "Sumarizar arquivos-fonte do projeto registrado: <nome-projeto>...")`. Esta etapa é **aditiva**: o sucesso das FASES 3 e 4 já foi reportado antes deste passo e não depende dele.
+4. Se usuário escolher (A) → `run_subagent(agentName: "code-knowledge-graph", description: "Sumarizar projeto <nome>", task: "Sumarizar arquivos-fonte do projeto registrado: <nome-projeto>...")`. Esta etapa é **aditiva**: o sucesso das FASES 3 e 4 já foi reportado antes deste passo e não depende dele.
 
 **Saída esperada (caso A):**
 ```
@@ -567,7 +567,7 @@ Após invocar `/add-project-context <workspace>/[PROJETO]`, verifique:
 - [ ] **Pós-execução**: `.github/instructions/README.md` foi sincronizado (referência, sem dado real)?
 - [ ] **FASE 4 (OBRIGATÓRIA, sem opt-out)**: `code-knowledge-graph` foi invocado sempre logo após a FASE 3 (gerando o grafo via `codegraph build`, registrando no catálogo MCP via `codegraph registry add` e indexando via `ctx_index`), sem `ask_questions` de "deseja construir?"?
 - [ ] **FASE 4.1**: se houver >1 projeto registrado em `.github/instructions/local/` (ou `catalog.local.yaml`), o Copilot disparou a sequência de `ask_questions` de integração e configurou o manifesto de fronteiras (`manifesto.boundaries`) em `.codegraphrc.json`?
-- [ ] **FASE 4.5 (opcional)**: se usuário aceitou, `code-summarizer` foi invocado **depois** da FASE 4?
+- [ ] **FASE 4.5 (opcional)**: se usuário aceitou, `code-knowledge-graph` foi invocado **depois** da FASE 4?
 
 **Se todos checkpoints completaram**: ✅ **Sucesso!**  
 **Se algum falhou**: ⚠️ Ver seção Troubleshooting acima.

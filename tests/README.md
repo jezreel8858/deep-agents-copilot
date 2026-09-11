@@ -51,13 +51,6 @@ tests/
 ├── routing_gate/                  # Quality gate de roteamento do agent-router
 │   └── test_routing_quality_gate.py
 │
-├── code-summarizer/               # Extração AST, segurança e orquestração do summarizer
-│   ├── test_extract_fidelidade.py
-│   ├── test_extract_seguranca.py
-│   ├── test_orquestracao_contrato.py
-│   ├── test_custo_contrato.py
-│   └── test_pending_suites.py
-│
 ├── codegraph_visualizer/          # Contratos OpenAPI/AsyncAPI e métricas de grafo
 │   ├── test_contract_parser.py
 │   ├── test_diff_checker.py
@@ -152,14 +145,6 @@ Abaixo detalha-se o escopo de cobertura e a importância crítica de cada arquiv
 ---
 
 ### 3.4. Especialistas e Ferramentas Auxiliares
-
-#### `tests/code-summarizer/`
-- **Arquivos**: `test_extract_fidelidade.py`, `test_extract_seguranca.py`, `test_orquestracao_contrato.py`, `test_custo_contrato.py`, `test_pending_suites.py`.
-- **O que cobrem**: O motor determinístico de sumarização de código (RF-001/RF-002):
-  - Fidelidade de parsing AST em Java, TypeScript, Python e SQL.
-  - Prevenção absoluta de vazamento de segredos/tokens no resumo (tolerância zero — RNF-005).
-  - Máquina de estados de custo (cache FTS5 → determinístico AST → fallback LLM).
-- **Importância para a qualidade**: **Economia de Contexto e Segurança**. Assegura que o resumidor de código entregue resumos estruturados de altíssima fidelidade sem gastar tokens caros de LLM e sem vazar credenciais no contexto do chat.
 
 #### `tests/codegraph_visualizer/`
 - **Arquivos**: `test_contract_parser.py`, `test_diff_checker.py`, `test_metrics_calculator.py`, `test_template_bundler.py`.

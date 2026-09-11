@@ -62,7 +62,7 @@ O motor `@optave/codegraph` fornece parsing via AST real (motor nativo) para 34 
 
 | Critério | Threshold objetivo | Ligado a |
 |---|---|---|
-| Cobertura de nós/arestas identificáveis pela via determinística | **≥ 80%** (mesmo piso histórico do `code-summarizer`) | RF-010/RNF-005 |
+| Cobertura de nós/arestas identificáveis pela via determinística | **≥ 80%** (piso histórico de conformidade) | RF-010/RNF-005 |
 | Reprodução de segredo/credencial em qualquer saída reportada | **0%** — bloqueante, não percentual | RNF-003/R-010 |
 | Reaproveitamento de cache `code-graph:*` antes de reprocessar | 100% das vezes, checado via `ctx_search` | RNF-002 |
 | Reporte de economia (RF-010) | Sempre calculado: bytes/tokens de consultar o grafo vs. ler o código-fonte bruto equivalente | RF-010 |
@@ -235,7 +235,6 @@ Próximo passo mínimo:
 
 | Destino | Delegar quando | Handoff mínimo |
 |---|---|---|
-| [`@code-summarizer`](code-summarizer.agent.md) | solicitante precisa também de um sumário textual de um arquivo (não apenas do grafo) | caminho do arquivo, project-id |
 | [`@tech-solution-architect`](tech-solution-architect.agent.md) | consumidor precisa de blast radius/dataflow/impacto (RF-015 e capacidades novas) para decisão técnica ou blueprint, ou precisa validar o Gate de Paridade Funcional (RNF-012) | project-id(s), comando(s) `codegraph` executados, cobertura reportada, status do gate |
 | [`@refactor-planner`](refactor-planner.agent.md) | consumidor precisa de impacto de refatoração a partir do grafo já construído, incluindo blast radius e detecção de ciclo | project-id(s), resultado relevante |
 | [`@bug-triage`](bug-triage.agent.md) | consumidor precisa rastrear cadeia de chamadas a partir do grafo já construído | project-id(s), nó de origem, comando usado |

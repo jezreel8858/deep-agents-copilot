@@ -165,7 +165,7 @@ Solicitação do Usuário (turno N)
 
 ## 6) Catálogo Atual (estado verificado)
 
-### Agents (38 catalogados / 81 arquivos totais com especialistas)
+### Agents (36 catalogados / 79 arquivos totais com especialistas)
 - `agent-router` v2.0.0 — entry point obrigatório; confidence score + nível de routing declarados no output; routing-graph.yaml como fonte estrutural (R-040)
 - `prompt-structuring` — ⚠️ passo mandatório pós-`agent-router` (R-041); loop de refinamento de prompt limitado a 5 iterações; sempre retorna ao `agent-router`
 - **Planejamento & Análise**: `requirements-analyst`, `deep-search`, `feature-planner`
@@ -178,13 +178,12 @@ Solicitação do Usuário (turno N)
   - `python-router` — orquestra os 7 especialistas em `.github/agents/backend/python/`
   - `database-router` — orquestra os 6 especialistas em `.github/agents/backend/database/`
   - `database-specialist` — migrações de schema e integridade referencial
-  - `code-summarizer` — sumarização determinística de código
 - **Qualidade & Validação**: `bug-triage`, `debugger`, `test-strategy`, `code-review`, `code-style-enforcer`, `security-reviewer`, `performance-agent`, `devops-engineer`, `runtime-verifier`, `repo-hygiene-auditor`
 - **Documentação**: `docs-engineer` (modos `author`/`curate`), `context-builder`
 - **Governança & Orquestração**: `governance-factory` (unifica criação/revisão de agents, skills, prompts e stacks), `governance-maintainer`, `agent-auditor`, `binding-initializer`, `adapter-generator`, `agentic-memory-manager`, `compliance-guardrails`, `pr-gatekeeper`
 
 ### Artefatos Estruturais de Orquestração
-- `.github/agents/routing-graph.yaml` — grafo de roteamento (R-040): 39 nós de agents + 5 nós de workflows, arestas com condições, política de cascata
+- `.github/agents/routing-graph.yaml` — grafo de roteamento (R-040): 37 nós de agents + 5 nós de workflows, arestas com condições, política de cascata
 - `.github/agents/evals/casos-roteamento.yaml` — suíte de evals de regressão de roteamento (81 casos)
 
 ## 7) Política de Mudança

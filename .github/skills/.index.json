@@ -217,20 +217,6 @@
       ]
     },
     {
-      "name": "context-builder",
-      "tier": 2,
-      "category": "process",
-      "path": ".github/skills/context-builder/SKILL.md",
-      "tools": [
-        "context-mode"
-      ],
-      "related_agents": [
-        "@context-builder",
-        "@deep-search",
-        "@tech-solution-architect"
-      ]
-    },
-    {
       "name": "context-compact",
       "tier": 2,
       "category": "process",

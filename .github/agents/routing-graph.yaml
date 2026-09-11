@@ -52,10 +52,6 @@ nos:
     tipo: downstream
     descricao: "Elicitação e estruturação de requisitos funcionais/não-funcionais a partir de pedido de negócio ambíguo (EARS/INVEST/Gherkin/FURPS+); detecta solution-jumping via Five Whys; prospectivo (pedido → requisito), nunca decide arquitetura, não confundir com business-rules-extractor (reverso: código → regra)"
 
-  - id: code-summarizer
-    tipo: downstream
-    descricao: "Ponto de entrada único para sumarização de código-fonte agnóstica a linguagem (RF-008); modelo híbrido — heurística/AST determinística primeiro, LLM leve como fallback; nunca substituído por chamada direta a lib de parsing por outros agents (RNF-007)"
-
   - id: code-knowledge-graph
     tipo: downstream
     descricao: "Ponto de entrada único para construção/consulta do grafo de conhecimento de código-fonte cross-projeto (RF-001/RF-002/RF-011): nós arquivo/classe/função, arestas import/chamada/herança/tabela-SQL, reaproveitando AST do code-summarizer; puramente determinístico, sem fallback LLM (RNF-008); nunca substituído por chamada direta a lib de parsing/grafo (RNF-004)"
@@ -89,10 +85,6 @@ nos:
   - id: adapter-generator
     tipo: downstream
     descricao: "Geração automática de adapters via /add-project-context"
-
-  - id: context-builder
-    tipo: downstream
-    descricao: "Coleta e consolidação de contexto técnico"
 
   - id: angular-router
     tipo: domain_router
@@ -599,7 +591,6 @@ arestas:
         - "memória procedimental"
       sinal_r006: "É persistência/recuperação de memória ENTRE SESSÕES (não consolidação pontual)?"
       nao_confundir_com:
-        - "consolidação pontual de contexto"  # → context-builder
 
   # Revisão de artefatos DevOps
   - de: agent-router
@@ -668,36 +659,6 @@ arestas:
         - "extrair regra de negócio de código existente"  # → business-rules-extractor (reverso)
         - "impacto técnico de mudança já definida"          # → tech-solution-architect (tier B1)
 
-  # Sumarização de código-fonte agnóstica a linguagem (RF-008)
-  - de: agent-router
-    para: code-summarizer
-    prioridade: 1.9
-    threshold_score: 0.90
-    nivel_routing: rule-based
-    condicoes:
-      keywords:
-        - "sumarizar código"
-        - "sumarização de código-fonte"
-        - "resumir arquivo"
-        - "reduzir contexto de código"
-        - "economizar tokens de código"
-        - "code summarization"
-      sinal_r006: "É pedido para reduzir volume de código-fonte levado ao contexto (sumário), não para revisar/corrigir/refatorar o código?"
-      nao_confundir_com:
-        - "revisar/corrigir código"        # → bug-triage/code-review/refactor-planner
-        - "extrair regra de negócio"       # → business-rules-extractor
-        - "implementar sumarização em lib" # → decisão técnica de governance-factory/tech-solution-architect, não roteamento
-
-  # Delegação interna: qualquer agent downstream pode invocar code-summarizer sob demanda (RF-002)
-  - de: "*downstream"
-    para: code-summarizer
-    prioridade: 0.5
-    threshold_score: 1.00
-    nivel_routing: rule-based
-    condicoes:
-      sinal: "Agent downstream identificou arquivo-fonte grande (>300 linhas OU >20KB) necessário ao contexto da tarefa (RF-002/RNF-002)"
-      gatilho: "Delegação interna via run_subagent antes de anexar conteúdo bruto ao contexto — nunca chamada direta a lib de parsing por outros agents (RNF-007)"
-
   # Grafo de conhecimento de código-fonte cross-projeto (RF-001/RF-002/RF-011)
   - de: agent-router
     para: code-knowledge-graph
@@ -721,7 +682,6 @@ arestas:
         - "mapear chamadas entre camadas"
       sinal_r006: "É pedido de construir/consultar relação estrutural entre símbolos de código (nós/arestas), camadas ou fluxo de dados do projeto?"
       nao_confundir_com:
-        - "sumarizar código"                       # → code-summarizer
         - "revisar/corrigir código"                # → bug-triage/code-review/refactor-planner
         - "implementação/feature de componente"    # → angular-engineer / spring-boot-engineer
         - "acoplamento arquitetural entre sistemas" # → tech-solution-architect (cross-sistema/contratos)

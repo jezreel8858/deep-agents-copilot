@@ -208,41 +208,6 @@ canonicos:
     critico: true
     threshold: 0.90
 
-  - id: "canon-015"
-    descricao: "Sumarização de código-fonte agnóstica a linguagem (perfil code-summarizer, RF-008)"
-    input:
-      solicitacao: "Sumarize este arquivo de código-fonte para reduzir o volume levado ao contexto do chat"
-    expected:
-      agent_route: "code-summarizer"
-      nivel_routing: "rule-based"
-      confianca: "alta"
-      score_minimo: 0.90
-      output_contains:
-        - "Delegado: @code-summarizer"
-    critico: true
-    threshold: 0.90
-    nao_confundir_com:
-      - "revisar/corrigir código"   # → code-review/bug-triage/refactor-planner
-      - "extrair regra de negócio"  # → business-rules-extractor
-
-  - id: "canon-019"
-    descricao: "Delegação interna downstream → code-summarizer (RF-002): agent especialista de stack detecta arquivo > 300 linhas/20KB e delega via run_subagent, valida aresta *downstream → code-summarizer de routing-graph.yaml"
-    input:
-      agent_solicitante: "spring-boot-router"
-      solicitacao_simulada: "spring-boot-feature-developer está lendo PedidoService.java (412 linhas, 24KB) para responder a uma tarefa e identifica que excede o threshold RF-002 antes de anexar o conteúdo ao contexto"
-    expected:
-      agent_route: "code-summarizer"
-      via: "run_subagent"
-      nivel_routing: "rule-based"
-      confianca: "alta"
-      score_minimo: 0.90
-      output_contains:
-        - "Delegado: @code-summarizer"
-    nao_deve:
-      comportamento: "spring-boot ler o arquivo inteiro diretamente para o contexto sem delegar (viola RF-002/RNF-002)"
-    critico: true
-    threshold: 0.90
-
   - id: "canon-020"
     descricao: "Revisão especializada de segurança (OWASP/CVE)"
     input:
@@ -707,23 +672,6 @@ ambiguos:
     critico: false
     threshold: 0.70
 
-  - id: "ambig-005"
-    descricao: "Duas intenções simultâneas envolvendo sumarização (RF-008 §4 da estratégia): 'sumarize e corrija' não deve rotear direto para code-summarizer nem bug-triage sem clarificação"
-    input:
-      solicitacao: "Sumarize e corrija este arquivo"
-    expected:
-      comportamento: "ask_questions com split de intenções"
-      opcoes_esperadas:
-        - "Sumarizar primeiro → @code-summarizer"
-        - "Corrigir primeiro → @bug-triage (requer relatório/causa raiz)"
-        - "Ambos em sequência → plano dividido (sumarizar para reduzir contexto, depois corrigir)"
-      confianca: "baixa"
-      score_esperado_range: [0.50, 0.69]
-    nao_deve:
-      agent_route: "code-summarizer|bug-triage (roteamento direto sem clarificação)"
-    critico: false
-    threshold: 0.70
-
 # ─────────────────────────────────────────────
 # SUITE 3 — Regressão de Roteamento (threshold = 1.00)
 # Bugs conhecidos de roteamento — NUNCA devem regredir.
@@ -877,24 +825,24 @@ regressao:
     threshold: 1.00
 
   - id: "regr-017"
-    descricao: "REGRESSÃO (§4 estratégia code-summarizer): 'extrair regras de negócio deste módulo' não deve rotear para code-summarizer — sumarizar ≠ extrair regra de negócio como artefato"
+    descricao: "REGRESSÃO: 'extrair regras de negócio deste módulo' não deve rotear para code-summarizer — sumarizar ≠ extrair regra de negócio como artefato"
     input:
       solicitacao: "Extrair regras de negócio deste módulo"
     expected:
       agent_route: "business-rules-extractor"
     nao_deve:
-      agent_route: "code-summarizer"
+      agent_route: "tech-solution-architect"
     critico: true
     threshold: 1.00
 
   - id: "regr-018"
-    descricao: "REGRESSÃO (§4 estratégia code-summarizer): 'revisar antes do merge' não deve rotear para code-summarizer mesmo mencionando 'resumir mudanças' — revisão de qualidade ≠ sumarização de contexto"
+    descricao: "REGRESSÃO: 'revisar antes do merge' não deve rotear para code-summarizer mesmo mencionando 'resumir mudanças' — revisão de qualidade ≠ sumarização de contexto"
     input:
       solicitacao: "Revisar este código antes do merge — pode aproveitar e resumir as mudanças no PR?"
     expected:
       agent_route: "code-review"
     nao_deve:
-      agent_route: "code-summarizer"
+      agent_route: "tech-solution-architect"
     critico: true
     threshold: 1.00
 

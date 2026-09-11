@@ -29,7 +29,6 @@ Toda skill deve declarar no topo:
 | `context-mode` | Tier 1 | Roteamento ctx-first, coleta em batch, busca indexada e processamento em sandbox com economia de tokens/créditos |
 | `sonarqube-governance` | Tier 2 | Monitorar métricas de qualidade, cobertura e segurança via SonarQube |
 | `tavily` | Tier 2 | Pesquisar documentação externa, changelog, versões e referências de terceiros |
-| `context-builder` | Tier 2 | Preparar, condensar e persistir contexto técnico multi-projeto em `docs/context/` |
 | `context-compact` | Tier 2 | Compactar contexto pós-leitura, remover ruído e gerar resumos executáveis |
 | `mermaid-diagrams` | Tier 2 | Criar diagramas Mermaid legíveis para documentação, ADRs e análises técnicas |
 | `agent-contracts` | Tier 1 | Padronizar contrato de entrada, saída e não-escopo de agents |

@@ -280,7 +280,7 @@ Depois, prosseguir para PASSO 8.
 
 ### **PASSO 8: Verificar Cache de Grafo de Conhecimento, Código e Sumarização (por Projeto)**
 
-Para cada projeto registrado em `catalog.local.yaml` (gitignored, R-043 — nunca em `catalog.yaml`), verificar se já existe cache de **grafo de conhecimento** (`@code-knowledge-graph`), de **código-fonte indexado** (`code:<project-id>`) e de **sumarização** (`@code-summarizer`) no Context Mode:
+Para cada projeto registrado em `catalog.local.yaml` (gitignored, R-043 — nunca em `catalog.yaml`), verificar se já existe cache de **grafo de conhecimento** (`@code-knowledge-graph`), de **código-fonte indexado** (`code:<project-id>`) no Context Mode:
 
 - Projetos registrados = 0 → pular verificação.
 - Projetos registrados > 0 → executar queries em lote via `ctx_batch_execute` (queries de todos os projetos no mesmo array — nunca 1 chamada por projeto, R-008):
@@ -330,7 +330,7 @@ Sintetiza em bullets objetivos apenas as pendências reais detectadas nos Passos
 - **[Model]** *(se recomendável)*: Ajuste o modelo da sessão conforme a complexidade da tarefa (R-021).
 - **[Binding]** *(se incompleto)*: Execute `binding-initializer` — `catalog.yaml`/`binding.md` ausentes (R-034).
 - **[Extends]** *(se houver projeto sem extends)*: Configure herança em `<n>` projeto(s) pendente(s) — PASSO 6.
-- **[Cache]** *(se houver projeto sem grafo/sumário)*: Considere `@code-knowledge-graph` / `@code-summarizer` para `<projeto(s)>` antes de análises profundas.
+- **[Cache]** *(se houver projeto sem grafo)*: Considere `@code-knowledge-graph` para `<projeto(s)>` antes de análises profundas.
 - **[Sessão]** *(se Context Mode inativo)*: Rode `/ctx-start` — Total calls = 0, dashboard não vai rastrear.
 - **[Fluxo]**: Toda solicitação a partir daqui deve começar por `@agent-router` (R-037).
 

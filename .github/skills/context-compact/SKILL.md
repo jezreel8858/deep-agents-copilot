@@ -20,8 +20,6 @@ source_docs:
   - "CLAUDE.md"
   - "docs/ai-context/catalog.yaml"
   - ".github/copilot-instructions.md"
-  - ".github/agents/context-builder.agent.md"
-  - ".github/skills/context-builder/SKILL.md"
   - ".github/skills/context-mode/SKILL.md"
 ---
 

@@ -29,6 +29,8 @@ LEGACY_DEPRECATED_AGENTS = {
     "impact-architect",
     "test-implementation",
     "test-fix",
+    "code-summarizer",
+    "context-builder",
 }
 
 READONLY_ADVISORY_AGENTS = {

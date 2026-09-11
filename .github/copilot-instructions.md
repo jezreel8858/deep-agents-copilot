@@ -318,7 +318,6 @@ Projetos e adapters por-projeto NUNCA são commitados no repositório compartilh
 **Contexto e Processo:**
 - `context-mode` -> organização de contexto e pesquisa sobre conteúdo já indexado/lido.
 - `context-compact` -> compactação pós-leitura e geração de resumos executáveis.
-- `context-builder` -> coleta e condensação de contexto técnico em `docs/context/`.
 - `refactoring-planning-patterns` -> planejamento de refatoração estrutural (Mikado, Branch by Abstraction, Strangler Fig, safety net).
 - `efficient-batch-code-modification` -> edição em lote, dry-run e diffs cirúrgicos para economia de tokens e créditos Copilot.
 
