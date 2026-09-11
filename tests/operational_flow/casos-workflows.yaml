@@ -1,0 +1,318 @@
+version: "1.0"
+description: >
+  Suíte declarativa de cenários de workflows de ponta a ponta (E2E) para validação
+  dos 5 Workflows Canônicos (R-050), branches de Fast-Path (R-041), detecção de
+  deriva de intenção (R-042), Circuit Breakers (R-050.2) e Fast-Chaining (R-050.1).
+last_updated: "2026-09-10"
+responsavel: "agent-evals-lab + tech-solution-architect"
+
+cenarios:
+  # ─────────────────────────────────────────────────────────────
+  # WORKFLOW 1 — BUG FIX
+  # ─────────────────────────────────────────────────────────────
+  - id: "WF-BUG-001"
+    nome: "Bug Fix Fast-Path — NullPointerException em Service Backend"
+    workflow: "WORKFLOW-BUG-FIX"
+    tipo: "fast_path"
+    projeto_alvo: "[PROJETO-ALVO]"
+    input_inicial: "Erro NullPointerException no EscalaService.java:45 ao salvar escala com horário nulo"
+    trajetoria:
+      - etapa: 1
+        nome_etapa: "Triagem & Repro Gate"
+        agente: "bug-triage"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: bug-triage"
+        output_esperado:
+          - "Hipótese de Causa Raiz"
+          - "Plano Mínimo de Correção"
+        proximos_permitidos: ["spring-boot-router", "spring-boot-unit-test-writer"]
+      - etapa: 2
+        nome_etapa: "Red Test (Falha Reproduzida)"
+        agente: "spring-boot-unit-test-writer"
+        invariantes:
+          proibir_mutacao: false
+          exigir_banner: "Agente Ativo: spring-boot-unit-test-writer"
+        output_esperado:
+          - "@Test"
+          - "deve_falhar"
+        proximos_permitidos: ["spring-boot-bug-fixer"]
+      - etapa: 3
+        nome_etapa: "Fix Cirúrgico (≤ 20 linhas)"
+        agente: "spring-boot-bug-fixer"
+        invariantes:
+          proibir_mutacao: false
+          exigir_banner: "Agente Ativo: spring-boot-bug-fixer"
+          diff_max_linhas: 20
+        output_esperado:
+          - "Correção Aplicada"
+          - "Diff Cirúrgico"
+        proximos_permitidos: ["spring-boot-unit-test-writer"]
+      - etapa: 4
+        nome_etapa: "Green Test (Regressão Validada)"
+        agente: "spring-boot-unit-test-writer"
+        invariantes:
+          proibir_mutacao: false
+          exigir_banner: "Agente Ativo: spring-boot-unit-test-writer"
+        output_esperado:
+          - "BUILD SUCCESS"
+          - "Tests run: 1, Failures: 0"
+        proximos_permitidos: ["code-review"]
+      - etapa: 5
+        nome_etapa: "Quality Gate"
+        agente: "code-review"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: code-review"
+        output_esperado:
+          - "Quality Gate Aprovado"
+        proximos_permitidos: ["pr-gatekeeper"]
+
+  # ─────────────────────────────────────────────────────────────
+  # WORKFLOW 2 — REFACTORING
+  # ─────────────────────────────────────────────────────────────
+  - id: "WF-REF-001"
+    nome: "Refatoração Estrutural com Golden Master e Grafo de Dependências"
+    workflow: "WORKFLOW-REFACTORING"
+    tipo: "standard"
+    projeto_alvo: "[PROJETO-ALVO]"
+    input_inicial: "Refatorar módulo legado de cálculo de escalas aplicando Clean Architecture"
+    trajetoria:
+      - etapa: 1
+        nome_etapa: "Extração de Regras Base"
+        agente: "business-rules-extractor"
+        invariantes:
+          proibir_mutacao: false
+          exigir_banner: "Agente Ativo: business-rules-extractor"
+        output_esperado:
+          - "Ground Truth de Regras de Negócio"
+        proximos_permitidos: ["code-knowledge-graph"]
+      - etapa: 2
+        nome_etapa: "Mapeamento Estrutural e Blast Radius"
+        agente: "code-knowledge-graph"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: code-knowledge-graph"
+        output_esperado:
+          - "Blast Radius"
+          - "Impact Analysis"
+        proximos_permitidos: ["refactor-planner"]
+      - etapa: 3
+        nome_etapa: "Plano Macro & Árvore Mikado"
+        agente: "refactor-planner"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: refactor-planner"
+        output_esperado:
+          - "Árvore Mikado"
+          - "Safety Net (Golden Master)"
+        proximos_permitidos: ["spring-boot-router", "spring-boot-feature-developer"]
+      - etapa: 4
+        nome_etapa: "Execução em Lote (Single-Turn Batching R-046)"
+        agente: "spring-boot-feature-developer"
+        invariantes:
+          proibir_mutacao: false
+          exigir_banner: "Agente Ativo: spring-boot-feature-developer"
+        output_esperado:
+          - "Alterações em Lote Concluídas"
+        proximos_permitidos: ["business-rules-extractor"]
+      - etapa: 5
+        nome_etapa: "Validação Comportamental de Paridade"
+        agente: "business-rules-extractor"
+        invariantes:
+          proibir_mutacao: false
+          exigir_banner: "Agente Ativo: business-rules-extractor"
+        output_esperado:
+          - "Paridade Comportamental 100%"
+        proximos_permitidos: ["code-review"]
+      - etapa: 6
+        nome_etapa: "Quality Gate Final"
+        agente: "code-review"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: code-review"
+        output_esperado:
+          - "Veredito Final"
+        proximos_permitidos: ["pr-gatekeeper"]
+
+  # ─────────────────────────────────────────────────────────────
+  # WORKFLOW 3 — TECHNICAL ANALYSIS
+  # ─────────────────────────────────────────────────────────────
+  - id: "WF-TECH-001"
+    nome: "Análise Técnica de Arquitetura e Viabilidade de Migração"
+    workflow: "WORKFLOW-TECHNICAL-ANALYSIS"
+    tipo: "standard"
+    projeto_alvo: "[PROJETO-ALVO]"
+    input_inicial: "Analisar viabilidade e trade-offs da migração de Signals zoneless em Angular 21"
+    trajetoria:
+      - etapa: 1
+        nome_etapa: "Delimitação de Escopo & Consulta de Stack"
+        agente: "angular-arch-advisor"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: angular-arch-advisor"
+        output_esperado:
+          - "Diagnóstico de Arquitetura"
+          - "Trade-offs e Riscos"
+        proximos_permitidos: ["code-knowledge-graph", "deep-search"]
+      - etapa: 2
+        nome_etapa: "Análise Determinística de Código e Chamadas"
+        agente: "code-knowledge-graph"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: code-knowledge-graph"
+        output_esperado:
+          - "Grafo de Componentes Afetados"
+        proximos_permitidos: ["docs-engineer", "tech-solution-architect"]
+      - etapa: 3
+        nome_etapa: "Síntese e Tabela de Propostas Acionáveis"
+        agente: "docs-engineer"
+        invariantes:
+          proibir_mutacao: false
+          exigir_banner: "Agente Ativo: docs-engineer"
+        output_esperado:
+          - "Tabela Mandatória de Propostas Acionáveis"
+          - "Decisão e Recomendações"
+        proximos_permitidos: ["agent-router"]
+
+  # ─────────────────────────────────────────────────────────────
+  # WORKFLOW 4 — FEATURE DEVELOPMENT
+  # ─────────────────────────────────────────────────────────────
+  - id: "WF-FEAT-001"
+    nome: "Desenvolvimento de Feature Completa com TDD e Security Gate"
+    workflow: "WORKFLOW-FEATURE-DEVELOPMENT"
+    tipo: "standard"
+    projeto_alvo: "[PROJETO-ALVO]"
+    input_inicial: "Implementar exportação de escalas para formato PDF estruturado"
+    trajetoria:
+      - etapa: 1
+        nome_etapa: "Elicitação de Requisitos"
+        agente: "requirements-analyst"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: requirements-analyst"
+        output_esperado:
+          - "Critérios de Aceite (Gherkin)"
+          - "Requisitos Funcionais e Não-Funcionais"
+        proximos_permitidos: ["tech-solution-architect"]
+      - etapa: 2
+        nome_etapa: "Technical Blueprint & Contrato de API"
+        agente: "tech-solution-architect"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: tech-solution-architect"
+        output_esperado:
+          - "Technical Blueprint"
+          - "Contrato OpenAPI"
+        proximos_permitidos: ["test-strategy"]
+      - etapa: 3
+        nome_etapa: "Estratégia de Testes por Risco"
+        agente: "test-strategy"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: test-strategy"
+        output_esperado:
+          - "Matriz de Cobertura de Riscos"
+        proximos_permitidos: ["angular-router", "angular-feature-developer"]
+      - etapa: 4
+        nome_etapa: "Implementação TDD (Red -> Green -> Refactor)"
+        agente: "angular-feature-developer"
+        invariantes:
+          proibir_mutacao: false
+          exigir_banner: "Agente Ativo: angular-feature-developer"
+        output_esperado:
+          - "Código da Feature e Testes Passando"
+        proximos_permitidos: ["code-review"]
+      - etapa: 5
+        nome_etapa: "Quality & Security Gate (OWASP)"
+        agente: "security-reviewer"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: security-reviewer"
+        output_esperado:
+          - "Relatório de Vulnerabilidades (OWASP 2026)"
+          - "Quality Gate Aprovado"
+        proximos_permitidos: ["pr-gatekeeper"]
+
+  # ─────────────────────────────────────────────────────────────
+  # WORKFLOW 5 — GOVERNANCE MAINTENANCE
+  # ─────────────────────────────────────────────────────────────
+  - id: "WF-GOV-001"
+    nome: "Manutenção de Governança com Pesquisa Prévia e Sincronização Quádrupla"
+    workflow: "WORKFLOW-GOVERNANCE-MAINTENANCE"
+    tipo: "fast_path"
+    projeto_alvo: "deep-agents-copilot"
+    input_inicial: "Criar nova skill de governança de observabilidade com OpenTelemetry"
+    trajetoria:
+      - etapa: 1
+        nome_etapa: "Pesquisa Prévia de Mercado"
+        agente: "deep-search"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: deep-search"
+        output_esperado:
+          - "Síntese de Boas Práticas e Padrões de Mercado"
+        proximos_permitidos: ["governance-factory"]
+      - etapa: 2
+        nome_etapa: "Geração do Artefato e Sincronização Quádrupla R-015"
+        agente: "governance-factory"
+        invariantes:
+          proibir_mutacao: false
+          exigir_banner: "Agente Ativo: governance-factory"
+        output_esperado:
+          - "SKILL.md criado"
+          - "Atualização Atômica de Catálogos e README"
+        proximos_permitidos: ["governance-maintainer", "agent-auditor"]
+      - etapa: 3
+        nome_etapa: "Quality Gate de Governança (Tier 1 Pytest)"
+        agente: "agent-auditor"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: agent-auditor"
+        output_esperado:
+          - "100% dos testes de governança passando"
+        proximos_permitidos: ["pr-gatekeeper"]
+
+  # ─────────────────────────────────────────────────────────────
+  # EDGE CASES & PROTOCOLOS DE SEGURANÇA
+  # ─────────────────────────────────────────────────────────────
+  - id: "WF-EDGE-INTENT-DRIFT"
+    nome: "Detecção e Recuperação de Deriva de Intenção (R-042 Anti-Sticky Session)"
+    tipo: "intent_drift"
+    cenario:
+      turno_1:
+        solicitacao: "Implementar endpoint REST para salvar escalas em Spring Boot"
+        agente_ativo: "spring-boot-feature-developer"
+      turno_2:
+        solicitacao: "Agora crie a tela de login com formulário reativo em Angular"
+        comportamento_esperado:
+          deriva_detectada: true
+          motivo: "deriva_de_intencao"
+          agente_destino: "agent-router"
+          banner_handoff: "Handoff: spring-boot-feature-developer → agent-router (motivo: deriva_de_intencao)"
+          novo_agente_delegado: "angular-router"
+
+  - id: "WF-EDGE-CIRCUIT-BREAKER"
+    nome: "Ativação de Circuit Breaker após Falha de Red Test Recorrente (R-050.2)"
+    tipo: "circuit_breaker"
+    cenario:
+      workflow: "WORKFLOW-BUG-FIX"
+      max_tentativas: 3
+      gatilho: "Falha consecutiva de teste de regressão após 3 iterações"
+      comportamento_esperado:
+        interromper_execucao: true
+        acionar_rollback: true
+        emitir_relatorio_bloqueio: true
+        solicitar_aprovacao_humana: true
+
+  - id: "WF-EDGE-FAST-CHAINING"
+    nome: "Fast-Chaining Direto de Technical Analysis para Refactoring (R-050.1)"
+    tipo: "fast_chaining"
+    cenario:
+      origem_workflow: "WORKFLOW-TECHNICAL-ANALYSIS"
+      destino_workflow: "WORKFLOW-REFACTORING"
+      condicao_ativacao: "Proposta técnica aprovada com alvo_refatoracao explícito"
+      comportamento_esperado:
+        preservar_state_bag: true
+        bypass_triagem_inicial: true
+        direcionar_para_etapa: 1

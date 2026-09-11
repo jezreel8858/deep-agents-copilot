@@ -6,6 +6,27 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.6.0] — 2026-09-10
+
+### Adicionado
+- **Suíte de Testes de Conformidade de Templates (Disjunção 1-de-N)**:
+  - `tests/governance_audit/test_template_sections.py`: Implementação estática da regra de conformidade polimórfica (Smells 2.9, 2.10 e 2.11), validando seções de agents, prompts e skills contra os templates canônicos com extração dinâmica e normalização semântica.
+  - `tests/governance_audit/test_router_agents.py`: Validação determinística especializada para os 6 agents com perfil de Router / Supervisor (`agent-router`, `angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `database-router`), exigindo as 6 seções obrigatórias e menor privilégio de ferramentas.
+  - Template canônico oficial para roteadores em `.github/agents/templates/router-agent.md`.
+- **Suíte de Testes de Trajetórias de Workflows Canônicos (R-050) & Simulador MAS**:
+  - `tests/operational_flow/casos-workflows.yaml`: Catálogo declarativo com 8 cenários de ponta a ponta (E2E) cobrindo os 5 workflows canônicos, detecção de deriva de intenção (R-042), circuit breaker (R-050.2) e fast-chaining (R-050.1).
+  - `tests/operational_flow/test_workflow_trajectories.py`: Validação determinística das transições de estados, isolamento de ferramentas por etapa e thresholds de cobertura (100% workflows, ≥85% etapas, ≥15 agentes).
+  - `tests/operational_flow/workflow_eval_simulator.py`: Motor CLI para auditoria estática de trajetórias em lote e cálculo em tempo real das 5 dimensões de cobertura de MAS (`--coverage`).
+  - `.github/prompts/eval-workflows.prompt.md`: Prompt operacional parametrizado para avaliação de trajetórias via modelo `Gemini 3.8 Flash`.
+- **Documentação Arquitetural de Testes MAS (`tests/README.md`)**:
+  - Documentação completa da Pirâmide de Testes de Sistemas Multi-Agentes (MAS), detalhamento arquivo por arquivo, objetivos de qualidade, métricas de cobertura e guia de execução.
+
+### Alterado
+- **Configuração do Pytest (`pytest.ini`)**:
+  - Inclusão da diretiva `pythonpath = .` garantindo resolução determinística da raiz do projeto independente da forma de invocação do runner.
+
+---
+
 ## [2.5.0] — 2026-09-10
 
 ### Adicionado
