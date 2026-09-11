@@ -37,11 +37,11 @@ Exemplos:
 **Características:**
 - Referências específicas de projeto/tecnologia **permitidas e esperadas**
 - Nunca incluem regras globais (apenas referências)
-- Declarados em `docs/ai-context/catalog.yaml` com `applyTo` glob patterns
+- Declarados em `.github/instructions/README.md` com `applyTo` glob patterns
 
 ### Nível 3: Contexto de Binding e Artefatos de Governança
 
-**Local:** `docs/ai-context/`
+**Local:** `.github/instructions/`
 
 - **`catalog.yaml`** — Manifest único de adapters, projetos e mapping stack → instrução; inclui seção `governance_artefacts` com artefatos estruturais de IA
 - **`binding.md`** — Documentação de binding e descoberta
@@ -51,6 +51,65 @@ Exemplos:
 - **`.github/agents/evals/casos-roteamento.yaml`** — Suíte de casos de teste de regressão de roteamento (canônicos, ambíguos, regressão, segurança)
 
 ---
+
+
+## Estrutura Física do Repositório
+
+```
+deep-agents-copilot/
+├── CLAUDE.md                                    # Governança global (CLAUDE.md)
+├── README.md                                    # Visão geral do repositório
+├── .ignore / .rgignore                          # Whitelist para ripgrep indexar .github/
+│
+├── .github/
+│   ├── copilot-instructions.md                  # Instruções operacionais Copilot
+│   ├── projects.local.yaml                      # Overlay local de projetos (gitignored, R-043)
+│   ├── projects.local.yaml.example              # Template rastreado do overlay local (R-043)
+│   │
+│   ├── agents/                                  # 36 Agents de IA
+│   │   ├── catalog.yaml                         # ⭐ Catálogo com modelos e metadados dos agents (ÚNICO)
+│   │   ├── routing-graph.yaml                   # ⭐ Grafo estrutural de transições
+│   │   ├── workflows.md                         # ⭐ Especificação dos 5 Workflows Canônicos
+│   │   ├── agent-router.agent.md                # Entry point obrigatório (R-037/R-042)
+│   │   ├── prompt-structuring.agent.md          # Refinamento de prompt (R-041)
+│   │   ├── bug-triage.agent.md                  # Triagem de bugs
+│   │   ├── pr-gatekeeper.agent.md               # Preparação de PR e commit
+│   │   ├── ... (outros agents raiz)
+│   │   │
+│   │   ├── evals/                               # Suíte de regressão de roteamento
+│   │   │   └── casos-roteamento.yaml            # Casos canônicos, ambíguos e regressões
+│   │   │
+│   │   ├── frontend/angular/                    # Domínio Frontend Angular (sub-catálogo + 8 especialistas)
+│   │   └── backend/                             # Domínios Backend (Spring Boot, Reactive, EJB, Python, DB)
+│   │
+│   ├── skills/                                  # 50+ Skills Especializadas
+│   │   ├── .index.json                          # Índice estruturado JSON de skills
+│   │   ├── README.md                            # Catálogo descritivo de skills
+│   │   └── ... (skills especializadas)
+│   │
+│   ├── prompts/                                 # Prompts Canônicos de Workflow (/init-context, /add-project-context...)
+│   │   └── README.md                            # Índice de prompts
+│   │
+│   └── instructions/                            # Adapters de Stack de Código
+│       ├── README.md                            # ⭐ SSOT de Binding e Adapters
+│       ├── angular-v21-frontend.instructions.md # Convenções Angular
+│       ├── spring-boot-backend.instructions.md  # Convenções Spring Boot
+│       ├── python-backend.instructions.md       # Convenções Python
+│       ├── database.instructions.md             # Convenções Banco de Dados
+│       ├── devops.instructions.md               # Convenções DevOps
+│       └── local/                               # Adapters locais de projetos (gitignored, R-043)
+│
+├── docs/                                        # Documentação de Produto, Arquitetura e Planos
+│   ├── agent-context/                           # Guias de uso de ferramentas
+│   ├── plan/                                    # Planos arquiteturais
+│   │   └── agent-profiles-taxonomy.md           # Taxonomia consolidada de agents de mercado
+│   └── requirements/                            # Requisitos de sistema
+│
+└── tests/                                       # Suíte de Testes Automatizados (pytest)
+    ├── governance_audit/                        # Auditoria de regras e smells de governança
+    ├── routing_gate/                            # Quality gate de roteamento
+    └── operational_flow/                        # Testes de workflows operacionais
+```
 
 ## Princípios Fundamentais
 
@@ -99,7 +158,7 @@ Arquivos Locais (CLAUDE.md → copilot-instructions.md → adapters)
 1. Carregue **`CLAUDE.md`** como fonte de verdade global
 2. Carregue **`.github/copilot-instructions.md`** para roteamento operacional
 3. Identifique o projeto/stack alvo
-4. Carregue o adapter correspondente via `docs/ai-context/catalog.yaml`
+4. Carregue o adapter correspondente via `.github/instructions/README.md`
 
 **Fluxo operacional:**
 
@@ -139,7 +198,7 @@ flowchart TD
    # Conteúdo específico do stack/domínio
    ```
 
-2. **Registrar** em `docs/ai-context/catalog.yaml`:
+2. **Registrar** em `.github/instructions/README.md`:
    ```yaml
    adapters:
      - name: seu-adapter
@@ -147,13 +206,13 @@ flowchart TD
        description: "Descrição breve"
    ```
 
-3. **Documentação** via `docs/ai-context/binding.md`
+3. **Documentação** via `.github/instructions/README.md`
 
 ---
 
 ## Cobertura de Mercado — Perfis de Agents
 
-> Análise completa: [`docs/ai-context/agent-profiles-taxonomy.md`](docs/ai-context/agent-profiles-taxonomy.md) — consolidação de fontes de mercado (Anthropic, OpenAI, Microsoft, Google DeepMind, GitHub, SpecWeave, ArXiv) sobre quais perfis de agent devem existir em um flow multi-agent de desenvolvimento de software.
+> Análise completa: [`docs/plan/agent-profiles-taxonomy.md`](docs/plan/agent-profiles-taxonomy.md) — consolidação de fontes de mercado (Anthropic, OpenAI, Microsoft, Google DeepMind, GitHub, SpecWeave, ArXiv) sobre quais perfis de agent devem existir em um flow multi-agent de desenvolvimento de software.
 
 ### O que o mercado recomenda (2026)
 
@@ -260,11 +319,11 @@ flowchart TB
 
 - **Governança Global:** [`CLAUDE.md`](CLAUDE.md)
 - **Operacional:** [`.github/copilot-instructions.md`](.github/copilot-instructions.md)
-- **Catalog de Adapters + Artefatos:** [`docs/ai-context/catalog.yaml`](docs/ai-context/catalog.yaml)
+- **Catalog de Adapters + Artefatos:** [`.github/instructions/README.md`](.github/instructions/README.md)
 - **Workflows Operacionais Determinísticos (R-050):** [`.github/agents/workflows.md`](.github/agents/workflows.md)
 - **Grafo de Roteamento (R-040):** [`.github/agents/routing-graph.yaml`](.github/agents/routing-graph.yaml)
 - **Suíte de Evals:** [`.github/agents/evals/casos-roteamento.yaml`](.github/agents/evals/casos-roteamento.yaml)
-- **Cobertura de Mercado — Perfis de Agents:** [`docs/ai-context/agent-profiles-taxonomy.md`](docs/ai-context/agent-profiles-taxonomy.md)
+- **Cobertura de Mercado — Perfis de Agents:** [`docs/plan/agent-profiles-taxonomy.md`](docs/plan/agent-profiles-taxonomy.md)
 - **Plano de Melhorias Implementado:** [`docs/plan/plano-implementacao-orquestracao.md`](docs/plan/plano-implementacao-orquestracao.md)
 - **Agents Disponíveis:** `.github/agents/README.md`
 - **Skills Disponíveis:** `.github/skills/README.md`
@@ -313,8 +372,8 @@ flowchart TB
 ### Artefatos Estruturais de Orquestração
 - ✅ `.github/agents/routing-graph.yaml` — grafo de roteamento declarado (R-040): 42 nós, arestas condicionais e política de cascata rule-based→semantic→LLM; aresta reversa universal `*downstream → agent-router` (R-042)
 - ✅ `.github/agents/evals/casos-roteamento.yaml` — suíte de testes de regressão de roteamento (canônicos, ambíguos, regressão, segurança + variantes)
-- ✅ `docs/ai-context/catalog.yaml` v1.2 — seção `governance_artefacts` com os artefatos estruturais
-- ✅ `docs/ai-context/agent-profiles-taxonomy.md` — análise consolidada de mercado + gaps + recomendações
+- ✅ `.github/instructions/README.md` v1.2 — seção `governance_artefacts` com os artefatos estruturais
+- ✅ `docs/plan/agent-profiles-taxonomy.md` — análise consolidada de mercado + gaps + recomendações
 
 ### Anti Sticky-Session (R-042)
 - ✅ Todo agent downstream/specialist declara seção "Retorno ao Router" com gatilho objetivo de deriva de intenção (mudança de verbo de ação, stack fora de competência, pedido de execução em agent read-only).

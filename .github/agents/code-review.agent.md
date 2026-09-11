@@ -38,7 +38,7 @@ Você é especialista em **revisar código antes do merge** — diff, PR ou arqu
 | Item | Caminho/Uso | Observação |
 |---|---|---|
 | Skill base (taxonomia/critérios) | [`../skills/code-review-patterns/SKILL.md`](../skills/code-review-patterns/SKILL.md) | Severidade, dimensões, critérios de bloqueio, anti-padrões |
-| Catálogo de projetos/adapters | [`../../docs/ai-context/catalog.yaml`](../../docs/ai-context/catalog.yaml) | Identifica adapter de stack aplicável ao diff |
+| Catálogo de projetos/adapters | [`../instructions/README.md`](../instructions/README.md) | Identifica adapter de stack aplicável ao diff |
 | Modelo de output por perfil | [`../skills/agent-contracts/SKILL.md`](../skills/agent-contracts/SKILL.md) § 8 | Perfil Analista/Read-only |
 
 ## Decision Tree
@@ -126,7 +126,7 @@ Próximo passo mínimo:
 > Antes de invocar este agent, anexe os arquivos abaixo. Se faltar, **PEÇA o anexo** — nunca infira.
 
 - [`../skills/code-review-patterns/SKILL.md`](../skills/code-review-patterns/SKILL.md) — taxonomia, dimensões e critérios de bloqueio.
-- [`../../docs/ai-context/catalog.yaml`](../../docs/ai-context/catalog.yaml) — mapa de adapters por projeto/stack.
+- [`../instructions/README.md`](../instructions/README.md) — mapa de adapters por projeto/stack.
 - [`../skills/terminal-governance/SKILL.md`](../skills/terminal-governance/SKILL.md) — governança de execução de terminal e reporting de erros.
 - [`../skills/context-mode/SKILL.md`](../skills/context-mode/SKILL.md) — coleta indexada quando o módulo investigado for grande.
 - [`../../CLAUDE.md`](../../CLAUDE.md) — regras globais.

@@ -12,8 +12,8 @@ argument-hint: ''
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - docs/ai-context/catalog.yaml
-  - docs/ai-context/catalog.local.yaml.example
+  - .github/instructions/README.md
+  - .github/projects.local.yaml.example
   - .github/skills/terminal-governance/SKILL.md
   - .github/skills/context-mode/SKILL.md
   - .github/skills/project-scanner/SKILL.md
@@ -39,7 +39,7 @@ Inicializa contexto obrigatório de governança. Execute 1x por sessão APENAS.
 ## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
 
 - ✅ **APENAS** carregar regras globais, checar binding context e auditar telemetria/ambiente de sessão.
-- ✅ **SEMPRE** verificar a existência de `catalog.yaml` e `binding.md` (R-034).
+- ✅ **SEMPRE** verificar a existência de `.github/instructions/README.md` e `.github/projects.local.yaml.example` (R-034).
 - ❌ **NÃO** implementar código ou executar refatorações de aplicação.
 - ❌ **NÃO** repetir este comando múltiplas vezes na mesma sessão.
 
@@ -104,12 +104,12 @@ Depois, prosseguir para PASSO 2.
 
 ### **PASSO 2: Detectar Ambiente de Execução (Environment Fingerprint)**
 
-Detecta terminal(is) disponível(is), versão de Python, versão de Node.js, versão de Java/JDK e CLI do Codegraph (`@optave/codegraph`) nesta máquina — registra em `catalog.local.yaml` (gitignored, R-043) para reuso por agents downstream (`code-knowledge-graph`, `test-engineer`, `devops-engineer`, `spring-boot-engineer`, `spring-reactive-engineer`, etc.) sem repetir a detecção a cada sessão.
+Detecta terminal(is) disponível(is), versão de Python, versão de Node.js, versão de Java/JDK e CLI do Codegraph (`@optave/codegraph`) nesta máquina — registra em `projects.local.yaml` (gitignored, R-043) para reuso por agents downstream (`code-knowledge-graph`, `test-engineer`, `devops-engineer`, `spring-boot-engineer`, `spring-reactive-engineer`, etc.) sem repetir a detecção a cada sessão.
 
 > Preferir `context-mode/ctx_execute` (sandbox, Think in Code — R-008); `run_in_terminal` é fallback apenas se o MCP estiver indisponível. Nunca bloqueia a sessão — item ausente é registrado como `available: false`.
 
 **Lógica de Cache (TTL 7 dias):**
-- Se `catalog.local.yaml` já possui `environment.detected_at` com menos de 7 dias: reutilizar cache, pular detecção ativa.
+- Se `projects.local.yaml` já possui `environment.detected_at` com menos de 7 dias: reutilizar cache, pular detecção ativa.
 - Se ausente ou expirado: executar detecção completa em lote (1 execução, não 1 comando por item).
 
 **Detecção completa (comandos não-interativos, sem paginação — R-035):**
@@ -126,7 +126,7 @@ Detecta terminal(is) disponível(is), versão de Python, versão de Node.js, ver
 
 Se algum item não for encontrado ou falhar, registrar `available: false` — **nunca falhar/bloquear a sessão** por isso.
 
-**Persistir em `catalog.local.yaml`** (nova chave de topo, irmã de `projetos:`):
+**Persistir em `projects.local.yaml`** (nova chave de topo, irmã de `projetos:`):
 
 ```yaml
 environment:
@@ -211,22 +211,22 @@ Depois, prosseguir para PASSO 5.
 ### **PASSO 5: Validar Binding Context (R-034) + Overlay Local (R-043)**
 
 Verificar se estrutura de binding existe **NESTE repositório de governança**:
-- `./docs/ai-context/catalog.yaml` (compartilhado/commitado — sem projetos)
+- `./.github/instructions/README.md` (compartilhado/commitado — sem projetos)
 - `./docs/ai-context/binding.md` (compartilhado/commitado)
-- `./docs/ai-context/catalog.local.yaml` (gitignored — overlay de projetos, R-043)
+- `./.github/projects.local.yaml` (gitignored — overlay de projetos, R-043)
 
-> ⚠️ O binding context (`catalog.yaml` + `binding.md`) é **EXCLUSIVO DESTE repositório**. Projetos externos NÃO possuem e NÃO devem possuir `catalog.yaml` ou `binding.md`.
-> **Projetos são dados LOCAIS (R-043)**: vivem em `catalog.local.yaml` (gitignored) — nunca em `catalog.yaml`. Se `catalog.local.yaml` não existir, criar a partir de `catalog.local.yaml.example` (template tracked, sem dados reais) antes de prosseguir.
+> ⚠️ A infraestrutura de binding e o overlay local de projetos são **EXCLUSIVOS DESTE repositório**. Projetos externos NÃO possuem arquivos de governança.
+> **Projetos são dados LOCAIS (R-043)**: vivem em `.github/projects.local.yaml` (gitignored). Se `.github/projects.local.yaml` não existir, criar a partir de `.github/projects.local.yaml.example` (template tracked, sem dados reais) antes de prosseguir.
 
 **Ações:**
-1. Se `catalog.yaml` e `binding.md` existem: ler `catalog.yaml` (adapters/global) e `catalog.local.yaml` (se existir — projetos), mesclando em memória para o checklist final.
+1. Se `catalog.yaml` e `binding.md` existem: ler `catalog.yaml` (adapters/global) e `projects.local.yaml` (se existir — projetos), mesclando em memória para o checklist final.
 2. Se `catalog.yaml`/`binding.md` faltam: disparar agent `binding-initializer` para criação neste repositório.
-3. Se apenas `catalog.local.yaml` faltar: copiar template (`cp docs/ai-context/catalog.local.yaml.example docs/ai-context/catalog.local.yaml`) e prosseguir com 0 projetos.
+3. Se apenas `projects.local.yaml` faltar: copiar template (`cp .github/projects.local.yaml.example .github/projects.local.yaml`) e prosseguir com 0 projetos.
 
 **Linha de progresso emitida:**
 
 ```
-[5/9] Binding: ✅ catalog.yaml + binding.md presentes (<n> projetos no overlay local)
+[5/9] Binding: ✅ instructions/README.md + projects.local.yaml presentes (<n> projetos no overlay local)
 ```
 *(Se incompleto: `[5/9] Binding: ⚠️ Incompleto (faltando <arquivo>) → disparando binding-initializer`)*
 
@@ -236,7 +236,7 @@ Depois, prosseguir para PASSO 6.
 
 ### **PASSO 6: Verificar Herança de Instruções Genéricas**
 
-Para cada projeto registrado em `catalog.local.yaml` (gitignored, R-043), verificar se o campo `extends:` está configurado, conectando o projeto aos adapters genéricos disponíveis em `catalog.yaml` (compartilhado).
+Para cada projeto registrado em `projects.local.yaml` (gitignored, R-043), verificar se o campo `extends:` está configurado, conectando o projeto aos adapters genéricos disponíveis em `catalog.yaml` (compartilhado).
 
 **Se algum projeto registrado está sem `extends:`**, perguntar via `ask_questions` (por projeto):
 - **(A)** Herdar 1 adapter existente (selecionar da lista)
@@ -244,13 +244,13 @@ Para cada projeto registrado em `catalog.local.yaml` (gitignored, R-043), verifi
 - **(C)** Não herdar agora — projeto possui ou terá adapter próprio em `.github/instructions/local/`
 
 Se usuário escolhe A ou B:
-1. Exibir preview do YAML a ser adicionado ao projeto em `catalog.local.yaml` (gitignored):
+1. Exibir preview do YAML a ser adicionado ao projeto em `projects.local.yaml` (gitignored):
    ```yaml
    extends:
      - "<adapter-id>"
    ```
 2. Aguardar confirmação do usuário
-3. Atualizar `catalog.local.yaml` com o campo `extends:` no projeto correspondente — **nunca `catalog.yaml`** (R-043)
+3. Atualizar `projects.local.yaml` com o campo `extends:` no projeto correspondente — **nunca `catalog.yaml`** (R-043)
 
 **Linha de progresso emitida:**
 
@@ -264,7 +264,7 @@ Depois, prosseguir para PASSO 7.
 
 ### **PASSO 7: Verificar Deriva de Stack e Instruções dos Projetos Locais (Drift Detection)**
 
-Para cada projeto registrado em `catalog.local.yaml` (gitignored, R-043) que possua `path_externo` acessível e `adapter_local` configurado (ou arquivo de adapter em `.github/instructions/local/<projeto>.instructions.md`):
+Para cada projeto registrado em `projects.local.yaml` (gitignored, R-043) que possua `path_externo` acessível e `adapter_local` configurado (ou arquivo de adapter em `.github/instructions/local/<projeto>.instructions.md`):
 
 Verifica se houve evolução tecnológica no projeto real (ex.: upgrade de versão major de framework, migração de test runner, mudança de linguagem ou compilação) que tornou as instruções do adapter local desatualizadas ou inconsistentes com a realidade do repositório externo.
 
@@ -296,7 +296,7 @@ A verificação deve ser rápida e determinística (preferir `context-mode` sand
    - **Framework Drift**: Versão major do framework principal no manifesto real difere da documentada no adapter (ex.: Angular 20 → 21, Spring Boot 2.x → 3.x).
    - **Testing Drift**: Runner ou biblioteca de testes no manifesto real difere da documentada no adapter (ex.: Jasmine/Karma → Vitest, JUnit 4 → JUnit 5, Jest → Vitest).
    - **Language/Compiler Drift**: Versão principal de linguagem/compilador difere significativamente (ex.: TypeScript 5.4 → 5.9, Java 17 → 21).
-   - **Extends Mismatch**: O campo `extends:` em `catalog.local.yaml` herda adapters genéricos incompatíveis com a nova versão detectada.
+   - **Extends Mismatch**: O campo `extends:` em `projects.local.yaml` herda adapters genéricos incompatíveis com a nova versão detectada.
 
 #### 2. Classificação de Estado
 
@@ -318,7 +318,7 @@ Se for detectada deriva de instruções em qualquer projeto:
 2. **Perguntar ação ao usuário via `ask_questions`**:
    - **(A) Atualizar adapter local agora (Recomendado)**:
      - Sincronizar `.github/instructions/local/<projeto>.instructions.md` com a nova stack (atualizando frontmatter `detected_stack`, `detected_frameworks`, `detected_testing`, tabela de stack e seções de teste/convenções).
-     - Se aplicável, atualizar o campo `descricao` e `extends:` em `catalog.local.yaml`.
+     - Se aplicável, atualizar o campo `descricao` e `extends:` em `projects.local.yaml`.
      - Exibir preview das alterações e solicitar confirmação antes de gravar (R-009).
      - Manter confinamento estrito: alterações ocorrem EXCLUSIVAMENTE neste repositório de governança, em arquivos locais/gitignored (R-043).
    - **(B) Manter instruções atuais por enquanto**:
@@ -354,7 +354,7 @@ Depois, prosseguir para PASSO 9.
 
 ### **PASSO 9: Verificar Cache de Grafo de Conhecimento, Código e Sumarização (por Projeto)**
 
-Para cada projeto registrado em `catalog.local.yaml` (gitignored, R-043 — nunca em `catalog.yaml`), verificar se já existe cache de **grafo de conhecimento** (`@code-knowledge-graph`), de **código-fonte indexado** (`code:<project-id>`) no Context Mode:
+Para cada projeto registrado em `projects.local.yaml` (gitignored, R-043 — nunca em `catalog.yaml`), verificar se já existe cache de **grafo de conhecimento** (`@code-knowledge-graph`), de **código-fonte indexado** (`code:<project-id>`) no Context Mode:
 
 - Projetos registrados = 0 → pular verificação.
 - Projetos registrados > 0 → executar queries em lote via `ctx_batch_execute` (queries de todos os projetos no mesmo array — nunca 1 chamada por projeto, R-008):
@@ -380,10 +380,10 @@ Ação concluir `/init-context`, Copilot exibe o bloco consolidado com todos os 
 | Verificação | Status / Detalhes |
 |---|---|
 | **Diretrizes Base (PASSO 1)** | ✅ `CLAUDE.md` + `.github/copilot-instructions.md` carregados (regras normativas globais) |
-| **Ambiente (Fingerprint, PASSO 2)** | ✅ `<SO>` · Shell: `<shell>` · Python: `<versão|ausente>` · Node: `<versão|ausente>` · Java: `<versão|ausente>` · Codegraph: `<versão|ausente>` (registrado em `catalog.local.yaml`) |
+| **Ambiente (Fingerprint, PASSO 2)** | ✅ `<SO>` · Shell: `<shell>` · Python: `<versão|ausente>` · Node: `<versão|ausente>` · Java: `<versão|ausente>` · Codegraph: `<versão|ausente>` (registrado em `projects.local.yaml`) |
 | **Modelo Ativo (PASSO 3)** | ✅ `<model-atual>` (sessão ativa, R-021) |
 | **Regras Críticas (PASSO 4)** | ✅ Regras normativas globais ativas (exibição contextual: `<recorrente \| 1ª vez>`) |
-| **Binding Context (PASSO 5)** | ✅ `./docs/ai-context/` DESTE repo · `<n>` projetos no overlay local · `<n>` adapters disponíveis |
+| **Binding Context (PASSO 5)** | ✅ `./.github/` DESTE repo · `<n>` projetos no overlay local · `<n>` adapters disponíveis |
 | **Herança de Instruções (PASSO 6)** | ✅ `<n-com-extends>` configurados · `<n-sem-extends>` sem `extends:` |
 | **Instruções Locais / Drift (PASSO 7)** | ✅ `<n-sincronizados>/<n-total>` em sincronia · `<n-com-deriva>` com deriva (<deltas-se-houver>) |
 | **Context Mode Session (PASSO 8)** | ✅ Ativo · `<Total calls>` chamadas registradas (dashboard rastreável) |
@@ -403,7 +403,7 @@ Sintetiza em bullets objetivos apenas as pendências reais detectadas nos Passos
 - **[Environment]** *(se python/node ausente)*: Instale `<ferramenta>` antes de invocar agents dependentes (ex.: `test-engineer`, `devops-engineer`).
 - **[Environment]** *(se codegraph ausente)*: Instale o codegraph (`npm install -g @optave/codegraph`) para habilitar grafo de conhecimento em `/add-project-context` e `@code-knowledge-graph`.
 - **[Model]** *(se recomendável)*: Ajuste o modelo da sessão conforme a complexidade da tarefa (R-021).
-- **[Binding]** *(se incompleto)*: Execute `binding-initializer` — `catalog.yaml`/`binding.md` ausentes (R-034).
+- **[Binding]** *(se incompleto)*: Execute `binding-initializer` — instructions/README.md ou projects.local.yaml.example ausentes (R-034).
 - **[Extends]** *(se houver projeto sem extends)*: Configure herança em `<n>` projeto(s) pendente(s) — PASSO 6.
 - **[Drift/Instruções]** *(se houver projeto com deriva)*: Atualize o adapter local de `<projeto>` via `adapter-generator` ou re-sincronização — detectada evolução de stack (ex.: framework ou runner de testes atualizados) — PASSO 7.
 - **[Cache]** *(se houver projeto sem grafo)*: Considere `@code-knowledge-graph` para `<projeto(s)>` antes de análises profundas.
@@ -422,7 +422,7 @@ Sintetiza em bullets objetivos apenas as pendências reais detectadas nos Passos
 ## 🔄 Combina Com (Encadeamento)
 
 - **`@agent-router`**: Próximo passo obrigatório para toda solicitação downstream (R-037 — Agent Router First).
-- **`/add-project-context <caminho>`**: Para vincular projetos externos no overlay local (`catalog.local.yaml`, R-043).
+- **`/add-project-context <caminho>`**: Para vincular projetos externos no overlay local (`projects.local.yaml`, R-043).
 - **`/health`**: Para auditar a saúde da governança e validar conformidade.
 
 ---
@@ -446,13 +446,13 @@ Invoque `/init-context` **manualmente** em caso de:
 | Problema | Causa | Solução |
 |----------|-------|---------|
 | "Arquivo não anexado" | Pre-fetch falhou | Copilot carrega manualmente via `read_file` |
-| "Binding context ausente" | `catalog.yaml` ou `binding.md` faltando | Disparar `binding-initializer` automaticamente |
+| "Binding context ausente" | `.github/instructions/README.md` ou `.github/projects.local.yaml.example` faltando | Disparar `binding-initializer` automaticamente |
 | "Copilot não respeita regras após" | Regras não foram relevantes no downstream | Reexecutar `/init-context` ou ativar diagnostics com `/ctx-doctor` |
 | "Python/Node não encontrado" | Ferramenta não instalada ou fora do PATH | Normal — registrado como `available: false`, não bloqueia a sessão; instalar se necessário para o agent alvo |
 | "Path de Python existe mas `--version` falha" | Alias quebrado (ex.: stub da Microsoft Store apontando para instalação removida) | Detecção deve tentar o próximo candidato (`python3`, `py`) — nunca considerar `available: true` só pela existência do path |
 | "Java não encontrado / JAVA_HOME vazio" | JDK não instalado ou não configurado no PATH | Normal — registrado como `available: false`; relevante apenas antes de invocar `spring-boot-engineer`/`spring-reactive-engineer` |
 | "Codegraph CLI não encontrado" | `@optave/codegraph` não instalado globalmente | Normal — registrado como `available: false`; executar `npm install -g @optave/codegraph` antes de `/add-project-context` |
-| "Deriva de stack no adapter local" | Projeto externo evoluiu versão de framework (ex.: Angular 20→21) ou runner de testes (Jasmine→Vitest) | Atualizar .github/instructions/local/<projeto>.instructions.md e catalog.local.yaml via re-sincronização ou adapter-generator com overwrite confirmado |
+| "Deriva de stack no adapter local" | Projeto externo evoluiu versão de framework (ex.: Angular 20→21) ou runner de testes (Jasmine→Vitest) | Atualizar .github/instructions/local/<projeto>.instructions.md e projects.local.yaml via re-sincronização ou adapter-generator com overwrite confirmado |
 
 ---
 

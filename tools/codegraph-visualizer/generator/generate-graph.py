@@ -93,7 +93,9 @@ def load_catalog_projects(workspace_root: Path, custom_catalog_path: Optional[st
         projects_raw.extend(data.get("projetos", []))
     else:
         # Prioridade 1: catalog.local.yaml (overlay local, gitignored, R-043)
-        catalog_local_path = workspace_root / "docs" / "ai-context" / "catalog.local.yaml"
+        catalog_local_path = workspace_root / ".github" / "projects.local.yaml"
+        if not catalog_local_path.exists():
+            catalog_local_path = workspace_root / "docs" / "ai-context" / "catalog.local.yaml"
         if catalog_local_path.exists():
             data = load_yaml_file(catalog_local_path)
             for p in data.get("projetos", []):

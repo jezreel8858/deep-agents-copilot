@@ -129,7 +129,7 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 
 | Campo | Conteúdo |
 |---|---|
-| Sintoma | Arquivo commitado sob `.github/**` (exceto `local/`), `CLAUDE.md` ou `docs/ai-context/catalog.yaml` contém nome de repositório/classe/método/pacote/namespace/caminho de arquivo REAL derivado de análise de projeto do usuário (típico de agents analíticos como `code-knowledge-graph`, `business-rules-extractor`, `context-builder`, `project-scanner`) |
+| Sintoma | Arquivo commitado sob `.github/**` (exceto `local/`), `CLAUDE.md` ou `.github/instructions/README.md` contém nome de repositório/classe/método/pacote/namespace/caminho de arquivo REAL derivado de análise de projeto do usuário (típico de agents analíticos como `code-knowledge-graph`, `business-rules-extractor`, `context-builder`, `project-scanner`) |
 | Como detectar | `grep_search` por padrões de caminho absoluto (`[A-Za-z]:\\`, `/home/`, `/Users/`) e por identificadores específicos nos arquivos de governança; comparar com checklist de R-044 |
 | Origem (TrustAgent) | Intrínseco — agent confunde evidência efêmera da conversa com evidência persistível em arquivo compartilhado |
 | Severidade | **Bloqueador** (risco de privacidade e contaminação de workspace) |

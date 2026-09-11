@@ -90,7 +90,7 @@ Prompts operacionais para workflow de execução no chat.
 
 - [ ] **Primeira coisa:** Executou `/init-context` na sessão?
 - [ ] **Para cada projeto:** Executou `/add-project-context <projeto>`?
-- [ ] **catalog.yaml sincronizado:** Verificou se projeto está em `docs/ai-context/catalog.yaml`?
+- [ ] **catalog.yaml sincronizado:** Verificou se projeto está em `.github/instructions/README.md`?
 - [ ] **Pronto para agentes:** Pode agora usar `@agent-router` com contexto completo?
 
 Se **TODOS SIM**: ✅ Você está usando corretamente!

@@ -39,7 +39,7 @@ Você é especialista em **elicitação e estruturação de requisitos** — tra
 | Item | Caminho/Uso | Observação |
 |---|---|---|
 | Skill base (taxonomia/EARS/INVEST) | [`../skills/requirements-engineering-patterns/SKILL.md`](../skills/requirements-engineering-patterns/SKILL.md) | Qualidade de requisito, notação, anti-solution-jumping |
-| Catálogo de projetos/adapters | [`../../docs/ai-context/catalog.yaml`](../../docs/ai-context/catalog.yaml) | Contexto de domínio/stack do pedido |
+| Catálogo de projetos/adapters | [`../instructions/README.md`](../instructions/README.md) | Contexto de domínio/stack do pedido |
 | Modelo de output por perfil | [`../skills/agent-contracts/SKILL.md`](../skills/agent-contracts/SKILL.md) § 8 | Perfil Operacional (produz `.md`) |
 | Extração reversa de regra | [`business-rules-extractor.agent.md`](business-rules-extractor.agent.md) | Não confundir — opera em código existente, não requisito novo |
 

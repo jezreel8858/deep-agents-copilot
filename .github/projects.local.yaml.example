@@ -7,7 +7,7 @@
 # ser commitado — vive apenas na máquina de cada desenvolvedor.
 #
 # SETUP (uma vez por clone/máquina):
-#   cp docs/ai-context/catalog.local.yaml.example docs/ai-context/catalog.local.yaml
+#   cp .github/projects.local.yaml.example .github/projects.local.yaml
 #
 # Depois disso, use normalmente:
 #   /add-project-context <caminho-absoluto-do-projeto>   → escreve aqui (catalog.local.yaml)

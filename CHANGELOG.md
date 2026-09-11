@@ -6,6 +6,20 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.7.0] — 2026-09-11
+
+### Refatorado & Simplificado
+- **Coesão em `.github/` — Simplificação Arquitetural e Desacoplamento Definitivo (Cenário 2)**:
+  - **Extinção de `docs/ai-context/catalog.yaml` e `docs/ai-context/binding.md`**: Eliminação de manifestos intermediários redundantes. Os adapters genéricos agora são 100% autodeclaratórios via frontmatter YAML nativo `applyTo` nos próprios arquivos `.instructions.md`, lidos diretamente pelo GitHub Copilot e demais IDEs.
+  - **Catálogo Único de Agents (`.github/agents/catalog.yaml`)**: Fim da colisão de nomes. O repositório passa a ter estritamente **um** arquivo `catalog.yaml`, eliminando a necessidade de desambiguações em prompts e no `repo-map.md`.
+  - **Migração do Overlay Local de Projetos**: Substituição de `docs/ai-context/catalog.local.yaml` por `.github/projects.local.yaml` (gitignored, R-043) e de seu template rastreado para `.github/projects.local.yaml.example`.
+  - **SSOT de Binding Consolidado (`.github/instructions/README.md`)**: O índice de instructions absorveu formalmente todas as definições da hierarquia de 3 camadas (Global $\rightarrow$ Stack $\rightarrow$ Projeto), discovery de IDEs e ciclo de vida de projetos locais.
+  - **Extinção do `repo-map.md` e Consolidação Nativa**: O arquivo `repo-map.md` foi integralmente absorvido e extinto. A árvore física oficial do repositório foi incorporada ao `README.md` raiz (para humanos) e os caminhos canônicos consolidados na seção 7 de `CLAUDE.md` e `.github/copilot-instructions.md` (para IAs), eliminando mais um ponto de manutenção e duplicação.
+  - **Remoção Completa do Diretório `docs/ai-context/`**: Diretório extinto por completo, concentrando toda a configuração e governança de IA sob `.github/`.
+  - **Sincronização em Cascata (R-015/R-043/R-046)**: Atualização atômica de `.gitignore`, `.githooks/pre-commit`, `CLAUDE.md` (R-034 e R-043), `.github/copilot-instructions.md`, todos os agents e prompts operacionais, scripts de tooling e suíte de testes (`test_local_project_isolation.py`, `test_governance_smells.py`, `test_routing_quality_gate.py`), mantendo 100% de conformidade e 89/89 testes aprovados no pytest.
+
+---
+
 ## [2.6.2] — 2026-09-11
 
 ### Adicionado

@@ -1,9 +1,9 @@
 ---
 name: del-project-context
 description:
-  Remove contexto estruturado de um projeto do overlay local (catalog.local.yaml,
+  Remove contexto estruturado de um projeto do overlay local (projects.local.yaml,
   gitignored — R-043) e do cache Context Mode. Operação destrutiva com validação
-  prévia, confirmação e rollback via Git. NUNCA toca docs/ai-context/catalog.yaml
+  prévia, confirmação e rollback via Git. NUNCA toca .github/agents/catalog.yaml
   (compartilhado/commitado).
 agent: 'agent'
 model: "Gemini 3.8 Flash"
@@ -11,13 +11,13 @@ tools: ['read_file', 'insert_edit_into_file', 'file_search', 'list_dir', 'ask_qu
 argument-hint: '<nome-do-projeto>'
 source_docs:
   - CLAUDE.md
-  - docs/ai-context/catalog.local.yaml.example
+  - .github/projects.local.yaml.example
   - .github/instructions/README.md
 ---
 
 # `/del-project-context`
 
-> **Propósito**: Remover o registro de um projeto no overlay local `catalog.local.yaml` e seu adapter em `.github/instructions/local/`.
+> **Propósito**: Remover o registro de um projeto no overlay local `projects.local.yaml` e seu adapter em `.github/instructions/local/`.
 > **Workspace**: `${workspaceFolder}`
 > **Projeto Alvo**: `${input:nomeDoProjeto}`
 
@@ -25,26 +25,26 @@ source_docs:
 
 ## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
 
-- ✅ **APENAS** remover o projeto especificado de `catalog.local.yaml` e deletar seu adapter correspondente em `.github/instructions/local/`.
+- ✅ **APENAS** remover o projeto especificado de `projects.local.yaml` e deletar seu adapter correspondente em `.github/instructions/local/`.
 - ✅ **SEMPRE** solicitar confirmação humana explícita antes de executar a exclusão.
-- ❌ **NÃO** tocar em `docs/ai-context/catalog.yaml` (compartilhado/commitado, R-043).
+- ❌ **NÃO** tocar em `.github/agents/catalog.yaml` (compartilhado/commitado, R-043).
 - ❌ **NÃO** excluir código-fonte ou diretórios do projeto real externo.
 
 ---
 
 workflow:
   1: "User fornece nome do projeto"
-  2: "Agent valida existência em catalog.local.yaml (gitignored, R-043)"
+  2: "Agent valida existência em projects.local.yaml (gitignored, R-043)"
   3: "Agent lista artefatos a remover (YAML entry + arquivo .instructions.md em local/)"
   4: "Agent pede confirmação explícita"
-  5: "Se confirmado: Atualiza catalog.local.yaml + valida YAML + registra em audit.log"
+  5: "Se confirmado: Atualiza projects.local.yaml + valida YAML + registra em audit.log"
 
 constraints:
   - "Operação destrutiva — exigir confirmação explícita"
   - "Validar YAML imediatamente após alteração"
   - "NÃO remove adapters globais nem código-fonte"
   - "NÃO usa rm ou operações shell destrutivas — Python via project-context-builder"
-  - "NUNCA edita docs/ai-context/catalog.yaml (compartilhado/commitado) — R-043"
+  - "NUNCA edita .github/agents/catalog.yaml (compartilhado/commitado) — R-043"
   - "Registrar ação em audit.log"
 ---
 
@@ -52,14 +52,14 @@ constraints:
 
 ## Visão Geral
 
-Remove um projeto do overlay local (`docs/ai-context/catalog.local.yaml`, gitignored) e do
+Remove um projeto do overlay local (`.github/projects.local.yaml`, gitignored) e do
 armazenamento de instruções locais (`.github/instructions/local/`) — **todos os artefatos
 são NESTE repositório de governança, porém LOCAIS/gitignored (R-043)**. Reversível via Git
 (arquivo local) ou recriação via `/add-project-context`.
 
 > ⚠️  Esta operação modifica APENAS artefatos locais/gitignored deste repositório.
 >     O repositório externo do projeto removido NÃO é tocado.
->     `docs/ai-context/catalog.yaml` (compartilhado/commitado) NUNCA é tocado.
+>     `.github/agents/catalog.yaml` (compartilhado/commitado) NUNCA é tocado.
 
 ## Uso
 
@@ -77,7 +77,7 @@ são NESTE repositório de governança, porém LOCAIS/gitignored (R-043)**. Reve
 
 | Alvo | Ação | Observação |
 |------|------|-----------|
-| `./docs/ai-context/catalog.local.yaml` | Remove entrada YAML do projeto | Sintaticamente validado; gitignored |
+| `./.github/projects.local.yaml` | Remove entrada YAML do projeto | Sintaticamente validado; gitignored |
 | `./.github/instructions/local/<projeto>.instructions.md` | Deleta arquivo de instruções | Específico do projeto; gitignored |
 | Context Mode Cache (FTS5) | Invalida índice + snapshot | TTL reset (24h) |
 
@@ -86,7 +86,7 @@ são NESTE repositório de governança, porém LOCAIS/gitignored (R-043)**. Reve
 - ✗ Repositório Git / código-fonte do projeto externo
 - ✗ Qualquer arquivo dentro do projeto externo
 - ✗ Adapters genéricos já existentes em `.github/instructions/` (raiz, compartilhados)
-- ✗ `docs/ai-context/catalog.yaml` (compartilhado/commitado) — nunca teve entrada de projeto (R-043)
+- ✗ `.github/agents/catalog.yaml` (compartilhado/commitado) — nunca teve entrada de projeto (R-043)
 - ✗ Regras em `CLAUDE.md` (governança global)
 - ✗ Documentação em `docs/` (preservada)
 
@@ -95,11 +95,11 @@ são NESTE repositório de governança, porém LOCAIS/gitignored (R-043)**. Reve
 ```
 /del-project-context meu-projeto-backend
 
-[1] Validar existência em catalog.local.yaml (gitignored)  ✓
+[1] Validar existência em projects.local.yaml (gitignored)  ✓
 [2] Listar artefatos a remover                          ✓
 [3] Pedir confirmação explícita (sim/não)               → User
 [4] Se sim:
-    ├─ Atualizar catalog.local.yaml (remove entrada YAML)
+    ├─ Atualizar projects.local.yaml (remove entrada YAML)
     ├─ Validar YAML com yamllint                        [fallback: abortar + Git checkout]
     ├─ Deletar .github/instructions/local/<projeto>.instructions.md
     └─ Registrar em audit.log
@@ -108,16 +108,16 @@ são NESTE repositório de governança, porém LOCAIS/gitignored (R-043)**. Reve
 
 ## Validação de YAML (Obrigatória)
 
-Após qualquer alteração em `catalog.local.yaml`:
+Após qualquer alteração em `projects.local.yaml`:
 
 **Python (recomendado)**
 ```bash
-python -c "import yaml; yaml.safe_load(open('docs/ai-context/catalog.local.yaml')); print('✅ Válido')" || echo "❌ Erro"
+python -c "import yaml; yaml.safe_load(open('.github/projects.local.yaml')); print('✅ Válido')" || echo "❌ Erro"
 ```
 
 **yamllint**
 ```bash
-yamllint docs/ai-context/catalog.local.yaml
+yamllint .github/projects.local.yaml
 ```
 
 Erros comuns:
@@ -142,7 +142,7 @@ Erros comuns:
 Se remover por engano:
 
 ```bash
-# Recuperar via Git (só funciona se catalog.local.yaml estiver sob controle de versão local
+# Recuperar via Git (só funciona se projects.local.yaml estiver sob controle de versão local
 # customizado pelo dev — por padrão é gitignored, então a via normal de recuperação é recriar):
 /add-project-context <caminho-absoluto-do-projeto>
 ```
@@ -151,7 +151,7 @@ Se remover por engano:
 
 | Cenário | Ação |
 |---|---|
-| Project não encontrado em catalog.local.yaml | Abortar com mensagem clara |
+| Project não encontrado em projects.local.yaml | Abortar com mensagem clara |
 | YAML inválido após remoção | Reverter com Git checkout (se local.yaml estiver versionado) ou recriar manualmente + report |
 | Confirmação não fornecida | Aguardar entrada do user |
 

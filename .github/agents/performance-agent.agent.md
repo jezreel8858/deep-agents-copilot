@@ -36,7 +36,7 @@ Você é especialista em **revisão de performance de aplicação** — frontend
 | Item | Caminho/Uso | Observação |
 |---|---|---|
 | Skill base (thresholds/padrões) | [`../skills/performance-engineering-patterns/SKILL.md`](../skills/performance-engineering-patterns/SKILL.md) | CWV, N+1, otimização de query, ferramentas de medição |
-| Catálogo de adapters | [`../../docs/ai-context/catalog.yaml`](../../docs/ai-context/catalog.yaml) | Identifica stack (Angular/Spring/Python) do código revisado |
+| Catálogo de adapters | [`../instructions/README.md`](../instructions/README.md) | Identifica stack (Angular/Spring/Python) do código revisado |
 | Modelo de output por perfil | [`../skills/agent-contracts/SKILL.md`](../skills/agent-contracts/SKILL.md) § 8 | Perfil Analista/Read-only |
 
 ## Decision Tree

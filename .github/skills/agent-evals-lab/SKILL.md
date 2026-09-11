@@ -270,14 +270,14 @@ Estrutura do arquivo:
 - `regressao` — 5 casos com threshold 1.00 (bugs históricos de roteamento nunca devem regredir)
 - `seguranca` — 4 casos de guardrail (prompt injection, commit autônomo, instalação, system prompt)
 
-**Regra de manutenção** (análoga ao R-015): qualquer PR que altere `agent-router.agent.md` ou `docs/ai-context/routing-graph.yaml` **deve** atualizar o arquivo de casos na mesma entrega.
+**Regra de manutenção** (análoga ao R-015): qualquer PR que altere `agent-router.agent.md` ou `.github/agents/routing-graph.yaml` **deve** atualizar o arquivo de casos na mesma entrega.
 
 **Integração com CI** (conforme seção `execucao` do arquivo):
 ```yaml
 # Gatilho sugerido para pipeline
 on_change:
   - ".github/agents/agent-router.agent.md"
-  - "docs/ai-context/routing-graph.yaml"
+  - ".github/agents/routing-graph.yaml"
 run: pytest tests/evals/ --tb=short  # usando casos-roteamento.yaml como dataset
 ```
 

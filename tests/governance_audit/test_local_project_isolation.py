@@ -4,9 +4,10 @@ as regras de isolamento e anonimização de projetos locais (R-038, R-043 e R-04
 
 Garante que:
 1. Nenhum arquivo rastreado no repositório faz referência a projetos locais/externos privados.
-2. As regras de gitignore para catalog.local.yaml e .github/instructions/local/ são rigorosamente respeitadas (R-043).
+2. As regras de gitignore para .github/projects.local.yaml e .github/instructions/local/ são rigorosamente respeitadas (R-043).
 3. Caminhos absolutos de máquina local ou IDs de usuário reais nunca vazam para arquivos versionados.
-4. O catalog.yaml compartilhado permanece 100% desacoplado de instâncias de projetos locais.
+4. O catálogo de agents (.github/agents/catalog.yaml) permanece 100% desacoplado de instâncias de projetos locais.
+5. docs/ai-context/catalog.yaml foi extinto em favor da arquitetura limpa (Cenário 2).
 """
 from __future__ import annotations
 
@@ -30,11 +31,14 @@ def get_git_tracked_files() -> list[Path]:
 
 
 def get_forbidden_project_identifiers() -> set[str]:
-    """Coleta dinamicamente todos os IDs e nomes de projetos locais externos registrados em catalog.local.yaml."""
+    """Coleta dinamicamente todos os IDs e nomes de projetos locais externos registrados em projects.local.yaml."""
     forbidden = set()
 
-    # Lê dinamicamente o catálogo local da máquina do desenvolvedor (R-043)
-    catalog_local = REPO_ROOT / "docs" / "ai-context" / "catalog.local.yaml"
+    # Lê dinamicamente o overlay local da máquina do desenvolvedor (R-043)
+    catalog_local = REPO_ROOT / ".github" / "projects.local.yaml"
+    if not catalog_local.exists():
+        catalog_local = REPO_ROOT / "docs" / "ai-context" / "catalog.local.yaml"
+
     if catalog_local.exists():
         try:
             data = yaml.safe_load(catalog_local.read_text(encoding="utf-8")) or {}
@@ -89,25 +93,25 @@ def test_no_local_projects_referenced_in_git_tracked_files():
 # ─────────────────────────────────────────────────────────────
 
 def test_r043_gitignore_isolation_rules():
-    """Valida R-043: catalog.local.yaml e .github/instructions/local/ devem estar no .gitignore e não rastreados."""
+    """Valida R-043: .github/projects.local.yaml e .github/instructions/local/ devem estar no .gitignore e não rastreados."""
     gitignore_path = REPO_ROOT / ".gitignore"
     assert gitignore_path.exists(), ".gitignore deve existir na raiz do repositório"
 
     gitignore_content = gitignore_path.read_text(encoding="utf-8")
-    assert "docs/ai-context/catalog.local.yaml" in gitignore_content, (
-        ".gitignore deve ignorar 'docs/ai-context/catalog.local.yaml' (R-043)"
+    assert ".github/projects.local.yaml" in gitignore_content, (
+        ".gitignore deve ignorar '.github/projects.local.yaml' (R-043)"
     )
     assert ".github/instructions/local/" in gitignore_content, (
         ".gitignore deve ignorar '.github/instructions/local/' (R-043)"
     )
 
-    # Valida que nenhum arquivo em local/ ou catalog.local.yaml está rastreado no git
+    # Valida que nenhum arquivo em local/ ou projects.local.yaml está rastreado no git
     p_catalog = subprocess.run(
-        ["git", "ls-files", "docs/ai-context/catalog.local.yaml"],
+        ["git", "ls-files", ".github/projects.local.yaml"],
         cwd=REPO_ROOT, capture_output=True, text=True, encoding="utf-8"
     )
     assert not p_catalog.stdout.strip(), (
-        "docs/ai-context/catalog.local.yaml NUNCA deve ser rastreado pelo git (violação R-043)"
+        ".github/projects.local.yaml NUNCA deve ser rastreado pelo git (violação R-043)"
     )
 
     p_local_instructions = subprocess.run(
@@ -143,12 +147,10 @@ def test_no_machine_specific_paths_in_tracked_files():
         lines = fpath.read_text(encoding="utf-8", errors="ignore").splitlines()
 
         for idx, line in enumerate(lines, 1):
-            # Ignora linhas que documentam o próprio padrão / regra / exemplos educativos de genericização
             line_lower = line.lower()
             if any(term in line_lower for term in ["regex", "padrao", "placeholder", "removidos", "exemplo ilustrativo", "exemplos ilustrativos", "pre-commit"]):
                 continue
 
-            # Checa caminhos de usuário reais
             if user_id_pattern.search(line):
                 leaks.append(f"[{rel_path}:{idx}] Caminho de usuário real de máquina: {line.strip()}")
 
@@ -159,25 +161,35 @@ def test_no_machine_specific_paths_in_tracked_files():
 
 
 # ─────────────────────────────────────────────────────────────
-# 4. Desacoplamento SSOT do catalog.yaml (R-043)
+# 4. Desacoplamento SSOT e Catálogo Único (Cenário 2 & R-043)
 # ─────────────────────────────────────────────────────────────
 
-def test_catalog_yaml_contains_zero_projects():
-    """Valida R-043: catalog.yaml compartilhado NUNCA deve conter o bloco 'projetos:' nem 'path_externo:'."""
-    catalog_shared = REPO_ROOT / "docs" / "ai-context" / "catalog.yaml"
-    assert catalog_shared.exists(), "docs/ai-context/catalog.yaml deve existir"
+def test_unique_catalog_and_zero_projects_in_shared_files():
+    """Valida Cenário 2: .github/agents/catalog.yaml é o único catalog.yaml e não contém projetos."""
+    # Valida que o antigo catalog.yaml em docs/ai-context foi extinto
+    assert not (REPO_ROOT / "docs" / "ai-context" / "catalog.yaml").exists(), (
+        "docs/ai-context/catalog.yaml deve ser extinto (Cenário 2 — Coesão em .github/)"
+    )
+
+    # Valida que .github/agents/catalog.yaml é o catálogo único de agents
+    catalog_shared = REPO_ROOT / ".github" / "agents" / "catalog.yaml"
+    assert catalog_shared.exists(), ".github/agents/catalog.yaml deve existir como catálogo único"
 
     content = catalog_shared.read_text(encoding="utf-8")
     data = yaml.safe_load(content) or {}
 
     assert "projetos" not in data, (
-        "docs/ai-context/catalog.yaml NÃO pode conter a chave 'projetos:'. "
-        "Projetos devem ser declarados exclusivamente em catalog.local.yaml (R-043)."
+        ".github/agents/catalog.yaml NÃO pode conter a chave 'projetos:'. "
+        "Projetos devem ser declarados exclusivamente em .github/projects.local.yaml (R-043)."
     )
 
     assert "path_externo" not in content, (
-        "docs/ai-context/catalog.yaml NÃO pode conter 'path_externo:' (R-043)."
+        ".github/agents/catalog.yaml NÃO pode conter 'path_externo:' (R-043)."
     )
+
+    # Valida que o template tracked de projetos existe
+    template_tracked = REPO_ROOT / ".github" / "projects.local.yaml.example"
+    assert template_tracked.exists(), ".github/projects.local.yaml.example deve existir como template rastreado"
 
 
 # ─────────────────────────────────────────────────────────────
@@ -200,4 +212,3 @@ def test_generic_placeholders_in_workflow_and_router():
     assert handoff_skill.exists()
     content_handoff = handoff_skill.read_text(encoding="utf-8")
     assert "[PROJETO-ALVO]" in content_handoff, "handoff-governance/SKILL.md deve usar o placeholder genérico [PROJETO-ALVO]"
-

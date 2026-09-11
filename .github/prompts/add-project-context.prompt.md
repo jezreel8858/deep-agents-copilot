@@ -15,7 +15,7 @@ source_docs:
   - .github/skills/terminal-governance/SKILL.md
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - docs/ai-context/catalog.local.yaml.example
+  - .github/projects.local.yaml.example
 ---
 
 # `/add-project-context`
@@ -43,7 +43,7 @@ Auto-carregar contexto estruturado de um projeto com Intent Classification + Mul
 ## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
 
 - ✅ **APENAS** analisar o projeto externo indicado em modo read-only e gerar o adapter local em `.github/instructions/local/`.
-- ✅ **SEMPRE** atualizar o overlay local `catalog.local.yaml` (gitignored, R-043) — **nunca** `catalog.yaml`.
+- ✅ **SEMPRE** atualizar o overlay local `projects.local.yaml` (gitignored, R-043) — **nunca** `catalog.yaml`.
 - ❌ **NÃO** modificar nenhum arquivo dentro do projeto externo escaneado.
 - ❌ **NÃO** commitar caminhos de arquivos locais ou segredos no repositório de governança (R-044).
 
@@ -61,8 +61,8 @@ Auto-carregar contexto estruturado de um projeto com Intent Classification + Mul
 │  Todos os artefatos criados ficam NESTE repositório.         │
 │  Projeto/adapter gerados são LOCAIS — NUNCA commitados.       │
 │                                                              │
-│  ✅ CRIA/ATUALIZA: ./docs/ai-context/catalog.local.yaml      │
-│                    (gitignored — NUNCA docs/ai-context/catalog.yaml) │
+│  ✅ CRIA/ATUALIZA: ./.github/projects.local.yaml      │
+│                    (gitignored — NUNCA .github/instructions/README.md) │
 │  ✅ CRIA EM: ./.github/instructions/local/<projeto>.instructions.md  │
 │              (gitignored — NUNCA raiz ./.github/instructions/)      │
 │                                                              │
@@ -76,8 +76,8 @@ Auto-carregar contexto estruturado de um projeto com Intent Classification + Mul
 > **Por quê (R-043)**: `catalog.yaml` e `.github/instructions/*.instructions.md` (raiz) são commitados e
 > compartilhados. Se projetos locais fossem gravados ali, um `git commit`/`git push` de rotina poderia
 > subir acidentalmente nomes/caminhos de projetos privados para o repositório de governança compartilhado.
-> A solução: overlay local — `catalog.local.yaml` + `.github/instructions/local/` — ambos gitignored,
-> nunca tocados por `git add`. Leitura sempre faz merge em memória (`catalog.yaml` + `catalog.local.yaml`);
+> A solução: overlay local — `projects.local.yaml` + `.github/instructions/local/` — ambos gitignored,
+> nunca tocados por `git add`. Leitura sempre faz merge em memória (`catalog.yaml` + `projects.local.yaml`);
 > escrita NUNCA toca o arquivo/pasta compartilhado.
 
 ---
@@ -97,24 +97,24 @@ Este prompt carrega automaticamente (conforme frontmatter `source_docs`):
 **ANTES de iniciar**, o Copilot VERIFICA **neste repositório de governança**:
 
 ```
-✓ Existe: ./docs/ai-context/catalog.yaml?
-✓ Existe: ./docs/ai-context/binding.md?
-✓ Existe: ./docs/ai-context/catalog.local.yaml?  (overlay local, gitignored — R-043)
+✓ Existe: ./.github/instructions/README.md?
+✓ Existe: ./.github/instructions/README.md?
+✓ Existe: ./.github/projects.local.yaml?  (overlay local, gitignored — R-043)
 ```
 
 **Se `catalog.yaml` ou `binding.md` FALTAREM**:
 ```
 ⚠️ Binding context não detectado!
 
-Este repositório de governança não possui docs/ai-context/catalog.yaml ou binding.md.
+Este repositório de governança não possui .github/instructions/README.md ou .github/projects.local.yaml.example.
 → Interromper `/add-project-context`
 → Disparar agent `binding-initializer` para criá-los NESTE repositório
 ```
 
-**Se `catalog.local.yaml` FALTAR** (primeira vez nesta máquina/clone):
+**Se `projects.local.yaml` FALTAR** (primeira vez nesta máquina/clone):
 ```
 ℹ️ Overlay local não encontrado — criando a partir do template.
-→ cp docs/ai-context/catalog.local.yaml.example docs/ai-context/catalog.local.yaml
+→ cp .github/projects.local.yaml.example .github/projects.local.yaml
 → Prosseguindo normalmente (este arquivo é gitignored — nunca será commitado)
 ```
 
@@ -205,7 +205,7 @@ Não reexecutar o scanner — usar diretamente o `project_profile` já obtido vi
 
 #### 2.4 Gerar Artefatos (NESTE repositório de governança — LOCAIS, gitignored, R-043)
 
-- **novo_projeto.yaml** (entry para `catalog.local.yaml` — NUNCA `catalog.yaml`, escrito pelo próprio prompt na FASE 3, não pelo agent):
+- **novo_projeto.yaml** (entry para `projects.local.yaml` — NUNCA `catalog.yaml`, escrito pelo próprio prompt na FASE 3, não pelo agent):
   ```yaml
   artefato: "projeto"
   nome: "<Q1>"
@@ -223,7 +223,7 @@ Não reexecutar o scanner — usar diretamente o `project_profile` já obtido vi
     description: "Gerar adapter para novo projeto <Q1>",
     task: "modo=generate-one, nome=<Q1>, path_externo=<caminho-absoluto-do-projeto-externo>,
            stack_detectado=<project_profile da FASE 1>. Criar SOMENTE o arquivo
-           .github/instructions/local/<Q1>.instructions.md — não tocar catalog.local.yaml
+           .github/instructions/local/<Q1>.instructions.md — não tocar projects.local.yaml
            (isso é responsabilidade deste prompt, na FASE 3)."
   )
   ```
@@ -252,43 +252,43 @@ O Copilot aplica mudanças **atomicamente por plano validado** (sem depender de 
 - ✅ Preview aprovado pelo usuário
 
 **Execução (somente neste repositório, artefatos LOCAIS/gitignored — R-043)**:
-1. **Validar**: schema YAML, kebab-case, sem duplicatas em `catalog.local.yaml`; adapter (se aplicável) já criado pelo agent na FASE 2.4 com sucesso
-2. **Planejar**: 2–3 operações — este prompt só cuida de `catalog.local.yaml` + READMEs; o adapter já foi criado pelo agent
+1. **Validar**: schema YAML, kebab-case, sem duplicatas em `projects.local.yaml`; adapter (se aplicável) já criado pelo agent na FASE 2.4 com sucesso
+2. **Planejar**: 2–3 operações — este prompt só cuida de `projects.local.yaml` + READMEs; o adapter já foi criado pelo agent
 3. **Preview**: arquivos a serem modificados → "Proceder? (y/n)"
 4. **Executar** (se confirmado):
    - Backup automático de arquivos
-   - [CREATE-SE-AUSENTE] `docs/ai-context/catalog.local.yaml` ← copiar de `catalog.local.yaml.example` se ainda não existir
-   - [UPDATE] `docs/ai-context/catalog.local.yaml` ← NESTE repo, gitignored (NUNCA `catalog.yaml`) — próprio prompt, não o agent
-   - [UPDATE] `docs/ai-context/README.md` ← NESTE repo (referência, sem dado de projeto real)
+   - [CREATE-SE-AUSENTE] `.github/projects.local.yaml` ← copiar de `projects.local.yaml.example` se ainda não existir
+   - [UPDATE] `.github/projects.local.yaml` ← NESTE repo, gitignored (NUNCA `catalog.yaml`) — próprio prompt, não o agent
+   - [UPDATE] `.github/instructions/README.md` ← NESTE repo (referência, sem dado de projeto real)
    - [UPDATE] `.github/instructions/README.md` ← NESTE repo (referência, sem dado de projeto real)
    - ❌ Nenhuma operação no projeto externo
-   - ❌ Nenhuma operação em `docs/ai-context/catalog.yaml` (compartilhado/commitado)
-5. **Validar pós**: YAML válido, entrada presente em `catalog.local.yaml`; arquivo do adapter (se aplicável) existe em `.github/instructions/local/`
+   - ❌ Nenhuma operação em `.github/instructions/README.md` (compartilhado/commitado)
+5. **Validar pós**: YAML válido, entrada presente em `projects.local.yaml`; arquivo do adapter (se aplicável) existe em `.github/instructions/local/`
 6. **Atomicidade**: Qualquer erro → abortar operação e reaplicar estado anterior por patch reverso
 
 **Saída esperada**:
 ```
 ✅ Artefato validado: projeto
 ✅ [FASE 2.4 — via adapter-generator] .github/instructions/local/<nome>.instructions.md  ← gitignored, NESTE repo
-✅ [CREATE-SE-AUSENTE] docs/ai-context/catalog.local.yaml       ← gitignored, NESTE repo
-✅ [UPDATE] docs/ai-context/catalog.local.yaml                 ← gitignored, NESTE repo
-✅ [UPDATE] docs/ai-context/README.md                          ← NESTE repo
+✅ [CREATE-SE-AUSENTE] .github/projects.local.yaml       ← gitignored, NESTE repo
+✅ [UPDATE] .github/projects.local.yaml                 ← gitignored, NESTE repo
+✅ [UPDATE] .github/instructions/README.md                          ← NESTE repo
 ✅ [UPDATE] .github/instructions/README.md                     ← NESTE repo
 ✅ YAML válido
 ⚠️  Nenhum arquivo modificado nos projetos externos
-⚠️  Nenhuma entrada escrita em docs/ai-context/catalog.yaml (compartilhado — R-043)
+⚠️  Nenhuma entrada escrita em .github/instructions/README.md (compartilhado — R-043)
 🎉 Artefato gerado com sucesso!
 ```
 
-**Output Fase 3**: Projeto registrado em `catalog.local.yaml` (gitignored) + adapter em `.github/instructions/local/` (gitignored) → pronto para `/deep-search`, `/plan`
+**Output Fase 3**: Projeto registrado em `projects.local.yaml` (gitignored) + adapter em `.github/instructions/local/` (gitignored) → pronto para `/deep-search`, `/plan`
 
-**Sanity check final (defesa em profundidade — R-043):** antes de reportar sucesso, executar `git status --short docs/ai-context/catalog.yaml .github/instructions/` e confirmar que **nenhuma** dessas duas entradas aparece como modificada/staged (o esperado é aparecerem apenas `catalog.local.yaml` e `.github/instructions/local/*`, ambos já gitignored e portanto invisíveis ao `git status` padrão). Se `catalog.yaml` aparecer como modificado, PARAR e reportar erro — algo escreveu no arquivo errado.
+**Sanity check final (defesa em profundidade — R-043):** antes de reportar sucesso, executar `git status --short .github/instructions/README.md .github/instructions/` e confirmar que **nenhuma** dessas duas entradas aparece como modificada/staged (o esperado é aparecerem apenas `projects.local.yaml` e `.github/instructions/local/*`, ambos já gitignored e portanto invisíveis ao `git status` padrão). Se `catalog.yaml` aparecer como modificado, PARAR e reportar erro — algo escreveu no arquivo errado.
 
 ### FASE 4: **Construção e Registro Obrigatório no Grafo de Conhecimento** (bloqueante, sem opt-out)
 
 > **Por que é obrigatória (não mais opcional):** o grafo de conhecimento (`code-knowledge-graph`) é a única forma de garantir que o mapa estrutural do projeto (imports, chamadas, acoplamento, blast radius) permaneça **sempre disponível** via `ctx_index`/`ctx_search`, independente de quanto o contexto da conversa cresça ou seja truncado. Modelos de menor capacidade (ex.: Claude Haiku) degradam a retenção de detalhes de projeto conforme o contexto aumenta — indexar o grafo fora da janela de contexto (em cache pesquisável) e registrá-lo no **Registry do Codegraph** para o MCP multi-repo é a mitigação estrutural para essa perda. Por isso esta fase **nunca pergunta "deseja construir?"** — ela sempre executa como parte do registro do projeto, exatamente como FASE 3 (binding).
 
-**Pré-requisito**: FASE 3 concluída com sucesso — `project-id` já existe em `catalog.local.yaml` (o agent indexa na chave `code-graph:<project-id>:<hash>`).
+**Pré-requisito**: FASE 3 concluída com sucesso — `project-id` já existe em `projects.local.yaml` (o agent indexa na chave `code-graph:<project-id>:<hash>`).
 
 1. Verificar se já existe grafo válido para o hash atual: `ctx_search(queries: ["code-graph"], source: "<nome-projeto>")`.
 2. **Se já existe e o hash bate** (nenhum arquivo do escopo mudou) → reaproveitar, sem reconstruir; reportar aviso compacto de 1 linha.
@@ -298,7 +298,7 @@ O Copilot aplica mudanças **atomicamente por plano validado** (sem depender de 
      agentName: "code-knowledge-graph",
      description: "Construir grafo obrigatório e registrar no MCP do projeto <nome>",
      task: "RF-001 (fluxo MANDATÓRIO de /add-project-context):
-            projeto recém-registrado <nome-projeto> (project-id em catalog.local.yaml),
+            projeto recém-registrado <nome-projeto> (project-id em projects.local.yaml),
             path <caminho-absoluto>.
             1. Invocar o motor @optave/codegraph (codegraph build <caminho-absoluto>) gerando .codegraph/graph.db.
             2. Registrar automaticamente o repositório no catálogo MCP multi-repo: codegraph registry add <caminho-absoluto>.
@@ -357,16 +357,16 @@ O Copilot aplica mudanças **atomicamente por plano validado** (sem depender de 
 
 ### FASE 4.1: **Descoberta de Integrações Multi-Projeto e Configuração de Fronteiras (`manifesto.boundaries`)**
 
-> **Objetivo**: Quando houver mais de 1 projeto registrado no repositório de governança (identificado em `.github/instructions/local/` ou `catalog.local.yaml`), o Copilot identifica relações de integração/dependência entre o novo projeto e os projetos já existentes, configurando automaticamente o manifesto de fronteiras arquiteturais (`manifesto.boundaries`) em `.codegraphrc.json` para deixar o ecossistema pronto para auditoria de arquitetura, CI gates e detecção de drift.
+> **Objetivo**: Quando houver mais de 1 projeto registrado no repositório de governança (identificado em `.github/instructions/local/` ou `projects.local.yaml`), o Copilot identifica relações de integração/dependência entre o novo projeto e os projetos já existentes, configurando automaticamente o manifesto de fronteiras arquiteturais (`manifesto.boundaries`) em `.codegraphrc.json` para deixar o ecossistema pronto para auditoria de arquitetura, CI gates e detecção de drift.
 
-1. **Condição de ativação**: Listar projetos registrados em `.github/instructions/local/` (ou ler chaves de `catalog.local.yaml`).
+1. **Condição de ativação**: Listar projetos registrados em `.github/instructions/local/` (ou ler chaves de `projects.local.yaml`).
    - Se total de projetos registrados $\le 1$ → pular esta fase e prosseguir para FASE 4.5.
    - Se total de projetos registrados $\ge 2$ → executar passos 2, 3 e 4 abaixo.
 
 2. **Sequência de Perguntas de Integração via `ask_questions` (R-027)**:
    ```
    [Q-INT1] "Quais projetos registrados possuem integração direta com '<novo-projeto>'?"
-     - Opções geradas: Lista dos outros projetos existentes em catalog.local.yaml (ex.: "meu-projeto-backend", "meu-auth-service") + "Nenhuma integração direta"
+     - Opções geradas: Lista dos outros projetos existentes em projects.local.yaml (ex.: "meu-projeto-backend", "meu-auth-service") + "Nenhuma integração direta"
      - Multi-seleção: Sim (permite selecionar múltiplos projetos integrados)
 
    [Q-INT2] "Qual a direção/papel da integração com cada projeto selecionado?" (somente se selecionou projetos em Q-INT1)
@@ -451,21 +451,21 @@ Deseja também iniciar a sumarização de código-fonte via agent especialista a
 ├─ Gerados (via adapter-generator, NESTE repo, gitignored — R-043):
 │  ✓ .github/instructions/local/meu-projeto-backend.instructions.md ← criado pelo agent
 ├─ Gerado (por este prompt, ainda em memória — não escrito):
-│  ✓ novo_projeto.yaml (entry para catalog.local.yaml)
+│  ✓ novo_projeto.yaml (entry para projects.local.yaml)
 └─ Preview aprovado ✅
 
 [FASE 3 ✅] Binding Atômico via Tools Nativas (NESTE repositório, LOCAIS/gitignored)
 ├─ Execução: aplicação de patches/edições por plano aprovado
 ├─ Validação: ✅ Artefato validado (schema OK, sem duplicatas); adapter já criado na FASE 2.4
-├─ Plano: 3 operações (UPDATE catalog.local.yaml, UPDATE READMEs) — todas NESTE repo
+├─ Plano: 3 operações (UPDATE projects.local.yaml, UPDATE READMEs) — todas NESTE repo
 ├─ Preview: 3 arquivos serao modificados → [Proceder? (y/n)] → y
 ├─ Execução:
-│  ✅ [UPDATE] docs/ai-context/catalog.local.yaml                        ← NESTE repo, gitignored
-│  ✅ [UPDATE] docs/ai-context/README.md                                 ← NESTE repo
+│  ✅ [UPDATE] .github/projects.local.yaml                        ← NESTE repo, gitignored
+│  ✅ [UPDATE] .github/instructions/README.md                                 ← NESTE repo
 │  ✅ [UPDATE] .github/instructions/README.md                            ← NESTE repo
 │  ❌ Nenhuma operação no projeto externo (meu-projeto-backend/)
-│  ❌ Nenhuma operação em docs/ai-context/catalog.yaml (compartilhado — R-043)
-├─ Validação pós: ✅ YAML válido, entrada presente em catalog.local.yaml
+│  ❌ Nenhuma operação em .github/instructions/README.md (compartilhado — R-043)
+├─ Validação pós: ✅ YAML válido, entrada presente em projects.local.yaml
 ├─ Sanity check: ✅ git status --short confirma catalog.yaml intocado
 └─ Resultado: 🎉 Artefato gerado com sucesso!
 
@@ -510,13 +510,13 @@ Deseja também iniciar a sumarização de código-fonte via agent especialista a
 
 **Opção A: yamllint (se disponível)**
 ```bash
-yamllint docs/ai-context/catalog.local.yaml
+yamllint .github/projects.local.yaml
 ```
 
 **Opção B: validação estrutural via revisão de diff**
 - Confirmar identação consistente (2 espaços)
 - Confirmar chaves obrigatórias e sem duplicatas
-- Confirmar bloco `projetos:` íntegro em `catalog.local.yaml` (nunca em `catalog.yaml` — R-043)
+- Confirmar bloco `projetos:` íntegro em `projects.local.yaml` (nunca em `catalog.yaml` — R-043)
 
 #### Checklist Pré-Confirmação (FASE 2.5)
 
@@ -526,7 +526,7 @@ Antes de confirmar `"Proceder? (y/n)"` em Fase 2:
 - [ ] Indentação é consistente (2 espaços)?
 - [ ] Sem tabs ou espaços misturados?
 - [ ] Todas as aspas fechadas?
-- [ ] Destino confirmado é `catalog.local.yaml` + `.github/instructions/local/` (nunca os compartilhados)?
+- [ ] Destino confirmado é `projects.local.yaml` + `.github/instructions/local/` (nunca os compartilhados)?
 
 **Se falhar em qualquer ponto**: PARE, corrija manualmente, e valide novamente.
 
@@ -536,14 +536,14 @@ Antes de confirmar `"Proceder? (y/n)"` em Fase 2:
 |----------|-------|---------|
 | "Projeto já existe em catalog" | Nome duplicado | Use nome único, ex: `projeto-exemplo-unico` |
 | "Copilot não apresenta descobertas" | Prompt não carregado corretamente | Reexecute `/add-project-context` ou carregue manualmente |
-| "Erro ao atualizar catalog.local.yaml" | YAML inválido | Valide YAML conforme checklist acima |
+| "Erro ao atualizar projects.local.yaml" | YAML inválido | Valide YAML conforme checklist acima |
 | `mapping values are not allowed here` | Indentação errada | Use **2 espaços**, nunca tabs |
 | `could not find expected ':'` | YAML malformado | Valide sintaxe de `key: value` |
 | `duplicate key` | Chave duplicada | Remova entrada duplicada |
 | "Falha de validação de payload" | YAML gerado incompleto | Verificar se `novo_projeto.yaml` tem: artefato, nome, tipo, extends, descrição |
 | "Execução abortada" | Erro em patch/edição de arquivo | Revisar preview, corrigir entrada e reexecutar |
-| "catalog.local.yaml não existe" | Primeira vez nesta máquina/clone | Copiar de `catalog.local.yaml.example` (feito automaticamente no Health Check) |
-| "catalog.yaml apareceu modificado no git status" | Escrita indevida no arquivo compartilhado — violação de R-043 | PARAR, reverter via `git checkout docs/ai-context/catalog.yaml`, reportar bug |
+| "projects.local.yaml não existe" | Primeira vez nesta máquina/clone | Copiar de `projects.local.yaml.example` (feito automaticamente no Health Check) |
+| "catalog.yaml apareceu modificado no git status" | Escrita indevida no arquivo compartilhado — violação de R-043 | PARAR, reverter via `git checkout .github/instructions/README.md`, reportar bug |
 | "codegraph falhou na FASE 4" | CLI `@optave/codegraph` não instalado globalmente | Executar `npm install -g @optave/codegraph` e verificar `codegraph --version`; FASE 4 reporta erro real mas não bloqueia o binding da FASE 3 |
 
 ---
@@ -560,13 +560,13 @@ Após invocar `/add-project-context <workspace>/[PROJETO]`, verifique:
 - [ ] **FASE 2.3**: Sugeriu adapter baseado no stack detectado?
 - [ ] **FASE 2.4**: Invocou `run_subagent(agentName: "adapter-generator", task: "modo=generate-one...")` para criar `<nome>.instructions.md` em `.github/instructions/local/` (se criar novo) — nunca via `create_file` direto do Copilot?
 - [ ] **FASE 2.5**: Mostrou preview antes de confirmar?
-- [ ] **FASE 3**: Aplicou plano de alterações por tools nativas (só `catalog.local.yaml` + READMEs — adapter já criado na FASE 2.4)?
+- [ ] **FASE 3**: Aplicou plano de alterações por tools nativas (só `projects.local.yaml` + READMEs — adapter já criado na FASE 2.4)?
 - [ ] **FASE 3**: Confirmou: ✅ "Artefato gerado com sucesso!"?
-- [ ] **Pós-execução**: `docs/ai-context/catalog.local.yaml` foi atualizado (gitignored)?
-- [ ] **Pós-execução**: `docs/ai-context/catalog.yaml` (compartilhado) permaneceu **intocado**?
+- [ ] **Pós-execução**: `.github/projects.local.yaml` foi atualizado (gitignored)?
+- [ ] **Pós-execução**: `.github/instructions/README.md` (compartilhado) permaneceu **intocado**?
 - [ ] **Pós-execução**: `.github/instructions/README.md` foi sincronizado (referência, sem dado real)?
 - [ ] **FASE 4 (OBRIGATÓRIA, sem opt-out)**: `code-knowledge-graph` foi invocado sempre logo após a FASE 3 (gerando o grafo via `codegraph build`, registrando no catálogo MCP via `codegraph registry add` e indexando via `ctx_index`), sem `ask_questions` de "deseja construir?"?
-- [ ] **FASE 4.1**: se houver >1 projeto registrado em `.github/instructions/local/` (ou `catalog.local.yaml`), o Copilot disparou a sequência de `ask_questions` de integração e configurou o manifesto de fronteiras (`manifesto.boundaries`) em `.codegraphrc.json`?
+- [ ] **FASE 4.1**: se houver >1 projeto registrado em `.github/instructions/local/` (ou `projects.local.yaml`), o Copilot disparou a sequência de `ask_questions` de integração e configurou o manifesto de fronteiras (`manifesto.boundaries`) em `.codegraphrc.json`?
 - [ ] **FASE 4.5 (opcional)**: se usuário aceitou, `code-knowledge-graph` foi invocado **depois** da FASE 4?
 
 **Se todos checkpoints completaram**: ✅ **Sucesso!**  

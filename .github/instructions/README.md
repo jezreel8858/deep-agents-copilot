@@ -1,119 +1,133 @@
-# Instructions — Adapters por Projeto/Stack
+# Instructions — Adapters por Projeto/Stack e Mecanismo de Binding
 
 Instructions registram convenções e padrões específicos de um projeto, domínio ou stack.
 
-> Regras globais: `../../CLAUDE.md`
-> Regras operacionais: `../copilot-instructions.md`
-> **Manifest de binding (compartilhado, adapters):** `../../docs/ai-context/catalog.yaml`
-> **Overlay de projetos (LOCAL, gitignored — R-043):** `../../docs/ai-context/catalog.local.yaml`
+> **Regras globais**: [`../../CLAUDE.md`](../../CLAUDE.md)
+> **Regras operacionais**: [`../copilot-instructions.md`](../copilot-instructions.md)
+> **Overlay de projetos (LOCAL, gitignored — R-043)**: [`../projects.local.yaml`](../projects.local.yaml)
+> **Template rastreado de projetos**: [`../projects.local.yaml.example`](../projects.local.yaml.example)
+
+---
 
 ## 1) Propósito
 
-- Centralizar instruções específicas por projeto/stack sem contaminar a governança global.
-- Servir como índice para descoberta rápida do conteúdo aplicável.
-- Evitar duplicação de regras globais que já vivem em `CLAUDE.md`.
-- Facilitar discovery automático via IDE/tooling com suporte a `applyTo` glob patterns.
+- **SSOT de Binding de Adapters**: Centralizar as instruções específicas por projeto/stack sem contaminar a governança global.
+- **Descoberta Nativa do Copilot**: Facilitar discovery automático via IDE com suporte nativo ao frontmatter YAML `applyTo`.
+- **Zero Duplicação (R-003)**: Regras globais vivem em `CLAUDE.md`; convenções específicas de tech/framework vivem aqui.
+- **Desacoplamento Total de Projetos (R-043)**: Adapters genéricos são commitados; adapters por-projeto e registros de repositórios locais vivem em overlays gitignored.
 
-## 2) Mecanismo de Binding (Padrão Consolidado GitHub Copilot)
-
-Cada arquivo de adapter declara um **frontmatter YAML com `applyTo`**:
-
-```yaml
 ---
-applyTo: ["src/**/*.java"]
+
+## 2) Mecanismo de Binding Hierárquico (3 Camadas)
+
+Este ecossistema adota o padrão consolidado de 3 camadas para injeção de contexto de IA:
+
+```
+┌────────────────────────────────────────────────────────┐
+│ Camada 1: GLOBAL (Priority 100 — Sempre Carregada)     │
+│ ├─ CLAUDE.md (regras normativas globais R-001..R-051)  │
+│ └─ .github/copilot-instructions.md (operacional/rotas) │
+└──────────────────────────┬─────────────────────────────┘
+                           ↓
+┌────────────────────────────────────────────────────────┐
+│ Camada 2: ADAPTER DE STACK (Priority 50 — Condicional) │
+│ ├─ .github/instructions/*.instructions.md (raiz)       │
+│ └─ Injeção nativa via frontmatter YAML 'applyTo' glob   │
+└──────────────────────────┬─────────────────────────────┘
+                           ↓
+┌────────────────────────────────────────────────────────┐
+│ Camada 3: PROJETO LOCAL (Priority 40 — Gitignored)     │
+│ ├─ .github/projects.local.yaml (overlay de projetos)   │
+│ └─ .github/instructions/local/*.instructions.md        │
+└────────────────────────────────────────────────────────┘
+```
+
 ---
-# Conteúdo da instrução...
-```
-
-O `applyTo` glob pattern informa ao IDE/tooling quais arquivos devem carregar esta instrução.
-
-**Hierarquia de aplicação:**
-
-```
-1. Global Rules (CLAUDE.md, ./copilot-instructions.md) — Priority 100
-   ↓
-2. Adapters de Stack (*.instructions.md com applyTo, raiz — compartilhados) — Priority 50
-   ↓
-3. Projeto (catalog.local.yaml → projetos[] + .github/instructions/local/*, gitignored — R-043) — Priority 40
-```
 
 ## 3) Estrutura da Pasta: Compartilhado vs. Local (R-043)
 
 | Local | Escopo | Git | Gerado por |
 |---|---|---|---|
-| `.github/instructions/*.instructions.md` (raiz) | Adapters **genéricos por stack** — reutilizáveis por qualquer projeto | ✅ Commitado | Manual/curadoria |
+| `.github/instructions/*.instructions.md` (raiz) | Adapters **genéricos por stack** — reutilizáveis por qualquer projeto | ✅ Commitado | Curadoria / engenharia |
 | `.github/instructions/local/*.instructions.md` | Adapters **por-projeto** — customizados via scanner | ❌ Gitignored | `adapter-generator` (via `/add-project-context`) |
 
-> ⚠️ Nunca misture os dois: um adapter por-projeto **nunca** vai na raiz, e um adapter genérico **nunca** vai em `local/`.
+> ⚠️ **Regra de Confinamento (R-043)**: Nunca misture os dois: um adapter por-projeto **nunca** vai na raiz, e um adapter genérico compartilhado **nunca** vai em `local/`.
 
-## 4) Instruções Convencionais (Adapters Compartilhados)
+---
 
-| Documento | Escopo | ApplyTo |
+## 4) Instruções Convencionais (Adapters Compartilhados Ativos)
+
+Cada arquivo de adapter declara um **frontmatter YAML nativo com `applyTo`**, lido automaticamente pelo GitHub Copilot:
+
+| Documento | Stack | ApplyTo Glob Patterns |
 |---|---|---|
-| `spring-boot-backend.instructions.md` | Backend Java/Spring Boot (genérico) | `**/*.java` |
-| `angular-v21-frontend.instructions.md` | Frontend Angular 21 (genérico) | `**/*.ts`, `**/*.js` |
-| `python-backend.instructions.md` | Backend Python (genérico) | `**/*.py`, `**/pyproject.toml` |
-| `database.instructions.md` | Banco de Dados / Migrações (genérico) | `migrations/**`, `**/*.sql`, `schema/**` |
-| `devops.instructions.md` | DevOps / CI-CD / Containers (genérico) | `**/Dockerfile*`, `kubernetes/**`, `.github/workflows/**` |
+| [`spring-boot-backend.instructions.md`](spring-boot-backend.instructions.md) | Java / Spring Boot (genérico) | `**/*.java` |
+| [`angular-v21-frontend.instructions.md`](angular-v21-frontend.instructions.md) | Frontend Angular 21 (genérico) | `**/*.ts`, `**/*.js` |
+| [`python-backend.instructions.md`](python-backend.instructions.md) | Backend Python (genérico) | `**/*.py`, `**/requirements*.txt`, `**/pyproject.toml` |
+| [`database.instructions.md`](database.instructions.md) | Banco de Dados / Migrações (genérico) | `migrations/**`, `schema/**`, `**/*.sql` |
+| [`devops.instructions.md`](devops.instructions.md) | DevOps / CI-CD / Containers (genérico) | `**/Dockerfile*`, `kubernetes/**`, `.github/workflows/**` |
 
-> **Lista de projetos**: consulte `../../docs/ai-context/catalog.local.yaml` (gitignored, R-043 — nunca `catalog.yaml`).
-> Projetos são adicionados/removidos via `/add-project-context` e `/del-project-context`.
+---
 
-## 5) Como Carrega Cada IDE
+## 5) Como o Binding Funciona na Prática
 
-| IDE | Mecanismo | Discovery |
+1. **Abertura de Arquivo**: Desenvolvedor abre `UsuarioService.java` no IDE.
+2. **Camada 1 (Global)**: Copilot carrega `CLAUDE.md` e `.github/copilot-instructions.md`.
+3. **Camada 2 (Stack)**: Copilot avalia os padrões glob dos adapters; `**/*.java` coincide com `spring-boot-backend.instructions.md`, injetando convenções de Java/Spring Boot.
+4. **Camada 3 (Projeto)**: Se o projeto estiver registrado em `.github/projects.local.yaml` e possuir adapter customizado em `.github/instructions/local/<projeto>.instructions.md`, as instruções específicas do projeto são aplicadas em sobreposição.
+
+---
+
+## 6) Gerenciamento de Projetos Locais (Local Overlay)
+
+```bash
+# Setup inicial (uma única vez por clone/máquina):
+cp .github/projects.local.yaml.example .github/projects.local.yaml
+
+# Inicializar sessão e verificar saúde do binding:
+/init-context
+
+# Conectar novo projeto ao ecossistema (gera adapter em local/ e registra em projects.local.yaml):
+/add-project-context <caminho-absoluto-do-projeto>
+
+# Remover projeto desconectado:
+/del-project-context <nome-do-projeto>
+
+# Diagnóstico de integridade da governança:
+/health
+```
+
+---
+
+## 7) Suporte por IDE / Ferramenta
+
+| IDE / Ferramenta | Mecanismo de Carregamento | Suporte a Discovery |
 |---|---|---|
-| **GitHub Copilot** (VS Code, JetBrains) | Carrega `../copilot-instructions.md` (global) + `*.instructions.md` com frontmatter `applyTo` | Automática por padrão glob |
-| **Cursor IDE** | Suporta `.cursor/rules/` mas também lê `../copilot-instructions.md` | Automática + manual |
-| **Claude Code** | Lê `../../CLAUDE.md` + `../copilot-instructions.md` conforme configuração | Via catalog.yaml |
+| **GitHub Copilot** (VS Code, JetBrains) | Carrega `copilot-instructions.md` + `*.instructions.md` via frontmatter `applyTo` | Automático nativo |
+| **Cursor IDE** | Suporta `.cursor/rules/` e lê `copilot-instructions.md` | Automático + manual |
+| **Claude Code** | Lê `CLAUDE.md` + `copilot-instructions.md` | Automático nativo |
 
-## 6) Como Adicionar Novo Adapter (genérico/compartilhado)
+---
 
-1. Criar arquivo `.github/instructions/<nome-projeto>.instructions.md`
-2. Adicionar **frontmatter YAML com `applyTo`**:
+## 8) Como Adicionar Novo Adapter Genérico (Compartilhado)
+
+1. Criar arquivo `.github/instructions/<nome-da-stack>.instructions.md`
+2. Adicionar frontmatter YAML com `applyTo`:
    ```yaml
    ---
-   applyTo: ["caminho/glob/**/*.ext"]
+   applyTo: ["src/**/*.ext", "**/build.file"]
    ---
+   # Convenções de Código — <Stack>
    ```
-3. Documentar o escopo e convenções
-4. Atualizar:
-   - **Este arquivo** (`README.md`) — adicionar linha na tabela
-   - **Manifest de binding** (`docs/ai-context/catalog.yaml`) — adicionar entry em `adapters:`
+3. Atualizar a tabela deste `README.md` com o novo adapter.
+4. Validar via `pytest`.
 
-> Adapter **por-projeto** segue fluxo diferente: gerado automaticamente por `/add-project-context`
-> em `.github/instructions/local/<projeto>.instructions.md` (gitignored) — nunca criado manualmente aqui.
+---
 
-## 7) Sugestões de Futuros Adapters
+## 9) Fonte de Verdade (SSOT)
 
-Os adapters abaixo **ainda não existem** e são candidatos para adição futura:
-
-```
-- mobile.instructions.md        → applyTo: ["**/*.swift", "**/*.kt"]
-- security.instructions.md      → applyTo: ["auth/**", "security/**"]
-- react-frontend.instructions.md → applyTo: ["src/**/*.tsx", "src/**/*.jsx"]
-- golang-backend.instructions.md → applyTo: ["**/*.go", "go.mod"]
-```
-
-## 8) Regras de Manutenção
-
-- Não inventariar documentos inexistentes (R-005).
-- Ao criar ou revisar um adapter, atualizar este índice na mesma entrega (R-015).
-- Se o conteúdo virar governança global, mover a regra para `CLAUDE.md` e manter aqui apenas referência (R-003).
-- Manter `applyTo` patterns precisos e mutuamente exclusivos quando possível.
-- Sincronizar sempre o manifest de binding (`docs/ai-context/catalog.yaml`).
-- **Nunca** criar/editar adapter por-projeto na raiz — destino correto é sempre `local/` (R-043).
-
-## 9) Fonte de Verdade
-
-- **Índice local de adapters:** este arquivo
-- **Manifest de binding global (compartilhado):** `../../docs/ai-context/catalog.yaml`
-- **Cada `*.instructions.md`:** representa um adapter reutilizável por projeto/stack
-- **Lista de projetos (LOCAL, gitignored):** `../../docs/ai-context/catalog.local.yaml`
-
-## 10) Referências
-
-- GitHub Copilot Instructions: https://docs.github.com/en/copilot/customizing-copilot/adding-custom-instructions
-- CLAUDE.md — R-003 (Sem duplicação), R-015 (Atualização atômica), R-043 (Local Overlay Pattern)
-- `../copilot-instructions.md` — Seção 5 (Binding de Adapters)
-- `../../docs/ai-context/binding.md` — Guia completo de binding
+- **Manifesto e Guia de Binding de Adapters**: Este arquivo (`.github/instructions/README.md`)
+- **Adapters Genéricos**: Arquivos `.github/instructions/*.instructions.md` (com `applyTo`)
+- **Adapters de Projetos Locais**: `.github/instructions/local/*.instructions.md` (gitignored)
+- **Overlay Local de Projetos**: `.github/projects.local.yaml` (gitignored, R-043)
+- **Template Rastreado do Overlay**: `.github/projects.local.yaml.example` (tracked, R-043)

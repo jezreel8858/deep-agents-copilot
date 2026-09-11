@@ -80,7 +80,7 @@ nos:
 
   - id: binding-initializer
     tipo: health_check
-    descricao: "Inicialização de binding context — acionado antes da triagem se catalog.yaml ausente"
+    descricao: "Inicialização de binding context — acionado antes da triagem se instructions ou template de overlay ausentes"
 
   - id: adapter-generator
     tipo: downstream
@@ -415,7 +415,7 @@ arestas:
     condicoes:
       tipo: health_check
       regra: "R-034"
-      gatilho: "docs/ai-context/catalog.yaml ausente OU docs/ai-context/binding.md ausente"
+      gatilho: ".github/instructions/README.md ausente OU .github/projects.local.yaml.example ausente"
 
   # Prompt structuring (pré-classificação para casos ambíguos/abertos) — exceção R-041
   - de: agent-router

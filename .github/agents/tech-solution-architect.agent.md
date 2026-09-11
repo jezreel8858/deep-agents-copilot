@@ -50,7 +50,7 @@ Você atua como **Arquiteto de Solução Técnica Sênior** responsável pela vi
 
 | Item | Caminho/Uso | Observação |
 |---|---|---|
-| Mapa do Ecossistema | [`../../docs/ai-context/catalog.yaml`](../../docs/ai-context/catalog.yaml) | Localização dos projetos e serviços |
+| Mapa do Ecossistema | [`../instructions/README.md`](../instructions/README.md) | Localização dos projetos e serviços |
 | Instructions por projeto/stack | [`../instructions/README.md`](../instructions/README.md) | Carregamento sob demanda via adapters |
 | Catálogo de Agents | [`README.md`](README.md) | Roteamento entre agentes especializados |
 | Skill de terminal | [`../skills/terminal-governance/SKILL.md`](../skills/terminal-governance/SKILL.md) | Para comandos grep/terminal |

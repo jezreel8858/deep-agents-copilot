@@ -50,6 +50,7 @@ __pycache__/
 # Binding de projetos locais e adapters auto-gerados por /add-project-context.
 # Vivem fora do repositório de governança compartilhado — ver CLAUDE.md R-043.
 # ============================================
+.github/projects.local.yaml
 docs/ai-context/catalog.local.yaml
 .github/instructions/local/
 

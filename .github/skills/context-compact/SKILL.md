@@ -18,7 +18,7 @@ triggers:
 tools: ["context-mode"]
 source_docs:
   - "CLAUDE.md"
-  - "docs/ai-context/catalog.yaml"
+  - ".github/instructions/README.md"
   - ".github/copilot-instructions.md"
   - ".github/skills/context-mode/SKILL.md"
 ---
@@ -43,7 +43,7 @@ Esta skill transforma leituras extensas, diffs, logs e notas dispersas em um res
 
 | Elemento | Preservar | Como registrar |
 |---|---|---|
-| Escopo | projeto(s) e objetivo | citar `docs/ai-context/catalog.yaml` e os arquivos relevantes |
+| Escopo | projeto(s) e objetivo | citar `.github/instructions/README.md` e os arquivos relevantes |
 | Evidência | nomes de arquivos, símbolos, comandos, contratos | apontar a origem exata |
 | Decisão | o que foi concluído e por quê | usar bullets curtos |
 | Risco | impacto funcional, técnico ou operacional | classificar em Alto, Médio, Baixo |

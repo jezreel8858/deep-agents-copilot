@@ -82,7 +82,7 @@ Abaixo detalha-se o escopo de cobertura e a importância crítica de cada arquiv
 #### `test_local_project_isolation.py`
 - **O que cobre**: Isolamento estrito de projetos locais e políticas de privacidade corporativa (R-038 e R-043/R-044):
   - Garante que arquivos rastreados no Git nunca mencionem caminhos reais de máquina ou nomes de projetos do usuário (exige placeholders genéricos como `[PROJETO-ALVO]`).
-  - Garante que `catalog.local.yaml` permaneça no `.gitignore` e que `docs/ai-context/catalog.yaml` contenha zero entradas na chave `projetos:`.
+  - Garante que `projects.local.yaml` permaneça no `.gitignore` e que `docs/ai-context/catalog.yaml` contenha zero entradas na chave `projetos:`.
 - **Importância para a qualidade**: **Segurança da Informação e Portabilidade**. Garante que o repositório de governança possa ser compartilhado publicamente ou entre equipes corporativas sem vazar identificadores, caminhos locais ou estruturas de código proprietárias do desenvolvedor.
 
 #### `test_template_sections.py`

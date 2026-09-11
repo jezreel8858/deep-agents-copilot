@@ -20,7 +20,7 @@ triggers:
 source_docs:
   - ".github/prompts/add-project-context.prompt.md"
   - ".github/agents/adapter-generator.agent.md"
-  - "docs/ai-context/catalog.yaml"
+  - ".github/instructions/README.md"
 
 capabilities:
   - name: "scan_project_structure"

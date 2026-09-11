@@ -11,7 +11,7 @@ argument-hint: '[caminho-do-arquivo | diff]'
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - docs/ai-context/catalog.yaml
+  - .github/instructions/README.md
   - .github/skills/terminal-governance/SKILL.md
   - .github/skills/code-review-patterns/SKILL.md
   - .github/agents/code-review.agent.md
@@ -65,7 +65,7 @@ git --no-pager diff HEAD
 
 ### PASSO 2 — Delegar ao agent `@code-review`
 
-Aplicar a Decision Tree e o formato de saída definidos em [`code-review.agent.md`](../agents/code-review.agent.md), usando [`code-review-patterns/SKILL.md`](../skills/code-review-patterns/SKILL.md) como base de severidade/dimensões e `docs/ai-context/catalog.yaml` para identificar o adapter de stack aplicável.
+Aplicar a Decision Tree e o formato de saída definidos em [`code-review.agent.md`](../agents/code-review.agent.md), usando [`code-review-patterns/SKILL.md`](../skills/code-review-patterns/SKILL.md) como base de severidade/dimensões e `.github/instructions/README.md` para identificar o adapter de stack aplicável.
 
 ### PASSO 3 — Apresentar o relatório
 

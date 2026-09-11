@@ -35,7 +35,7 @@ Você é especialista em **verificar aderência de código às convenções de e
 
 | Item | Caminho/Uso | Observação |
 |---|---|---|
-| Adapters de convenção | [`../../docs/ai-context/catalog.yaml`](../../docs/ai-context/catalog.yaml) | Identifica qual `.instructions.md` aplica ao arquivo revisado |
+| Adapters de convenção | [`../instructions/README.md`](../instructions/README.md) | Identifica qual `.instructions.md` aplica ao arquivo revisado |
 | Skill de revisão (dimensão convenções) | [`../skills/code-review-patterns/SKILL.md`](../skills/code-review-patterns/SKILL.md) § 2 | Base genérica — este agent aprofunda apenas "convenções" |
 
 ## Decision Tree
@@ -92,7 +92,7 @@ Próximo passo mínimo:
 
 ## Docs Sempre Anexadas (pre-fetch obrigatório)
 
-- [`../../docs/ai-context/catalog.yaml`](../../docs/ai-context/catalog.yaml) — mapa de adapters.
+- [`../instructions/README.md`](../instructions/README.md) — mapa de adapters.
 - [`../skills/terminal-governance/SKILL.md`](../skills/terminal-governance/SKILL.md) — governança de execução de terminal e reporting de erros.
 - Código/diff alvo — obrigatório.
 

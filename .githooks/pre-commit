@@ -17,13 +17,12 @@ set -euo pipefail
 
 blocked=0
 
-# 1) Nenhuma entrada de projeto pode ser adicionada a docs/ai-context/catalog.yaml
-#    (compartilhado). Marcador de fingerprint: "path_externo:" só existe em
-#    entradas de projeto — se aparecer no diff staged deste arquivo, é violação.
-if git diff --cached --name-only | grep -qx "docs/ai-context/catalog.yaml"; then
-  if git diff --cached -- docs/ai-context/catalog.yaml | grep -qE '^\+.*path_externo:'; then
-    echo "❌ [R-043] Bloqueado: docs/ai-context/catalog.yaml não pode conter entrada de projeto (path_externo:)."
-    echo "   → Projetos vivem em docs/ai-context/catalog.local.yaml (gitignored)."
+# 1) Nenhuma entrada de projeto pode ser adicionada a catálogos compartilhados.
+#    Marcador de fingerprint: "path_externo:" só existe em entradas de projeto.
+if git diff --cached --name-only | grep -qE '^(.github/agents/catalog.yaml|docs/ai-context/catalog.yaml)$'; then
+  if git diff --cached -- .github/agents/catalog.yaml docs/ai-context/catalog.yaml 2>/dev/null | grep -qE '^\+.*path_externo:'; then
+    echo "❌ [R-043] Bloqueado: catálogo compartilhado não pode conter entrada de projeto (path_externo:)."
+    echo "   → Projetos vivem em .github/projects.local.yaml (gitignored)."
     blocked=1
   fi
 fi
@@ -36,10 +35,10 @@ if git diff --cached --name-only | grep -qE '^\.github/instructions/local/'; the
   blocked=1
 fi
 
-# 3) catalog.local.yaml (instância real, não o .example) nunca pode ser commitado.
-if git diff --cached --name-only | grep -qx "docs/ai-context/catalog.local.yaml"; then
-  echo "❌ [R-043] Bloqueado: docs/ai-context/catalog.local.yaml (overlay local real) nunca deve ser commitado."
-  echo "   → Remova do stage: git restore --staged docs/ai-context/catalog.local.yaml"
+# 3) projects.local.yaml (instância real, não o .example) nunca pode ser commitado.
+if git diff --cached --name-only | grep -qE '^(\.github/projects\.local\.yaml|docs/ai-context/catalog\.local\.yaml)$'; then
+  echo "❌ [R-043] Bloqueado: .github/projects.local.yaml (overlay local real) nunca deve ser commitado."
+  echo "   → Remova do stage: git restore --staged .github/projects.local.yaml"
   blocked=1
 fi
 
@@ -50,7 +49,7 @@ fi
 #    repositório/usuário via changelog/exemplo de agent analítico.
 #    CLAUDE.md/copilot-instructions.md são EXCLUÍDOS deste check: são os
 #    próprios arquivos de definição da regra R-044 e legitimamente contêm
-#    exemplos ilustrativos de caminho (ex.: "C:\Users\...", "D:\workspace\...")
+#    exemplos ilustrativos de caminho (ex.: "C:\\Users\\...", "D:\\workspace\\...")
 #    para explicar o que NÃO fazer — não são evidência real de projeto.
 staged_gov_files=$(git diff --cached --name-only | grep '^\.github/' | grep -v '^\.github/instructions/local/' || true)
 if [ -n "$staged_gov_files" ]; then
@@ -65,8 +64,15 @@ if [ -n "$staged_gov_files" ]; then
 fi
 
 # 5) Bloqueio de nomes de projetos locais externos em arquivos staged (R-044)
-if [ -f "docs/ai-context/catalog.local.yaml" ]; then
-  local_ids=$(grep -E '^\s*-\s*id:' docs/ai-context/catalog.local.yaml | awk -F'"' '{print $2}' | grep -v 'deep-agents-copilot' || true)
+target_catalog=""
+if [ -f ".github/projects.local.yaml" ]; then
+  target_catalog=".github/projects.local.yaml"
+elif [ -f "docs/ai-context/catalog.local.yaml" ]; then
+  target_catalog="docs/ai-context/catalog.local.yaml"
+fi
+
+if [ -n "$target_catalog" ]; then
+  local_ids=$(grep -E '^\s*-\s*id:' "$target_catalog" | awk -F'"' '{print $2}' | grep -v 'deep-agents-copilot' || true)
   for proj_id in $local_ids; do
     [ -z "$proj_id" ] && continue
     if git diff --cached | grep -qiE "^\+.*$proj_id"; then
@@ -84,4 +90,3 @@ if [ "$blocked" -ne 0 ]; then
 fi
 
 exit 0
-

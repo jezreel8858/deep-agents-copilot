@@ -27,7 +27,7 @@
 | Agent | `governance-factory` | 🏭 ***(v1.2.0)*** Criação/revisão de agent, skill, prompt ou nova stack via parâmetro `type`; na criação de qualquer artefato/stack, delega compulsoriamente pesquisa prévia de mercado/skills ao `deep-search` antes de materializar os arquivos |
 | Agent | `governance-maintainer` | 🛠️ ***(NEW)*** Especialista executor em manutenção atômica, refatoração estrutural e sincronização em lote de governança via context-mode e diffs cirúrgicos |
 | Agent | `context-builder` | Coletar, condensar e persistir contexto técnico em `docs/context/` |
-| Agent | `binding-initializer` | ⚡ ***(NEW)*** Criar `catalog.yaml` + `binding.md` para novo repositório (1 pergunta — Health Check R-034) |
+| Agent | `binding-initializer` | ⚡ Inicializar overlay local e templates de governança para novo repositório (1 pergunta — Health Check R-034) |
 | Agent | `adapter-generator` | ⚡ ***(NEW)*** Gerar automaticamente adapters em `.github/instructions/` via `/add-project-context` |
 | Agent | `business-rules-extractor` | 📋 ***(NEW)*** Extrair regras de negócio de código e documentar em `.md`; validar refatorações contra regras documentadas |
 | Agent | `runtime-verifier` | 🩺 ***(NEW)*** Verifica saúde do ambiente (build limpo, dependências, serviços dependentes) antes de disparar testes/codificadores; read-only, nunca corrige |

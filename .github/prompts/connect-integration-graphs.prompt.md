@@ -13,8 +13,8 @@ argument-hint: '[repositório-alvo]'
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - docs/ai-context/catalog.yaml
-  - docs/ai-context/catalog.local.yaml.example
+  - .github/instructions/README.md
+  - .github/projects.local.yaml.example
   - .github/agents/tech-solution-architect.agent.md
   - .github/agents/code-knowledge-graph.agent.md
   - .github/skills/integration-contract-analysis/SKILL.md
@@ -31,7 +31,7 @@ source_docs:
 > **Workspace**: `${workspaceFolder}`
 >
 > **NÃO faz**: não implementa/corrige código de aplicação; não reconstrói grafo já cacheado; não
-> escreve em `docs/ai-context/catalog.yaml` (compartilhado, R-043); não é o fluxo de registro de
+> escreve em `.github/instructions/README.md` (compartilhado, R-043); não é o fluxo de registro de
 > um projeto novo (isso é `/add-project-context`, FASE 4.1) — este prompt roda **depois**, sobre o
 > conjunto já registrado, para auditar/fechar o que a FASE 4.1 não perguntou/pegou naquele momento.
 
@@ -42,7 +42,7 @@ source_docs:
 - ✅ **APENAS** mapear fronteiras de integração multi-repo (`manifesto.boundaries`) em `.codegraphrc.json`.
 - ✅ **SEMPRE** preservar isolamento local e respeitar o grafo construído pelo `@code-knowledge-graph`.
 - ❌ **NÃO** implementar código ou alterar endpoints em serviços da aplicação.
-- ❌ **NÃO** escrever em `docs/ai-context/catalog.yaml` (compartilhado, R-043).
+- ❌ **NÃO** escrever em `.github/instructions/README.md` (compartilhado, R-043).
 
 ---
 
@@ -51,7 +51,7 @@ source_docs:
 ## 🎯 Uso
 
 ```bash
-/connect-integration-graphs                            → varre todos os projetos registrados (catalog.yaml + catalog.local.yaml)
+/connect-integration-graphs                            → varre todos os projetos registrados (catalog.yaml + projects.local.yaml)
 /connect-integration-graphs <projeto-A> <projeto-B>     → escopo restrito a um par/subconjunto de projetos
 ```
 
@@ -60,7 +60,7 @@ source_docs:
 ## CRÍTICO
 
 - ❌ NÃO implementar/corrigir código de aplicação nos projetos analisados.
-- ❌ NÃO escrever em `docs/ai-context/catalog.yaml` (compartilhado) — projetos vivem em `catalog.local.yaml` (R-043); esta é leitura apenas.
+- ❌ NÃO escrever em `.github/instructions/README.md` (compartilhado) — projetos vivem em `projects.local.yaml` (R-043); esta é leitura apenas.
 - ❌ NÃO reconstruir grafo do zero se já existir cache válido — sempre delegar a `@code-knowledge-graph`, que verifica hash/cache antes de reprocessar (RNF-002).
 - ❌ NÃO editar `.codegraphrc.json` de nenhum projeto sem confirmação explícita via `ask_questions` (R-009) — é mudança estrutural em projeto(s) externo(s).
 - ❌ NÃO afirmar que uma integração existe sem evidência dupla: (a) declarada no levantamento de contrato (FASE 1) **e** (b) confirmada pela aresta real no grafo (FASE 2) — divergência é gap de evidência, não integração fechada.
@@ -73,7 +73,7 @@ source_docs:
 
 ### FASE 1 — Levantamento de Integrações (Survey)
 
-1. Ler `docs/ai-context/catalog.yaml` + `docs/ai-context/catalog.local.yaml` (merge em memória — nunca escrever no compartilhado) para obter a lista de projetos registrados no ecossistema.
+1. Ler `.github/instructions/README.md` + `.github/projects.local.yaml` (merge em memória — nunca escrever no compartilhado) para obter a lista de projetos registrados no ecossistema.
 2. Para cada projeto (ou apenas o subconjunto informado como argumento), delegar o levantamento detalhado:
 
 ```
@@ -81,7 +81,7 @@ run_subagent(
   agentName: "tech-solution-architect",
   description: "Levantar integrações expostas/consumidas do projeto <nome>",
   task: "Analisar contratos de integração (OpenAPI/AsyncAPI/gRPC/GraphQL, HTTP clients, filas)
-         do projeto <nome> (path_externo em catalog.local.yaml). Retornar lista estruturada:
+         do projeto <nome> (path_externo em projects.local.yaml). Retornar lista estruturada:
          endpoints/tópicos expostos, endpoints/tópicos consumidos, projeto(s) contraparte
          identificado(s) por evidência (arquivo:linha), e classificação BREAKING|COMPATIBLE|N-A
          quando houver contrato versionado."
@@ -178,12 +178,12 @@ Resultado final: <N> gaps fechados / <N> gaps remanescentes (com próximo passo 
 
 ## ✅ Checklist Antes de Apresentar
 
-- [ ] Todos os projetos registrados (merge `catalog.yaml` + `catalog.local.yaml`) foram considerados no levantamento — ou apenas o subconjunto explicitamente informado no argumento.
+- [ ] Todos os projetos registrados (merge `catalog.yaml` + `projects.local.yaml`) foram considerados no levantamento — ou apenas o subconjunto explicitamente informado no argumento.
 - [ ] Levantamento de integração delegado a `@tech-solution-architect` com evidência (arquivo:linha) por conclusão.
 - [ ] Varredura de grafo restrita apenas aos arquivos/símbolos do fluxo de integração (nunca full-scan) e delegada a `@code-knowledge-graph`.
 - [ ] Cache `code-graph:*` reaproveitado quando válido (sem reconstrução redundante — RNF-002).
 - [ ] Gaps de fronteira (`manifesto.boundaries`) apresentados via `ask_questions` antes de qualquer escrita em `.codegraphrc.json`.
-- [ ] Nenhuma escrita em `docs/ai-context/catalog.yaml` (compartilhado — R-043).
+- [ ] Nenhuma escrita em `.github/instructions/README.md` (compartilhado — R-043).
 - [ ] Relatório final declara: 0 gaps remanescentes, ou lista explícita dos que não puderam ser fechados + próximo passo mínimo.
 - [ ] **Confirmado: nenhuma operação destrutiva (edição de `.codegraphrc.json`) executada sem confirmação.**
 
@@ -205,7 +205,7 @@ Resultado final: <N> gaps fechados / <N> gaps remanescentes (com próximo passo 
 /add-project-context → /connect-integration-graphs → /validate
 ```
 
-- `/add-project-context` → pré-requisito: os projetos precisam estar registrados em `catalog.local.yaml` antes desta varredura; a FASE 4.1 daquele prompt já cobre a pergunta de integração no momento do registro de **um** projeto novo — este prompt audita/fecha o que ficou pendente para **todo** o conjunto já registrado.
+- `/add-project-context` → pré-requisito: os projetos precisam estar registrados em `projects.local.yaml` antes desta varredura; a FASE 4.1 daquele prompt já cobre a pergunta de integração no momento do registro de **um** projeto novo — este prompt audita/fecha o que ficou pendente para **todo** o conjunto já registrado.
 - `@tech-solution-architect` → consumido via `run_subagent` para o levantamento de contratos/integrações (FASE 1).
 - `@code-knowledge-graph` → consumido via `run_subagent` para consulta e validação restrita do grafo já existente (FASE 2/3).
 - `/validate` → depois de fechar as pontes, validar a conformidade estrutural do ecossistema como um todo.
