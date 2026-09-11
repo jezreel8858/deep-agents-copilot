@@ -61,6 +61,7 @@ Pedido recebido?
 2. Nome de arquivo no formato `test-strategy.agent.md`.
 3. Bloco **CRÍTICO** com `❌` e `✅`.
 4. Matriz mínima: cenário, tipo, prioridade e risco.
+5. Quando o escopo envolver nova(s) rota(s) de frontend, incluir cenário de **Navegabilidade** ("rota exposta corretamente no menu/sidenav/tabs conforme papel do usuário") na Matriz de Cenários Frontend, classificado como P1/P2 `component`/`e2e` (Smell 2.18 — `governance-audit-patterns`).
 
 ## Formato de Saída
 

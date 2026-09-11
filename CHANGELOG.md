@@ -6,6 +6,26 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.4.0] — 2026-09-10
+
+### Adicionado
+- **Novos Smells de Governança (19 Smells Canônicos)** — originados de auditoria real do primeiro ciclo completo de `WORKFLOW-FEATURE-DEVELOPMENT` (feature de Gestão de Usuários/Auditoria Global no projeto de referência):
+  - **Smell 2.18 (Gap de Definição de Pronto — Feature Não-Alcançável / Rota Órfã de Navegação)**: nenhum artefato do pipeline (blueprint, implementer, test-strategy, code-review) tratava "alcançabilidade via navegação" como critério de conclusão — feature entregue com testes verdes e build íntegro, porém sem entrada correspondente no menu/sidenav do projeto.
+  - **Smell 2.19 (Ausência de Verificação de Reuso de Design System / Componentes Compartilhados)**: agent implementer de UI criou HTML/CSS customizado (`<select>` nativo, cards/badges ad-hoc) ignorando catálogo interno de componentes compartilhados já documentado no projeto (`docs/componentes-shared.md`, `docs/padrao-angular-material.md`).
+- **Reforço de Definition of Done em Frontend**: `angular-implementation-patterns/SKILL.md` ganha passo 0 (Reuse-First) e passo 7 (Navegabilidade) no Workflow — Feature Nova, com checklist de PR e anti-padrões correspondentes.
+- **Princípio Reuse-First**: `frontend-componentization-patterns/SKILL.md` ganha nova seção "Reuso-First: Antes de Criar Componente Novo" com processo objetivo de busca em `shared/`/documentação interna antes de qualquer HTML/CSS customizado.
+- **8ª Dimensão de Code Review**: `code-review-patterns/SKILL.md` § 2 ganha dimensão "UX/Design System & Navegabilidade", cobrindo os Smells 2.18/2.19 na revisão de diffs de frontend.
+- **Template Canônico Completado em 2 Agents**: `angular-feature-developer.agent.md` e `angular-ui-stylist.agent.md` — únicos 2 agents do catálogo Angular sem `Decision Tree`/`Checklist Antes de Entregar`/`Quando Delegar` — receberam as 3 seções ausentes (Smell 2.9 aplicado retroativamente).
+- **Reforço em `tech-solution-architect.agent.md`**: Context Firewall `[FRONTEND_TASKS]` e Checklist Antes de Entregar agora exigem explicitamente tarefa de integração ao shell de navegação e consulta prévia a design system compartilhado quando a feature introduzir rota(s)/UI nova(s).
+- **Reforço em `code-review.agent.md`**: novo branch no Decision Tree e item 6 nos Padrões Obrigatórios para validar navegabilidade e reuso de design system antes do veredito em diffs de frontend.
+- **Reforço em `test-strategy.agent.md`**: item 5 dos Padrões Obrigatórios exige cenário de Navegabilidade na Matriz de Cenários Frontend quando houver rota nova.
+- **Adapter Local Corrigido (`[PROJETO-ALVO].instructions.md`)**: novas seções § 1.1 (Design System Interno — Consulta Obrigatória) e § 1.2 (Navegação — SidenavComponent/Shell como Única Fonte de Verdade), referenciando explicitamente a documentação interna de componentes/design system e o componente de shell de navegação do projeto — o adapter não continha nenhuma dessas referências antes desta correção, apesar de os documentos já existirem no projeto.
+
+### Autocrítica de Processo (Achado de Execução)
+- Identificado e documentado que a fidelidade de handoff da Etapa 5 (`tdd_domain_implementation`) de `WORKFLOW-FEATURE-DEVELOPMENT` depende de invocação **real** de `run_subagent` para o specialist correspondente — rotular a resposta com `Agente Ativo: <specialist>` sem a invocação real não carrega o contrato/checklist do agent, tornando as correções de conteúdo insuficientes por si só sem a disciplina de delegação genuína já normatizada em R-042.
+
+---
+
 ## [2.3.0] — 2026-09-10
 
 ### Adicionado
@@ -164,7 +184,7 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
   - `spring-boot-implementation-patterns` — matriz de decisão virtual threads vs reativo, N+1/OSIV, DTOs de borda.
   - `spring-reactive-implementation-patterns` — composição não-bloqueante, operadores de erro (`onErrorResume`/`onErrorMap`/`retryWhen`), `StepVerifier`/`WebTestClient`.
 - **`tools:`** dos 3 agents expandidas com `create_file`, `insert_edit_into_file`, `get_errors`, `run_in_terminal`.
-- **`docs/ai-context/evals/casos-roteamento.yaml`**: `canon-018` (implementação direta de bugfix), `regr-014` corrigido (implementação no próprio domínio não é deriva), `regr-016` novo (deriva real cross-stack) — suíte 40 → 42 casos.
+- **`docs/ai-context/evals/casos-roteamento.yaml`**: `canon-018` (implementação direta de bugfix), `regr-014` corrigido (implementação no próprio domínio não é deriva), `regr-016` novo (deriva real cross-stack) — suíte passa de 35 para 40 casos.
 
 ### Corrigido
 - **SYNC (R-015)**: `.github/skills/.index.json` — corrigido gap pré-existente onde as 3 skills de análise (`angular-frontend-patterns`, `spring-boot-backend-patterns`, `spring-reactive-webflux-patterns`) nunca haviam sido registradas; total_skills 39 → 45 (3 análise + 3 implementação novas).

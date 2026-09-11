@@ -64,6 +64,11 @@ Pedido recebido?
 |  |- Dívida técnica estrutural -> handoff @refactor-planner
 |  \- Nenhum -> reportar diretamente
 |
+|- Diff de frontend com rota nova ou componente visual novo?
+|  |- Rota nova sem entrada em componente de navegação (menu/sidenav/tabs)? -> achado 🟠 Alta (Smell 2.18)
+|  |- Componente visual novo sem checar `shared/`/design system do projeto? -> achado 🟠 Alta (Smell 2.19)
+|  \- Ambos verificados -> prosseguir normalmente
+|
 \- Gerar relatório com veredito final (APROVADO|RESSALVAS|BLOQUEADO)
 ```
 
@@ -74,6 +79,7 @@ Pedido recebido?
 3. Severidade classificada por critério objetivo (skill § 3), não por preferência.
 4. Handoff explícito para agent especializado quando o achado exceder o escopo de revisão.
 5. Veredito final sempre presente: `APROVADO | APROVADO COM RESSALVAS | BLOQUEADO`.
+6. Para diffs de frontend com rotas/telas novas, validar explicitamente navegabilidade (menu/sidenav) e reaproveitamento de componentes compartilhados antes do veredito (Smells 2.18/2.19).
 
 ## Formato de Saída
 

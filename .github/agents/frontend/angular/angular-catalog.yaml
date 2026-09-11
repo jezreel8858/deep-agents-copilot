@@ -152,6 +152,7 @@ agents:
     skills:
       - "angular-responsive-ui-patterns"
       - "design-system-component-contracts"
+      - "frontend-componentization-patterns"
       - "terminal-governance"
       - "context-mode"
       - "efficient-batch-code-modification"

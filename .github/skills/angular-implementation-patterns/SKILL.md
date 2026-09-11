@@ -39,12 +39,14 @@ tools: []
 
 ## Workflow — Feature Nova
 
+0. **Reuse-First (obrigatório antes de qualquer HTML/CSS novo)**: inventariar `shared/components/` (ou pasta equivalente) e a documentação interna de design system do projeto (referenciada pelo adapter local, ex.: `docs/*componentes*`/`docs/*padrao*`) — reaproveitar componentes/tokens já existentes (cards, filtros, badges, diálogos, form fields) é preferencial a criar HTML/CSS customizado (ver `frontend-componentization-patterns` § Reuso-First). Se o projeto tiver script de auditoria de padrão de UI (ex.: `npm run <lint-de-padrao-ui>`), executá-lo antes de reportar conclusão.
 1. Confirmar escopo com `@requirements-analyst`/handoff recebido (critério de aceite testável).
 2. Escrever teste(s) que descrevem o comportamento esperado antes do componente/service (testing-first).
 3. Implementar com **standalone components**, `ChangeDetectionStrategy.OnPush`, `inject()`.
 4. Aplicar convenções do adapter do projeto (`.github/instructions/<projeto>-frontend.instructions.md` ou `frontend.instructions.md` genérico) para naming, SCSS e organização.
 5. Rodar suíte local (`ng test`/Vitest conforme projeto) — nunca reportar sucesso sem rodar.
 6. `get_errors` no(s) arquivo(s) editado(s).
+7. **Navegabilidade (Definition of Done)**: se a feature introduziu nova(s) rota(s), localizar o(s) componente(s) de shell de navegação do projeto (menu lateral, sidenav, tab-bar, breadcrumb) e registrar a nova entrada de acesso — uma rota sem ponto de entrada de navegação correspondente é considerada **incompleta**, mesmo com testes verdes e build íntegro.
 
 ## Workflow — Correção de Bug
 
@@ -78,6 +80,8 @@ tools: []
 - [ ] Convenções do adapter do projeto respeitadas (SCSS, naming, estrutura).
 - [ ] `get_errors` limpo no(s) arquivo(s) tocado(s).
 - [ ] Diff mínimo — sem refactor oportunista fora do escopo pedido.
+- [ ] Toda nova rota está alcançável via componente de navegação do projeto (menu/sidenav/tabs) — não apenas via URL direta.
+- [ ] Nenhum padrão visual novo (card, filtro, diálogo, badge, select) foi criado sem antes verificar componentes/design system compartilhados já existentes no projeto (Smell 2.19).
 
 ## Anti-padrões
 
@@ -86,6 +90,8 @@ tools: []
 - ❌ Reescrever componente inteiro para corrigir 1 bug pontual.
 - ❌ Ignorar convenções do adapter do projeto em favor de preferência pessoal.
 - ❌ Reportar "concluído" sem rodar a suíte de teste local.
+- ❌ Entregar rota/feature nova sem vínculo em menu/sidenav/navegação — usuário final não consegue alcançar a funcionalidade (Smell 2.18).
+- ❌ Recriar em HTML/CSS customizado um padrão (card, filtro, diálogo, badge) que já existe como componente compartilhado documentado no projeto (Smell 2.19).
 
 ## Referências
 

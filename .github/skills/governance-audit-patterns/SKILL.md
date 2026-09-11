@@ -280,6 +280,26 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 | Severidade | **Bloqueador** (trava a execução do terminal do IDE à espera de `q` no pager `less`, exigindo intervenção manual do usuário) |
 | Remediação | Substituir o comando no arquivo por sua forma canônica não-interativa (`git --no-pager diff ...`, `git --no-pager log ...`) e assegurar `git config core.pager cat` no repositório |
 
+### 2.18 — Gap de Definição de Pronto (Feature Não-Alcançável / Rota Órfã de Navegação)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Pipeline de `WORKFLOW-FEATURE-DEVELOPMENT` entrega nova(s) rota(s) navegáveis (Angular Router, tabs, deep-links) com testes verdes e build íntegro, mas **nenhum artefato do pipeline** verifica se a rota está de fato alcançável pelo usuário final via componente de navegação (sidenav/menu/tab-bar) do projeto — a feature existe no código mas é invisível na UI |
+| Como detectar | Para diffs frontend com nova(s) entrada(s) em arquivo de rotas (`app.routes.ts`/equivalente), `grep_search` pelo `path` da nova rota dentro dos componentes de navegação do projeto (ex.: `sidenav.component.ts/html`, menu principal, tab-bar); ausência de `routerLink`/entrada correspondente é achado positivo. Verificar também se `tech-solution-architect` particionou `[FRONTEND_TASKS]` sem tarefa explícita de integração ao shell de navegação, e se `test-strategy`/`code-review` cobriram "navegabilidade" como cenário/dimensão |
+| Origem (TrustAgent) | Extrínseco — nenhum agent do pipeline (blueprint, implementer, test-strategy, code-review) declara "alcançabilidade via navegação" como critério de conclusão; falha estrutural simultânea em 3+ artefatos, não lapso pontual de 1 agent |
+| Severidade | **Alta** (feature entregue e "aprovada" porém inutilizável para o usuário final — falha de valor de negócio) |
+| Remediação | `@governance-factory`/`@governance-maintainer` insere passo obrigatório de "integração ao shell de navegação" no workflow de implementação (`angular-implementation-patterns` e skills equivalentes de outras stacks com UI), no Context Firewall de `tech-solution-architect` e na dimensão de análise de `code-review-patterns` |
+
+### 2.19 — Ausência de Verificação de Reuso de Design System / Componentes Compartilhados
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Agent implementer de UI cria HTML/CSS customizado (cards, filtros, badges, diálogos, selects) para uma capacidade que já possui componente compartilhado documentado no projeto (ex.: `shared/components/` + `docs/*componentes*`/`docs/*padrao*`), gerando inconsistência visual e duplicação de padrão em vez de reaproveitamento |
+| Como detectar | Comparar o(s) novo(s) template(s) `.html` contra o inventário de componentes compartilhados do projeto (barrel `shared/components/index.ts` ou equivalente) e contra documentação interna de design system referenciada (ou ausente) no adapter local (`.github/instructions/local/<projeto>.instructions.md`); presença de `<select>`/`<input>` nativo ou classes CSS ad-hoc quando existe componente shared documentado para a mesma capacidade é achado positivo; ausência de execução de script de auditoria de padrão do projeto (quando existente, ex.: `npm run <lint-de-padrao-ui>`) no Quality Gate é agravante |
+| Origem (TrustAgent) | Extrínseco — (a) adapter local (Camada 3) não referencia a documentação interna de design system já existente no projeto, quebrando a cadeia de descoberta; (b) skills genéricas de implementação/componentização não tratam "buscar componente equivalente antes de criar um novo" (Reuse-First) como etapa obrigatória do workflow |
+| Severidade | **Alta** (inconsistência de UX e retrabalho de refatoração; não bloqueia função, mas degrada padrão de produto) |
+| Remediação | `@adapter-generator`/`@docs-engineer` garante que adapters locais referenciem documentação interna de design system quando detectada no projeto; `@governance-factory` insere etapa "Reuse-First" em `frontend-componentization-patterns`/`angular-implementation-patterns` (ou skill equivalente de outra stack) e nos agents implementer/stylist de UI; `code-review-patterns` ganha dimensão de análise correspondente |
+
 ## 3) Severidade — Reaproveitamento da Taxonomia Existente
 
 Esta skill **reaproveita** (não recria) a taxonomia de `code-review-patterns`:
@@ -314,7 +334,7 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 
 ## 6) Checklist de Conformidade da Auditoria
 
-- [ ] Todo achado classificado estritamente em uma das 14 categorias de smell (§2.1..§2.14).
+- [ ] Todo achado classificado estritamente em uma das 19 categorias de smell (2.1..2.19).
 - [ ] Severidade reaproveitada de `code-review-patterns` (Bloqueador/Alto/Sugestão).
 - [ ] Origem classificada como intrínseca ou extrínseca (TrustAgent) quando relevante.
 - [ ] Remediação aponta agent executor real do catálogo (nunca "corrigir diretamente" — agent de auditoria é estritamente read-only).
@@ -329,7 +349,7 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 ## 7) Anti-padrões
 
 - ❌ Agent de auditoria aplicar a correção diretamente (deve ser read-only — só análise e recomendação).
-- ❌ Inventar categoria de smell fora das 14 catalogadas nesta skill.
+- ❌ Inventar categoria de smell fora das 19 catalogadas nesta skill.
 - ❌ Duplicar taxonomia de severidade ou checklist de segurança já existentes em outras skills.
 - ❌ Reportar achado sem apontar agent executor de remediação (relatório inacionável).
 - ❌ Classificar achados como Bloqueadores sem critério estrutural comprovado.
