@@ -719,7 +719,10 @@
       "description": "Padrões específicos pytest, fixtures, MagicMock, pytest-mock, coverage.py",
       "path": ".github/skills/test-implementation-python/SKILL.md",
       "related_agents": [
-        "@test-strategy"
+        "@test-strategy",
+        "@python-unit-test-writer",
+        "@python-integration-test-writer",
+        "@python-test-fixer"
       ]
     },
     {

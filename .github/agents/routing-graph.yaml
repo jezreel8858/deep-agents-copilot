@@ -111,6 +111,10 @@ nos:
     tipo: domain_router
     descricao: "Supervisor hierárquico do domínio Java Legado EJB — despacha para os 7 especialistas registrados em .github/agents/backend/ejb/ejb-catalog.yaml"
 
+  - id: python-router
+    tipo: domain_router
+    descricao: "Supervisor hierárquico do domínio Python Backend — despacha para os 7 especialistas registrados em .github/agents/backend/python/python-catalog.yaml"
+
   - id: database-router
     tipo: domain_router
     descricao: "Supervisor hierárquico do domínio de Banco de Dados — despacha para os 6 especialistas Oracle e Informix registrados em .github/agents/backend/database/database-catalog.yaml"
@@ -181,7 +185,7 @@ convencao_papeis_genericos:
   descricao: >
     Nomes "specialist-<papel>" usados em estados.*.agent sao aliases genericos
     resolvidos pelo domain router ativo (angular-router|spring-boot-router|
-    spring-reactive-router|ejb-router) para o id concreto do seu sub-catalogo
+    spring-reactive-router|ejb-router|python-router) para o id concreto do seu sub-catalogo
     que declara a tag role: correspondente (fixer|tester|stylist|implementer|
     advisory|performance). Tabela completa de resolucao por stack em
     workflows.md secao 1.3. Nunca invocar run_subagent com o nome generico
@@ -754,9 +758,10 @@ arestas:
         - "executar testes spring boot"    # → spring-boot-router
         - "executar testes reativos"       # → spring-reactive-router
         - "executar testes ejb"            # → ejb-router
+        - "executar testes python"         # → python-router
 
   # Delegação interna: Routers de domínio consultam test-strategy para mapear cenários antes de codar (Fluxo 2 TDD)
-  - de: "angular-router | spring-boot-router | spring-reactive-router | ejb-router"
+  - de: "angular-router | spring-boot-router | spring-reactive-router | ejb-router | python-router"
     para: test-strategy
     prioridade: 0.5
     threshold_score: 1.00
@@ -1021,6 +1026,27 @@ arestas:
         - "openejb"
         - "arquillian"
       sinal_r006: "É qualquer solicitação do ecossistema Java Legado EJB? (despacha para o catálogo de 7 especialistas backend em .github/agents/backend/ejb/ejb-catalog.yaml)"
+
+  # Supervisor e roteador de domínio Python Backend (Hierarchical Sub-Router)
+  - de: agent-router
+    para: python-router
+    prioridade: 1.6
+    threshold_score: 0.85
+    nivel_routing: rule-based
+    condicoes:
+      keywords:
+        - "python"
+        - "python-router"
+        - "fastapi"
+        - "django"
+        - "flask"
+        - "pytest"
+        - "pydantic"
+        - "sqlalchemy"
+        - "asyncio"
+        - "uvicorn"
+        - "celery"
+      sinal_r006: "É qualquer solicitação do ecossistema Python Backend? (despacha para o catálogo de 7 especialistas backend em .github/agents/backend/python/python-catalog.yaml)"
 
   # Supervisor e roteador de domínio Banco de Dados (Hierarchical Sub-Router)
   - de: agent-router

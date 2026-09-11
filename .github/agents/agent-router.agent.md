@@ -75,6 +75,7 @@ Você é o roteador obrigatório do fluxo agent-first no GitHub Copilot. Seu tra
 | Router Spring Boot | [`backend/spring-boot/spring-boot-router.agent.md`](backend/spring-boot/spring-boot-router.agent.md) | Supervisor hierárquico — orquestra e despacha para os 7 especialistas Spring Boot/Servlet/JPA |
 | Router Spring Reactive | [`backend/spring-reactive/spring-reactive-router.agent.md`](backend/spring-reactive/spring-reactive-router.agent.md) | Supervisor hierárquico — orquestra e despacha para os 7 especialistas WebFlux/Reactor |
 | Router Java Legado EJB | [`backend/ejb/ejb-router.agent.md`](backend/ejb/ejb-router.agent.md) | Supervisor hierárquico — orquestra e despacha para os 7 especialistas Java Legado EJB |
+| Router Python Backend | [`backend/python/python-router.agent.md`](backend/python/python-router.agent.md) | Supervisor hierárquico — orquestra e despacha para os 7 especialistas Python Backend |
 | Router de Banco de Dados | [`backend/database/database-router.agent.md`](backend/database/database-router.agent.md) | Supervisor hierárquico — despacha para 6 especialistas Oracle/Informix (migração, PL/SQL/SPL, query tuning) |
 | Especialista Banco de Dados (fallback) | [`database-specialist.agent.md`](database-specialist.agent.md) | Fallback genérico para SGBDs fora de Oracle/Informix (Flyway/Liquibase/Alembic) |
 | Engenheiro de Documentação | [`docs-engineer.agent.md`](docs-engineer.agent.md) | Autoria e curadoria de documentação técnica exclusivamente em `.md` |
@@ -222,6 +223,9 @@ Pedido recebido (já refinado por @prompt-structuring ou via Fast-Path)?
 |- É análise/recomendação, implementação OU testes em Java Legado EJB?
 |  |- Sim -> @ejb-router (supervisor hierárquico Java Legado EJB)
 |  \- Não
+|- É análise/recomendação, implementação OU testes em Python (FastAPI/Flask/Django/SQLAlchemy/pytest)?
+|  |- Sim -> @python-router (supervisor hierárquico backend Python)
+|  \- Não
 |- É migração de schema (Flyway/Liquibase/Alembic) Oracle/Informix, PL/SQL/SPL, query tuning ou otimização de índices?
 |  |- Sim -> @database-router (supervisor hierárquico Oracle/Informix; fallback @database-specialist para outros SGBDs)
 |  \- Não
@@ -232,7 +236,7 @@ Pedido recebido (já refinado por @prompt-structuring ou via Fast-Path)?
 |  |- Sim -> @business-rules-extractor
 |  \- Não
 |- Já existe plano de refactor APROVADO para executar (não criar do zero)?
-|  |- Sim -> delegar ao router de stack correspondente (@angular-router / @spring-boot-router / @spring-reactive-router / @ejb-router / @database-router)
+|  |- Sim -> delegar ao router de stack correspondente (@angular-router / @spring-boot-router / @spring-reactive-router / @ejb-router / @database-router / @python-router)
 |  \- Não
 |- É pedido de refatoração/plano de refactor estrutural (do zero)?
 |  |- Sim -> @refactor-planner (deve delegar mapeamento de blast radius/dependências ao `@code-knowledge-graph` — R-045)
@@ -411,6 +415,7 @@ Próximo passo mínimo:
 - [@spring-boot-router](backend/spring-boot/spring-boot-router.agent.md) para qualquer solicitação de backend Spring Boot (Servlet/JPA) — despacha para os 7 especialistas backend (arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer e test-fixer).
 - [@spring-reactive-router](backend/spring-reactive/spring-reactive-router.agent.md) para qualquer solicitação de backend reativo WebFlux/Reactor — despacha para os 7 especialistas reativos (arch-advisor, feature-developer, bug-fixer, resilience-tuner, unit-test-writer, integration-test-writer e test-fixer).
 - [@ejb-router](backend/ejb/ejb-router.agent.md) para qualquer solicitação de backend Java Legado EJB (EJB 2.x/3.x, SLSB, SFSB, MDB, JTA/CMT, EAR/WAR/JAR) — despacha para os 7 especialistas backend (arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer e test-fixer).
+- [@python-router](backend/python/python-router.agent.md) para qualquer solicitação de backend Python (FastAPI, Flask, Django, Pydantic, SQLAlchemy, pytest, asyncio) — despacha para os 7 especialistas backend (arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer e test-fixer).
 - [@database-router](backend/database/database-router.agent.md) para migração de schema Oracle/Informix (DDL/Flyway), Stored Procedures (PL/SQL/SPL) e query tuning read-only (Explain Plan/SET EXPLAIN) — despacha para os 6 especialistas (oracle-migration-dev, oracle-plsql-expert, oracle-query-tuner, informix-migration-dev, informix-spl-expert, informix-query-tuner).
 - [@database-specialist](database-specialist.agent.md) como fallback para migrações de schema (Flyway/Liquibase/Alembic) em SGBDs fora de Oracle/Informix.
 - [@test-strategy](test-strategy.agent.md) para estratégia/plano de testes e mapeamento de cenários por risco.
