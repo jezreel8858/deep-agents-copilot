@@ -6,6 +6,17 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.6.2] — 2026-09-11
+
+### Adicionado
+- **Prompt `/init-context` — Verificação de Deriva de Stack e Instruções Locais (Drift Detection)**:
+  - Adicionado novo PASSO 7 (expandindo a execução para 9 passos) para detectar discrepâncias entre os manifestos reais dos projetos locais externos (`package.json`, `pom.xml`, `build.gradle`, `pyproject.toml`) e os adapters locais em `.github/instructions/local/<projeto>.instructions.md` (R-043).
+  - Identifica automaticamente upgrades de versão major de frameworks (ex.: Angular 20 → 21, Spring Boot 2.x → 3.x) e migrações de test runners/bibliotecas (ex.: Karma/Jasmine → Vitest, JUnit 4 → JUnit 5, Jest → Vitest).
+  - Adiciona remediação guiada interativa via `ask_questions` (R-009) para sincronização do adapter local, linha dedicada na tabela de checklist consolidada, recomendações e troubleshooting.
+  - Inclusão da tool `ask_questions` em `tools:` e de `.github/skills/project-scanner/SKILL.md` em `source_docs:` do prompt.
+
+---
+
 ## [2.6.1] — 2026-09-11
 
 ### Refatorado
