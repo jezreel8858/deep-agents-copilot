@@ -175,74 +175,53 @@ Frameworks de referência (Claude Code/Agent SDK da Anthropic, Microsoft Agent F
 ### Mapa de Agents por Perfil (Mermaid)
 
 ```mermaid
-graph TB
-    subgraph CAT1["🎯 PLANNING &amp; ANALYSIS"]
+flowchart TB
+    subgraph COL_A
         direction TB
-        A1[requirements-analyst]
-        A2[deep-search]
-        A3[feature-planner]
+        subgraph CAT1["🎯 PLANNING &amp; ANALYSIS"]
+            direction TB
+            A1[requirements-analyst] ~~~ A2[deep-search] ~~~ A3[feature-planner]
+        end
+
+        subgraph CAT2["📐 ARCHITECTURE &amp; DESIGN"]
+            direction TB
+            B1[tech-solution-architect] ~~~ B2[code-knowledge-graph] ~~~ B3[business-rules-extractor]
+            B4[refactor-planner] ~~~ B5["ddd-bounded-context-mapper 🗺️"] ~~~ B6["adr-sentinel 📜"]
+        end
+
+        subgraph CAT3["💻 IMPLEMENTATION — Domain Routers &amp; Specialists"]
+            direction TB
+            C1[angular-router] ~~~ C2[spring-boot-router] ~~~ C3[spring-reactive-router] ~~~ C4[ejb-router]
+            C5[python-router] ~~~ C6[database-router] ~~~ C7[database-specialist]
+        end
+
+        CAT1 ~~~ CAT2 ~~~ CAT3
     end
 
-    subgraph CAT2["📐 ARCHITECTURE &amp; DESIGN"]
+    subgraph COL_B
         direction TB
-        B1[tech-solution-architect]
-        B2[code-knowledge-graph]
-        B3[business-rules-extractor]
-        B4[refactor-planner]
-        B5["ddd-bounded-context-mapper 🗺️"]
-        B6["adr-sentinel 📜"]
+        subgraph CAT4["✅ QUALITY &amp; VALIDATION"]
+            direction TB
+            D1[bug-triage] ~~~ D2[debugger] ~~~ D3[test-strategy] ~~~ D4[code-review] ~~~ D5[code-style-enforcer]
+            D6["security-reviewer 🔒"] ~~~ D7["performance-agent ⚡"] ~~~ D8["devops-engineer 🐳"] ~~~ D9["runtime-verifier 🩺"] ~~~ D10["repo-hygiene-auditor 🧹"]
+        end
+
+        subgraph CAT5["📚 DOCUMENTATION &amp; LEARNING"]
+            direction TB
+            E1[docs-engineer]
+        end
+
+        subgraph CAT6["🔄 GOVERNANCE &amp; ORCHESTRATION"]
+            direction TB
+            F1["agent-router ⭐"] ~~~ F2[prompt-structuring] ~~~ F3[governance-factory] ~~~ F4[agent-auditor] ~~~ F5[binding-initializer]
+            F6[adapter-generator] ~~~ F7["agentic-memory-manager 🧠"] ~~~ F8["compliance-guardrails 🛡️"] ~~~ F9["pr-gatekeeper 📦"] ~~~ F10["governance-maintainer 🛠️"]
+        end
+
+        CAT4 ~~~ CAT5 ~~~ CAT6
     end
 
-    subgraph CAT3["💻 IMPLEMENTATION — Domain Routers &amp; Specialists"]
-        direction TB
-        C1[angular-router]
-        C2[spring-boot-router]
-        C3[spring-reactive-router]
-        C4[ejb-router]
-        C5[python-router]
-        C6[database-router]
-        C7[database-specialist]
-    end
-
-    subgraph CAT4["✅ QUALITY &amp; VALIDATION"]
-        direction TB
-        D1[bug-triage]
-        D2[debugger]
-        D3[test-strategy]
-        D4[code-review]
-        D5[code-style-enforcer]
-        D6["security-reviewer 🔒"]
-        D7["performance-agent ⚡"]
-        D8["devops-engineer 🐳"]
-        D9["runtime-verifier 🩺"]
-        D10["repo-hygiene-auditor 🧹"]
-    end
-
-    subgraph CAT5["📚 DOCUMENTATION &amp; LEARNING"]
-        direction TB
-        E1[docs-engineer]
-    end
-
-    subgraph CAT6["🔄 GOVERNANCE &amp; ORCHESTRATION"]
-        direction TB
-        F1["agent-router ⭐"]
-        F2[prompt-structuring]
-        F3[governance-factory]
-        F4[agent-auditor]
-        F5[binding-initializer]
-        F6[adapter-generator]
-        F7["agentic-memory-manager 🧠"]
-        F8["compliance-guardrails 🛡️"]
-        F9["pr-gatekeeper 📦"]
-        F10["governance-maintainer 🛠️"]
-    end
-
-    F1 -.orquestra.-> CAT1
-    F1 -.orquestra.-> CAT2
-    F1 -.orquestra.-> CAT3
-    F1 -.orquestra.-> CAT4
-    F1 -.orquestra.-> CAT5
-    F1 -.orquestra.-> CAT6
+    style COL_A fill:none,stroke:none
+    style COL_B fill:none,stroke:none
 
     style CAT1 fill:#e3f2fd,stroke:#1976d2
     style CAT2 fill:#f3e5f5,stroke:#7b1fa2
