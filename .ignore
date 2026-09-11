@@ -1,0 +1,4 @@
+# Whitelist .github/ for ripgrep, file_search, and grep_search
+!.github/
+!.github/**
+

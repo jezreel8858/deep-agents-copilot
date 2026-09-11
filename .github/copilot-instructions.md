@@ -1,7 +1,9 @@
 # Instruções de IA — Base de Governança Reutilizável
 
 > Fonte de verdade operacional: [`CLAUDE.md`](../CLAUDE.md).
+> Mapa do Repositório (Repo Map): [`docs/ai-context/repo-map.md`](../docs/ai-context/repo-map.md).
 > Mapa de Adapters (compartilhado): [`docs/ai-context/catalog.yaml`](../docs/ai-context/catalog.yaml).
+> Catálogo de Agents (Modelos e Metadados): [`.github/agents/catalog.yaml`](agents/catalog.yaml).
 > Mapa de Projetos (LOCAL/gitignored, R-043): [`docs/ai-context/catalog.local.yaml`](../docs/ai-context/catalog.local.yaml).
 > IDs normativos: consulte `R-001..R-051` em `CLAUDE.md`.
 
@@ -101,6 +103,7 @@ Esta matriz é **responsabilidade do roteador** — não é regra global.
 - **Grafo de Roteamento (R-040)**: o roteamento de agents DEVE ser declarado como dado estruturado em `.github/agents/routing-graph.yaml`. A Decision Tree em prosa é documentação derivada. Toda nova rota exige: *(a)* entrada no grafo; *(b)* atualização da Decision Tree; *(c)* novo caso em `.github/agents/evals/casos-roteamento.yaml`.
 - **Execução via Context Mode (R-008 — Think in Code)**: Use **100% o `context-mode` MCP** para leitura, busca, escrita em lote, análise e remoção de arquivos (`ctx_execute`, `ctx_execute_file`, `ctx_index`, `ctx_search`). O processamento acontece no sandbox e apenas o resultado limpo entra na conversa. `read_file` e `replace_string_in_file` são reservados exclusivamente para edições cirúrgicas pontuais do editor. `run_in_terminal` é **FALLBACK de última instância** restrito exclusivamente a comandos de ciclo de vida (`git`, `npm install`, `mvn`, `pytest`) — comandos de varredura/leitura (`cat`, `grep`, `find`, scripts inline `node -e`) são terminantemente proibidos no terminal.
 - **Vinculação Compulsória de Governança de Terminal em Tooling (R-049)**: Todo agent (`*.agent.md`), prompt (`*.prompt.md`) ou entrada de catálogo que declare a ferramenta `run_in_terminal` em `tools:` DEVE compulsoriamente referenciar `.github/skills/terminal-governance/SKILL.md` em `source_docs:` (ou na seção `skills:` em sub-catálogos locais). É expressamente vedada a concessão de execução em terminal desprovida de vinculação com a respectiva skill de governança.
+- **Localização Determinística de Arquivos (Zero Blind Searches — Repo Map First)**: Consulte compulsoriamente `docs/ai-context/repo-map.md` para saber a localização exata de qualquer arquivo do projeto antes de buscar. NUNCA execute buscas cegas/especulativas (`file_search` ou `grep_search`) para arquivos de governança cujos caminhos são canônicos (ex.: `.github/agents/catalog.yaml` para metadados de agents, `docs/ai-context/catalog.yaml` para binding). Em caso de `file_search` indispensável, use sempre curinga inicial (`**/<nome>`) para compatibilidade com workspaces multi-root. Os arquivos `.ignore` e `.rgignore` na raiz desocultam `.github/` para que ripgrep indexe o repositório sem falhas de 0 matches.
 - **Pre-fetch automático pelo agent**: ao selecionar um agent, carregue automaticamente os `source_docs` declarados no `catalog.yaml` e anuncie o que foi anexado via a linha `Skills Carregadas:` do banner universal (R-042, `agent-contracts/SKILL.md` § 0) — nunca em prosa solta ou omitido. Usuário pode rejeitar com "Sem pre-fetch".
 - **Um comando por vez**: leia o output uma única vez.
 - **`get_errors` consolidado**: chame `get_errors` uma única vez ao final do lote com o array completo `filePaths`, nunca arquivo por arquivo.
@@ -446,7 +449,9 @@ Cada adapter na raiz de `.github/instructions/` deve:
 
 ## 7) Índices de Governança
 
-- **Adapters/Binding:** `docs/ai-context/catalog.yaml` (manifest de carregamento hierárquico)
+- **Mapa do Repositório (Repo Map):** `docs/ai-context/repo-map.md` (fonte de verdade de navegação determinística de arquivos)
+- **Catálogo de Agents:** `.github/agents/catalog.yaml` (37 agents, modelos, domínios, prioridades)
+- **Adapters/Binding:** `docs/ai-context/catalog.yaml` (manifest de carregamento hierárquico — NUNCA buscar agents aqui)
 - **Grafo de Roteamento (R-040):** `.github/agents/routing-graph.yaml` (fonte estrutural — nós, arestas, cascata)
 - **Suíte de Evals:** `.github/agents/evals/casos-roteamento.yaml` (quality gate de regressão de roteamento)
 - **Instructions:** `.github/instructions/README.md` + `.github/instructions/*.instructions.md`

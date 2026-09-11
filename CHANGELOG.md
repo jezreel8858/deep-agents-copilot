@@ -6,6 +6,22 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.5.0] — 2026-09-10
+
+### Adicionado
+- **Mapa do Repositório Canônico (`docs/ai-context/repo-map.md`)**:
+  - Fonte de verdade de navegação determinística de arquivos (princípio Zero Blind Searches), contendo guia de localização direta, tabela rápida de arquivos de governança (Quick File Finder) e árvore física estrutural do projeto.
+- **Whitelist de Busca e Indexação para ripgrep (`.ignore` e `.rgignore`)**:
+  - Arquivos de configuração na raiz liberando a varredura de `!.github/` e `!.github/**` pelas ferramentas de busca (`file_search` e `grep_search`), sanando falhas de localização com 0 matches de agents e skills em workspaces multi-root.
+
+### Alterado
+- **Desambiguação Canônica dos Catálogos (`catalog.yaml`)**:
+  - Formalizada a distinção unívoca entre o Catálogo de Agents (`.github/agents/catalog.yaml` — metadados, modelos Gemini/Claude, prioridades) e o Catálogo de Binding (`docs/ai-context/catalog.yaml` — manifest de stacks e adapters).
+  - Atualizadas as instruções em `CLAUDE.md`, `.github/copilot-instructions.md` e `.github/agents/agent-router.agent.md` proibindo explicitamente que o router busque modelos em `docs/ai-context/catalog.yaml`.
+  - Inclusão do `repo-map.md` como leitura de infraestrutura mandatória no `@agent-router`.
+
+---
+
 ## [2.4.0] — 2026-09-10
 
 ### Adicionado

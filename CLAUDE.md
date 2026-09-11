@@ -157,7 +157,10 @@ Solicitação do Usuário (turno N)
     - Health Check (R-034): Se faltarem `catalog.yaml` + `binding.md`, disparar `binding-initializer` automaticamente
   - **Novo (v1.3 — R-043)**:
     - Local Overlay Pattern: projetos/adapters locais vivem em `catalog.local.yaml` + `.github/instructions/local/` (gitignored) — nunca em `catalog.yaml`/`.github/instructions/` (compartilhados)
-- `.github/agents/catalog.yaml` -> catálogo estruturado de agents.
+- `docs/ai-context/repo-map.md` -> mapa estrutural do repositório para navegação determinística de arquivos (zero buscas cegas).
+- `.ignore` e `.rgignore` -> whitelist de `.github/` para indexação por ripgrep (file_search e grep_search sem 0 matches).
+- `.github/agents/catalog.yaml` -> catálogo estruturado de agents (metadados e modelos — NUNCA confundir com `docs/ai-context/catalog.yaml` de binding).
+- `docs/ai-context/catalog.yaml` -> manifest de binding de adapters e stacks.
 - `.github/skills/.index.json` -> índice estruturado de skills.
 
 ## 6) Catálogo Atual (estado verificado)
