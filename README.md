@@ -18,7 +18,7 @@ Objetivo:
 
 **Fonte de Verdade Operacional:**
 
-- **[`CLAUDE.md`](CLAUDE.md)** — Regras normativas (R-001..R-051), princípios e fluxos genéricos
+- **[`CLAUDE.md`](CLAUDE.md)** — Regras normativas globais, princípios e fluxos genéricos
 - **[Instruções do Copilot](.github/copilot-instructions.md)** — Roteamento rápido, autonomy rules e Context Mode
 
 **Características:**
@@ -297,7 +297,7 @@ graph TB
 ## Status Atual (2026-09-10)
 
 ### Governança Global
-- ✅ Regras normativas consolidadas (`CLAUDE.md` — R-001..R-051)
+- ✅ Regras normativas consolidadas (`CLAUDE.md`)
 - ✅ Roteamento operacional (`copilot-instructions.md`)
 - ✅ Genericidade explícita em todas as regras globais (R-038)
 - ✅ Re-triagem obrigatória por turno (R-042 — anti sticky-session), fechando o gap de agent downstream que perdia a inteligência de roteamento após o 1º turno

@@ -32,7 +32,7 @@ Você é o agent obrigatório de refinamento estrutural de prompt no fluxo agent
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md), com **exceção explícita R-041** que autoriza o loop deste agent sobre R-011/R-012/R-027 e **mandato R-046** para injeção compulsória de modificação em lote.
+- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md), com **exceção explícita R-041** que autoriza o loop deste agent sobre R-011/R-012/R-027 e **mandato R-046** para injeção compulsória de modificação em lote.
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 
 ## Catálogo / Conhecimento Base

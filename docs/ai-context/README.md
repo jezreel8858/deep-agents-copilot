@@ -45,7 +45,7 @@
 
 ```
 <repo>/
-├── CLAUDE.md ......................... Regras globais de IA (R-001..R-051)
+├── CLAUDE.md ......................... Regras globais de IA (CLAUDE.md)
 ├── .github/
 │   ├── copilot-instructions.md ....... Operacional + Roteamento
 │   └── instructions/
@@ -143,7 +143,7 @@
 
 👉 **Para Regras Globais**
 
-👉 **[`CLAUDE.md`](../../CLAUDE.md)** — Regras normativas (R-001..R-051)
+👉 **[`CLAUDE.md`](../../CLAUDE.md)** — Regras normativas globais
 
 👉 **[`.github/copilot-instructions.md`](../../.github/copilot-instructions.md)** — Operacional
 
@@ -189,7 +189,7 @@ git commit -m "feat: adicionar adapter novo-dominio"
 
 - **GitHub Docs:** [Copilot Custom Instructions](https://docs.github.com/en/copilot/customizing-copilot/adding-custom-instructions)
 - **Cursor Docs:** [Rules for AI](https://docs.cursor.com/context/rules-for-ai)
-- **CLAUDE.md:** Governança global (R-001..R-051)
+- **CLAUDE.md:** Governança global (CLAUDE.md)
 
 ---
 

@@ -350,7 +350,7 @@ def test_smell_2_9_source_docs_referential_integrity():
 
 
 # ─────────────────────────────────────────────────────────────
-# SMELL 2.15 — Citação de Range Normativo Desatualizado (Drift de R-0XX)
+# SMELL 2.15 — Acoplamento Rígido de Range Normativo (Hardcoded Range Coupling)
 # ─────────────────────────────────────────────────────────────
 
 def _get_latest_normative_rule_number() -> int:
@@ -361,26 +361,34 @@ def _get_latest_normative_rule_number() -> int:
     return max(rule_numbers)
 
 
-def test_smell_2_15_no_stale_normative_rule_range():
-    """Smell 2.15: nenhum agent com seção 'Regras Herdadas' deve citar um range
-    R-001..R-0XX inferior ao maior R-0XX vigente em CLAUDE.md (drift de sincronização —
-    achado sistêmico de 2026-09: 44/44 agents estavam desatualizados antes da correção)."""
-    latest = _get_latest_normative_rule_number()
-    stale = []
+def test_smell_2_15_no_hardcoded_normative_rule_range():
+    """Smell 2.15: nenhum agent deve conter acoplamento rígido de range numérico
+    normativo (ex: R-001..R-051) em 'Regras Herdadas' ou no corpo.
+    A referência a CLAUDE.md deve ser aberta e desacoplada da quantidade de regras (R-xxx),
+    eliminando shotgun surgery e queima de créditos a cada nova regra adicionada.
+    Além disso, todo agent com seção 'Regras Herdadas' DEVE referenciar CLAUDE.md."""
+    hardcoded = []
+    missing_claude_ref = []
     for agent_file in get_all_agent_files():
         content = agent_file.read_text(encoding="utf-8")
-        match = re.search(r"R-001\.\.R-(\d{3})", content)
-        if not match:
-            continue
-        cited = int(match.group(1))
-        if cited < latest:
-            stale.append((agent_file.relative_to(REPO_ROOT), cited))
+        if "Regras Herdadas" in content:
+            if "CLAUDE.md" not in content:
+                missing_claude_ref.append(agent_file.relative_to(REPO_ROOT))
 
-    assert not stale, (
-        f"Smell 2.15: {len(stale)} agent(s) citam range normativo desatualizado "
-        f"(esperado R-001..R-{latest:03d}):\n"
-        + "\n".join(f"  - {path}: R-001..R-{val:03d}" for path, val in stale)
+        match = re.search(r"R-001\.\.R-\d{3}", content)
+        if match:
+            hardcoded.append((agent_file.relative_to(REPO_ROOT), match.group(0)))
+
+    assert not missing_claude_ref, (
+        f"Smell 2.15: {len(missing_claude_ref)} agent(s) com 'Regras Herdadas' não referenciam CLAUDE.md:\n"
+        + "\n".join(f"  - {path}" for path in missing_claude_ref)
     )
+    assert not hardcoded, (
+        f"Smell 2.15 (Acoplamento Rígido de Range): {len(hardcoded)} agent(s) contêm range numérico hardcoded "
+        f"(deve usar herança aberta 'regras normativas globais em CLAUDE.md'):\n"
+        + "\n".join(f"  - {path}: {val}" for path, val in hardcoded)
+    )
+
 
 
 # ─────────────────────────────────────────────────────────────

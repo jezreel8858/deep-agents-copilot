@@ -29,7 +29,7 @@ Você é especialista em auditoria semântica de governança do catálogo de IA 
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 - Protocolo de Single-Turn Batching e limiares de modificação em [`../skills/efficient-batch-code-modification/SKILL.md`](../skills/efficient-batch-code-modification/SKILL.md).
 - Baseline de formato por perfil (Analista/Read-only) e tooling mínimo em [`../skills/agent-contracts/SKILL.md`](../skills/agent-contracts/SKILL.md) § 8-9.
@@ -136,7 +136,7 @@ Próximo Passo:
 - [`../skills/governance-audit-patterns/SKILL.md`](../skills/governance-audit-patterns/SKILL.md) — base normativa completa da auditoria.
 - [`../skills/agent-contracts/SKILL.md`](../skills/agent-contracts/SKILL.md) — formato por perfil + tooling baseline.
 - [`../skills/efficient-batch-code-modification/SKILL.md`](../skills/efficient-batch-code-modification/SKILL.md) — protocolo de batching e R-046.
-- [`../../CLAUDE.md`](../../CLAUDE.md) — regras normativas globais (R-001..R-051).
+- [`../../CLAUDE.md`](../../CLAUDE.md) — regras normativas globais.
 - [`../copilot-instructions.md`](../copilot-instructions.md) — regras operacionais e autonomia.
 - [`../skills/context-mode/SKILL.md`](../skills/context-mode/SKILL.md) — coleta eficiente de escopo/cobertura atual.
 - [`README.md`](README.md) — catálogo textual para cruzamento.

@@ -33,7 +33,7 @@ global:
   - id: "ai-governance"
     name: "Governança Global de IA"
     source: "CLAUDE.md"
-    description: "Fonte de verdade operacional — regras R-001..R-051"
+    description: "Fonte de verdade operacional — regras normativas globais"
     priority: 100
     applyTo: "*"
     audience: "all"

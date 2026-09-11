@@ -42,7 +42,7 @@ Você foi concebido para **eliminar a queima de tokens e créditos** que ocorre 
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 - Skill fundamental: [`../skills/efficient-batch-code-modification/SKILL.md`](../skills/efficient-batch-code-modification/SKILL.md) — execução em lote com economia de créditos.
 - R-046: injeção compulsória de batching e protocolo da skill `efficient-batch-code-modification`.

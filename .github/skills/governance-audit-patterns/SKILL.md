@@ -250,15 +250,15 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 
 ---
 
-### 2.15 — Citação de Range Normativo Desatualizado (Drift de R-0XX)
+### 2.15 — Acoplamento Rígido de Range Normativo (Hardcoded Normative Range Coupling)
 
 | Campo | Conteúdo |
 |---|---|
-| Sintoma | Seção `## Regras Herdadas` de um `.agent.md` cita um range `R-001..R-0XX` onde `XX` é menor que a última regra normativa vigente em `CLAUDE.md` (atualmente R-051) — o agent não referencia formalmente as regras mais recentes, mesmo herdando-as implicitamente via link ao arquivo completo |
-| Como detectar | Regex `R-001\.\.R-(\d{3})` em cada `.github/agents/**/*.agent.md`; comparar o valor capturado contra o maior `R-0XX` declarado em `CLAUDE.md` § 3; qualquer valor menor é um achado. Ver Tier 1: `test_smell_2_15_no_stale_normative_rule_range` |
-| Origem (TrustAgent) | Extrínseco — `CLAUDE.md` evolui (novas regras) mas os agents consumidores não são atualizados na mesma entrega (violação de R-015 a posteriori) |
-| Severidade | Baixa individualmente, mas **Alta em agregado** quando sistêmica (evidência real: 44/44 agents com a seção encontrados desatualizados simultaneamente em auditoria de 2026-09 — sinal de ausência de processo de sincronização, não de um lapso isolado) |
-| Remediação | Batch update via `@governance-maintainer`: script `ctx_execute` com match-verificado por arquivo (ler → contar ocorrências == 1 → substituir → escrever), nunca `insert_edit_into_file` em arquivos grandes/YAML sensível a indentação (incidente documentado: corrompeu `workflows.md` e `routing-graph.yaml` na auditoria de 2026-09 ao tentar edições multi-linha sem ancoragem precisa) |
+| Sintoma | Seção `## Regras Herdadas` de um `.agent.md` ou prompt cita um range numérico fechado (ex.: `R-001..R-051`), acoplando o consumidor à cardinalidade exata de regras vigentes em `CLAUDE.md` e forçando *Shotgun Surgery* (edições em massa em 44+ arquivos e queima de créditos a cada nova regra criada) |
+| Como detectar | Regex `R-001\.\.R-(\d{3})` em cada `.github/agents/**/*.agent.md` e prompts; qualquer ocorrência de range numérico fechado é um achado. Ver Tier 1: `test_smell_2_15_no_hardcoded_normative_rule_range` |
+| Origem (TrustAgent) | Intrínseco — acoplamento frágil entre consumidores de governança e o contador numérico de regras |
+| Severidade | **Alta em Custo Operacional** (gera retrabalho sistêmico, edições em massa e gasto desnecessário de tokens/créditos em cascata) |
+| Remediação | Substituir o range fechado por herança aberta e desacoplada: `- Regras normativas globais em [caminho]/CLAUDE.md.` |
 
 ### 2.16 — Agent Mutativo Sem Skill de Edição Segura Referenciada (R-051)
 

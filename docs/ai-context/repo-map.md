@@ -50,7 +50,7 @@ Quando for estritamente necessário buscar por padrão:
 
 ```
 deep-agents-copilot/
-├── CLAUDE.md                                    # Governança global (regras R-001..R-051)
+├── CLAUDE.md                                    # Governança global (CLAUDE.md)
 ├── README.md                                    # Visão geral do repositório
 ├── .ignore / .rgignore                          # Whitelist para ripgrep indexar .github/
 │
@@ -118,7 +118,7 @@ deep-agents-copilot/
 │   └── requirements/                            # Requisitos de sistema
 │
 └── tests/                                       # Suíte de Testes Automatizados (pytest)
-    ├── governance_audit/                        # Auditoria de regras e smells (R-001..R-051)
+    ├── governance_audit/                        # Auditoria de regras e smells de governança
     ├── routing_gate/                            # Quality gate de roteamento
     ├── operational_flow/                        # Testes de workflows operacionais
     └── code-summarizer/                         # Testes do summarizer

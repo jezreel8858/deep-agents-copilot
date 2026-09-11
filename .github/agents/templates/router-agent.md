@@ -28,7 +28,7 @@ Você é o supervisor de domínio e roteador especializado de <domínio/stack>. 
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-051` em [`../../../../CLAUDE.md`](../../../../CLAUDE.md).
+- Regras normativas globais em [`../../../../CLAUDE.md`](../../../../CLAUDE.md).
 - Sub-catálogo local em [`<dominio>-catalog.yaml`](./<dominio>-catalog.yaml).
 
 ## Skills Associadas

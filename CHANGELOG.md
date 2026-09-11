@@ -6,6 +6,18 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.6.1] — 2026-09-11
+
+### Refatorado
+- **Desacoplamento de Cardinalidade Normativa (Herança Aberta de Governança)**:
+  - Substituição da referência rígida ao contador fechado (`R-001..R-051`) pela herança aberta desacoplada (`regras normativas globais em CLAUDE.md`) em 45 agents/templates e todos os prompts, skills e catálogos.
+  - Eliminação definitiva do problema de *Shotgun Surgery* (manutenção em cascata e gasto desnecessário de créditos Copilot a cada nova regra adicionada ao `CLAUDE.md`).
+- **Redefinição do Smell 2.15 (`governance-audit-patterns/SKILL.md` & `test_governance_smells.py`)**:
+  - Inversão de sentido do Smell 2.15 de "range desatualizado" para "Acoplamento Rígido de Range Normativo (Hardcoded Range Coupling)".
+  - Nova validação automatizada em `test_smell_2_15_no_hardcoded_normative_rule_range`: exige que todo agent herde `CLAUDE.md` e proíbe a reintrodução de ranges numéricos hardcoded em agents.
+
+---
+
 ## [2.6.0] — 2026-09-10
 
 ### Adicionado

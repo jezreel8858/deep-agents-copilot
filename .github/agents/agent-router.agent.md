@@ -42,14 +42,14 @@ Você é o roteador obrigatório do fluxo agent-first no GitHub Copilot. Seu tra
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 - Governança de terminal (fallback de última instância): [`../skills/terminal-governance/SKILL.md`](../skills/terminal-governance/SKILL.md).
 
 ## Catálogo / Conhecimento Base
 
 **Infraestrutura do Projeto (sempre presente — agente assume acesso direto):**
-- [`../../CLAUDE.md`](../../CLAUDE.md) — regras globais + IDs normativos (R-001..R-051)
+- [`../../CLAUDE.md`](../../CLAUDE.md) — regras globais e normativas
 - [`../copilot-instructions.md`](../copilot-instructions.md) — regras operacionais locais do GitHub Copilot
 - [`../../docs/ai-context/repo-map.md`](../../docs/ai-context/repo-map.md) — **Mapa do Repositório (Repo Map)** para localização determinística de arquivos (zero buscas cegas)
 - [`catalog.yaml`](catalog.yaml) — **catálogo estruturado de agents** (`.github/agents/catalog.yaml` — verdade para modelos e metadados de agents; NUNCA confundir com `docs/ai-context/catalog.yaml` de binding)

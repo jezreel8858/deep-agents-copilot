@@ -1,7 +1,7 @@
 # Arquitetura e Estrutura de Testes — Multi-Agent System (MAS)
 
 > **Documentação de Governança de Qualidade**  
-> Referência normativa: [`CLAUDE.md`](../CLAUDE.md) (`R-001..R-051`), [`agent-evals-lab/SKILL.md`](../.github/skills/agent-evals-lab/SKILL.md) e [`governance-audit-patterns/SKILL.md`](../.github/skills/governance-audit-patterns/SKILL.md).
+> Referência normativa: [`CLAUDE.md`](../CLAUDE.md) (regras normativas globais), [`agent-evals-lab/SKILL.md`](../.github/skills/agent-evals-lab/SKILL.md) e [`governance-audit-patterns/SKILL.md`](../.github/skills/governance-audit-patterns/SKILL.md).
 
 Este documento descreve a arquitetura, a taxonomia e a cobertura de todos os arquivos de teste do ecossistema `deep-agents-copilot`. Seguindo as melhores práticas da engenharia de software para **Sistemas Multi-Agentes (MAS)** de 2025/2026, a qualidade é tratada como um **Quality Gate Contínuo em Camadas**, garantindo determinismo, segurança, menor privilégio de ferramentas e prevenção de regressões em rotas e workflows.
 
@@ -83,7 +83,7 @@ Abaixo detalha-se o escopo de cobertura e a importância crítica de cada arquiv
   - **Smell 2.7 / 2.7.1**: Matriz de ferramentas por papel (agents read-only proibidos de possuir ferramentas mutativas de escrita; uso de terminal exigindo `terminal-governance` por R-049; context-mode exigindo skill por R-008).
   - **Smell 2.8**: Protocolo de batching R-046 em agents mutativos.
   - **Smell 2.11**: Teto de 8 linhas para código inline executável em skills (R-026).
-  - **Smell 2.15 / 2.16 / 2.17 / 2.20**: Referência a ranges normativos atualizados, desativação de pager no Git (`--no-pager` por R-035) e regra de delegação plana no router (R-047).
+  - **Smell 2.15 / 2.16 / 2.17 / 2.20**: Prevenção de acoplamento rígido de range normativo (herança aberta de CLAUDE.md), desativação de pager no Git (`--no-pager` por R-035) e regra de delegação plana no router (R-047).
 - **Importância para a qualidade**: Atua como o **escudo primário de governança**. Impede que agentes degradem seus contratos operacionais ou acumulem ferramentas perigosas (como permissão de escrita em agentes de auditoria), eliminando regressões antes da revisão humana.
 
 #### `test_local_project_isolation.py`

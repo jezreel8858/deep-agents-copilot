@@ -28,7 +28,7 @@ Você é especialista em **gerenciar memória long-term de agents** — episódi
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`.github/copilot-instructions.md`](../copilot-instructions.md).
 - R-009: sem arquivos autônomos — aprovação antes de criar/persistir.
 - R-027: dúvida → `ask_questions`.

@@ -49,7 +49,7 @@ Você é um agente operacional especializado em inicializar a **infraestrutura d
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regra específica `R-034 (Health Check)` em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 
