@@ -7,37 +7,213 @@
   },
   "skills": [
     {
-      "name": "prompt-engineering-patterns",
-      "tier": 2,
-      "category": "process",
-      "path": ".github/skills/prompt-engineering-patterns/SKILL.md",
+      "name": "agent-contracts",
+      "tier": 1,
+      "category": "governance",
+      "path": ".github/skills/agent-contracts/SKILL.md",
+      "tools": [
+        "context-mode"
+      ],
       "related_agents": [
-        "@prompt-structuring",
         "@agent-router",
-        "@deep-search"
+        "@governance-factory",
+        "@docs-engineer",
+        "@tech-solution-architect"
       ]
     },
     {
-      "name": "context-mode",
-      "tier": 1,
-      "category": "process",
-      "path": ".github/skills/context-mode/SKILL.md",
+      "name": "agent-evals-lab",
+      "tier": 2,
+      "category": "quality",
+      "path": ".github/skills/agent-evals-lab/SKILL.md",
+      "tools": [
+        "context-mode",
+        "tavily"
+      ],
+      "related_agents": [
+        "@governance-factory",
+        "@test-strategy",
+        "@tech-solution-architect",
+        "@agent-router"
+      ]
+    },
+    {
+      "name": "agent-memory-policy",
+      "tier": 3,
+      "category": "governance",
+      "path": ".github/skills/agent-memory-policy/SKILL.md",
+      "description": "Política de memória long-term para agents de IA: tipos episódico, semântico e procedimental. Foco em memória procedimental (agents auto-adaptativos) com guardrails de segurança e aprovação humana obrigatória (R-027).",
+      "tools": [
+        "context-mode"
+      ],
+      "related_agents": [
+        "@governance-factory",
+        "@agent-router",
+        "@docs-engineer",
+        "@context-builder"
+      ]
+    },
+    {
+      "name": "agent-observability-otel",
+      "tier": 2,
+      "category": "observability",
+      "path": ".github/skills/agent-observability-otel/SKILL.md",
+      "tools": [
+        "context-mode",
+        "sonarqube-governance"
+      ],
       "related_agents": [
         "@agent-router",
-        "@deep-search",
+        "@tech-solution-architect",
+        "@context-builder"
+      ]
+    },
+    {
+      "name": "agent-safety-guardrails",
+      "tier": 1,
+      "category": "security",
+      "path": ".github/skills/agent-safety-guardrails/SKILL.md",
+      "tools": [
+        "context-mode"
+      ],
+      "related_agents": [
+        "@governance-factory",
         "@tech-solution-architect",
         "@bug-triage",
+        "@docs-engineer"
+      ]
+    },
+    {
+      "name": "angular-frontend-patterns",
+      "tier": 2,
+      "category": "quality",
+      "description": "Boas práticas e patterns de codificação Angular para componentes modernos, templates, reatividade, segurança e consistência arquitetural.",
+      "path": ".github/skills/angular-frontend-patterns/SKILL.md",
+      "related_agents": [
+        "@angular-router",
+        "@tech-solution-architect",
+        "@test-strategy"
+      ]
+    },
+    {
+      "name": "angular-implementation-patterns",
+      "tier": 2,
+      "category": "quality",
+      "description": "Padrões de mercado (2026) para IMPLEMENTAR features/bugs em Angular — fronteira Signals/RxJS, testing-first, checklist de PR. Contraparte de execução de angular-frontend-patterns.",
+      "path": ".github/skills/angular-implementation-patterns/SKILL.md",
+      "related_agents": [
+        "@angular-router"
+      ]
+    },
+    {
+      "name": "angular-performance-patterns",
+      "tier": 2,
+      "category": "quality",
+      "path": ".github/skills/angular-performance-patterns/SKILL.md",
+      "related_agents": [
+        "@angular-router",
+        "@performance-agent",
+        "@tech-solution-architect"
+      ]
+    },
+    {
+      "name": "angular-responsive-ui-patterns",
+      "tier": 2,
+      "category": "quality",
+      "description": "Diretrizes de responsividade para Angular: mobile-first, breakpoints, layout fluido, container queries, imagens responsivas e validação multi-viewport.",
+      "path": ".github/skills/angular-responsive-ui-patterns/SKILL.md",
+      "related_agents": [
+        "@angular-router",
+        "@tech-solution-architect",
+        "@test-strategy"
+      ]
+    },
+    {
+      "name": "business-rules-governance",
+      "tier": 1,
+      "category": "documentation",
+      "path": ".github/skills/business-rules-governance/SKILL.md",
+      "description": "Taxonomia, templates e protocolos para extrair, documentar e validar regras de negócio de código-fonte em qualquer linguagem. Formato markdown canônico para ground truth de refatorações.",
+      "tools": [
+        "read_file",
+        "grep_search",
+        "file_search",
+        "create_file",
+        "insert_edit_into_file"
+      ],
+      "related_agents": [
+        "@business-rules-extractor",
+        "@refactor-planner",
+        "@docs-engineer",
+        "@tech-solution-architect"
+      ]
+    },
+    {
+      "name": "code-review-patterns",
+      "tier": 2,
+      "category": "quality",
+      "description": "Diretrizes de mercado para revisão de código automatizada por IA — taxonomia de severidade, dimensões de análise, critérios de bloqueio de merge e anti-padrões de review.",
+      "path": ".github/skills/code-review-patterns/SKILL.md",
+      "related_agents": [
+        "@code-review",
+        "@bug-triage",
+        "@tech-solution-architect"
+      ]
+    },
+    {
+      "name": "code-tracing",
+      "tier": 1,
+      "category": "tooling",
+      "path": ".github/skills/code-tracing/SKILL.md",
+      "description": "Estratégias para rastrear código de um sintoma até a causa raiz — grep vs semântico, stack trace parsing, call graph, rastreio de API/método e coleta mínima de evidências. Agnóstico de linguagem.",
+      "tools": [
+        "grep_search",
+        "file_search",
+        "read_file",
+        "run_in_terminal"
+      ],
+      "related_agents": [
+        "@bug-triage",
+        "@test-strategy",
         "@refactor-planner",
         "@business-rules-extractor",
-        "@docs-engineer",
-        "@context-builder",
-        "@test-strategy",
-        "@governance-factory",
-        "@binding-initializer",
-        "@adapter-generator",
-        "@angular-router",
-        "@spring-boot-router",
-        "@spring-reactive-router"
+        "@tech-solution-architect"
+      ]
+    },
+    {
+      "name": "codegraph-optave-usage",
+      "tier": 2,
+      "category": "tooling",
+      "description": "Uso da lib externa @optave/codegraph (CLI local e MCP Server enxuto, zero API keys) como motor único de build/consulta de grafo de conhecimento de código — build, query, blast radius, ciclos, dead code, dataflow e CI gate — base do agent code-knowledge-graph.",
+      "path": ".github/skills/codegraph-optave-usage/SKILL.md",
+      "related_agents": [
+        "@code-knowledge-graph"
+      ]
+    },
+    {
+      "name": "compliance-governance-patterns",
+      "tier": 2,
+      "category": "security",
+      "description": "SOC 2 (Type I/II), GDPR/LGPD, HIPAA, ISO 27001, audit trails, least privilege/RBAC e retenção de dado pessoal para avaliação de conformidade regulatória de aplicação — base do agent compliance-guardrails, distinto de agent-safety-guardrails (segurança do próprio agent de IA).",
+      "path": ".github/skills/compliance-governance-patterns/SKILL.md",
+      "related_agents": [
+        "@compliance-guardrails"
+      ]
+    },
+    {
+      "name": "confidence-fallback-policy",
+      "tier": 1,
+      "category": "governance",
+      "path": ".github/skills/confidence-fallback-policy/SKILL.md",
+      "tools": [
+        "context-mode",
+        "tavily"
+      ],
+      "related_agents": [
+        "@agent-router",
+        "@bug-triage",
+        "@tech-solution-architect",
+        "@deep-search"
       ]
     },
     {
@@ -69,382 +245,26 @@
       ]
     },
     {
-      "name": "sonarqube-governance",
-      "tier": 2,
-      "category": "quality",
-      "path": ".github/skills/sonarqube-governance/SKILL.md",
-      "tools": [
-        "sonarqube-monitor"
-      ],
+      "name": "context-mode",
+      "tier": 1,
+      "category": "process",
+      "path": ".github/skills/context-mode/SKILL.md",
       "related_agents": [
-        "@tech-solution-architect"
-      ]
-    },
-    {
-      "name": "tavily",
-      "tier": 2,
-      "category": "research",
-      "path": ".github/skills/tavily/SKILL.md",
-      "related_agents": [
+        "@agent-router",
         "@deep-search",
         "@tech-solution-architect",
+        "@bug-triage",
+        "@refactor-planner",
+        "@business-rules-extractor",
+        "@docs-engineer",
+        "@context-builder",
+        "@test-strategy",
+        "@governance-factory",
+        "@binding-initializer",
+        "@adapter-generator",
         "@angular-router",
         "@spring-boot-router",
         "@spring-reactive-router"
-      ]
-    },
-    {
-      "name": "mermaid-diagrams",
-      "tier": 2,
-      "category": "documentation",
-      "path": ".github/skills/mermaid-diagrams/SKILL.md",
-      "related_agents": [
-        "@deep-search",
-        "@tech-solution-architect"
-      ]
-    },
-    {
-      "name": "agent-contracts",
-      "tier": 1,
-      "category": "governance",
-      "path": ".github/skills/agent-contracts/SKILL.md",
-      "tools": [
-        "context-mode"
-      ],
-      "related_agents": [
-        "@agent-router",
-        "@governance-factory",
-        "@docs-engineer",
-        "@tech-solution-architect"
-      ]
-    },
-    {
-      "name": "handoff-governance",
-      "tier": 1,
-      "category": "governance",
-      "path": ".github/skills/handoff-governance/SKILL.md",
-      "tools": [
-        "context-mode"
-      ],
-      "related_agents": [
-        "@agent-router",
-        "@deep-search",
-        "@tech-solution-architect"
-      ]
-    },
-    {
-      "name": "confidence-fallback-policy",
-      "tier": 1,
-      "category": "governance",
-      "path": ".github/skills/confidence-fallback-policy/SKILL.md",
-      "tools": [
-        "context-mode",
-        "tavily"
-      ],
-      "related_agents": [
-        "@agent-router",
-        "@bug-triage",
-        "@tech-solution-architect",
-        "@deep-search"
-      ]
-    },
-    {
-      "name": "agent-safety-guardrails",
-      "tier": 1,
-      "category": "security",
-      "path": ".github/skills/agent-safety-guardrails/SKILL.md",
-      "tools": [
-        "context-mode"
-      ],
-      "related_agents": [
-        "@governance-factory",
-        "@tech-solution-architect",
-        "@bug-triage",
-        "@docs-engineer"
-      ]
-    },
-    {
-      "name": "agent-observability-otel",
-      "tier": 2,
-      "category": "observability",
-      "path": ".github/skills/agent-observability-otel/SKILL.md",
-      "tools": [
-        "context-mode",
-        "sonarqube-governance"
-      ],
-      "related_agents": [
-        "@agent-router",
-        "@tech-solution-architect",
-        "@context-builder"
-      ]
-    },
-    {
-      "name": "agent-evals-lab",
-      "tier": 2,
-      "category": "quality",
-      "path": ".github/skills/agent-evals-lab/SKILL.md",
-      "tools": [
-        "context-mode",
-        "tavily"
-      ],
-      "related_agents": [
-        "@governance-factory",
-        "@test-strategy",
-        "@tech-solution-architect",
-        "@agent-router"
-      ]
-    },
-    {
-      "name": "yaml-governance",
-      "tier": 2,
-      "category": "governance",
-      "path": ".github/skills/yaml-governance/SKILL.md",
-      "tools": [
-        "yamllint",
-        "check-jsonschema",
-        "yq",
-        "kubeconform"
-      ],
-      "related_agents": [
-        "@agent-router",
-        "@tech-solution-architect",
-        "@deep-search"
-      ]
-    },
-    {
-      "name": "test-implementation-backend",
-      "tier": 2,
-      "category": "testing",
-      "scope": "generico",
-      "description": "Padrões agnósticos de framework para backend — pirâmide de testes, AAA, isolamento, nomenclatura",
-      "path": ".github/skills/test-implementation-backend/SKILL.md",
-      "related_agents": [
-        "@test-strategy"
-      ]
-    },
-    {
-      "name": "test-implementation-spring-boot",
-      "tier": 2,
-      "category": "testing",
-      "scope": "especifico",
-      "stack": "Java + Spring Boot + JUnit 5 + Mockito + JaCoCo",
-      "description": "Padrões específicos JUnit 5, Mockito, @WebMvcTest, @DataJpaTest, mvn test",
-      "path": ".github/skills/test-implementation-spring-boot/SKILL.md",
-      "related_agents": [
-        "@test-strategy"
-      ]
-    },
-    {
-      "name": "test-implementation-frontend",
-      "tier": 2,
-      "category": "testing",
-      "scope": "generico",
-      "description": "Padrões agnósticos de framework para frontend — componentes, mocks, E2E, data-testid",
-      "path": ".github/skills/test-implementation-frontend/SKILL.md",
-      "related_agents": [
-        "@test-strategy"
-      ]
-    },
-    {
-      "name": "test-implementation-angular-jasmine",
-      "tier": 2,
-      "category": "testing",
-      "scope": "especifico",
-      "stack": "Angular 21 + Jasmine + Karma + Playwright",
-      "description": "Padrões específicos TestBed, Jasmine spies, fakeAsync, Signals, ng test",
-      "path": ".github/skills/test-implementation-angular-jasmine/SKILL.md",
-      "related_agents": [
-        "@test-strategy"
-      ]
-    },
-    {
-      "name": "test-implementation-python",
-      "tier": 2,
-      "category": "testing",
-      "scope": "especifico",
-      "stack": "Python + pytest + coverage.py",
-      "description": "Padrões específicos pytest, fixtures, MagicMock, pytest-mock, coverage.py",
-      "path": ".github/skills/test-implementation-python/SKILL.md",
-      "related_agents": [
-        "@test-strategy"
-      ]
-    },
-    {
-      "name": "test-coverage-governance",
-      "tier": 2,
-      "category": "testing",
-      "description": "Estratégia agnóstica de cobertura, métricas por risco, interpretação de reports",
-      "path": ".github/skills/test-coverage-governance/SKILL.md",
-      "related_agents": [
-        "@test-strategy"
-      ]
-    },
-    {
-      "name": "project-scanner",
-      "tier": 2,
-      "category": "tooling",
-      "path": ".github/skills/project-scanner/SKILL.md",
-      "related_agents": [
-        "@adapter-generator",
-        "@binding-initializer"
-      ]
-    },
-    {
-      "name": "project-context-builder",
-      "tier": 2,
-      "category": "tooling",
-      "path": ".github/skills/project-context-builder/SKILL.md",
-      "related_agents": [
-        "@context-builder",
-        "@tech-solution-architect"
-      ]
-    },
-    {
-      "name": "test-implementation-angular-vitest",
-      "tier": 2,
-      "category": "testing",
-      "scope": "especifico",
-      "stack": "Angular 20/21+ + Vitest 3+ + @angular/build:unit-test + @vitest/coverage-v8",
-      "description": "Setup nativo Angular 20+ (runner:vitest), vi.fn/vi.spyOn, zoneless async/await, Signals, coverage v8, migração de Jasmine/Karma",
-      "path": ".github/skills/test-implementation-angular-vitest/SKILL.md",
-      "related_agents": [
-        "@test-strategy"
-      ]
-    },
-    {
-      "name": "git-governance",
-      "tier": 2,
-      "category": "governance",
-      "path": ".github/skills/git-governance/SKILL.md",
-      "related_agents": [
-        "@docs-engineer",
-        "@refactor-planner"
-      ]
-    },
-    {
-      "name": "terminal-governance",
-      "tier": 1,
-      "category": "tooling",
-      "path": ".github/skills/terminal-governance/SKILL.md",
-      "description": "Boas práticas obrigatórias para uso de run_in_terminal por agents de IA — prevenção de poluição de contexto, truncamento de saída, não-interativo, execução em lote, orçamento de tokens e padrões proibidos",
-      "tools": [
-        "run_in_terminal"
-      ],
-      "related_agents": [
-        "@bug-triage",
-        "@test-strategy",
-        "@adapter-generator",
-        "@context-builder"
-      ]
-    },
-    {
-      "name": "code-tracing",
-      "tier": 1,
-      "category": "tooling",
-      "path": ".github/skills/code-tracing/SKILL.md",
-      "description": "Estratégias para rastrear código de um sintoma até a causa raiz — grep vs semântico, stack trace parsing, call graph, rastreio de API/método e coleta mínima de evidências. Agnóstico de linguagem.",
-      "tools": [
-        "grep_search",
-        "file_search",
-        "read_file",
-        "run_in_terminal"
-      ],
-      "related_agents": [
-        "@bug-triage",
-        "@test-strategy",
-        "@refactor-planner",
-        "@business-rules-extractor",
-        "@tech-solution-architect"
-      ]
-    },
-    {
-      "name": "business-rules-governance",
-      "tier": 1,
-      "category": "documentation",
-      "path": ".github/skills/business-rules-governance/SKILL.md",
-      "description": "Taxonomia, templates e protocolos para extrair, documentar e validar regras de negócio de código-fonte em qualquer linguagem. Formato markdown canônico para ground truth de refatorações.",
-      "tools": [
-        "read_file",
-        "grep_search",
-        "file_search",
-        "create_file",
-        "insert_edit_into_file"
-      ],
-      "related_agents": [
-        "@business-rules-extractor",
-        "@refactor-planner",
-        "@docs-engineer",
-        "@tech-solution-architect"
-      ]
-    },
-    {
-      "name": "integration-contract-analysis",
-      "tier": 2,
-      "category": "governance",
-      "path": ".github/skills/integration-contract-analysis/SKILL.md",
-      "description": "Análise e validação de contratos de integração (OpenAPI, AsyncAPI, gRPC, GraphQL): detecção de breaking changes, classificação BREAKING/COMPATIBLE/DEPRECIAÇÃO e mapeamento de consumidores afetados.",
-      "tools": [
-        "grep_search",
-        "file_search",
-        "read_file",
-        "context-mode/ctx_batch_execute",
-        "context-mode/ctx_execute"
-      ],
-      "related_agents": [
-        "@tech-solution-architect",
-        "@refactor-planner"
-      ]
-    },
-    {
-      "name": "agent-memory-policy",
-      "tier": 3,
-      "category": "governance",
-      "path": ".github/skills/agent-memory-policy/SKILL.md",
-      "description": "Política de memória long-term para agents de IA: tipos episódico, semântico e procedimental. Foco em memória procedimental (agents auto-adaptativos) com guardrails de segurança e aprovação humana obrigatória (R-027).",
-      "tools": [
-        "context-mode"
-      ],
-      "related_agents": [
-        "@governance-factory",
-        "@agent-router",
-        "@docs-engineer",
-        "@context-builder"
-      ]
-    },
-    {
-      "name": "frontend-componentization-patterns",
-      "tier": 2,
-      "category": "process",
-      "description": "Padrões genéricos de componentização frontend para reduzir acoplamento, aumentar reutilização e melhorar manutenibilidade.",
-      "path": ".github/skills/frontend-componentization-patterns/SKILL.md",
-      "related_agents": [
-        "@angular-router",
-        "@tech-solution-architect",
-        "@test-strategy"
-      ]
-    },
-    {
-      "name": "angular-frontend-patterns",
-      "tier": 2,
-      "category": "quality",
-      "description": "Boas práticas e patterns de codificação Angular para componentes modernos, templates, reatividade, segurança e consistência arquitetural.",
-      "path": ".github/skills/angular-frontend-patterns/SKILL.md",
-      "related_agents": [
-        "@angular-router",
-        "@tech-solution-architect",
-        "@test-strategy"
-      ]
-    },
-    {
-      "name": "angular-responsive-ui-patterns",
-      "tier": 2,
-      "category": "quality",
-      "description": "Diretrizes de responsividade para Angular: mobile-first, breakpoints, layout fluido, container queries, imagens responsivas e validação multi-viewport.",
-      "path": ".github/skills/angular-responsive-ui-patterns/SKILL.md",
-      "related_agents": [
-        "@angular-router",
-        "@tech-solution-architect",
-        "@test-strategy"
       ]
     },
     {
@@ -460,201 +280,6 @@
       ]
     },
     {
-      "name": "spring-boot-backend-patterns",
-      "tier": 2,
-      "category": "quality",
-      "description": "Diretrizes enterprise para análise e recomendação de arquitetura, operação e evolução de serviços backend com Spring Boot, sem implementação direta.",
-      "path": ".github/skills/spring-boot-backend-patterns/SKILL.md",
-      "related_agents": [
-        "@spring-boot-router",
-        "@tech-solution-architect"
-      ]
-    },
-    {
-      "name": "spring-reactive-webflux-patterns",
-      "tier": 2,
-      "category": "quality",
-      "description": "Diretrizes enterprise para análise e recomendação de arquiteturas reativas com Spring WebFlux e Project Reactor, com foco em resiliência, capacidade e operação.",
-      "path": ".github/skills/spring-reactive-webflux-patterns/SKILL.md",
-      "related_agents": [
-        "@spring-reactive-router",
-        "@tech-solution-architect"
-      ]
-    },
-    {
-      "name": "java-jdk-backend-governance",
-      "tier": 1,
-      "category": "governance",
-      "description": "Governança de versões Java/JDK em backend: LTS, compatibilidade de ecossistema, segurança, performance e migração.",
-      "path": ".github/skills/java-jdk-backend-governance/SKILL.md",
-      "related_agents": [
-        "@spring-boot-router",
-        "@spring-reactive-router",
-        "@tech-solution-architect"
-      ]
-    },
-    {
-      "name": "documentation-writing-patterns",
-      "tier": 2,
-      "category": "documentation",
-      "description": "Diretrizes agnósticas de domínio para estruturar e escrever documentação técnica em Markdown (Diátaxis, ADR/MADR, README, front-matter, formatação chunking-friendly para IA).",
-      "path": ".github/skills/documentation-writing-patterns/SKILL.md",
-      "related_agents": [
-        "@docs-engineer"
-      ]
-    },
-    {
-      "name": "code-review-patterns",
-      "tier": 2,
-      "category": "quality",
-      "description": "Diretrizes de mercado para revisão de código automatizada por IA — taxonomia de severidade, dimensões de análise, critérios de bloqueio de merge e anti-padrões de review.",
-      "path": ".github/skills/code-review-patterns/SKILL.md",
-      "related_agents": [
-        "@code-review",
-        "@bug-triage",
-        "@tech-solution-architect"
-      ]
-    },
-    {
-      "name": "requirements-engineering-patterns",
-      "tier": 2,
-      "category": "process",
-      "description": "Diretrizes de Engenharia de Requisitos (ISO/IEC/IEEE 29148, EARS, INVEST, Gherkin/BDD, FURPS+) para elicitar e estruturar requisitos funcionais/não-funcionais a partir de pedidos de negócio ambíguos, com detecção de solution-jumping via Five Whys.",
-      "path": ".github/skills/requirements-engineering-patterns/SKILL.md",
-      "related_agents": [
-        "@requirements-analyst",
-        "@tech-solution-architect"
-      ]
-    },
-    {
-      "name": "angular-implementation-patterns",
-      "tier": 2,
-      "category": "quality",
-      "description": "Padrões de mercado (2026) para IMPLEMENTAR features/bugs em Angular — fronteira Signals/RxJS, testing-first, checklist de PR. Contraparte de execução de angular-frontend-patterns.",
-      "path": ".github/skills/angular-implementation-patterns/SKILL.md",
-      "related_agents": [
-        "@angular-router"
-      ]
-    },
-    {
-      "name": "spring-boot-implementation-patterns",
-      "tier": 2,
-      "category": "quality",
-      "description": "Padrões de mercado (2026) para IMPLEMENTAR features/bugs em Spring Boot — virtual threads vs reativo, N+1/OSIV, DTOs de borda, testing-first. Contraparte de execução de spring-boot-backend-patterns.",
-      "path": ".github/skills/spring-boot-implementation-patterns/SKILL.md",
-      "related_agents": [
-        "@spring-boot-router"
-      ]
-    },
-    {
-      "name": "spring-reactive-implementation-patterns",
-      "tier": 2,
-      "category": "quality",
-      "description": "Padrões de mercado (2026) para IMPLEMENTAR features/bugs em Spring WebFlux/Reactor — composição não-bloqueante, tratamento de erro por operador, StepVerifier/WebTestClient. Contraparte de execução de spring-reactive-webflux-patterns.",
-      "path": ".github/skills/spring-reactive-implementation-patterns/SKILL.md",
-      "related_agents": [
-        "@spring-reactive-router"
-      ]
-    },
-    {
-      "name": "structured-intake-patterns",
-      "tier": 2,
-      "category": "process",
-      "description": "Padrão canônico de coleta estruturada via ask_questions (P1..PN), critério de mínimo necessário para prosseguir e template de consolidação.",
-      "path": ".github/skills/structured-intake-patterns/SKILL.md",
-      "related_agents": [
-        "@bug-triage",
-        "@test-strategy",
-        "@business-rules-extractor",
-        "@requirements-analyst"
-      ]
-    },
-    {
-      "name": "governance-factory-patterns",
-      "tier": 1,
-      "category": "governance",
-      "description": "Fluxo canônico Factory Pattern (criar/revisar/auditar), checklist de qualidade estrutural e formato de saída com validações ✅/❌ parametrizável por tipo de artefato (agent/skill/prompt).",
-      "path": ".github/skills/governance-factory-patterns/SKILL.md",
-      "related_agents": [
-        "@governance-factory",
-        "@governance-maintainer"
-      ]
-    },
-    {
-      "name": "specialist-hybrid-advisory-implementation-patterns",
-      "tier": 1,
-      "category": "governance",
-      "description": "Template canônico do perfil híbrido (Advisory + Implementação) para specialists de stack técnico — desambiguação de modo, formatos de saída e checklist unificado.",
-      "path": ".github/skills/specialist-hybrid-advisory-implementation-patterns/SKILL.md",
-      "related_agents": [
-        "@angular-router",
-        "@spring-boot-router",
-        "@spring-reactive-router"
-      ]
-    },
-    {
-      "name": "governance-audit-patterns",
-      "tier": 1,
-      "category": "governance",
-      "description": "Catálogo consolidado de agent/governance smells (anti-padrão estrutural, gap de perfil, desalinhamento contratual perfil ↔ tools ↔ skills ↔ catálogo, gap de diretriz, diretriz redundante, gap de cobertura de categoria, vazamento de evidência real R-044) com sintoma, detecção, severidade e remediação — base do agent agent-auditor.",
-      "path": ".github/skills/governance-audit-patterns/SKILL.md",
-      "related_agents": [
-        "@agent-auditor"
-      ]
-    },
-    {
-      "name": "reflection-self-critique-patterns",
-      "tier": 2,
-      "category": "process",
-      "description": "Padrão generate→critique→revise (Reflection) de baixo custo para agents Executores reexaminarem o próprio artefato antes de reportar sucesso, 1 round, grounded — evita agent 'critic' dedicado (overengineering).",
-      "path": ".github/skills/reflection-self-critique-patterns/SKILL.md",
-      "related_agents": [
-        "@docs-engineer",
-        "@test-strategy"
-      ]
-    },
-    {
-      "name": "security-review-patterns",
-      "tier": 2,
-      "category": "security",
-      "description": "OWASP Top 10:2025, ASVS 5.0, OWASP LLM Top 10 e Agentic AI Security (2026), SCA/CVE, detecção de secrets e rubrica de triagem para revisão especializada de segurança de aplicação — base do agent security-reviewer.",
-      "path": ".github/skills/security-review-patterns/SKILL.md",
-      "related_agents": [
-        "@security-reviewer"
-      ]
-    },
-    {
-      "name": "performance-engineering-patterns",
-      "tier": 2,
-      "category": "quality",
-      "description": "Core Web Vitals (LCP/INP/CLS), padrões de degradação backend (N+1, cache, payload), otimização de query e ferramentas de medição — base do agent performance-agent.",
-      "path": ".github/skills/performance-engineering-patterns/SKILL.md",
-      "related_agents": [
-        "@performance-agent"
-      ]
-    },
-    {
-      "name": "compliance-governance-patterns",
-      "tier": 2,
-      "category": "security",
-      "description": "SOC 2 (Type I/II), GDPR/LGPD, HIPAA, ISO 27001, audit trails, least privilege/RBAC e retenção de dado pessoal para avaliação de conformidade regulatória de aplicação — base do agent compliance-guardrails, distinto de agent-safety-guardrails (segurança do próprio agent de IA).",
-      "path": ".github/skills/compliance-governance-patterns/SKILL.md",
-      "related_agents": [
-        "@compliance-guardrails"
-      ]
-    },
-    {
-      "name": "task-decomposition-patterns",
-      "tier": 2,
-      "category": "process",
-      "description": "Estratégias de decomposição sequencial/hierárquica/paralela, granularidade ideal (2-3 níveis) e validação de dependências para planejamento de feature nova — base do agent feature-planner, distinto de refactor-planner (refatoração de código existente).",
-      "path": ".github/skills/task-decomposition-patterns/SKILL.md",
-      "related_agents": [
-        "@feature-planner",
-        "@tech-solution-architect"
-      ]
-    },
-    {
       "name": "devops-agent-patterns",
       "tier": 2,
       "category": "quality",
@@ -665,57 +290,13 @@
       ]
     },
     {
-      "name": "codegraph-optave-usage",
+      "name": "documentation-writing-patterns",
       "tier": 2,
-      "category": "tooling",
-      "description": "Uso da lib externa @optave/codegraph (CLI local e MCP Server enxuto, zero API keys) como motor único de build/consulta de grafo de conhecimento de código — build, query, blast radius, ciclos, dead code, dataflow e CI gate — base do agent code-knowledge-graph.",
-      "path": ".github/skills/codegraph-optave-usage/SKILL.md",
+      "category": "documentation",
+      "description": "Diretrizes agnósticas de domínio para estruturar e escrever documentação técnica em Markdown (Diátaxis, ADR/MADR, README, front-matter, formatação chunking-friendly para IA).",
+      "path": ".github/skills/documentation-writing-patterns/SKILL.md",
       "related_agents": [
-        "@code-knowledge-graph"
-      ]
-    },
-    {
-      "name": "angular-performance-patterns",
-      "tier": 2,
-      "category": "quality",
-      "path": ".github/skills/angular-performance-patterns/SKILL.md",
-      "related_agents": [
-        "@angular-router",
-        "@performance-agent",
-        "@tech-solution-architect"
-      ]
-    },
-    {
-      "name": "spring-boot-performance-patterns",
-      "tier": 2,
-      "category": "quality",
-      "path": ".github/skills/spring-boot-performance-patterns/SKILL.md",
-      "related_agents": [
-        "@spring-boot-router",
-        "@performance-agent",
-        "@tech-solution-architect"
-      ]
-    },
-    {
-      "name": "spring-reactive-performance-patterns",
-      "tier": 2,
-      "category": "quality",
-      "path": ".github/skills/spring-reactive-performance-patterns/SKILL.md",
-      "related_agents": [
-        "@spring-reactive-router",
-        "@performance-agent",
-        "@tech-solution-architect"
-      ]
-    },
-    {
-      "name": "refactoring-planning-patterns",
-      "tier": 2,
-      "category": "process",
-      "path": ".github/skills/refactoring-planning-patterns/SKILL.md",
-      "related_agents": [
-        "@refactor-planner",
-        "@tech-solution-architect",
-        "@code-knowledge-graph"
+        "@docs-engineer"
       ]
     },
     {
@@ -740,6 +321,434 @@
         "@spring-boot-router",
         "@spring-reactive-router",
         "@ejb-router"
+      ]
+    },
+    {
+      "name": "frontend-componentization-patterns",
+      "tier": 2,
+      "category": "process",
+      "description": "Padrões genéricos de componentização frontend para reduzir acoplamento, aumentar reutilização e melhorar manutenibilidade.",
+      "path": ".github/skills/frontend-componentization-patterns/SKILL.md",
+      "related_agents": [
+        "@angular-router",
+        "@tech-solution-architect",
+        "@test-strategy"
+      ]
+    },
+    {
+      "name": "git-governance",
+      "tier": 2,
+      "category": "governance",
+      "path": ".github/skills/git-governance/SKILL.md",
+      "related_agents": [
+        "@docs-engineer",
+        "@refactor-planner"
+      ]
+    },
+    {
+      "name": "governance-audit-patterns",
+      "tier": 1,
+      "category": "governance",
+      "description": "Catálogo consolidado de agent/governance smells (anti-padrão estrutural, gap de perfil, desalinhamento contratual perfil ↔ tools ↔ skills ↔ catálogo, gap de diretriz, diretriz redundante, gap de cobertura de categoria, vazamento de evidência real R-044) com sintoma, detecção, severidade e remediação — base do agent agent-auditor.",
+      "path": ".github/skills/governance-audit-patterns/SKILL.md",
+      "related_agents": [
+        "@agent-auditor"
+      ]
+    },
+    {
+      "name": "governance-factory-patterns",
+      "tier": 1,
+      "category": "governance",
+      "description": "Fluxo canônico Factory Pattern (criar/revisar/auditar), checklist de qualidade estrutural e formato de saída com validações ✅/❌ parametrizável por tipo de artefato (agent/skill/prompt).",
+      "path": ".github/skills/governance-factory-patterns/SKILL.md",
+      "related_agents": [
+        "@governance-factory",
+        "@governance-maintainer"
+      ]
+    },
+    {
+      "name": "handoff-governance",
+      "tier": 1,
+      "category": "governance",
+      "path": ".github/skills/handoff-governance/SKILL.md",
+      "tools": [
+        "context-mode"
+      ],
+      "related_agents": [
+        "@agent-router",
+        "@deep-search",
+        "@tech-solution-architect"
+      ]
+    },
+    {
+      "name": "integration-contract-analysis",
+      "tier": 2,
+      "category": "governance",
+      "path": ".github/skills/integration-contract-analysis/SKILL.md",
+      "description": "Análise e validação de contratos de integração (OpenAPI, AsyncAPI, gRPC, GraphQL): detecção de breaking changes, classificação BREAKING/COMPATIBLE/DEPRECIAÇÃO e mapeamento de consumidores afetados.",
+      "tools": [
+        "grep_search",
+        "file_search",
+        "read_file",
+        "context-mode/ctx_batch_execute",
+        "context-mode/ctx_execute"
+      ],
+      "related_agents": [
+        "@tech-solution-architect",
+        "@refactor-planner"
+      ]
+    },
+    {
+      "name": "java-jdk-backend-governance",
+      "tier": 1,
+      "category": "governance",
+      "description": "Governança de versões Java/JDK em backend: LTS, compatibilidade de ecossistema, segurança, performance e migração.",
+      "path": ".github/skills/java-jdk-backend-governance/SKILL.md",
+      "related_agents": [
+        "@spring-boot-router",
+        "@spring-reactive-router",
+        "@tech-solution-architect"
+      ]
+    },
+    {
+      "name": "mermaid-diagrams",
+      "tier": 2,
+      "category": "documentation",
+      "path": ".github/skills/mermaid-diagrams/SKILL.md",
+      "related_agents": [
+        "@deep-search",
+        "@tech-solution-architect"
+      ]
+    },
+    {
+      "name": "performance-engineering-patterns",
+      "tier": 2,
+      "category": "quality",
+      "description": "Core Web Vitals (LCP/INP/CLS), padrões de degradação backend (N+1, cache, payload), otimização de query e ferramentas de medição — base do agent performance-agent.",
+      "path": ".github/skills/performance-engineering-patterns/SKILL.md",
+      "related_agents": [
+        "@performance-agent"
+      ]
+    },
+    {
+      "name": "project-context-builder",
+      "tier": 2,
+      "category": "tooling",
+      "path": ".github/skills/project-context-builder/SKILL.md",
+      "related_agents": [
+        "@context-builder",
+        "@tech-solution-architect"
+      ]
+    },
+    {
+      "name": "project-scanner",
+      "tier": 2,
+      "category": "tooling",
+      "path": ".github/skills/project-scanner/SKILL.md",
+      "related_agents": [
+        "@adapter-generator",
+        "@binding-initializer"
+      ]
+    },
+    {
+      "name": "prompt-engineering-patterns",
+      "tier": 2,
+      "category": "process",
+      "path": ".github/skills/prompt-engineering-patterns/SKILL.md",
+      "related_agents": [
+        "@prompt-structuring",
+        "@agent-router",
+        "@deep-search"
+      ]
+    },
+    {
+      "name": "refactoring-planning-patterns",
+      "tier": 2,
+      "category": "process",
+      "path": ".github/skills/refactoring-planning-patterns/SKILL.md",
+      "related_agents": [
+        "@refactor-planner",
+        "@tech-solution-architect",
+        "@code-knowledge-graph"
+      ]
+    },
+    {
+      "name": "reflection-self-critique-patterns",
+      "tier": 2,
+      "category": "process",
+      "description": "Padrão generate→critique→revise (Reflection) de baixo custo para agents Executores reexaminarem o próprio artefato antes de reportar sucesso, 1 round, grounded — evita agent 'critic' dedicado (overengineering).",
+      "path": ".github/skills/reflection-self-critique-patterns/SKILL.md",
+      "related_agents": [
+        "@docs-engineer",
+        "@test-strategy"
+      ]
+    },
+    {
+      "name": "repository-hygiene-patterns",
+      "tier": 2,
+      "category": "process",
+      "path": ".github/skills/repository-hygiene-patterns/SKILL.md",
+      "related_agents": [
+        "@repo-hygiene-auditor"
+      ]
+    },
+    {
+      "name": "requirements-engineering-patterns",
+      "tier": 2,
+      "category": "process",
+      "description": "Diretrizes de Engenharia de Requisitos (ISO/IEC/IEEE 29148, EARS, INVEST, Gherkin/BDD, FURPS+) para elicitar e estruturar requisitos funcionais/não-funcionais a partir de pedidos de negócio ambíguos, com detecção de solution-jumping via Five Whys.",
+      "path": ".github/skills/requirements-engineering-patterns/SKILL.md",
+      "related_agents": [
+        "@requirements-analyst",
+        "@tech-solution-architect"
+      ]
+    },
+    {
+      "name": "security-review-patterns",
+      "tier": 2,
+      "category": "security",
+      "description": "OWASP Top 10:2025, ASVS 5.0, OWASP LLM Top 10 e Agentic AI Security (2026), SCA/CVE, detecção de secrets e rubrica de triagem para revisão especializada de segurança de aplicação — base do agent security-reviewer.",
+      "path": ".github/skills/security-review-patterns/SKILL.md",
+      "related_agents": [
+        "@security-reviewer"
+      ]
+    },
+    {
+      "name": "sonarqube-governance",
+      "tier": 2,
+      "category": "quality",
+      "path": ".github/skills/sonarqube-governance/SKILL.md",
+      "tools": [
+        "sonarqube-monitor"
+      ],
+      "related_agents": [
+        "@tech-solution-architect"
+      ]
+    },
+    {
+      "name": "specialist-hybrid-advisory-implementation-patterns",
+      "tier": 1,
+      "category": "governance",
+      "description": "Template canônico do perfil híbrido (Advisory + Implementação) para specialists de stack técnico — desambiguação de modo, formatos de saída e checklist unificado.",
+      "path": ".github/skills/specialist-hybrid-advisory-implementation-patterns/SKILL.md",
+      "related_agents": [
+        "@angular-router",
+        "@spring-boot-router",
+        "@spring-reactive-router"
+      ]
+    },
+    {
+      "name": "spring-boot-backend-patterns",
+      "tier": 2,
+      "category": "quality",
+      "description": "Diretrizes enterprise para análise e recomendação de arquitetura, operação e evolução de serviços backend com Spring Boot, sem implementação direta.",
+      "path": ".github/skills/spring-boot-backend-patterns/SKILL.md",
+      "related_agents": [
+        "@spring-boot-router",
+        "@tech-solution-architect"
+      ]
+    },
+    {
+      "name": "spring-boot-implementation-patterns",
+      "tier": 2,
+      "category": "quality",
+      "description": "Padrões de mercado (2026) para IMPLEMENTAR features/bugs em Spring Boot — virtual threads vs reativo, N+1/OSIV, DTOs de borda, testing-first. Contraparte de execução de spring-boot-backend-patterns.",
+      "path": ".github/skills/spring-boot-implementation-patterns/SKILL.md",
+      "related_agents": [
+        "@spring-boot-router"
+      ]
+    },
+    {
+      "name": "spring-boot-performance-patterns",
+      "tier": 2,
+      "category": "quality",
+      "path": ".github/skills/spring-boot-performance-patterns/SKILL.md",
+      "related_agents": [
+        "@spring-boot-router",
+        "@performance-agent",
+        "@tech-solution-architect"
+      ]
+    },
+    {
+      "name": "spring-reactive-implementation-patterns",
+      "tier": 2,
+      "category": "quality",
+      "description": "Padrões de mercado (2026) para IMPLEMENTAR features/bugs em Spring WebFlux/Reactor — composição não-bloqueante, tratamento de erro por operador, StepVerifier/WebTestClient. Contraparte de execução de spring-reactive-webflux-patterns.",
+      "path": ".github/skills/spring-reactive-implementation-patterns/SKILL.md",
+      "related_agents": [
+        "@spring-reactive-router"
+      ]
+    },
+    {
+      "name": "spring-reactive-performance-patterns",
+      "tier": 2,
+      "category": "quality",
+      "path": ".github/skills/spring-reactive-performance-patterns/SKILL.md",
+      "related_agents": [
+        "@spring-reactive-router",
+        "@performance-agent",
+        "@tech-solution-architect"
+      ]
+    },
+    {
+      "name": "spring-reactive-webflux-patterns",
+      "tier": 2,
+      "category": "quality",
+      "description": "Diretrizes enterprise para análise e recomendação de arquiteturas reativas com Spring WebFlux e Project Reactor, com foco em resiliência, capacidade e operação.",
+      "path": ".github/skills/spring-reactive-webflux-patterns/SKILL.md",
+      "related_agents": [
+        "@spring-reactive-router",
+        "@tech-solution-architect"
+      ]
+    },
+    {
+      "name": "structured-intake-patterns",
+      "tier": 2,
+      "category": "process",
+      "description": "Padrão canônico de coleta estruturada via ask_questions (P1..PN), critério de mínimo necessário para prosseguir e template de consolidação.",
+      "path": ".github/skills/structured-intake-patterns/SKILL.md",
+      "related_agents": [
+        "@bug-triage",
+        "@test-strategy",
+        "@business-rules-extractor",
+        "@requirements-analyst"
+      ]
+    },
+    {
+      "name": "task-decomposition-patterns",
+      "tier": 2,
+      "category": "process",
+      "description": "Estratégias de decomposição sequencial/hierárquica/paralela, granularidade ideal (2-3 níveis) e validação de dependências para planejamento de feature nova — base do agent feature-planner, distinto de refactor-planner (refatoração de código existente).",
+      "path": ".github/skills/task-decomposition-patterns/SKILL.md",
+      "related_agents": [
+        "@feature-planner",
+        "@tech-solution-architect"
+      ]
+    },
+    {
+      "name": "tavily",
+      "tier": 2,
+      "category": "research",
+      "path": ".github/skills/tavily/SKILL.md",
+      "related_agents": [
+        "@deep-search",
+        "@tech-solution-architect",
+        "@angular-router",
+        "@spring-boot-router",
+        "@spring-reactive-router"
+      ]
+    },
+    {
+      "name": "terminal-governance",
+      "tier": 1,
+      "category": "tooling",
+      "path": ".github/skills/terminal-governance/SKILL.md",
+      "description": "Boas práticas obrigatórias para uso de run_in_terminal por agents de IA — prevenção de poluição de contexto, truncamento de saída, não-interativo, execução em lote, orçamento de tokens e padrões proibidos",
+      "tools": [
+        "run_in_terminal"
+      ],
+      "related_agents": [
+        "@bug-triage",
+        "@test-strategy",
+        "@adapter-generator",
+        "@context-builder"
+      ]
+    },
+    {
+      "name": "test-coverage-governance",
+      "tier": 2,
+      "category": "testing",
+      "description": "Estratégia agnóstica de cobertura, métricas por risco, interpretação de reports",
+      "path": ".github/skills/test-coverage-governance/SKILL.md",
+      "related_agents": [
+        "@test-strategy"
+      ]
+    },
+    {
+      "name": "test-implementation-angular-jasmine",
+      "tier": 2,
+      "category": "testing",
+      "scope": "especifico",
+      "stack": "Angular 21 + Jasmine + Karma + Playwright",
+      "description": "Padrões específicos TestBed, Jasmine spies, fakeAsync, Signals, ng test",
+      "path": ".github/skills/test-implementation-angular-jasmine/SKILL.md",
+      "related_agents": [
+        "@test-strategy"
+      ]
+    },
+    {
+      "name": "test-implementation-angular-vitest",
+      "tier": 2,
+      "category": "testing",
+      "scope": "especifico",
+      "stack": "Angular 20/21+ + Vitest 3+ + @angular/build:unit-test + @vitest/coverage-v8",
+      "description": "Setup nativo Angular 20+ (runner:vitest), vi.fn/vi.spyOn, zoneless async/await, Signals, coverage v8, migração de Jasmine/Karma",
+      "path": ".github/skills/test-implementation-angular-vitest/SKILL.md",
+      "related_agents": [
+        "@test-strategy"
+      ]
+    },
+    {
+      "name": "test-implementation-backend",
+      "tier": 2,
+      "category": "testing",
+      "scope": "generico",
+      "description": "Padrões agnósticos de framework para backend — pirâmide de testes, AAA, isolamento, nomenclatura",
+      "path": ".github/skills/test-implementation-backend/SKILL.md",
+      "related_agents": [
+        "@test-strategy"
+      ]
+    },
+    {
+      "name": "test-implementation-frontend",
+      "tier": 2,
+      "category": "testing",
+      "scope": "generico",
+      "description": "Padrões agnósticos de framework para frontend — componentes, mocks, E2E, data-testid",
+      "path": ".github/skills/test-implementation-frontend/SKILL.md",
+      "related_agents": [
+        "@test-strategy"
+      ]
+    },
+    {
+      "name": "test-implementation-python",
+      "tier": 2,
+      "category": "testing",
+      "scope": "especifico",
+      "stack": "Python + pytest + coverage.py",
+      "description": "Padrões específicos pytest, fixtures, MagicMock, pytest-mock, coverage.py",
+      "path": ".github/skills/test-implementation-python/SKILL.md",
+      "related_agents": [
+        "@test-strategy"
+      ]
+    },
+    {
+      "name": "test-implementation-spring-boot",
+      "tier": 2,
+      "category": "testing",
+      "scope": "especifico",
+      "stack": "Java + Spring Boot + JUnit 5 + Mockito + JaCoCo",
+      "description": "Padrões específicos JUnit 5, Mockito, @WebMvcTest, @DataJpaTest, mvn test",
+      "path": ".github/skills/test-implementation-spring-boot/SKILL.md",
+      "related_agents": [
+        "@test-strategy"
+      ]
+    },
+    {
+      "name": "yaml-governance",
+      "tier": 2,
+      "category": "governance",
+      "path": ".github/skills/yaml-governance/SKILL.md",
+      "tools": [
+        "yamllint",
+        "check-jsonschema",
+        "yq",
+        "kubeconform"
+      ],
+      "related_agents": [
+        "@agent-router",
+        "@tech-solution-architect",
+        "@deep-search"
       ]
     }
   ],

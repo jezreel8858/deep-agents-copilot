@@ -45,7 +45,7 @@ Atalho manual on-demand para o agent [`@code-review`](../agents/code-review.agen
 ## 🎯 Uso
 
 ```bash
-/review                          → revisa mudanças não commitadas (git diff HEAD)
+/review                          → revisa mudanças não commitadas (git --no-pager diff HEAD)
 /review <arquivo>                → revisa arquivo específico
 /review <arquivo> <outro>        → revisa múltiplos arquivos
 ```
