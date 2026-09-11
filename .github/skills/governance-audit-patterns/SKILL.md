@@ -300,6 +300,16 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 | Severidade | **Alta** (inconsistência de UX e retrabalho de refatoração; não bloqueia função, mas degrada padrão de produto) |
 | Remediação | `@adapter-generator`/`@docs-engineer` garante que adapters locais referenciem documentação interna de design system quando detectada no projeto; `@governance-factory` insere etapa "Reuse-First" em `frontend-componentization-patterns`/`angular-implementation-patterns` (ou skill equivalente de outra stack) e nos agents implementer/stylist de UI; `code-review-patterns` ganha dimensão de análise correspondente |
 
+### 2.20 — Duplicação por Aninhamento de Router (Nested Subagent Sprawl)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | O `@agent-router` (ou supervisor hierárquico) invoca subagente executor downstream via `run_subagent` por dentro de si mesmo, e ao concluir e retornar ao Orquestrador Raiz com o bloco de decisão (`Delegado: @<agent>`), o orquestrador re-dispara o mesmo subagente, gerando execução duplicada, gasto excessivo de créditos e reexecução redundante de testes/diffs (incidente real documentado em 2026-09 com prompt `commit <projeto>`) |
+| Como detectar | Inspeção de traces/tool calls onde `agent-router` invoca executores downstream (`pr-gatekeeper`, `*-developer`, `*-bug-fixer`) via `run_subagent`; ausência da regra mandatória de Delegação Plana (Flat Delegation) no `agent-router.agent.md` e na regra R-047. Ver Tier 1: `test_smell_2_20_router_forbids_nested_subagent_execution` |
+| Origem (TrustAgent) | Intrínseco — ambiguidade no escopo do router (confundir classificador de rota com despachante executor) somada à redação de R-047 sem exceção explícita para blocos de decisão de roteamento |
+| Severidade | **Bloqueador** (desperdício financeiro direto de créditos, duplicação de runtime e loops de cancelamento pelo usuário) |
+| Remediação | Declarar explicitamente a Delegação Plana (Flat Delegation) em `agent-router.agent.md` e a exceção em R-047: o router emite apenas o bloco de decisão de rota e encerra o turno sem chamar executores via `run_subagent`. A invocação de `run_subagent` pelo router é restrita a `@prompt-structuring` (R-041) e `@binding-initializer` (R-034). O Orquestrador Raiz despacha o downstream em nível plano exatamente uma única vez |
+
 ## 3) Severidade — Reaproveitamento da Taxonomia Existente
 
 Esta skill **reaproveita** (não recria) a taxonomia de `code-review-patterns`:
@@ -334,7 +344,7 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 
 ## 6) Checklist de Conformidade da Auditoria
 
-- [ ] Todo achado classificado estritamente em uma das 19 categorias de smell (2.1..2.19).
+- [ ] Todo achado classificado estritamente em uma das 20 categorias de smell (2.1..2.20).
 - [ ] Severidade reaproveitada de `code-review-patterns` (Bloqueador/Alto/Sugestão).
 - [ ] Origem classificada como intrínseca ou extrínseca (TrustAgent) quando relevante.
 - [ ] Remediação aponta agent executor real do catálogo (nunca "corrigir diretamente" — agent de auditoria é estritamente read-only).
@@ -349,7 +359,7 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 ## 7) Anti-padrões
 
 - ❌ Agent de auditoria aplicar a correção diretamente (deve ser read-only — só análise e recomendação).
-- ❌ Inventar categoria de smell fora das 19 catalogadas nesta skill.
+- ❌ Inventar categoria de smell fora das 20 catalogadas nesta skill.
 - ❌ Duplicar taxonomia de severidade ou checklist de segurança já existentes em outras skills.
 - ❌ Reportar achado sem apontar agent executor de remediação (relatório inacionável).
 - ❌ Classificar achados como Bloqueadores sem critério estrutural comprovado.

@@ -452,3 +452,37 @@ def test_smell_2_17_no_bare_git_pager_commands_in_prompts_and_governance():
         f"encontrado(s) em prompts/governança (R-035):\n"
         + "\n".join(f"  - {path}:{num} -> {cmd}" for path, num, cmd in violations)
     )
+
+
+# ─────────────────────────────────────────────────────────────
+# SMELL 2.20 — Duplicação por Aninhamento de Router (R-047 / R-037)
+# ─────────────────────────────────────────────────────────────
+
+def test_smell_2_20_router_flat_delegation_rule():
+    """Smell 2.20: agent-router deve operar sob Delegação Plana (Flat Delegation),
+    sendo proibido de invocar subagentes executores downstream via run_subagent
+    para evitar execução duplicada pelo orquestrador raiz (R-047 / R-037)."""
+    router_file = AGENTS_DIR / "agent-router.agent.md"
+    assert router_file.exists(), "agent-router.agent.md deve existir"
+    router_content = router_file.read_text(encoding="utf-8")
+
+    # Verifica declaração de Delegação Plana no router
+    assert "Flat Delegation" in router_content or "Delegação Plana" in router_content, (
+        "agent-router.agent.md DEVE declarar regra de Delegação Plana (Flat Delegation)"
+    )
+
+    # Verifica proibição explícita de subagente executor downstream
+    assert "NÃO invocar subagente executor downstream" in router_content or "proibido aninhamento" in router_content, (
+        "agent-router.agent.md DEVE proibir invocação de executores downstream via run_subagent"
+    )
+
+    # Verifica exceção no CLAUDE.md (R-047)
+    claude_content = CLAUDE_MD.read_text(encoding="utf-8")
+    assert "Delegação Plana" in claude_content, (
+        "CLAUDE.md (R-047) DEVE prever a exceção de Delegação Plana para routers"
+    )
+
+    # Verifica documentação do Smell 2.20 na skill
+    gap_skill = SKILLS_DIR / "governance-audit-patterns" / "SKILL.md"
+    gap_content = gap_skill.read_text(encoding="utf-8")
+    assert "2.20" in gap_content, "governance-audit-patterns/SKILL.md DEVE documentar o Smell 2.20"
