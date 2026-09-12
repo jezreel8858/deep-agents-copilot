@@ -282,12 +282,12 @@ flowchart TB
     style COL_A fill:none,stroke:none
     style COL_B fill:none,stroke:none
 
-    style CAT1 fill:#e3f2fd,stroke:#1976d2
-    style CAT2 fill:#f3e5f5,stroke:#7b1fa2
-    style CAT3 fill:#e8f5e9,stroke:#388e3c
-    style CAT4 fill:#fff3e0,stroke:#f57c00
-    style CAT5 fill:#fce4ec,stroke:#c2185b
-    style CAT6 fill:#eceff1,stroke:#455a64
+    style CAT1 fill:#102a43,stroke:#334e68,stroke-width:2px
+    style CAT2 fill:#2d1b4e,stroke:#6236ff,stroke-width:2px
+    style CAT3 fill:#0b3823,stroke:#27ab83,stroke-width:2px
+    style CAT4 fill:#3d2204,stroke:#f08c00,stroke-width:2px
+    style CAT5 fill:#381228,stroke:#e03131,stroke-width:2px
+    style CAT6 fill:#1f2933,stroke:#616e7c,stroke-width:2px
 ```
 
 
