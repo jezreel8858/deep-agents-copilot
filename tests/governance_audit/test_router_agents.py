@@ -89,6 +89,7 @@ def test_all_expected_router_agents_exist():
         "ejb-router.agent.md",
         "database-router.agent.md",
         "python-router.agent.md",
+        "struts-router.agent.md",
     }
     missing = expected - router_names
     assert not missing, f"Routers ausentes no catálogo: {missing}"

@@ -182,6 +182,7 @@ Solicitação do Usuário (turno N)
   - `spring-reactive-router` — orquestra os 7 especialistas em `.github/agents/backend/spring-reactive/`
   - `ejb-router` — orquestra os 7 especialistas em `.github/agents/backend/ejb/`
   - `python-router` — orquestra os 7 especialistas em `.github/agents/backend/python/`
+  - `struts-router` — orquestra os 7 especialistas em `.github/agents/backend/struts/`
   - `database-router` — orquestra os 6 especialistas em `.github/agents/backend/database/`
   - `database-specialist` — migrações de schema e integridade referencial
 - **Qualidade & Validação**: `bug-triage`, `debugger`, `test-strategy`, `code-review`, `code-style-enforcer`, `security-reviewer`, `performance-agent`, `devops-engineer`, `runtime-verifier`, `repo-hygiene-auditor`

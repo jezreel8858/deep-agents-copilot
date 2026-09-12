@@ -963,6 +963,20 @@ regressao:
     critico: true
     threshold: 0.90
 
+  - id: "canon-045"
+    descricao: "Demanda do ecossistema Java Legado Struts (Action/ActionForm/JSP -> struts-router)"
+    input:
+      solicitacao: "Implementar uma nova Action no Apache Struts legado com ActionForm e validação no struts-config.xml"
+    expected:
+      agent_route: "struts-router"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.85
+      output_contains:
+        - "Delegado: @struts-router"
+    critico: true
+    threshold: 0.85
+
   - id: "regr-020"
     descricao: "REGRESSÃO: governance-factory NUNCA deve criar novo agent, prompt ou skill diretamente sem antes delegar pesquisa prévia de diretrizes e skills ao deep-search"
     input:

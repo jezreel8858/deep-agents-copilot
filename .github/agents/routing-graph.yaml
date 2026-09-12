@@ -107,6 +107,10 @@ nos:
     tipo: domain_router
     descricao: "Supervisor hierárquico do domínio Python Backend — despacha para os 7 especialistas registrados em .github/agents/backend/python/python-catalog.yaml"
 
+  - id: struts-router
+    tipo: domain_router
+    descricao: "Supervisor hierárquico do domínio Java Legado Struts — despacha para os 7 especialistas registrados em .github/agents/backend/struts/struts-catalog.yaml"
+
   - id: database-router
     tipo: domain_router
     descricao: "Supervisor hierárquico do domínio de Banco de Dados — despacha para os 6 especialistas Oracle e Informix registrados em .github/agents/backend/database/database-catalog.yaml"
@@ -177,7 +181,7 @@ convencao_papeis_genericos:
   descricao: >
     Nomes "specialist-<papel>" usados em estados.*.agent sao aliases genericos
     resolvidos pelo domain router ativo (angular-router|spring-boot-router|
-    spring-reactive-router|ejb-router|python-router) para o id concreto do seu sub-catalogo
+    spring-reactive-router|ejb-router|python-router|struts-router) para o id concreto do seu sub-catalogo
     que declara a tag role: correspondente (fixer|tester|stylist|implementer|
     advisory|performance). Tabela completa de resolucao por stack em
     workflows.md secao 1.3. Nunca invocar run_subagent com o nome generico
@@ -303,6 +307,7 @@ workflows:
           - "spring-boot-arch-advisor"
           - "spring-reactive-arch-advisor"
           - "ejb-arch-advisor"
+          - "struts-arch-advisor"
           - "oracle-query-tuner"
           - "informix-query-tuner"
           - "devops-engineer"
@@ -345,7 +350,7 @@ workflows:
         checkpoint_humano: "ask_questions (aprovacao_blueprint)"
         particionamento_escopo: ["frontend_only", "backend_only", "fullstack", "database_only"]
         sub_rotinas_permitidas: ["database-specialist"]
-        tasks_backend_tag_obrigatoria: "stack (spring-boot|spring-reactive|ejb) por item, nunca lista plana"
+        tasks_backend_tag_obrigatoria: "stack (spring-boot|spring-reactive|ejb|python|struts) por item, nunca lista plana"
       - etapa: 4
         nome: "test_strategy_and_risk_matrix"
         agent: "test-strategy"
@@ -825,9 +830,10 @@ arestas:
         - "executar testes reativos"       # → spring-reactive-router
         - "executar testes ejb"            # → ejb-router
         - "executar testes python"         # → python-router
+        - "executar testes struts"         # → struts-router
 
   # Delegação interna: Routers de domínio consultam test-strategy para mapear cenários antes de codar (Fluxo 2 TDD)
-  - de: "angular-router | spring-boot-router | spring-reactive-router | ejb-router | python-router"
+  - de: "angular-router | spring-boot-router | spring-reactive-router | ejb-router | python-router | struts-router"
     para: test-strategy
     prioridade: 0.5
     threshold_score: 1.00
@@ -1113,6 +1119,30 @@ arestas:
         - "uvicorn"
         - "celery"
       sinal_r006: "É qualquer solicitação do ecossistema Python Backend? (despacha para o catálogo de 7 especialistas backend em .github/agents/backend/python/python-catalog.yaml)"
+
+  # Supervisor e roteador de domínio Java Legado Struts (Hierarchical Sub-Router)
+  - de: agent-router
+    para: struts-router
+    prioridade: 1.6
+    threshold_score: 0.85
+    nivel_routing: rule-based
+    condicoes:
+      keywords:
+        - "struts"
+        - "struts-router"
+        - "struts 1"
+        - "struts 2"
+        - "actionform"
+        - "dynaactionform"
+        - "actionmapping"
+        - "actionforward"
+        - "dispatchaction"
+        - "tiles"
+        - "struts-config"
+        - "struts.xml"
+        - "valuestack"
+        - "ognl"
+      sinal_r006: "É qualquer solicitação do ecossistema Java Legado Struts? (despacha para o catálogo de 7 especialistas backend em .github/agents/backend/struts/struts-catalog.yaml)"
 
   # Supervisor e roteador de domínio Banco de Dados (Hierarchical Sub-Router)
   - de: agent-router

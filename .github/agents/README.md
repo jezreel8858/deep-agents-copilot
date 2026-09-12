@@ -39,6 +39,7 @@
 | Agent | `ejb-router` | 🏛️ **Backend Java Legado EJB Router** (`backend/ejb/`) — supervisor hierárquico do ecossistema Java Legado EJB; orquestra e despacha para os 7 especialistas backend mapeados em `.github/agents/backend/ejb/ejb-catalog.yaml` (`arch-advisor`, `feature-developer`, `bug-fixer`, `perf-tuner`, `unit-test-writer`, `integration-test-writer`, `test-fixer`) |
 | Agent | `database-router` | 🗄️ **Backend Database Router** (`backend/database/`) — supervisor hierárquico do ecossistema de Banco de Dados; orquestra e despacha para os 6 especialistas Oracle e Informix mapeados em `.github/agents/backend/database/database-catalog.yaml` (`oracle-migration-dev`, `oracle-plsql-expert`, `oracle-query-tuner`, `informix-migration-dev`, `informix-spl-expert`, `informix-query-tuner`) |
 | Agent | `python-router` | 🐍 **Backend Python Router** (`backend/python/`) — supervisor hierárquico do ecossistema Python Backend; orquestra e despacha para os 7 especialistas backend mapeados em `.github/agents/backend/python/python-catalog.yaml` (`arch-advisor`, `feature-developer`, `bug-fixer`, `perf-tuner`, `unit-test-writer`, `integration-test-writer`, `test-fixer`) |
+| Agent | `struts-router` | ☕ **Backend Java Legado Struts Router** (`backend/struts/`) — supervisor hierárquico do ecossistema Java Legado Struts; orquestra e despacha para os 7 especialistas backend mapeados em `.github/agents/backend/struts/struts-catalog.yaml` (`arch-advisor`, `feature-developer`, `bug-fixer`, `perf-tuner`, `unit-test-writer`, `integration-test-writer`, `test-fixer`) |
 | Agent | `docs-engineer` | 📝 ***(FUSÃO)*** Autoria e curadoria de documentação técnica em `.md` — modos `author`/`curate`; substitui docs-writer + docs-curator, que já delegavam entre si a mesma decisão |
 | Agent | `code-review` | 🔎 Revisa código (diff/PR) antes do merge por correção, segurança, convenções, impacto, testes e performance; classifica achados por severidade; read-only; delega para `bug-triage`/`tech-solution-architect`/`test-strategy`/`refactor-planner` |
 | Agent | `requirements-analyst` | 🧾 ***(NEW)*** Elicita e estrutura requisitos funcionais/não-funcionais a partir de pedido de negócio ambíguo (EARS, INVEST, Gherkin, FURPS+); detecta *solution-jumping* via Five Whys; prospectivo (não confundir com `business-rules-extractor`, que é reverso) |
@@ -79,6 +80,7 @@
 | ⚛️ Backend Spring Reactive Router (supervisor que despacha para os 7 especialistas em `backend/spring-reactive/`) | `spring-reactive-router` |
 | 🏛️ Backend Java Legado EJB Router (supervisor que despacha para os 7 especialistas em `backend/ejb/`) | `ejb-router` |
 | 🐍 Backend Python Router (supervisor que despacha para os 7 especialistas em `backend/python/`) | `python-router` |
+| ☕ Backend Java Legado Struts Router (supervisor que despacha para os 7 especialistas em `backend/struts/`) | `struts-router` |
 | 📝 Escrever/gerar/curar documentação técnica em `.md` (qualquer domínio) | `docs-engineer` |
 | 🔎 Revisar código (diff/PR) antes do merge, por severidade | `code-review` |
 | 🧾 Elicitar/estruturar requisitos a partir de pedido ambíguo (pré-técnico) | `requirements-analyst` |
