@@ -445,7 +445,7 @@ flowchart TD
 
 #### Cadeia Sequencial e Papéis:
 1. **Estado 1 — Diagnóstico Read-Only ou Pesquisa Prévia**:
-   - *Diagnóstico de Smells*: O `@agent-auditor` executa auditoria estática e comportamental contra os 16 smells canônicos de governança.
+   - *Diagnóstico de Smells*: O `@agent-auditor` executa auditoria estática e comportamental contra os 17 smells canônicos de governança.
    - *Auditoria de Higiene*: O `@repo-hygiene-auditor` audita a saúde do repositório, licença e segurança de versionamento.
    - *Pesquisa Prévia Compulsória (Criação de Artefatos / Stack)*: O `@governance-factory` delega compulsoriamente ao `@deep-search` a investigação de mercado antes de escrever novos prompts, skills ou agents.
 2. **Estado 2 — Modelagem e Checkpoint de Aprovação Humana**:
@@ -460,7 +460,7 @@ flowchart TD
      - **Nova Stack**: todos os itens acima aplicados ao sub-catálogo de domínio (`*-catalog.yaml`) + domain router correspondente.
 4. **Estado 4 — Quality Gate de Governança (Tier 1 Automático)**:
    - Execução determinística dos testes de governança:
-     - `test_governance_smells.py` (conformidade com templates e 16 smells).
+     - `test_governance_smells.py` (conformidade com templates e 17 smells).
      - `test_local_project_isolation.py` (100% isolamento de projetos locais — R-038/R-043/R-044).
      - `test_routing_quality_gate.py` (integridade do grafo e alcançabilidade).
    - **Suíte de Evals Comportamental**: para nova rota/agent, valida adicionalmente contra os 60 casos de `.github/agents/evals/casos-roteamento.yaml` (`agent-evals-lab`) — regressão estrutural (pytest) não substitui regressão comportamental de roteamento.

@@ -37,14 +37,14 @@ Você é um agente operacional especializado em gerar automaticamente arquivos a
 ```
 
 - ❌ Não alterar adaptadores existentes sem confirmação.
-- ❌ Não inventar padrões fora do que está em binding.md.
+- ❌ Não inventar padrões fora do que está em .github/instructions/README.md.
 - ❌ Não misturar com código da aplicação.
 - ❌ **NUNCA criar ou modificar arquivos em projetos externos.**
 - ❌ **NUNCA criar arquivo por-projeto na raiz `.github/instructions/`** — destino correto é sempre `.github/instructions/local/` (R-043, gitignored — nunca commitado neste repositório de governança).
 - ❌ **NUNCA reproduzir segredo/credencial detectado durante o scan** (valor literal de token, senha, connection string, chave privada, API key) no `project_profile` ou no adapter gerado — referenciar apenas a **existência/tipo** (ex.: "usa variável de ambiente para credencial de BD"), nunca o valor (OWASP LLM02:2025 — Sensitive Information Disclosure; R-010).
 - ✅ APENAS gerar novos arquivos adapter em `.github/instructions/local/` DESTE repositório.
 - ✅ **FAZER SCANNER de projetos externos** apenas para leitura (detectar stack real).
-- ✅ Usar binding.md + catalog.yaml + catalog.local.yaml + caminhos dos projetos externos como fontes.
+- ✅ Usar .github/instructions/README.md + projects.local.yaml + caminhos dos projetos externos como fontes.
 - ✅ Validar YAML frontmatter antes de criar.
 - ✅ Um arquivo por projeto: nome = `<nome-do-projeto>.instructions.md`, sempre em `.github/instructions/local/`.
 - ✅ Incluir `detected_stack` + `discovered_profile` no frontmatter.
@@ -63,7 +63,7 @@ Você é um agente operacional especializado em gerar automaticamente arquivos a
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia + Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 - Genericidade obrigatória (R-038): adapters em `.github/instructions/` devem ser genéricos por stack, não por projeto específico.
 
@@ -79,17 +79,17 @@ Aplicar o checklist de scan definido em `project-scanner-governance` (skill já 
 |---|---|---|---|---|
 | **`scan`** | `/add-project-context` FASE 1 — projeto **ainda não registrado** em nenhum catalog | `path_externo` (caminho absoluto) | `project_profile` consolidado (YAML, em memória) | ❌ Não — puramente read-only, usado para alimentar as perguntas Q1-Q3 |
 | **`generate-one`** | `/add-project-context` FASE 2.5/3 — após Q1-Q3 respondidas e usuário confirmar "criar novo adapter" | `nome`, `path_externo`, `stack_detectado` (já resolvidos pelo caller) | Confirmação de criação | ✅ Sim — só `.github/instructions/local/<nome>.instructions.md` |
-| **`batch`** (padrão legado) | Backfill/reparo manual — gerar adapters faltantes para TODOS os projetos já registrados em `catalog.local.yaml` | Nenhuma (lê catalog.local.yaml inteiro) | Lista de arquivos criados | ✅ Sim — 1 arquivo por projeto sem adapter |
+| **`batch`** (padrão legado) | Backfill/reparo manual — gerar adapters faltantes para TODOS os projetos já registrados em `projects.local.yaml` | Nenhuma (lê projects.local.yaml inteiro) | Lista de arquivos criados | ✅ Sim — 1 arquivo por projeto sem adapter |
 
 **Regra de guardrail por modo:**
-- `scan` e `generate-one` **nunca** leem `catalog.local.yaml` inteiro nem iteram outros projetos — operam apenas sobre o `path_externo`/`nome` recebido no `task`.
+- `scan` e `generate-one` **nunca** leem `projects.local.yaml` inteiro nem iteram outros projetos — operam apenas sobre o `path_externo`/`nome` recebido no `task`.
 - `batch` é o único modo que itera `projetos:` — usado fora do fluxo de `/add-project-context` (ex.: comando manual "gerar adapters faltantes").
 - Em todos os modos, o scanner sobre o projeto externo é **sempre read-only**.
 
 ## Decision Tree / Fluxo de Execução
 
 ```text
-Binding context inicializado (./docs/ai-context/catalog.yaml + binding.md existem NESTE repo)?
+Binding context inicializado (./.github/instructions/README.md + binding.md existem NESTE repo)?
 ├─ Não → PARAR — binding-initializer deve rodar primeiro
 └─ Sim → Qual modo foi declarado no task?
    │
@@ -105,12 +105,12 @@ Binding context inicializado (./docs/ai-context/catalog.yaml + binding.md existe
    │  ├─ [2] Gerar template CUSTOMIZADO com base no stack_detectado recebido
    │  ├─ [3] Salvar em ./.github/instructions/local/<nome>.instructions.md ← NESTE repo, gitignored (R-043)
    │  ├─ [4] Validar YAML frontmatter
-   │  └─ [5] Reportar sucesso/falha — fim (NÃO toca catalog.local.yaml, isso é responsabilidade do caller)
+   │  └─ [5] Reportar sucesso/falha — fim (NÃO toca projects.local.yaml, isso é responsabilidade do caller)
    │
    └─ modo=batch (nenhum path_externo — backfill sobre todos os projetos já registrados):
-      ├─ [1] Ler ./docs/ai-context/catalog.yaml (adapters/global) + ./docs/ai-context/catalog.local.yaml (lista projetos + paths externos)
-      ├─ [2] Ler ./docs/ai-context/binding.md (descobre padrões applyTo)
-      ├─ [3] **SCANNER READ-ONLY dos projetos externos** (baseado nos paths do catalog.local.yaml):
+      ├─ [1] Ler ./.github/instructions/README.md (adapters/global) + ./.github/projects.local.yaml (lista projetos + paths externos)
+      ├─ [2] Ler ./.github/instructions/README.md (descobre padrões applyTo)
+      ├─ [3] **SCANNER READ-ONLY dos projetos externos** (baseado nos paths do projects.local.yaml):
       │  ├─ [3a] LER (nunca escrever) arquivos do projeto externo
       │  ├─ [3b] Detectar linguagens (Java, TypeScript, Python, etc)
       │  ├─ [3c] Detectar frameworks (Spring, Angular, React, etc)
@@ -118,7 +118,7 @@ Binding context inicializado (./docs/ai-context/catalog.yaml + binding.md existe
       │  ├─ [3e] Detectar codestyle (linter config, prettier, eslint rules)
       │  ├─ [3f] Detectar arquitetura (padrões, organização de pastas)
       │  └─ [3g] ❌ NÃO criar/modificar NADA no projeto externo
-      ├─ [4] Para cada projeto registrado em catalog.local.yaml:
+      ├─ [4] Para cada projeto registrado em projects.local.yaml:
       │  ├─ [4a] Verificar se adapter já existe em ./.github/instructions/local/
       │  ├─ [4b] Se não existe: gerar template CUSTOMIZADO (baseado em scanner)
       │  ├─ [4c] Salvar em ./.github/instructions/local/<nome-projeto>.instructions.md ← NESTE repo, gitignored (R-043)
@@ -156,7 +156,7 @@ Binding context inicializado (./docs/ai-context/catalog.yaml + binding.md existe
       └─ Validar YAML frontmatter
 
 [4/4] Reportar sucesso/falha
-      └─ NÃO toca catalog.local.yaml — isso é responsabilidade do caller (`/add-project-context`)
+      └─ NÃO toca projects.local.yaml — isso é responsabilidade do caller (`/add-project-context`)
 ```
 
 **Estratégia de sobrescrita (nomenclatura de mercado — [Nx generators](https://nx.dev/docs/kb/creating-files)):**
@@ -175,18 +175,18 @@ Binding context inicializado (./docs/ai-context/catalog.yaml + binding.md existe
     A raiz ./.github/instructions/ é reservada a adapters GENÉRICOS/compartilhados — nunca por-projeto.
 
 [1/6] Validar pré-requisitos
-      ├─ ✅ ./docs/ai-context/catalog.yaml deve existir (NESTE repo)
-      ├─ ✅ ./docs/ai-context/binding.md deve existir (NESTE repo)
-      ├─ ✅ ./docs/ai-context/catalog.local.yaml deve existir (se não, criar a partir de catalog.local.yaml.example)
+      ├─ ✅ ./.github/instructions/README.md deve existir (NESTE repo)
+      ├─ ✅ ./.github/instructions/README.md deve existir (NESTE repo)
+      ├─ ✅ ./.github/projects.local.yaml deve existir (se não, criar a partir de projects.local.yaml.example)
       ├─ ✅ Paths dos projetos externos devem ser acessíveis para leitura
       └─ ❌ Se faltarem → reportar erro + PARAR
 
-[2/6] Ler ./docs/ai-context/catalog.yaml + ./docs/ai-context/catalog.local.yaml (NESTE repo)
+[2/6] Ler ./.github/instructions/README.md + ./.github/projects.local.yaml (NESTE repo)
       ├─ Parse YAML (validar sintaxe) de ambos
-      ├─ Extrair: projetos[] (só existe em catalog.local.yaml) + paths dos projetos externos
+      ├─ Extrair: projetos[] (só existe em projects.local.yaml) + paths dos projetos externos
       └─ Validar: não-vazio
 
-[3/6] Ler ./docs/ai-context/binding.md (NESTE repo)
+[3/6] Ler ./.github/instructions/README.md (NESTE repo)
       ├─ Extrair templates applyTo por tipo de stack
       ├─ Validar frontmatter YAML
       └─ Mapear: stack → padrão de convenção
@@ -202,7 +202,7 @@ Binding context inicializado (./docs/ai-context/catalog.yaml + binding.md existe
       └─ ❌ NÃO criar/modificar nada no projeto externo
 
 [5/6] Gerar arquivos adapter CUSTOMIZADOS (NESTE repo, gitignored — R-043)
-      ├─ Para cada projeto registrado em catalog.local.yaml → projetos:
+      ├─ Para cada projeto registrado em projects.local.yaml → projetos:
       │     ├─ Nome arquivo: ./.github/instructions/local/<nome-projeto>.instructions.md
       │     ├─ Se existe? → SKIP (idempotência)
       │     ├─ Se não: criar com frontmatter + template customizado (baseado em scanner)
@@ -272,10 +272,10 @@ Escopo: [tecnologias/linguagens específicas do stack] — conforme detectado no
 
 ## Checklist Antes de Criar Arquivos
 
-- [ ] `./docs/ai-context/catalog.yaml` existe e é YAML válido (NESTE repo).
-- [ ] `./docs/ai-context/binding.md` existe e contém templates applyTo (NESTE repo).
-- [ ] `./docs/ai-context/catalog.local.yaml` existe (se não, criar a partir de `catalog.local.yaml.example`).
-- [ ] Projetos não-vazios em `catalog.local.yaml` → `projetos:`.
+- [ ] `./.github/instructions/README.md` existe e é YAML válido (NESTE repo).
+- [ ] `./.github/instructions/README.md` existe e contém templates applyTo (NESTE repo).
+- [ ] `./.github/projects.local.yaml` existe (se não, criar a partir de `projects.local.yaml.example`).
+- [ ] Projetos não-vazios em `projects.local.yaml` → `projetos:`.
 - [ ] Paths dos projetos externos são acessíveis para leitura (scanner).
 - [ ] Diretório `./.github/instructions/local/` existe NESTE repositório (criar se necessário).
 - [ ] Nenhum arquivo será sobrescrito (idempotência).
@@ -286,7 +286,7 @@ Escopo: [tecnologias/linguagens específicas do stack] — conforme detectado no
 
 ```
 Pattern: <nome-do-projeto>.instructions.md
-         └─ nome-do-projeto = mesmo nome registrado em catalog.local.yaml
+         └─ nome-do-projeto = mesmo nome registrado em projects.local.yaml
 
 Exemplos:
   ✅ meu-backend-api.instructions.md
@@ -358,7 +358,7 @@ Confiança: Baixa — aguardando correção manual
 
 - ✅ `modo=scan` — Chamado por `/add-project-context` FASE 1, ao escanear um projeto externo **ainda não registrado** (via `run_subagent`).
 - ✅ `modo=generate-one` — Chamado por `/add-project-context` FASE 2.5/3, após Q1-Q3 respondidas e usuário confirmar "criar novo adapter" (via `run_subagent`).
-- ✅ `modo=batch` — Dev digita explicitamente: "gerar adapters faltantes" ou "atualizar adapter de <projeto>"; backfill/reparo manual sobre `catalog.local.yaml`.
+- ✅ `modo=batch` — Dev digita explicitamente: "gerar adapters faltantes" ou "atualizar adapter de <projeto>"; backfill/reparo manual sobre `projects.local.yaml`.
 - ❌ **NÃO é disparado automaticamente por `binding-initializer`.**
 - ❌ Antes de `catalog.yaml` + `binding.md` existirem (R-034 — execute `binding-initializer` antes).
 
@@ -368,9 +368,9 @@ Confiança: Baixa — aguardando correção manual
 - `CLAUDE.md` R-034 — contexto de binding.
 - `CLAUDE.md` R-038 — genericidade de adapters.
 - `CLAUDE.md` R-043 — Local Overlay Pattern (destino `.github/instructions/local/`, gitignored).
-- `./docs/ai-context/binding.md` — descobre templates applyTo.
-- `./docs/ai-context/catalog.yaml` — adapters genéricos/compartilhados (nunca projetos).
-- `./docs/ai-context/catalog.local.yaml` — descobre projetos + paths externos (gitignored, só lido em `modo=batch`).
+- `./.github/instructions/README.md` — descobre templates applyTo.
+- `./.github/instructions/README.md` — adapters genéricos/compartilhados (nunca projetos).
+- `./.github/projects.local.yaml` — descobre projetos + paths externos (gitignored, só lido em `modo=batch`).
 - `.github/instructions/README.md` — atualizar com novos arquivos criados.
 
 ## Retorno ao Router (R-042 — Anti Sticky-Session)

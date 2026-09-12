@@ -52,10 +52,6 @@ nos:
     tipo: downstream
     descricao: "Elicitação e estruturação de requisitos funcionais/não-funcionais a partir de pedido de negócio ambíguo (EARS/INVEST/Gherkin/FURPS+); detecta solution-jumping via Five Whys; prospectivo (pedido → requisito), nunca decide arquitetura, não confundir com business-rules-extractor (reverso: código → regra)"
 
-  - id: code-summarizer
-    tipo: downstream
-    descricao: "Ponto de entrada único para sumarização de código-fonte agnóstica a linguagem (RF-008); modelo híbrido — heurística/AST determinística primeiro, LLM leve como fallback; nunca substituído por chamada direta a lib de parsing por outros agents (RNF-007)"
-
   - id: code-knowledge-graph
     tipo: downstream
     descricao: "Ponto de entrada único para construção/consulta do grafo de conhecimento de código-fonte cross-projeto (RF-001/RF-002/RF-011): nós arquivo/classe/função, arestas import/chamada/herança/tabela-SQL, reaproveitando AST do code-summarizer; puramente determinístico, sem fallback LLM (RNF-008); nunca substituído por chamada direta a lib de parsing/grafo (RNF-004)"
@@ -84,15 +80,11 @@ nos:
 
   - id: binding-initializer
     tipo: health_check
-    descricao: "Inicialização de binding context — acionado antes da triagem se catalog.yaml ausente"
+    descricao: "Inicialização de binding context — acionado antes da triagem se instructions ou template de overlay ausentes"
 
   - id: adapter-generator
     tipo: downstream
     descricao: "Geração automática de adapters via /add-project-context"
-
-  - id: context-builder
-    tipo: downstream
-    descricao: "Coleta e consolidação de contexto técnico"
 
   - id: angular-router
     tipo: domain_router
@@ -110,6 +102,10 @@ nos:
   - id: ejb-router
     tipo: domain_router
     descricao: "Supervisor hierárquico do domínio Java Legado EJB — despacha para os 7 especialistas registrados em .github/agents/backend/ejb/ejb-catalog.yaml"
+
+  - id: python-router
+    tipo: domain_router
+    descricao: "Supervisor hierárquico do domínio Python Backend — despacha para os 7 especialistas registrados em .github/agents/backend/python/python-catalog.yaml"
 
   - id: database-router
     tipo: domain_router
@@ -181,7 +177,7 @@ convencao_papeis_genericos:
   descricao: >
     Nomes "specialist-<papel>" usados em estados.*.agent sao aliases genericos
     resolvidos pelo domain router ativo (angular-router|spring-boot-router|
-    spring-reactive-router|ejb-router) para o id concreto do seu sub-catalogo
+    spring-reactive-router|ejb-router|python-router) para o id concreto do seu sub-catalogo
     que declara a tag role: correspondente (fixer|tester|stylist|implementer|
     advisory|performance). Tabela completa de resolucao por stack em
     workflows.md secao 1.3. Nunca invocar run_subagent com o nome generico
@@ -419,7 +415,7 @@ arestas:
     condicoes:
       tipo: health_check
       regra: "R-034"
-      gatilho: "docs/ai-context/catalog.yaml ausente OU docs/ai-context/binding.md ausente"
+      gatilho: ".github/instructions/README.md ausente OU .github/projects.local.yaml.example ausente"
 
   # Prompt structuring (pré-classificação para casos ambíguos/abertos) — exceção R-041
   - de: agent-router
@@ -595,7 +591,6 @@ arestas:
         - "memória procedimental"
       sinal_r006: "É persistência/recuperação de memória ENTRE SESSÕES (não consolidação pontual)?"
       nao_confundir_com:
-        - "consolidação pontual de contexto"  # → context-builder
 
   # Revisão de artefatos DevOps
   - de: agent-router
@@ -664,36 +659,6 @@ arestas:
         - "extrair regra de negócio de código existente"  # → business-rules-extractor (reverso)
         - "impacto técnico de mudança já definida"          # → tech-solution-architect (tier B1)
 
-  # Sumarização de código-fonte agnóstica a linguagem (RF-008)
-  - de: agent-router
-    para: code-summarizer
-    prioridade: 1.9
-    threshold_score: 0.90
-    nivel_routing: rule-based
-    condicoes:
-      keywords:
-        - "sumarizar código"
-        - "sumarização de código-fonte"
-        - "resumir arquivo"
-        - "reduzir contexto de código"
-        - "economizar tokens de código"
-        - "code summarization"
-      sinal_r006: "É pedido para reduzir volume de código-fonte levado ao contexto (sumário), não para revisar/corrigir/refatorar o código?"
-      nao_confundir_com:
-        - "revisar/corrigir código"        # → bug-triage/code-review/refactor-planner
-        - "extrair regra de negócio"       # → business-rules-extractor
-        - "implementar sumarização em lib" # → decisão técnica de governance-factory/tech-solution-architect, não roteamento
-
-  # Delegação interna: qualquer agent downstream pode invocar code-summarizer sob demanda (RF-002)
-  - de: "*downstream"
-    para: code-summarizer
-    prioridade: 0.5
-    threshold_score: 1.00
-    nivel_routing: rule-based
-    condicoes:
-      sinal: "Agent downstream identificou arquivo-fonte grande (>300 linhas OU >20KB) necessário ao contexto da tarefa (RF-002/RNF-002)"
-      gatilho: "Delegação interna via run_subagent antes de anexar conteúdo bruto ao contexto — nunca chamada direta a lib de parsing por outros agents (RNF-007)"
-
   # Grafo de conhecimento de código-fonte cross-projeto (RF-001/RF-002/RF-011)
   - de: agent-router
     para: code-knowledge-graph
@@ -717,7 +682,6 @@ arestas:
         - "mapear chamadas entre camadas"
       sinal_r006: "É pedido de construir/consultar relação estrutural entre símbolos de código (nós/arestas), camadas ou fluxo de dados do projeto?"
       nao_confundir_com:
-        - "sumarizar código"                       # → code-summarizer
         - "revisar/corrigir código"                # → bug-triage/code-review/refactor-planner
         - "implementação/feature de componente"    # → angular-engineer / spring-boot-engineer
         - "acoplamento arquitetural entre sistemas" # → tech-solution-architect (cross-sistema/contratos)
@@ -754,9 +718,10 @@ arestas:
         - "executar testes spring boot"    # → spring-boot-router
         - "executar testes reativos"       # → spring-reactive-router
         - "executar testes ejb"            # → ejb-router
+        - "executar testes python"         # → python-router
 
   # Delegação interna: Routers de domínio consultam test-strategy para mapear cenários antes de codar (Fluxo 2 TDD)
-  - de: "angular-router | spring-boot-router | spring-reactive-router | ejb-router"
+  - de: "angular-router | spring-boot-router | spring-reactive-router | ejb-router | python-router"
     para: test-strategy
     prioridade: 0.5
     threshold_score: 1.00
@@ -1021,6 +986,27 @@ arestas:
         - "openejb"
         - "arquillian"
       sinal_r006: "É qualquer solicitação do ecossistema Java Legado EJB? (despacha para o catálogo de 7 especialistas backend em .github/agents/backend/ejb/ejb-catalog.yaml)"
+
+  # Supervisor e roteador de domínio Python Backend (Hierarchical Sub-Router)
+  - de: agent-router
+    para: python-router
+    prioridade: 1.6
+    threshold_score: 0.85
+    nivel_routing: rule-based
+    condicoes:
+      keywords:
+        - "python"
+        - "python-router"
+        - "fastapi"
+        - "django"
+        - "flask"
+        - "pytest"
+        - "pydantic"
+        - "sqlalchemy"
+        - "asyncio"
+        - "uvicorn"
+        - "celery"
+      sinal_r006: "É qualquer solicitação do ecossistema Python Backend? (despacha para o catálogo de 7 especialistas backend em .github/agents/backend/python/python-catalog.yaml)"
 
   # Supervisor e roteador de domínio Banco de Dados (Hierarchical Sub-Router)
   - de: agent-router

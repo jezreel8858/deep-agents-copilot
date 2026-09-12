@@ -6,12 +6,138 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.8.1] — 2026-09-12
+
+### Adicionado & Aperfeiçoado
+- **Geração Integrada de Título e Descrição de Pull Request (`@pr-gatekeeper` e `/commit`)**:
+  - **`pr-gatekeeper.agent.md` (v1.1.0 → v1.2.0)**:
+    - Atualização do fluxo operacional com passo dedicado para geração de Título de PR no padrão Conventional Commits (≤72 cols, imperativo em PT-BR).
+    - Inclusão formal de template estruturado de Descrição de PR contendo: resumo de entregas, tipo de mudança categorizado, matriz de risco avaliada com base no diff, instruções de validação/teste e checklist pré-PR.
+    - Sincronização de catálogo em `.github/agents/catalog.yaml` (versão e descrição).
+  - **`commit.prompt.md` (v1.3 → v1.4)**:
+    - Expansão do PASSO 5 para fornecer, junto à mensagem de commit e comando manual, o Título de PR e a Descrição estruturada de PR pronta para preenchimento na plataforma de Git.
+    - Orientações explícitas de entrada para o `CHANGELOG.md` no encerramento da entrega.
+
+---
+
+## [2.8.0] — 2026-09-11
+
+### Adicionado
+- **Consolidação de Workflows com Padrões de Mercado (ADLC / Autonomous SDLC 2026 — R-050)**:
+  - **Expansão de 5 para 8 Workflows Canônicos e de Ciclo de Vida**: Pesquisa de mercado e benchmarking com padrões corporativos (Anthropic *Building Effective Agents*, Cycode/IBM *Agentic Development Lifecycle - ADLC* e engenharia DevSecOps) identificou e supriu 3 lacunas operacionais críticas de repositórios reais:
+    - **`WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION` (WF6)**: remediação determinística de vulnerabilidades SCA e CVEs (`@security-reviewer`), mapeamento de blast radius de dependências (`@code-knowledge-graph`), bump cirúrgico em manifestos/lockfiles (`specialist-developer`), adaptação de breaking changes de bibliotecas (`specialist-bug-fixer`) e quality gate com re-scan de segurança (`runtime-verifier`).
+    - **`WORKFLOW-FRAMEWORK-MIGRATION` (WF7)**: condução de elevações estruturais de versão maior de framework ou plataforma (Angular standalone/signals, Spring Boot 2→3, Java 17→21/25, EJB→Spring), com pre-flight assessment (`@tech-solution-architect`), decomposição em fases entregáveis, codemods automatizados no sandbox (`context-mode`), testes de paridade funcional e checkpoints humanos obrigatórios.
+    - **`WORKFLOW-RELEASE-READINESS` (WF8)**: pre-flight completo de release e validação pré-deploy, auditando compatibilidade retroativa de contratos OpenAPI (`@tech-solution-architect`), rollout de banco com scripts DDL idempotentes e reversíveis (`@database-specialist`), varredura de segredos e licenças (`@security-reviewer` + `@repo-hygiene-auditor`), packaging semântico com changelog (`@pr-gatekeeper`) e decisão executiva Go/No-Go (`@code-review`).
+  - **Sincronização Atômica em Cascata (R-015/R-040/R-050)**:
+    - Atualização formal de `workflows.md` (diagrama geral, especificações detalhadas e Typed State Bags para WF6, WF7 e WF8).
+    - Inclusão dos 3 pipelines em `routing-graph.yaml` sob o bloco `workflows:`, com expansão das diretrizes de `fast_path_bypass`.
+    - Atualização de `CLAUDE.md` (§ R-050 e R-041), `.github/copilot-instructions.md` e `agent-router.agent.md`.
+    - Adição de 3 cenários declarativos E2E em `tests/operational_flow/casos-workflows.yaml` (`WF-DEP-001`, `WF-MIG-001`, `WF-REL-001`) e 3 testes específicos em `test_operational_workflows.py`.
+    - Validação total da suíte determinística: **92/92 testes passando (100%)** com cobertura de 100% dos workflows (`8/8`).
+
+---
+
+## [2.7.0] — 2026-09-11
+
+### Refatorado & Simplificado
+- **Coesão em `.github/` — Simplificação Arquitetural e Desacoplamento Definitivo (Cenário 2)**:
+  - **Extinção de `docs/ai-context/catalog.yaml` e `docs/ai-context/binding.md`**: Eliminação de manifestos intermediários redundantes. Os adapters genéricos agora são 100% autodeclaratórios via frontmatter YAML nativo `applyTo` nos próprios arquivos `.instructions.md`, lidos diretamente pelo GitHub Copilot e demais IDEs.
+  - **Catálogo Único de Agents (`.github/agents/catalog.yaml`)**: Fim da colisão de nomes. O repositório passa a ter estritamente **um** arquivo `catalog.yaml`, eliminando a necessidade de desambiguações em prompts e no `repo-map.md`.
+  - **Migração do Overlay Local de Projetos**: Substituição de `docs/ai-context/catalog.local.yaml` por `.github/projects.local.yaml` (gitignored, R-043) e de seu template rastreado para `.github/projects.local.yaml.example`.
+  - **SSOT de Binding Consolidado (`.github/instructions/README.md`)**: O índice de instructions absorveu formalmente todas as definições da hierarquia de 3 camadas (Global $\rightarrow$ Stack $\rightarrow$ Projeto), discovery de IDEs e ciclo de vida de projetos locais.
+  - **Extinção do `repo-map.md` e Consolidação Nativa**: O arquivo `repo-map.md` foi integralmente absorvido e extinto. A árvore física oficial do repositório foi incorporada ao `README.md` raiz (para humanos) e os caminhos canônicos consolidados na seção 7 de `CLAUDE.md` e `.github/copilot-instructions.md` (para IAs), eliminando mais um ponto de manutenção e duplicação.
+  - **Remoção Completa do Diretório `docs/ai-context/`**: Diretório extinto por completo, concentrando toda a configuração e governança de IA sob `.github/`.
+  - **Sincronização em Cascata (R-015/R-043/R-046)**: Atualização atômica de `.gitignore`, `.githooks/pre-commit`, `CLAUDE.md` (R-034 e R-043), `.github/copilot-instructions.md`, todos os agents e prompts operacionais, scripts de tooling e suíte de testes (`test_local_project_isolation.py`, `test_governance_smells.py`, `test_routing_quality_gate.py`), mantendo 100% de conformidade e 89/89 testes aprovados no pytest.
+
+---
+
+## [2.6.2] — 2026-09-11
+
+### Adicionado
+- **Prompt `/init-context` — Verificação de Deriva de Stack e Instruções Locais (Drift Detection)**:
+  - Adicionado novo PASSO 7 (expandindo a execução para 9 passos) para detectar discrepâncias entre os manifestos reais dos projetos locais externos (`package.json`, `pom.xml`, `build.gradle`, `pyproject.toml`) e os adapters locais em `.github/instructions/local/<projeto>.instructions.md` (R-043).
+  - Identifica automaticamente upgrades de versão major de frameworks (ex.: Angular 20 → 21, Spring Boot 2.x → 3.x) e migrações de test runners/bibliotecas (ex.: Karma/Jasmine → Vitest, JUnit 4 → JUnit 5, Jest → Vitest).
+  - Adiciona remediação guiada interativa via `ask_questions` (R-009) para sincronização do adapter local, linha dedicada na tabela de checklist consolidada, recomendações e troubleshooting.
+  - Inclusão da tool `ask_questions` em `tools:` e de `.github/skills/project-scanner/SKILL.md` em `source_docs:` do prompt.
+
+---
+
+## [2.6.1] — 2026-09-11
+
+### Refatorado
+- **Desacoplamento de Cardinalidade Normativa (Herança Aberta de Governança)**:
+  - Substituição da referência rígida ao contador fechado (`R-001..R-051`) pela herança aberta desacoplada (`regras normativas globais em CLAUDE.md`) em 45 agents/templates e todos os prompts, skills e catálogos.
+  - Eliminação definitiva do problema de *Shotgun Surgery* (manutenção em cascata e gasto desnecessário de créditos Copilot a cada nova regra adicionada ao `CLAUDE.md`).
+- **Redefinição do Smell 2.15 (`governance-audit-patterns/SKILL.md` & `test_governance_smells.py`)**:
+  - Inversão de sentido do Smell 2.15 de "range desatualizado" para "Acoplamento Rígido de Range Normativo (Hardcoded Range Coupling)".
+  - Nova validação automatizada em `test_smell_2_15_no_hardcoded_normative_rule_range`: exige que todo agent herde `CLAUDE.md` e proíbe a reintrodução de ranges numéricos hardcoded em agents.
+
+---
+
+## [2.6.0] — 2026-09-10
+
+### Adicionado
+- **Suíte de Testes de Conformidade de Templates (Disjunção 1-de-N)**:
+  - `tests/governance_audit/test_template_sections.py`: Implementação estática da regra de conformidade polimórfica (Smells 2.9, 2.10 e 2.11), validando seções de agents, prompts e skills contra os templates canônicos com extração dinâmica e normalização semântica.
+  - `tests/governance_audit/test_router_agents.py`: Validação determinística especializada para os 6 agents com perfil de Router / Supervisor (`agent-router`, `angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `database-router`), exigindo as 6 seções obrigatórias e menor privilégio de ferramentas.
+  - Template canônico oficial para roteadores em `.github/agents/templates/router-agent.md`.
+- **Suíte de Testes de Trajetórias de Workflows Canônicos (R-050) & Simulador MAS**:
+  - `tests/operational_flow/casos-workflows.yaml`: Catálogo declarativo com 8 cenários de ponta a ponta (E2E) cobrindo os 5 workflows canônicos, detecção de deriva de intenção (R-042), circuit breaker (R-050.2) e fast-chaining (R-050.1).
+  - `tests/operational_flow/test_workflow_trajectories.py`: Validação determinística das transições de estados, isolamento de ferramentas por etapa e thresholds de cobertura (100% workflows, ≥85% etapas, ≥15 agentes).
+  - `tests/operational_flow/workflow_eval_simulator.py`: Motor CLI para auditoria estática de trajetórias em lote e cálculo em tempo real das 5 dimensões de cobertura de MAS (`--coverage`).
+  - `.github/prompts/eval-workflows.prompt.md`: Prompt operacional parametrizado para avaliação de trajetórias via modelo `Gemini 3.8 Flash`.
+- **Documentação Arquitetural de Testes MAS (`tests/README.md`)**:
+  - Documentação completa da Pirâmide de Testes de Sistemas Multi-Agentes (MAS), detalhamento arquivo por arquivo, objetivos de qualidade, métricas de cobertura e guia de execução.
+
+### Alterado
+- **Configuração do Pytest (`pytest.ini`)**:
+  - Inclusão da diretiva `pythonpath = .` garantindo resolução determinística da raiz do projeto independente da forma de invocação do runner.
+
+---
+
+## [2.5.0] — 2026-09-10
+
+### Adicionado
+- **Mapa do Repositório Canônico (`docs/ai-context/repo-map.md`)**:
+  - Fonte de verdade de navegação determinística de arquivos (princípio Zero Blind Searches), contendo guia de localização direta, tabela rápida de arquivos de governança (Quick File Finder) e árvore física estrutural do projeto.
+- **Whitelist de Busca e Indexação para ripgrep (`.ignore` e `.rgignore`)**:
+  - Arquivos de configuração na raiz liberando a varredura de `!.github/` e `!.github/**` pelas ferramentas de busca (`file_search` e `grep_search`), sanando falhas de localização com 0 matches de agents e skills em workspaces multi-root.
+
+### Alterado
+- **Desambiguação Canônica dos Catálogos (`catalog.yaml`)**:
+  - Formalizada a distinção unívoca entre o Catálogo de Agents (`.github/agents/catalog.yaml` — metadados, modelos Gemini/Claude, prioridades) e o Catálogo de Binding (`docs/ai-context/catalog.yaml` — manifest de stacks e adapters).
+  - Atualizadas as instruções em `CLAUDE.md`, `.github/copilot-instructions.md` e `.github/agents/agent-router.agent.md` proibindo explicitamente que o router busque modelos em `docs/ai-context/catalog.yaml`.
+  - Inclusão do `repo-map.md` como leitura de infraestrutura mandatória no `@agent-router`.
+
+---
+
+## [2.4.0] — 2026-09-10
+
+### Adicionado
+- **Novos Smells de Governança (20 Smells Canônicos)** — originados de auditoria real do primeiro ciclo completo de `WORKFLOW-FEATURE-DEVELOPMENT` (feature de Gestão de Usuários/Auditoria Global no projeto de referência):
+  - **Smell 2.18 (Gap de Definição de Pronto — Feature Não-Alcançável / Rota Órfã de Navegação)**: nenhum artefato do pipeline (blueprint, implementer, test-strategy, code-review) tratava "alcançabilidade via navegação" como critério de conclusão — feature entregue com testes verdes e build íntegro, porém sem entrada correspondente no menu/sidenav do projeto.
+  - **Smell 2.19 (Ausência de Verificação de Reuso de Design System / Componentes Compartilhados)**: agent implementer de UI criou HTML/CSS customizado (`<select>` nativo, cards/badges ad-hoc) ignorando catálogo interno de componentes compartilhados já documentado no projeto (`docs/componentes-shared.md`, `docs/padrao-angular-material.md`).
+  - **Smell 2.20 (Duplicação por Aninhamento de Router — Nested Subagent Sprawl)**: identificada e eliminada a duplicação na cadeia de orquestração onde o `@agent-router` invocava executores downstream via `run_subagent` por dentro de si mesmo e, ao retornar ao Orquestrador Raiz com o bloco de decisão, o orquestrador re-disparava o mesmo downstream. Formalizada a regra de Delegação Plana (Flat Delegation) em R-047, R-037, `agent-router.agent.md` e `handoff-governance/SKILL.md` (§ 2.3), acompanhada de teste estático determinístico no Tier 1 (`test_smell_2_20_router_flat_delegation_rule`).
+- **Reforço de Definition of Done em Frontend**: `angular-implementation-patterns/SKILL.md` ganha passo 0 (Reuse-First) e passo 7 (Navegabilidade) no Workflow — Feature Nova, com checklist de PR e anti-padrões correspondentes.
+- **Princípio Reuse-First**: `frontend-componentization-patterns/SKILL.md` ganha nova seção "Reuso-First: Antes de Criar Componente Novo" com processo objetivo de busca em `shared/`/documentação interna antes de qualquer HTML/CSS customizado.
+- **8ª Dimensão de Code Review**: `code-review-patterns/SKILL.md` § 2 ganha dimensão "UX/Design System & Navegabilidade", cobrindo os Smells 2.18/2.19 na revisão de diffs de frontend.
+- **Template Canônico Completado em 2 Agents**: `angular-feature-developer.agent.md` e `angular-ui-stylist.agent.md` — únicos 2 agents do catálogo Angular sem `Decision Tree`/`Checklist Antes de Entregar`/`Quando Delegar` — receberam as 3 seções ausentes (Smell 2.9 aplicado retroativamente).
+- **Reforço em `tech-solution-architect.agent.md`**: Context Firewall `[FRONTEND_TASKS]` e Checklist Antes de Entregar agora exigem explicitamente tarefa de integração ao shell de navegação e consulta prévia a design system compartilhado quando a feature introduzir rota(s)/UI nova(s).
+- **Reforço em `code-review.agent.md`**: novo branch no Decision Tree e item 6 nos Padrões Obrigatórios para validar navegabilidade e reuso de design system antes do veredito em diffs de frontend.
+- **Reforço em `test-strategy.agent.md`**: item 5 dos Padrões Obrigatórios exige cenário de Navegabilidade na Matriz de Cenários Frontend quando houver rota nova.
+- **Adapter Local Corrigido (`[PROJETO-ALVO].instructions.md`)**: novas seções § 1.1 (Design System Interno — Consulta Obrigatória) e § 1.2 (Navegação — SidenavComponent/Shell como Única Fonte de Verdade), referenciando explicitamente a documentação interna de componentes/design system e o componente de shell de navegação do projeto — o adapter não continha nenhuma dessas referências antes desta correção, apesar de os documentos já existirem no projeto.
+
+### Autocrítica de Processo (Achado de Execução)
+- Identificado e documentado que a fidelidade de handoff da Etapa 5 (`tdd_domain_implementation`) de `WORKFLOW-FEATURE-DEVELOPMENT` depende de invocação **real** de `run_subagent` para o specialist correspondente — rotular a resposta com `Agente Ativo: <specialist>` sem a invocação real não carrega o contrato/checklist do agent, tornando as correções de conteúdo insuficientes por si só sem a disciplina de delegação genuína já normatizada em R-042.
+
+---
+
 ## [2.3.0] — 2026-09-10
 
 ### Adicionado
 - **Regra Normativa R-051 (Proteção Anti-Corrupção em Edição de Arquivo Único Grande/Estruturado)**: Formalizada em `CLAUDE.md` e `efficient-batch-code-modification/SKILL.md` (§ 5). Veda o uso de `insert_edit_into_file` em arquivos com mais de 200 linhas, formato YAML/JSON ou consumidos por CI/testes, exigindo o Padrão de Edição Segura Verificada (leitura integral, contagem unívoca de ocorrência da âncora, all-or-nothing write e releitura de confirmação).
 - **Snippet Canônico de Edição Segura (`safe-single-file-edit-pattern.js`)**: Materializado em `.github/skills/efficient-batch-code-modification/snippets/safe-single-file-edit-pattern.js` como template reutilizável para context-mode (`ctx_execute`), em estrita conformidade com R-026 (código real fora do corpo da skill).
-- **Novos Smells de Governança (16 Smells Canônicos)**:
+- **Novos Smells de Governança (17 Smells Canônicos)**:
   - **Smell 2.15 (Citação de Range Normativo Desatualizado — Drift de R-0XX)**: Formalizada em `governance-audit-patterns/SKILL.md` e amparada por teste determinístico no Tier 1 (`test_smell_2_15_no_stale_normative_rule_range`), que lê dinamicamente o maior R-0XX de `CLAUDE.md` e bloqueia desatualizações nos agents.
   - **Smell 2.16 (Agent Mutativo Sem Skill de Edição Segura Referenciada)**: Formalizada em `governance-audit-patterns/SKILL.md` e amparada por teste determinístico no Tier 1 (`test_smell_2_16_mutating_agents_reference_safe_editing_skill`), exigindo que todo agent com tools mutativas referencie `efficient-batch-code-modification`.
 - **Transparência de Base de Conhecimento — Terceira Linha do Banner Universal (`Skills Carregadas`)**: Estendido o Banner Universal de Identidade em `CLAUDE.md` (R-042), `agent-contracts/SKILL.md` (§ 0 e § 8), `.github/copilot-instructions.md` e `handoff-governance/SKILL.md` (§ 5.2) para exibir compulsoriamente a linha `Skills Carregadas: <skill-1>, ...` em cada resposta, garantindo visibilidade no chat sobre quais skills foram pre-fetched e consultadas a cada turno.
@@ -164,7 +290,7 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
   - `spring-boot-implementation-patterns` — matriz de decisão virtual threads vs reativo, N+1/OSIV, DTOs de borda.
   - `spring-reactive-implementation-patterns` — composição não-bloqueante, operadores de erro (`onErrorResume`/`onErrorMap`/`retryWhen`), `StepVerifier`/`WebTestClient`.
 - **`tools:`** dos 3 agents expandidas com `create_file`, `insert_edit_into_file`, `get_errors`, `run_in_terminal`.
-- **`docs/ai-context/evals/casos-roteamento.yaml`**: `canon-018` (implementação direta de bugfix), `regr-014` corrigido (implementação no próprio domínio não é deriva), `regr-016` novo (deriva real cross-stack) — suíte 40 → 42 casos.
+- **`docs/ai-context/evals/casos-roteamento.yaml`**: `canon-018` (implementação direta de bugfix), `regr-014` corrigido (implementação no próprio domínio não é deriva), `regr-016` novo (deriva real cross-stack) — suíte passa de 35 para 40 casos.
 
 ### Corrigido
 - **SYNC (R-015)**: `.github/skills/.index.json` — corrigido gap pré-existente onde as 3 skills de análise (`angular-frontend-patterns`, `spring-boot-backend-patterns`, `spring-reactive-webflux-patterns`) nunca haviam sido registradas; total_skills 39 → 45 (3 análise + 3 implementação novas).

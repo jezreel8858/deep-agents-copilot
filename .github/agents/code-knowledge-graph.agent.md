@@ -20,7 +20,7 @@ source_docs:
 
 ## Objetivo
 
-Ser o **único ponto de entrada** para construção e consulta do grafo de conhecimento de código-fonte no repositório (RF-001/RF-002/RF-011 do REQ). Recebe um ou mais projetos via `run_subagent`, invoca o **motor único de extração** — a lib externa **`@optave/codegraph`** (CLI local, Node.js/TypeScript nativo, zero API keys, zero LLM) — e constrói/consulta nós e arestas de código **exclusivamente por via determinística** (parsing AST nativo/Rust via `@optave/codegraph`, sem qualquer inferência de modelo) — **nunca invoca LLM** para completar ou inferir relações (RNF-008). Cobre, desde o MVP, escopo cross-projeto via `docs/ai-context/catalog.yaml` (RF-003).
+Ser o **único ponto de entrada** para construção e consulta do grafo de conhecimento de código-fonte no repositório (RF-001/RF-002/RF-011 do REQ). Recebe um ou mais projetos via `run_subagent`, invoca o **motor único de extração** — a lib externa **`@optave/codegraph`** (CLI local, Node.js/TypeScript nativo, zero API keys, zero LLM) — e constrói/consulta nós e arestas de código **exclusivamente por via determinística** (parsing AST nativo/Rust via `@optave/codegraph`, sem qualquer inferência de modelo) — **nunca invoca LLM** para completar ou inferir relações (RNF-008). Cobre, desde o MVP, escopo cross-projeto via `.github/instructions/README.md` (RF-003).
 
 O motor `@optave/codegraph` fornece parsing via AST real (motor nativo) para 34 linguagens, dataflow analysis + CFG + interprocedural dataflow, CI gate nativo (`codegraph check`), dead-code detection, complexity metrics, community detection e co-change analysis. Uso da lib documentado na skill [`codegraph-optave-usage`](../skills/codegraph-optave-usage/SKILL.md).
 
@@ -62,7 +62,7 @@ O motor `@optave/codegraph` fornece parsing via AST real (motor nativo) para 34 
 
 | Critério | Threshold objetivo | Ligado a |
 |---|---|---|
-| Cobertura de nós/arestas identificáveis pela via determinística | **≥ 80%** (mesmo piso histórico do `code-summarizer`) | RF-010/RNF-005 |
+| Cobertura de nós/arestas identificáveis pela via determinística | **≥ 80%** (piso histórico de conformidade) | RF-010/RNF-005 |
 | Reprodução de segredo/credencial em qualquer saída reportada | **0%** — bloqueante, não percentual | RNF-003/R-010 |
 | Reaproveitamento de cache `code-graph:*` antes de reprocessar | 100% das vezes, checado via `ctx_search` | RNF-002 |
 | Reporte de economia (RF-010) | Sempre calculado: bytes/tokens de consultar o grafo vs. ler o código-fonte bruto equivalente | RF-010 |
@@ -73,7 +73,7 @@ Estes valores **substituem** qualquer autoavaliação subjetiva nas seções Dec
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 - Aplicar especialmente: `R-009`, `R-010`, `R-015`, `R-023`, `R-024`, `R-026`, `R-038`, `R-042`, `R-048`.
 
@@ -81,7 +81,7 @@ Estes valores **substituem** qualquer autoavaliação subjetiva nas seções Dec
 
 | Item | Caminho/Uso | Observação |
 |---|---|---|
-| Catálogo de projetos cross-repo | [`docs/ai-context/catalog.yaml`](../../docs/ai-context/catalog.yaml) | Escopo multi-repo (RF-003) |
+| Catálogo de projetos cross-repo | [`.github/instructions/README.md`](../instructions/README.md) | Escopo multi-repo (RF-003) |
 | **Skill de uso do motor (obrigatória)** | [`../skills/codegraph-optave-usage/SKILL.md`](../skills/codegraph-optave-usage/SKILL.md) | Instalação, tabela de comandos CLI, least-tools MCP, gaps conhecidos — fonte única de verdade operacional do motor |
 | Catálogo textual de agents | [`README.md`](README.md) | Registro deste agent |
 | Catálogo estruturado | [`catalog.yaml`](catalog.yaml) | Registro oficial para invocação via `run_subagent` |
@@ -203,7 +203,7 @@ Próximo passo mínimo:
 
 > Antes de invocar este agent, anexe os arquivos abaixo. Se faltar, **PEÇA o anexo** — nunca infira.
 
-- [`docs/ai-context/catalog.yaml`](../../docs/ai-context/catalog.yaml) — escopo cross-repo (RF-003).
+- [`.github/instructions/README.md`](../instructions/README.md) — escopo cross-repo (RF-003).
 - [`../../CLAUDE.md`](../../CLAUDE.md) — regras globais (R-009, R-010, R-023, R-024, R-038).
 - [`../copilot-instructions.md`](../copilot-instructions.md) — regras operacionais e Context Mode.
 - [`../skills/codegraph-optave-usage/SKILL.md`](../skills/codegraph-optave-usage/SKILL.md) — **obrigatória**: instalação, comandos, least-tools MCP, gaps conhecidos.
@@ -235,7 +235,6 @@ Próximo passo mínimo:
 
 | Destino | Delegar quando | Handoff mínimo |
 |---|---|---|
-| [`@code-summarizer`](code-summarizer.agent.md) | solicitante precisa também de um sumário textual de um arquivo (não apenas do grafo) | caminho do arquivo, project-id |
 | [`@tech-solution-architect`](tech-solution-architect.agent.md) | consumidor precisa de blast radius/dataflow/impacto (RF-015 e capacidades novas) para decisão técnica ou blueprint, ou precisa validar o Gate de Paridade Funcional (RNF-012) | project-id(s), comando(s) `codegraph` executados, cobertura reportada, status do gate |
 | [`@refactor-planner`](refactor-planner.agent.md) | consumidor precisa de impacto de refatoração a partir do grafo já construído, incluindo blast radius e detecção de ciclo | project-id(s), resultado relevante |
 | [`@bug-triage`](bug-triage.agent.md) | consumidor precisa rastrear cadeia de chamadas a partir do grafo já construído | project-id(s), nó de origem, comando usado |

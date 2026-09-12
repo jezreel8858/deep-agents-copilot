@@ -2,20 +2,21 @@
 name: init-context
 description:
   ⚠️ PRÉ-REQUISITO OBRIGATÓRIO — Inicializa contexto de governança global para TODA sessão.
-  Carrega CLAUDE.md + copilot-instructions.md, valida conformidade R-001..R-051.
+  Carrega CLAUDE.md + copilot-instructions.md, valida conformidade com as regras normativas globais.
   Execute UMA ÚNICA VEZ no início da sessão ANTES de /add-project-context ou qualquer agent.
   NÃO REPITA na mesma sessão — faz 1x apenas.
 agent: 'agent'
 model: "Gemini 3.8 Flash"
-tools: ['read_file', 'list_dir', 'run_subagent', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_batch_execute', 'context-mode/ctx_search', 'context-mode/ctx_stats']
+tools: ['read_file', 'list_dir', 'run_subagent', 'run_in_terminal', 'ask_questions', 'context-mode/ctx_execute', 'context-mode/ctx_batch_execute', 'context-mode/ctx_search', 'context-mode/ctx_stats']
 argument-hint: ''
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - docs/ai-context/catalog.yaml
-  - docs/ai-context/catalog.local.yaml.example
+  - .github/instructions/README.md
+  - .github/projects.local.yaml.example
   - .github/skills/terminal-governance/SKILL.md
   - .github/skills/context-mode/SKILL.md
+  - .github/skills/project-scanner/SKILL.md
 ---
 
 # `/init-context`
@@ -24,7 +25,7 @@ source_docs:
 
 Inicializa contexto obrigatório de governança. Execute 1x por sessão APENAS.
 
-> **Propósito**: PRÉ-REQUISITO para toda execução downstream. Carregar regras R-001..R-051, validar model, eliminar alucinação.
+> **Propósito**: PRÉ-REQUISITO para toda execução downstream. Carregar regras normativas globais, validar model, eliminar alucinação.
 > **Workspace**: `${workspaceFolder}`
 >
 > **FREQUÊNCIA**: ❌ 1x POR SESSÃO (nunca repita na mesma sessão)
@@ -38,7 +39,7 @@ Inicializa contexto obrigatório de governança. Execute 1x por sessão APENAS.
 ## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
 
 - ✅ **APENAS** carregar regras globais, checar binding context e auditar telemetria/ambiente de sessão.
-- ✅ **SEMPRE** verificar a existência de `catalog.yaml` e `binding.md` (R-034).
+- ✅ **SEMPRE** verificar a existência de `.github/instructions/README.md` e `.github/projects.local.yaml.example` (R-034).
 - ❌ **NÃO** implementar código ou executar refatorações de aplicação.
 - ❌ **NÃO** repetir este comando múltiplas vezes na mesma sessão.
 
@@ -50,7 +51,7 @@ Inicializa contexto obrigatório de governança. Execute 1x por sessão APENAS.
 
 Este prompt carrega **automaticamente** (conforme frontmatter `source_docs`):
 
-- ✅ **`CLAUDE.md`** — Governança global, regras normativas R-001..R-051
+- ✅ **`CLAUDE.md`** — Governança global, regras normativas globais
 - ✅ **`.github/copilot-instructions.md`** — Roteamento rápido, agents, skills, binding
 
 **Validação**: Se algum arquivo não foi anexado, Copilot **DEVE** alertar e carregá-lo manualmente.
@@ -73,28 +74,28 @@ Este prompt carrega **automaticamente** (conforme frontmatter `source_docs`):
 ### Invocação Automática (Copilot — Obrigatório)
 
 Copilot **EXATAMENTE**:
-1. Ao iniciar sessão ou trabalho em novo repositório
+1. Ação iniciar sessão ou trabalho em novo repositório
 2. Após reset explícito do usuário ou perda de contexto relevante
 3. ANTES de invocar `@agent-router` na primeira execução da sessão
 
 ---
 
-## 📋 Execução em 8 Passos
+## 📋 Execução em 9 Passos
 
-> **Regra de Emissão de Progresso**: Durante os Passos 1 a 8, emita apenas **1 linha compacta de status** por passo concluído. Todos os dados detalhados coletados devem ser mantidos em memória e consolidados no checklist final.
+> **Regra de Emissão de Progresso**: Durante os Passos 1 a 9, emita apenas **1 linha compacta de status** por passo concluído. Todos os dados detalhados coletados devem ser mantidos em memória e consolidados no checklist final.
 
 ### **PASSO 1: Validar Carregamento de Diretrizes Base**
 
 Copilot VERIFICA que ambos os `source_docs` foram carregados, mantendo status em memória e emitindo 1 linha de progresso:
 
 ```
-[1/8] Diretrizes: ✅ CLAUDE.md + copilot-instructions.md carregados
+[1/9] Diretrizes: ✅ CLAUDE.md + copilot-instructions.md carregados
 ```
 
 **Se FALTA algum:**
 
 ```
-[1/8] Diretrizes: ⚠️ <arquivo> ausente → tentando carregar manualmente via read_file...
+[1/9] Diretrizes: ⚠️ <arquivo> ausente → tentando carregar manualmente via read_file...
 ```
 
 Depois, prosseguir para PASSO 2.
@@ -103,12 +104,12 @@ Depois, prosseguir para PASSO 2.
 
 ### **PASSO 2: Detectar Ambiente de Execução (Environment Fingerprint)**
 
-Detecta terminal(is) disponível(is), versão de Python, versão de Node.js, versão de Java/JDK e CLI do Codegraph (`@optave/codegraph`) nesta máquina — registra em `catalog.local.yaml` (gitignored, R-043) para reuso por agents downstream (`code-knowledge-graph`, `test-engineer`, `devops-engineer`, `spring-boot-engineer`, `spring-reactive-engineer`, etc.) sem repetir a detecção a cada sessão.
+Detecta terminal(is) disponível(is), versão de Python, versão de Node.js, versão de Java/JDK e CLI do Codegraph (`@optave/codegraph`) nesta máquina — registra em `projects.local.yaml` (gitignored, R-043) para reuso por agents downstream (`code-knowledge-graph`, `test-engineer`, `devops-engineer`, `spring-boot-engineer`, `spring-reactive-engineer`, etc.) sem repetir a detecção a cada sessão.
 
 > Preferir `context-mode/ctx_execute` (sandbox, Think in Code — R-008); `run_in_terminal` é fallback apenas se o MCP estiver indisponível. Nunca bloqueia a sessão — item ausente é registrado como `available: false`.
 
 **Lógica de Cache (TTL 7 dias):**
-- Se `catalog.local.yaml` já possui `environment.detected_at` com menos de 7 dias: reutilizar cache, pular detecção ativa.
+- Se `projects.local.yaml` já possui `environment.detected_at` com menos de 7 dias: reutilizar cache, pular detecção ativa.
 - Se ausente ou expirado: executar detecção completa em lote (1 execução, não 1 comando por item).
 
 **Detecção completa (comandos não-interativos, sem paginação — R-035):**
@@ -121,10 +122,11 @@ Detecta terminal(is) disponível(is), versão de Python, versão de Node.js, ver
 | Node.js | `node --version` | Capturar também `npm --version` se disponível |
 | Java/JDK | `java -version` (saída vai para **stderr**, capturar com `2>&1`) + `echo $JAVA_HOME` (Unix) / `echo %JAVA_HOME%` (Windows) | Relevante para `spring-boot-engineer`, `spring-reactive-engineer` e a skill `java-jdk-backend-governance` (LTS: 17, 21) — registrar mesmo se não for LTS, apenas informativo |
 | Codegraph CLI | `codegraph --version` | Relevante para `@code-knowledge-graph` e FASE 4 de `/add-project-context` (`@optave/codegraph`) — registrar versão se disponível |
+| Git Pager (R-035) | `git config core.pager cat` | Desativa pager interativo (`less`) no Git local do workspace para prevenir travamento do terminal em `git diff`/`log` |
 
 Se algum item não for encontrado ou falhar, registrar `available: false` — **nunca falhar/bloquear a sessão** por isso.
 
-**Persistir em `catalog.local.yaml`** (nova chave de topo, irmã de `projetos:`):
+**Persistir em `projects.local.yaml`** (nova chave de topo, irmã de `projetos:`):
 
 ```yaml
 environment:
@@ -160,9 +162,9 @@ environment:
 **Linha de progresso emitida:**
 
 ```
-[2/8] Ambiente: ✅ <SO> · <Shell ativo> · Python <ver|❌> · Node <ver|❌> · Java <ver|❌> · Codegraph <ver|❌>
+[2/9] Ambiente: ✅ <SO> · <Shell ativo> · Python <ver|❌> · Node <ver|❌> · Java <ver|❌> · Codegraph <ver|❌>
 ```
-*(Se cache reutilizado: `[2/8] Ambiente: ✅ Cache reaproveitado (< 7 dias) — <SO> · <Shell ativo> · Python <ver> · Node <ver> · Java <ver> · Codegraph <ver>`)*
+*(Se cache reutilizado: `[2/9] Ambiente: ✅ Cache reaproveitado (< 7 dias) — <SO> · <Shell ativo> · Python <ver> · Node <ver> · Java <ver> · Codegraph <ver>`)*
 
 Dados detalhados são preservados em memória para o checklist final. Depois, prosseguir para PASSO 3.
 
@@ -176,7 +178,7 @@ Validar modelo em uso — informativo, não bloqueante:
 **Linha de progresso emitida:**
 
 ```
-[3/8] Modelo: ✅ <model-atual> (sessão ativa)
+[3/9] Modelo: ✅ <model-atual> (sessão ativa)
 ```
 
 Depois, prosseguir para PASSO 4.
@@ -199,7 +201,7 @@ O nível de detalhe é verificado em memória conforme a existência de binding 
 **Linha de progresso emitida:**
 
 ```
-[4/8] Regras: ✅ R-001..R-051 ativas (<recorrente: top 5 em memória | 1ª vez: catálogo completo>)
+[4/9] Regras: ✅ Regras normativas ativas (<recorrente: top 5 em memória | 1ª vez: catálogo completo>)
 ```
 
 Depois, prosseguir para PASSO 5.
@@ -209,24 +211,24 @@ Depois, prosseguir para PASSO 5.
 ### **PASSO 5: Validar Binding Context (R-034) + Overlay Local (R-043)**
 
 Verificar se estrutura de binding existe **NESTE repositório de governança**:
-- `./docs/ai-context/catalog.yaml` (compartilhado/commitado — sem projetos)
+- `./.github/instructions/README.md` (compartilhado/commitado — sem projetos)
 - `./docs/ai-context/binding.md` (compartilhado/commitado)
-- `./docs/ai-context/catalog.local.yaml` (gitignored — overlay de projetos, R-043)
+- `./.github/projects.local.yaml` (gitignored — overlay de projetos, R-043)
 
-> ⚠️ O binding context (`catalog.yaml` + `binding.md`) é **EXCLUSIVO DESTE repositório**. Projetos externos NÃO possuem e NÃO devem possuir `catalog.yaml` ou `binding.md`.
-> **Projetos são dados LOCAIS (R-043)**: vivem em `catalog.local.yaml` (gitignored) — nunca em `catalog.yaml`. Se `catalog.local.yaml` não existir, criar a partir de `catalog.local.yaml.example` (template tracked, sem dados reais) antes de prosseguir.
+> ⚠️ A infraestrutura de binding e o overlay local de projetos são **EXCLUSIVOS DESTE repositório**. Projetos externos NÃO possuem arquivos de governança.
+> **Projetos são dados LOCAIS (R-043)**: vivem em `.github/projects.local.yaml` (gitignored). Se `.github/projects.local.yaml` não existir, criar a partir de `.github/projects.local.yaml.example` (template tracked, sem dados reais) antes de prosseguir.
 
 **Ações:**
-1. Se `catalog.yaml` e `binding.md` existem: ler `catalog.yaml` (adapters/global) e `catalog.local.yaml` (se existir — projetos), mesclando em memória para o checklist final.
+1. Se `catalog.yaml` e `binding.md` existem: ler `catalog.yaml` (adapters/global) e `projects.local.yaml` (se existir — projetos), mesclando em memória para o checklist final.
 2. Se `catalog.yaml`/`binding.md` faltam: disparar agent `binding-initializer` para criação neste repositório.
-3. Se apenas `catalog.local.yaml` faltar: copiar template (`cp docs/ai-context/catalog.local.yaml.example docs/ai-context/catalog.local.yaml`) e prosseguir com 0 projetos.
+3. Se apenas `projects.local.yaml` faltar: copiar template (`cp .github/projects.local.yaml.example .github/projects.local.yaml`) e prosseguir com 0 projetos.
 
 **Linha de progresso emitida:**
 
 ```
-[5/8] Binding: ✅ catalog.yaml + binding.md presentes (<n> projetos no overlay local)
+[5/9] Binding: ✅ instructions/README.md + projects.local.yaml presentes (<n> projetos no overlay local)
 ```
-*(Se incompleto: `[5/8] Binding: ⚠️ Incompleto (faltando <arquivo>) → disparando binding-initializer`)*
+*(Se incompleto: `[5/9] Binding: ⚠️ Incompleto (faltando <arquivo>) → disparando binding-initializer`)*
 
 Depois, prosseguir para PASSO 6.
 
@@ -234,7 +236,7 @@ Depois, prosseguir para PASSO 6.
 
 ### **PASSO 6: Verificar Herança de Instruções Genéricas**
 
-Para cada projeto registrado em `catalog.local.yaml` (gitignored, R-043), verificar se o campo `extends:` está configurado, conectando o projeto aos adapters genéricos disponíveis em `catalog.yaml` (compartilhado).
+Para cada projeto registrado em `projects.local.yaml` (gitignored, R-043), verificar se o campo `extends:` está configurado, conectando o projeto aos adapters genéricos disponíveis em `catalog.yaml` (compartilhado).
 
 **Se algum projeto registrado está sem `extends:`**, perguntar via `ask_questions` (por projeto):
 - **(A)** Herdar 1 adapter existente (selecionar da lista)
@@ -242,25 +244,98 @@ Para cada projeto registrado em `catalog.local.yaml` (gitignored, R-043), verifi
 - **(C)** Não herdar agora — projeto possui ou terá adapter próprio em `.github/instructions/local/`
 
 Se usuário escolhe A ou B:
-1. Exibir preview do YAML a ser adicionado ao projeto em `catalog.local.yaml` (gitignored):
+1. Exibir preview do YAML a ser adicionado ao projeto em `projects.local.yaml` (gitignored):
    ```yaml
    extends:
      - "<adapter-id>"
    ```
 2. Aguardar confirmação do usuário
-3. Atualizar `catalog.local.yaml` com o campo `extends:` no projeto correspondente — **nunca `catalog.yaml`** (R-043)
+3. Atualizar `projects.local.yaml` com o campo `extends:` no projeto correspondente — **nunca `catalog.yaml`** (R-043)
 
 **Linha de progresso emitida:**
 
 ```
-[6/8] Herança: ✅ <n-com-extends> configurados (<n-sem-extends> sem extends)
+[6/9] Herança: ✅ <n-com-extends> configurados (<n-sem-extends> sem extends)
 ```
 
 Depois, prosseguir para PASSO 7.
 
 ---
 
-### **PASSO 7: Validar Atividade do Context Mode (Dashboard Health)**
+### **PASSO 7: Verificar Deriva de Stack e Instruções dos Projetos Locais (Drift Detection)**
+
+Para cada projeto registrado em `projects.local.yaml` (gitignored, R-043) que possua `path_externo` acessível e `adapter_local` configurado (ou arquivo de adapter em `.github/instructions/local/<projeto>.instructions.md`):
+
+Verifica se houve evolução tecnológica no projeto real (ex.: upgrade de versão major de framework, migração de test runner, mudança de linguagem ou compilação) que tornou as instruções do adapter local desatualizadas ou inconsistentes com a realidade do repositório externo.
+
+> **Por que é essencial**: Evita que agents downstream especialistas (`angular-router`, `angular-feature-developer`, `angular-unit-test-writer`, `spring-boot-router`, etc.) operem sob premissas obsoletas — como gerar testes em Jasmine/Karma quando o projeto migrou para Vitest, prescrever convenções de Angular 20 quando o projeto já está em Angular 21, ou adotar JUnit 4 e Java 17 em projetos Spring Boot 3 com Java 21.
+
+#### 1. Inspeção Comparativa (Drift Detection — Read-Only & Least-Tokens)
+
+A verificação deve ser rápida e determinística (preferir `context-mode` sandbox `ctx_execute` ou `read_file` pontual dos manifestos raiz — sem varredura pesada de código):
+
+1. **Ler o Adapter Local Atual** (em `adapter_local` ou `.github/instructions/local/<projeto>.instructions.md`):
+   - Inspecionar frontmatter YAML: `detected_stack`, `detected_frameworks`, `detected_testing`, `detected_language`.
+   - Inspecionar seções canônicas de convenções (ex.: `## 1) Stack Detectado`, `## 8) Testes`).
+
+2. **Ler o Manifesto Raiz no Projeto Externo (`path_externo`)**:
+   - **Frontend / Node / TypeScript** (`package.json`):
+     - *Framework*: versão major em `dependencies` (ex.: `@angular/core: ^21.0.0` vs Angular 20; `react: ^19.0.0` vs React 18).
+     - *Testes*: runner e frameworks em `scripts.test` e `devDependencies` (ex.: script `"test": "vitest run"` ou dependência `vitest` vs `karma`/`jasmine`).
+     - *Linguagem/Build*: versão de `typescript` ou ferramenta de bundling (`vite`, `webpack`).
+   - **Backend Java / Spring Boot** (`pom.xml`, `build.gradle`, `build.gradle.kts`):
+     - *Framework*: versão de `spring-boot-starter-parent` ou plugins (ex.: `3.3.x` vs `2.7.x`).
+     - *Testes*: dependências de teste (ex.: `org.junit.jupiter` / JUnit 5 vs `junit:junit:4.x`).
+     - *Linguagem*: `<java.version>` ou `sourceCompatibility` (ex.: `21` vs `17`).
+   - **Backend Python** (`pyproject.toml`, `requirements.txt`, `Pipfile`):
+     - *Framework*: `fastapi`, `django`, `flask`.
+     - *Testes*: `pytest` vs `unittest`.
+     - *Linguagem*: `python_version` / `target-version`.
+
+3. **Critérios de Detecção de Deriva (Drift Indicators)**:
+   - **Framework Drift**: Versão major do framework principal no manifesto real difere da documentada no adapter (ex.: Angular 20 → 21, Spring Boot 2.x → 3.x).
+   - **Testing Drift**: Runner ou biblioteca de testes no manifesto real difere da documentada no adapter (ex.: Jasmine/Karma → Vitest, JUnit 4 → JUnit 5, Jest → Vitest).
+   - **Language/Compiler Drift**: Versão principal de linguagem/compilador difere significativamente (ex.: TypeScript 5.4 → 5.9, Java 17 → 21).
+   - **Extends Mismatch**: O campo `extends:` em `projects.local.yaml` herda adapters genéricos incompatíveis com a nova versão detectada.
+
+#### 2. Classificação de Estado
+
+- `✅ Em Sincronia`: Stack do manifesto real é compatível com o adapter local.
+- `⚠️ Deriva Detectada (Drift)`: Identificada alteração em framework, testes ou linguagem.
+- `ℹ️ Sem Adapter Local`: Projeto registrado sem adapter em `.github/instructions/local/`.
+
+#### 3. Tratamento e Remediação (Drift Remediation — R-009 / R-043)
+
+Se for detectada deriva de instruções em qualquer projeto:
+
+1. **Exibir relatório objetivo de deltas no chat**:
+   ```
+   ⚠️ Deriva de instruções detectada em `<projeto>`:
+      - Framework: <declarado-no-adapter> → <detectado-no-projeto-real>
+      - Test Runner: <declarado-no-adapter> → <detectado-no-projeto-real>
+      - Arquivo: .github/instructions/local/<projeto>.instructions.md
+   ```
+2. **Perguntar ação ao usuário via `ask_questions`**:
+   - **(A) Atualizar adapter local agora (Recomendado)**:
+     - Sincronizar `.github/instructions/local/<projeto>.instructions.md` com a nova stack (atualizando frontmatter `detected_stack`, `detected_frameworks`, `detected_testing`, tabela de stack e seções de teste/convenções).
+     - Se aplicável, atualizar o campo `descricao` e `extends:` em `projects.local.yaml`.
+     - Exibir preview das alterações e solicitar confirmação antes de gravar (R-009).
+     - Manter confinamento estrito: alterações ocorrem EXCLUSIVAMENTE neste repositório de governança, em arquivos locais/gitignored (R-043).
+   - **(B) Manter instruções atuais por enquanto**:
+     - Manter como está nesta sessão e registrar aviso nas Recomendações finais.
+
+**Linha de progresso emitida:**
+
+```
+[7/9] Instruções Locais: ✅ <n-sincronizados>/<n-total> em sincronia (<n-com-deriva> com deriva detectada)
+```
+*(Se 0 projetos ou sem adapters: `[7/9] Instruções Locais: ℹ️ Nenhum adapter local registrado no overlay`)*
+
+Depois, prosseguir para PASSO 8.
+
+---
+
+### **PASSO 8: Validar Atividade do Context Mode (Dashboard Health)**
 
 Verificar se a sessão atual do Context Mode está sendo rastreada para evitar "Dashboard vazia" no JetBrains:
 1. Execute `ctx_stats()`.
@@ -269,17 +344,17 @@ Verificar se a sessão atual do Context Mode está sendo rastreada para evitar "
 **Linha de progresso emitida:**
 
 ```
-[7/8] Context Mode: ✅ Ativo (<n> chamadas registradas)
+[8/9] Context Mode: ✅ Ativo (<n> chamadas registradas)
 ```
-*(Se inativo: `[7/8] Context Mode: ⚠️ Inativo (0 chamadas) → disparando /ctx-start...`)*
+*(Se inativo: `[8/9] Context Mode: ⚠️ Inativo (0 chamadas) → disparando /ctx-start...`)*
 
-Depois, prosseguir para PASSO 8.
+Depois, prosseguir para PASSO 9.
 
 ---
 
-### **PASSO 8: Verificar Cache de Grafo de Conhecimento, Código e Sumarização (por Projeto)**
+### **PASSO 9: Verificar Cache de Grafo de Conhecimento, Código e Sumarização (por Projeto)**
 
-Para cada projeto registrado em `catalog.local.yaml` (gitignored, R-043 — nunca em `catalog.yaml`), verificar se já existe cache de **grafo de conhecimento** (`@code-knowledge-graph`), de **código-fonte indexado** (`code:<project-id>`) e de **sumarização** (`@code-summarizer`) no Context Mode:
+Para cada projeto registrado em `projects.local.yaml` (gitignored, R-043 — nunca em `catalog.yaml`), verificar se já existe cache de **grafo de conhecimento** (`@code-knowledge-graph`), de **código-fonte indexado** (`code:<project-id>`) no Context Mode:
 
 - Projetos registrados = 0 → pular verificação.
 - Projetos registrados > 0 → executar queries em lote via `ctx_batch_execute` (queries de todos os projetos no mesmo array — nunca 1 chamada por projeto, R-008):
@@ -292,26 +367,27 @@ Para cada projeto registrado em `catalog.local.yaml` (gitignored, R-043 — nunc
 **Linha de progresso emitida:**
 
 ```
-[8/8] Cache Projetos: ✅ <n-com-grafo>/<n-total> grafo · <n-com-codigo>/<n-total> código · <n-com-sumario>/<n-total> sumário
+[9/9] Cache Projetos: ✅ <n-com-grafo>/<n-total> grafo · <n-com-codigo>/<n-total> código · <n-com-sumario>/<n-total> sumário
 ```
-*(Se 0 projetos: `[8/8] Cache Projetos: ℹ️ Nenhum projeto registrado no overlay`)*
+*(Se 0 projetos: `[9/9] Cache Projetos: ℹ️ Nenhum projeto registrado no overlay`)*
 
 ---
 
 ## ✅ Validação Final — Checklist de Inicialização
 
-Ao concluir `/init-context`, Copilot exibe o bloco consolidado com todos os dados coletados nos Passos 1 a 8:
+Ação concluir `/init-context`, Copilot exibe o bloco consolidado com todos os dados coletados nos Passos 1 a 9:
 
 | Verificação | Status / Detalhes |
 |---|---|
-| **Diretrizes Base (PASSO 1)** | ✅ `CLAUDE.md` + `.github/copilot-instructions.md` carregados (regras R-001..R-051) |
-| **Ambiente (Fingerprint, PASSO 2)** | ✅ `<SO>` · Shell: `<shell>` · Python: `<versão|ausente>` · Node: `<versão|ausente>` · Java: `<versão|ausente>` · Codegraph: `<versão|ausente>` (registrado em `catalog.local.yaml`) |
+| **Diretrizes Base (PASSO 1)** | ✅ `CLAUDE.md` + `.github/copilot-instructions.md` carregados (regras normativas globais) |
+| **Ambiente (Fingerprint, PASSO 2)** | ✅ `<SO>` · Shell: `<shell>` · Python: `<versão|ausente>` · Node: `<versão|ausente>` · Java: `<versão|ausente>` · Codegraph: `<versão|ausente>` (registrado em `projects.local.yaml`) |
 | **Modelo Ativo (PASSO 3)** | ✅ `<model-atual>` (sessão ativa, R-021) |
-| **Regras Críticas (PASSO 4)** | ✅ R-001..R-051 ativas (exibição contextual: `<recorrente \| 1ª vez>`) |
-| **Binding Context (PASSO 5)** | ✅ `./docs/ai-context/` DESTE repo · `<n>` projetos no overlay local · `<n>` adapters disponíveis |
+| **Regras Críticas (PASSO 4)** | ✅ Regras normativas globais ativas (exibição contextual: `<recorrente \| 1ª vez>`) |
+| **Binding Context (PASSO 5)** | ✅ `./.github/` DESTE repo · `<n>` projetos no overlay local · `<n>` adapters disponíveis |
 | **Herança de Instruções (PASSO 6)** | ✅ `<n-com-extends>` configurados · `<n-sem-extends>` sem `extends:` |
-| **Context Mode Session (PASSO 7)** | ✅ Ativo · `<Total calls>` chamadas registradas (dashboard rastreável) |
-| **Cache por Projeto (PASSO 8)** | ℹ️ Grafo: `<n-com-grafo>/<n-total>` · Código: `<n-com-codigo>/<n-total>` · Sumários: `<n-com-sumario>/<n-total>` |
+| **Instruções Locais / Drift (PASSO 7)** | ✅ `<n-sincronizados>/<n-total>` em sincronia · `<n-com-deriva>` com deriva (<deltas-se-houver>) |
+| **Context Mode Session (PASSO 8)** | ✅ Ativo · `<Total calls>` chamadas registradas (dashboard rastreável) |
+| **Cache por Projeto (PASSO 9)** | ℹ️ Grafo: `<n-com-grafo>/<n-total>` · Código: `<n-com-codigo>/<n-total>` · Sumários: `<n-com-sumario>/<n-total>` |
 
 🎯 **Próximos passos recomendados:**
 - `/add-project-context <caminho-externo>` para plugar um projeto externo
@@ -322,14 +398,15 @@ Ao concluir `/init-context`, Copilot exibe o bloco consolidado com todos os dado
 
 ### 💡 Recomendações para Esta Sessão
 
-Sintetiza em bullets objetivos apenas as pendências reais detectadas nos Passos 1-8 — nunca genéricas, sempre condicionadas ao estado real:
+Sintetiza em bullets objetivos apenas as pendências reais detectadas nos Passos 1-9 — nunca genéricas, sempre condicionadas ao estado real:
 
 - **[Environment]** *(se python/node ausente)*: Instale `<ferramenta>` antes de invocar agents dependentes (ex.: `test-engineer`, `devops-engineer`).
 - **[Environment]** *(se codegraph ausente)*: Instale o codegraph (`npm install -g @optave/codegraph`) para habilitar grafo de conhecimento em `/add-project-context` e `@code-knowledge-graph`.
 - **[Model]** *(se recomendável)*: Ajuste o modelo da sessão conforme a complexidade da tarefa (R-021).
-- **[Binding]** *(se incompleto)*: Execute `binding-initializer` — `catalog.yaml`/`binding.md` ausentes (R-034).
+- **[Binding]** *(se incompleto)*: Execute `binding-initializer` — instructions/README.md ou projects.local.yaml.example ausentes (R-034).
 - **[Extends]** *(se houver projeto sem extends)*: Configure herança em `<n>` projeto(s) pendente(s) — PASSO 6.
-- **[Cache]** *(se houver projeto sem grafo/sumário)*: Considere `@code-knowledge-graph` / `@code-summarizer` para `<projeto(s)>` antes de análises profundas.
+- **[Drift/Instruções]** *(se houver projeto com deriva)*: Atualize o adapter local de `<projeto>` via `adapter-generator` ou re-sincronização — detectada evolução de stack (ex.: framework ou runner de testes atualizados) — PASSO 7.
+- **[Cache]** *(se houver projeto sem grafo)*: Considere `@code-knowledge-graph` para `<projeto(s)>` antes de análises profundas.
 - **[Sessão]** *(se Context Mode inativo)*: Rode `/ctx-start` — Total calls = 0, dashboard não vai rastrear.
 - **[Fluxo]**: Toda solicitação a partir daqui deve começar por `@agent-router` (R-037).
 
@@ -338,14 +415,14 @@ Sintetiza em bullets objetivos apenas as pendências reais detectadas nos Passos
 > ✅ Nenhuma pendência detectada — ambiente 100% conforme.
 > → Prossiga diretamente para @agent-router.
 > ```
-> Recomendações são sempre informativas — nunca bloqueiam a sessão nem disparam ação autônoma (R-009). Ordem fixa: Environment → Model → Binding → Extends → Cache → Sessão → Fluxo.
+> Recomendações são sempre informativas — nunca bloqueiam a sessão nem disparam ação autônoma (R-009). Ordem fixa: Environment → Model → Binding → Extends → Drift/Instruções → Cache → Sessão → Fluxo.
 
 ---
 
 ## 🔄 Combina Com (Encadeamento)
 
 - **`@agent-router`**: Próximo passo obrigatório para toda solicitação downstream (R-037 — Agent Router First).
-- **`/add-project-context <caminho>`**: Para vincular projetos externos no overlay local (`catalog.local.yaml`, R-043).
+- **`/add-project-context <caminho>`**: Para vincular projetos externos no overlay local (`projects.local.yaml`, R-043).
 - **`/health`**: Para auditar a saúde da governança e validar conformidade.
 
 ---
@@ -369,12 +446,13 @@ Invoque `/init-context` **manualmente** em caso de:
 | Problema | Causa | Solução |
 |----------|-------|---------|
 | "Arquivo não anexado" | Pre-fetch falhou | Copilot carrega manualmente via `read_file` |
-| "Binding context ausente" | `catalog.yaml` ou `binding.md` faltando | Disparar `binding-initializer` automaticamente |
+| "Binding context ausente" | `.github/instructions/README.md` ou `.github/projects.local.yaml.example` faltando | Disparar `binding-initializer` automaticamente |
 | "Copilot não respeita regras após" | Regras não foram relevantes no downstream | Reexecutar `/init-context` ou ativar diagnostics com `/ctx-doctor` |
 | "Python/Node não encontrado" | Ferramenta não instalada ou fora do PATH | Normal — registrado como `available: false`, não bloqueia a sessão; instalar se necessário para o agent alvo |
 | "Path de Python existe mas `--version` falha" | Alias quebrado (ex.: stub da Microsoft Store apontando para instalação removida) | Detecção deve tentar o próximo candidato (`python3`, `py`) — nunca considerar `available: true` só pela existência do path |
 | "Java não encontrado / JAVA_HOME vazio" | JDK não instalado ou não configurado no PATH | Normal — registrado como `available: false`; relevante apenas antes de invocar `spring-boot-engineer`/`spring-reactive-engineer` |
 | "Codegraph CLI não encontrado" | `@optave/codegraph` não instalado globalmente | Normal — registrado como `available: false`; executar `npm install -g @optave/codegraph` antes de `/add-project-context` |
+| "Deriva de stack no adapter local" | Projeto externo evoluiu versão de framework (ex.: Angular 20→21) ou runner de testes (Jasmine→Vitest) | Atualizar .github/instructions/local/<projeto>.instructions.md e projects.local.yaml via re-sincronização ou adapter-generator com overwrite confirmado |
 
 ---
 

@@ -1,9 +1,11 @@
 # Instruções de IA — Base de Governança Reutilizável
 
 > Fonte de verdade operacional: [`CLAUDE.md`](../CLAUDE.md).
-> Mapa de Adapters (compartilhado): [`docs/ai-context/catalog.yaml`](../docs/ai-context/catalog.yaml).
-> Mapa de Projetos (LOCAL/gitignored, R-043): [`docs/ai-context/catalog.local.yaml`](../docs/ai-context/catalog.local.yaml).
-> IDs normativos: consulte `R-001..R-051` em `CLAUDE.md`.
+> Mapa do Repositório (Repo Map): [`docs/repo-map.md`](../docs/repo-map.md).
+> Mapa de Adapters (compartilhado): [`.github/instructions/README.md`](../.github/instructions/README.md).
+> Catálogo de Agents (Modelos e Metadados): [`.github/agents/catalog.yaml`](agents/catalog.yaml).
+> Mapa de Projetos (LOCAL/gitignored, R-043): [`.github/projects.local.yaml`](../.github/projects.local.yaml).
+> IDs normativos: consulte `CLAUDE.md`.
 
 ---
 
@@ -17,10 +19,10 @@
 
 | Tipo | Arquivo | Escopo | Conteúdo Permitido | Exemplos / Referências |
 |------|---------|--------|-------|---|
-| **Governança Global** | `CLAUDE.md` | 🌍 Multi-projeto, desacoplado | Regras R-001..R-051, princípios, fluxos genéricos | ❌ Nenhum projeto/tech específicos |
+| **Governança Global** | `CLAUDE.md` | 🌍 Multi-projeto, desacoplado | Regras normativas globais (R-xxx), princípios, fluxos genéricos | ❌ Nenhum projeto/tech específicos |
 | **Operacional** | `.github/copilot-instructions.md` | 🌍 Multi-projeto, desacoplado | Roteamento, agents, skills, estrutura genérica | ❌ Nenhum projeto/tech específicos (remeter a adapters) |
 | **Adapters** | `.github/instructions/*.instructions.md` | 🔧 Stack/domínio específico | Convenções, padrões, tools, paradigmas de tech/domínio **excluivos** | ✅ Projeto, linguagem, framework **específicos permitidos** |
-| **Contexto de Binding** | `docs/ai-context/catalog.yaml` + `docs/ai-context/binding.md` | 🔗 Mapa de instâncias | Lista concreta de adapters, projetos, mapeamento stack → adapter | ✅ Dados de instância permitidos |
+| **Contexto de Binding** | `.github/instructions/README.md` + `.github/instructions/README.md` | 🔗 Mapa de instâncias | Lista concreta de adapters, projetos, mapeamento stack → adapter | ✅ Dados de instância permitidos |
 
 ---
 
@@ -94,18 +96,19 @@ Esta matriz é **responsabilidade do roteador** — não é regra global.
 
 ### ✅ Sempre
 
-- **Agent Router First (R-037)**: TODA solicitação começa com `@agent-router`. Pular router é violação de governança.
+- **Agent Router First (R-037)**: TODA solicitação começa com `@agent-router`. Pular router é violação de governança. **Salvaguarda Anti-Duplicação**: Quando o `@agent-router` retornar a decisão de rota (`Delegado: @<agent>`), o Orquestrador Raiz despacha o agent downstream UMA ÚNICA VEZ em nível plano (Flat Delegation). Se a resposta do subagente já contiver o resultado de execução concluída do downstream, o Orquestrador NUNCA deve re-invocar o mesmo agent.
 - **Re-triagem Obrigatória por Turno (R-042 — Anti Sticky-Session)**: R-037 aplica-se a CADA novo turno, não só ao primeiro. Agent downstream ativo deve checar deriva de intenção (mudança de verbo de ação, stack fora de competência, pedido de execução em agent read-only) a cada mensagem; ao detectar deriva, retorna IMEDIATAMENTE ao `@agent-router` (payload `handoff-governance` § 2.1, `motivo: "deriva_de_intencao"`) — nunca prossegue silenciosamente fora do escopo. *Exceção de ação in-scope*: mudança de verbo não constitui deriva se a ação já constar em "Quando Delegar" do agent ativo (ex.: pesquisa externa via `@deep-search` solicitada a `@tech-solution-architect` ativo é sub-tarefa, não deriva; controle retorna ao agent ativo com call stack `origem_contexto.parent_agent`). **Visibilidade obrigatória**: TODO agent (não apenas o `agent-router`) abre toda resposta com `Agente Ativo: <name>`; se houve handoff/re-triagem neste turno, adiciona `Handoff: <origem> → <destino> (motivo: ...)` — padrão de mercado (OpenAI Agents SDK `HandoffOutputItem`, LangGraph `active_agent` streaming; detalhes em `agent-contracts/SKILL.md` § 0). **Pré-requisito de tooling**: o handoff só é efetivo via tool `run_subagent`; por isso `run_subagent` é obrigatório e bloqueante no frontmatter `tools:` de todo agent (`agent-contracts/SKILL.md` § 9). Persistência estruturada opcional do handoff (schema `handoff-governance` v1.1, campo `roteamento_grafo`) via `ctx_index` é permitida como camada auxiliar de auditoria/memória entre sessões, mas NUNCA substitui o banner nem é lida de forma bloqueante a cada turno do `@agent-router`.
 - **Prompt Structuring & Fast-Path Determinístico (R-041)**: após o Health Check (R-034), o `@agent-router` avalia se a solicitação possui gatilho determinístico para Fast-Path (`WORKFLOW-BUG-FIX`, `WORKFLOW-REFACTORING`, `WORKFLOW-TECHNICAL-ANALYSIS`, `WORKFLOW-GOVERNANCE-MAINTENANCE`). Em caso positivo, o Fast-Path bypassa `@prompt-structuring` diretamente para a etapa 1 do workflow. Se o pedido for ambíguo, aberto ou uma feature de alto nível não estruturada, delega compulsoriamente ao `@prompt-structuring` (loop máx. 5 iterações), que SEMPRE retorna ao `@agent-router`.
 - **Workflows Operacionais Determinísticos (R-050)**: toda tarefa de desenvolvimento segue rigorosamente a máquina de estados de um dos 5 Workflows Canônicos (`WORKFLOW-BUG-FIX`, `WORKFLOW-REFACTORING`, `WORKFLOW-TECHNICAL-ANALYSIS`, `WORKFLOW-FEATURE-DEVELOPMENT`, `WORKFLOW-GOVERNANCE-MAINTENANCE`). **Visibilidade Obrigatória no Chat (Anti-Cegueira)**: toda resposta do router e avanço de etapa por downstream DEVE renderizar o bloco visual `### 🗺️ Pipeline de Execução do Workflow (<total> etapas)` com marcadores `[✅]` (Concluído), `[▶]` (Em Andamento), `[⏳]` (Pendente), mapeando explicitamente agentes e etapas até a conclusão. Proibido pular etapas, omitir testes de caracterização em refatoração ou gerar becos sem saída descritivos sem handoff ou aprovação humana (R-047).
 - **Grafo de Roteamento (R-040)**: o roteamento de agents DEVE ser declarado como dado estruturado em `.github/agents/routing-graph.yaml`. A Decision Tree em prosa é documentação derivada. Toda nova rota exige: *(a)* entrada no grafo; *(b)* atualização da Decision Tree; *(c)* novo caso em `.github/agents/evals/casos-roteamento.yaml`.
 - **Execução via Context Mode (R-008 — Think in Code)**: Use **100% o `context-mode` MCP** para leitura, busca, escrita em lote, análise e remoção de arquivos (`ctx_execute`, `ctx_execute_file`, `ctx_index`, `ctx_search`). O processamento acontece no sandbox e apenas o resultado limpo entra na conversa. `read_file` e `replace_string_in_file` são reservados exclusivamente para edições cirúrgicas pontuais do editor. `run_in_terminal` é **FALLBACK de última instância** restrito exclusivamente a comandos de ciclo de vida (`git`, `npm install`, `mvn`, `pytest`) — comandos de varredura/leitura (`cat`, `grep`, `find`, scripts inline `node -e`) são terminantemente proibidos no terminal.
 - **Vinculação Compulsória de Governança de Terminal em Tooling (R-049)**: Todo agent (`*.agent.md`), prompt (`*.prompt.md`) ou entrada de catálogo que declare a ferramenta `run_in_terminal` em `tools:` DEVE compulsoriamente referenciar `.github/skills/terminal-governance/SKILL.md` em `source_docs:` (ou na seção `skills:` em sub-catálogos locais). É expressamente vedada a concessão de execução em terminal desprovida de vinculação com a respectiva skill de governança.
+- **Localização Determinística de Arquivos (Zero Blind Searches — Governance Indices First)**: Consulte compulsoriamente os caminhos canônicos dos índices de governança (§ 7) antes de buscar. NUNCA execute buscas cegas/especulativas (`file_search` ou `grep_search`) para arquivos de governança cujos caminhos são canônicos (ex.: `.github/agents/catalog.yaml` para metadados de agents, `.github/instructions/README.md` para binding). Em caso de `file_search` indispensável, use sempre curinga inicial (`**/<nome>`) para compatibilidade com workspaces multi-root. Os arquivos `.ignore` e `.rgignore` na raiz desocultam `.github/` para que ripgrep indexe o repositório sem falhas de 0 matches.
 - **Pre-fetch automático pelo agent**: ao selecionar um agent, carregue automaticamente os `source_docs` declarados no `catalog.yaml` e anuncie o que foi anexado via a linha `Skills Carregadas:` do banner universal (R-042, `agent-contracts/SKILL.md` § 0) — nunca em prosa solta ou omitido. Usuário pode rejeitar com "Sem pre-fetch".
 - **Um comando por vez**: leia o output uma única vez.
 - **`get_errors` consolidado**: chame `get_errors` uma única vez ao final do lote com o array completo `filePaths`, nunca arquivo por arquivo.
 - **Edições agrupadas e em lote (`efficient-batch-code-modification` — R-046)**: todas as alterações de múltiplos arquivos devem ser emitidas em lote na mesma rodada de tool calls (*single-turn batching*). Diffs cirúrgicos mínimos com 2-3 linhas de contexto para unicidade.
-- **Fluxo contínuo sem becos sem saída (`R-047`)**: nenhum agent do catálogo pode encerrar resposta apenas com texto descritivo sugerindo "próximo passo"; deve obrigatoriamente acionar `run_subagent` (handoff a outro agent) OU `ask_questions` (decisão/aprovação humana), salvo resposta 100% conclusiva sem pendências.
+- **Fluxo contínuo sem becos sem saída (`R-047`)**: nenhum agent do catálogo pode encerrar resposta apenas com texto descritivo sugerindo "próximo passo"; deve obrigatoriamente acionar `run_subagent` (handoff a outro agent) OU `ask_questions` (decisão/aprovação humana), salvo resposta 100% conclusiva sem pendências. **Exceção de Routers / Delegação Plana**: O `@agent-router` (e supervisores hierárquicos) encerra sua resposta com o bloco canônico de decisão de roteamento (`Agente Ativo`, `Delegado: @<agent>`, `Pipeline de Execução`) — isso NÃO constitui beco sem saída. É **terminantemente proibido ao `@agent-router` invocar subagentes executores downstream via `run_subagent`** (aninhamento `root -> agent-router -> downstream`), pois causa duplicação de execução e desperdício de créditos. O despacho downstream é executado pelo Orquestrador Raiz em nível plano (Flat Delegation).
 - **Plano Auto-Implementável (R-031)**: plano aprovado → execução integral sem interrupção. Pré-voo: escopo + contingências inline `[fallback: X]` + critério de falha tolerável. Parada permitida APENAS por: commit autônomo, credencial exposta, ou estado irrecuperável. Relatório final substitui checkpoints intermediários.
 - **Estrutura de Resposta (R-028)**: toda implementação abre com resumo em 5 seções (Abordagem · Componentes · Código · Passos Cruciais · Impacto).
 - **Postura Senior Engineer (R-029)**: bullets/tabelas > parágrafos · código limpo sem narrativa inline · tom direto sem filler de IA.
@@ -175,7 +178,7 @@ Quando as tools de context-mode estiverem disponíveis, elas viram o caminho pad
 - CPU-bound (build/test/lint): `concurrency: 1`.
 - `gh` CLI: máximo `4`.
 
-**Terminal (`run_in_terminal`) apenas para:** `git`, `mkdir`, `rm`, `mv`, `cd`, `ls`, `npm install`, `pip install`.
+**Terminal (`run_in_terminal`) apenas para:** `git` (`--no-pager` MANDATÓRIO em `diff`/`log`/`show`/`branch` — R-035), `mkdir`, `rm`, `mv`, `cd`, `ls`, `npm install`, `pip install`.
 
 **Continuidade de sessão e memória:**
 
@@ -229,15 +232,15 @@ Avalie o tipo da tarefa e emita o sinal abaixo quando exigir modelo **1× ou sup
 **GATILHO AUTOMÁTICO**: Ao iniciar trabalho em novo repositório, Copilot DEVE verificar:
 
 ```
-✓ Existe: docs/ai-context/catalog.yaml  ← NESTE repositório de governança
-✓ Existe: docs/ai-context/binding.md    ← NESTE repositório de governança
+✓ Existe: .github/instructions/README.md  ← NESTE repositório de governança
+✓ Existe: .github/instructions/README.md    ← NESTE repositório de governança
 ```
 
 > ⛔ **GUARDRAIL DE CONFINAMENTO (R-034 + R-043)**:
 > - `catalog.yaml` e `binding.md` existem APENAS neste repositório (compartilhados/commitados).
 > - Adapters GENÉRICOS existem APENAS em `.github/instructions/<stack>.instructions.md` (raiz, compartilhados).
 > - Adapters POR-PROJETO existem em `.github/instructions/local/<projeto>.instructions.md` — **gitignored, nunca commitados** (R-043).
-> - Projetos são registrados exclusivamente em `docs/ai-context/catalog.local.yaml` (gitignored) — **nunca** em `catalog.yaml`.
+> - Projetos são registrados exclusivamente em `.github/projects.local.yaml` (gitignored) — **nunca** em `catalog.yaml`.
 > - Projetos externos (ex.: `custom-project-app`) são referenciados no overlay local,
 >   mas **NUNCA recebem arquivos de governança** criados por estes agents.
 > - O `adapter-generator` faz SCANNER dos projetos externos (read-only), mas cria
@@ -250,21 +253,21 @@ Avalie o tipo da tarefa e emita o sinal abaixo quando exigir modelo **1× ou sup
    ⚠️ Binding context não detectado!
 
    Este repositório não possui:
-   - docs/ai-context/catalog.yaml
-   - docs/ai-context/binding.md
+   - .github/instructions/README.md
+   - .github/instructions/README.md
 
    → Vou disparar o agent `binding-initializer` para criá-los NESTE repositório
    → Responda 1 pergunta (nome do ecossistema) e o esqueleto será criado aqui
-   → Projetos são adicionados depois via /add-project-context (grava em catalog.local.yaml, gitignored)
+   → Projetos são adicionados depois via /add-project-context (grava em projects.local.yaml, gitignored)
    ```
 
 2. **DISPARAR AGENT** `binding-initializer` com `ask_questions`:
    - P1: Nome do ecossistema/organização (kebab-case) — única pergunta obrigatória
 
 3. **GERAR AUTOMATICAMENTE — TODOS NESTE REPOSITÓRIO:**
-   - `docs/ai-context/catalog.yaml` — via `binding-initializer` ← NESTE repo (esqueleto, **sem** `projetos:` — R-043)
-   - `docs/ai-context/binding.md` — via `binding-initializer` ← NESTE repo
-   - `docs/ai-context/catalog.local.yaml.example` — via `binding-initializer` ← NESTE repo (template tracked, sem dados reais)
+   - `.github/instructions/README.md` — via `binding-initializer` ← NESTE repo
+   - `.github/projects.local.yaml.example` — via `binding-initializer` ← NESTE repo (template tracked, sem dados reais)
+   - `.github/projects.local.yaml` — via `binding-initializer` ← NESTE repo (overlay local privado, gitignored)
    - `.github/instructions/local/<projeto>.instructions.md` — via `adapter-generator` após `/add-project-context` (gitignored)
    - Préview antes de criar
 
@@ -297,10 +300,11 @@ Projetos e adapters por-projeto NUNCA são commitados no repositório compartilh
 - `spring-boot-router` -> supervisor hierárquico e roteador do domínio Spring Boot — orquestra os 7 especialistas em `.github/agents/backend/spring-boot/` (arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer, test-fixer).
 - `spring-reactive-router` -> supervisor hierárquico e roteador do domínio Spring Reactive — orquestra os 7 especialistas em `.github/agents/backend/spring-reactive/` (arch-advisor, feature-developer, bug-fixer, resilience-tuner, unit-test-writer, integration-test-writer, test-fixer).
 - `ejb-router` -> supervisor hierárquico e roteador do domínio Java legado EJB — orquestra os 7 especialistas em `.github/agents/backend/ejb/` (arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer, test-fixer).
+- `python-router` -> supervisor hierárquico e roteador do domínio Python backend — orquestra os 7 especialistas em `.github/agents/backend/python/` (arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer, test-fixer).
 - `database-router` -> supervisor hierárquico e roteador do domínio de Banco de Dados — orquestra os 6 especialistas em `.github/agents/backend/database/` (oracle-migration-dev, oracle-plsql-expert, oracle-query-tuner, informix-migration-dev, informix-spl-expert, informix-query-tuner).
 - `governance-factory` -> criar/revisar agent, skill, prompt ou nova stack via parâmetro `type` (na criação, delega compulsoriamente pesquisa prévia de mercado/skills ao `deep-search`).
 - `governance-maintainer` -> manutenção atômica, refatoração em cascata e sincronização em lote de artefatos de governança via context-mode e diffs cirúrgicos.
-- `binding-initializer` -> ⚡ inicializar `catalog.yaml` + `binding.md` + `catalog.local.yaml.example` para novo repositório (1 pergunta — R-034)
+- `binding-initializer` -> ⚡ inicializar `catalog.yaml` + `binding.md` + `projects.local.yaml.example` para novo repositório (1 pergunta — R-034)
 - `adapter-generator` -> ⚡ gerar automaticamente adapters por-projeto em `.github/instructions/local/` (gitignored, R-043) via `/add-project-context`
 - `runtime-verifier` -> verificação de saúde do ambiente (build/dependências/serviços) antes de testes/codificadores; read-only.
 - `pr-gatekeeper` -> preparação de PR pós-aprovação (diff, commit semântico, matriz de risco, changelog); nunca commit/push autônomo.
@@ -314,7 +318,6 @@ Projetos e adapters por-projeto NUNCA são commitados no repositório compartilh
 **Contexto e Processo:**
 - `context-mode` -> organização de contexto e pesquisa sobre conteúdo já indexado/lido.
 - `context-compact` -> compactação pós-leitura e geração de resumos executáveis.
-- `context-builder` -> coleta e condensação de contexto técnico em `docs/context/`.
 - `refactoring-planning-patterns` -> planejamento de refatoração estrutural (Mikado, Branch by Abstraction, Strangler Fig, safety net).
 - `efficient-batch-code-modification` -> edição em lote, dry-run e diffs cirúrgicos para economia de tokens e créditos Copilot.
 
@@ -357,7 +360,7 @@ Projetos e adapters por-projeto NUNCA são commitados no repositório compartilh
 
 ### Pre-fetch recomendado (antes de tarefas não triviais)
 - `CLAUDE.md`
-- `docs/ai-context/catalog.yaml`
+- `.github/instructions/README.md`
 - `.github/copilot-instructions.md`
 - `.github/agents/README.md`
 - `.github/skills/README.md`
@@ -391,19 +394,19 @@ Camada 1 (Global)      → CLAUDE.md + .github/copilot-instructions.md
                            ↓
 Camada 2 (Stack/Adapter) → .github/instructions/*.instructions.md (com applyTo glob)
                            ↓
-Camada 3 (Projeto)      → Local Overlay (catalog.local.yaml + .github/instructions/local/, gitignored, R-043)
+Camada 3 (Projeto)      → Local Overlay (projects.local.yaml + .github/instructions/local/, gitignored, R-043)
 ```
 
 ### Manifest de Binding
 
-**Arquivo:** `docs/ai-context/catalog.yaml` (single source of truth — adapters/global, **nunca projetos**)
+**Arquivo:** `.github/instructions/README.md` (single source of truth — adapters/global, **nunca projetos**)
 
 - Define ordem de carregamento de adapters
 - Mapeia `applyTo` glob patterns → instruções específicas
 - Documenta escopo e audiência de cada adapter genérico
 - Garante não-duplicação (R-003)
 
-> Projetos: `docs/ai-context/catalog.local.yaml` (gitignored, R-043) — nunca em `catalog.yaml`.
+> Projetos: `.github/projects.local.yaml` (gitignored, R-043) — nunca em `catalog.yaml`.
 
 ### Adapters: Estrutura Genérica
 
@@ -411,14 +414,14 @@ Cada adapter na raiz de `.github/instructions/` deve:
 - Ser **independente** de outros adapters
 - Declarar seus `applyTo` glob patterns via YAML frontmatter
 - **Nunca referenciar projetos específicos ou tecnologias exclusivas** (R-038)
-- Estar registrado em `docs/ai-context/catalog.yaml` como single source of truth
+- Estar registrado em `.github/instructions/README.md` como single source of truth
 - **Nunca ser** um adapter por-projeto (esses vivem em `.github/instructions/local/`, gitignored — R-043)
 
-**Para exemplos concretos de adapters registrados**, consulte `docs/ai-context/catalog.yaml` (binding context).
+**Para exemplos concretos de adapters registrados**, consulte `.github/instructions/README.md` (binding context).
 
 - **GitHub Copilot** (VS Code, JetBrains): carrega `.github/copilot-instructions.md` (global) + adapters via YAML frontmatter `applyTo`
 - **Cursor IDE**, **Claude Code**: suporta o mesmo mecanismo
-- **Custom tooling**: use `docs/ai-context/catalog.yaml` como manifesto de discovery
+- **Custom tooling**: use `.github/instructions/README.md` como manifesto de discovery
 
 ### Adicionar Novo Adapter (genérico/compartilhado)
 
@@ -429,12 +432,12 @@ Cada adapter na raiz de `.github/instructions/` deve:
    applyTo: ["src/**/*.ext"]
    ---
    ```
-3. Atualizar `docs/ai-context/catalog.yaml` com novo entry
+3. Atualizar `.github/instructions/README.md` com novo entry
 4. Sincronizar `.github/instructions/README.md`
 
 > Adapter **por-projeto** (gerado por `/add-project-context`) segue fluxo diferente — vai em
 > `.github/instructions/local/<projeto>.instructions.md` (gitignored) e é registrado em
-> `catalog.local.yaml`, nunca aqui (R-043).
+> `projects.local.yaml`, nunca aqui (R-043).
 
 ---
 
@@ -446,7 +449,9 @@ Cada adapter na raiz de `.github/instructions/` deve:
 
 ## 7) Índices de Governança
 
-- **Adapters/Binding:** `docs/ai-context/catalog.yaml` (manifest de carregamento hierárquico)
+- **Mapa do Repositório (Repo Map):** `docs/repo-map.md` (fonte de verdade de navegação determinística de arquivos)
+- **Catálogo de Agents:** `.github/agents/catalog.yaml` (único catalog.yaml do repositório — metadados e modelos)
+- **Adapters/Binding:** `.github/instructions/README.md` (manifest de carregamento hierárquico — NUNCA buscar agents aqui)
 - **Grafo de Roteamento (R-040):** `.github/agents/routing-graph.yaml` (fonte estrutural — nós, arestas, cascata)
 - **Suíte de Evals:** `.github/agents/evals/casos-roteamento.yaml` (quality gate de regressão de roteamento)
 - **Instructions:** `.github/instructions/README.md` + `.github/instructions/*.instructions.md`

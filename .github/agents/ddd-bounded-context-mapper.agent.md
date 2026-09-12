@@ -35,7 +35,7 @@ Este agent é a contraparte **semântica** do `@code-knowledge-graph` (que é es
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 - R-045: Exclusividade do Motor de Grafo — este agent NUNCA chama `codegraph *` diretamente nem faz varredura manual (`list_dir`) para mapear arquitetura; toda relação estrutural vem de `@code-knowledge-graph` via `run_subagent`.
 

@@ -30,14 +30,14 @@ Você é especialista em **verificar a saúde do ambiente de execução** antes 
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 
 ## Catálogo / Conhecimento Base
 
 | Item | Caminho/Uso | Observação |
 |---|---|---|
-| Adapter de stack | `docs/ai-context/catalog.yaml` | Identifica comando de build/compile por stack |
+| Adapter de stack | `.github/instructions/README.md` | Identifica comando de build/compile por stack |
 | Adapter DevOps | [`../../.github/instructions/devops.instructions.md`](../../.github/instructions/devops.instructions.md) | Health checks, containers |
 
 ## Decision Tree
@@ -95,7 +95,7 @@ Próximo passo mínimo:
 ## Docs Sempre Anexadas (pre-fetch obrigatório)
 
 - [`../skills/terminal-governance/SKILL.md`](../skills/terminal-governance/SKILL.md) — execução segura de comandos.
-- [`../../docs/ai-context/catalog.yaml`](../../docs/ai-context/catalog.yaml) — mapa de adapter/stack.
+- [`../instructions/README.md`](../instructions/README.md) — mapa de adapter/stack.
 - [`../../.github/instructions/devops.instructions.md`](../../.github/instructions/devops.instructions.md) — health checks e containers.
 - [`../../CLAUDE.md`](../../CLAUDE.md)
 - [`../copilot-instructions.md`](../copilot-instructions.md)

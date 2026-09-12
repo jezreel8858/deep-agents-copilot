@@ -29,7 +29,6 @@ Toda skill deve declarar no topo:
 | `context-mode` | Tier 1 | Roteamento ctx-first, coleta em batch, busca indexada e processamento em sandbox com economia de tokens/créditos |
 | `sonarqube-governance` | Tier 2 | Monitorar métricas de qualidade, cobertura e segurança via SonarQube |
 | `tavily` | Tier 2 | Pesquisar documentação externa, changelog, versões e referências de terceiros |
-| `context-builder` | Tier 2 | Preparar, condensar e persistir contexto técnico multi-projeto em `docs/context/` |
 | `context-compact` | Tier 2 | Compactar contexto pós-leitura, remover ruído e gerar resumos executáveis |
 | `mermaid-diagrams` | Tier 2 | Criar diagramas Mermaid legíveis para documentação, ADRs e análises técnicas |
 | `agent-contracts` | Tier 1 | Padronizar contrato de entrada, saída e não-escopo de agents |
@@ -75,6 +74,7 @@ Toda skill deve declarar no topo:
 | **`specialist-hybrid-advisory-implementation-patterns`** | 🧑‍🔧 **Tier 1** | Template canônico do perfil híbrido (Advisory + Implementação) para specialists de stack — base de `angular-engineer`, `spring-boot-engineer`, `spring-reactive-engineer` |
 | **`governance-audit-patterns`** | 🕵️ **Tier 1** | Catálogo dos 16 agent/governance smells (anti-padrão estrutural, gap de perfil, desalinhamento contratual perfil ↔ tools ↔ skills ↔ catálogo, R-046, R-044, R-051 e drift normativo R-0XX) com sintoma, detecção estática Tier 1, severidade e remediação — base do agent `agent-auditor` |
 | **`reflection-self-critique-patterns`** | 🪞 **Tier 2** | Padrão generate→critique→revise (Reflection) de baixo custo — self-reflection 1 round grounded para agents Executores reexaminarem o próprio artefato antes de reportar sucesso — base de `docs-writer`, `test-implementation` |
+| **`repository-hygiene-patterns`** | 🧹 **Tier 2** | Diretrizes e matriz canônica para auditoria e garantia de higiene de repositório, documentação essencial (README, CONTRIBUTING, LICENSE), segurança de versionamento (.gitignore) e práticas de CI/CD — base do agent `repo-hygiene-auditor` |
 | **`security-review-patterns`** | 🔒 **Tier 2** | ⭐ ***(NEW)*** OWASP Top 10:2025, ASVS 5.0, OWASP LLM/Agentic AI, SCA (CVE/CVSS), detecção de secrets e rubrica de triagem — base do agent `security-reviewer` |
 | **`performance-engineering-patterns`** | ⚡ **Tier 2** | ⭐ ***(NEW)*** Core Web Vitals (LCP/INP/CLS), N+1 queries, profiling de latência e otimização de query — base do agent `performance-agent` |
 | **`compliance-governance-patterns`** | 🛡️ **Tier 2** | ⭐ ***(NEW)*** SOC 2/GDPR/LGPD/HIPAA/ISO 27001, audit trails, least privilege e retenção de dado pessoal — base do agent `compliance-guardrails` |

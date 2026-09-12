@@ -26,7 +26,7 @@ Atalho manual on-demand para o agent [`@agent-router`](../agents/agent-router.ag
 >
 > **NÃO implementa código de domínio** — apenas triagem e roteamento (agent `@agent-router` nunca executa a solução final).
 >
-> A lógica completa (catálogo, Decision Tree, matriz de decisão R-006, formato de saída, checklist) vive em `agent-router.agent.md` + `docs/ai-context/routing-graph.yaml` — este prompt apenas dispara o fluxo manualmente, sem duplicar a regra (R-003).
+> A lógica completa (catálogo, Decision Tree, matriz de decisão R-006, formato de saída, checklist) vive em `agent-router.agent.md` + `.github/agents/routing-graph.yaml` — este prompt apenas dispara o fluxo manualmente, sem duplicar a regra (R-003).
 
 ---
 
@@ -54,7 +54,7 @@ Atalho manual on-demand para o agent [`@agent-router`](../agents/agent-router.ag
 
 ### PASSO 0 — Health Check de Binding (R-034)
 
-Verificar se `docs/ai-context/catalog.yaml` e `docs/ai-context/binding.md` existem. Se **NÃO** → delegar a `@binding-initializer` e **parar o roteamento**.
+Verificar se `.github/instructions/README.md` e `.github/projects.local.yaml.example` existem. Se **NÃO** → delegar a `@binding-initializer` e **parar o roteamento**.
 
 ### PASSO 0.5 — Prompt Structuring obrigatório (R-041)
 

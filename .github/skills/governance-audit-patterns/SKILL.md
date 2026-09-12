@@ -129,7 +129,7 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 
 | Campo | Conteúdo |
 |---|---|
-| Sintoma | Arquivo commitado sob `.github/**` (exceto `local/`), `CLAUDE.md` ou `docs/ai-context/catalog.yaml` contém nome de repositório/classe/método/pacote/namespace/caminho de arquivo REAL derivado de análise de projeto do usuário (típico de agents analíticos como `code-knowledge-graph`, `business-rules-extractor`, `context-builder`, `project-scanner`) |
+| Sintoma | Arquivo commitado sob `.github/**` (exceto `local/`), `CLAUDE.md` ou `.github/instructions/README.md` contém nome de repositório/classe/método/pacote/namespace/caminho de arquivo REAL derivado de análise de projeto do usuário (típico de agents analíticos como `code-knowledge-graph`, `business-rules-extractor`, `context-builder`, `project-scanner`) |
 | Como detectar | `grep_search` por padrões de caminho absoluto (`[A-Za-z]:\\`, `/home/`, `/Users/`) e por identificadores específicos nos arquivos de governança; comparar com checklist de R-044 |
 | Origem (TrustAgent) | Intrínseco — agent confunde evidência efêmera da conversa com evidência persistível em arquivo compartilhado |
 | Severidade | **Bloqueador** (risco de privacidade e contaminação de workspace) |
@@ -250,15 +250,15 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 
 ---
 
-### 2.15 — Citação de Range Normativo Desatualizado (Drift de R-0XX)
+### 2.15 — Acoplamento Rígido de Range Normativo (Hardcoded Normative Range Coupling)
 
 | Campo | Conteúdo |
 |---|---|
-| Sintoma | Seção `## Regras Herdadas` de um `.agent.md` cita um range `R-001..R-0XX` onde `XX` é menor que a última regra normativa vigente em `CLAUDE.md` (atualmente R-051) — o agent não referencia formalmente as regras mais recentes, mesmo herdando-as implicitamente via link ao arquivo completo |
-| Como detectar | Regex `R-001\.\.R-(\d{3})` em cada `.github/agents/**/*.agent.md`; comparar o valor capturado contra o maior `R-0XX` declarado em `CLAUDE.md` § 3; qualquer valor menor é um achado. Ver Tier 1: `test_smell_2_15_no_stale_normative_rule_range` |
-| Origem (TrustAgent) | Extrínseco — `CLAUDE.md` evolui (novas regras) mas os agents consumidores não são atualizados na mesma entrega (violação de R-015 a posteriori) |
-| Severidade | Baixa individualmente, mas **Alta em agregado** quando sistêmica (evidência real: 44/44 agents com a seção encontrados desatualizados simultaneamente em auditoria de 2026-09 — sinal de ausência de processo de sincronização, não de um lapso isolado) |
-| Remediação | Batch update via `@governance-maintainer`: script `ctx_execute` com match-verificado por arquivo (ler → contar ocorrências == 1 → substituir → escrever), nunca `insert_edit_into_file` em arquivos grandes/YAML sensível a indentação (incidente documentado: corrompeu `workflows.md` e `routing-graph.yaml` na auditoria de 2026-09 ao tentar edições multi-linha sem ancoragem precisa) |
+| Sintoma | Seção `## Regras Herdadas` de um `.agent.md` ou prompt cita um range numérico fechado (ex.: `R-001..R-051`), acoplando o consumidor à cardinalidade exata de regras vigentes em `CLAUDE.md` e forçando *Shotgun Surgery* (edições em massa em 44+ arquivos e queima de créditos a cada nova regra criada) |
+| Como detectar | Regex `R-001\.\.R-(\d{3})` em cada `.github/agents/**/*.agent.md` e prompts; qualquer ocorrência de range numérico fechado é um achado. Ver Tier 1: `test_smell_2_15_no_hardcoded_normative_rule_range` |
+| Origem (TrustAgent) | Intrínseco — acoplamento frágil entre consumidores de governança e o contador numérico de regras |
+| Severidade | **Alta em Custo Operacional** (gera retrabalho sistêmico, edições em massa e gasto desnecessário de tokens/créditos em cascata) |
+| Remediação | Substituir o range fechado por herança aberta e desacoplada: `- Regras normativas globais em [caminho]/CLAUDE.md.` |
 
 ### 2.16 — Agent Mutativo Sem Skill de Edição Segura Referenciada (R-051)
 
@@ -269,6 +269,46 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 | Origem (TrustAgent) | Intrínseco — agent herda tool de mutação sem herdar o protocolo de segurança correspondente |
 | Severidade | **Bloqueador** (mesmo risco de corrupção documentado em R-051, incidente real de 2026-09 que corrompeu `workflows.md`/`routing-graph.yaml` três vezes) |
 | Remediação | Adicionar `.github/skills/efficient-batch-code-modification/SKILL.md` a `source_docs:` (ou `skills:` no sub-catálogo) do agent afetado via `@governance-maintainer` |
+
+### 2.17 — Comando Git Sem Desativação de Pager (Violação R-035)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Arquivo de prompt (`.prompt.md`) ou skill de terminal contém exemplo de comando git (`git diff`, `git log`, `git show`, `git branch`, `git tag`) desprovido de flag não-interativa (`--no-pager` ou `GIT_PAGER=cat` ou pipe `\| cat`), induzindo os agents a executar comandos paginados interativos que travam a sessão indefinidamente em "Processing..." |
+| Como detectar | Varredura estática por comandos `git (diff\|log\|show\|branch\|tag)` em `.github/prompts/*.prompt.md` e skills; verificar ausência de `--no-pager`, `GIT_PAGER` ou pipe seguro. Ver Tier 1: `test_smell_2_17_no_bare_git_pager_commands_in_prompts_and_governance` |
+| Origem (TrustAgent) | Intrínseco — documentação e prompts de governança exemplificam comandos interativos sem prever o comportamento de pager em terminais não-TTY |
+| Severidade | **Bloqueador** (trava a execução do terminal do IDE à espera de `q` no pager `less`, exigindo intervenção manual do usuário) |
+| Remediação | Substituir o comando no arquivo por sua forma canônica não-interativa (`git --no-pager diff ...`, `git --no-pager log ...`) e assegurar `git config core.pager cat` no repositório |
+
+### 2.18 — Gap de Definição de Pronto (Feature Não-Alcançável / Rota Órfã de Navegação)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Pipeline de `WORKFLOW-FEATURE-DEVELOPMENT` entrega nova(s) rota(s) navegáveis (Angular Router, tabs, deep-links) com testes verdes e build íntegro, mas **nenhum artefato do pipeline** verifica se a rota está de fato alcançável pelo usuário final via componente de navegação (sidenav/menu/tab-bar) do projeto — a feature existe no código mas é invisível na UI |
+| Como detectar | Para diffs frontend com nova(s) entrada(s) em arquivo de rotas (`app.routes.ts`/equivalente), `grep_search` pelo `path` da nova rota dentro dos componentes de navegação do projeto (ex.: `sidenav.component.ts/html`, menu principal, tab-bar); ausência de `routerLink`/entrada correspondente é achado positivo. Verificar também se `tech-solution-architect` particionou `[FRONTEND_TASKS]` sem tarefa explícita de integração ao shell de navegação, e se `test-strategy`/`code-review` cobriram "navegabilidade" como cenário/dimensão |
+| Origem (TrustAgent) | Extrínseco — nenhum agent do pipeline (blueprint, implementer, test-strategy, code-review) declara "alcançabilidade via navegação" como critério de conclusão; falha estrutural simultânea em 3+ artefatos, não lapso pontual de 1 agent |
+| Severidade | **Alta** (feature entregue e "aprovada" porém inutilizável para o usuário final — falha de valor de negócio) |
+| Remediação | `@governance-factory`/`@governance-maintainer` insere passo obrigatório de "integração ao shell de navegação" no workflow de implementação (`angular-implementation-patterns` e skills equivalentes de outras stacks com UI), no Context Firewall de `tech-solution-architect` e na dimensão de análise de `code-review-patterns` |
+
+### 2.19 — Ausência de Verificação de Reuso de Design System / Componentes Compartilhados
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Agent implementer de UI cria HTML/CSS customizado (cards, filtros, badges, diálogos, selects) para uma capacidade que já possui componente compartilhado documentado no projeto (ex.: `shared/components/` + `docs/*componentes*`/`docs/*padrao*`), gerando inconsistência visual e duplicação de padrão em vez de reaproveitamento |
+| Como detectar | Comparar o(s) novo(s) template(s) `.html` contra o inventário de componentes compartilhados do projeto (barrel `shared/components/index.ts` ou equivalente) e contra documentação interna de design system referenciada (ou ausente) no adapter local (`.github/instructions/local/<projeto>.instructions.md`); presença de `<select>`/`<input>` nativo ou classes CSS ad-hoc quando existe componente shared documentado para a mesma capacidade é achado positivo; ausência de execução de script de auditoria de padrão do projeto (quando existente, ex.: `npm run <lint-de-padrao-ui>`) no Quality Gate é agravante |
+| Origem (TrustAgent) | Extrínseco — (a) adapter local (Camada 3) não referencia a documentação interna de design system já existente no projeto, quebrando a cadeia de descoberta; (b) skills genéricas de implementação/componentização não tratam "buscar componente equivalente antes de criar um novo" (Reuse-First) como etapa obrigatória do workflow |
+| Severidade | **Alta** (inconsistência de UX e retrabalho de refatoração; não bloqueia função, mas degrada padrão de produto) |
+| Remediação | `@adapter-generator`/`@docs-engineer` garante que adapters locais referenciem documentação interna de design system quando detectada no projeto; `@governance-factory` insere etapa "Reuse-First" em `frontend-componentization-patterns`/`angular-implementation-patterns` (ou skill equivalente de outra stack) e nos agents implementer/stylist de UI; `code-review-patterns` ganha dimensão de análise correspondente |
+
+### 2.20 — Duplicação por Aninhamento de Router (Nested Subagent Sprawl)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | O `@agent-router` (ou supervisor hierárquico) invoca subagente executor downstream via `run_subagent` por dentro de si mesmo, e ao concluir e retornar ao Orquestrador Raiz com o bloco de decisão (`Delegado: @<agent>`), o orquestrador re-dispara o mesmo subagente, gerando execução duplicada, gasto excessivo de créditos e reexecução redundante de testes/diffs (incidente real documentado em 2026-09 com prompt `commit <projeto>`) |
+| Como detectar | Inspeção de traces/tool calls onde `agent-router` invoca executores downstream (`pr-gatekeeper`, `*-developer`, `*-bug-fixer`) via `run_subagent`; ausência da regra mandatória de Delegação Plana (Flat Delegation) no `agent-router.agent.md` e na regra R-047. Ver Tier 1: `test_smell_2_20_router_forbids_nested_subagent_execution` |
+| Origem (TrustAgent) | Intrínseco — ambiguidade no escopo do router (confundir classificador de rota com despachante executor) somada à redação de R-047 sem exceção explícita para blocos de decisão de roteamento |
+| Severidade | **Bloqueador** (desperdício financeiro direto de créditos, duplicação de runtime e loops de cancelamento pelo usuário) |
+| Remediação | Declarar explicitamente a Delegação Plana (Flat Delegation) em `agent-router.agent.md` e a exceção em R-047: o router emite apenas o bloco de decisão de rota e encerra o turno sem chamar executores via `run_subagent`. A invocação de `run_subagent` pelo router é restrita a `@prompt-structuring` (R-041) e `@binding-initializer` (R-034). O Orquestrador Raiz despacha o downstream em nível plano exatamente uma única vez |
 
 ## 3) Severidade — Reaproveitamento da Taxonomia Existente
 
@@ -304,7 +344,7 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 
 ## 6) Checklist de Conformidade da Auditoria
 
-- [ ] Todo achado classificado estritamente em uma das 14 categorias de smell (§2.1..§2.14).
+- [ ] Todo achado classificado estritamente em uma das 20 categorias de smell (2.1..2.20).
 - [ ] Severidade reaproveitada de `code-review-patterns` (Bloqueador/Alto/Sugestão).
 - [ ] Origem classificada como intrínseca ou extrínseca (TrustAgent) quando relevante.
 - [ ] Remediação aponta agent executor real do catálogo (nunca "corrigir diretamente" — agent de auditoria é estritamente read-only).
@@ -319,7 +359,7 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 ## 7) Anti-padrões
 
 - ❌ Agent de auditoria aplicar a correção diretamente (deve ser read-only — só análise e recomendação).
-- ❌ Inventar categoria de smell fora das 14 catalogadas nesta skill.
+- ❌ Inventar categoria de smell fora das 20 catalogadas nesta skill.
 - ❌ Duplicar taxonomia de severidade ou checklist de segurança já existentes em outras skills.
 - ❌ Reportar achado sem apontar agent executor de remediação (relatório inacionável).
 - ❌ Classificar achados como Bloqueadores sem critério estrutural comprovado.

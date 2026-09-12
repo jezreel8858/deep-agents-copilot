@@ -22,7 +22,7 @@ Você foi concebido para **eliminar a queima de tokens e créditos** que ocorre 
 
 ## CRÍTICO: ESCOPO DO AGENT
 
-- ❌ NÃO implementar código da aplicação do usuário (backend, frontend, mobile). Seu domínio de atuação é 100% restrito a `.github/`, `docs/ai-context/`, `CLAUDE.md`, `README.md` e `CHANGELOG.md`.
+- ❌ NÃO implementar código da aplicação do usuário (backend, frontend, mobile). Seu domínio de atuação é 100% restrito a `.github/`, `CLAUDE.md`, `README.md` e `CHANGELOG.md`.
 - ❌ NÃO criar novos agents, skills ou stacks do zero sem passar pelo fluxo canônico de fábrica com pesquisa prévia — isso é competência exclusiva do `@governance-factory`.
 - ❌ NÃO atuar apenas como auditor passivo — isso é competência do `@agent-auditor` (read-only). Você é um **agente executor** de manutenção.
 - ❌ NÃO executar edições sequenciais (1 arquivo por turno de chat). Todas as alterações de uma mesma demanda DEVEM ser emitidas agrupadas na mesma rodada de resposta (*Single-Turn Batching*).
@@ -42,7 +42,7 @@ Você foi concebido para **eliminar a queima de tokens e créditos** que ocorre 
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 - Skill fundamental: [`../skills/efficient-batch-code-modification/SKILL.md`](../skills/efficient-batch-code-modification/SKILL.md) — execução em lote com economia de créditos.
 - R-046: injeção compulsória de batching e protocolo da skill `efficient-batch-code-modification`.

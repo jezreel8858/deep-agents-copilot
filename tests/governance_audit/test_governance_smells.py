@@ -1,5 +1,5 @@
 """
-test_governance_smells.py — Suíte determinística de auditoria estática para os 16 smells de governança.
+test_governance_smells.py — Suíte determinística de auditoria estática para os 17 smells de governança.
 
 Executa no Tier 1 (0 tokens, < 1s) para validar conformidade estrutural, contratual e de segurança
 antes que o agent-auditor (LLM) atue na camada interpretativa/semântica (Two-Tier Hybrid Audit).
@@ -333,7 +333,7 @@ def test_smell_2_9_source_docs_referential_integrity():
 
         for doc in docs:
             # Suporte a R-043: catalog.local.yaml é gitignored; no CI o template rastreado é .example
-            if str(doc).endswith("catalog.local.yaml") and (REPO_ROOT / "docs/ai-context/catalog.local.yaml.example").exists():
+            if (str(doc).endswith("catalog.local.yaml") or str(doc).endswith("projects.local.yaml") or str(doc).endswith("projects.local.yaml.example")) and ((REPO_ROOT / ".github/projects.local.yaml.example").exists()):
                 continue
 
             # Caminho pode ser relativo à raiz do repo ou ao próprio arquivo
@@ -350,7 +350,7 @@ def test_smell_2_9_source_docs_referential_integrity():
 
 
 # ─────────────────────────────────────────────────────────────
-# SMELL 2.15 — Citação de Range Normativo Desatualizado (Drift de R-0XX)
+# SMELL 2.15 — Acoplamento Rígido de Range Normativo (Hardcoded Range Coupling)
 # ─────────────────────────────────────────────────────────────
 
 def _get_latest_normative_rule_number() -> int:
@@ -361,26 +361,34 @@ def _get_latest_normative_rule_number() -> int:
     return max(rule_numbers)
 
 
-def test_smell_2_15_no_stale_normative_rule_range():
-    """Smell 2.15: nenhum agent com seção 'Regras Herdadas' deve citar um range
-    R-001..R-0XX inferior ao maior R-0XX vigente em CLAUDE.md (drift de sincronização —
-    achado sistêmico de 2026-09: 44/44 agents estavam desatualizados antes da correção)."""
-    latest = _get_latest_normative_rule_number()
-    stale = []
+def test_smell_2_15_no_hardcoded_normative_rule_range():
+    """Smell 2.15: nenhum agent deve conter acoplamento rígido de range numérico
+    normativo (ex: R-001..R-051) em 'Regras Herdadas' ou no corpo.
+    A referência a CLAUDE.md deve ser aberta e desacoplada da quantidade de regras (R-xxx),
+    eliminando shotgun surgery e queima de créditos a cada nova regra adicionada.
+    Além disso, todo agent com seção 'Regras Herdadas' DEVE referenciar CLAUDE.md."""
+    hardcoded = []
+    missing_claude_ref = []
     for agent_file in get_all_agent_files():
         content = agent_file.read_text(encoding="utf-8")
-        match = re.search(r"R-001\.\.R-(\d{3})", content)
-        if not match:
-            continue
-        cited = int(match.group(1))
-        if cited < latest:
-            stale.append((agent_file.relative_to(REPO_ROOT), cited))
+        if "Regras Herdadas" in content:
+            if "CLAUDE.md" not in content:
+                missing_claude_ref.append(agent_file.relative_to(REPO_ROOT))
 
-    assert not stale, (
-        f"Smell 2.15: {len(stale)} agent(s) citam range normativo desatualizado "
-        f"(esperado R-001..R-{latest:03d}):\n"
-        + "\n".join(f"  - {path}: R-001..R-{val:03d}" for path, val in stale)
+        match = re.search(r"R-001\.\.R-\d{3}", content)
+        if match:
+            hardcoded.append((agent_file.relative_to(REPO_ROOT), match.group(0)))
+
+    assert not missing_claude_ref, (
+        f"Smell 2.15: {len(missing_claude_ref)} agent(s) com 'Regras Herdadas' não referenciam CLAUDE.md:\n"
+        + "\n".join(f"  - {path}" for path in missing_claude_ref)
     )
+    assert not hardcoded, (
+        f"Smell 2.15 (Acoplamento Rígido de Range): {len(hardcoded)} agent(s) contêm range numérico hardcoded "
+        f"(deve usar herança aberta 'regras normativas globais em CLAUDE.md'):\n"
+        + "\n".join(f"  - {path}: {val}" for path, val in hardcoded)
+    )
+
 
 
 # ─────────────────────────────────────────────────────────────
@@ -410,3 +418,79 @@ def test_smell_2_16_mutating_agents_reference_safe_editing_skill():
         f"'{skill_ref}' em source_docs/skills:\n"
         + "\n".join(f"  - {p}" for p in gaps)
     )
+
+
+# ─────────────────────────────────────────────────────────────
+# SMELL 2.17 — Comando Git Sem Desativação de Pager (R-035)
+# ─────────────────────────────────────────────────────────────
+
+def test_smell_2_17_no_bare_git_pager_commands_in_prompts_and_governance():
+    """Smell 2.17: nenhum prompt (.prompt.md) ou skill de terminal deve conter comandos
+    executáveis git (diff|log|show|branch|tag) sem desativação explícita de pager
+    (--no-pager, GIT_PAGER=cat ou pipe | cat), prevenindo travamento do terminal (R-035)."""
+    paged_git_pattern = re.compile(r"^\s*git\s+(diff|log|show|branch|tag)\b")
+    safe_flags = ("--no-pager", "GIT_PAGER", "| cat", "| head")
+    violations = []
+
+    # Valida prompts
+    for prompt_file in get_all_prompt_files():
+        p_content = prompt_file.read_text(encoding="utf-8")
+        for line_no, line in enumerate(p_content.splitlines(), start=1):
+            trimmed = line.strip()
+            if paged_git_pattern.match(trimmed):
+                if not any(flag in trimmed for flag in safe_flags):
+                    violations.append((prompt_file.relative_to(REPO_ROOT), line_no, trimmed))
+
+    # Valida skill terminal-governance
+    tg_file = SKILLS_DIR / "terminal-governance" / "SKILL.md"
+    if tg_file.exists():
+        tg_content = tg_file.read_text(encoding="utf-8")
+        in_problematic_table = False
+        for line_no, line in enumerate(tg_content.splitlines(), start=1):
+            if "## 4) Comandos Não-Interativos" in line or "## 6) Padrões Proibidos" in line:
+                in_problematic_table = True
+            elif line.startswith("## ") and in_problematic_table:
+                in_problematic_table = False
+            if not in_problematic_table and paged_git_pattern.match(line.strip()):
+                if not any(flag in line for flag in safe_flags):
+                    violations.append((tg_file.relative_to(REPO_ROOT), line_no, line.strip()))
+
+    assert not violations, (
+        f"Smell 2.17: {len(violations)} comando(s) git desprovido(s) de desativação de pager "
+        f"encontrado(s) em prompts/governança (R-035):\n"
+        + "\n".join(f"  - {path}:{num} -> {cmd}" for path, num, cmd in violations)
+    )
+
+
+# ─────────────────────────────────────────────────────────────
+# SMELL 2.20 — Duplicação por Aninhamento de Router (R-047 / R-037)
+# ─────────────────────────────────────────────────────────────
+
+def test_smell_2_20_router_flat_delegation_rule():
+    """Smell 2.20: agent-router deve operar sob Delegação Plana (Flat Delegation),
+    sendo proibido de invocar subagentes executores downstream via run_subagent
+    para evitar execução duplicada pelo orquestrador raiz (R-047 / R-037)."""
+    router_file = AGENTS_DIR / "agent-router.agent.md"
+    assert router_file.exists(), "agent-router.agent.md deve existir"
+    router_content = router_file.read_text(encoding="utf-8")
+
+    # Verifica declaração de Delegação Plana no router
+    assert "Flat Delegation" in router_content or "Delegação Plana" in router_content, (
+        "agent-router.agent.md DEVE declarar regra de Delegação Plana (Flat Delegation)"
+    )
+
+    # Verifica proibição explícita de subagente executor downstream
+    assert "NÃO invocar subagente executor downstream" in router_content or "proibido aninhamento" in router_content, (
+        "agent-router.agent.md DEVE proibir invocação de executores downstream via run_subagent"
+    )
+
+    # Verifica exceção no CLAUDE.md (R-047)
+    claude_content = CLAUDE_MD.read_text(encoding="utf-8")
+    assert "Delegação Plana" in claude_content, (
+        "CLAUDE.md (R-047) DEVE prever a exceção de Delegação Plana para routers"
+    )
+
+    # Verifica documentação do Smell 2.20 na skill
+    gap_skill = SKILLS_DIR / "governance-audit-patterns" / "SKILL.md"
+    gap_content = gap_skill.read_text(encoding="utf-8")
+    assert "2.20" in gap_content, "governance-audit-patterns/SKILL.md DEVE documentar o Smell 2.20"

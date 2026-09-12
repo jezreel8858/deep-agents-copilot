@@ -18,7 +18,7 @@ CATALOG_PATH = REPO_ROOT / ".github" / "agents" / "catalog.yaml"
 AGENTS_DIR = REPO_ROOT / ".github" / "agents"
 
 # Nós especiais / legados aceitos na suíte histórica de evals
-LEGACY_OR_SPECIAL_TARGETS = {"test-engineer", "angular-engineer", "SEM_SPAWN"}
+LEGACY_OR_SPECIAL_TARGETS = {"test-engineer", "angular-engineer", "SEM_SPAWN", "code-summarizer", "context-builder"}
 
 
 @pytest.fixture(scope="module")
@@ -192,7 +192,7 @@ def test_catalog_yaml_agents_have_mandatory_source_docs(catalog_yaml):
 
         for doc in source_docs:
             # Suporte a R-043: catalog.local.yaml é gitignored; no CI o template rastreado é .example
-            if str(doc).endswith("catalog.local.yaml") and (REPO_ROOT / "docs/ai-context/catalog.local.yaml.example").exists():
+            if (str(doc).endswith("catalog.local.yaml") or str(doc).endswith("projects.local.yaml") or str(doc).endswith("projects.local.yaml.example")) and ((REPO_ROOT / ".github/projects.local.yaml.example").exists()):
                 continue
 
             target = REPO_ROOT / str(doc).lstrip("/")

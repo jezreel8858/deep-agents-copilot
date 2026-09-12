@@ -29,7 +29,7 @@ Você é especialista em **revisão de segurança de aplicação** — código, 
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-051` em [`../../CLAUDE.md`](../../CLAUDE.md).
+- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
 - Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
 - R-010: nunca expor credenciais, tokens ou dados sensíveis — nem no relatório de achados.
 
@@ -39,7 +39,7 @@ Você é especialista em **revisão de segurança de aplicação** — código, 
 |---|---|---|
 | Skill base (standards/checklists) | [`../skills/security-review-patterns/SKILL.md`](../skills/security-review-patterns/SKILL.md) | OWASP Top 10:2025, ASVS 5.0, SCA, rubrica de triagem |
 | Skill de compliance (complementar) | [`../skills/compliance-governance-patterns/SKILL.md`](../skills/compliance-governance-patterns/SKILL.md) | Quando achado envolve dado pessoal/regulado — handoff |
-| Catálogo de adapters | [`../../docs/ai-context/catalog.yaml`](../../docs/ai-context/catalog.yaml) | Identifica stack/convenção do código revisado |
+| Catálogo de adapters | [`../instructions/README.md`](../instructions/README.md) | Identifica stack/convenção do código revisado |
 | Modelo de output por perfil | [`../skills/agent-contracts/SKILL.md`](../skills/agent-contracts/SKILL.md) § 8 | Perfil Analista/Read-only |
 
 ## Decision Tree

@@ -1,0 +1,74 @@
+# Catalog Local Overlay — TEMPLATE (Tracked, sem dados reais)
+# ======================================================
+#
+# PROPÓSITO (R-043 — Local Overlay Pattern):
+# Este é o TEMPLATE rastreado do overlay local de projetos. O arquivo real
+# (`catalog.local.yaml`, SEM o sufixo `.example`) é gitignored e nunca deve
+# ser commitado — vive apenas na máquina de cada desenvolvedor.
+#
+# SETUP (uma vez por clone/máquina):
+#   cp .github/projects.local.yaml.example .github/projects.local.yaml
+#
+# Depois disso, use normalmente:
+#   /add-project-context <caminho-absoluto-do-projeto>   → escreve aqui (catalog.local.yaml)
+#   /del-project-context <nome-do-projeto>                → remove daqui (catalog.local.yaml)
+#
+# NUNCA editar catalog.yaml (compartilhado) para adicionar projeto — ver R-043.
+#
+# Análogo de mercado: .env vs .env.example, docker-compose.override.yml,
+# terraform.tfvars vs terraform.tfvars.example.
+
+# ============================================
+# PROJETOS (preenchido por /add-project-context — nunca manualmente)
+# ============================================
+# Campo `extends:` declara quais adapters genéricos (de catalog.yaml) o projeto herda.
+#
+#   Exemplo de entry gerada automaticamente:
+#   projetos:
+#     - id: "meu-projeto-backend"
+#       name: "Meu Projeto Backend"
+#       tipo: "backend"
+#       path_externo: "D:\\workspace\\meu-projeto-backend"   # read-only, nunca versionado
+#       extends:
+#         - "base-backend"
+#       descricao: "Serviço de domínio X — Java/Spring Boot"
+#       adapter_local: ".github/instructions/local/meu-projeto-backend.instructions.md"
+
+projetos: []
+
+# ============================================
+# ENVIRONMENT FINGERPRINT (preenchido por /init-context — nunca manualmente)
+# ============================================
+# Detectado automaticamente no PASSO 2 de init-context.prompt.md: shells
+# disponíveis, shell ativo na sessão, versão de Python e versão de Node.js.
+# Cache reaproveitado por até 7 dias (evita redetecção redundante a cada sessão).
+#
+#   Exemplo de entry gerada automaticamente:
+#   environment:
+#     detected_at: "2026-09-01T14:00:00Z"
+#     os: "windows"
+#     shells_available:
+#       - name: "powershell"
+#         path: "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"
+#       - name: "cmd"
+#         path: "C:\\Windows\\System32\\cmd.exe"
+#       - name: "git-bash"
+#         path: "C:\\Program Files\\Git\\usr\\bin\\bash.exe"
+#       - name: "wsl"
+#         path: "C:\\Windows\\System32\\wsl.exe"
+#     shell_ativo_na_sessao: "MINGW64 (Git Bash)"
+#     python:
+#       available: true
+#       version: "3.12.4"
+#       path: "C:\\Users\\<user>\\AppData\\Local\\Programs\\Python\\Python312\\python.exe"
+#     nodejs:
+#       available: true
+#       version: "24.15.0"
+#       path: "C:\\Program Files\\nodejs\\node.exe"
+#     java:
+#       available: true
+#       version: "22.0.2"
+#       java_home: "C:\\Program Files\\Java\\jdk-22"
+
+environment: {}
+

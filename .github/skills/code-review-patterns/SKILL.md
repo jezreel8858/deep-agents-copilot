@@ -50,9 +50,8 @@ source_docs:
 | **Testes** | Cobertura ausente em caminho crítico, testes quebrados pelo diff |
 | **Performance** | N+1, queries sem índice, loops/alocações desnecessárias no hot path |
 | **Manutenibilidade** | Complexidade ciclomática alta, duplicação, nomes obscuros |
-
+| **UX/Design System & Navegabilidade** | Nova rota frontend possui entrada correspondente em componente de navegação do projeto (menu/sidenav/tabs — Smell 2.18); componentes de UI novos reaproveitam `shared/`/design system do projeto em vez de HTML/CSS customizado duplicado (Smell 2.19) |
 ## 3) Critérios de Bloqueio de Merge
-
 Bloquear (🔴) **somente** quando:
 - Segurança crítica (secret exposto, injeção, bypass de autenticação/autorização).
 - Bug funcional com evidência clara (não suposição).
@@ -76,7 +75,8 @@ Demais achados → alertar (🟠/🟡), nunca bloquear por preferência de estil
 - ❌ Ignorar contexto de negócio documentado (issue/PR description) e sugerir mudança já rejeitada anteriormente.
 - ❌ Bloquear merge por preferência de estilo sem violação de convenção declarada.
 - ❌ Corrigir o código diretamente — revisão é read-only por definição.
-
+- ❌ Aprovar PR de feature frontend com rota nova sem verificar se está integrada à navegação do projeto (menu/sidenav) — feature entregue porém inalcançável (Smell 2.18).
+- ❌ Aprovar componente de UI novo sem verificar reaproveitamento de `shared/`/design system já documentado no projeto (Smell 2.19).
 ## 6) Formato de Saída Recomendado
 
 - Sumário executivo no topo (contagem por severidade + veredito).

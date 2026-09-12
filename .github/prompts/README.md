@@ -10,7 +10,7 @@ Prompts operacionais para workflow de execução no chat.
 
 | Aspecto | `/init-context` | `/add-project-context` |
 |---------|---|---|
-| **Propósito** | Carregar **governança global** (R-001..R-051) | Descobrir **stack de projeto específico** |
+| **Propósito** | Carregar **governança global** (`CLAUDE.md`) | Descobrir **stack de projeto específico** |
 | **Escopo** | TODO Copilot na sessão | APENAS 1 projeto |
 | **Quando usar** | **PRIMEIRO — antes de tudo** | **DEPOIS — para cada projeto** |
 | **Frequência** | ❌ 1x por sessão (não repetir) | ✅ N vezes (1 por projeto) |
@@ -22,7 +22,7 @@ Prompts operacionais para workflow de execução no chat.
 ```
 1. /init-context
    └─ Valida CLAUDE.md + copilot-instructions.md
-   └─ Carrega R-001..R-051
+   └─ Carrega regras normativas globais
    └─ Faz 1x por sessão APENAS
 
 2. @agent-router ou qualquer agent
@@ -43,7 +43,7 @@ Prompts operacionais para workflow de execução no chat.
 
 | Command | Arquivo | Descrição | Frequência |
 |---------|---------|-----------|-----------|
-| `/init-context` | `.github/prompts/init-context.prompt.md` | Inicializa contexto de governança obrigatório (carrega CLAUDE.md + copilot-instructions.md) para eliminar alucinação e assegurar conformidade com R-001..R-051 | **1x/sessão** |
+| `/init-context` | `.github/prompts/init-context.prompt.md` | Inicializa contexto de governança obrigatório (carrega CLAUDE.md + copilot-instructions.md) para eliminar alucinação e assegurar conformidade com as regras normativas globais | **1x/sessão** |
 
 ---
 
@@ -90,7 +90,7 @@ Prompts operacionais para workflow de execução no chat.
 
 - [ ] **Primeira coisa:** Executou `/init-context` na sessão?
 - [ ] **Para cada projeto:** Executou `/add-project-context <projeto>`?
-- [ ] **catalog.yaml sincronizado:** Verificou se projeto está em `docs/ai-context/catalog.yaml`?
+- [ ] **catalog.yaml sincronizado:** Verificou se projeto está em `.github/instructions/README.md`?
 - [ ] **Pronto para agentes:** Pode agora usar `@agent-router` com contexto completo?
 
 Se **TODOS SIM**: ✅ Você está usando corretamente!

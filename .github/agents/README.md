@@ -27,7 +27,7 @@
 | Agent | `governance-factory` | 🏭 ***(v1.2.0)*** Criação/revisão de agent, skill, prompt ou nova stack via parâmetro `type`; na criação de qualquer artefato/stack, delega compulsoriamente pesquisa prévia de mercado/skills ao `deep-search` antes de materializar os arquivos |
 | Agent | `governance-maintainer` | 🛠️ ***(NEW)*** Especialista executor em manutenção atômica, refatoração estrutural e sincronização em lote de governança via context-mode e diffs cirúrgicos |
 | Agent | `context-builder` | Coletar, condensar e persistir contexto técnico em `docs/context/` |
-| Agent | `binding-initializer` | ⚡ ***(NEW)*** Criar `catalog.yaml` + `binding.md` para novo repositório (1 pergunta — Health Check R-034) |
+| Agent | `binding-initializer` | ⚡ Inicializar overlay local e templates de governança para novo repositório (1 pergunta — Health Check R-034) |
 | Agent | `adapter-generator` | ⚡ ***(NEW)*** Gerar automaticamente adapters em `.github/instructions/` via `/add-project-context` |
 | Agent | `business-rules-extractor` | 📋 ***(NEW)*** Extrair regras de negócio de código e documentar em `.md`; validar refatorações contra regras documentadas |
 | Agent | `runtime-verifier` | 🩺 ***(NEW)*** Verifica saúde do ambiente (build limpo, dependências, serviços dependentes) antes de disparar testes/codificadores; read-only, nunca corrige |
@@ -38,10 +38,10 @@
 | Agent | `spring-reactive-router` | ⚛️ **Backend Spring Reactive Router** (`backend/spring-reactive/`) — supervisor hierárquico do ecossistema WebFlux/Reactor; orquestra e despacha para os 7 especialistas reativos mapeados em `.github/agents/backend/spring-reactive/spring-reactive-catalog.yaml` (`arch-advisor`, `feature-developer`, `bug-fixer`, `resilience-tuner`, `unit-test-writer`, `integration-test-writer`, `test-fixer`) |
 | Agent | `ejb-router` | 🏛️ **Backend Java Legado EJB Router** (`backend/ejb/`) — supervisor hierárquico do ecossistema Java Legado EJB; orquestra e despacha para os 7 especialistas backend mapeados em `.github/agents/backend/ejb/ejb-catalog.yaml` (`arch-advisor`, `feature-developer`, `bug-fixer`, `perf-tuner`, `unit-test-writer`, `integration-test-writer`, `test-fixer`) |
 | Agent | `database-router` | 🗄️ **Backend Database Router** (`backend/database/`) — supervisor hierárquico do ecossistema de Banco de Dados; orquestra e despacha para os 6 especialistas Oracle e Informix mapeados em `.github/agents/backend/database/database-catalog.yaml` (`oracle-migration-dev`, `oracle-plsql-expert`, `oracle-query-tuner`, `informix-migration-dev`, `informix-spl-expert`, `informix-query-tuner`) |
+| Agent | `python-router` | 🐍 **Backend Python Router** (`backend/python/`) — supervisor hierárquico do ecossistema Python Backend; orquestra e despacha para os 7 especialistas backend mapeados em `.github/agents/backend/python/python-catalog.yaml` (`arch-advisor`, `feature-developer`, `bug-fixer`, `perf-tuner`, `unit-test-writer`, `integration-test-writer`, `test-fixer`) |
 | Agent | `docs-engineer` | 📝 ***(FUSÃO)*** Autoria e curadoria de documentação técnica em `.md` — modos `author`/`curate`; substitui docs-writer + docs-curator, que já delegavam entre si a mesma decisão |
 | Agent | `code-review` | 🔎 Revisa código (diff/PR) antes do merge por correção, segurança, convenções, impacto, testes e performance; classifica achados por severidade; read-only; delega para `bug-triage`/`tech-solution-architect`/`test-strategy`/`refactor-planner` |
 | Agent | `requirements-analyst` | 🧾 ***(NEW)*** Elicita e estrutura requisitos funcionais/não-funcionais a partir de pedido de negócio ambíguo (EARS, INVEST, Gherkin, FURPS+); detecta *solution-jumping* via Five Whys; prospectivo (não confundir com `business-rules-extractor`, que é reverso) |
-| Agent | `code-summarizer` | 🗜️ ***(NEW)*** Ponto de entrada único para sumarização de código-fonte agnóstica a linguagem (RF-008); modelo híbrido — heurística/AST determinística primeiro, LLM leve como fallback; nunca substituído por chamada direta a lib de parsing |
 | Agent | `code-knowledge-graph` | 🕸️ Ponto de entrada único para construção/consulta do grafo de conhecimento de código-fonte cross-projeto. Motor único baseado na lib externa **`@optave/codegraph`** (CLI local e MCP Server enxuto, Node.js/TypeScript nativo, Tree-sitter/Rust, zero API keys/LLM). Suporta dataflow/CFG interprocedural, dead-code, complexity metrics, co-change analysis, detecção de ciclos e visualização interativa via `codegraph plot`. Skill de uso: `codegraph-optave-usage` |
 | Agent | `security-reviewer` | 🔒 ***(NEW)*** Revisa código de aplicação por segurança especializada (OWASP Top 10:2025, ASVS 5.0, SCA/CVE, secrets) — complementa `code-review` (dimensão genérica) com profundidade de security specialist; read-only |
 | Agent | `performance-agent` | ⚡ ***(NEW)*** Revisa código por performance especializada — Core Web Vitals (frontend), N+1/latência (backend), otimização de query (banco); read-only |
@@ -71,7 +71,6 @@
 | 🧪 Auditoria semântica de governança do catálogo (smells/gaps em agents, skills e prompts) | `agent-auditor` |
 | Criação/revisão de agent, skill, prompt ou nova stack (com pesquisa prévia via `@deep-search` na criação) | `governance-factory` (`type: agent\|skill\|prompt\|stack`) |
 | Manutenção atômica, refatoração em cascata ou sincronização em lote de governança | `governance-maintainer` |
-| Consolidação de contexto para execução posterior | `context-builder` |
 | ⚡ Binding context faltando (Health Check) | `binding-initializer` |
 | ⚡ Gerar adapters após /add-project-context | `adapter-generator` |
 | 📋 Extrair/documentar/validar regras de negócio | `business-rules-extractor` |
@@ -79,10 +78,10 @@
 | ☕ Backend Spring Boot Router (supervisor que despacha para os 7 especialistas em `backend/spring-boot/`) | `spring-boot-router` |
 | ⚛️ Backend Spring Reactive Router (supervisor que despacha para os 7 especialistas em `backend/spring-reactive/`) | `spring-reactive-router` |
 | 🏛️ Backend Java Legado EJB Router (supervisor que despacha para os 7 especialistas em `backend/ejb/`) | `ejb-router` |
+| 🐍 Backend Python Router (supervisor que despacha para os 7 especialistas em `backend/python/`) | `python-router` |
 | 📝 Escrever/gerar/curar documentação técnica em `.md` (qualquer domínio) | `docs-engineer` |
 | 🔎 Revisar código (diff/PR) antes do merge, por severidade | `code-review` |
 | 🧾 Elicitar/estruturar requisitos a partir de pedido ambíguo (pré-técnico) | `requirements-analyst` |
-| 🗜️ Sumarizar código-fonte para reduzir bytes/tokens no contexto (pós-`/init-context` ou sob demanda) | `code-summarizer` |
 | 🕸️ Construir/consultar grafo de conhecimento de código — nível código (arquivo/classe/função, import/chamada/herança/tabela-SQL) e nível arquitetural (sistema/serviço, blast radius, ciclo, acoplamento, risco, diagrama Mermaid), cross-projeto | `code-knowledge-graph` |
 | 🔒 Revisão especializada de segurança de aplicação (OWASP, CVE, secrets), read-only | `security-reviewer` |
 | ⚡ Revisão especializada de performance (Core Web Vitals, N+1, query), read-only | `performance-agent` |

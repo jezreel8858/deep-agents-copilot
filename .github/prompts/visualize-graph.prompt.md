@@ -11,7 +11,7 @@ argument-hint: '[--diff <ref> | --bridges <file>]'
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - docs/ai-context/catalog.yaml
+  - .github/instructions/README.md
   - tools/codegraph-visualizer/README.md
   - tools/codegraph-visualizer/bridges.json
   - .github/skills/terminal-governance/SKILL.md
@@ -49,7 +49,7 @@ source_docs:
 ## 📋 Fluxo de Execução
 
 1. **Localizar Bancos de Dados SQLite do Grafo**:
-   - Verificar a existência dos arquivos `.codegraph/graph.db` nos repositórios registrados no catálogo (`catalog.local.yaml` / `catalog.yaml`).
+   - Verificar a existência dos arquivos `.codegraph/graph.db` nos repositórios registrados no catálogo (`projects.local.yaml` / `catalog.yaml`).
    - Se algum projeto não possuir grafo construído, alertar e sugerir rodar `codegraph build` no repositório correspondente.
 
 2. **Carregar Pontes REST Cross-Repo**:

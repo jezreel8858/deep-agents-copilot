@@ -10,7 +10,7 @@ Guia rápido para usar os prompts do Copilot Chat.
 /init-context
 ```
 
-**Razão**: Carregar governança global (R-001..R-051). Faça isto **UMA ÚNICA VEZ** no início da sessão.
+**Razão**: Carregar governança global de `CLAUDE.md`. Faça isto **UMA ÚNICA VEZ** no início da sessão.
 
 ---
 

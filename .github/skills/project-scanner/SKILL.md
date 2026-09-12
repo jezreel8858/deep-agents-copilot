@@ -23,7 +23,7 @@ source_docs:
   - ".github/copilot-instructions.md"
   - ".github/agents/adapter-generator.agent.md"
   - ".github/prompts/add-project-context.prompt.md"
-  - "docs/ai-context/catalog.yaml"
+  - ".github/instructions/README.md"
 tools:
   - "read_file"
   - "list_dir"

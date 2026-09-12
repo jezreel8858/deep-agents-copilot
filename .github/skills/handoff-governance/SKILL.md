@@ -169,7 +169,37 @@ handoff_payload:
 
 ---
 
-### 2.3) Indexação Semântica de Telemetria (FTS5 / BM25)
+### 2.3) Delegação Plana (Flat Delegation) vs. Aninhamento de Subagentes (Anti-Duplicação)
+
+Em plataformas com suporte a subagentes via tool-calling (`run_subagent`), como GitHub Copilot no VS Code/JetBrains, existe um risco crítico de **dupla orquestração**:
+
+```
+❌ ANINHAMENTO INDEVIDO (Nested Subagent Sprawl — Smell 2.20):
+Orquestrador Raiz (Copilot)
+   └─► run_subagent(agent-router)
+          └─► run_subagent(downstream_agent)  ◄── Downstream executa dentro do router
+   Retorno ao Orquestrador Raiz: "Delegado: @downstream_agent"
+   Orquestrador Raiz: "O router mandou delegar!"
+   └─► run_subagent(downstream_agent)         ◄── Downstream executa PELA SEGUNDA VEZ! (Duplicação e desperdício)
+
+✅ DELEGAÇÃO PLANA (Flat Delegation — Padrão Canônico):
+Orquestrador Raiz (Copilot)
+   └─► run_subagent(agent-router)
+   Retorno: Bloco de Decisão de Roteamento (Agente Ativo, Delegado: @<agent>, Pipeline de Execução)
+Orquestrador Raiz despacha o downstream UMA ÚNICA VEZ:
+   └─► run_subagent(downstream_agent)
+```
+
+**Regras Mandatórias de Delegação Plana:**
+1. **Papel Estrito do Router**: `@agent-router` (e supervisores hierárquicos) é um classificador de rota, NÃO um executor. Ele encerra seu turno emitindo o bloco de decisão canônico para o orquestrador raiz, sem invocar subagentes executores downstream via `run_subagent`.
+2. **Exceções Permitidas para o Router**: A invocação de `run_subagent` por dentro do `agent-router` é restrita exclusivamente a:
+   - `@prompt-structuring` (R-041) para refinamento pré-roteamento de pedidos ambíguos.
+   - `@binding-initializer` (R-034) para inicialização obrigatória de contexto ausente.
+3. **Salvaguarda no Orquestrador**: Quando o orquestrador raiz recebe o retorno do `agent-router`, ele dispara o agente delegado exatamente uma vez. Se por qualquer anomalia a resposta já contiver o resultado final concluído pelo downstream (`Resultado do @<agent>:`), o orquestrador repassa diretamente ao usuário, sem re-invocar o mesmo agent.
+
+---
+
+### 2.4) Indexação Semântica de Telemetria (FTS5 / BM25)
 
 Para habilitar rastreabilidade sem poluição de contexto no chat, transições de handoff podem ser indexadas via `context-mode` MCP (`ctx_index`) para auditoria e recuperação semântica:
 

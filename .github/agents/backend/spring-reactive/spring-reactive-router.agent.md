@@ -37,7 +37,7 @@ Você é o supervisor de domínio e roteador especializado de backend Spring Rea
 
 ## Regras Herdadas
 
-- Regras normativas `R-001..R-051` em [`../../../../CLAUDE.md`](../../../../CLAUDE.md).
+- Regras normativas globais em [`../../../../CLAUDE.md`](../../../../CLAUDE.md).
 - Sub-catálogo Spring Reactive em [`spring-reactive-catalog.yaml`](./spring-reactive-catalog.yaml).
 
 ## Skills Associadas
