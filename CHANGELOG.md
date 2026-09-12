@@ -6,6 +6,37 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.8.1] — 2026-09-12
+
+### Adicionado & Aperfeiçoado
+- **Geração Integrada de Título e Descrição de Pull Request (`@pr-gatekeeper` e `/commit`)**:
+  - **`pr-gatekeeper.agent.md` (v1.1.0 → v1.2.0)**:
+    - Atualização do fluxo operacional com passo dedicado para geração de Título de PR no padrão Conventional Commits (≤72 cols, imperativo em PT-BR).
+    - Inclusão formal de template estruturado de Descrição de PR contendo: resumo de entregas, tipo de mudança categorizado, matriz de risco avaliada com base no diff, instruções de validação/teste e checklist pré-PR.
+    - Sincronização de catálogo em `.github/agents/catalog.yaml` (versão e descrição).
+  - **`commit.prompt.md` (v1.3 → v1.4)**:
+    - Expansão do PASSO 5 para fornecer, junto à mensagem de commit e comando manual, o Título de PR e a Descrição estruturada de PR pronta para preenchimento na plataforma de Git.
+    - Orientações explícitas de entrada para o `CHANGELOG.md` no encerramento da entrega.
+
+---
+
+## [2.8.0] — 2026-09-11
+
+### Adicionado
+- **Consolidação de Workflows com Padrões de Mercado (ADLC / Autonomous SDLC 2026 — R-050)**:
+  - **Expansão de 5 para 8 Workflows Canônicos e de Ciclo de Vida**: Pesquisa de mercado e benchmarking com padrões corporativos (Anthropic *Building Effective Agents*, Cycode/IBM *Agentic Development Lifecycle - ADLC* e engenharia DevSecOps) identificou e supriu 3 lacunas operacionais críticas de repositórios reais:
+    - **`WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION` (WF6)**: remediação determinística de vulnerabilidades SCA e CVEs (`@security-reviewer`), mapeamento de blast radius de dependências (`@code-knowledge-graph`), bump cirúrgico em manifestos/lockfiles (`specialist-developer`), adaptação de breaking changes de bibliotecas (`specialist-bug-fixer`) e quality gate com re-scan de segurança (`runtime-verifier`).
+    - **`WORKFLOW-FRAMEWORK-MIGRATION` (WF7)**: condução de elevações estruturais de versão maior de framework ou plataforma (Angular standalone/signals, Spring Boot 2→3, Java 17→21/25, EJB→Spring), com pre-flight assessment (`@tech-solution-architect`), decomposição em fases entregáveis, codemods automatizados no sandbox (`context-mode`), testes de paridade funcional e checkpoints humanos obrigatórios.
+    - **`WORKFLOW-RELEASE-READINESS` (WF8)**: pre-flight completo de release e validação pré-deploy, auditando compatibilidade retroativa de contratos OpenAPI (`@tech-solution-architect`), rollout de banco com scripts DDL idempotentes e reversíveis (`@database-specialist`), varredura de segredos e licenças (`@security-reviewer` + `@repo-hygiene-auditor`), packaging semântico com changelog (`@pr-gatekeeper`) e decisão executiva Go/No-Go (`@code-review`).
+  - **Sincronização Atômica em Cascata (R-015/R-040/R-050)**:
+    - Atualização formal de `workflows.md` (diagrama geral, especificações detalhadas e Typed State Bags para WF6, WF7 e WF8).
+    - Inclusão dos 3 pipelines em `routing-graph.yaml` sob o bloco `workflows:`, com expansão das diretrizes de `fast_path_bypass`.
+    - Atualização de `CLAUDE.md` (§ R-050 e R-041), `.github/copilot-instructions.md` e `agent-router.agent.md`.
+    - Adição de 3 cenários declarativos E2E em `tests/operational_flow/casos-workflows.yaml` (`WF-DEP-001`, `WF-MIG-001`, `WF-REL-001`) e 3 testes específicos em `test_operational_workflows.py`.
+    - Validação total da suíte determinística: **92/92 testes passando (100%)** com cobertura de 100% dos workflows (`8/8`).
+
+---
+
 ## [2.7.0] — 2026-09-11
 
 ### Refatorado & Simplificado

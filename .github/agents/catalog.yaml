@@ -612,12 +612,12 @@ agents:
     id: "pr-gatekeeper"
     model: "Gemini 3.8 Flash"
     priority: 4.5
-    version: "1.1.0"
+    version: "1.2.0"
     domain: "Preparacao de entrega (PR/commit/changelog)"
     description: >-
       Prepara submissao de PR pos-aprovacao do quality gate — sintetiza diff,
-      aplica guardrail de segredos e template semantico SSOT (/commit), gera descricao
-      de PR com matriz de risco e atualiza CHANGELOG.md. Nunca executa git add/commit/push (R-031).
+      aplica guardrail de segredos e template semantico SSOT (/commit), gera titulo
+      e descricao de PR com matriz de risco e atualiza CHANGELOG.md. Nunca executa git add/commit/push (R-031).
     keywords:
       - "pull request"
       - "commit semantico"

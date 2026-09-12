@@ -4,7 +4,8 @@ description:
   Gera mensagem de commit convencional (PT-BR) baseada no stage e no padrão
   global (docs/ai-copilot/global-git-commit-instructions.md). Analisa arquivos,
   aplica guardrail de secrets, verifica atomicidade, estrutura por complexidade
-  (simples vs complexo) e produz mensagem pronta. NÃO executa git add/commit/push.
+  (simples vs complexo), gera título e descrição de PR correspondentes e produz
+  saída pronta com orientações para CHANGELOG.md. NÃO executa git add/commit/push.
 agent: 'agent'
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent']
@@ -19,20 +20,20 @@ source_docs:
 
 # `/commit`
 
-Gera mensagem de commit convencional pronta para uso, estruturada conforme as **Diretrizes Globais** (`docs/ai-copilot/global-git-commit-instructions.md`).
+Gera mensagem de commit convencional pronta para uso, estruturada conforme as **Diretrizes Globais** (`docs/ai-copilot/global-git-commit-instructions.md`), além de gerar automaticamente **título e descrição de Pull Request (PR)** e orientações para o `CHANGELOG.md`.
 
-> **Propósito**: Analisar o diff/stage e gerar mensagem de commit semântico padronizada em PT-BR.
+> **Propósito**: Analisar o diff/stage e gerar mensagem de commit semântico padronizada em PT-BR, título/descrição de PR e diff para CHANGELOG.
 > **Arquivo Ativo**: `${file}`
 > **Workspace**: `${workspaceFolder}`
 >
-> **REGRA ABSOLUTA (R-031)**: Este prompt apenas **analisa o diff e gera a mensagem formatada**.
+> **REGRA ABSOLUTA (R-031)**: Este prompt apenas **analisa o diff e gera a mensagem e artefatos textuais formatados**.
 > NUNCA executa `git add`, `git commit` ou `git push` — decisão e execução são sempre do desenvolvedor.
 
 ---
 
 ## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
 
-- ✅ **APENAS** analisar git diff/log e gerar texto de mensagem de commit convencional.
+- ✅ **APENAS** analisar git diff/log e gerar texto de mensagem de commit convencional, título/descrição de PR e entrada de CHANGELOG.md.
 - ✅ **SEMPRE** verificar guardrail de segredos e credenciais antes de emitir a mensagem.
 - ❌ **NÃO** executar `git add`, `git commit` ou `git push` de forma autônoma.
 - ❌ **NÃO** commitar arquivos contendo tokens, chaves privadas ou caminhos locais absolutos (R-044).
@@ -213,13 +214,17 @@ Co-authored-by: Nome <email@exemplo.com>
 
 ---
 
-### PASSO 5 — Apresentar a Mensagem e Instruções de Aplicação
+### PASSO 5 — Apresentar a Mensagem, Título/Descrição de PR e Instruções de Aplicação
 
-Apresentar a saída em duas partes claras:
+Apresentar a saída estruturada nas seguintes seções claras:
 
-1. **Bloco de Mensagem Formatada**: a mensagem pronta para revisão.
+1. **Bloco de Mensagem Formatada**: a mensagem pronta para revisão (Formato A ou Formato B).
 2. **Comando para Execução Manual**: bloco bash utilizando `git commit -F - << 'EOF'` para facilitar a cópia e preservar quebras de linha e caracteres especiais.
-3. Se houver sugestão de staging prévio, exibir o `git add` correspondente antes do commit.
+3. **Pull Request (Título e Descrição)**:
+   - **Título do PR**: formato Conventional Commits (≤72 cols, imperativo, PT-BR).
+   - **Descrição do PR**: Markdown com seções "O que foi feito", "Tipo de mudança", "Matriz de Risco", "Como testar" e "Checklist" (alinhado a `.github/skills/git-governance/SKILL.md` § 3).
+4. **CHANGELOG.md (Entrada Sugerida)**: diff sugerido no formato Keep a Changelog / SemVer.
+5. Se houver sugestão de staging prévio, exibir o `git add <arquivos>` correspondente antes do commit.
 
 ---
 
@@ -232,6 +237,8 @@ Apresentar a saída em duas partes claras:
 - [ ] **Corpo**: Wrap em ≤ 72 caracteres por linha, explicando por quê e não apenas o quê?
 - [ ] **Remoções**: Todo arquivo removido tem motivo e substituto explicados?
 - [ ] **Validação**: Seção `Como validar:` presente com comando executável?
+- [ ] **Pull Request**: Título de PR e Descrição estruturada de PR gerados no formato padrão?
+- [ ] **CHANGELOG**: Entrada sugerida para o `CHANGELOG.md` compatível com SemVer?
 - [ ] **Autonomia**: Nenhum comando `git add`, `git commit` ou `git push` executado automaticamente.
 
 ---
@@ -255,5 +262,5 @@ Apresentar a saída em duas partes claras:
 
 ---
 
-*v1.3 — commit prompt — 2026-09-07 (SSOT consolidada com @pr-gatekeeper e alinhamento com global-git-commit-instructions.md)*
+*v1.4 — commit prompt — 2026-09-12 (Geração integrada de título e descrição de PR + entrada para CHANGELOG.md)*
 
