@@ -401,6 +401,110 @@ workflows:
         validacao_comportamental: "agent-evals-lab (60 casos casos-roteamento.yaml)"
         escalonamento_apos_teto: "ask_questions (revisao_manual_diff)"
 
+  - id: WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION
+    nome: "Remediação de Vulnerabilidades, CVEs e Atualização de Dependências"
+    regra: "R-050"
+    fast_path: true
+    gatilhos:
+      - "atualizar dependência"
+      - "atualizar dependencias"
+      - "atualizar pacote"
+      - "remediar cve"
+      - "vulnerabilidade snyk"
+      - "trivy alert"
+      - "dependabot"
+      - "npm audit fix"
+      - "upgrade lib"
+      - "cve remediation"
+    estados:
+      - etapa: 1
+        nome: "vulnerability_scan_and_advisory_triage"
+        agent: "security-reviewer"
+        sub_rotinas_permitidas: ["deep-search"]
+      - etapa: 2
+        nome: "dependency_blast_radius_mapping"
+        agent: "code-knowledge-graph"
+        sub_rotinas_permitidas: ["tech-solution-architect"]
+      - etapa: 3
+        nome: "manifest_bump_and_lockfile_sync"
+        agent: "domain-router | specialist-feature-developer"
+        protocolo: "context-mode"
+      - etapa: 4
+        nome: "breaking_change_adaptation_and_compilation"
+        agent: "domain-router | specialist-bug-fixer"
+        sub_rotinas_permitidas: ["specialist-test-fixer"]
+        max_retries: 3
+        circuit_breaker: "specialist-bug-fixer (executa_revert_manifesto) -> ask_questions"
+      - etapa: 5
+        nome: "regression_verification_and_sca_gate"
+        agent: "runtime-verifier | code-review | security-reviewer"
+
+  - id: WORKFLOW-FRAMEWORK-MIGRATION
+    nome: "Migração de Framework, Plataforma ou Major Version"
+    regra: "R-050"
+    fast_path: false
+    gatilhos:
+      - "migrar framework"
+      - "migração angular"
+      - "migrar spring boot"
+      - "upgrade major"
+      - "modernizar stack"
+      - "migrar para standalone"
+      - "migrar para signals"
+      - "migrar para virtual threads"
+    estados:
+      - etapa: 1
+        nome: "pre_flight_compatibility_assessment"
+        agent: "tech-solution-architect"
+        sub_rotinas_permitidas: ["code-knowledge-graph", "deep-search"]
+      - etapa: 2
+        nome: "migration_blueprint_and_phasing"
+        agent: "tech-solution-architect"
+        checkpoint_humano: "ask_questions (aprovacao_fases_migracao)"
+      - etapa: 3
+        nome: "codemod_and_batch_rewrite"
+        agent: "domain-router | specialist-feature-developer"
+        protocolo: "efficient-batch-code-modification"
+      - etapa: 4
+        nome: "refinement_and_parity_testing"
+        agent: "domain-router | specialist-unit-test-writer | specialist-component-test-writer"
+      - etapa: 5
+        nome: "baseline_and_quality_gate"
+        agent: "runtime-verifier | code-review"
+
+  - id: WORKFLOW-RELEASE-READINESS
+    nome: "Prontidão de Release, Breaking Changes & Deploy Pre-Flight"
+    regra: "R-050"
+    fast_path: true
+    gatilhos:
+      - "preparar release"
+      - "release readiness"
+      - "pre-flight deploy"
+      - "auditar release"
+      - "prontidão de entrega"
+      - "validar versão"
+      - "tagging de release"
+    estados:
+      - etapa: 1
+        nome: "contract_and_api_compatibility_audit"
+        agent: "tech-solution-architect"
+        sub_rotinas_permitidas: ["code-knowledge-graph"]
+      - etapa: 2
+        nome: "database_rollout_pre_flight"
+        agent: "database-specialist"
+        verificacoes: ["idempotencia_ddl", "script_rollback_testado", "sem_drop_destrutivo"]
+      - etapa: 3
+        nome: "security_secrets_and_hygiene_scan"
+        agent: "security-reviewer"
+        co_agentes: ["repo-hygiene-auditor"]
+      - etapa: 4
+        nome: "changelog_semver_and_packaging"
+        agent: "pr-gatekeeper"
+      - etapa: 5
+        nome: "release_verdict_and_executive_summary"
+        agent: "code-review"
+        checkpoint_final: "ask_questions (aprovacao_go_no_go_deploy)"
+
 # ─────────────────────────────────────────────
 # ARESTAS — condições de roteamento
 # Cada aresta define: origem, destino, sinais de ativação e threshold mínimo
@@ -432,6 +536,8 @@ arestas:
         - "WORKFLOW-REFACTORING (refatorações com alvo definido)"
         - "WORKFLOW-TECHNICAL-ANALYSIS (análises e diagnósticos diretos)"
         - "WORKFLOW-GOVERNANCE-MAINTENANCE (auditoria e higiene)"
+        - "WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION (CVEs, alertas SCA e bumps de dependência)"
+        - "WORKFLOW-RELEASE-READINESS (pre-flight de deploy, auditoria de release e DDL)"
       loop_maximo: 5
       retorno_obrigatorio: agent-router
 
