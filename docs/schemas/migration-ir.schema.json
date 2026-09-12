@@ -1,0 +1,175 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deep-agents-copilot/schemas/migration-ir.schema.json",
+  "title": "Canonical Migration Intermediate Representation (IR)",
+  "description": "Schema canônico neutro para representação semântica de módulos legados em processos de migração agnóstica de frameworks.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "metadata",
+    "entryPoints",
+    "domainEntities",
+    "businessRules",
+    "characterizationVectors"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["migrationId", "timestamp", "sourceStack", "targetStack", "moduleName"],
+      "properties": {
+        "migrationId": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "sourceStack": {
+          "type": "object",
+          "required": ["domain", "name", "catalogRef"],
+          "properties": {
+            "domain": { "type": "string", "enum": ["backend", "frontend", "database"] },
+            "name": { "type": "string" },
+            "version": { "type": "string" },
+            "catalogRef": { "type": "string" }
+          }
+        },
+        "targetStack": {
+          "type": "object",
+          "required": ["domain", "name", "catalogRef"],
+          "properties": {
+            "domain": { "type": "string", "enum": ["backend", "frontend", "database"] },
+            "name": { "type": "string" },
+            "version": { "type": "string" },
+            "catalogRef": { "type": "string" }
+          }
+        },
+        "moduleName": { "type": "string" }
+      }
+    },
+    "entryPoints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "type", "inputSchema", "outputSchema", "security"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "type": { "type": "string", "enum": ["http_endpoint", "rpc_service", "message_listener", "batch_job"] },
+          "route": {
+            "type": "object",
+            "required": ["path", "method"],
+            "properties": {
+              "path": { "type": "string" },
+              "method": { "type": "string", "enum": ["GET", "POST", "PUT", "DELETE", "PATCH"] }
+            }
+          },
+          "inputSchema": { "type": "object" },
+          "outputSchema": { "type": "object" },
+          "errorSchemas": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["statusCode", "errorCode", "schema"],
+              "properties": {
+                "statusCode": { "type": "integer" },
+                "errorCode": { "type": "string" },
+                "schema": { "type": "object" }
+              }
+            }
+          },
+          "security": {
+            "type": "object",
+            "required": ["authenticated"],
+            "properties": {
+              "authenticated": { "type": "boolean" },
+              "roles": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        }
+      }
+    },
+    "domainEntities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "fields", "relationships"],
+        "properties": {
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["name", "type", "required"],
+              "properties": {
+                "name": { "type": "string" },
+                "type": { "type": "string", "enum": ["string", "integer", "decimal", "boolean", "date", "uuid", "binary"] },
+                "required": { "type": "boolean" },
+                "primaryKey": { "type": "boolean" },
+                "unique": { "type": "boolean" }
+              }
+            }
+          },
+          "relationships": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["type", "targetEntity", "foreignKeyField"],
+              "properties": {
+                "type": { "type": "string", "enum": ["one_to_many", "many_to_one", "many_to_many", "one_to_one"] },
+                "targetEntity": { "type": "string" },
+                "foreignKeyField": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "businessRules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["ruleId", "title", "description", "category", "preconditions", "actions", "postconditions"],
+        "properties": {
+          "ruleId": { "type": "string" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "category": { "type": "string", "enum": ["validation", "calculation", "state_transition", "permission"] },
+          "preconditions": { "type": "array", "items": { "type": "string" } },
+          "actions": { "type": "array", "items": { "type": "string" } },
+          "postconditions": { "type": "array", "items": { "type": "string" } },
+          "associatedEntryPoints": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "characterizationVectors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["vectorId", "entryPointId", "scenario", "inputPayload", "expectedOutputPayload", "expectedStatusCode"],
+        "properties": {
+          "vectorId": { "type": "string" },
+          "entryPointId": { "type": "string" },
+          "description": { "type": "string" },
+          "scenario": { "type": "string" },
+          "inputPayload": { "type": "object" },
+          "mockDependencies": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["targetService", "method", "returns"],
+              "properties": {
+                "targetService": { "type": "string" },
+                "method": { "type": "string" },
+                "returns": {}
+              }
+            }
+          },
+          "expectedOutputPayload": { "type": "object" },
+          "expectedStatusCode": { "type": "integer" }
+        }
+      }
+    }
+  }
+}
+

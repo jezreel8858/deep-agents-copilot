@@ -98,6 +98,7 @@ Próximo passo mínimo:
 - [`catalog.yaml`](catalog.yaml)
 - [`../../CLAUDE.md`](../../CLAUDE.md)
 - [`../copilot-instructions.md`](../copilot-instructions.md)
+- [`../skills/mermaid-diagrams/SKILL.md`](../skills/mermaid-diagrams/SKILL.md) | Visualização de fluxos e dependências
 - [`../skills/context-mode/SKILL.md`](../skills/context-mode/SKILL.md) — coleta eficiente de escopo/cobertura atual.
 - [`../skills/test-coverage-governance/SKILL.md`](../skills/test-coverage-governance/SKILL.md) — priorização por risco e métricas de cobertura.
 - Skill da stack alvo (`test-implementation-backend` | `test-implementation-frontend` | `test-implementation-spring-boot` | `test-implementation-angular-vitest` | `test-implementation-angular-jasmine` | `test-implementation-python`) — carregar conforme stack identificada.
