@@ -163,9 +163,26 @@ O motor de migração opera através de 6 fases estritas e determinísticas, ger
 | **Fase 0** | **Pre-Flight Stack Governance Check** | `@tech-solution-architect` | Solicitação de migração recebida | Ambas as stacks (origem e destino) possuem `.github/agents/<camada>/<stack>/` completo com supervisor, catalog e 7 especialistas |
 | **Fase 1** | **Characterization & Rule Extraction** | `source-stack-arch-advisor` + `@business-rules-extractor` | Pré-voo aprovado | Vetores Golden Master gerados e matriz de regras documentada em `docs/business-rules/` |
 | **Fase 2** | **Semantic IR Generation** | `source-stack-arch-advisor` | Fase 1 concluída | Arquivo `migration-ir.json` gerado e 100% válido contra o JSON Schema canônico |
-| **Fase 3** | **Idiomatic Code Emission** | `target-stack-feature-developer` | IR validada | Código moderno implementado sob TDD, com diffs cirúrgicos em lote (R-046) e zero menção a classes legadas |
+| **Fase 3a** | **Target Project Bootstrapping (Human-in-the-Loop)** | `target-stack-feature-developer` | IR validada & projeto alvo novo | Decisões de build/runtime (Maven vs Gradle, Java LTS) confirmadas pelo usuário via `ask_questions` e esqueleto base inicializado |
+| **Fase 3b** | **Idiomatic Code Emission** | `target-stack-feature-developer` | Projeto alvo inicializado/existente | Código moderno implementado sob TDD a partir da IR, com diffs cirúrgicos em lote (R-046) e zero menção a classes legadas |
 | **Fase 4** | **Dual-Verification Parity Gate** | `target-stack-test-fixer` + `@runtime-verifier` | Código emitido | 100% dos testes Golden Master passando verdes e 100% das regras comprovadas por asserções |
 | **Fase 5** | **Quality Gate & PR Readiness** | `@code-review` + `@security-reviewer` + `@pr-gatekeeper` | Paridade comprovada | Build limpo, zero vulnerabilidades OWASP, changelog e PR estruturado |
+
+### 3.1 Sub-rotina Fase 3a: Target Project Bootstrapping (Interactive Human Gate)
+
+Quando o destino da migração for um novo repositório ou módulo autônomo (Cenário Green-Field), o motor de migração suspende a emissão direta de código de domínio e aciona a sub-rotina interativa de inicialização:
+
+1. **Consulta Obrigatória via `ask_questions` (R-027 / RNF-005):**
+   O especialista da stack de destino (`target-stack-feature-developer`) submete as decisões estruturais ao desenvolvedor:
+   - **Ferramenta de Build:** Ex.: `Maven (pom.xml)` vs `Gradle (Kotlin DSL / Groovy)` para Spring Boot; `npm` vs `pnpm` vs `yarn` para Angular; `uv` vs `poetry` vs `pip` para Python.
+   - **Versão LTS de Runtime:** Ex.: `Java 21 LTS` vs `Java 25 LTS`; `Node 20 LTS` vs `Node 22 LTS`; `Python 3.11` vs `Python 3.12`.
+   - **Formato de Packaging:** Ex.: `Jar (Cloud-native)` vs `War (Traditional Application Server)`.
+   - **Metadados do Projeto:** `groupId`, `artifactId` e namespace raiz de pacotes.
+2. **Scaffolding Oficial da Stack:**
+   Apenas após o recebimento das respostas do usuário, o agente executa a inicialização oficial (ex.: via Spring Initializr CLI/API, Maven Archetype ou Angular CLI no sandbox).
+3. **Registro de Governança Local (R-043):**
+   O novo projeto é registrado no overlay local `.github/projects.local.yaml` via `/add-project-context`, gerando o respectivo adapter em `.github/instructions/local/<novo-projeto>.instructions.md` sem poluir o repositório de governança compartilhado.
+
 
 ### Circuit Breakers e Proteções de Rollback (R-050.2)
 1. **Breaker de Governança (Fase 0):** Se a stack de origem ou destino não estiver no projeto, a migração é **imediatamente suspensa**, acionando `@governance-factory` para criar a stack faltante.

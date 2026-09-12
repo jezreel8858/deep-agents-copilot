@@ -235,3 +235,43 @@ def test_dual_verification_contract_evaluation():
     assert fail_rules is False
     assert "Cobertura de regras de negócio" in msg_rules
 
+
+
+# ── Testes de Bootstrapping Interativo (REQ-007 / RNF-005) ─────────────────
+
+def test_target_project_bootstrapping_requires_human_confirmation():
+    """Valida que para projetos novos (green-field), decisões de build e runtime exigem aprovação via ask_questions"""
+    def evaluate_bootstrapping_flow(is_new_project: bool, user_confirmed_options: dict | None) -> tuple[bool, str]:
+        if not is_new_project:
+            return True, "Projeto existente: prosseguir diretamente para emissão de código a partir da IR."
+        
+        if not user_confirmed_options:
+            return False, "Violação RNF-005: Decisões de scaffolding exigem confirmação explícita do desenvolvedor via ask_questions."
+        
+        required_keys = {"build_tool", "runtime_version"}
+        if not required_keys.issubset(user_confirmed_options.keys()):
+            return False, f"Opções de bootstrapping incompletas: {required_keys - set(user_confirmed_options.keys())}"
+        
+        return True, f"Scaffolding oficial aprovado com {user_confirmed_options['build_tool']} e runtime {user_confirmed_options['runtime_version']}."
+
+    # Cenário 1: Tentativa de gerar projeto novo sem confirmação do usuário (deve falhar)
+    ok_unconfirmed, msg_unconfirmed = evaluate_bootstrapping_flow(is_new_project=True, user_confirmed_options=None)
+    assert ok_unconfirmed is False
+    assert "Violação RNF-005" in msg_unconfirmed
+
+    # Cenário 2: Usuário escolhe explicitamente Maven e Java 21 (deve passar)
+    confirmed_maven = {"build_tool": "maven", "runtime_version": "java-21"}
+    ok_maven, msg_maven = evaluate_bootstrapping_flow(is_new_project=True, user_confirmed_options=confirmed_maven)
+    assert ok_maven is True
+    assert "maven" in msg_maven
+
+    # Cenário 3: Usuário escolhe explicitamente Gradle e Java 25 (deve passar)
+    confirmed_gradle = {"build_tool": "gradle", "runtime_version": "java-25"}
+    ok_gradle, msg_gradle = evaluate_bootstrapping_flow(is_new_project=True, user_confirmed_options=confirmed_gradle)
+    assert ok_gradle is True
+    assert "gradle" in msg_gradle
+
+    # Cenário 4: Projeto existente (in-place) dispensa novo bootstrapping
+    ok_existing, msg_existing = evaluate_bootstrapping_flow(is_new_project=False, user_confirmed_options=None)
+    assert ok_existing is True
+    assert "Projeto existente" in msg_existing
