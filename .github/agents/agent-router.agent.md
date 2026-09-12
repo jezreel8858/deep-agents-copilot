@@ -155,6 +155,10 @@ Você é o roteador obrigatório do fluxo agent-first no GitHub Copilot. Seu tra
 │            [Bypass de @prompt-structuring — despachar direto para o especialista analítico correspondente]
 ├─ É AUDITORIA/MANUTENÇÃO DE GOVERNANÇA (smells de agents/skills/prompts, higiene de repositório)?
 │  └─ Sim -> ⚡ FAST-PATH IMEDIATO → WORKFLOW-GOVERNANCE-MAINTENANCE (@agent-auditor / @repo-hygiene-auditor)
+├─ É ALERTA DE VULNERABILIDADE (CVE, Snyk, Trivy) ou BUMP DE DEPENDÊNCIA?
+│  └─ Sim -> ⚡ FAST-PATH IMEDIATO → WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION (@security-reviewer)
+├─ É PRE-FLIGHT DE RELEASE, PRONTIDÃO DE DEPLOY OU AUDITORIA DE ENTREGA?
+│  └─ Sim -> ⚡ FAST-PATH IMEDIATO → WORKFLOW-RELEASE-READINESS (@tech-solution-architect)
 └─ Não (é solicitação de nova feature, pedido ambíguo ou aberto) -> continuar para PASSO 0.5
 *Resolução de Projeto-Alvo (R-050.3)*: Em qualquer workflow despachado, se a solicitação referenciar projeto registrado em .github/projects.local.yaml (ex.: "[PROJETO-ALVO]" ou "meu-projeto-app"), o router DEVE incluir no payload 'workflow_tracking.projeto_alvo' com id, root_path e adapter_ref, garantindo isolamento total do workspace de aplicação.
 
@@ -298,7 +302,7 @@ Pedido recebido (já refinado por @prompt-structuring ou via Fast-Path)?
 ```markdown
 Agente Ativo: <@agent delegado nesta resposta — auditoria de R-042>
 Transição: <"Nova triagem (1º turno)" | "<agent-anterior> → <agent-atual> (motivo: deriva_de_intencao)" | "Sem mudança — mesmo agent do turno anterior">
-Workflow: <WORKFLOW-BUG-FIX|WORKFLOW-REFACTORING|WORKFLOW-TECHNICAL-ANALYSIS|WORKFLOW-FEATURE-DEVELOPMENT|WORKFLOW-GOVERNANCE-MAINTENANCE>
+Workflow: <WORKFLOW-BUG-FIX|WORKFLOW-REFACTORING|WORKFLOW-TECHNICAL-ANALYSIS|WORKFLOW-FEATURE-DEVELOPMENT|WORKFLOW-GOVERNANCE-MAINTENANCE|WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION|WORKFLOW-FRAMEWORK-MIGRATION|WORKFLOW-RELEASE-READINESS>
 Etapa do Workflow: <1..N — nome da etapa inicial conforme workflows.md>
 Rota: <bug_fix|environment_check|root_cause_analysis|code_review|security_review|performance_review|compliance|devops|code_style|requirements|feature_planning|code_summarization|code_knowledge_graph|specialist_advisory|specialist_implementation|database_migration|test_strategy|test_implementation|business_rules|refactor_plan|refactor_execution|pr_preparation|documentation|governance|memory_management|impact_analysis|deep_search|integration_fallback>
 [Model] Delegando para @<agent> — modelo solicitado: <model-alvo> (.github/agents/catalog.yaml)

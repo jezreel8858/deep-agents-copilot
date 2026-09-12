@@ -387,3 +387,59 @@ def test_workflow_governance_maintenance_edge_scenarios_and_state_bag(routing_gr
     etapa4 = next((e for e in estados if e["etapa"] == 4), {})
     assert "pytest" in str(etapa4.get("validacao_automatizada", "")), "Workflow 5 deve ter validação automatizada na etapa 4"
 
+
+
+def test_workflow_dependency_remediation_edge_scenarios_and_state_bag(routing_graph):
+    """Valida que WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION cobre triagem SCA, blast radius,
+    bump de manifesto, adaptação de breaking changes e Typed State Bag."""
+    content_wf = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    assert "WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION" in content_wf
+    assert "Triagem de Vulnerabilidade & Advisory" in content_wf
+    assert "Mapeamento de Blast Radius da Dependência" in content_wf
+    assert "tipo_remediacao:" in content_wf, "workflows.md deve definir Typed State Bag do Workflow 6"
+
+    wf6 = next((wf for wf in routing_graph.get("workflows", []) if wf["id"] == "WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION"), None)
+    assert wf6 is not None, "WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION deve existir no routing-graph.yaml"
+    estados = wf6.get("estados", [])
+    etapa1 = next((e for e in estados if e["etapa"] == 1), {})
+    assert "security-reviewer" in etapa1.get("agent", "")
+    etapa2 = next((e for e in estados if e["etapa"] == 2), {})
+    assert "code-knowledge-graph" in etapa2.get("agent", "")
+
+
+def test_workflow_framework_migration_edge_scenarios_and_state_bag(routing_graph):
+    """Valida que WORKFLOW-FRAMEWORK-MIGRATION cobre avaliação de compatibilidade pre-flight,
+    decomposição em fases, codemods automatizados, testes de paridade e State Bag."""
+    content_wf = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    assert "WORKFLOW-FRAMEWORK-MIGRATION" in content_wf
+    assert "Pre-Flight Compatibility Assessment" in content_wf
+    assert "Migration Phasing & Blueprint" in content_wf
+    assert "stack_migracao:" in content_wf, "workflows.md deve definir Typed State Bag do Workflow 7"
+
+    wf7 = next((wf for wf in routing_graph.get("workflows", []) if wf["id"] == "WORKFLOW-FRAMEWORK-MIGRATION"), None)
+    assert wf7 is not None, "WORKFLOW-FRAMEWORK-MIGRATION deve existir no routing-graph.yaml"
+    estados = wf7.get("estados", [])
+    etapa1 = next((e for e in estados if e["etapa"] == 1), {})
+    assert "tech-solution-architect" in etapa1.get("agent", "")
+    etapa2 = next((e for e in estados if e["etapa"] == 2), {})
+    assert "aprovacao_fases_migracao" in str(etapa2.get("checkpoint_humano", ""))
+
+
+def test_workflow_release_readiness_edge_scenarios_and_state_bag(routing_graph):
+    """Valida que WORKFLOW-RELEASE-READINESS cobre auditoria de contratos OpenAPI, rollout DDL
+    com rollback testado, varredura de segredos, packaging semântico e State Bag."""
+    content_wf = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    assert "WORKFLOW-RELEASE-READINESS" in content_wf
+    assert "Contract & API Compatibility Audit" in content_wf
+    assert "Database Rollout Pre-Flight" in content_wf
+    assert "release_versao:" in content_wf, "workflows.md deve definir Typed State Bag do Workflow 8"
+
+    wf8 = next((wf for wf in routing_graph.get("workflows", []) if wf["id"] == "WORKFLOW-RELEASE-READINESS"), None)
+    assert wf8 is not None, "WORKFLOW-RELEASE-READINESS deve existir no routing-graph.yaml"
+    estados = wf8.get("estados", [])
+    etapa1 = next((e for e in estados if e["etapa"] == 1), {})
+    assert "tech-solution-architect" in etapa1.get("agent", "")
+    etapa2 = next((e for e in estados if e["etapa"] == 2), {})
+    assert "database-specialist" in etapa2.get("agent", "")
+    etapa4 = next((e for e in estados if e["etapa"] == 4), {})
+    assert "pr-gatekeeper" in etapa4.get("agent", "")

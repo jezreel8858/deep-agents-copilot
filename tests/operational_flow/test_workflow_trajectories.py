@@ -231,6 +231,6 @@ def test_workflow_and_state_coverage_thresholds(casos_workflows, routing_graph):
     sc = cov["state_coverage"]
     ap = cov["agent_participation"]
 
-    assert wc["covered"] == wc["total"] == 5, f"Cobertura de workflows incompleta: {wc}"
+    assert wc["covered"] == wc["total"] == 8, f"Cobertura de workflows incompleta: {wc}"
     assert sc["percentage"] >= 85.0, f"Cobertura de etapas/estados abaixo de 85%: {sc['percentage']}%"
     assert ap["total_exercised"] >= 15, f"Menos de 15 agentes exercitados: {ap['total_exercised']}"

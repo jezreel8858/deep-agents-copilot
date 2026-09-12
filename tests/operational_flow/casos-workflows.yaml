@@ -274,6 +274,180 @@ cenarios:
         proximos_permitidos: ["pr-gatekeeper"]
 
   # ─────────────────────────────────────────────────────────────
+  # WORKFLOW 6 — DEPENDENCY & VULNERABILITY REMEDIATION
+  # ─────────────────────────────────────────────────────────────
+  - id: "WF-DEP-001"
+    nome: "Remediação de CVE Crítica com Bump de Manifesto e Adaptação de Breaking Changes"
+    workflow: "WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION"
+    tipo: "fast_path"
+    projeto_alvo: "[PROJETO-ALVO]"
+    input_inicial: "Alerta Snyk: vulnerabilidade crítica CVE-2026-1122 em pacote npm, atualizar para versão corrigida"
+    trajetoria:
+      - etapa: 1
+        nome_etapa: "Triagem de Vulnerabilidade & Advisory"
+        agente: "security-reviewer"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: security-reviewer"
+        output_esperado:
+          - "Versão Corrigida Identificada"
+          - "Severidade CVSS"
+        proximos_permitidos: ["code-knowledge-graph"]
+      - etapa: 2
+        nome_etapa: "Blast Radius & Mapeamento de Consumidores"
+        agente: "code-knowledge-graph"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: code-knowledge-graph"
+        output_esperado:
+          - "Mapeamento de Importações e Callers"
+        proximos_permitidos: ["angular-feature-developer", "spring-boot-feature-developer"]
+      - etapa: 3
+        nome_etapa: "Bump de Manifesto & Sincronização de Lockfile"
+        agente: "angular-feature-developer"
+        invariantes:
+          proibir_mutacao: false
+          exigir_banner: "Agente Ativo: angular-feature-developer"
+        output_esperado:
+          - "package.json atualizado"
+          - "Lockfile sincronizado"
+        proximos_permitidos: ["angular-bug-fixer"]
+      - etapa: 4
+        nome_etapa: "Adaptação de Breaking Changes"
+        agente: "angular-bug-fixer"
+        invariantes:
+          proibir_mutacao: false
+          exigir_banner: "Agente Ativo: angular-bug-fixer"
+        output_esperado:
+          - "Assinatura de Método Atualizada"
+          - "Compilação Limpa"
+        proximos_permitidos: ["runtime-verifier"]
+      - etapa: 5
+        nome_etapa: "Regressão e Quality Gate SCA"
+        agente: "runtime-verifier"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: runtime-verifier"
+        output_esperado:
+          - "100% dos testes passando"
+          - "Vulnerabilidade Sanada"
+        proximos_permitidos: ["pr-gatekeeper"]
+
+  # ─────────────────────────────────────────────────────────────
+  # WORKFLOW 7 — FRAMEWORK MIGRATION
+  # ─────────────────────────────────────────────────────────────
+  - id: "WF-MIG-001"
+    nome: "Migração de Major Version de Framework com Codemods e Paridade Funcional"
+    workflow: "WORKFLOW-FRAMEWORK-MIGRATION"
+    tipo: "standard"
+    projeto_alvo: "[PROJETO-ALVO]"
+    input_inicial: "Migrar aplicação Angular de componentes modulares para Standalone e Signals"
+    trajetoria:
+      - etapa: 1
+        nome_etapa: "Pre-Flight Compatibility Assessment"
+        agente: "tech-solution-architect"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: tech-solution-architect"
+        output_esperado:
+          - "Inventário de Compatibilidade de Bibliotecas"
+        proximos_permitidos: ["tech-solution-architect"]
+      - etapa: 2
+        nome_etapa: "Migration Phasing & Blueprint"
+        agente: "tech-solution-architect"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: tech-solution-architect"
+        output_esperado:
+          - "Plano de Migração em Fases Entregáveis"
+        proximos_permitidos: ["angular-feature-developer", "spring-boot-feature-developer"]
+      - etapa: 3
+        nome_etapa: "Codemod & Transformação em Lote"
+        agente: "angular-feature-developer"
+        invariantes:
+          proibir_mutacao: false
+          exigir_banner: "Agente Ativo: angular-feature-developer"
+        output_esperado:
+          - "Transformação de Sintaxe Aplicada no Sandbox"
+        proximos_permitidos: ["angular-unit-test-writer"]
+      - etapa: 4
+        nome_etapa: "Refinamento & Paridade Funcional"
+        agente: "angular-unit-test-writer"
+        invariantes:
+          proibir_mutacao: false
+          exigir_banner: "Agente Ativo: angular-unit-test-writer"
+        output_esperado:
+          - "Testes de Paridade Verdes"
+        proximos_permitidos: ["runtime-verifier"]
+      - etapa: 5
+        nome_etapa: "Baseline & Quality Gate de Migração"
+        agente: "runtime-verifier"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: runtime-verifier"
+        output_esperado:
+          - "Build de Produção Limpo"
+          - "Zero Regressões Detectadas"
+        proximos_permitidos: ["pr-gatekeeper"]
+
+  # ─────────────────────────────────────────────────────────────
+  # WORKFLOW 8 — RELEASE READINESS
+  # ─────────────────────────────────────────────────────────────
+  - id: "WF-REL-001"
+    nome: "Pre-Flight Completo de Release: Contratos, Rollback DDL, Segurança e Changelog"
+    workflow: "WORKFLOW-RELEASE-READINESS"
+    tipo: "fast_path"
+    projeto_alvo: "[PROJETO-ALVO]"
+    input_inicial: "Preparar e auditar release v2.8.0 para deploy em produção"
+    trajetoria:
+      - etapa: 1
+        nome_etapa: "Contract & API Compatibility Audit"
+        agente: "tech-solution-architect"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: tech-solution-architect"
+        output_esperado:
+          - "Contratos OpenAPI 100% Retrocompatíveis"
+        proximos_permitidos: ["database-specialist"]
+      - etapa: 2
+        nome_etapa: "Database Rollout Pre-Flight"
+        agente: "database-specialist"
+        invariantes:
+          proibir_mutacao: false
+          exigir_banner: "Agente Ativo: database-specialist"
+        output_esperado:
+          - "DDL Idempotente e Reversível com Rollback"
+        proximos_permitidos: ["security-reviewer"]
+      - etapa: 3
+        nome_etapa: "Security, Secrets & Hygiene Scan"
+        agente: "security-reviewer"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: security-reviewer"
+        output_esperado:
+          - "Zero Segredos ou Variáveis .env Expostas"
+        proximos_permitidos: ["pr-gatekeeper"]
+      - etapa: 4
+        nome_etapa: "Changelog, SemVer & Release Packaging"
+        agente: "pr-gatekeeper"
+        invariantes:
+          proibir_mutacao: false
+          exigir_banner: "Agente Ativo: pr-gatekeeper"
+        output_esperado:
+          - "CHANGELOG.md Atualizado"
+          - "Tag SemVer Consistente"
+        proximos_permitidos: ["code-review"]
+      - etapa: 5
+        nome_etapa: "Release Verdict & Executive Summary"
+        agente: "code-review"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: code-review"
+        output_esperado:
+          - "Matriz de Risco Executiva e Decisão Go/No-Go"
+        proximos_permitidos: ["pr-gatekeeper"]
+
+  # ─────────────────────────────────────────────────────────────
   # EDGE CASES & PROTOCOLOS DE SEGURANÇA
   # ─────────────────────────────────────────────────────────────
   - id: "WF-EDGE-INTENT-DRIFT"

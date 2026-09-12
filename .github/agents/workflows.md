@@ -51,6 +51,9 @@ flowchart TD
     IntentEval -- "Refatoração Estrutural" --> WF2["⚡ WORKFLOW-REFACTORING\nFast-Path direto para @refactor-planner"]
     IntentEval -- "Análise Técnica / Grafo / Segurança" --> WF3["⚡ WORKFLOW-TECHNICAL-ANALYSIS\nFast-Path direto para Especialista"]
     IntentEval -- "Governança / Auditoria de Agents" --> WF5["⚡ WORKFLOW-GOVERNANCE-MAINTENANCE\nFast-Path direto para @agent-auditor"]
+    IntentEval -- "CVE / Atualizar Dependência" --> WF6["⚡ WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION\nFast-Path direto para @security-reviewer"]
+    IntentEval -- "Pre-Flight Release / Deploy" --> WF8["⚡ WORKFLOW-RELEASE-READINESS\nFast-Path direto para @tech-solution-architect"]
+    IntentEval -- "Migração de Framework / Major Version" --> WF7["🚀 WORKFLOW-FRAMEWORK-MIGRATION\nDireto para @tech-solution-architect"]
     IntentEval -- "Feature Nova / Pedido Ambíguo" --> Structuring["@prompt-structuring\n(R-041 — loop máx. 5x)"]
 
     Structuring --> RouterRet["@agent-router\n(Retomada com Prompt Refinado)"]
@@ -59,7 +62,7 @@ flowchart TD
 
 ---
 
-## 3. Especificação dos 5 Workflows Canônicos
+## 3. Especificação dos Workflows Canônicos e de Ciclo de Vida (8 Workflows Determinísticos)
 
 ---
 
@@ -489,6 +492,186 @@ workflow_state:
   status_aprovacao_humana: "aprovado"
   quality_gate_tier1: "100_passando"
   tentativas_autofix: 0  # teto: 3 (Estado 4b)
+```
+
+---
+
+### 3.6 WORKFLOW 6: `WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION` (Remediação de Vulnerabilidades, CVEs e Atualização de Dependências)
+
+- **Objetivo**: Detectar, isolar e sanar vulnerabilidades (CVE/SCA) em bibliotecas de terceiros ou executar atualização programada de dependências, mapeando o blast radius no código-fonte, aplicando bumps de versão em arquivos de manifesto (Maven `pom.xml`, NPM `package.json`, Python `pyproject.toml`) e resolvendo cirurgicamente breaking changes de APIs atualizadas com suíte de testes 100% verde.
+- **Gatilhos de Fast-Path**: `"atualizar dependência"`, `"atualizar dependencias"`, `"atualizar pacote"`, `"remediar cve"`, `"vulnerabilidade snyk"`, `"trivy alert"`, `"dependabot"`, `"npm audit fix"`, `"upgrade lib"`, `"cve remediation"`.
+- **Política R-041**: **Bypass Total** de `@prompt-structuring`. O alerta técnico de SCA ou pedido de bump é despachado imediatamente.
+
+```mermaid
+flowchart TD
+    Start(["⚡ Solicitação de Atualização de Dependência / Alerta CVE (Fast-Path)"]) --> Triage["<b>1. Triagem de Vulnerabilidade & Advisory</b><br/>Agente: @security-reviewer<br/>Ação: Análise de CVE, CVSS, changelog e versão corrigida"]
+
+    Triage --> Blast["<b>2. Blast Radius & Consumidores</b><br/>Agente: @code-knowledge-graph (R-045)<br/>Ação: Mapeia classes/arquivos que importam símbolos da lib"]
+
+    Blast --> BumpManifest["<b>3. Bump de Manifesto & Lockfile</b><br/>Agente: specialist-developer<br/>Ação: Edição de package.json/pom.xml e geração de lockfile no sandbox"]
+
+    BumpManifest --> CheckCompile{"Build & Compilação<br/>passou sem erros?"}
+    CheckCompile -- "Sim" --> RegressionTest["<b>5. Verificação de Regressão & Quality Gate SCA</b><br/>Agente: runtime-verifier + @code-review + @security-reviewer<br/>Ação: 100% testes verdes e novo scan SCA limpo"]
+    CheckCompile -- "Não (Breaking Change)" --> AdaptBreak["<b>4. Adaptação de Breaking Changes</b><br/>Agente: specialist-bug-fixer<br/>Ação: Ajuste cirúrgico em chamadas de API descontinuadas"]
+
+    AdaptBreak --> TestFixLoop["<b>4a. Test Fix Loop (máx 3x)</b><br/>Agente: specialist-test-fixer<br/>Ação: Correção de testes quebrados pela nova versão da lib"]
+    TestFixLoop --> CheckPass{"Testes passaram<br/>dentro do teto 3x?"}
+    CheckPass -- "Sim" --> RegressionTest
+    CheckPass -- "Não" --> Rollback["<b>4b. Circuit Breaker & Rollback</b><br/>Agente: specialist-developer<br/>Ação: Reversão atômica do manifesto + Alerta de incompatibilidade humana"]
+
+    RegressionTest --> EndDone(["✅ Dependência Atualizada & Vulnerabilidade Sanada"])
+    Rollback --> EndFail(["🛑 Atualização Bloqueada por Incompatibilidade Crítica"])
+```
+
+#### Cadeia Sequencial e Papéis:
+1. **Estado 1 — Triagem de Vulnerabilidade & Advisory (`@security-reviewer`)**:
+   - *Entrada*: Alerta SCA (Snyk/Trivy/Dependabot/NPM Audit), CVE ID ou pedido de upgrade de dependência.
+   - *Saída*: Versão atual vs. versão mínima corrigida, severidade (CVSS), escopo do advisory e identificação de breaking changes conhecidas.
+   - *Sub-rotina 1a*: Se o advisory exigir pesquisa profunda de changelogs ou repositórios externos, invoca `@deep-search` como sub-rotina.
+2. **Estado 2 — Mapeamento de Blast Radius da Dependência (`@code-knowledge-graph`)**:
+   - *Entrada*: Nome da biblioteca/pacote e símbolos afetados.
+   - *Ação*: Consulta determinística via `@optave/codegraph` para mapear todos os arquivos da aplicação que importam ou instanciam classes da dependência. Proibido varredura manual (R-045).
+   - *Saída*: Lista de classes/arquivos consumidores e callers diretos.
+3. **Estado 3 — Bump de Manifesto & Sincronização de Lockfile (`specialist-developer`)**:
+   - *Entrada*: Arquivo de manifesto (`package.json`, `pom.xml`, etc.) e nova versão.
+   - *Ação*: Edição cirúrgica do manifesto e regeneração do lockfile via terminal não-interativo sob `terminal-governance` (`npm install --package-lock-only`, `mvn dependency:resolve`).
+   - *Saída*: Manifesto e lockfile sincronizados.
+4. **Estado 4 — Adaptação de Breaking Changes & Compilação (`specialist-bug-fixer`)**:
+   - *Entrada*: Código da aplicação e eventuais erros de compilação ou incompatibilidade de assinatura de método da nova versão da lib.
+   - *Ação*: Diffs cirúrgicos mínimos adaptando o código para a nova API da biblioteca.
+   - *Sub-rotina 4a (Test Fix Loop)*: Até 3 tentativas com `specialist-test-fixer` se os testes quebrarem.
+   - *Estado 4b (Circuit Breaker & Rollback)*: Se após 3 tentativas o build ou testes não passarem, o especialista reverte atomicamente as alterações no manifesto e escala para decisão humana via `ask_questions`.
+5. **Estado 5 — Verificação de Regressão & Quality Gate SCA (`runtime-verifier` + `@code-review` + `@security-reviewer`)**:
+   - *Entrada*: Build completo e suíte de testes.
+   - *Saída*: Validação de que 100% dos testes passam, linter limpo, nova varredura SCA sem CVEs e preparação de PR via `@pr-gatekeeper`.
+
+#### Typed State Bag (`workflow_state`):
+```yaml
+workflow_state:
+  tipo_remediacao: "cve_vulnerability | scheduled_upgrade | transitive_conflict"
+  cve_id: "CVE-2026-XXXX"
+  severidade: "CRITICAL | HIGH | MEDIUM | LOW"
+  pacote_alvo: "<nome-do-pacote>"
+  versao_anterior: "1.2.0"
+  versao_alvo: "1.4.2"
+  arquivos_manifesto:
+    - "package.json"
+    - "package-lock.json"
+  blast_radius_consumidores:
+    - "<caminho/arquivo.ext:linha>"
+  breaking_changes_detectadas: false
+  status_scan_pos_fix: "vulnerabilidade_sanada | regressao_detectada"
+```
+
+---
+
+### 3.7 WORKFLOW 7: `WORKFLOW-FRAMEWORK-MIGRATION` (Migração de Framework, Plataforma ou Major Version)
+
+- **Objetivo**: Conduzir elevações estruturais de versão maior de framework ou plataforma (ex.: Angular standalone/signals, Spring Boot 2→3, Java 17→21/25, EJB→Spring) de forma previsível e particionada em fases entregáveis, combinando codemods automatizados, testes de paridade funcional e checkpoints humanos obrigatórios.
+- **Gatilhos**: `"migrar framework"`, `"migração angular"`, `"migrar spring boot"`, `"upgrade major"`, `"modernizar stack"`, `"migrar para standalone"`, `"migrar para signals"`, `"migrar para virtual threads"`.
+- **Política R-041**: **Bypass** caso a meta e a stack estejam claras; se o pedido for ambíguo ("modernize nosso sistema"), aciona `@prompt-structuring`.
+
+```mermaid
+flowchart TD
+    Start(["🚀 Solicitação de Migração de Framework / Major Version"]) --> PreFlight["<b>1. Pre-Flight Compatibility Assessment</b><br/>Agente: @tech-solution-architect + @code-knowledge-graph<br/>Ação: Inventário de compatibilidade de libs, flags e APIs obsoletas"]
+
+    PreFlight --> PlanPhasing["<b>2. Migration Phasing & Blueprint</b><br/>Agente: @tech-solution-architect<br/>Ação: Decomposição em fases autônomas entregáveis"]
+
+    PlanPhasing --> PhaseGate{"<b>2b. Checkpoint Humano de Fases</b><br/>Aprovação obrigatória via ask_questions"}
+    PhaseGate -- "Revisar" --> PlanPhasing
+    PhaseGate -- "Aprovado" --> BatchCodemod["<b>3. Codemod & Transformação em Lote</b><br/>Agente: specialist-developer<br/>Ação: Execução de codemods oficiais (ng update / OpenRewrite) no sandbox"]
+
+    BatchCodemod --> ParityRefine["<b>4. Refinamento & Paridade Funcional</b><br/>Agente: specialist-developer + specialist-unit-test-writer<br/>Ação: Adoção de convenções modernas da stack e testes de paridade"]
+
+    ParityRefine --> QualityGateMig["<b>5. Baseline & Quality Gate de Migração</b><br/>Agente: runtime-verifier + @code-review<br/>Ação: 100% testes verdes, linter limpo e PR semântico"]
+
+    QualityGateMig --> CheckMig{"Todas as fases<br/>concluídas?"}
+    CheckMig -- "Sim" --> EndMigDone(["✅ Migração de Framework Concluída com Sucesso"])
+    CheckMig -- "Não (Próxima Fase)" --> BatchCodemod
+```
+
+#### Cadeia Sequencial e Papéis:
+1. **Estado 1 — Pre-Flight Compatibility Assessment (`@tech-solution-architect`)**:
+   - *Ação*: Análise do inventário de compatibilidade: bibliotecas de terceiros, flags de compilação, descontinuações e dependências nativas. Coleta de evidências via `@code-knowledge-graph`.
+2. **Estado 2 — Migration Phasing & Blueprint (`@tech-solution-architect`)**:
+   - *Ação*: Decomposição da migração em fases entregáveis autônomas (*Phased Migration* — ex.: Fase 1: Sintaxe de controle; Fase 2: Standalone; Fase 3: Reatividade).
+   - *Checkpoint Humano (Estado 2b)*: Apresentação da estratégia e aprovação obrigatória do plano de fases via `ask_questions`.
+3. **Estado 3 — Codemod & Transformação em Lote (`specialist-developer`)**:
+   - *Ação*: Execução de scripts de migração oficiais (`ng update`, OpenRewrite recipes) ou transformações de sintaxe via sandbox `context-mode` (R-046).
+4. **Estado 4 — Refinamento e Paridade Funcional (`specialist-developer` + `specialist-unit-test-writer`)**:
+   - *Ação*: Ajuste de convenções idiomáticas da nova versão e execução de testes de paridade comprovando comportamento idêntico ao baseline.
+5. **Estado 5 — Baseline & Quality Gate de Migração (`runtime-verifier` + `@code-review`)**:
+   - *Ação*: Verificação de build limpo, execução de 100% da suíte de testes de ponta a ponta e preparação de PR semântico pelo `@pr-gatekeeper`.
+
+#### Typed State Bag (`workflow_state`):
+```yaml
+workflow_state:
+  stack_migracao: "angular | spring_boot | java_jdk | ejb_to_spring"
+  versao_origem: "17"
+  versao_destino: "20"
+  fase_atual: 1
+  total_fases: 3
+  blueprint_migracao: "docs/migrations/plano-migracao-<alvo>.md"
+  codemods_executados:
+    - "control-flow"
+    - "standalone-components"
+  paridade_funcional_validada: true
+  checkpoint_aprovacao_humana: "aprovado | pendente"
+```
+
+---
+
+### 3.8 WORKFLOW 8: `WORKFLOW-RELEASE-READINESS` (Prontidão de Release, Breaking Changes & Deploy Pre-Flight)
+
+- **Objetivo**: Executar a auditoria consolidada de pré-lançamento e prontidão operacional de uma release ou entrega principal, validando compatibilidade de contratos de API (OpenAPI/gRPC), idempotência e reversibilidade de migrações de banco DDL, ausência de segredos vazados (`.env`, credenciais), conformidade de licenças, integridade do changelog semântico e veredito formal de Go/No-Go para deploy.
+- **Gatilhos de Fast-Path**: `"preparar release"`, `"release readiness"`, `"pre-flight deploy"`, `"auditar release"`, `"prontidão de entrega"`, `"validar versão"`, `"tagging de release"`.
+- **Política R-041**: **Bypass Total** de `@prompt-structuring`.
+
+```mermaid
+flowchart TD
+    Start(["⚡ Solicitação de Pre-Flight de Release / Deploy (Fast-Path)"]) --> ContractAudit["<b>1. Contract & API Compatibility Audit</b><br/>Agente: @tech-solution-architect<br/>Ação: Diff OpenAPI v3 contra breaking changes não-versionadas"]
+
+    ContractAudit --> CheckContract{"Contratos 100%<br/>retrocompatíveis?"}
+    CheckContract -- "Não (Breaking Change Ilegal)" --> BlockContract["🛑 Bloqueio: Exige versionamento de rota /v2/ ou deprecation plan"]
+    CheckContract -- "Sim" --> DBRollout["<b>2. Database Rollout Pre-Flight</b><br/>Agente: @database-specialist<br/>Ação: Confirmação de DDL idempotente e scripts de rollback testados"]
+
+    DBRollout --> CheckDB{"DDL idempotente<br/>e reversível?"}
+    CheckDB -- "Não" --> BlockDB["🛑 Bloqueio: Script DDL não possui rollback idempotente"]
+    CheckDB -- "Sim" --> SecScan["<b>3. Security, Secrets & Hygiene Scan</b><br/>Agente: @security-reviewer + @repo-hygiene-auditor<br/>Ação: Varredura de credenciais expostas, .env commitado e licenças"]
+
+    SecScan --> CheckSec{"Segredos ou CVEs<br/>detectados?"}
+    CheckSec -- "Sim" --> BlockSec["🛑 Bloqueio: Segredos expostos ou CVE crítica não tratada"]
+    CheckSec -- "Não" --> Packaging["<b>4. Changelog, SemVer & Release Packaging</b><br/>Agente: @pr-gatekeeper<br/>Ação: Validação SemVer, compilação de changelog e draft de release"]
+
+    Packaging --> VerdictGate{"<b>5. Release Verdict & Executive Summary</b><br/>Agente: @code-review + ask_questions<br/>Ação: Matriz de risco consolidada e decisão Go / No-Go"}
+
+    VerdictGate -- "Go (Aprovado)" --> EndGo(["🚀 Release Aprovada para Deploy"])
+    VerdictGate -- "No-Go" --> EndNoGo(["🟡 Release Pausada — Pendências Críticas"])
+```
+
+#### Cadeia Sequencial e Papéis:
+1. **Estado 1 — Contract & API Compatibility Audit (`@tech-solution-architect`)**:
+   - *Ação*: Validação de diffs de especificação OpenAPI v3 / contratos de integração entre a versão atual e a release pretendida. Verificação estrita de *breaking changes* não versionadas contra clientes consumidores.
+2. **Estado 2 — Database Rollout Pre-Flight & Rollback Check (`@database-specialist`)**:
+   - *Ação*: Auditoria de scripts Flyway/DDL pendentes: confirmação de idempotência, ausência de `DROP` destrutivo sem fase de deprecação e existência de scripts de reversão (rollback) testados.
+3. **Estado 3 — Security, Secrets & Repository Hygiene Scan (`@security-reviewer` + `@repo-hygiene-auditor`)**:
+   - *Ação*: Varredura de diffs contra credenciais vazadas, variáveis `.env` expostas, pacotes de licença incompatível e conformidade de arquivos essenciais (`README`, `CHANGELOG`, `.gitignore`).
+4. **Estado 4 — Changelog, SemVer & Release Packaging (`@pr-gatekeeper`)**:
+   - *Ação*: Compilação das alterações agrupadas por convenção Conventional Commits (`feat`, `fix`, `refactor`, `perf`), validação do bump SemVer (`major`, `minor`, `patch`) e atualização formal do `CHANGELOG.md`.
+5. **Estado 5 — Release Verdict & Executive Summary (`@code-review` + `ask_questions`)**:
+   - *Ação*: Emissão da Matriz de Risco Executiva de Release e checkpoint formal de decisão humana (Go / No-Go / Contingência) via `ask_questions`.
+
+#### Typed State Bag (`workflow_state`):
+```yaml
+workflow_state:
+  release_versao: "v2.8.0"
+  semver_tipo: "major | minor | patch"
+  contract_compatibility_status: "compativel | breaking_changes_versionadas"
+  database_preflight_status: "aprovado_com_rollback | pendencia_ddl"
+  security_secrets_scan: "limpo | segredos_detectados"
+  repo_hygiene_status: "conforme | inconforme"
+  changelog_atualizado: true
+  veredito_final: "GO | NO_GO | PENDENCIA"
 ```
 
 ---

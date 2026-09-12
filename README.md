@@ -69,7 +69,7 @@ deep-agents-copilot/
 │   ├── agents/                                  # 36 Agents de IA
 │   │   ├── catalog.yaml                         # ⭐ Catálogo com modelos e metadados dos agents (ÚNICO)
 │   │   ├── routing-graph.yaml                   # ⭐ Grafo estrutural de transições
-│   │   ├── workflows.md                         # ⭐ Especificação dos 5 Workflows Canônicos
+│   │   ├── workflows.md                         # ⭐ Especificação dos 8 Workflows Canônicos e de Ciclo de Vida
 │   │   ├── agent-router.agent.md                # Entry point obrigatório (R-037/R-042)
 │   │   ├── prompt-structuring.agent.md          # Refinamento de prompt (R-041)
 │   │   ├── bug-triage.agent.md                  # Triagem de bugs
