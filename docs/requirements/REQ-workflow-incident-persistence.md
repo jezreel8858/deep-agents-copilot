@@ -118,6 +118,32 @@ Se a conexão com o banco local SQLite falhar (ex.: disco cheio, lock temporári
     E a execução da tarefa principal do agente deve prosseguir sem interrupção.
   ```
 
+### REQ-008 [EARS - Evento]: Pareamento de Resolução e Destilação de Lição Aprendida
+Quando um erro previamente registrado for superado ou corrigido pelo agente (ex.: teste passa de vermelho para verde, ou retry bem-sucedido), o sistema deve atualizar o incidente com o diagnóstico de causa raiz (`root_cause`), o diff da correção (`successful_patch`) e uma síntese de lição aprendida (`lesson_learned`), permitindo a consulta preventiva em execuções futuras.
+- **Rastreabilidade:** *"esse banco de dados vai ser nao só para observabilidade mas para que os agents aprendam com os erros"*
+- **Prioridade:** Must Have (MoSCoW)
+- **Critério de Aceite (Gherkin):**
+  ```gherkin
+  Cenário: Atualização de resolução pós-sucesso
+    Dado que um incidente com status 'RETRYING' ou 'OPEN' existe no banco local
+    Quando o agente aplica a correção com sucesso
+    Então o incidente deve ser atualizado para status 'RESOLVED'
+    E deve conter a causa raiz e a lição aprendida destilada para reutilização.
+  ```
+
+### REQ-009 [EARS - Evento]: Purge e Liberação de Espaço no Banco (Storage Pruning)
+Quando uma lição aprendida for promovida para memória estável/governança ou atingir o critério de expiração definido (ex.: incidentes resolvidos após retenção configurável), o motor de persistência deve excluir os registros de incidentes brutos do banco Supabase e do SQLite local (executando DELETE e VACUUM local), liberando espaço em disco e mantendo o consumo do banco sempre sob controle.
+- **Rastreabilidade:** *"precisamos de um mecanismo de liberar espaço no banco(Supabase), por exemplo apos o agent aprender com erro, o registro desse error deve ser excluido"*
+- **Prioridade:** Must Have (MoSCoW)
+- **Critério de Aceite (Gherkin):**
+  ```gherkin
+  Cenário: Exclusão de incidentes resolvidos e liberados de espaço
+    Dado que existem incidentes com status 'RESOLVED' e lições já assimiladas no banco
+    Quando a rotina de purge/pruning é acionada
+    Então os registros brutos devem ser excluídos do Supabase e do SQLite local
+    E o espaço em disco deve ser compactado.
+  ```
+
 ---
 
 ## 3. Requisitos Não-Funcionais (FURPS+)
@@ -154,6 +180,8 @@ O motor de persistência deve aplicar compulsoriamente um filtro de sanitizaçã
 | **REQ-005** | Padrão Outbox para Sincronização Assíncrona com Nuvem | Funcional | **Must Have** |
 | **REQ-006** | Mapeamento Nativo para Supabase (PostgreSQL JSONB) e Firestore | Funcional | **Should Have** |
 | **REQ-007** | Resiliência e Isolamento contra Falhas de Persistência (Fail-Safe) | Funcional | **Must Have** |
+| **REQ-008** | Pareamento de Resolução e Destilação de Lição Aprendida | Funcional | **Must Have** |
+| **REQ-009** | Purge e Liberação de Espaço no Banco (Storage Pruning) | Funcional | **Must Have** |
 | **RNF-001** | Gravação Local Ultrarrápida (<5ms) | Não-Funcional | **Must Have** |
 | **RNF-002** | Transacionalidade e Isolamento Local ACID | Não-Funcional | **Must Have** |
 | **RNF-003** | Interoperabilidade Documental Neutra | Não-Funcional | **Must Have** |

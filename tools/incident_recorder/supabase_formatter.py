@@ -2,11 +2,11 @@
 supabase_formatter.py — Formatador de payloads de incidentes para Supabase (PostgreSQL JSONB).
 
 Converte documentos canônicos de incidentes no formato exato esperado pela tabela
-workflow_incidents do Supabase via API PostgREST.
+workflow_incidents do Supabase via API PostgREST, incluindo suporte a inserção e exclusão (purge).
 """
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 
 def format_for_supabase(incident_dict: Dict[str, Any]) -> Dict[str, Any]:
@@ -23,7 +23,7 @@ def format_for_supabase(incident_dict: Dict[str, Any]) -> Dict[str, Any]:
     - category (TEXT)
     - status (TEXT)
     - created_at (TIMESTAMPTZ)
-    - document_payload (JSONB — documento completo para consultas analíticas)
+    - document_payload (JSONB — documento completo com rootCause e lessonLearned)
     """
     return {
         "incident_id": incident_dict["incidentId"],
@@ -40,3 +40,19 @@ def format_for_supabase(incident_dict: Dict[str, Any]) -> Dict[str, Any]:
         "document_payload": incident_dict,  # Salvo diretamente como JSONB no PostgreSQL
     }
 
+
+def format_supabase_delete_request(incident_ids: List[str]) -> Dict[str, Any]:
+    """
+    Gera a especificação da requisição PostgREST para exclusão em lote no Supabase:
+    DELETE /rest/v1/workflow_incidents?incident_id=in.(id1,id2,...)
+    Permite liberar espaço excluindo incidentes cujas lições já foram assimiladas.
+    """
+    ids_param = f"in.({','.join(incident_ids)})"
+    return {
+        "method": "DELETE",
+        "path": "/rest/v1/workflow_incidents",
+        "params": {"incident_id": ids_param},
+        "headers": {
+            "Prefer": "return=representation",
+        },
+    }

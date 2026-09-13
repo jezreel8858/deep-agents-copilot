@@ -50,6 +50,10 @@ class WorkflowIncident:
         status: str = "OPEN",
         retry_count: int = 0,
         action_taken: str | None = None,
+        root_cause: str | None = None,
+        successful_patch: str | None = None,
+        lesson_learned: str | None = None,
+        pruned_at: str | None = None,
         incident_id: str | None = None,
         timestamp: str | None = None,
         sync_status: str = "PENDING_SYNC",
@@ -76,6 +80,10 @@ class WorkflowIncident:
         self.status = status
         self.retry_count = retry_count
         self.action_taken = action_taken
+        self.root_cause = root_cause
+        self.successful_patch = successful_patch
+        self.lesson_learned = lesson_learned
+        self.pruned_at = pruned_at
         self.sync_status = sync_status
         self.target_backend = target_backend
 
@@ -114,6 +122,14 @@ class WorkflowIncident:
             doc["errorDetails"]["toolCall"] = self.tool_call
         if self.action_taken:
             doc["resolution"]["actionTaken"] = self.action_taken
+        if self.root_cause:
+            doc["resolution"]["rootCause"] = self.root_cause
+        if self.successful_patch:
+            doc["resolution"]["successfulPatch"] = self.successful_patch
+        if self.lesson_learned:
+            doc["resolution"]["lessonLearned"] = self.lesson_learned
+        if self.pruned_at:
+            doc["resolution"]["prunedAt"] = self.pruned_at
 
         context = {}
         if self.target_project:

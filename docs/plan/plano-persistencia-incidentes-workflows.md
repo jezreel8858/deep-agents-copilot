@@ -128,6 +128,17 @@ No Firestore, o documento é inserido diretamente na coleção `workflow_inciden
   └── timestamp: Timestamp(2026-09-12T...)
 ```
 
+### 3.3 Ciclo de Aprendizado Contínuo (Pre-Execution Retrieval)
+Para que os agentes não cometam os mesmos erros, o banco opera com recuperação preventiva:
+1. **Pareamento Erro ↔ Resolução:** Quando um agente corrige um erro com sucesso, o método `resolve_incident()` anexa `rootCause`, `successfulPatch` e `lessonLearned`.
+2. **Injeção Preventiva (`find_lessons`):** Antes de iniciar uma tarefa arriscada (ex.: codificar novo controller, executar testes), o agente consulta incidentes resolvidos por categoria ou keyword. O resultado é injetado nas `<constraints>` como Few-Shot preventivo.
+
+### 3.4 Mecanismo de Purge e Liberação de Espaço no Supabase (Storage Pruning)
+Para manter o banco no Supabase e o SQLite local sempre leves e dentro do Free Tier:
+1. **Critério de Exclusão:** Quando um incidente é resolvido (`status = 'RESOLVED'`) e sua lição é assimilada ou promovida, os dados brutos (stack traces pesados) tornam-se descartáveis.
+2. **Purge no SQLite Local:** Executa `DELETE FROM workflow_incidents WHERE status = 'RESOLVED'` seguido de `VACUUM;` para recuperar fisicamente o espaço em disco.
+3. **Purge no Supabase:** Emite requisição PostgREST `DELETE /rest/v1/workflow_incidents?incident_id=in.(id1,id2,...)` para liberar os bytes no PostgreSQL na nuvem.
+
 ---
 
 ## 4. Context Firewall — Divisão de Tarefas por Stack

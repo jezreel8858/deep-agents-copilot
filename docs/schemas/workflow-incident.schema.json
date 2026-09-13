@@ -124,6 +124,8 @@
             "OPEN",
             "RETRYING",
             "MITIGATED",
+            "RESOLVED",
+            "LEARNED_AND_PRUNED",
             "ESCALATED_TO_HUMAN",
             "CIRCUIT_TRIPPED"
           ]
@@ -132,7 +134,11 @@
           "type": "integer",
           "minimum": 0
         },
-        "actionTaken": { "type": "string" }
+        "actionTaken": { "type": "string" },
+        "rootCause": { "type": "string", "description": "Diagnóstico de causa raiz identificado" },
+        "successfulPatch": { "type": "string", "description": "Diff cirúrgico ou ação que resolveu o incidente" },
+        "lessonLearned": { "type": "string", "description": "Síntese concisa da lição aprendida para recuperação preventiva" },
+        "prunedAt": { "type": "string", "format": "date-time", "description": "Data/hora em que os dados brutos foram expurgados para liberar espaço" }
       }
     },
     "syncMetadata": {

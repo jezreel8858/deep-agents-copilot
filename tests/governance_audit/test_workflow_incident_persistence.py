@@ -242,3 +242,132 @@ def test_supabase_formatter_maps_jsonb_and_relational_columns():
     assert isinstance(supabase_payload["document_payload"], dict)
     assert supabase_payload["document_payload"]["schemaVersion"] == "1.0.0"
 
+
+
+# ── Testes de Aprendizado com Erros e Purge de Espaço (REQ-008 / REQ-009) ───
+
+def test_incident_model_with_lesson_learned_passes_schema():
+    """Valida que o documento com lição aprendida e status RESOLVED passa no schema canônico"""
+    incident = WorkflowIncident(
+        workflow_id="WF-LEARN-001",
+        workflow_name="WORKFLOW-FRAMEWORK-MIGRATION",
+        agent_id="spring-boot-feature-developer",
+        step_index=4,
+        step_name="Paridade Funcional",
+        severity="HIGH",
+        category="TOOL_FAILURE",
+        symptom="Import javax.persistence não encontrado no Spring Boot 3",
+        error_type="PackageNotFoundError",
+        error_message="package javax.persistence does not exist",
+        status="RESOLVED",
+        root_cause="Spring Boot 3 migrou para Jakarta EE 10",
+        successful_patch="Substituído javax.persistence.* por jakarta.persistence.* no pom.xml e classes",
+        lesson_learned="No Spring Boot 3+, use sempre jakarta.persistence em vez de javax.persistence",
+    )
+    incident.validate()
+    doc = incident.to_dict()
+    assert doc["resolution"]["status"] == "RESOLVED"
+    assert doc["resolution"]["rootCause"] == "Spring Boot 3 migrou para Jakarta EE 10"
+    assert "jakarta.persistence" in doc["resolution"]["lessonLearned"]
+
+
+def test_sqlite_sink_resolve_and_find_lessons():
+    """Valida o ciclo completo: registrar erro -> resolver com lição -> buscar preventivamente"""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "test_learn.db"
+        sink = SqliteIncidentSink(db_path=db_path)
+
+        incident = WorkflowIncident(
+            workflow_id="WF-RESOLVE-001",
+            workflow_name="WORKFLOW-FRAMEWORK-MIGRATION",
+            agent_id="angular-feature-developer",
+            step_index=3,
+            step_name="Emissão de Componente",
+            severity="MEDIUM",
+            category="RUNTIME_EXCEPTION",
+            symptom="NG0203: inject() must be called from an injection context",
+            error_type="AngularInjectionError",
+            error_message="inject() called outside constructor or field initializer",
+            status="OPEN",
+        )
+        sink.record_incident(incident)
+
+        # Inicialmente não há lições aprendidas (status OPEN)
+        lessons_initial = sink.find_lessons(workflow_name="WORKFLOW-FRAMEWORK-MIGRATION")
+        assert len(lessons_initial) == 0
+
+        # Agente corrige e resolve o incidente anexando a lição aprendida
+        resolved = sink.resolve_incident(
+            incident_id=incident.incident_id,
+            root_cause="Chamada de inject() dentro de método assíncrono após await",
+            successful_patch="Injetado serviço no topo da classe como campo final",
+            lesson_learned="inject() só pode ser invocado no inicializador de campo ou construtor síncrono",
+        )
+        assert resolved is True
+
+        # Agora a busca preventiva deve encontrar a lição
+        lessons = sink.find_lessons(workflow_name="WORKFLOW-FRAMEWORK-MIGRATION", keyword="inject")
+        assert len(lessons) == 1
+        assert lessons[0]["agent_id"] == "angular-feature-developer"
+        assert "construtor" in lessons[0]["lesson_learned"]
+
+
+def test_sqlite_sink_purge_learned_incidents_frees_space():
+    """Valida exclusão de incidentes resolvidos para liberar espaço (REQ-009)"""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "test_purge.db"
+        sink = SqliteIncidentSink(db_path=db_path)
+
+        inc1 = WorkflowIncident(
+            workflow_id="WF-1",
+            workflow_name="WORKFLOW-BUG-FIX",
+            agent_id="fixer",
+            step_index=1,
+            step_name="triage",
+            severity="LOW",
+            category="TOOL_FAILURE",
+            symptom="s1",
+            error_type="e1",
+            error_message="m1",
+            status="OPEN",
+        )
+        inc2 = WorkflowIncident(
+            workflow_id="WF-2",
+            workflow_name="WORKFLOW-BUG-FIX",
+            agent_id="fixer",
+            step_index=1,
+            step_name="triage",
+            severity="LOW",
+            category="TOOL_FAILURE",
+            symptom="s2",
+            error_type="e2",
+            error_message="m2",
+            status="OPEN",
+        )
+        sink.record_incident(inc1)
+        sink.record_incident(inc2)
+        assert sink.count_incidents() == 2
+
+        # Resolve apenas o inc1
+        sink.resolve_incident(inc1.incident_id, "root", "patch", "lesson")
+
+        # Purgar incidentes resolvidos
+        purged_ids = sink.purge_learned_incidents()
+        assert inc1.incident_id in purged_ids
+        assert inc2.incident_id not in purged_ids
+
+        # Agora só inc2 permanece no banco
+        assert sink.count_incidents() == 1
+
+
+def test_supabase_formatter_delete_request_generation():
+    """Valida geração da requisição PostgREST DELETE para purge no Supabase"""
+    from tools.incident_recorder.supabase_formatter import format_supabase_delete_request
+
+    ids_to_purge = ["uuid-1", "uuid-2", "uuid-3"]
+    req = format_supabase_delete_request(ids_to_purge)
+
+    assert req["method"] == "DELETE"
+    assert req["path"] == "/rest/v1/workflow_incidents"
+    assert req["params"]["incident_id"] == "in.(uuid-1,uuid-2,uuid-3)"
+    assert req["headers"]["Prefer"] == "return=representation"

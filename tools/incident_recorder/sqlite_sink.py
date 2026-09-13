@@ -174,3 +174,135 @@ class SqliteIncidentSink:
                 f.write(f"[FALLBACK LOG] {msg}\n")
         except Exception:
             pass
+
+    def resolve_incident(
+        self,
+        incident_id: str,
+        root_cause: str,
+        successful_patch: str,
+        lesson_learned: str,
+    ) -> bool:
+        """
+        Marca um incidente como RESOLVED e anexa a lição aprendida.
+        Atualiza o payload JSON e define sync_status = 'PENDING_SYNC' para propagar ao Supabase.
+        """
+        try:
+            with self._connection() as conn:
+                conn.row_factory = sqlite3.Row
+                cursor = conn.execute("SELECT document_payload FROM workflow_incidents WHERE incident_id = ?;", (incident_id,))
+                row = cursor.fetchone()
+                if not row:
+                    return False
+                
+                doc = json.loads(row["document_payload"])
+                doc["resolution"]["status"] = "RESOLVED"
+                doc["resolution"]["rootCause"] = root_cause
+                doc["resolution"]["successfulPatch"] = successful_patch
+                doc["resolution"]["lessonLearned"] = lesson_learned
+                doc["syncMetadata"]["syncStatus"] = "PENDING_SYNC"
+
+                conn.execute("""
+                    UPDATE workflow_incidents
+                    SET status = 'RESOLVED',
+                        sync_status = 'PENDING_SYNC',
+                        document_payload = ?
+                    WHERE incident_id = ?;
+                """, (json.dumps(doc, ensure_ascii=False), incident_id))
+                conn.commit()
+            return True
+        except Exception as e:
+            self._log_fallback(f"Erro ao resolver incidente {incident_id}: {e}")
+            return False
+
+    def find_lessons(
+        self,
+        category: Optional[str] = None,
+        workflow_name: Optional[str] = None,
+        keyword: Optional[str] = None,
+        limit: int = 5,
+    ) -> List[Dict[str, Any]]:
+        """
+        Recupera lições aprendidas de incidentes resolvidos para injeção preventiva.
+        Permite que o agente consulte erros passados antes de cometer a mesma falha.
+        """
+        try:
+            with self._connection() as conn:
+                conn.row_factory = sqlite3.Row
+                query = "SELECT incident_id, workflow_name, agent_id, category, document_payload FROM workflow_incidents WHERE status = 'RESOLVED'"
+                params: List[Any] = []
+
+                if category:
+                    query += " AND category = ?"
+                    params.append(category)
+                if workflow_name:
+                    query += " AND workflow_name = ?"
+                    params.append(workflow_name)
+
+                query += " ORDER BY created_at DESC LIMIT ?;"
+                params.append(limit * 2)  # busca margem maior para filtrar keyword
+
+                cursor = conn.execute(query, params)
+                lessons = []
+                for row in cursor.fetchall():
+                    doc = json.loads(row["document_payload"])
+                    resolution = doc.get("resolution", {})
+                    lesson_text = resolution.get("lessonLearned")
+                    if not lesson_text:
+                        continue
+
+                    # Filtro opcional de keyword na mensagem ou lição
+                    if keyword:
+                        err_msg = doc.get("errorDetails", {}).get("message", "")
+                        if keyword.lower() not in lesson_text.lower() and keyword.lower() not in err_msg.lower():
+                            continue
+
+                    lessons.append({
+                        "incident_id": row["incident_id"],
+                        "category": row["category"],
+                        "agent_id": row["agent_id"],
+                        "symptom": doc.get("symptom"),
+                        "root_cause": resolution.get("rootCause"),
+                        "lesson_learned": lesson_text,
+                        "successful_patch": resolution.get("successfulPatch"),
+                    })
+                    if len(lessons) >= limit:
+                        break
+                return lessons
+        except Exception as e:
+            self._log_fallback(f"Erro ao buscar lições aprendidas: {e}")
+            return []
+
+    def purge_learned_incidents(self, incident_ids: Optional[List[str]] = None) -> List[str]:
+        """
+        Exclui incidentes resolvidos para liberar espaço em disco no SQLite e no Supabase.
+        Executa VACUUM no SQLite para desfragmentar e recuperar espaço físico.
+        Retorna a lista de IDs purgados para que o adapter envie a exclusão ao Supabase.
+        """
+        purged_ids: List[str] = []
+        try:
+            with self._connection() as conn:
+                conn.row_factory = sqlite3.Row
+                if incident_ids:
+                    placeholders = ",".join("?" for _ in incident_ids)
+                    cursor = conn.execute(f"SELECT incident_id FROM workflow_incidents WHERE incident_id IN ({placeholders}) AND status = 'RESOLVED';", incident_ids)
+                else:
+                    # Purga todos os incidentes que já foram resolvidos
+                    cursor = conn.execute("SELECT incident_id FROM workflow_incidents WHERE status = 'RESOLVED';")
+
+                purged_ids = [row["incident_id"] for row in cursor.fetchall()]
+
+                if purged_ids:
+                    del_placeholders = ",".join("?" for _ in purged_ids)
+                    conn.execute(f"DELETE FROM workflow_incidents WHERE incident_id IN ({del_placeholders});", purged_ids)
+                    conn.commit()
+
+            # Executa VACUUM para recuperar espaço no arquivo físico
+            if purged_ids:
+                with self._connection() as conn:
+                    conn.execute("VACUUM;")
+                    conn.commit()
+
+            return purged_ids
+        except Exception as e:
+            self._log_fallback(f"Erro ao purgar incidentes resolvidos: {e}")
+            return []
