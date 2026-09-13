@@ -14,7 +14,8 @@ from typing import Any, Dict, Generator, List, Optional
 
 from tools.incident_recorder.incident_model import WorkflowIncident
 
-DEFAULT_DB_DIR = Path(".workflow-db")
+REPO_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_DB_DIR = REPO_ROOT / ".workflow-db"
 DEFAULT_DB_PATH = DEFAULT_DB_DIR / "incidents.db"
 FALLBACK_LOG_PATH = DEFAULT_DB_DIR / "fallback.log"
 
@@ -70,14 +71,20 @@ class SqliteIncidentSink:
         except Exception as e:
             self._log_fallback(f"Falha na inicialização do SQLite Sink: {e}")
 
-    def record_incident(self, incident: WorkflowIncident) -> bool:
+    def record_incident(self, incident: WorkflowIncident | Dict[str, Any]) -> bool:
         """
         Persiste um incidente no banco local.
+        Aceita tanto instância de WorkflowIncident quanto dicionário estruturado.
         Aplica Fail-Safe: retorna True se gravado, False se caiu em fallback.
         """
         try:
-            incident.validate()
-            payload_dict = incident.to_dict()
+            if isinstance(incident, dict):
+                incident_obj = WorkflowIncident.from_dict(incident)
+            else:
+                incident_obj = incident
+
+            incident_obj.validate()
+            payload_dict = incident_obj.to_dict()
             payload_json = json.dumps(payload_dict, ensure_ascii=False)
 
             with self._connection() as conn:
@@ -88,19 +95,19 @@ class SqliteIncidentSink:
                         status, created_at, sync_status, target_backend, document_payload
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
                 """, (
-                    incident.incident_id,
-                    incident.workflow_id,
-                    incident.workflow_name,
-                    incident.session_id,
-                    incident.agent_id,
-                    incident.step_index,
-                    incident.step_name,
-                    incident.severity,
-                    incident.category,
-                    incident.status,
-                    incident.timestamp,
-                    incident.sync_status,
-                    incident.target_backend,
+                    incident_obj.incident_id,
+                    incident_obj.workflow_id,
+                    incident_obj.workflow_name,
+                    incident_obj.session_id,
+                    incident_obj.agent_id,
+                    incident_obj.step_index,
+                    incident_obj.step_name,
+                    incident_obj.severity,
+                    incident_obj.category,
+                    incident_obj.status,
+                    incident_obj.timestamp,
+                    incident_obj.sync_status,
+                    incident_obj.target_backend,
                     payload_json
                 ))
                 conn.commit()
