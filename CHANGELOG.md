@@ -6,6 +6,28 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.8.3] — 2026-09-12
+
+### Adicionado & Aperfeiçoado
+- **Persistência Local e Nuvem de Incidentes de Workflows (`tools/incident_recorder`)**:
+  - **Especificação de Requisitos (`docs/requirements/REQ-workflow-incident-persistence.md`)**:
+    - Requisitos funcionais (REQ-001 a REQ-007) cobrindo captura contínua de erros de tools, exceptions de runtime, quebras de paridade, acionamento de circuit breakers, persistência local em SQLite WAL com JSON1, padrão Outbox e fail-safe operacional.
+    - Requisitos não-funcionais (RNF-001 a RNF-004) para escrita ultrarrápida (<5ms), isolamento ACID local, interoperabilidade documental neutra e sanitização automática de credenciais e tokens (PII/Secret Scrubbing).
+  - **Technical Blueprint & Contratos (`docs/plan/plano-persistencia-incidentes-workflows.md`)**:
+    - Arquitetura Local-First Outbox Pattern com DDL SQLite local otimizado e DDL Supabase (PostgreSQL 15+ com coluna `document_payload JSONB` e índice GIN).
+    - Context Firewall dividindo responsabilidades entre `[CORE_PERSISTENCE_TASKS]`, `[LOCAL_STORAGE_TASKS]` e `[CLOUD_SYNC_TASKS]`.
+  - **Schema Canônico do Incidente (`docs/schemas/workflow-incident.schema.json`)**:
+    - JSON Schema Draft 2020-12 validando `incidentId`, `workflowId`, `agentId`, `stepIndex`, `severity`, `category`, `errorDetails`, `resolution` e `syncMetadata`.
+  - **Módulos de Produção (`tools/incident_recorder/`)**:
+    - `secret_scrubber.py`: sanitizador de credenciais, chaves de API (`sk-*`, `ghp_*`, `sbp_*`), Bearer JWTs e senhas.
+    - `incident_model.py`: modelo canônico de incidente com validação estrita contra o schema.
+    - `sqlite_sink.py`: repositório SQLite com modo WAL, gerenciamento estrito de conexões, colunas indexadas e isolamento Fail-Safe (fallback log).
+    - `supabase_formatter.py`: formatador compatível com PostgREST e colunas relacionais + JSONB do Supabase.
+  - **Suíte de Testes Automatizados (`tests/governance_audit/test_workflow_incident_persistence.py`)**:
+    - 9 novos testes em pytest cobrindo schema, sanitização, banco local SQLite, outbox sync, fail-safe e formatação Supabase (117 testes globais passando, 100% verde).
+
+---
+
 ## [2.8.2] — 2026-09-12
 
 ### Adicionado & Aperfeiçoado

@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deep-agents-copilot/schemas/workflow-incident.schema.json",
+  "title": "Canonical Workflow Incident Document Schema",
+  "description": "Schema canônico neutro para registro de incidentes, exceções e problemas ocorridos durante a execução de workflows de IA, compatível com SQLite JSON1, PostgreSQL JSONB (Supabase) e Firebase Firestore.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "incidentId",
+    "timestamp",
+    "workflowId",
+    "workflowName",
+    "agentId",
+    "stepIndex",
+    "severity",
+    "category",
+    "symptom",
+    "errorDetails",
+    "resolution",
+    "syncMetadata"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "incidentId": {
+      "type": "string",
+      "description": "Identificador único do incidente (UUIDv4)"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp ISO 8601 do momento da ocorrência"
+    },
+    "workflowId": {
+      "type": "string",
+      "description": "ID do workflow em execução (ex.: WF-BUG-2026-001)"
+    },
+    "workflowName": {
+      "type": "string",
+      "enum": [
+        "WORKFLOW-BUG-FIX",
+        "WORKFLOW-REFACTORING",
+        "WORKFLOW-TECHNICAL-ANALYSIS",
+        "WORKFLOW-FEATURE-DEVELOPMENT",
+        "WORKFLOW-GOVERNANCE-MAINTENANCE",
+        "WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION",
+        "WORKFLOW-FRAMEWORK-MIGRATION",
+        "WORKFLOW-RELEASE-READINESS"
+      ]
+    },
+    "sessionId": {
+      "type": "string",
+      "description": "ID da sessão do Copilot Chat ou IDE"
+    },
+    "agentId": {
+      "type": "string",
+      "description": "Identificador do agente ativo no momento do incidente"
+    },
+    "stepIndex": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Número da etapa do workflow em execução"
+    },
+    "stepName": {
+      "type": "string",
+      "description": "Nome da etapa do workflow (ex.: Triagem & Hipótese)"
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "TOOL_FAILURE",
+        "RUNTIME_EXCEPTION",
+        "CIRCUIT_BREAKER",
+        "PARITY_BREAK",
+        "QUALITY_GATE_FAILURE",
+        "HUMAN_ESCALATION"
+      ]
+    },
+    "symptom": {
+      "type": "string",
+      "description": "Descrição sucinta e observável do problema ocorrido"
+    },
+    "errorDetails": {
+      "type": "object",
+      "required": ["errorType", "message"],
+      "properties": {
+        "errorType": { "type": "string" },
+        "message": { "type": "string" },
+        "stackTrace": { "type": "string" },
+        "toolCall": {
+          "type": "object",
+          "properties": {
+            "toolName": { "type": "string" },
+            "arguments": { "type": "object" },
+            "exitCode": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "targetProject": { "type": "string" },
+        "targetFiles": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "activeSkill": { "type": "string" }
+      }
+    },
+    "resolution": {
+      "type": "object",
+      "required": ["status", "retryCount"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "OPEN",
+            "RETRYING",
+            "MITIGATED",
+            "ESCALATED_TO_HUMAN",
+            "CIRCUIT_TRIPPED"
+          ]
+        },
+        "retryCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "actionTaken": { "type": "string" }
+      }
+    },
+    "syncMetadata": {
+      "type": "object",
+      "required": ["syncStatus"],
+      "properties": {
+        "syncStatus": {
+          "type": "string",
+          "enum": ["PENDING_SYNC", "SYNCED", "LOCAL_ONLY"]
+        },
+        "syncedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "targetBackend": {
+          "type": "string",
+          "enum": ["supabase", "firestore", "none"]
+        }
+      }
+    }
+  }
+}
+
