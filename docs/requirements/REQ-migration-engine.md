@@ -109,6 +109,25 @@ Se durante a execução da Dual-Verification houver divergência de paridade fun
     E um relatório detalhado de divergência semântica deve ser emitido para correção pelo test-fixer/feature-developer.
   ```
 
+### REQ-007 [EARS - Guiado por Estado]: Bootstrapping Interativo de Novo Projeto com Human-in-the-Loop
+Enquanto o destino da migração for um projeto novo (green-field) ou novo módulo autônomo, o especialista da stack de destino deve coletar compulsoriamente as decisões de scaffolding (ferramenta de build, versão do runtime/LTS, formato de empacotamento e dependências base) através de `ask_questions` com opções estruturadas e permitir que o usuário defina as preferências da nova stack antes de materializar o esqueleto base oficial.
+- **Rastreabilidade:** *"para novos projetos os agents dasd stacks devem pedir confirmação ao usuario. exemplo: o usuario se quiser pode escolher o maven no lugar do gradle. pra esses cenarios o usuario precisa participar dessas decicoes"*
+- **Prioridade:** Must Have (MoSCoW)
+- **Critério de Aceite (Gherkin):**
+  ```gherkin
+  Cenário: Confirmação interativa de build tool e runtime para novo projeto Spring Boot
+    Dado que a migração tem como destino um novo projeto Spring Boot que ainda não existe no workspace
+    Quando a fase de inicialização do projeto alvo é iniciada
+    Então o especialista da stack (@spring-boot-feature-developer) não deve gerar o projeto unilateralmente
+    E deve acionar ask_questions solicitando que o usuário selecione entre Maven e Gradle, e a versão LTS de Java (21 vs 25)
+    E o esqueleto base oficial só deve ser criado após a resposta explícita do usuário.
+
+  Cenário: Migração in-place em projeto existente dispensa novo bootstrapping
+    Dado que o projeto de destino já possui arquivos de build e estrutura configurada (ex.: pom.xml ou build.gradle presente)
+    Quando o motor de migração avalia a stack de destino
+    Então o especialista da stack deve reutilizar a infraestrutura de build existente sem solicitar redefinição de scaffolding.
+  ```
+
 ---
 
 ## 3. Requisitos Não-Funcionais (FURPS+)
@@ -137,6 +156,10 @@ O motor de migração deve emitir evidências estruturadas de cada fase:
 4. Relatório comparativo de execução dos testes Golden Master.
 - **Prioridade:** Should Have
 
+### RNF-005 [Usability / Governance]: Checkpoint Humano Mandatório para Decisões de Scaffolding (Human-in-the-Loop)
+É terminantemente proibido a qualquer agente executor tomar decisões unilaterais sobre ferramentas de build, frameworks auxiliares ou versões de runtime ao inicializar um novo projeto. Toda decisão que afete o ciclo de vida do novo repositório deve ser submetida à aprovação do desenvolvedor via `ask_questions` (R-027), mantendo a autonomia do engenheiro sobre a nova stack.
+- **Prioridade:** Must Have
+
 ---
 
 ## 4. Matriz de Priorização (MoSCoW)
@@ -149,10 +172,12 @@ O motor de migração deve emitir evidências estruturadas de cada fase:
 | **REQ-004** | Emissão de Código Alvo pelos Especialistas da Stack Moderna | Funcional | **Must Have** |
 | **REQ-005** | Dual-Verification de Paridade Funcional | Funcional | **Must Have** |
 | **REQ-006** | Bloqueio por Desvio de Comportamento (Circuit Breaker) | Funcional | **Must Have** |
+| **REQ-007** | Bootstrapping Interativo de Novo Projeto com Human-in-the-Loop | Funcional | **Must Have** |
 | **RNF-001** | Extensibilidade Combinatória $O(N + M)$ | Não-Funcional | **Must Have** |
 | **RNF-002** | Fidelidade Semântica e Limiar Zero de Regressão Silenciosa | Não-Funcional | **Must Have** |
 | **RNF-003** | Conformidade com Governança de Domínio | Não-Funcional | **Must Have** |
 | **RNF-004** | Rastreabilidade de Transição e Auditoria | Não-Funcional | **Should Have** |
+| **RNF-005** | Checkpoint Humano Mandatório para Decisões de Scaffolding | Não-Funcional | **Must Have** |
 
 ---
 

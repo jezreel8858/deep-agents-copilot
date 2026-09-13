@@ -11,18 +11,18 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 ### Adicionado & Aperfeiçoado
 - **Motor Agnóstico de Migração de Tecnologias Legadas (Agnostic Legacy Migration Engine)**:
   - **Especificação de Requisitos (`docs/requirements/REQ-migration-engine.md`)**:
-    - Requisitos funcionais (REQ-001 a REQ-006) com notação EARS e critérios de aceitação Gherkin/BDD.
-    - Requisitos não-funcionais (RNF-001 a RNF-004) cobrindo desacoplamento estrutural $O(N+M)$, limiar zero de regressão via Dual-Verification, conformidade com ecossistemas de domínio e rastreabilidade total.
+    - Requisitos funcionais (REQ-001 a REQ-007) com notação EARS e critérios de aceitação Gherkin/BDD, incluindo REQ-007 cobrindo o Bootstrapping Interativo de Novo Projeto com Human-in-the-Loop.
+    - Requisitos não-funcionais (RNF-001 a RNF-005) cobrindo desacoplamento estrutural $O(N+M)$, limiar zero de regressão via Dual-Verification, conformidade com ecossistemas de domínio, rastreabilidade e checkpoint humano obrigatório para decisões de build/runtime (RNF-005).
   - **Technical Blueprint & Contratos (`docs/plan/plano-motor-migracao-agnostica.md`)**:
     - Design de pipeline em 3 estágios desacoplados: Source Adapter (extração de legado) → Core Migration Engine (agnóstico) → Target Adapter (geração moderna).
-    - Máquina de estados determinística em 6 fases com circuit breakers para governança de stacks, validação de schema e paridade funcional.
+    - Máquina de estados determinística com inclusão formal da sub-rotina Fase 3a (Target Project Bootstrapping via `ask_questions` para escolha de build tool como Maven vs Gradle, versão LTS de runtime e formato de empacotamento).
     - Context Firewall dividindo responsabilidades entre `[CORE_ENGINE_TASKS]`, `[SOURCE_STACK_TASKS]` e `[TARGET_STACK_TASKS]`.
   - **Schema Canônico da Representação Intermediária (`docs/schemas/migration-ir.schema.json`)**:
     - JSON Schema Draft 2020-12 definindo os contratos neutros para `metadata`, `entryPoints`, `domainEntities`, `businessRules` e `characterizationVectors`.
   - **Governança de Workflows (`.github/agents/workflows.md`)**:
-    - Formalização do sub-padrão 3.7.1 no `WORKFLOW-FRAMEWORK-MIGRATION` integrando o pipeline agnóstico via IR e o gate de Dual-Verification.
+    - Formalização do sub-padrão 3.7.1 no `WORKFLOW-FRAMEWORK-MIGRATION` integrando o pipeline agnóstico via IR, o checkpoint interativo da Fase 3a e o gate de Dual-Verification.
   - **Suíte de Testes Automatizados (`tests/governance_audit/test_migration_engine_governance.py`)**:
-    - 15 novos testes unitários e de integração em pytest validando validade do schema, rejeição de payloads incompletos, aprovação de stacks registradas (`struts`, `ejb`, `spring-boot`, `angular`, `python`), rejeição de stacks não cadastradas e lógica do contrato de Dual-Verification. 100% verde (107 testes da suíte global passando).
+    - 16 testes unitários e de integração em pytest validando validade do schema, rejeição de payloads incompletos, aprovação de stacks registradas (`struts`, `ejb`, `spring-boot`, `angular`, `python`), rejeição de stacks não cadastradas, contrato de paridade e exigência de confirmação humana para bootstrapping green-field. 100% verde (108 testes da suíte global passando).
 
 ---
 
