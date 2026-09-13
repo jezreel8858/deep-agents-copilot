@@ -167,3 +167,41 @@ class WorkflowIncident:
         doc = self.to_dict()
         validator.validate(doc)
 
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> WorkflowIncident:
+        """Reconstrói uma instância de WorkflowIncident a partir de um dicionário canônico."""
+        error_details = data.get("errorDetails", {})
+        resolution = data.get("resolution", {})
+        context = data.get("context", {})
+        sync_meta = data.get("syncMetadata", {})
+
+        return cls(
+            workflow_id=data.get("workflowId", "UNKNOWN_WORKFLOW"),
+            workflow_name=data.get("workflowName", "UNKNOWN_WORKFLOW"),
+            agent_id=data.get("agentId", "unknown-agent"),
+            step_index=data.get("stepIndex", 0),
+            step_name=data.get("stepName", "unknown-step"),
+            severity=data.get("severity", "MEDIUM"),
+            category=data.get("category", "RUNTIME_EXCEPTION"),
+            symptom=data.get("symptom", "Sintoma não especificado"),
+            error_type=error_details.get("errorType", "UnknownError"),
+            error_message=error_details.get("message", "Sem mensagem de erro"),
+            session_id=data.get("sessionId"),
+            stack_trace=error_details.get("stackTrace"),
+            tool_call=error_details.get("toolCall"),
+            target_project=context.get("targetProject"),
+            target_files=context.get("targetFiles"),
+            active_skill=context.get("activeSkill"),
+            status=resolution.get("status", "OPEN"),
+            retry_count=resolution.get("retryCount", 0),
+            action_taken=resolution.get("actionTaken"),
+            root_cause=resolution.get("rootCause"),
+            successful_patch=resolution.get("successfulPatch"),
+            lesson_learned=resolution.get("lessonLearned"),
+            pruned_at=resolution.get("prunedAt"),
+            incident_id=data.get("incidentId"),
+            timestamp=data.get("timestamp"),
+            sync_status=sync_meta.get("syncStatus", "PENDING_SYNC"),
+            target_backend=sync_meta.get("targetBackend", "supabase"),
+        )
+

@@ -45,7 +45,11 @@ def get_supabase_config() -> tuple[Optional[str], Optional[str]]:
     """Recupera URL e API Key do Supabase do ambiente ou .env."""
     load_env_file()
     url = os.environ.get("SUPABASE_URL")
-    key = os.environ.get("SUPABASE_KEY") or os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+    key = (
+            os.environ.get("SUPABASE_KEY")
+            or os.environ.get("SUPABASE_ANON_KEY")
+            or os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+    )
     return url, key
 
 
