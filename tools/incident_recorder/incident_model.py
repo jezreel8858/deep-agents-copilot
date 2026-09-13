@@ -12,8 +12,12 @@ from pathlib import Path
 from typing import Any
 import uuid
 
-import jsonschema
-from jsonschema import Draft202012Validator
+try:
+    import jsonschema
+    from jsonschema import Draft202012Validator
+except ImportError:
+    jsonschema = None
+    Draft202012Validator = None
 
 from tools.incident_recorder.secret_scrubber import scrub_data
 
@@ -146,6 +150,18 @@ class WorkflowIncident:
 
     def validate(self) -> None:
         """Valida o documento contra o JSON Schema canônico."""
+        if Draft202012Validator is None:
+            # Fallback estrutural leve caso jsonschema não esteja instalado
+            doc = self.to_dict()
+            required = [
+                "schemaVersion", "incidentId", "timestamp", "workflowId",
+                "workflowName", "agentId", "stepIndex", "severity",
+                "category", "symptom", "errorDetails", "resolution", "syncMetadata"
+            ]
+            for req in required:
+                if req not in doc:
+                    raise ValueError(f"Campo obrigatório ausente no incidente: {req}")
+            return
         schema = get_incident_schema()
         validator = Draft202012Validator(schema)
         doc = self.to_dict()

@@ -15,8 +15,13 @@ import json
 from pathlib import Path
 import tempfile
 import pytest
-import jsonschema
-from jsonschema import Draft202012Validator
+
+try:
+    import jsonschema
+    from jsonschema import Draft202012Validator
+except ImportError:
+    jsonschema = None
+    Draft202012Validator = None
 
 from tools.incident_recorder.incident_model import WorkflowIncident, get_incident_schema
 from tools.incident_recorder.secret_scrubber import scrub_data, scrub_string
@@ -31,6 +36,8 @@ SCHEMA_FILE = REPO_ROOT / "docs" / "schemas" / "workflow-incident.schema.json"
 
 def test_workflow_incident_schema_is_valid_draft202012():
     """Valida que o schema de incidentes é um JSON Schema sintaticamente válido Draft 2020-12"""
+    if Draft202012Validator is None:
+        pytest.skip("jsonschema não instalado no ambiente")
     schema = get_incident_schema()
     Draft202012Validator.check_schema(schema)
 
@@ -68,6 +75,8 @@ def test_incident_model_generates_valid_schema_document():
 
 def test_incident_model_rejects_invalid_severity_or_category():
     """Valida que o schema rejeita valores inválidos de severidade ou categoria"""
+    if Draft202012Validator is None:
+        pytest.skip("jsonschema não instalado no ambiente")
     schema = get_incident_schema()
     validator = Draft202012Validator(schema)
 

@@ -3,4 +3,5 @@
 #   python -m pip install -r tests/requirements.txt
 pytest>=8.0
 PyYAML>=6.0
+jsonschema>=4.20.0
 

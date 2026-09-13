@@ -11,8 +11,13 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import pytest
-import jsonschema
-from jsonschema import Draft202012Validator
+
+try:
+    import jsonschema
+    from jsonschema import Draft202012Validator
+except ImportError:
+    jsonschema = None
+    Draft202012Validator = None
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCHEMAS_DIR = REPO_ROOT / "docs" / "schemas"
@@ -57,12 +62,16 @@ def validate_stack_governance_registered(domain: str, stack_name: str) -> tuple[
 
 def test_ir_schema_is_valid_draft202012():
     """Valida que o schema da IR é um JSON Schema sintaticamente válido segundo Draft 2020-12"""
+    if Draft202012Validator is None:
+        pytest.skip("jsonschema não instalado no ambiente")
     schema = load_ir_schema()
     Draft202012Validator.check_schema(schema)
 
 
 def test_ir_schema_validates_canonical_payload():
     """Valida que um payload de IR em conformidade com o Technical Blueprint passa 100% no schema"""
+    if Draft202012Validator is None:
+        pytest.skip("jsonschema não instalado no ambiente")
     schema = load_ir_schema()
     validator = Draft202012Validator(schema)
 
@@ -157,6 +166,8 @@ def test_ir_schema_validates_canonical_payload():
 
 def test_ir_schema_rejects_missing_required_sections():
     """Valida que o schema rejeita payloads incompletos (ausência de vetores de teste ou regras)"""
+    if Draft202012Validator is None:
+        pytest.skip("jsonschema não instalado no ambiente")
     schema = load_ir_schema()
     validator = Draft202012Validator(schema)
 
@@ -241,7 +252,7 @@ def test_dual_verification_contract_evaluation():
 
 def test_target_project_bootstrapping_requires_human_confirmation():
     """Valida que para projetos novos (green-field), decisões de build e runtime exigem aprovação via ask_questions"""
-    def evaluate_bootstrapping_flow(is_new_project: bool, user_confirmed_options: dict | None) -> tuple[bool, str]:
+    def evaluate_bootstrapping_flow(is_new_project: bool, user_confirmed_options: dict = None) -> tuple:
         if not is_new_project:
             return True, "Projeto existente: prosseguir diretamente para emissão de código a partir da IR."
         
