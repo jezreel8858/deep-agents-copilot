@@ -370,7 +370,7 @@ flowchart TB
 - ✅ Tier 3 (Experimental): `agent-memory-policy` — memória episódica/semântica/procedimental (reaproveitada por `agentic-memory-manager`)
 
 ### Consolidações e Gaps de Mercado Fechados (2026-09-02)
-- ✅ Fusões canônicas para redução de redundância semântica: `test-engineer` (unifica create/fix/coverage), `docs-engineer` (unifica author/curate) e `governance-factory` (unifica agent/skill/prompt factory).
+- ✅ Fusões canônicas para redução de redundância semântica: `test-strategy` (estratégia e matriz de risco), `docs-engineer` (unifica author/curate) e `governance-factory` (unifica agent/skill/prompt factory).
 - ✅ Novos perfis especializados enterprise integrados: `runtime-verifier` (read-only pre-flight), `pr-gatekeeper` (preparação de PR pós quality gate) e `database-specialist` (migrações de schema e integridade).
 - ✅ 9 agents de maturidade enterprise adicionados anteriormente: `security-reviewer`, `performance-agent`, `compliance-guardrails`, `feature-planner`, `agentic-memory-manager`, `devops-engineer`, `debugger`, `code-style-enforcer`, `refactor-executor`.
 - ✅ Governança sincronizada atomicamente (R-015/R-040): `catalog.yaml`, `README.md` (raiz e agents), `routing-graph.yaml` (42 nós) e `casos-roteamento.yaml`.
@@ -386,8 +386,8 @@ flowchart TB
 - ✅ Todo agent downstream/specialist declara seção "Retorno ao Router" com gatilho objetivo de deriva de intenção (mudança de verbo de ação, stack fora de competência, pedido de execução em agent read-only).
 - ✅ Visibilidade obrigatória: toda resposta abre com `Agente Ativo: <name>` e sinalização de handoff quando aplicável.
 
-### Especialistas Híbridos — Advisory + Implementação
-- ✅ `angular-engineer`, `spring-boot-engineer` e `spring-reactive-engineer` atuam em análise/recomendação e implementação no domínio de stack, testing-first e diff mínimo.
+### Supervisores de Domínio e Especialistas por Stack
+- ✅ Supervisores hierárquicos (`angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `struts-router`, `python-router` e `database-router`) orquestram seus especialistas dedicados em análise (Advisory) e implementação tática, testing-first e diffs cirúrgicos.
 
 ---
 

@@ -210,12 +210,13 @@ agents:
     related_agents:
       - "agent-router"
       - "tech-solution-architect"
-      - "angular-engineer"
-      - "spring-boot-engineer"
-      - "spring-reactive-engineer"
+      - "angular-router"
+      - "spring-boot-router"
+      - "spring-reactive-router"
+      - "database-router"
       - "database-specialist"
       - "code-knowledge-graph"
-      - "test-engineer"
+      - "test-strategy"
     tools:
       - "read_file"
       - "grep_search"
@@ -587,7 +588,7 @@ agents:
       - ".github/agents/README.md"
     related_agents:
       - "agent-router"
-      - "test-engineer"
+      - "test-strategy"
       - "devops-engineer"
     tools:
       - "read_file"

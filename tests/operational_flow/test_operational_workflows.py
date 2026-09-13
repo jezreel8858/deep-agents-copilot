@@ -31,6 +31,10 @@ LEGACY_DEPRECATED_AGENTS = {
     "test-fix",
     "code-summarizer",
     "context-builder",
+    "angular-engineer",
+    "spring-boot-engineer",
+    "spring-reactive-engineer",
+    "test-engineer",
 }
 
 READONLY_ADVISORY_AGENTS = {

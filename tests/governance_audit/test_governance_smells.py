@@ -494,3 +494,40 @@ def test_smell_2_20_router_flat_delegation_rule():
     gap_skill = SKILLS_DIR / "governance-audit-patterns" / "SKILL.md"
     gap_content = gap_skill.read_text(encoding="utf-8")
     assert "2.20" in gap_content, "governance-audit-patterns/SKILL.md DEVE documentar o Smell 2.20"
+
+# ─────────────────────────────────────────────────────────────
+# SMELL 2.1 — Referência Órfã / Agentes Descomissionados em Documentação Viva
+# ─────────────────────────────────────────────────────────────
+def test_smell_2_1_no_deprecated_agents_in_live_readmes():
+    """Smell 2.1: Garante que nenhum agent descontinuado/substituído seja citado
+    na documentação viva do repositório (README.md raiz e .github/skills/README.md)."""
+    deprecated_agents = {
+        "docs-writer",
+        "docs-curator",
+        "agent-factory",
+        "skill-factory",
+        "prompt-factory",
+        "impact-architect",
+        "test-implementation",
+        "test-fix",
+        "code-summarizer",
+        "context-builder",
+        "angular-engineer",
+        "spring-boot-engineer",
+        "spring-reactive-engineer",
+        "test-engineer",
+    }
+    # 1. README.md principal
+    readme_content = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    for dep in deprecated_agents:
+        pattern = rf"(?<![a-zA-Z0-9_-]){re.escape(dep)}(?![a-zA-Z0-9_-])"
+        assert not re.search(pattern, readme_content), (
+            f"README.md cita agent descontinuado '{dep}' fora de changelog histórico"
+        )
+    # 2. .github/skills/README.md
+    skills_readme = (SKILLS_DIR / "README.md").read_text(encoding="utf-8")
+    for dep in deprecated_agents:
+        pattern = rf"(?<![a-zA-Z0-9_-]){re.escape(dep)}(?![a-zA-Z0-9_-])"
+        assert not re.search(pattern, skills_readme), (
+            f".github/skills/README.md cita agent descontinuado '{dep}'"
+        )
