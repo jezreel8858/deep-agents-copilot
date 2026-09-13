@@ -6,6 +6,29 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.8.3] — 2026-09-12
+
+### Adicionado & Aperfeiçoado
+- **Persistência Local e Nuvem de Incidentes de Workflows (`tools/incident_recorder`)**:
+  - **Especificação de Requisitos (`docs/requirements/REQ-workflow-incident-persistence.md`)**:
+    - Requisitos funcionais (REQ-001 a REQ-009) cobrindo captura contínua de erros, persistência local em SQLite WAL com JSON1, padrão Outbox, fail-safe operacional, aprendizado contínuo com destilação de lições aprendidas (REQ-008) e mecanismo de purge/pruning para liberação de espaço em disco e no Supabase (REQ-009).
+    - Requisitos não-funcionais (RNF-001 a RNF-004) para escrita ultrarrápida (<5ms), isolamento ACID local, interoperabilidade documental neutra e sanitização automática de credenciais e tokens (PII/Secret Scrubbing).
+  - **Technical Blueprint & Contratos (`docs/plan/plano-persistencia-incidentes-workflows.md`)**:
+    - Arquitetura Local-First Outbox Pattern com DDL SQLite local otimizado e DDL Supabase (PostgreSQL 15+ com coluna `document_payload JSONB` e índice GIN).
+    - Sub-rotina de ciclo de vida de aprendizado e mecanismo de purge para exclusão de incidentes resolvidos via PostgREST no Supabase e `VACUUM` no SQLite local.
+    - Context Firewall dividindo responsabilidades entre `[CORE_PERSISTENCE_TASKS]`, `[LOCAL_STORAGE_TASKS]` e `[CLOUD_SYNC_TASKS]`.
+  - **Schema Canônico do Incidente (`docs/schemas/workflow-incident.schema.json`)**:
+    - JSON Schema Draft 2020-12 estendido com `rootCause`, `successfulPatch`, `lessonLearned` e `prunedAt` na seção `resolution`.
+  - **Módulos de Produção (`tools/incident_recorder/`)**:
+    - `secret_scrubber.py`: sanitizador de credenciais, chaves de API (`sk-*`, `ghp_*`, `sbp_*`), Bearer JWTs e senhas.
+    - `incident_model.py`: modelo canônico de incidente com validação estrita contra o schema e suporte a lições aprendidas.
+    - `sqlite_sink.py`: repositório SQLite com modo WAL, gerenciamento estrito de conexões, métodos `resolve_incident`, busca preventiva `find_lessons` e rotina de purge com `VACUUM` (`purge_learned_incidents`).
+    - `supabase_formatter.py`: formatador compatível com PostgREST e gerador de queries de exclusão em lote (`format_supabase_delete_request`).
+  - **Suíte de Testes Automatizados (`tests/governance_audit/test_workflow_incident_persistence.py`)**:
+    - 13 testes em pytest cobrindo schema, sanitização, banco local SQLite, outbox sync, fail-safe, busca de lições e liberação de espaço (121 testes globais passando, 100% verde).
+
+---
+
 ## [2.8.2] — 2026-09-12
 
 ### Adicionado & Aperfeiçoado
