@@ -24,6 +24,8 @@ build/
 
 # Environment files
 .env
+.workflow-db/
+
 .env.local
 .env.*.local
 

@@ -1,0 +1,50 @@
+# Configuração do OpenTelemetry Collector Contrib
+# Recebe dados OTLP da IDE (Copilot / Claude Code) na porta 4318 e despacha para o Langfuse e arquivo local
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+        cors:
+          allowed_origins:
+            - "http://*"
+            - "https://*"
+
+processors:
+  batch:
+    timeout: 1s
+    send_batch_size: 64
+
+exporters:
+  # Exportador OTLP HTTP para o Langfuse v3
+  # Header calculado a partir de Basic base64(pk-lf-deep-agents-local-001:sk-lf-deep-agents-local-001)
+  otlp_http/langfuse:
+    endpoint: "http://langfuse-server:3000/api/public/otel"
+    headers:
+      Authorization: "Basic cGstbGYtZGVlcC1hZ2VudHMtbG9jYWwtMDAxOnNrLWxmLWRlZXAtYWdlbnRzLWxvY2FsLTAwMQ=="
+
+  # Exportador em arquivo local (JSON estruturado) para auditoria e integração com Context Insight Visualizer
+  file/traces:
+    path: /var/log/otel/traces.json
+
+  # Log no stdout do container para depuração
+  debug:
+    verbosity: basic
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp_http/langfuse, file/traces, debug]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug]

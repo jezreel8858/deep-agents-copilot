@@ -1,0 +1,4 @@
+# Dados do Postgres e logs locais de traces
+data/
+postgres_data/
+.env
