@@ -6,6 +6,19 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.8.4] — 2026-09-13
+
+### Corrigido & Sincronizado
+- **Saneamento de Referências a Agentes Descomissionados nos READMEs e Catálogo**:
+  - `README.md`: Atualizada a seção de especialistas de stack para a topologia vigente de supervisores de domínio (`angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `struts-router`, `python-router` e `database-router`), removendo menções residuais aos agentes monolíticos antigos (`angular-engineer`, `spring-boot-engineer`, `spring-reactive-engineer`).
+  - `.github/skills/README.md`: Atualizadas as descrições das skills de performance e implementação para apontar para os especialistas dos ecossistemas de domínio atuais, saneando referências a `angular-engineer`, `spring-boot-engineer`, `spring-reactive-engineer` e `docs-writer`.
+  - `.github/agents/catalog.yaml`: Atualizados os campos `related_agents` de `refactor-planner` e `runtime-verifier` para referenciar os routers de domínio e `test-strategy`.
+- **Fortalecimento da Suíte de Testes e Governança Estática (Smell 2.1)**:
+  - `tests/operational_flow/test_operational_workflows.py`: Atualizado o conjunto `LEGACY_DEPRECATED_AGENTS` para incluir `angular-engineer`, `spring-boot-engineer`, `spring-reactive-engineer` e `test-engineer`.
+  - `tests/governance_audit/test_governance_smells.py`: Implementado o teste determinístico `test_smell_2_1_no_deprecated_agents_in_live_readmes` (Smell 2.1 — Referência Órfã) com regex de fronteira de palavras, garantindo que nenhum agente descontinuado volte a ser citado na documentação viva. Suíte totalizando 123 testes (100% verde).
+
+---
+
 ## [2.8.3] — 2026-09-12
 
 ### Adicionado & Aperfeiçoado
