@@ -380,3 +380,18 @@ def test_supabase_formatter_delete_request_generation():
     assert req["path"] == "/rest/v1/workflow_incidents"
     assert req["params"]["incident_id"] == "in.(uuid-1,uuid-2,uuid-3)"
     assert req["headers"]["Prefer"] == "return=representation"
+
+
+def test_supabase_sync_client_unconfigured_failsafe():
+    """Valida que o cliente de sincronização trata ausência de credenciais sem lançar erro fatal"""
+    from tools.incident_recorder.supabase_sync import SupabaseSyncClient
+
+    client = SupabaseSyncClient(supabase_url="", supabase_key="")
+    assert client.is_configured is False
+
+    res = client.sync_pending()
+    assert res["success"] is False
+    assert "não configurado" in res["error"]
+
+    res_purge = client.purge_from_supabase([])
+    assert res_purge["purged_count"] == 0

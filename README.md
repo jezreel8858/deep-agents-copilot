@@ -103,7 +103,14 @@ deep-agents-copilot/
 │   ├── agent-context/                           # Guias de uso de ferramentas
 │   ├── plan/                                    # Planos arquiteturais
 │   │   └── agent-profiles-taxonomy.md           # Taxonomia consolidada de agents de mercado
-│   └── requirements/                            # Requisitos de sistema
+│   ├── requirements/                            # Requisitos formais de sistema
+│   └── schemas/                                 # Schemas JSON canônicos (IR de migração, incidentes)
+│
+├── tools/                                       # Ferramentas Utilitárias e Telemetria
+│   ├── incident_recorder/                       # ⭐ Motor de persistência de incidentes e aprendizado (SQLite + Supabase)
+│   ├── codegraph-visualizer/                    # Visualizador de grafos de código
+│   ├── context-insight-visualizer/              # Visualizador de insights de contexto
+│   └── otel-langfuse/                           # Coletor OpenTelemetry para Langfuse
 │
 └── tests/                                       # Suíte de Testes Automatizados (pytest)
     ├── governance_audit/                        # Auditoria de regras e smells de governança
