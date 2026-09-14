@@ -13,6 +13,7 @@ source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
   - .github/skills/refactoring-planning-patterns/SKILL.md
+  - .github/skills/context-mode/SKILL.md
 ---
 
 # DDD Bounded Context Mapper
@@ -32,22 +33,6 @@ Este agent é a contraparte **semântica** do `@code-knowledge-graph` (que é es
 - ❌ NÃO implementa a segregação/refatoração — delega a `@refactor-planner`.
 - ❌ NÃO substitui `@code-knowledge-graph` — sempre consome o grafo dele como insumo, nunca reimplementa parsing de AST.
 - ❌ NÃO afirma um domínio de negócio sem evidência de nomenclatura real observada no código (nunca supor intenção de negócio não documentada).
-
-## Regras Herdadas
-
-- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
-- Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
-- R-045: Exclusividade do Motor de Grafo — este agent NUNCA chama `codegraph *` diretamente nem faz varredura manual (`list_dir`) para mapear arquitetura; toda relação estrutural vem de `@code-knowledge-graph` via `run_subagent`.
-
-## Catálogo / Conhecimento Base
-
-| Item | Caminho/Uso | Observação |
-|---|---|---|
-| Agent de grafo estrutural | [`code-knowledge-graph.agent.md`](code-knowledge-graph.agent.md) | Fonte obrigatória do mapa físico (imports/module_map) antes de qualquer análise semântica (R-045) |
-| Skill de refatoração | [`../skills/refactoring-planning-patterns/SKILL.md`](../skills/refactoring-planning-patterns/SKILL.md) | Estratégias de Strangler Fig/Branch by Abstraction para os candidatos a segregação identificados |
-| Agent de blueprint | [`tech-solution-architect.agent.md`](tech-solution-architect.agent.md) | Avalia se um Bounded Context candidato justifica extração para microserviço |
-| Agent de plano de refactor | [`refactor-planner.agent.md`](refactor-planner.agent.md) | Executor do plano de segregação de módulos identificados |
-| Agent de regras de negócio | [`business-rules-extractor.agent.md`](business-rules-extractor.agent.md) | Complementar — usar quando o mapeamento de domínio precisar de detalhamento de regra específica |
 
 ## Decision Tree
 
@@ -139,15 +124,8 @@ Se a solicitação pivotar de "mapear domínios" para "implementar a segregaçã
 
 **Gatilho de deriva:** pedido de implementação/correção direta de código; pedido de análise de blast radius pontual sem foco em domínio (→ `@code-knowledge-graph` direto).
 
-## Combina Com (Commands)
+## 🔗 Combina Com
 
 - `/plan` → delimitar escopo do mapeamento de Bounded Contexts.
 - `/deep-search` → pesquisar padrões de DDD/Bounded Context aplicáveis ao domínio identificado.
 - `/validate` → confirmar mapa de contextos antes de acionar `@refactor-planner`.
-
-## Docs Sempre Anexadas (pre-fetch obrigatório)
-
-- [`../../CLAUDE.md`](../../CLAUDE.md)
-- [`../copilot-instructions.md`](../copilot-instructions.md)
-- [`../skills/refactoring-planning-patterns/SKILL.md`](../skills/refactoring-planning-patterns/SKILL.md)
-

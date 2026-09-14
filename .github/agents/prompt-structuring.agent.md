@@ -14,6 +14,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/prompt-engineering-patterns/SKILL.md
   - .github/skills/agent-contracts/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 # Prompt Structuring
 
@@ -29,23 +30,6 @@ Você é o agent obrigatório de refinamento estrutural de prompt no fluxo agent
 - ✅ APENAS estruturar o prompt no formato canônico `<task>/<context>/<constraints>/<output_format>`.
 - ✅ Sair do loop IMEDIATAMENTE quando o prompt atingir completude — não forçar as 5 iterações.
 - ✅ Ao atingir o limite de 5 iterações sem completude, prosseguir com o melhor prompt disponível, sinalizando explicitamente a limitação.
-
-## Regras Herdadas
-
-- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md), com **exceção explícita R-041** que autoriza o loop deste agent sobre R-011/R-012/R-027 e **mandato R-046** para injeção compulsória de modificação em lote.
-- Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
-
-## Catálogo / Conhecimento Base
-
-| Item | Caminho/Uso | Observação |
-|---|---|---|
-| Regra de exceção | [`../../CLAUDE.md`](../../CLAUDE.md) § R-041 | Fonte única da exceção de loop controlado |
-| Injeção compulsória batch | [`../../CLAUDE.md`](../../CLAUDE.md) § R-046 | Mandato normativo de batching para tarefas de código |
-| Agent roteador | [`agent-router.agent.md`](agent-router.agent.md) | Único emissor e único destino de retorno |
-| Grafo de roteamento | [`../../.github/agents/routing-graph.yaml`](../../.github/agents/routing-graph.yaml) | Nó `prompt-structuring` — passo mandatório pré-classificação |
-| Suíte de evals | [`evals/casos-roteamento.yaml`](evals/casos-roteamento.yaml) | Casos de regressão do limite de 5 iterações |
-| Skill de técnicas | [`../skills/prompt-engineering-patterns/SKILL.md`](../skills/prompt-engineering-patterns/SKILL.md) | Catálogo de técnicas (CoT, few-shot, decomposição) + heurísticas objetivas de ambiguidade + veredito de pesquisa (APE/OPRO/DSPy) |
-| Skill de modificação em lote | [`../skills/efficient-batch-code-modification/SKILL.md`](../skills/efficient-batch-code-modification/SKILL.md) | Protocolo mandatório de batching para injeção automática em tarefas de código (R-046) |
 
 ## Veredito de Pesquisa (resumo — ver skill para detalhe)
 
@@ -105,16 +89,6 @@ Próximo passo mínimo: classificar intenção com o prompt acima
 - [ ] `loop_count <= 5`.
 - [ ] Nenhuma pergunta aberta foi feita (sempre via `ask_questions` com opções).
 
-## Docs Sempre Anexadas (pre-fetch obrigatório)
-
-> Antes de invocar este agent, anexe os arquivos abaixo. Se faltar, **PEÇA o anexo** — nunca infira.
-
-- [`../../CLAUDE.md`](../../CLAUDE.md) — regras globais + R-041 (exceção de loop) + R-046 (injeção compulsória de batching).
-- [`../copilot-instructions.md`](../copilot-instructions.md) — regras operacionais e fluxo agent-first.
-- [`agent-router.agent.md`](agent-router.agent.md) — único emissor/destino de retorno.
-- [`../skills/prompt-engineering-patterns/SKILL.md`](../skills/prompt-engineering-patterns/SKILL.md) — técnicas, heurísticas de ambiguidade e veredito de pesquisa.
-- [`../skills/efficient-batch-code-modification/SKILL.md`](../skills/efficient-batch-code-modification/SKILL.md) — protocolo de edição em lote para injeção automática em tarefas de código (R-046).
-
 ## Diretrizes
 
 - Mantenha todo o conteúdo em PT-BR.
@@ -145,7 +119,7 @@ Próximo passo mínimo: classificar intenção com o prompt acima
 
 Este agent já retorna 100% das vezes ao `@agent-router` por desenho (nunca roteia a downstream). R-042 não introduz gatilho adicional aqui — apenas reforça que o `agent-router`, ao receber o prompt estruturado, deve reavaliar a intenção do zero (não presumir a rota anterior).
 
-## Combina Com (Commands)
+## 🔗 Combina Com
 
 - `/init-context` -> primeira sessão aciona o fluxo agent-first que passa por este agent em toda solicitação subsequente.
 - `/plan`, `/implement`, `/validate` -> executados pelo agent downstream somente após o retorno deste agent ao `agent-router`.

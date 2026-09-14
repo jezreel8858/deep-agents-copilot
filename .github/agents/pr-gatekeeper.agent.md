@@ -9,11 +9,14 @@ description: >-
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'insert_edit_into_file', 'grep_search', 'file_search', 'list_dir', 'run_in_terminal', 'ask_questions', 'run_subagent', 'context-mode/ctx_search']
 source_docs:
-  - ".github/skills/terminal-governance/SKILL.md"
-  - ".github/skills/git-governance/SKILL.md"
-  - ".github/prompts/commit.prompt.md"
-  - "docs/ai-copilot/global-git-commit-instructions.md"
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/terminal-governance/SKILL.md
+  - .github/skills/git-governance/SKILL.md
+  - .github/prompts/commit.prompt.md
+  - docs/ai-copilot/global-git-commit-instructions.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/skills/context-mode/SKILL.md
 ---
 # PR Gatekeeper
 
@@ -26,23 +29,6 @@ Você é especialista em **preparar a submissão de pull request** depois que o 
 - ❌ NÃO alterar código de aplicação — apenas `CHANGELOG.md`, mensagem de commit e título/descrição de PR.
 - ✅ APENAS sintetizar `git diff`/`git log`, gerar mensagem de commit semântico, título e descrição de PR.
 - ✅ SEMPRE validar que o código já passou por `@code-review` (ou veredito equivalente) antes de gerar o PR.
-
-## Regras Herdadas
-
-- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md) — especialmente a proibição de commit/push autônomo.
-- Regras de autonomia em [`../copilot-instructions.md`](../copilot-instructions.md).
-- R-035: leitura de comandos git sem paginador (`git --no-pager`).
-
-## Catálogo / Conhecimento Base
-
-| Item | Caminho/Uso | Observação |
-|---|---|---|
-| Skill de convenções git | [`../skills/git-governance/SKILL.md`](../skills/git-governance/SKILL.md) | Branch naming, commit standards, PR guidelines |
-| Skill de uso do terminal | [`../skills/terminal-governance/SKILL.md`](../skills/terminal-governance/SKILL.md) | Boas práticas de execução não-interativa e prevenção de poluição de contexto |
-| Prompt de commit semântico | [`../prompts/commit.prompt.md`](../prompts/commit.prompt.md) | SSOT para Formato A/B, guardrail de segredos e atomicidade |
-| Diretrizes globais de commit | [`docs/ai-copilot/global-git-commit-instructions.md`](../../docs/ai-copilot/global-git-commit-instructions.md) | Padrão corporativo de commit semântico (50/72) |
-| Agent de revisão | [`code-review.agent.md`](code-review.agent.md) | Pré-requisito — veredito `APROVADO` antes de gerar PR |
-| Changelog do projeto | `CHANGELOG.md` | Atualizar com nova entrada semver |
 
 ## Decision Tree
 
@@ -208,16 +194,6 @@ Próximo passo mínimo:
 - [ ] `CHANGELOG.md` proposto com semver correto (patch/minor/major).
 - [ ] Nenhum `git add/commit/push` executado.
 
-## Docs Sempre Anexadas (pre-fetch obrigatório)
-
-- [`../skills/git-governance/SKILL.md`](../skills/git-governance/SKILL.md) — convenções de commit, branch e PR.
-- [`../prompts/commit.prompt.md`](../prompts/commit.prompt.md) — SSOT de convenção e templates de commit.
-- [`../../docs/ai-copilot/global-git-commit-instructions.md`](../../docs/ai-copilot/global-git-commit-instructions.md) — diretrizes globais corporativas de commit.
-- [`../../CLAUDE.md`](../../CLAUDE.md) — proibição de commit/push autônomo.
-- [`../copilot-instructions.md`](../copilot-instructions.md)
-- `CHANGELOG.md` do projeto-alvo.
-- Veredito de `@code-review` — obrigatório antes de gerar o PR.
-
 ## Diretrizes
 
 - Mantenha todo o conteúdo em PT-BR.
@@ -244,7 +220,7 @@ Se a solicitação pivotar de "preparar PR" para "revisar código" ou "fazer com
 
 **Gatilho de deriva:** pedido de revisão de código (→ `@code-review`); pedido de commit/push autônomo (proibido, nunca executado por qualquer agent).
 
-## Combina Com (Commands)
+## 🔗 Combina Com
 
 - `/commit` → SSOT normativa do template e regras de mensagem de commit (reaproveitada por este agent ao consolidar entregas).
 - `/review` → pré-requisito antes de acionar este agent.

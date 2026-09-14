@@ -7,10 +7,12 @@ description: >-
 model: "Claude Sonnet 5"
 tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
 source_docs:
-  - ".github/skills/performance-engineering-patterns/SKILL.md"
-  - ".github/skills/context-mode/SKILL.md"
-  - ".github/skills/agent-contracts/SKILL.md"
-  - ".github/instructions/database.instructions.md"
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/performance-engineering-patterns/SKILL.md
+  - .github/skills/context-mode/SKILL.md
+  - .github/skills/agent-contracts/SKILL.md
+  - .github/instructions/database.instructions.md
 ---
 
 # Informix Query Tuner
@@ -36,18 +38,6 @@ Você atua como **Especialista Sênior em Performance e Query Tuning para IBM In
   - `UPDATE STATISTICS HIGH FOR TABLE tabela(coluna_distribuicao);`
   - `UPDATE STATISTICS MEDIUM FOR TABLE tabela;`
 - ✅ Desenhar recomendações de novos índices e diretivas de otimização Informix (`{+ AVOID_FULL(tabela) }`, `{+ INDEX(tabela indice) }`, `{+ ORDERED }`).
-
-## Regras Herdadas
-
-- Regras normativas globais em [`../../../../../CLAUDE.md`](../../../../../CLAUDE.md).
-- Adapter de banco de dados em [`../../../../instructions/database.instructions.md`](../../../../instructions/database.instructions.md).
-- Skill de engenharia de performance em [`../../../../skills/performance-engineering-patterns/SKILL.md`](../../../../skills/performance-engineering-patterns/SKILL.md).
-
-## Skills Associadas
-
-- `performance-engineering-patterns`
-- `agent-contracts`
-- `context-mode`
 
 ## Formato de Saída
 

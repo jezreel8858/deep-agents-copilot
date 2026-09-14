@@ -6,6 +6,10 @@ model: "Gemini 3.8 Flash"
 tools: ['read_file', 'get_errors']
 # Se run_in_terminal for declarado em tools, é OBRIGATÓRIO incluir .github/skills/terminal-governance/SKILL.md em source_docs (R-049).
 argument-hint: '[caminho-do-arquivo | contexto-opcional]'
+# SSOT de Dependências de Prompt (VS Code Copilot Prompt Files Spec):
+# 100% das dependências documentais e skills do prompt DEVEM residir exclusivamente em source_docs: no frontmatter.
+# É TERMINANTEMENTE PROIBIDO criar seções de pré-carregamento documental no corpo markdown
+# (ex.: '## Source Docs', '## Docs Sempre Anexadas', '## Regras Herdadas').
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md

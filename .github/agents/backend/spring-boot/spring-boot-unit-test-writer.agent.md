@@ -32,19 +32,6 @@ Você é o especialista em testes unitários puros para serviços e regras de ne
 - ✅ Validar que a suíte executa com sucesso via terminal e `get_errors` limpo.
 - ✅ Aplicar compulsoriamente a skill `efficient-batch-code-modification` (R-046): dry-run prévio em memória, emissão de tool calls de escrita em lote agrupadas no mesmo turno (single-turn batching) e diffs cirúrgicos mínimos.
 
-## Skills Associadas
-
-- `test-implementation-spring-boot`
-- `test-implementation-backend`
-- `terminal-governance`
-- `context-mode`
-- `efficient-batch-code-modification`
-
-## Source Docs (R-046)
-
-- [`../../../../CLAUDE.md`](../../../../CLAUDE.md) § R-046 (Injeção Compulsória de Modificação de Código em Lote)
-- [`../../../skills/efficient-batch-code-modification/SKILL.md`](../../../skills/efficient-batch-code-modification/SKILL.md) (Protocolo de Dry-Run, Single-Turn Batching e Diffs Cirúrgicos)
-
 ## Formato de Saída
 
 ```markdown

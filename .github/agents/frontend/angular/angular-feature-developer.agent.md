@@ -49,20 +49,6 @@ Feature/tarefa recebida pelo Angular Feature Developer?
 │   └─ Não → escrever teste primeiro, nunca implementar sem cobertura
 └─ Fora do domínio Angular (backend, infraestrutura)? → retornar ao @angular-router (deriva_de_intencao)
 ```
-## Skills Associadas
-
-- `angular-implementation-patterns`
-- `frontend-componentization-patterns`
-- `test-implementation-angular-vitest`
-- `terminal-governance`
-- `context-mode`
-- `efficient-batch-code-modification`
-
-## Source Docs (R-046)
-
-- [`../../../../CLAUDE.md`](../../../../CLAUDE.md) § R-046 (Injeção Compulsória de Modificação de Código em Lote)
-- [`../../../skills/efficient-batch-code-modification/SKILL.md`](../../../skills/efficient-batch-code-modification/SKILL.md) (Protocolo de Dry-Run, Single-Turn Batching e Diffs Cirúrgicos)
-
 ## Formato de Saída
 
 ```markdown

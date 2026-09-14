@@ -1,5 +1,6 @@
 ---
 name: test-strategy
+version: "1.0.0"
 description: >-
   Definir estratégia de testes por risco, escopo e cobertura, sem implementar
   testes automaticamente.
@@ -10,6 +11,10 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/test-coverage-governance/SKILL.md
   - .github/skills/task-decomposition-patterns/SKILL.md
+  - .github/skills/agent-evals-lab/SKILL.md
+  - .github/skills/confidence-fallback-policy/SKILL.md
+  - .github/skills/context-mode/SKILL.md
+  - .github/skills/mermaid-diagrams/SKILL.md
 ---
 # Test Strategy
 
@@ -25,20 +30,6 @@ Atua em 2 fluxos de integração:
 - ❌ NÃO sugerir cenários sem vínculo com risco/escopo real.
 - ❌ NÃO converter estratégia em execução de refactor.
 - ✅ APENAS definir estratégia, escopo, prioridade, casos de borda e critérios de aceitação.
-
-## Regras Herdadas
-
-- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
-- Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
-
-## Catálogo / Conhecimento Base
-
-| Item | Caminho/Uso | Observação |
-|---|---|---|
-| Catálogo textual | [`README.md`](README.md) | Descoberta de agentes e escopos |
-| Catálogo estruturado | [`catalog.yaml`](catalog.yaml) | Fonte de roteamento e governança |
-| Router de entrada | [`agent-router.agent.md`](agent-router.agent.md) | Delegação principal de testes |
-| Curadoria de docs | [`docs-engineer.agent.md`](docs-engineer.agent.md) | Documentar estratégia final |
 
 ## Decision Tree
 
@@ -90,21 +81,6 @@ Próximo passo mínimo:
 - [ ] Critérios de aceitação definidos.
 - [ ] Próximo passo objetivo.
 
-## Docs Sempre Anexadas (pre-fetch obrigatório)
-
-> Antes de invocar este agent, anexe os arquivos abaixo. Se faltar, **PEÇA o anexo** — nunca infira.
-
-- [`README.md`](README.md)
-- [`catalog.yaml`](catalog.yaml)
-- [`../../CLAUDE.md`](../../CLAUDE.md)
-- [`../copilot-instructions.md`](../copilot-instructions.md)
-- [`../skills/mermaid-diagrams/SKILL.md`](../skills/mermaid-diagrams/SKILL.md) | Visualização de fluxos e dependências
-- [`../skills/context-mode/SKILL.md`](../skills/context-mode/SKILL.md) — coleta eficiente de escopo/cobertura atual.
-- [`../skills/test-coverage-governance/SKILL.md`](../skills/test-coverage-governance/SKILL.md) — priorização por risco e métricas de cobertura.
-- Skill da stack alvo (`test-implementation-backend` | `test-implementation-frontend` | `test-implementation-spring-boot` | `test-implementation-angular-vitest` | `test-implementation-angular-jasmine` | `test-implementation-python`) — carregar conforme stack identificada.
-- [`../skills/agent-evals-lab/SKILL.md`](../skills/agent-evals-lab/SKILL.md) — quando a estratégia envolver avaliação de agents/prompts.
-- [`../skills/confidence-fallback-policy/SKILL.md`](../skills/confidence-fallback-policy/SKILL.md) — score de confiança ao declarar prioridade de cenários.
-
 ## Diretrizes
 
 - Conteúdo em PT-BR.
@@ -133,7 +109,7 @@ Se a solicitação pivotar de "definir estratégia" para "implementar os testes"
 
 **Gatilho de deriva:** pedido de escrita/execução de testes; pedido de correção de bug (→ `@bug-triage`).
 
-## Combina Com (Commands)
+## 🔗 Combina Com
 
 - `/plan` -> desenhar estratégia.
 - `/validate` -> checar aderência da matriz.

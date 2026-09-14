@@ -48,20 +48,6 @@ Tarefa de UI/estilização recebida pelo Angular UI Stylist?
 │   └─ Sim → handoff para @angular-feature-developer
 └─ Fora do domínio Angular? → retornar ao @angular-router (deriva_de_intencao)
 ```
-## Skills Associadas
-
-- `angular-responsive-ui-patterns`
-- `design-system-component-contracts`
-- `frontend-componentization-patterns`
-- `terminal-governance`
-- `context-mode`
-- `efficient-batch-code-modification`
-
-## Source Docs (R-046)
-
-- [`../../../../CLAUDE.md`](../../../../CLAUDE.md) § R-046 (Injeção Compulsória de Modificação de Código em Lote)
-- [`../../../skills/efficient-batch-code-modification/SKILL.md`](../../../skills/efficient-batch-code-modification/SKILL.md) (Protocolo de Dry-Run, Single-Turn Batching e Diffs Cirúrgicos)
-
 ## Formato de Saída
 
 ```markdown

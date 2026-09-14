@@ -1,5 +1,6 @@
 ---
 name: adapter-generator
+version: "1.0.0"
 description: >-
   Gera automaticamente adapters por-projeto em `.github/instructions/local/`
   (gitignored, R-043) via scanner read-only de stack e arquitetura. Opera em
@@ -11,6 +12,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/project-scanner/SKILL.md
   - .github/skills/handoff-governance/SKILL.md
+  - .github/skills/context-mode/SKILL.md
 ---
 # Gerador de Adapters
 
@@ -61,15 +63,9 @@ Você é um agente operacional especializado em gerar automaticamente arquivos a
 | `OverwriteStrategy` de mercado para geração idempotente de arquivo: `Overwrite` (padrão, sobrescreve) \| `KeepExisting` (mantém se já existe) \| `ThrowIfExisting` (falha se já existe) | [Nx — Creating Files with a Generator](https://nx.dev/docs/kb/creating-files) | Este agent já usa `KeepExisting` (SKIP se existir) como padrão — nomenclatura adotada explicitamente abaixo, substitui prosa vaga de "idempotência" |
 | OWASP LLM06:2025 (Excessive Agency) e OWASP Agentic AI ASI02/ASI03 (Tool Misuse, Identity/Privilege Abuse): mitigar restringindo escopo/permissão/autonomia por invocação, nunca dar a um agent mais alcance do que a tarefa exige | [Aembit — OWASP Top 10 LLM 2025](https://aembit.io/blog/owasp-top-10-llm-risks-explained), [Promptfoo — OWASP Agentic AI](https://www.promptfoo.dev/docs/red-team/owasp-agentic-ai) | Fundamenta a divisão em 3 modos (`scan`/`generate-one`/`batch`) — cada modo só acessa o escopo mínimo necessário (least privilege), nunca lote quando 1 projeto basta |
 
-## Regras Herdadas
-
-- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
-- Regras de autonomia + Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
-- Genericidade obrigatória (R-038): adapters em `.github/instructions/` devem ser genéricos por stack, não por projeto específico.
-
 ## 🔍 Scanner de Projeto — O Que Procurar
 
-Aplicar o checklist de scan definido em `project-scanner-governance` (skill já carregada em Docs Sempre Anexadas), mantendo scanner estritamente **read-only** nos projetos externos e usando o resultado para customizar o adapter gerado neste repositório.
+Aplicar o checklist de scan definido em `project-scanner-governance` (skill declarada em `source_docs`), mantendo scanner estritamente **read-only** nos projetos externos e usando o resultado para customizar o adapter gerado neste repositório.
 
 ## Modos de Operação
 

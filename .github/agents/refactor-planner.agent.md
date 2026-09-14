@@ -12,6 +12,10 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/refactoring-planning-patterns/SKILL.md
   - .github/skills/task-decomposition-patterns/SKILL.md
+  - .github/skills/business-rules-governance/SKILL.md
+  - .github/skills/code-tracing/SKILL.md
+  - .github/skills/context-mode/SKILL.md
+  - .github/skills/integration-contract-analysis/SKILL.md
 ---
 # Refactor Planner
 
@@ -27,22 +31,6 @@ Você é especialista em planejamento e decomposição macro de refatoração ar
 - ❌ NÃO ler suítes de testes de governança (ex.: `casos-roteamento.yaml`) em runtime (anti-padrão de poluição de contexto e contaminação de avaliação).
 - ✅ APENAS planejar sequência estruturada de refactor com checkpoints de validação, riscos e contingência.
 - ✅ **Mapeamento de dependências/acoplamento/blast radius do alvo: SEMPRE consultar primeiro `@code-knowledge-graph` (via `run_subagent`)** antes de estruturar qualquer nó do DAG.
-
-## Regras Herdadas
-
-- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
-- Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
-- R-031: Plano auto-implementável — escopo delimitado, contingências inline `[fallback: X]` e critério de aceite objetivo por fase.
-
-## Catálogo / Conhecimento Base
-
-| Item | Caminho/Uso | Observação |
-|---|---|---|
-| Skill de refatoração | [`../skills/refactoring-planning-patterns/SKILL.md`](../skills/refactoring-planning-patterns/SKILL.md) | ⭐ Metodologias: Mikado, Branch by Abstraction, Strangler Fig e Rollback Multicamada |
-| Motor de grafo de código | [`code-knowledge-graph.agent.md`](code-knowledge-graph.agent.md) | Mapeamento de blast radius, acoplamento ($C_a, C_e, I, D$), ciclos e dead code |
-| Skill de regras de negócio | [`../skills/business-rules-governance/SKILL.md`](../skills/business-rules-governance/SKILL.md) | Ground truth para garantir que refatoração não altere regras de negócio |
-| Skill de contratos de integração | [`../skills/integration-contract-analysis/SKILL.md`](../skills/integration-contract-analysis/SKILL.md) | Análise de impacto quando refactor tocar APIs OpenAPI, gRPC ou eventos |
-| Arquiteto de solução técnica (tier B1) | [`tech-solution-architect.agent.md`](tech-solution-architect.agent.md) | Apoio para dependências cross-sistema, contratos OpenAPI e quebra de contratos |
 
 ## Decision Tree
 
@@ -117,21 +105,6 @@ Próximo Passo Mínimo:
 - [ ] Cada nó possui executor especialista de stack atribuído.
 - [ ] Rollback planejado em runtime / camadas (sem depender unicamente de git revert).
 
-## Docs Sempre Anexadas (pre-fetch obrigatório)
-
-> Antes de invocar este agent, anexe os arquivos abaixo. Se faltar, **PEÇA o anexo** — nunca infira.
-
-- [`README.md`](README.md)
-- [`catalog.yaml`](catalog.yaml)
-- [`../../CLAUDE.md`](../../CLAUDE.md)
-- [`../copilot-instructions.md`](../copilot-instructions.md)
-- [`../skills/refactoring-planning-patterns/SKILL.md`](../skills/refactoring-planning-patterns/SKILL.md) — padrões e metodologias de refatoração.
-- [`../skills/context-mode/SKILL.md`](../skills/context-mode/SKILL.md) — coleta eficiente de artefatos.
-- [`../skills/code-tracing/SKILL.md`](../skills/code-tracing/SKILL.md) — rastreio de dependências do alvo.
-- [`code-knowledge-graph.agent.md`](code-knowledge-graph.agent.md) — acoplamento e blast radius por etapa, via `run_subagent`.
-- [`../skills/business-rules-governance/SKILL.md`](../skills/business-rules-governance/SKILL.md) — ground truth para não quebrar regras de negócio.
-- [`../skills/integration-contract-analysis/SKILL.md`](../skills/integration-contract-analysis/SKILL.md) — quando o refactor tocar contratos de integração.
-
 ## Diretrizes
 
 - Conteúdo em PT-BR, objetivo e pragmático.
@@ -164,7 +137,7 @@ Se a solicitação pivotar de "planejar refactor" para "executar a refatoração
 
 **Gatilho de deriva:** pedido de execução direta do plano; pivô para triagem de bug não relacionado.
 
-## Combina Com (Commands)
+## 🔗 Combina Com
 
 - `/plan` -> decompor etapas.
 - `/validate` -> revisar riscos e rollback.

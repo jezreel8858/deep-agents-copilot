@@ -6,6 +6,24 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.8.6] — 2026-09-14
+
+### Refatorado & Consolidado
+- **Consolidação Global de SSOT no Frontmatter (`source_docs:`) e Extirpação de Redundâncias**:
+  - Unificação de 100% das dependências normativas, contextuais e skills no frontmatter YAML `source_docs:`, eliminando a quádrupla duplicação de links documentais no catálogo de agentes e prompts.
+  - Extirpadas **1.350+ linhas de texto redundante** em 79 agentes (`.agent.md`) e 2 prompts (`.prompt.md`), removendo as seções obsoletas do corpo markdown: `## Regras Herdadas`, `## Catálogo / Conhecimento Base`, `## Skills Associadas`, `## Docs Sempre Anexadas (pre-fetch obrigatório)` e `## Source Docs (R-046)`.
+  - Preservadas integralmente as seções contratuais de roteamento dos supervisores hierárquicos (8 routers), garantindo a conformidade da máquina de estados de despacho.
+- **Refinamento e Blindagem dos Templates Canônicos (`.github/templates/`)**:
+  - `agent-template.md`, `operational-agent.md`, `research-agent.md`: Adicionada diretriz normativa de SSOT de documentação, formalizando o bloqueio estrito de seções redundantes de doc-loading no corpo markdown.
+  - `router-agent.md`: Documentado o contrato estrutural fechado para supervisores hierárquicos e alinhamento com `test_router_agents.py`.
+  - `prompt-template.md`: Consolidada a especificação oficial de Prompt Files com injeção de dependências em `source_docs:` e variáveis nativas do VS Code Copilot.
+  - `skill-template.md`: Formalizada a arquitetura de *Progressive Disclosure* em 3 níveis (Nível 1 Metadados, Nível 2 Corpo Operacional de 7 seções canônicas, Nível 3 Recursos Suplementares).
+  - Atualizados `governance-factory.agent.md`, `governance-audit-patterns/SKILL.md` (Smell 2.2 saneado) e `adapter-generator.agent.md` para eliminar referências residuais à seção descontinuada `Docs Sempre Anexadas`.
+- **Quality Gate de Governança — Gate de Homologação de Seções (Tier 1)**:
+  - `tests/governance_audit/test_template_sections.py`: Implementados 4 novos testes determinísticos (`test_homologation_gate_no_unhomologated_sections_in_agents`, `test_homologation_gate_no_unhomologated_sections_in_prompts`, `test_homologation_gate_no_unhomologated_sections_in_skills`, `test_homologation_gate_blocks_unhomologated_injections`) para barrar compulsoriamente a injeção de seções ad-hoc sem template previamente homologado. Suíte expandida para 127 testes passando com 100% verde.
+
+---
+
 ## [2.8.5] — 2026-09-14
 
 ### Aprimorado

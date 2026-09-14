@@ -15,6 +15,7 @@ source_docs:
   - .github/skills/governance-factory-patterns/SKILL.md
   - .github/skills/agent-contracts/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/skills/context-mode/SKILL.md
 ---
 # Governance Factory
 
@@ -102,34 +103,12 @@ Retorne a síntese com citações de fontes para o solicitante 'governance-facto
 });
 ```
 
-## Regras Herdadas
-
-- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
-- Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
-- R-026: código inline > 8 linhas → `templates/`/`snippets/`.
-
-## Catálogo / Conhecimento Base
-
-| Item | Caminho/Uso | Aplica a |
-|---|---|---|
-| Fluxo canônico de factory | [`../skills/governance-factory-patterns/SKILL.md`](../skills/governance-factory-patterns/SKILL.md) | Todos os tipos — Decision Tree §1, checklist §3, saída §4, seleção de modelo §9 |
-| Pesquisa prévia de diretrizes e skills | [`deep-search.agent.md`](deep-search.agent.md) | **Obrigatório antes de criar** qualquer agent, prompt ou skill |
-| Template canônico de agent (unificado) | [`templates/agent-template.md`](templates/agent-template.md) | `type: agent` |
-| Template de agent operacional / procedural | [`templates/operational-agent.md`](templates/operational-agent.md) | `type: agent` |
-| Template de agent deliberativo / research | [`templates/research-agent.md`](templates/research-agent.md) | `type: agent` |
-| Template canônico de skill | [`../skills/templates/skill-template.md`](../skills/templates/skill-template.md) | `type: skill` |
-| Exemplo skill Tier 1 | `../skills/agent-contracts/SKILL.md` | `type: skill` |
-| Template de prompt | [`../prompts/templates/prompt-template.md`](../prompts/templates/prompt-template.md) | `type: prompt` |
-| Catálogo de agents | [`README.md`](README.md) + [`catalog.yaml`](catalog.yaml) | `type: agent` |
-| Índice de skills | `.github/skills/.index.json` + `.github/skills/README.md` | `type: skill` |
-| README de prompts | `.github/prompts/README.md` | `type: prompt` |
-
 ## Padrão Estrutural por Tipo
 
 ### `type: agent`
 
-- Frontmatter `name`, `description`, `model` (Title Case oficial), `tools` (com `run_subagent` obrigatório por R-042; se `run_in_terminal` presente, inclusão compulsória de `terminal-governance` em `source_docs` por R-049).
-- Ordem de seções: objetivo → CRÍTICO → Regras Herdadas → Catálogo → Decision Tree → Padrões → Formato Saída → Checklist → Docs Sempre Anexadas → Diretrizes → Anti-padrões → Quando Delegar → Retorno ao Router → Combina Com.
+- Frontmatter `name`, `version`, `description`, `model` (Title Case oficial), `tools` (com `run_subagent` obrigatório por R-042; se `run_in_terminal` presente, inclusão compulsória de `terminal-governance` em `source_docs` por R-049), `source_docs` (SSOT declarativo de governança e dependências funcionais).
+- Ordem de seções canônicas: H1 (Identidade) → CRÍTICO (Escopo/Não-Escopo) → Decision Tree / Workflow Numerado → Padrões / Protocolo → Contrato Operacional / Formato Saída → Checklist → Anti-padrões → Quando Delegar → Retorno ao Router → Combina Com. (Proibidas seções redundantes de doc-loading no corpo).
 - Atualizar `README.md` + `catalog.yaml` na mesma entrega.
 
 ### `type: skill`
@@ -216,16 +195,6 @@ Executar o checklist genérico de `governance-factory-patterns` §3, mais:
 - [ ] `model:` (quando presente) validado via `get_errors`.
 - [ ] Se `run_in_terminal` for declarado em `tools:` (agent, prompt ou stack): inclusão compulsória de `.github/skills/terminal-governance/SKILL.md` em `source_docs` (ou `skills:` locais) (R-049).
 
-## Docs Sempre Anexadas (pre-fetch obrigatório)
-
-- [`../skills/governance-factory-patterns/SKILL.md`](../skills/governance-factory-patterns/SKILL.md) — fluxo canônico comum aos 3 tipos.
-- [`deep-search.agent.md`](deep-search.agent.md) — subagente mandatório de pesquisa pré-criação.
-- [`../../CLAUDE.md`](../../CLAUDE.md)
-- [`README.md`](README.md) — catálogo de agents (`type: agent`)
-- [`templates/operational-agent.md`](templates/operational-agent.md) / [`templates/research-agent.md`](templates/research-agent.md) / [`templates/agent-template.md`](templates/agent-template.md) — `type: agent`
-- [`../skills/templates/skill-template.md`](../skills/templates/skill-template.md) + `.github/skills/.index.json` + `.github/skills/README.md` — `type: skill`
-- [`../prompts/templates/prompt-template.md`](../prompts/templates/prompt-template.md) + `../prompts/README.md` — `type: prompt`
-
 ## Diretrizes
 
 - Mantenha todo o conteúdo em PT-BR.
@@ -262,7 +231,7 @@ Se a solicitação pivotar de "criar/revisar artefato de governança" para "impl
 
 **Gatilho de deriva:** pedido de implementação de feature da aplicação; pedido de documentação ampla não-estrutural (→ `@docs-engineer`).
 
-## Combina Com (Commands)
+## 🔗 Combina Com
 
 - `/plan` → definir tipo e escopo do novo artefato.
 - `/implement` → materializar o artefato e atualizar catálogo correspondente.

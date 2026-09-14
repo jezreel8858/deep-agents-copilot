@@ -11,6 +11,7 @@ model: Gemini 3.8 Flash
 tools: ['read_file', 'insert_edit_into_file', 'create_file', 'grep_search', 'file_search', 'list_dir', 'get_errors', 'ask_questions', 'run_subagent', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_search', 'context-mode/ctx_index']
 source_docs:
   - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/copilot-instructions.md
   - .github/skills/context-mode/SKILL.md
   - CLAUDE.md
 ---
@@ -39,28 +40,6 @@ Você foi concebido para **eliminar a queima de tokens e créditos** que ocorre 
   6. Referências cruzadas em outros agents (`Quando Delegar`)
   7. `.index.json` (se envolver skills)
   8. `copilot-instructions.md`, `CLAUDE.md`, `README.md` e `CHANGELOG.md`
-
-## Regras Herdadas
-
-- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
-- Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
-- Skill fundamental: [`../skills/efficient-batch-code-modification/SKILL.md`](../skills/efficient-batch-code-modification/SKILL.md) — execução em lote com economia de créditos.
-- R-046: injeção compulsória de batching e protocolo da skill `efficient-batch-code-modification`.
-- R-015: atualização atômica obrigatória de catálogos e referências.
-- R-040: integridade do grafo de roteamento como fonte de verdade.
-
-## Catálogo / Conhecimento Base
-
-| Item | Caminho/Uso | Observação |
-|---|---|---|
-| Skill de Edição em Lote | [`../skills/efficient-batch-code-modification/SKILL.md`](../skills/efficient-batch-code-modification/SKILL.md) | ⭐ Protocolo de dry-run, batching e diffs cirúrgicos |
-| Skill Context Mode | [`../skills/context-mode/SKILL.md`](../skills/context-mode/SKILL.md) | Coleta e busca em sandbox sem poluição de contexto |
-| Catálogo de Agents | [`catalog.yaml`](catalog.yaml) | Fonte estruturada de verdade dos agents |
-| Grafo de Roteamento | [`routing-graph.yaml`](routing-graph.yaml) | Nós, arestas e políticas de cascata |
-| Suíte de Evals | [`evals/casos-roteamento.yaml`](evals/casos-roteamento.yaml) | Casos canônicos e de regressão de roteamento |
-| Índice de Skills | [`../skills/.index.json`](../skills/.index.json) | Metadados e related_agents de todas as skills |
-| Auditor de Governança | [`agent-auditor.agent.md`](agent-auditor.agent.md) | Origem comum de relatórios de smells a corrigir |
-| Fábrica de Governança | [`governance-factory.agent.md`](governance-factory.agent.md) | Criação de novos artefatos do zero |
 
 ## Protocolo de Execução em 3 Fases (Batch Protocol)
 
@@ -120,7 +99,7 @@ Agente Ativo: governance-maintainer
 **Banner obrigatório**: toda resposta abre com `Agente Ativo: governance-maintainer`.
 Se a solicitação pivotar para criar um novo agente/skill do zero com pesquisa de mercado (→ `@governance-factory`), auditar smells sem alterar (→ `@agent-auditor`) ou implementar código de aplicação, retornar para `@agent-router` com handoff (`motivo: "deriva_de_intencao"`).
 
-## Combina Com (Commands)
+## 🔗 Combina Com
 
 - `/validate` → verificar integridade de catálogos após alterações.
 - `@agent-auditor` → consome relatórios de smells para aplicar correções em lote.

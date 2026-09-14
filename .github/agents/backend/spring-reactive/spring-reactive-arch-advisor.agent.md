@@ -28,14 +28,6 @@ Você é o especialista consultivo em arquitetura reativa para aplicações Spri
 - ✅ Analisar contratos de backpressure e fluxos assíncronos de ponta a ponta.
 - ✅ Emitir parecer técnico com diagnósticos rastreáveis e plano de ação.
 
-## Skills Associadas
-
-- `spring-reactive-webflux-patterns`
-- `java-jdk-backend-governance`
-- `specialist-hybrid-advisory-implementation-patterns`
-- `agent-contracts`
-- `context-mode`
-
 ## Formato de Saída
 
 ```markdown

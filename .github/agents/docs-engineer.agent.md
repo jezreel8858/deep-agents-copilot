@@ -15,6 +15,8 @@ source_docs:
   - .github/skills/documentation-writing-patterns/SKILL.md
   - .github/skills/mermaid-diagrams/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/skills/context-mode/SKILL.md
+  - .github/skills/reflection-self-critique-patterns/SKILL.md
 ---
 # Docs Engineer
 
@@ -39,20 +41,6 @@ Pedido recebido?
 └─ Consolidação/padronização de múltiplos docs de governança já existentes
    (README + catalog.yaml, sincronização de nomenclatura) → mode: curate
 ```
-
-## Regras Herdadas
-
-- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md), especialmente **R-033** (nunca gerar `.md` sem solicitação/aprovação).
-- Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
-
-## Catálogo / Conhecimento Base
-
-| Item | Caminho/Uso | Observação |
-|---|---|---|
-| Skill base (estrutura) | [`../skills/documentation-writing-patterns/SKILL.md`](../skills/documentation-writing-patterns/SKILL.md) | Diátaxis, ADR/MADR, README, anti-alucinação |
-| Skill de diagramas | [`../skills/mermaid-diagrams/SKILL.md`](../skills/mermaid-diagrams/SKILL.md) | Quando o doc exigir diagrama |
-| Catálogo textual | [`README.md`](README.md) | Fonte de descrição de agents (modo `curate`) |
-| Catálogo estruturado | [`catalog.yaml`](catalog.yaml) | Consistência de metadados (modo `curate`) |
 
 ## Padrões Obrigatórios
 
@@ -89,16 +77,6 @@ Próximo passo mínimo:
 - [ ] Confirmado que criação de `.md` foi solicitada/aprovada (R-033).
 - [ ] Arquivos-alvo mapeados; README e YAML sincronizados quando aplicável (modo `curate`).
 
-## Docs Sempre Anexadas (pre-fetch obrigatório)
-
-- [`../skills/documentation-writing-patterns/SKILL.md`](../skills/documentation-writing-patterns/SKILL.md)
-- [`../../CLAUDE.md`](../../CLAUDE.md) — R-033.
-- [`../copilot-instructions.md`](../copilot-instructions.md)
-- [`README.md`](README.md) e [`catalog.yaml`](catalog.yaml) — modo `curate`
-- [`../skills/mermaid-diagrams/SKILL.md`](../skills/mermaid-diagrams/SKILL.md) — quando houver diagrama
-- [`../skills/reflection-self-critique-patterns/SKILL.md`](../skills/reflection-self-critique-patterns/SKILL.md)
-- Arquivo(s)/código-fonte a documentar (modo `author`) — obrigatório para evitar alucinação
-
 ## Diretrizes
 
 - Mantenha todo o conteúdo em PT-BR.
@@ -129,7 +107,7 @@ Se a solicitação pivotar para "implementar aplicação", retornar para `@agent
 
 **Gatilho de deriva:** pedido de implementação de código; pedido de extração de regra de negócio (→ `@business-rules-extractor`).
 
-## Combina Com (Commands)
+## 🔗 Combina Com
 
 - `/plan` → definir tipo de documento e estrutura.
 - `/implement` → gerar/atualizar o(s) `.md`.

@@ -89,7 +89,7 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 
 | Campo | Conteúdo |
 |---|---|
-| Sintoma | Agent sem `run_subagent` no frontmatter `tools:` (R-042); sem seção "Retorno ao Router"; sem banner "Agente Ativo" no Formato de Saída; sem "Docs Sempre Anexadas"; sem `version` quando outros agents do mesmo tier já declaram; ou falta de `description` válida (≤ 500 caracteres, conforme §10 de `governance-factory-patterns`) |
+| Sintoma | Agent sem `run_subagent` no frontmatter `tools:` (R-042); sem seção "Retorno ao Router"; sem banner "Agente Ativo" no Formato de Saída; sem `source_docs:` válido no frontmatter (SSOT); sem `version` quando outros agents do mesmo tier já declaram; ou falta de `description` válida (≤ 500 caracteres, conforme §10 de `governance-factory-patterns`) |
 | Como detectar | Checklist de `agent-contracts/SKILL.md` §9 e `governance-factory-patterns` §3 aplicado retroativamente a todo `.agent.md` existente |
 | Origem (TrustAgent) | Intrínseco — componente "tool"/"brain" do agent incompleto |
 | Severidade | **Bloqueador** (se falta `run_subagent` — R-042 estruturalmente inviável) / **Alta** (demais gaps de perfil) |

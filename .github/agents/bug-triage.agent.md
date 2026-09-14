@@ -36,28 +36,6 @@ Você é especialista em triagem técnica de bugs. Seu trabalho é estruturar re
 - ✅ Rastrear causa raiz via código usando skill `code-tracing` e motor de grafo (`@code-knowledge-graph`).
 - ✅ Adaptar coleta de contexto ao que o usuário tem disponível, ativando questionamento ativo de regras.
 
-## Regras Herdadas
-
-- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
-- Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
-- Governança de terminal (fallback de última instância): [`../skills/terminal-governance/SKILL.md`](../skills/terminal-governance/SKILL.md).
-
-## Catálogo / Conhecimento Base
-
-| Item | Caminho/Uso | Observação |
-|---|---|---|
-| Skill de rastreio de código | [`../skills/code-tracing/SKILL.md`](../skills/code-tracing/SKILL.md) | **Carregar antes de iniciar investigação** |
-| Skill de terminal | [`../skills/terminal-governance/SKILL.md`](../skills/terminal-governance/SKILL.md) | Para comandos grep/terminal não-interativos |
-| Skill de intake estruturado | [`../skills/structured-intake-patterns/SKILL.md`](../skills/structured-intake-patterns/SKILL.md) | Protocolo P1..PN e Challenge Gate |
-| Skill de planejamento de refatoração | [`../skills/refactoring-planning-patterns/SKILL.md`](../skills/refactoring-planning-patterns/SKILL.md) | Safety net quando o bug exigir mini-refactoring |
-| Skill de governança de regras de negócio | [`../skills/business-rules-governance/SKILL.md`](../skills/business-rules-governance/SKILL.md) | Formalização e questionamento de regras |
-| Skill de modificação em lote eficiente | [`../skills/efficient-batch-code-modification/SKILL.md`](../skills/efficient-batch-code-modification/SKILL.md) | Otimização de tokens, prevenção de loops e diffs mínimos |
-| Catálogo textual | [`README.md`](README.md) | Descoberta e roteamento entre agents |
-| Catálogo estruturado | [`catalog.yaml`](catalog.yaml) | Fonte de verdade para escopo |
-| Router de entrada | [`agent-router.agent.md`](agent-router.agent.md) | Origem principal de delegação |
-| Motor de Grafo de Conhecimento | [`code-knowledge-graph.agent.md`](code-knowledge-graph.agent.md) | Análise de blast radius, dependências e impacto transitivo (R-045) |
-| Arquiteto de solução técnica (tier B1) | [`tech-solution-architect.agent.md`](tech-solution-architect.agent.md) | Apoio quando bug exige análise de impacto local ou arquitetura aprofundada |
-
 ## Pré-Checklist de Triagem — Coleta de Contexto (OBRIGATÓRIO)
 
 Aplicar o padrão canônico de intake da skill [`../skills/structured-intake-patterns`](../skills/structured-intake-patterns/SKILL.md) (estrutura `P1..PN`, classificação Obrigatório/Recomendado/Opcional e template de consolidação `PRÉ-CONTEXTO VALIDADO`).
@@ -356,22 +334,6 @@ C) PARCIALMENTE — Preciso de mais informações ou há outro componente afetad
 - [ ] Severidade classificada?
 - [ ] Plano mínimo de correção com Safety Net declarado?
 
-## Docs Sempre Anexadas (pre-fetch obrigatório)
-
-> Antes de invocar este agent, anexe os arquivos abaixo. Se faltar, **PEÇA o anexo** — nunca infira.
-
-- [`../../CLAUDE.md`](../../CLAUDE.md)
-- [`../copilot-instructions.md`](../copilot-instructions.md)
-- [`../skills/code-tracing/SKILL.md`](../skills/code-tracing/SKILL.md)
-- [`../skills/structured-intake-patterns/SKILL.md`](../skills/structured-intake-patterns/SKILL.md)
-- [`../skills/terminal-governance/SKILL.md`](../skills/terminal-governance/SKILL.md)
-- [`../skills/context-mode/SKILL.md`](../skills/context-mode/SKILL.md) — coleta indexada quando o módulo investigado for grande.
-- [`../skills/refactoring-planning-patterns/SKILL.md`](../skills/refactoring-planning-patterns/SKILL.md)
-- [`../skills/business-rules-governance/SKILL.md`](../skills/business-rules-governance/SKILL.md)
-- [`../skills/efficient-batch-code-modification/SKILL.md`](../skills/efficient-batch-code-modification/SKILL.md)
-- [`README.md`](README.md)
-- [`catalog.yaml`](catalog.yaml)
-
 ## Diretrizes
 
 - **PRIMEIRA AÇÃO**: `ask_questions` com P1-P8 — nunca inicie análise sem contexto mínimo validado.
@@ -418,7 +380,7 @@ Se a solicitação pivotar de "triagem do bug" para refatoração ampla, novo re
 
 **Gatilho de deriva:** pedido de refactor amplo sem relação com o bug; pivô para elicitar requisito novo; pedido de implementação de feature nova.
 
-## Combina Com (Commands)
+## 🔗 Combina Com
 
 - `/plan` → estruturar triagem.
 - `/validate` → revisar evidências e severidade.

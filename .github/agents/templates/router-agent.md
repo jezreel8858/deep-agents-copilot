@@ -6,6 +6,10 @@ description: >-
   e despacha determinística e compulsoriamente para os especialistas do catálogo local.
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search']
+# Contrato Estrutural de Router (test_router_agents.py):
+# Supervisores hierárquicos possuem estrutura contratual fechada para roteamento determinístico.
+# As 6 seções canônicas são: CRÍTICO: ESCOPO DE ROTEAMENTO, Regras Herdadas (sub-catálogo),
+# Skills Associadas, Decision Tree, Formato de Saída e Retorno ao Router.
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md

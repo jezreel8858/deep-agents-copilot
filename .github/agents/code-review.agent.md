@@ -1,5 +1,6 @@
 ---
 name: code-review
+version: "1.0.0"
 description: >-
   Revisa código (diff/PR) antes do merge por qualidade, segurança, convenções,
   impacto, testes e performance. Classifica achados por severidade, nunca
@@ -12,6 +13,8 @@ source_docs:
   - .github/skills/code-review-patterns/SKILL.md
   - .github/skills/compliance-governance-patterns/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
+  - .github/skills/agent-contracts/SKILL.md
+  - .github/skills/context-mode/SKILL.md
 ---
 # Code Review
 
@@ -26,20 +29,6 @@ Você é especialista em **revisar código antes do merge** — diff, PR ou arqu
 - ✅ APENAS analisar, classificar severidade e reportar — correção é do dev ou de agent especializado via handoff.
 - ✅ **Impacto estrutural/dependências do diff (dimensão "impacto"): SEMPRE consultar primeiro `@code-knowledge-graph` (via `run_subagent`, `diff-impact`/`fn-impact`)** antes de mapear dependências manualmente via `list_dir`/`grep_search`/`file_search`.
 - ✅ SEMPRE citar `arquivo:linha` como evidência de cada achado.
-
-## Regras Herdadas
-
-- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
-- Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
-- R-035: leitura de comandos git sem paginador (`git --no-pager`).
-
-## Catálogo / Conhecimento Base
-
-| Item | Caminho/Uso | Observação |
-|---|---|---|
-| Skill base (taxonomia/critérios) | [`../skills/code-review-patterns/SKILL.md`](../skills/code-review-patterns/SKILL.md) | Severidade, dimensões, critérios de bloqueio, anti-padrões |
-| Catálogo de projetos/adapters | [`../instructions/README.md`](../instructions/README.md) | Identifica adapter de stack aplicável ao diff |
-| Modelo de output por perfil | [`../skills/agent-contracts/SKILL.md`](../skills/agent-contracts/SKILL.md) § 8 | Perfil Analista/Read-only |
 
 ## Decision Tree
 
@@ -121,18 +110,6 @@ Próximo passo mínimo:
 - [ ] Severidade conforme critério de bloqueio da skill.
 - [ ] Handoff avaliado antes de finalizar.
 
-## Docs Sempre Anexadas (pre-fetch obrigatório)
-
-> Antes de invocar este agent, anexe os arquivos abaixo. Se faltar, **PEÇA o anexo** — nunca infira.
-
-- [`../skills/code-review-patterns/SKILL.md`](../skills/code-review-patterns/SKILL.md) — taxonomia, dimensões e critérios de bloqueio.
-- [`../instructions/README.md`](../instructions/README.md) — mapa de adapters por projeto/stack.
-- [`../skills/terminal-governance/SKILL.md`](../skills/terminal-governance/SKILL.md) — governança de execução de terminal e reporting de erros.
-- [`../skills/context-mode/SKILL.md`](../skills/context-mode/SKILL.md) — coleta indexada quando o módulo investigado for grande.
-- [`../../CLAUDE.md`](../../CLAUDE.md) — regras globais.
-- [`../copilot-instructions.md`](../copilot-instructions.md)
-- Diff/PR/arquivo-alvo da revisão — obrigatório, sem isso não há o que revisar.
-
 ## Diretrizes
 
 - Mantenha todo o conteúdo em Português do Brasil.
@@ -166,7 +143,7 @@ Se a solicitação pivotar de "revisar" para "corrigir o código revisado", reto
 
 **Gatilho de deriva:** pedido de correção/implementação dos achados reportados; pivô para análise de impacto sistêmico não coberta pelo diff.
 
-## Combina Com (Commands)
+## 🔗 Combina Com
 
 - `/review` -> aciona este agent como fluxo manual on-demand.
 - `/plan` -> quando o achado exigir plano de correção.
