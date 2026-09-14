@@ -6,6 +6,24 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.8.5] — 2026-09-14
+
+### Aprimorado
+- **Evolução do Agent `bug-triage` (v1.1.0 — Blast Radius Proativo & Challenge Gate de Regras)**:
+  - `.github/agents/bug-triage.agent.md`:
+    - Adicionado **Challenge Gate de Regras de Negócio & Consumidores (Fase 1.5)** obrigatório via `ask_questions`, impedindo presunção de correção pontual mesmo quando o desenvolvedor já entrega pré-análise e arquivos no prompt.
+    - Expandida a Fase C para **Fase C+ (Traçar Call Chain e Blast Radius Proativo)** com classificação em Verde (Cirúrgico), Amarelo (Mini-Refactoring) e Vermelho (Sistêmico) e integração com `@code-knowledge-graph`.
+    - Adicionada detecção e tratamento de `mini-refactoring` na classificação de falha e no plano de ação, exigindo **Passo 0: Testes de Caracterização dos Componentes Vizinhos (Safety Net)** antes de qualquer alteração de código compartilhado para evitar quebras colaterais.
+    - Vinculadas as skills `refactoring-planning-patterns`, `business-rules-governance` e `efficient-batch-code-modification` em `source_docs` e no catálogo.
+  - `.github/agents/catalog.yaml`: Atualizados metadados, `related_agents`, `related_skills` e `source_docs` de `bug-triage` (v1.1.0).
+
+- **Codificação de Diretrizes Anti-Band-Aid e Timing Reativo (`angular-bug-fixer`, `code-tracing`, `angular-implementation-patterns`)**:
+  - `code-tracing/SKILL.md`: Adicionados 4 novos anti-padrões essenciais de diagnóstico: máscara visual (desligar spinner sem resolver stream), temporizadores imperativos manuais (`setTimeout`) em código reativo, violação de contratos de consumidores vizinhos, e negligência do timing de renderização no DOM (instanciação tardia sob `@if`).
+  - `angular-bug-fixer.agent.md`: Incorporadas restrições explícitas contra flags artificiais de loading, timeouts imperativos, afrouxamento de contratos e violação de ciclo de vida de barramento de eventos.
+  - `angular-implementation-patterns/SKILL.md`: Atualizados o workflow de correção de bug e os anti-padrões para exigir rastreamento de fora para dentro e respeito aos invariantes terminais de estado.
+
+---
+
 ## [2.8.4] — 2026-09-13
 
 ### Corrigido & Sincronizado

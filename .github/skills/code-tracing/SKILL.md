@@ -306,6 +306,10 @@ Após o rastreio, classificar a confiança da hipótese de causa raiz:
 - ❌ Assumir causa raiz sem evidências em ≥2 pontos do código.
 - ❌ Traçar mais de 2 níveis de call chain sem reportar hipótese parcial — risco de loop.
 - ❌ Ignorar frames de projeto no stack trace em favor de frames de framework.
+- ❌ **Tratar o sintoma visual em vez do ciclo de estado real**: Forçar flags de prontidão/carregamento (`loading = false`) para sumir com spinners sem resolver a Promise ou stream subjacente que não completou.
+- ❌ **Usar temporizadores imperativos (`setTimeout`) em fluxos reativos**: Adicionar timeouts manuais como band-aid para destravar streams; a ausência de emissão deve ser resolvida no gatilho ou com operadores declarativos nativos.
+- ❌ **Violar contratos de componentes consumidores**: Afrouxar regras de validação ou travas de segurança de telas/componentes vizinhos para mascarar a falta de resposta do produtor.
+- ❌ **Ignorar timing de renderização no DOM (Timing de Instanciação)**: Focar apenas na lógica interna do componente filho sem inspecionar se ele foi montado condicionalmente sob demanda (`@if`) após a emissão de eventos no barramento. Rastrear sempre de fora para dentro.
 
 ---
 

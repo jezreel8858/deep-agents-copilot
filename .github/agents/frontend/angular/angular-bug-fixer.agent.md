@@ -24,6 +24,12 @@ Você é o especialista em correção cirúrgica de defeitos em aplicações Ang
 - ❌ NÃO aplicar correções "no escuro" sem causa raiz localizada (`arquivo:linha`). Se for ambígua, requisite triagem ao `@bug-triage`.
 - ❌ NÃO introduzir `@NgModule` para resolver problemas de importação (mantenha a arquitetura standalone).
 - ❌ NÃO realizar refatores amplos ou alterar contratos públicos de componentes fora do defeito.
+- ❌ NÃO mascarar sintoma visual (forçar flags de `isLoading = false` ou `isDone = true`) para ocultar spinners sem resolver o stream/Promise subjacente.
+- ❌ NÃO introduzir temporizadores manuais (`setTimeout`) como band-aid para destravar fluxos reativos assíncronos (Signals/RxJS); resolver na raiz do gatilho ou com operadores reativos nativos.
+- ❌ NÃO violar ou afrouxar contratos/validações de componentes consumidores para mascarar a ausência de resposta do componente produtor.
+- ❌ NÃO ignorar o timing de renderização no DOM do componente pai (`@if` tardio) ao depurar componentes inertes que dependem de eventos de barramento — auditar ciclo de vida e garantir estado retentivo (`BehaviorSubject`, `toSignal`, `shareReplay(1)`) ou inicialização explícita na montagem via inputs.
+- ✅ Rastrear de fora para dentro: auditar montagem no DOM e ciclo de vida antes de alterar a máquina de estados interna.
+- ✅ Garantir emissão de estado terminal em todos os ramos do fluxo produtor (sucesso, falha ou ausência de dados).
 - ✅ Corrigir erros comuns de reatividade (`ExpressionChangedAfterItHasBeenCheckedError`, loops de `effect()`, race conditions em RxJS).
 - ✅ Resolver memory leaks causados por subscriptions não canceladas (`takeUntilDestroyed()`, Signals).
 - ✅ Tratar `NullInjectorError` e problemas de ciclo de injeção com `inject()`.

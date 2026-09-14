@@ -95,12 +95,13 @@ agents:
     model: "Gemini 3.8 Flash"
     priority: 2
     domain: "Triagem de bugs e regressao"
-    description: "Classificar bugs, reproduzir erro e propor plano minimo de correcao"
+    description: "Classificar bugs, reproduzir erro, analisar blast radius e propor plano minimo de correcao"
     keywords:
       - "bug"
       - "regressao"
       - "erro"
       - "severidade"
+      - "blast-radius"
     prerequisite_docs:
       - "CLAUDE.md"
       - ".github/copilot-instructions.md"
@@ -110,6 +111,8 @@ agents:
       - "agent-router"
       - "tech-solution-architect"
       - "test-strategy"
+      - "code-knowledge-graph"
+      - "refactor-planner"
     tools:
       - "read_file"
       - "grep_search"
@@ -128,6 +131,10 @@ agents:
       - "context-mode"
       - "terminal-governance"
       - "code-tracing"
+      - "structured-intake-patterns"
+      - "refactoring-planning-patterns"
+      - "business-rules-governance"
+      - "efficient-batch-code-modification"
       - "agent-contracts"
       - "confidence-fallback-policy"
       - "agent-evals-lab"
@@ -138,6 +145,10 @@ agents:
       - ".github/skills/terminal-governance/SKILL.md"
       - ".github/skills/context-mode/SKILL.md"
       - ".github/skills/code-tracing/SKILL.md"
+      - ".github/skills/structured-intake-patterns/SKILL.md"
+      - ".github/skills/refactoring-planning-patterns/SKILL.md"
+      - ".github/skills/business-rules-governance/SKILL.md"
+      - ".github/skills/efficient-batch-code-modification/SKILL.md"
     estimated_time_minutes: 25
 
   test-strategy:

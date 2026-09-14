@@ -51,9 +51,13 @@ tools: []
 ## Workflow — Correção de Bug
 
 1. Exigir causa raiz com evidência (`arquivo:linha`) — se ausente, delegar para `@bug-triage` primeiro.
-2. Reproduzir a falha em teste antes de corrigir (evita regressão).
-3. Aplicar diff mínimo — nunca reescrever componente inteiro para 1 bug.
-4. Validar que o teste que reproduzia a falha agora passa + suíte do módulo intacta.
+2. **Rastrear de fora para dentro**: auditar o momento de montagem no DOM (`@if` no componente pai) e o ciclo de vida das entradas (`input()`) antes de alterar a máquina de estados interna do filho.
+3. **Não mascarar o sintoma visual**: proibido forçar flags de prontidão/loading (`isLoading = false`) para sumir com spinners; resolver a Promise ou stream subjacente que não resolveu.
+4. **Respeitar invariantes e contratos**: garantir que o fluxo produtor emita estado terminal em todos os ramos (sucesso, erro ou vazio), sem nunca afrouxar travas ou validações de componentes consumidores vizinhos.
+5. **Zero band-aids imperativos**: proibido usar `setTimeout` para destravar streams; usar operadores declarativos nativos ou corrigir o gatilho na raiz.
+6. Reproduzir a falha em teste antes de corrigir (evita regressão).
+7. Aplicar diff mínimo — nunca reescrever componente inteiro para 1 bug.
+8. Validar que o teste que reproduzia a falha agora passa + suíte do módulo intacta.
 
 ## Padrões de Código (mercado 2026)
 
@@ -92,6 +96,10 @@ tools: []
 - ❌ Reportar "concluído" sem rodar a suíte de teste local.
 - ❌ Entregar rota/feature nova sem vínculo em menu/sidenav/navegação — usuário final não consegue alcançar a funcionalidade (Smell 2.18).
 - ❌ Recriar em HTML/CSS customizado um padrão (card, filtro, diálogo, badge) que já existe como componente compartilhado documentado no projeto (Smell 2.19).
+- ❌ Forçar flags de `isLoading = false` ou `isDone = true` para desligar spinners visuais sem resolver a Promise ou Observable de fundo (mascarar sintoma).
+- ❌ Adicionar temporizadores artificiais (`setTimeout`) como band-aid para contornar streams reativos inertes.
+- ❌ Afrouxar regras de validação ou travas de segurança de componentes consumidores para mascarar a ausência de resposta do componente produtor.
+- ❌ Ignorar a renderização condicional do componente pai (`@if` tardio) que faz o componente filho perder eventos de carga já transitados no barramento.
 
 ## Referências
 
