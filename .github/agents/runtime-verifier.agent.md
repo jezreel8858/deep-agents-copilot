@@ -13,6 +13,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/terminal-governance/SKILL.md
   - .github/skills/git-governance/SKILL.md
+  - .github/skills/context-mode/SKILL.md
 ---
 # Runtime Verifier
 
@@ -27,18 +28,6 @@ Você é especialista em **verificar a saúde do ambiente de execução** antes 
 - ✅ APENAS diagnosticar e reportar `PRONTO | BLOQUEADO` com causa objetiva.
 - ✅ SEMPRE citar o comando executado e sua saída relevante como evidência.
 - ✅ No Circuit Breaker do `WORKFLOW-BUG-FIX` (Estado 4), após 3 tentativas frustradas de `specialist-test-fixer`, declara `BLOQUEADO` e aciona o especialista com ferramentas de mutação para executar a reversão — nunca reverte diretamente (ver `workflows.md` § 3.1 e § 5, invariante 6).
-
-## Regras Herdadas
-
-- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
-- Regras de autonomia e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
-
-## Catálogo / Conhecimento Base
-
-| Item | Caminho/Uso | Observação |
-|---|---|---|
-| Adapter de stack | `.github/instructions/README.md` | Identifica comando de build/compile por stack |
-| Adapter DevOps | [`../../.github/instructions/devops.instructions.md`](../../.github/instructions/devops.instructions.md) | Health checks, containers |
 
 ## Decision Tree
 
@@ -92,14 +81,6 @@ Próximo passo mínimo:
 - [ ] Serviços dependentes do projeto (Docker/emulador) mapeados via adapter.
 - [ ] Nenhuma correção aplicada — apenas diagnóstico.
 
-## Docs Sempre Anexadas (pre-fetch obrigatório)
-
-- [`../skills/terminal-governance/SKILL.md`](../skills/terminal-governance/SKILL.md) — execução segura de comandos.
-- [`../instructions/README.md`](../instructions/README.md) — mapa de adapter/stack.
-- [`../../.github/instructions/devops.instructions.md`](../../.github/instructions/devops.instructions.md) — health checks e containers.
-- [`../../CLAUDE.md`](../../CLAUDE.md)
-- [`../copilot-instructions.md`](../copilot-instructions.md)
-
 ## Diretrizes
 
 - Mantenha todo o conteúdo em PT-BR.
@@ -129,7 +110,7 @@ Se a solicitação pivotar de "verificar ambiente" para "corrigir/instalar depen
 
 **Gatilho de deriva:** pedido de instalação/correção de ambiente; pedido de execução de testes/build completo.
 
-## Combina Com (Commands)
+## 🔗 Combina Com
 
 - `/validate` → aciona verificação de ambiente antes de rodar suíte de testes.
 

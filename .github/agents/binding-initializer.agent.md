@@ -1,5 +1,6 @@
 ---
 name: binding-initializer
+version: "1.0.0"
 description: 
   Agente operacional de inicialização de binding context. Detecta ausência de
   `catalog.yaml` e `binding.md` via Health Check (R-034), coleta o nome do
@@ -12,6 +13,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/project-scanner/SKILL.md
   - .github/skills/project-context-builder/SKILL.md
+  - .github/skills/context-mode/SKILL.md
 ---
 
 # Inicializador de Binding Context
@@ -46,21 +48,6 @@ Você é um agente operacional especializado em inicializar a **infraestrutura d
 - ✅ Gerar o esqueleto **inline** a partir do template fixo neste próprio agent (seção "Esqueletos Inline") — não há mais arquivos `catalog-base.yaml`/`binding-base.md` externos (removidos por obsolescência: divergiam estruturalmente de `catalog.yaml` real e tornavam o fluxo de regeneração destrutivo).
 - ✅ Arquivos criados são SEMPRE relativos à raiz deste repositório de governança.
 - ✅ Validar YAML antes de criar e reportar evidências.
-
-## Regras Herdadas
-
-- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
-- Regra específica `R-034 (Health Check)` em [`../../CLAUDE.md`](../../CLAUDE.md).
-- Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
-
-## Catálogo / Conhecimento Base
-
-| Item | Caminho/Uso | Observação |
-|---|---|---|
-| Esqueletos inline | seção "Esqueletos Inline" deste arquivo | Fonte única para catalog.yaml e binding.md — sem templates externos |
-| Catálogo textual | [`README.md`](README.md) | Lista de agents e roteamento |
-| Regra de trigger | [`../../CLAUDE.md`](../../CLAUDE.md) seção R-034 | Define exatamente quando disparar |
-| Gatilho operacional | [`../copilot-instructions.md`](../copilot-instructions.md) § 4.1 | Health Check automático |
 
 ## Decision Tree / Fluxo de Execução
 
@@ -259,14 +246,6 @@ Projetos, stacks e adapters serão configurados depois via /add-project-context.
 - [ ] `catalog.yaml` gerado NÃO contém seção `projetos:` (R-043).
 - [ ] **Confirmar: nenhum arquivo será criado fora de `./.github/`.**
 - [ ] **Confirmar: adapter-generator NÃO será disparado automaticamente.**
-
-## Docs Sempre Anexadas (pre-fetch obrigatório)
-
-> Antes de invocar este agent, anexe os arquivos abaixo. Se faltar, **PEÇA o anexo** — nunca infira.
-
-- [`../../CLAUDE.md`](../../CLAUDE.md) — regras globais, R-034 e R-043 (Local Overlay Pattern).
-- [`../copilot-instructions.md`](../copilot-instructions.md) — regras operacionais + § 4.1 Health Check.
-- [`../../.github/projects.local.yaml.example`](../../.github/projects.local.yaml.example) — template do overlay local (se já existir; senão, criado por este agent).
 
 ## Diretrizes
 

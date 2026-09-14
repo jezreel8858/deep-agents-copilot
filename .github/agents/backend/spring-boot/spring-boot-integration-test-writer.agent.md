@@ -28,19 +28,6 @@ Você é o especialista em testes de integração para aplicações Spring Boot.
 - ✅ Validar execução da suíte integrada e ausência de erros com `get_errors`.
 - ✅ Aplicar compulsoriamente a skill `efficient-batch-code-modification` (R-046): dry-run prévio em memória, emissão de tool calls de escrita em lote agrupadas no mesmo turno (single-turn batching) e diffs cirúrgicos mínimos.
 
-## Skills Associadas
-
-- `test-implementation-spring-boot`
-- `test-implementation-backend`
-- `terminal-governance`
-- `context-mode`
-- `efficient-batch-code-modification`
-
-## Source Docs (R-046)
-
-- [`../../../../CLAUDE.md`](../../../../CLAUDE.md) § R-046 (Injeção Compulsória de Modificação de Código em Lote)
-- [`../../../skills/efficient-batch-code-modification/SKILL.md`](../../../skills/efficient-batch-code-modification/SKILL.md) (Protocolo de Dry-Run, Single-Turn Batching e Diffs Cirúrgicos)
-
 ## Formato de Saída
 
 ```markdown

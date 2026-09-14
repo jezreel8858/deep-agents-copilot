@@ -297,3 +297,136 @@ def test_smell_2_11_all_skills_have_mandatory_operational_sections():
             gaps.append(f"[{rel_path}] ausência de seções de orientação ('Quando Usar' / 'Diretrizes')")
 
     assert not gaps, f"Smell 2.11: {len(gaps)} skills sem seções operacionais mínimas:\n" + "\n".join(gaps)
+
+
+# ─────────────────────────────────────────────────────────────
+# 6. GATE DE HOMOLOGAÇÃO DE SEÇÕES (ANTI-AD-HOC SECTIONS / TEMPLATE WHITELIST)
+# ─────────────────────────────────────────────────────────────
+
+PROHIBITED_DOC_SECTIONS_NON_ROUTERS = {
+    "docs sempre anexadas",
+    "regras herdadas",
+    "catálogo / conhecimento base",
+    "catalogo / conhecimento base",
+    "skills associadas",
+    "source docs",
+}
+
+
+def test_homologation_gate_no_unhomologated_sections_in_agents():
+    """
+    Gate de Homologação: Garante que nenhum agent não-router possua seções redundantes
+    ou não homologadas em templates canônicos (ex.: Docs Sempre Anexadas, Regras Herdadas,
+    Catálogo / Conhecimento Base, Skills Associadas).
+    Toda dependência documental DEVE residir no frontmatter 'source_docs:' (SSOT).
+    Inclusões de novas seções exigem homologação prévia em agent-template.md/operational/research.
+    """
+    non_router_agents = [
+        p for p in AGENTS_DIR.glob("**/*.agent.md")
+        if "router" not in p.name and "templates" not in p.parts
+    ]
+    assert len(non_router_agents) >= 70
+
+    violations = []
+    for agent_file in non_router_agents:
+        rel_path = agent_file.relative_to(REPO_ROOT)
+        h2s = extract_h2_sections(agent_file)
+        for h in h2s:
+            clean_h = h.lower()
+            for prohibited in PROHIBITED_DOC_SECTIONS_NON_ROUTERS:
+                if prohibited in clean_h:
+                    violations.append(f"[{rel_path}] Seção não homologada/proibida: '## {h}'")
+
+    assert not violations, (
+        f"Gate de Homologação falhou: {len(violations)} seções não homologadas em agents:\n"
+        + "\n".join(violations)
+        + "\n-> Toda dependência documental deve residir no frontmatter 'source_docs:'. "
+        "Novas seções exigem atualização prévia do template canônico correspondente."
+    )
+
+
+def test_homologation_gate_no_unhomologated_sections_in_prompts():
+    """
+    Gate de Homologação: Garante que nenhum prompt (.prompt.md) possua seções
+    não homologadas de pré-carregamento documental (ex.: Source Docs, Docs Sempre Anexadas,
+    Regras Herdadas, Catálogo). Dependências residem exclusivamente no frontmatter 'source_docs:'.
+    """
+    prompt_files = [p for p in PROMPTS_DIR.glob("*.prompt.md") if "templates" not in p.parts]
+    assert len(prompt_files) >= 15
+
+    prohibited_prompt_sections = {
+        "source docs",
+        "docs sempre anexadas",
+        "regras herdadas",
+        "catálogo / conhecimento base",
+        "catalogo / conhecimento base",
+        "skills associadas",
+    }
+
+    violations = []
+    for prompt_file in prompt_files:
+        rel_path = prompt_file.relative_to(REPO_ROOT)
+        h2s = extract_h2_sections(prompt_file)
+        for h in h2s:
+            clean_h = h.lower()
+            for prohibited in prohibited_prompt_sections:
+                if prohibited in clean_h:
+                    violations.append(f"[{rel_path}] Seção não homologada/proibida: '## {h}'")
+
+    assert not violations, (
+        f"Gate de Homologação falhou: {len(violations)} seções não homologadas em prompts:\n"
+        + "\n".join(violations)
+        + "\n-> Prompts devem utilizar frontmatter 'source_docs:' e aderir a prompt-template.md."
+    )
+
+
+def test_homologation_gate_no_unhomologated_sections_in_skills():
+    """
+    Gate de Homologação: Garante que nenhuma skill (SKILL.md) possua seções não homologadas
+    de catálogo ou herança (ex.: Regras Herdadas, Docs Sempre Anexadas, Catálogo / Conhecimento Base).
+    Skills devem aderir estritamente à arquitetura Progressive Disclosure de skill-template.md.
+    """
+    skill_files = [p for p in SKILLS_DIR.glob("**/SKILL.md") if "templates" not in p.parts]
+    assert len(skill_files) >= 30
+
+    prohibited_skill_sections = {
+        "docs sempre anexadas",
+        "catálogo / conhecimento base",
+        "catalogo / conhecimento base",
+        "skills associadas",
+    }
+
+    violations = []
+    for skill_file in skill_files:
+        rel_path = skill_file.relative_to(REPO_ROOT)
+        h2s = extract_h2_sections(skill_file)
+        for h in h2s:
+            clean_h = h.lower()
+            for prohibited in prohibited_skill_sections:
+                if prohibited in clean_h:
+                    violations.append(f"[{rel_path}] Seção não homologada/proibida: '## {h}'")
+
+    assert not violations, (
+        f"Gate de Homologação falhou: {len(violations)} seções não homologadas em skills:\n"
+        + "\n".join(violations)
+        + "\n-> Skills devem aderir estritamente à estrutura de skill-template.md."
+    )
+
+
+def test_homologation_gate_blocks_unhomologated_injections(tmp_path: Path):
+    """
+    Valida empiricamente que o gate de homologação bloqueia qualquer injeção ad-hoc de seções
+    não homologadas em agents, prompts ou skills caso um template prévio não autorize.
+    """
+    dummy_agent = tmp_path / "dummy.agent.md"
+    dummy_agent.write_text(
+        "---\nname: dummy\n---\n# Dummy Agent\n## 🛑 CRÍTICO: ESCOPO\n## 📌 Docs Sempre Anexadas (pre-fetch obrigatório)\n",
+        encoding="utf-8"
+    )
+
+    h2s = extract_h2_sections(dummy_agent)
+    has_unhomologated = any(
+        any(p in h.lower() for p in PROHIBITED_DOC_SECTIONS_NON_ROUTERS)
+        for h in h2s
+    )
+    assert has_unhomologated is True, "Gate deveria identificar a seção não homologada como violação"

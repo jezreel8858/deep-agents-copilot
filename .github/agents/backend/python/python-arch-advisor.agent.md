@@ -31,14 +31,6 @@ Você é o especialista consultivo em arquitetura e governança para aplicaçõe
 - ✅ Elaborar estratégias de modernização técnica (migração de Python legado para 3.11+, adoção de typing estrito, transição sync para async).
 - ✅ Emitir parecer técnico com diagnósticos rastreáveis, riscos de compatibilidade e plano de ação.
 
-## Skills Associadas
-
-- `test-implementation-python`
-- `specialist-hybrid-advisory-implementation-patterns`
-- `codegraph-optave-usage`
-- `agent-contracts`
-- `context-mode`
-
 ## Formato de Saída
 
 ```markdown

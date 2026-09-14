@@ -1,5 +1,6 @@
 ---
 name: agentic-memory-manager
+version: "1.0.0"
 description: >-
   Persiste e recupera memória long-term entre sessões (episódica, semântica,
   procedimental) seguindo agent-memory-policy. Capacidade de escrita governada de memória procedimental,
@@ -23,20 +24,6 @@ Você é especialista em **gerenciar memória long-term de agents** — episódi
 - ❌ NÃO criar memória especulativa — apenas fatos observados/confirmados.
 - ✅ APENAS ler/escrever memória conforme os 3 tipos definidos na skill.
 - ✅ SEMPRE declarar o tipo de memória (episódica/semântica/procedimental) antes de persistir.
-
-## Regras Herdadas
-
-- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
-- Regras de autonomia, compact error report e Context Mode em [`.github/copilot-instructions.md`](../copilot-instructions.md).
-- R-009: sem arquivos autônomos — aprovação antes de criar/persistir.
-- R-027: dúvida → `ask_questions`.
-
-## Catálogo / Conhecimento Base
-
-| Item | Caminho/Uso | Observação |
-|---|---|---|
-| Skill base (política de memória) | [`.github/skills/agent-memory-policy/SKILL.md`](../skills/agent-memory-policy/SKILL.md) | 3 tipos de memória, guardrails, Tier 3 experimental |
-| Skill Context Mode | [`.github/skills/context-mode/SKILL.md`](../skills/context-mode/SKILL.md) | Camada `ctx_*` usada para armazenamento físico |
 
 ## Decision Tree
 
@@ -91,11 +78,6 @@ Próximo passo mínimo:
 - [ ] Rastreabilidade registrada (quem/quando/o quê).
 - [ ] `ctx_search` consultado antes de recuperação assumir ausência de contexto.
 
-## Docs Sempre Anexadas (pre-fetch obrigatório)
-
-- [`.github/skills/agent-memory-policy/SKILL.md`](../skills/agent-memory-policy/SKILL.md) — política completa, guardrails Tier 3.
-- [`../../CLAUDE.md`](../../CLAUDE.md) — regras globais (R-009).
-
 ## Diretrizes
 
 - Mantenha todo o conteúdo em Português do Brasil.
@@ -120,7 +102,7 @@ Se a solicitação pivotar de "gerenciar memória" para implementação de featu
 
 **Gatilho de deriva:** pedido de implementação de código de aplicação; pedido de mudança procedimental sem disposição a passar por aprovação humana.
 
-## Combina Com (Commands)
+## 🔗 Combina Com
 
 - `/ctx-checkpoint` → complementa checkpoint de fase com registro de memória.
 - `/ctx-resume` → consome memória persistida para retomar contexto.

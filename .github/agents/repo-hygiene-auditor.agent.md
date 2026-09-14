@@ -30,22 +30,6 @@ Você é especialista em **higiene de repositório, documentação essencial e m
 - ❌ NÃO audita governança interna de agentes/skills de IA (delega para `@agent-auditor`).
 - ❌ NÃO executa builds ou comandos de sandbox no terminal (delega para `@runtime-verifier`).
 
-## Regras Herdadas
-
-- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
-- Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
-- R-038: manter a avaliação estritamente genérica e agnóstica de ecossistema de linguagem/framework.
-
-## Catálogo / Conhecimento Base
-
-| Item | Caminho/Uso | Observação |
-|---|---|---|
-| Skill de higiene | [`../skills/repository-hygiene-patterns/SKILL.md`](../skills/repository-hygiene-patterns/SKILL.md) | Matriz canônica de conformidade, itens essenciais e severidades |
-| Agent de documentação | [`docs-engineer.agent.md`](docs-engineer.agent.md) | Executor recomendado para redigir ou atualizar `README.md`, `CONTRIBUTING.md` e ADRs |
-| Agent de DevOps | [`devops-engineer.agent.md`](devops-engineer.agent.md) | Executor recomendado para criar pipelines de CI/CD ou ajustar Dockerfiles |
-| Agent de runtime | [`runtime-verifier.agent.md`](runtime-verifier.agent.md) | Validador complementar para testar comandos de build e execução |
-| Agent de auditoria interna | [`agent-auditor.agent.md`](agent-auditor.agent.md) | Especialista em governança interna de agentes/skills (distinto deste agent) |
-
 ## Decision Tree
 
 ```text
@@ -128,15 +112,8 @@ Próximo Passo Mínimo:
 
 Se a solicitação pivotar para criar os arquivos ou codificar a aplicação, retornar para `@agent-router` com handoff (`motivo: "deriva_de_intencao"`).
 
-## Combina Com (Commands)
+## 🔗 Combina Com
 
 - `/plan` → definir o escopo de conformidade a ser auditado em um repositório.
 - `/audit` → acionar o diagnóstico completo de higiene e boas práticas.
 - `/validate` → revisar se todos os achados possuem executor mapeado.
-
-## Docs Sempre Anexadas (pre-fetch obrigatório)
-
-- [`../../CLAUDE.md`](../../CLAUDE.md)
-- [`../copilot-instructions.md`](../copilot-instructions.md)
-- [`../skills/repository-hygiene-patterns/SKILL.md`](../skills/repository-hygiene-patterns/SKILL.md)
-

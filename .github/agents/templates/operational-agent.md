@@ -4,6 +4,11 @@ description: >-
   Executa <ação procedural objetiva em 3ª pessoa>, aplicando alterações determinísticas de código, testes ou configurações com validação imediata de integridade. Use quando precisar de <frase-gatilho de invocação>. Não use para análises arquiteturais abertas.
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'insert_edit_into_file', 'create_file', 'grep_search', 'file_search', 'list_dir', 'get_errors', 'run_subagent']
+# SSOT de Governança e Dependências (Context Engineering Benchmark 2026):
+# 100% das dependências documentais e skills DEVEM residir exclusivamente em source_docs: no frontmatter.
+# É TERMINANTEMENTE PROIBIDO criar seções redundantes no corpo markdown (ex.: '## Regras Herdadas',
+# '## Catálogo / Conhecimento Base', '## Skills Associadas' ou '## Docs Sempre Anexadas').
+# O gate de testes determinístico (test_template_sections.py) bloqueia compulsoriamente seções não homologadas.
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md

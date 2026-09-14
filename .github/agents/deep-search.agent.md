@@ -13,6 +13,7 @@ source_docs:
   - .github/skills/tavily/SKILL.md
   - .github/skills/context-mode/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
+  - .github/skills/prompt-engineering-patterns/SKILL.md
 ---
 
 # deep-search
@@ -30,22 +31,6 @@ Retriever/Researcher especializado para investigação técnica e documental no 
 - ✅ APENAS pesquisar, decompor consultas, coletar evidências e sintetizar conclusões com fonte.
 - ✅ APENAS operar em modo read-only com rastreabilidade de evidências.
 - ✅ SEMPRE usar `run_subagent` para paralelização de sub-queries e para retorno efetivo ao `@agent-router` quando houver deriva (R-042).
-
-## Regras Herdadas
-
-- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
-- Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
-
-## Catálogo / Conhecimento Base
-
-| Item | Caminho/Uso | Observação |
-|---|---|---|
-| Origem de capacidade (histórico) | `research-router` | Lógica de decisão atômica vs composta já absorvida neste agent |
-| Arquiteto de solução técnica (papel distinto) | [`tech-solution-architect.agent.md`](tech-solution-architect.agent.md) | Recebe handoff quando o objetivo vira crítica/análise de integração ou blueprint |
-| Skill de pesquisa externa | [`../skills/tavily/SKILL.md`](../skills/tavily/SKILL.md) | Hierarquia obrigatória local/indexado → externo |
-| Skill de coleta indexada | [`../skills/context-mode/SKILL.md`](../skills/context-mode/SKILL.md) | Coleta, indexação e recuperação eficiente |
-| Skill de decomposição de prompts | [`../skills/prompt-engineering-patterns/SKILL.md`](../skills/prompt-engineering-patterns/SKILL.md) | Apoia quebra de pesquisa composta em sub-queries |
-| Plano aprovado de escopo | [`../../docs/plan/plano-otimizacao-catalogo-agents.md`](../../docs/plan/plano-otimizacao-catalogo-agents.md) § A.1 | Define `deep-search` como Retriever/Researcher interno+externo |
 
 ## Decision Tree
 
@@ -114,18 +99,6 @@ Próximo passo mínimo:
 - [ ] Declarei lacunas sem inferência especulativa.
 - [ ] Mantive escopo read-only e sem edição de arquivos.
 
-## Docs Sempre Anexadas (pre-fetch obrigatório)
-
-> Antes de invocar este agent, anexe os arquivos abaixo. Se faltar, **PEÇA o anexo** — nunca infira.
-
-- [`../skills/tavily/SKILL.md`](../skills/tavily/SKILL.md)
-- [`../skills/context-mode/SKILL.md`](../skills/context-mode/SKILL.md)
-- [`../skills/terminal-governance/SKILL.md`](../skills/terminal-governance/SKILL.md)
-- [`../skills/prompt-engineering-patterns/SKILL.md`](../skills/prompt-engineering-patterns/SKILL.md)
-- [`README.md`](README.md)
-- [`catalog.yaml`](catalog.yaml)
-- [`../../CLAUDE.md`](../../CLAUDE.md)
-
 ## Diretrizes
 
 - Manter resposta curta, verificável e em PT-BR.
@@ -158,7 +131,7 @@ Se a solicitação pivotar de "pesquisar" para "implementar/aplicar alteração"
 
 **Gatilho de deriva:** pedido de implementação da aplicação; pedido de criação de agent (`@governance-factory`); pedido de criação de skill (`@governance-factory`); pedido de criação de prompt (`@governance-factory`); pedido de análise crítica profunda (→ `@tech-solution-architect`).
 
-## Combina Com (Commands)
+## 🔗 Combina Com
 
 | Command | Uso |
 |---|---|

@@ -45,24 +45,6 @@ Inicializa contexto obrigatório de governança. Execute 1x por sessão APENAS.
 
 ---
 
----
-
-## 📌 Source Docs (Pre-Fetch Obrigatório)
-
-Este prompt carrega **automaticamente** (conforme frontmatter `source_docs`):
-
-- ✅ **`CLAUDE.md`** — Governança global, regras normativas globais
-- ✅ **`.github/copilot-instructions.md`** — Roteamento rápido, agents, skills, binding
-
-**Validação**: Se algum arquivo não foi anexado, Copilot **DEVE** alertar e carregá-lo manualmente.
-
-```
-⚠️ ALERTA: Arquivo não anexado automaticamente!
-   → Carregando manualmente...
-```
-
----
-
 ## 🎯 Uso
 
 ### Invocação Explícita (Manual)

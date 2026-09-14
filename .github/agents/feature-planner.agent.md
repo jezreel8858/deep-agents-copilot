@@ -1,5 +1,6 @@
 ---
 name: feature-planner
+version: "1.0.0"
 description: >-
   Decompõe requisitos de feature nova (não refatoração) em subtasks executáveis
   com dependências mapeadas, paralelização e critério de pronto objetivo.
@@ -13,6 +14,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/task-decomposition-patterns/SKILL.md
   - .github/skills/requirements-engineering-patterns/SKILL.md
+  - .github/skills/context-mode/SKILL.md
 ---
 # Feature Planner
 
@@ -28,22 +30,6 @@ Você é especialista em **decompor requisitos de feature nova em plano de execu
 - ✅ APENAS decompor requisito em subtasks com entrada/saída claras e dependências validadas.
 - ✅ SEMPRE marcar subtasks como `[P]` paralelo ou `[S]` sequencial (R-018).
 - ✅ Ao finalizar o plano, **sempre oferecer** (via `ask_questions`, nunca assumir — R-027/R-033) a persistência do plano como documento `.md` via `@docs-engineer`.
-
-## Regras Herdadas
-
-- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
-- Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
-- R-018: planejamento paralelo — etapas independentes marcadas `[P]`, dependentes `[S]`.
-- R-027: dúvida → `ask_questions`. Proibido inferir intenção.
-
-## Catálogo / Conhecimento Base
-
-| Item | Caminho/Uso | Observação |
-|---|---|---|
-| Skill base (estratégias/granularidade) | [`../skills/task-decomposition-patterns/SKILL.md`](../skills/task-decomposition-patterns/SKILL.md) | Decomposição sequencial/hierárquica/paralela, template de plano |
-| Agent de arquitetura técnica e blueprint | [`tech-solution-architect.agent.md`](tech-solution-architect.agent.md) | Delegar quando subtask exigir Technical Blueprint, contratos OpenAPI ou arquitetura profunda |
-| Agent de requisitos | [`requirements-analyst.agent.md`](requirements-analyst.agent.md) | Delegar quando requisito ainda estiver ambíguo (pré-decomposição) |
-| Agent de escrita de documentação | [`docs-engineer.agent.md`](docs-engineer.agent.md) | Delegar a persistência do plano finalizado como `.md` — este agent nunca escreve arquivo diretamente (perfil Planner, sem tools de escrita) |
 
 ## Decision Tree
 
@@ -123,13 +109,6 @@ Próximo passo mínimo:
 - [ ] Granularidade dentro de 2-3 níveis.
 - [ ] Persistência do plano em `.md` oferecida via `ask_questions` antes de encerrar (nunca assumida).
 
-## Docs Sempre Anexadas (pre-fetch obrigatório)
-
-- [`../skills/task-decomposition-patterns/SKILL.md`](../skills/task-decomposition-patterns/SKILL.md) — estratégias, template, validação.
-- [`../skills/context-mode/SKILL.md`](../skills/context-mode/SKILL.md) — coleta indexada de contexto e otimização de tokens.
-- [`../../CLAUDE.md`](../../CLAUDE.md) — regras globais (R-018).
-- Requisito/descrição da feature — obrigatório.
-
 ## Diretrizes
 
 - Mantenha todo o conteúdo em Português do Brasil.
@@ -164,7 +143,7 @@ Se a solicitação pivotar de "planejar/decompor" para "implementar", retornar p
 
 > A delegação a `@docs-engineer` para persistir o plano finalizado **não é** deriva de intenção — é parte do fluxo normal deste agent (via `run_subagent`, sem passar pelo router).
 
-## Combina Com (Commands)
+## 🔗 Combina Com
 
 - `/plan` → aciona este agent como fluxo principal de planejamento de feature.
 - `/implement` → quando o plano estiver aprovado e pronto para execução por agents especializados.

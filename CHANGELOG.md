@@ -6,6 +6,42 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.8.6] — 2026-09-14
+
+### Refatorado & Consolidado
+- **Consolidação Global de SSOT no Frontmatter (`source_docs:`) e Extirpação de Redundâncias**:
+  - Unificação de 100% das dependências normativas, contextuais e skills no frontmatter YAML `source_docs:`, eliminando a quádrupla duplicação de links documentais no catálogo de agentes e prompts.
+  - Extirpadas **1.350+ linhas de texto redundante** em 79 agentes (`.agent.md`) e 2 prompts (`.prompt.md`), removendo as seções obsoletas do corpo markdown: `## Regras Herdadas`, `## Catálogo / Conhecimento Base`, `## Skills Associadas`, `## Docs Sempre Anexadas (pre-fetch obrigatório)` e `## Source Docs (R-046)`.
+  - Preservadas integralmente as seções contratuais de roteamento dos supervisores hierárquicos (8 routers), garantindo a conformidade da máquina de estados de despacho.
+- **Refinamento e Blindagem dos Templates Canônicos (`.github/templates/`)**:
+  - `agent-template.md`, `operational-agent.md`, `research-agent.md`: Adicionada diretriz normativa de SSOT de documentação, formalizando o bloqueio estrito de seções redundantes de doc-loading no corpo markdown.
+  - `router-agent.md`: Documentado o contrato estrutural fechado para supervisores hierárquicos e alinhamento com `test_router_agents.py`.
+  - `prompt-template.md`: Consolidada a especificação oficial de Prompt Files com injeção de dependências em `source_docs:` e variáveis nativas do VS Code Copilot.
+  - `skill-template.md`: Formalizada a arquitetura de *Progressive Disclosure* em 3 níveis (Nível 1 Metadados, Nível 2 Corpo Operacional de 7 seções canônicas, Nível 3 Recursos Suplementares).
+  - Atualizados `governance-factory.agent.md`, `governance-audit-patterns/SKILL.md` (Smell 2.2 saneado) e `adapter-generator.agent.md` para eliminar referências residuais à seção descontinuada `Docs Sempre Anexadas`.
+- **Quality Gate de Governança — Gate de Homologação de Seções (Tier 1)**:
+  - `tests/governance_audit/test_template_sections.py`: Implementados 4 novos testes determinísticos (`test_homologation_gate_no_unhomologated_sections_in_agents`, `test_homologation_gate_no_unhomologated_sections_in_prompts`, `test_homologation_gate_no_unhomologated_sections_in_skills`, `test_homologation_gate_blocks_unhomologated_injections`) para barrar compulsoriamente a injeção de seções ad-hoc sem template previamente homologado. Suíte expandida para 127 testes passando com 100% verde.
+
+---
+
+## [2.8.5] — 2026-09-14
+
+### Aprimorado
+- **Evolução do Agent `bug-triage` (v1.1.0 — Blast Radius Proativo & Challenge Gate de Regras)**:
+  - `.github/agents/bug-triage.agent.md`:
+    - Adicionado **Challenge Gate de Regras de Negócio & Consumidores (Fase 1.5)** obrigatório via `ask_questions`, impedindo presunção de correção pontual mesmo quando o desenvolvedor já entrega pré-análise e arquivos no prompt.
+    - Expandida a Fase C para **Fase C+ (Traçar Call Chain e Blast Radius Proativo)** com classificação em Verde (Cirúrgico), Amarelo (Mini-Refactoring) e Vermelho (Sistêmico) e integração com `@code-knowledge-graph`.
+    - Adicionada detecção e tratamento de `mini-refactoring` na classificação de falha e no plano de ação, exigindo **Passo 0: Testes de Caracterização dos Componentes Vizinhos (Safety Net)** antes de qualquer alteração de código compartilhado para evitar quebras colaterais.
+    - Vinculadas as skills `refactoring-planning-patterns`, `business-rules-governance` e `efficient-batch-code-modification` em `source_docs` e no catálogo.
+  - `.github/agents/catalog.yaml`: Atualizados metadados, `related_agents`, `related_skills` e `source_docs` de `bug-triage` (v1.1.0).
+
+- **Codificação de Diretrizes Anti-Band-Aid e Timing Reativo (`angular-bug-fixer`, `code-tracing`, `angular-implementation-patterns`)**:
+  - `code-tracing/SKILL.md`: Adicionados 4 novos anti-padrões essenciais de diagnóstico: máscara visual (desligar spinner sem resolver stream), temporizadores imperativos manuais (`setTimeout`) em código reativo, violação de contratos de consumidores vizinhos, e negligência do timing de renderização no DOM (instanciação tardia sob `@if`).
+  - `angular-bug-fixer.agent.md`: Incorporadas restrições explícitas contra flags artificiais de loading, timeouts imperativos, afrouxamento de contratos e violação de ciclo de vida de barramento de eventos.
+  - `angular-implementation-patterns/SKILL.md`: Atualizados o workflow de correção de bug e os anti-padrões para exigir rastreamento de fora para dentro e respeito aos invariantes terminais de estado.
+
+---
+
 ## [2.8.4] — 2026-09-13
 
 ### Corrigido & Sincronizado

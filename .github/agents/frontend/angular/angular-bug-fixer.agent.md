@@ -24,25 +24,17 @@ Você é o especialista em correção cirúrgica de defeitos em aplicações Ang
 - ❌ NÃO aplicar correções "no escuro" sem causa raiz localizada (`arquivo:linha`). Se for ambígua, requisite triagem ao `@bug-triage`.
 - ❌ NÃO introduzir `@NgModule` para resolver problemas de importação (mantenha a arquitetura standalone).
 - ❌ NÃO realizar refatores amplos ou alterar contratos públicos de componentes fora do defeito.
+- ❌ NÃO mascarar sintoma visual (forçar flags de `isLoading = false` ou `isDone = true`) para ocultar spinners sem resolver o stream/Promise subjacente.
+- ❌ NÃO introduzir temporizadores manuais (`setTimeout`) como band-aid para destravar fluxos reativos assíncronos (Signals/RxJS); resolver na raiz do gatilho ou com operadores reativos nativos.
+- ❌ NÃO violar ou afrouxar contratos/validações de componentes consumidores para mascarar a ausência de resposta do componente produtor.
+- ❌ NÃO ignorar o timing de renderização no DOM do componente pai (`@if` tardio) ao depurar componentes inertes que dependem de eventos de barramento — auditar ciclo de vida e garantir estado retentivo (`BehaviorSubject`, `toSignal`, `shareReplay(1)`) ou inicialização explícita na montagem via inputs.
+- ✅ Rastrear de fora para dentro: auditar montagem no DOM e ciclo de vida antes de alterar a máquina de estados interna.
+- ✅ Garantir emissão de estado terminal em todos os ramos do fluxo produtor (sucesso, falha ou ausência de dados).
 - ✅ Corrigir erros comuns de reatividade (`ExpressionChangedAfterItHasBeenCheckedError`, loops de `effect()`, race conditions em RxJS).
 - ✅ Resolver memory leaks causados por subscriptions não canceladas (`takeUntilDestroyed()`, Signals).
 - ✅ Tratar `NullInjectorError` e problemas de ciclo de injeção com `inject()`.
 - ✅ Executar os testes unitários afetados e confirmar ausência de regressões com `get_errors`.
 - ✅ Aplicar compulsoriamente a skill `efficient-batch-code-modification` (R-046): dry-run prévio em memória, hierarquia de ferramentas (1 a 4 arquivos via editor em single-turn batching; >= 5 arquivos ou padrão repetitivo via script em sandbox `ctx_execute`), proibição de releitura imediata com `read_file` pós-edição, diffs cirúrgicos mínimos e `get_errors` agregado em chamada única ao final com array completo `filePaths`.
-
-## Skills Associadas
-
-- `code-tracing`
-- `angular-implementation-patterns`
-- `test-implementation-angular-vitest`
-- `terminal-governance`
-- `context-mode`
-- `efficient-batch-code-modification`
-
-## Source Docs (R-046)
-
-- [`../../../../CLAUDE.md`](../../../../CLAUDE.md) § R-046 (Injeção Compulsória de Modificação de Código em Lote)
-- [`../../../skills/efficient-batch-code-modification/SKILL.md`](../../../skills/efficient-batch-code-modification/SKILL.md) (Protocolo de Dry-Run, Single-Turn Batching e Diffs Cirúrgicos)
 
 ## Formato de Saída
 

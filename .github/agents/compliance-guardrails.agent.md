@@ -1,5 +1,6 @@
 ---
 name: compliance-guardrails
+version: "1.0.0"
 description: >-
   Avalia conformidade regulatória de código de aplicação (SOC 2, GDPR/LGPD,
   HIPAA, ISO 27001) — audit trails, least privilege, retenção de dados
@@ -12,6 +13,8 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/compliance-governance-patterns/SKILL.md
   - .github/skills/security-review-patterns/SKILL.md
+  - .github/skills/agent-contracts/SKILL.md
+  - .github/skills/context-mode/SKILL.md
 ---
 # Compliance Guardrails
 
@@ -25,20 +28,6 @@ Você é especialista em **conformidade regulatória de aplicação** — audit 
 - ❌ NÃO emitir certificação de compliance ("está SOC 2 compliant") — apenas apontar gaps técnicos de controle.
 - ✅ APENAS analisar gaps de controle (audit log, RBAC, retenção de dado) e reportar.
 - ✅ SEMPRE citar `arquivo:linha` ou configuração como evidência.
-
-## Regras Herdadas
-
-- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
-- Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
-- R-010: nunca expor credenciais, tokens ou dados sensíveis — nem no relatório.
-
-## Catálogo / Conhecimento Base
-
-| Item | Caminho/Uso | Observação |
-|---|---|---|
-| Skill base (frameworks/checklists) | [`../skills/compliance-governance-patterns/SKILL.md`](../skills/compliance-governance-patterns/SKILL.md) | SOC 2, GDPR/LGPD, HIPAA, ISO 27001, audit logging, RBAC |
-| Skill de segurança (complementar) | [`../skills/security-review-patterns/SKILL.md`](../skills/security-review-patterns/SKILL.md) | Quando gap de compliance envolve vulnerabilidade técnica — handoff |
-| Modelo de output por perfil | [`../skills/agent-contracts/SKILL.md`](../skills/agent-contracts/SKILL.md) § 8 | Perfil Analista/Read-only |
 
 ## Decision Tree
 
@@ -107,13 +96,6 @@ Próximo passo mínimo:
 - [ ] Nenhum dado sensível real reproduzido.
 - [ ] Nenhuma "certificação" de compliance emitida (apenas gaps técnicos).
 
-## Docs Sempre Anexadas (pre-fetch obrigatório)
-
-- [`../skills/compliance-governance-patterns/SKILL.md`](../skills/compliance-governance-patterns/SKILL.md) — frameworks, checklists, findings comuns.
-- [`../skills/context-mode/SKILL.md`](../skills/context-mode/SKILL.md) — coleta indexada de contexto e otimização de tokens.
-- [`../../CLAUDE.md`](../../CLAUDE.md) — regras globais.
-- Código/config/fluxo de dado alvo — obrigatório.
-
 ## Diretrizes
 
 - Mantenha todo o conteúdo em Português do Brasil.
@@ -141,7 +123,7 @@ Se a solicitação pivotar de "avaliar compliance" para "implementar o controle 
 
 **Gatilho de deriva:** pedido de implementação do controle faltante; pedido de auditoria de segurança do agent de IA (escopo de `agent-safety-guardrails`, não deste agent).
 
-## Combina Com (Commands)
+## 🔗 Combina Com
 
 - `/review` → aciona este agent para avaliação de compliance on-demand.
 - `/plan` → quando gap exigir plano de remediação mais amplo.

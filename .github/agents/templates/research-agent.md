@@ -4,6 +4,11 @@ description: >-
   Atua em modo estritamente analítico e read-only para <objetivo de pesquisa/avaliação arquitetural em 3ª pessoa>, identificando evidências, riscos e trade-offs fundamentados. Use para <frase-gatilho de invocação>. Nunca altera arquivos nem implementa código.
 model: "Claude Sonnet 5"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'mcp_context-mode_ctx_search']
+# SSOT de Governança e Dependências (Context Engineering Benchmark 2026):
+# 100% das dependências documentais e skills DEVEM residir exclusivamente em source_docs: no frontmatter.
+# É TERMINANTEMENTE PROIBIDO criar seções redundantes no corpo markdown (ex.: '## Regras Herdadas',
+# '## Catálogo / Conhecimento Base', '## Skills Associadas' ou '## Docs Sempre Anexadas').
+# O gate de testes determinístico (test_template_sections.py) bloqueia compulsoriamente seções não homologadas.
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md

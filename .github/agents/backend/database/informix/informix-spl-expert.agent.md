@@ -7,9 +7,11 @@ description: >-
 model: "Claude Sonnet 5"
 tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'create_file', 'insert_edit_into_file', 'get_errors', 'run_in_terminal', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index']
 source_docs:
-  - ".github/skills/terminal-governance/SKILL.md"
-  - ".github/skills/efficient-batch-code-modification/SKILL.md"
-  - ".github/instructions/database.instructions.md"
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/skills/terminal-governance/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/instructions/database.instructions.md
 ---
 
 # Informix SPL Expert
@@ -32,19 +34,6 @@ Você é o desenvolvedor especialista em programação de Stored Procedures e Fu
 - ✅ Estruturar tratamento robusto de falhas com `ON EXCEPTION IN (<codigos_erro>) SET <var_sqlcode>, <var_isamcode>; ... END EXCEPTION;`.
 - ✅ Implementar Triggers Informix (`CREATE TRIGGER ... INSERT/UPDATE/DELETE ON ... FOR EACH ROW (EXECUTE PROCEDURE ...)`).
 - ✅ Aplicar compulsoriamente a skill `efficient-batch-code-modification` (R-046): dry-run prévio em memória, hierarquia de ferramentas (1 a 4 arquivos via editor em single-turn batching; >= 5 arquivos ou padrão repetitivo via script em sandbox `ctx_execute`), proibição de releitura imediata com `read_file` pós-edição, diffs cirúrgicos mínimos e `get_errors` agregado em chamada única ao final com array completo `filePaths`.
-
-## Regras Herdadas
-
-- Regras normativas globais em [`../../../../../CLAUDE.md`](../../../../../CLAUDE.md).
-- Adapter de banco de dados em [`../../../../instructions/database.instructions.md`](../../../../instructions/database.instructions.md).
-- Regras de terminal em [`../../../../skills/terminal-governance/SKILL.md`](../../../../skills/terminal-governance/SKILL.md).
-
-## Skills Associadas
-
-- `terminal-governance`
-- `context-mode`
-- `efficient-batch-code-modification`
-- `agent-contracts`
 
 ## Formato de Saída
 

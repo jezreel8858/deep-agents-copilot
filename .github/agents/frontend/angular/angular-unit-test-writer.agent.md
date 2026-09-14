@@ -30,19 +30,6 @@ Você é o especialista em testes unitários puros para aplicações Angular. Se
 - ✅ Executar a suíte de testes unitários localmente e validar que `get_errors` esteja sem erros.
 - ✅ Aplicar compulsoriamente a skill `efficient-batch-code-modification` (R-046): dry-run prévio em memória, emissão de tool calls de escrita em lote agrupadas no mesmo turno (single-turn batching) e diffs cirúrgicos mínimos.
 
-## Skills Associadas
-
-- `test-implementation-angular-vitest`
-- `test-implementation-frontend`
-- `terminal-governance`
-- `context-mode`
-- `efficient-batch-code-modification`
-
-## Source Docs (R-046)
-
-- [`../../../../CLAUDE.md`](../../../../CLAUDE.md) § R-046 (Injeção Compulsória de Modificação de Código em Lote)
-- [`../../../skills/efficient-batch-code-modification/SKILL.md`](../../../skills/efficient-batch-code-modification/SKILL.md) (Protocolo de Dry-Run, Single-Turn Batching e Diffs Cirúrgicos)
-
 ## Formato de Saída
 
 ```markdown

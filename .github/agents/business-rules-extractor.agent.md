@@ -1,5 +1,6 @@
 ---
 name: business-rules-extractor
+version: "1.1.0"
 description: >
   Extrair regras de negócio de qualquer código-fonte e documentá-las em arquivos
   .md estruturados — servindo como ground truth para validar que refatorações
@@ -12,7 +13,11 @@ source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
   - .github/skills/business-rules-governance/SKILL.md
+  - .github/skills/code-tracing/SKILL.md
   - .github/skills/documentation-writing-patterns/SKILL.md
+  - .github/skills/mermaid-diagrams/SKILL.md
+  - .github/skills/structured-intake-patterns/SKILL.md
+  - .github/skills/context-mode/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 # Business Rules Extractor
@@ -37,22 +42,6 @@ Opera em dois modos:
 - ❌ NÃO assumir intenção de negócio — documentar o que o código faz, não o que deveria fazer.
 - ❌ NÃO criar documentação fora de `docs/business-rules/`.
 
-## Regras Herdadas
-
-- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
-- Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
-
-## Catálogo / Conhecimento Base
-
-| Item | Caminho/Uso | Observação |
-|---|---|---|
-| Skill principal | [`../skills/business-rules-governance/SKILL.md`](../skills/business-rules-governance/SKILL.md) | **Carregar ANTES de qualquer ação** — taxonomia, templates, protocolos |
-| Skill de rastreio | [`../skills/code-tracing/SKILL.md`](../skills/code-tracing/SKILL.md) | Localizar regras no código (grep → semântico → call chain) |
-| Skill de diagramas | [`../skills/mermaid-diagrams/SKILL.md`](../skills/mermaid-diagrams/SKILL.md) | Diagramas de estado para fluxos complexos |
-| Docs de saída | `docs/business-rules/*.md` | Destino de toda documentação gerada |
-| Agent de curadoria | [`docs-engineer.agent.md`](docs-engineer.agent.md) | Para revisão e curadoria pós-geração |
-| Agent de impacto | [`tech-solution-architect.agent.md`](tech-solution-architect.agent.md) | Quando violação de regra tem impacto amplo (tier B1 local ou cross-sistema) |
-| Agent de refatoração | [`refactor-planner.agent.md`](refactor-planner.agent.md) | Quando validação precede plano de refactor |
 
 ## Decision Tree
 
@@ -323,27 +312,10 @@ Se a solicitação pivotar de "extrair/validar regras" para "executar a refatora
 
 **Gatilho de deriva:** pedido de implementação/correção de código de produção; pedido de execução do refactor planejado (→ `@refactor-planner`).
 
-## Combina Com (Commands)
+## 🔗 Combina Com
 
-- `/implement` → executar extração ou validação após plano definido.
-- `/validate` → verificar relatório de validação com dev.
-- `/plan` → mapear escopo de extração antes de iniciar em projeto grande.
+- **Upstream**: `@agent-router`, `@refactor-planner`.
+- **Downstream**: `@docs-engineer`, `@tech-solution-architect`, `@refactor-planner`, `@bug-triage`, `@test-strategy`, `@code-knowledge-graph`.
+- **Commands**: `/implement`, `/validate`, `/plan`.
 
-## Skills Associadas
-
-- **`business-rules-governance`** — 📋 Taxonomia, templates e protocolos (pré-fetch obrigatório)
-- **`code-tracing`** — 🔍 Localizar regras no código (grep → semântico → call chain)
-- **`mermaid-diagrams`** — 📊 Diagramas de estado para regras FLOW
-- **`context-mode`** — 🧠 Para análise de módulos grandes sem poluir contexto
-
-## Docs Sempre Anexadas (pre-fetch obrigatório)
-
-> Antes de invocar este agent, anexe os arquivos abaixo. Se faltar, **PEÇA o anexo** — nunca infira.
-
-- [`../../CLAUDE.md`](../../CLAUDE.md)
-- [`../copilot-instructions.md`](../copilot-instructions.md)
-- [`../skills/business-rules-governance/SKILL.md`](../skills/business-rules-governance/SKILL.md)
-- [`../skills/code-tracing/SKILL.md`](../skills/code-tracing/SKILL.md)
-- [`../skills/structured-intake-patterns/SKILL.md`](../skills/structured-intake-patterns/SKILL.md)
-- Documento existente `docs/business-rules/business-rules-<modulo>.md` (se disponível)
 

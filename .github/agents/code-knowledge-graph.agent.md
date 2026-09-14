@@ -15,6 +15,8 @@ source_docs:
   - .github/skills/codegraph-optave-usage/SKILL.md
   - .github/skills/integration-contract-analysis/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
+  - .github/skills/agent-contracts/SKILL.md
+  - .github/skills/context-mode/SKILL.md
 ---
 # Code Knowledge Graph
 
@@ -70,23 +72,6 @@ O motor `@optave/codegraph` fornece parsing via AST real (motor nativo) para 34 
 | Gate de Paridade Funcional (RNF-012) | **4/9 itens ✅** — ver tabela na seção Formato de Saída; **3 itens ❌ aceitos conscientemente** na migração total (RabbitMQ/filas, coupling taxonomy, risco PII/financeiro); visualização (item 7) corrigido para ✅ em 2026-09-03 (`codegraph plot`, ver skill `codegraph-optave-usage` §4.1) | RNF-012 |
 
 Estes valores **substituem** qualquer autoavaliação subjetiva nas seções Decision Tree, Modo de Operação e Formato de Saída abaixo — use-os como gate de decisão.
-
-## Regras Herdadas
-
-- Regras normativas globais em [`../../CLAUDE.md`](../../CLAUDE.md).
-- Regras de autonomia, compact error report e Context Mode em [`../copilot-instructions.md`](../copilot-instructions.md).
-- Aplicar especialmente: `R-009`, `R-010`, `R-015`, `R-023`, `R-024`, `R-026`, `R-038`, `R-042`, `R-048`.
-
-## Catálogo / Conhecimento Base
-
-| Item | Caminho/Uso | Observação |
-|---|---|---|
-| Catálogo de projetos cross-repo | [`.github/instructions/README.md`](../instructions/README.md) | Escopo multi-repo (RF-003) |
-| **Skill de uso do motor (obrigatória)** | [`../skills/codegraph-optave-usage/SKILL.md`](../skills/codegraph-optave-usage/SKILL.md) | Instalação, tabela de comandos CLI, least-tools MCP, gaps conhecidos — fonte única de verdade operacional do motor |
-| Catálogo textual de agents | [`README.md`](README.md) | Registro deste agent |
-| Catálogo estruturado | [`catalog.yaml`](catalog.yaml) | Registro oficial para invocação via `run_subagent` |
-| Skill de operação em sandbox | [`../skills/context-mode/SKILL.md`](../skills/context-mode/SKILL.md) | `ctx_execute`/`ctx_execute_file` disponíveis para consultas pontuais; `ctx_index` persiste o resultado final |
-| Skill de contratos de agent | [`../skills/agent-contracts/SKILL.md`](../skills/agent-contracts/SKILL.md) | Tooling baseline (§9) e formato de saída por perfil (§8) |
 
 ## Modelo de Dados (saída do `@optave/codegraph`)
 
@@ -198,18 +183,6 @@ Próximo passo mínimo:
 - [ ] MCP não habilitado com as 34 tools completas (R-024) — se usado, apenas subconjunto mínimo da skill.
 - [ ] Gaps aceitos (RabbitMQ, SOAP, coupling, risco) sinalizados explicitamente quando a consulta tocar esses temas — nunca omitidos. Visualização (`codegraph plot`) NÃO é gap — usar quando solicitado.
 - [ ] Resultado indexado via `ctx_index` (`code-graph:<project-id>:<hash>`) antes de reportar.
-
-## Docs Sempre Anexadas (pre-fetch obrigatório)
-
-> Antes de invocar este agent, anexe os arquivos abaixo. Se faltar, **PEÇA o anexo** — nunca infira.
-
-- [`.github/instructions/README.md`](../instructions/README.md) — escopo cross-repo (RF-003).
-- [`../../CLAUDE.md`](../../CLAUDE.md) — regras globais (R-009, R-010, R-023, R-024, R-038).
-- [`../copilot-instructions.md`](../copilot-instructions.md) — regras operacionais e Context Mode.
-- [`../skills/codegraph-optave-usage/SKILL.md`](../skills/codegraph-optave-usage/SKILL.md) — **obrigatória**: instalação, comandos, least-tools MCP, gaps conhecidos.
-- [`../skills/terminal-governance/SKILL.md`](../skills/terminal-governance/SKILL.md) — governança de execução de terminal e reporting de erros.
-- [`../skills/context-mode/SKILL.md`](../skills/context-mode/SKILL.md) — execução em sandbox e cache (`ctx_index`).
-- Projeto(s)-alvo (identificação explícita em `catalog.yaml`) — nunca inferir quais projetos processar sem o solicitante informar.
 
 ## Diretrizes
 
