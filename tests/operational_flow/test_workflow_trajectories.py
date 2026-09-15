@@ -234,3 +234,62 @@ def test_workflow_and_state_coverage_thresholds(casos_workflows, routing_graph):
     assert wc["covered"] == wc["total"] == 8, f"Cobertura de workflows incompleta: {wc}"
     assert sc["percentage"] >= 85.0, f"Cobertura de etapas/estados abaixo de 85%: {sc['percentage']}%"
     assert ap["total_exercised"] >= 15, f"Menos de 15 agentes exercitados: {ap['total_exercised']}"
+
+
+# ─────────────────────────────────────────────────────────────
+# 6. Validação E2E de Propagação do State Bag e Quality Gates (R-050)
+# ─────────────────────────────────────────────────────────────
+
+def test_e2e_state_bag_preservation_across_all_8_workflows(casos_workflows):
+    """
+    Simula a execução sequencial completa das trajetórias dos 8 workflows (R-050),
+    validando a propagação do Typed State Bag (workflow_state) sem corrupção ou perda de campos.
+    """
+    from tests.operational_flow.workflow_eval_simulator import WorkflowEvaluator
+
+    evaluator = WorkflowEvaluator()
+    trajectory_scenarios = [
+        c["id"] for c in casos_workflows["cenarios"] if "trajetoria" in c
+    ]
+    assert len(trajectory_scenarios) == 8, (
+        f"Esperado 8 cenários de trajetória sequencial, encontrado: {len(trajectory_scenarios)}"
+    )
+
+    for scenario_id in trajectory_scenarios:
+        result = evaluator.simulate_state_bag_transitions(scenario_id)
+        assert result["status"] == "PASS", (
+            f"Falha na simulação de transição E2E para {scenario_id}: {result.get('reason')}"
+        )
+        state_bag = result["state_bag_final"]
+        assert state_bag["status"] == "CONCLUIDO"
+        assert len(state_bag["historico_handoffs"]) == result["total_etapas"]
+        assert len(state_bag["artifacts"]) == result["total_etapas"]
+
+
+def test_all_8_workflows_have_terminal_quality_gates(casos_workflows):
+    """
+    Valida que o estado final de cada um dos 8 workflows canônicos termina
+    em um Quality Gate verificado ou síntese formal de propostas,
+    eliminando becos sem saída descritivos (R-047).
+    """
+    terminal_valid_agents = {
+        "code-review",
+        "pr-gatekeeper",
+        "runtime-verifier",
+        "security-reviewer",
+        "agent-auditor",
+        "docs-engineer",
+    }
+    trajectory_scenarios = [
+        c for c in casos_workflows["cenarios"] if "trajetoria" in c
+    ]
+
+    for cenario in trajectory_scenarios:
+        cid = cenario["id"]
+        last_step = cenario["trajetoria"][-1]
+        last_agent = last_step["agente"]
+        assert last_agent in terminal_valid_agents, (
+            f"[{cid}] Etapa final ({last_step['etapa']}) deve terminar em um Quality Gate ({terminal_valid_agents}), mas terminou com '{last_agent}'"
+        )
+
+

@@ -333,6 +333,7 @@ Projetos e adapters por-projeto NUNCA são commitados no repositório compartilh
 - `sonarqube-governance` -> monitoramento de métricas de qualidade via SonarQube.
 - `yaml-governance` -> boas práticas para leitura, geração e validação de arquivos YAML/YML.
 - `git-governance` -> convenções de git workflow, branch naming e commit standards.
+- `git-worktree-governance` -> diretrizes de ciclo de vida e isolamento para execução de agentes paralelos via Git Worktrees.
 - `performance-engineering-patterns` -> revisão especializada de performance (Core Web Vitals, N+1, latência, profiling).
 - `angular-performance-patterns` -> engenharia de performance Angular (Zoneless, Signals, @defer, SSR incremental, CWV).
 - `spring-boot-performance-patterns` -> engenharia de performance Spring Boot (Virtual Threads, pinning, HikariCP, N+1, cache, ZGC).

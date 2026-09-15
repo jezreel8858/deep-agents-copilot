@@ -1,8 +1,30 @@
-# CHANGELOG — Deep Agents Copilot (Estrutura de Governança Genérica e Reutilizável
+# CHANGELOG — Deep Agents Copilot (Estrutura de Governança Genérica e Reutilizável)
 
 Todas as mudanças significativas nesta base de governança são documentadas aqui.
 
 Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](https://www.conventionalcommits.org/)
+
+---
+
+## [2.8.7] — 2026-09-14
+
+### Adicionado & Aprimorado
+- **Alinhamento com OWASP Top 10 for Agentic Applications 2026 (ASI01..ASI10:2026)**:
+  - Atualizada a skill `.github/skills/agent-safety-guardrails/SKILL.md` com a taxonomia formal oficial da OWASP para sistemas autônomos de agentes (ASI01:2026 a ASI10:2026), publicada em dezembro de 2025.
+  - Implementadas diretrizes operacionais de contenção para:
+    - *ASI07: Insecure Inter-Agent Communication*: Validação de schema tipado de handoff (`handoff-governance` v1.1) e não-repúdio via banner de `Agente Ativo:`.
+    - *ASI08: Cascading Agent Failures*: Circuit breaker a 3 falhas consecutivas (R-050.2) e isolamento de estado por Typed State Bags.
+    - *ASI06: Memory & Context Poisoning*: Controles contra injeção em memória de longo prazo e sanitização de chunks de context-mode.
+    - *ASI09: Human-Agent Trust Exploitation*: Neutralidade e transparência em `ask_questions`, vedando perguntas indutivas em operações sensíveis.
+- **Nova Skill de Governança: `git-worktree-governance`**:
+  - Criada a skill `.github/skills/git-worktree-governance/SKILL.md` (Tier 2, categoria governance) padronizando o ciclo de vida de 5 etapas (`setup → isolate → verify → merge → cleanup`) para agentes executores paralelos e explorações especulativas.
+  - Prevenção de colisões em lockfiles (`package.json`, `pom.xml`), locks de git index e concorrência de compilação.
+  - Sincronização atômica SSOT (R-015) em `.github/skills/.index.json` (`total_skills: 59`), `.github/skills/README.md`, `.github/copilot-instructions.md` e adição de `.worktrees/` em `.gitignore`.
+- **Evals Lab — Validação E2E e Simulação dos 8 Workflows Canônicos (R-050)**:
+  - `tests/operational_flow/workflow_eval_simulator.py`: Implementado o método `simulate_state_bag_transitions()` para simulação determinística de propagação do Typed State Bag (`workflow_state`), auditando transições entre etapas sem consumo de tokens de LLM.
+  - `tests/operational_flow/test_workflow_trajectories.py`: Adicionados os testes `test_e2e_state_bag_preservation_across_all_8_workflows` e `test_all_8_workflows_have_terminal_quality_gates`, garantindo preservação de artefatos e terminação em Quality Gate formal para todos os 8 workflows.
+  - `tests/operational_flow/casos-workflows.yaml`: Corrigido o gate de transição da etapa de implementação do `WF-FEAT-001` para autorizar avanço ao gate de segurança do `security-reviewer`.
+  - Suíte de testes expandida para **129 testes**, 100% verde (`pytest` em 13.54s).
 
 ---
 
