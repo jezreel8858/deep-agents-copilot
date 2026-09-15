@@ -303,7 +303,7 @@ def test_smell_2_11_all_skills_have_mandatory_operational_sections():
 # 6. GATE DE HOMOLOGAÇÃO DE SEÇÕES (ANTI-AD-HOC SECTIONS / TEMPLATE WHITELIST)
 # ─────────────────────────────────────────────────────────────
 
-PROHIBITED_DOC_SECTIONS_NON_ROUTERS = {
+PROHIBITED_DOC_SECTIONS = {
     "docs sempre anexadas",
     "regras herdadas",
     "catálogo / conhecimento base",
@@ -315,25 +315,26 @@ PROHIBITED_DOC_SECTIONS_NON_ROUTERS = {
 
 def test_homologation_gate_no_unhomologated_sections_in_agents():
     """
-    Gate de Homologação: Garante que nenhum agent não-router possua seções redundantes
-    ou não homologadas em templates canônicos (ex.: Docs Sempre Anexadas, Regras Herdadas,
-    Catálogo / Conhecimento Base, Skills Associadas).
+    Gate de Homologação: Garante que NENHUM agent (incluindo routers e templates)
+    possua seções redundantes ou não homologadas em templates canônicos (ex.: Docs Sempre Anexadas,
+    Regras Herdadas, Catálogo / Conhecimento Base, Skills Associadas).
     Toda dependência documental DEVE residir no frontmatter 'source_docs:' (SSOT).
-    Inclusões de novas seções exigem homologação prévia em agent-template.md/operational/research.
+    Inclusões de novas seções exigem homologação prévia em agent-template.md/operational/research/router-agent.md.
     """
-    non_router_agents = [
+    all_agent_files = [
         p for p in AGENTS_DIR.glob("**/*.agent.md")
-        if "router" not in p.name and "templates" not in p.parts
+    ] + [
+        p for p in (AGENTS_DIR / "templates").glob("*.md")
     ]
-    assert len(non_router_agents) >= 70
+    assert len(all_agent_files) >= 70
 
     violations = []
-    for agent_file in non_router_agents:
+    for agent_file in all_agent_files:
         rel_path = agent_file.relative_to(REPO_ROOT)
         h2s = extract_h2_sections(agent_file)
         for h in h2s:
             clean_h = h.lower()
-            for prohibited in PROHIBITED_DOC_SECTIONS_NON_ROUTERS:
+            for prohibited in PROHIBITED_DOC_SECTIONS:
                 if prohibited in clean_h:
                     violations.append(f"[{rel_path}] Seção não homologada/proibida: '## {h}'")
 
@@ -426,7 +427,7 @@ def test_homologation_gate_blocks_unhomologated_injections(tmp_path: Path):
 
     h2s = extract_h2_sections(dummy_agent)
     has_unhomologated = any(
-        any(p in h.lower() for p in PROHIBITED_DOC_SECTIONS_NON_ROUTERS)
+        any(p in h.lower() for p in PROHIBITED_DOC_SECTIONS)
         for h in h2s
     )
     assert has_unhomologated is True, "Gate deveria identificar a seção não homologada como violação"

@@ -35,16 +35,6 @@ Você é o supervisor de domínio e roteador especializado em Banco de Dados (Or
 - ✅ Se a solicitação envolver alterações em services Java/Spring Boot que consumam essas tabelas, faça handoff para `@spring-boot-router` ou `@ejb-router`.
 - ✅ Se sair do domínio de banco de dados, retorne ao `@agent-router` (R-042, `motivo: "deriva_de_intencao"`).
 
-## Regras Herdadas
-
-- Regras normativas globais em [`../../../../CLAUDE.md`](../../../../CLAUDE.md).
-- Sub-catálogo Database em [`database-catalog.yaml`](./database-catalog.yaml).
-
-## Skills Associadas
-
-- `agent-contracts`
-- `handoff-governance`
-- `context-mode`
 
 ## Decision Tree
 

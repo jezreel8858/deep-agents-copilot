@@ -35,16 +35,6 @@ Você é o supervisor de domínio e roteador especializado em backend Python (Fa
 - ✅ Se a solicitação for de Java/Spring Boot, encaminhe para `@spring-boot-router`. Se for Java Legado EJB, encaminhe para `@ejb-router`.
 - ✅ Se a solicitação for de frontend (Angular), encaminhe para `@angular-router`. Se for fora de Python/backend, retorne ao `@agent-router` (R-042, `motivo: "deriva_de_intencao"`).
 
-## Regras Herdadas
-
-- Regras normativas globais em [`../../../../CLAUDE.md`](../../../../CLAUDE.md).
-- Sub-catálogo Python em [`python-catalog.yaml`](./python-catalog.yaml).
-
-## Skills Associadas
-
-- `agent-contracts`
-- `handoff-governance`
-- `context-mode`
 
 ## Decision Tree
 

@@ -35,16 +35,6 @@ Você é o supervisor de domínio e roteador especializado de backend Spring Boo
 - ✅ Se a solicitação for de Spring Reativo (WebFlux/Reactor/R2DBC), encaminhe para `@spring-reactive-router`.
 - ✅ Se a solicitação for de frontend (Angular), encaminhe para `@angular-router`. Se for fora de Java/backend, retorne ao `@agent-router` (R-042, `motivo: "deriva_de_intencao"`).
 
-## Regras Herdadas
-
-- Regras normativas globais em [`../../../../CLAUDE.md`](../../../../CLAUDE.md).
-- Sub-catálogo Spring Boot em [`spring-boot-catalog.yaml`](./spring-boot-catalog.yaml).
-
-## Skills Associadas
-
-- `agent-contracts`
-- `handoff-governance`
-- `context-mode`
 
 ## Decision Tree
 
