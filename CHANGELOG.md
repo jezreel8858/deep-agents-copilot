@@ -6,6 +6,23 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.8.10] — 2026-09-14
+
+### Refatorado & Saneado
+- **Limpeza Profunda de Seções Não-Homologadas em Routers e Templates**:
+  - Extirpação completa das seções legadas e redundantes no corpo Markdown (`## Regras Herdadas`, `## Catálogo / Conhecimento Base`, `## Skills Associadas`) em 9 arquivos:
+    - Roteador central: `agent-router.agent.md`
+    - Template de router: `.github/agents/templates/router-agent.md`
+    - 7 supervisores de domínio: `angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `python-router`, `struts-router` e `database-router`.
+  - Consolidação formal de dependências documentais e de skills exclusivamente no frontmatter YAML `source_docs:` (SSOT), eliminando duplicação e acoplamento desnecessário no corpo dos agentes.
+  - Saneamento de ferramentas do frontmatter de `agent-router.agent.md` removendo referências a ferramentas `angular-cli/*` não-reconhecidas.
+- **Fortalecimento do Gate de Homologação de Seções (Smell 2.9)**:
+  - `tests/governance_audit/test_template_sections.py`: O teste de homologação foi expandido para cobrir **100% dos agentes** (incluindo todos os routers e templates), garantindo que nenhuma seção não-homologada volte a ser introduzida em qualquer `.agent.md` do repositório.
+  - `tests/governance_audit/test_router_agents.py`: Atualizadas as seções obrigatórias dos routers para as 4 seções canônicas de roteamento (`CRÍTICO: ESCOPO`, `Decision Tree`, `Formato de Saída`, `Retorno ao Router`), sem dependência de seções legadas no corpo.
+  - Suíte global de testes preservada com **136 testes**, 100% verde (`pytest` em 11.65s).
+
+---
+
 ## [2.8.9] — 2026-09-14
 
 ### Adicionado & Aprimorado

@@ -35,16 +35,6 @@ Você é o supervisor de domínio e roteador especializado em backend Java Legad
 - ✅ Se a solicitação for de Spring Boot moderno, encaminhe para `@spring-boot-router`. Se for Java Legado EJB, encaminhe para `@ejb-router`. Se for Spring Reativo, encaminhe para `@spring-reactive-router`.
 - ✅ Se a solicitação for de frontend moderno (Angular), encaminhe para `@angular-router`. Se for fora de Java/backend, retorne ao `@agent-router` (R-042, `motivo: "deriva_de_intencao"`).
 
-## Regras Herdadas
-
-- Regras normativas globais em [`../../../../CLAUDE.md`](../../../../CLAUDE.md).
-- Sub-catálogo Struts em [`struts-catalog.yaml`](./struts-catalog.yaml).
-
-## Skills Associadas
-
-- `agent-contracts`
-- `handoff-governance`
-- `context-mode`
 
 ## Decision Tree
 

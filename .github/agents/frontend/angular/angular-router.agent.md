@@ -36,16 +36,6 @@ Você é o supervisor de domínio e roteador especializado de frontend Angular. 
 - ✅ **Consulta Interna ao `@test-strategy` (Fluxo 2 TDD)**: Quando um novo componente ou store envolver regras de transição de estado complexas ou fluxos críticos, o router pode consultar previamente o `@test-strategy` via `run_subagent(agentName: 'test-strategy', ...)` para mapear a matriz de cenários antes de acionar o `angular-unit-test-writer` ou `angular-component-test-writer`.
 - ✅ Se a solicitação não for de Angular (ex.: backend Java/Spring Boot ou banco de dados), retorne imediatamente ao `@agent-router` (R-042, `motivo: "deriva_de_intencao"`).
 
-## Regras Herdadas
-
-- Regras normativas globais em [`../../../../CLAUDE.md`](../../../../CLAUDE.md).
-- Sub-catálogo Angular em [`angular-catalog.yaml`](./angular-catalog.yaml).
-
-## Skills Associadas
-
-- `agent-contracts`
-- `handoff-governance`
-- `context-mode`
 
 ## Decision Tree
 

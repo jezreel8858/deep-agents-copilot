@@ -30,16 +30,6 @@ Você é o supervisor de domínio e roteador especializado de <domínio/stack>. 
 - ✅ **Consulta Interna ao `@test-strategy` (Fluxo 2 TDD)**: Quando uma nova demanda envolver requisitos de teste complexos, o router pode consultar previamente o `@test-strategy` antes de acionar os test-writers locais.
 - ✅ Se a solicitação não pertencer a este domínio, retorne imediatamente ao `@agent-router` (R-042, `motivo: "deriva_de_intencao"`).
 
-## Regras Herdadas
-
-- Regras normativas globais em [`../../../../CLAUDE.md`](../../../../CLAUDE.md).
-- Sub-catálogo local em [`<dominio>-catalog.yaml`](./<dominio>-catalog.yaml).
-
-## Skills Associadas
-
-- `agent-contracts`
-- `handoff-governance`
-- `context-mode`
 
 ## Decision Tree
 

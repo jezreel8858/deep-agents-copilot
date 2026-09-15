@@ -35,16 +35,6 @@ Você é o supervisor de domínio e roteador especializado de backend Spring Rea
 - ✅ Se a solicitação for de Spring tradicional bloqueante (Servlet/JPA), encaminhe para `@spring-boot-router`.
 - ✅ Se a solicitação for de frontend (Angular), encaminhe para `@angular-router`. Se for fora de reativo, retorne ao `@agent-router` (R-042, `motivo: "deriva_de_intencao"`).
 
-## Regras Herdadas
-
-- Regras normativas globais em [`../../../../CLAUDE.md`](../../../../CLAUDE.md).
-- Sub-catálogo Spring Reactive em [`spring-reactive-catalog.yaml`](./spring-reactive-catalog.yaml).
-
-## Skills Associadas
-
-- `agent-contracts`
-- `handoff-governance`
-- `context-mode`
 
 ## Decision Tree
 

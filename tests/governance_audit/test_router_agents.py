@@ -101,8 +101,6 @@ def test_all_expected_router_agents_exist():
 
 MANDATORY_DOMAIN_ROUTER_SECTIONS = [
     "CRÍTICO: ESCOPO DE ROTEAMENTO",
-    "Regras Herdadas",
-    "Skills Associadas",
     "Decision Tree",
     "Formato de Saída",
     "Retorno ao Router (R-042 — Anti Sticky-Session)",
@@ -110,8 +108,7 @@ MANDATORY_DOMAIN_ROUTER_SECTIONS = [
 
 MANDATORY_CENTRAL_ROUTER_SECTIONS = [
     "CRÍTICO: ESCOPO DE ORQUESTRAÇÃO",
-    "Regras Herdadas",
-    "Catálogo / Conhecimento Base",
+    "Model Awareness — Solicitação de Modelo na Delegação",
     "Formato de Saída",
     "Quando Delegar",
 ]
@@ -119,13 +116,12 @@ MANDATORY_CENTRAL_ROUTER_SECTIONS = [
 
 def test_domain_routers_have_all_mandatory_sections():
     """
-    Valida se todo supervisor de domínio (stack router) possui exatamente as 6 seções canônicas:
+    Valida se todo supervisor de domínio (stack router) possui exatamente as 4 seções canônicas:
     1. CRÍTICO: ESCOPO DE ROTEAMENTO
-    2. Regras Herdadas
-    3. Skills Associadas
-    4. Decision Tree
-    5. Formato de Saída
-    6. Retorno ao Router (R-042 — Anti Sticky-Session)
+    2. Decision Tree
+    3. Formato de Saída
+    4. Retorno ao Router (R-042 — Anti Sticky-Session)
+    Toda dependência documental e de skills deve residir no frontmatter 'source_docs:' (SSOT).
     """
     domain_routers = get_domain_router_agents()
     assert len(domain_routers) >= 5
