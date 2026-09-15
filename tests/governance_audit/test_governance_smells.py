@@ -555,3 +555,27 @@ def test_smell_2_21_visual_blindness_and_ui_contracts_documented():
     assert aus_file.exists()
     aus_content = aus_file.read_text(encoding="utf-8")
     assert "Canonical Sibling" in aus_content, "angular-ui-stylist deve adotar Canonical Sibling First"
+
+# ─────────────────────────────────────────────────────────────
+# SMELL 2.22 — Sticky Agent e Falha de Reset de Workflow (R-042 / R-052)
+# ─────────────────────────────────────────────────────────────
+def test_smell_2_22_workflow_reset_and_anti_sticky_agent_rule():
+    """Smell 2.22: Garante que CLAUDE.md, copilot-instructions.md, workflows.md
+    e governance-audit-patterns/SKILL.md documentam a proibição de Sticky Agent
+    e a obrigatoriedade de reset pós-conclusão de workflow (R-052 / R-042)."""
+    # 1. Verifica no CLAUDE.md
+    claude_content = CLAUDE_MD.read_text(encoding="utf-8")
+    assert "R-052" in claude_content, "CLAUDE.md DEVE declarar a regra R-052"
+    assert "Anti Sticky-Agent" in claude_content or "conclusao_de_workflow_anterior" in claude_content
+
+    # 2. Verifica no copilot-instructions.md
+    copilot_file = REPO_ROOT / ".github" / "copilot-instructions.md"
+    assert copilot_file.exists()
+    copilot_content = copilot_file.read_text(encoding="utf-8")
+    assert "R-052" in copilot_content, "copilot-instructions.md DEVE declarar R-052"
+
+    # 3. Verifica em governance-audit-patterns/SKILL.md
+    gap_file = SKILLS_DIR / "governance-audit-patterns" / "SKILL.md"
+    gap_content = gap_file.read_text(encoding="utf-8")
+    assert "2.22" in gap_content, "governance-audit-patterns/SKILL.md DEVE documentar o Smell 2.22"
+    assert "Sticky Agent" in gap_content
