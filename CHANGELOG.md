@@ -6,6 +6,20 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.8.9] — 2026-09-14
+
+### Adicionado & Aprimorado
+- **Guia Canônico de Arquitetura e Governança (arc42 / Diátaxis / IEEE 42010)**:
+  - Criado o documento canônico `docs/architecture/ARCHITECTURE_AND_GOVERNANCE_GUIDE.md` estruturado conforme as 12 seções padrão do arc42 (v8.2), o padrão internacional IEEE 42010 e o framework Diátaxis (dimensões de *Explanation* e *Architecture Reference*).
+  - Consolidação formal do modelo estático e dinâmico da governança multi-agente:
+    - *Visão de Contexto e Fronteiras*: diagrama Mermaid delimitando IDE, host, governança central, aplicações de negócio locais e servidores MCP.
+    - *Visão de Blocos de Construção (Building Blocks)*: decomposição das 4 camadas (Entrada/Triagem, Supervisores de Domínio, Especialistas de Execução e Agentes Transversais de Qualidade) com mapeamento dos 65 agentes catalogados.
+    - *Visão de Execução e Runtime*: especificação determinística dos 8 Workflows Canônicos (R-050), banner universal de handoff (R-042/R-048) e diagrama de estados do Multi-Agent Circuit Breaker (`CLOSED` → `OPEN` → `HALF-OPEN`).
+    - *Visão de Implantação*: topologia de runtimes locais, worktrees efêmeros (`.worktrees/`), overlay privado (`projects.local.yaml`) e motor de grafo `@optave/codegraph`.
+  - Matriz de Validação de Mercado (Seção 9): mapeamento detalhado e fundamentação de 10 decisões arquiteturais centrais (ADR-01 a ADR-10) confrontadas com publicações e normas de mercado consolidadas em 2026 (Anthropic Agentic Coding Trends Report 2026, NSA CSI MCP Security 2026, Cloud Security Alliance Agentic MCP Security Best Practices v1, Linux Foundation A2A v1.0.0, IETF draft-aevum-agentcard-00, ISO/IEC 25010 e IEEE 42010).
+
+---
+
 ## [2.8.8] — 2026-09-14
 
 ### Adicionado & Aprimorado
