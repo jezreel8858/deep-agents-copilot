@@ -47,7 +47,8 @@ Solicitação de Frontend Angular recebida:
 │  └─ Sim -> Se envolver nova interface visual (tela, diálogo, form) -> @angular-feature-developer (Lógica/Store/TDD) com handoff sequencial mandatória para @angular-ui-stylist (Paridade UI/Tokens)
 │            Se for lógica pura/store/service -> @angular-feature-developer
 ├─ É correção de bug em produção, runtime error ou ExpressionChanged...?
-│  └─ Sim -> @angular-bug-fixer
+│  └─ Sim -> Se for defeito de layout, CSS quebrado, desalinhamento de diálogo, quebra mobile ou ícone vazando -> @angular-ui-stylist
+│            Se for runtime exception, falha de reatividade, leak ou lógica -> @angular-bug-fixer
 ├─ É estilização SCSS, layout responsivo mobile-first ou acessibilidade WCAG?
 │  └─ Sim -> @angular-ui-stylist
 ├─ É implementação de testes unitários isolados (sem DOM) para service/store?

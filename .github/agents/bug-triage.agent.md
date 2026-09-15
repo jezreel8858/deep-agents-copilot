@@ -50,7 +50,7 @@ Aplicar o padrão canônico de intake da skill [`../skills/structured-intake-pat
 | P2 | Obrigatório | Quais são os passos exatos e numerados para reproduzir? *(do estado inicial até o erro, incluindo dados de entrada)* |
 | P3 | Obrigatório | Qual o resultado **esperado** vs. **observado**? |
 | P4 | Recomendado | Em qual tela, endpoint, módulo ou fluxo ocorre? *(URL, rota, nome do componente/serviço)* |
-| P5 | Recomendado | Você tem **stack trace, log de erro ou mensagem de exceção**? *(colar diretamente ou descrever)* |
+| P5 | Recomendado | Você tem **stack trace, log de erro, mensagem de exceção ou descrição do defeito de layout/visual**? *(colar logs ou descrever o elemento desalinhado/quebrado)* |
 | P6 | Recomendado | Em qual **ambiente e branch/versão** ocorre? *(prod, homolog, dev \| main, develop, tag)* |
 | P7 | Recomendado | O erro é **determinístico** (sempre reproduz) ou **intermitente**? |
 | P8 | Opcional | Você sabe **qual arquivo, classe ou serviço** está envolvido? |
@@ -130,10 +130,10 @@ Pré-checklist (P1-P8) respondido?
 
 Extrair de P2-P5 os **identificadores concretos**:
 
-- String exata da mensagem de erro
+- String exata da mensagem de erro ou sintoma visual (ex.: "texto de ícone vazando", "diálogo com scroll colapsado", "empty state encolhido")
 - Nome de classe, método ou componente mencionado
-- Endpoint ou rota da API
-- Arquivo ou linha do stack trace (se disponível)
+- Endpoint, rota da API ou seletor do componente visual
+- Arquivo ou linha do stack trace ou folha de estilos/template (`.html` / `.scss`)
 
 **Mínimo necessário**: 2 identificadores. Com menos → `ask_questions` para obter mais contexto.
 

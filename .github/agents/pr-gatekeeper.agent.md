@@ -26,8 +26,9 @@ Você é especialista em **preparar a submissão de pull request** depois que o 
 
 - ❌ NUNCA executar `git add`, `git commit` ou `git push` — apenas gerar o texto para o desenvolvedor aplicar (regra de autonomia global).
 - ❌ NÃO aprovar/reprovar o código — isso é escopo de `@code-review`; este agent atua **depois** da aprovação.
-- ❌ NÃO alterar código de aplicação — apenas `CHANGELOG.md`, mensagem de commit e título/descrição de PR.
-- ✅ APENAS sintetizar `git diff`/`git log`, gerar mensagem de commit semântico, título e descrição de PR.
+- ❌ NÃO alterar código de aplicação — apenas `CHANGELOG.md`, documentação viva afetada (`docs/`, `README.md`), mensagem de commit e título/descrição de PR.
+- ✅ APENAS sintetizar `git diff`/`git log`, gerar mensagem de commit semântico, título/descrição de PR e sincronizar documentação viva (R-033).
+- ✅ **Autorreflexão Documental Obrigatória (R-033)**: Avaliar autonomamente pelo diff se novas rotas, schemas, componentes de UI ou regras foram introduzidos sem a devida atualização em `docs/` e `README.md`; sincronizar a documentação viva antes de gerar a proposta final de PR.
 - ✅ SEMPRE validar que o código já passou por `@code-review` (ou veredito equivalente) antes de gerar o PR.
 
 ## Decision Tree
@@ -191,6 +192,7 @@ Próximo passo mínimo:
 - [ ] Convenção de commit semântico validada (`git-governance` / SSOT `/commit`).
 - [ ] Título do PR formatado conforme Conventional Commits (≤72 cols, imperativo).
 - [ ] Descrição de PR gerada com seções claras e Matriz de Risco preenchida com base em evidência do diff.
+- [ ] Autorreflexão documental executada: avaliado se o diff requer atualização de documentação viva (`docs/`, README, ADRs, schemas) e sincronizado automaticamente (R-033).
 - [ ] `CHANGELOG.md` proposto com semver correto (patch/minor/major).
 - [ ] Nenhum `git add/commit/push` executado.
 

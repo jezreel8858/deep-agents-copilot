@@ -51,6 +51,7 @@ Pedido recebido?
 
 ## Padrões Obrigatórios
 
+0. **Autorreflexão de Schema (R-033)**: Toda criação ou alteração de DDL exige a atualização automática imediata da documentação de schema do projeto (`docs/database/DATABASE_SCHEMA_<PROJETO>.md` ou `docs/schema/`) na mesma entrega.
 1. Toda migração versionada e nomeada conforme padrão da ferramenta (Flyway/Liquibase/Alembic).
 2. Migração idempotente quando possível; nunca `DROP` destrutivo direto em produção.
 3. Rollback documentado ou script de reversão disponível antes de aplicar.
