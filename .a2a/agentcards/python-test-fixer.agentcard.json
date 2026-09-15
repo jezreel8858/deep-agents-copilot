@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "python-test-fixer",
+  "name": "Python Test Fixer",
+  "version": "1.0.0",
+  "description": "Diagnostica e corrige falhas em suítes pytest: desvios de fixtures, problemas de event loop em pytest-asyncio, mocks incorretos e regressões com diff cirúrgico.",
+  "domain": "Diagnóstico e reparo de testes quebrados no pytest, asserções desatualizadas e quebras de fixtures",
+  "role": "fixer",
+  "capabilities": [
+    "fix teste python",
+    "pytest quebrado",
+    "falha fixture",
+    "corrigir teste pytest",
+    "pytest-asyncio error"
+  ],
+  "skills": [
+    "agent-contracts",
+    "handoff-governance"
+  ],
+  "tools": [
+    "read_file",
+    "file_search",
+    "grep_search",
+    "list_dir",
+    "ask_questions",
+    "run_subagent",
+    "insert_edit_into_file",
+    "get_errors",
+    "run_in_terminal",
+    "context-mode/ctx_search",
+    "context-mode/ctx_batch_execute"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only",
+      "mutating",
+      "execution"
+    ],
+    "least_privilege_level": "elevated",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Gemini 3.8 Flash",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/backend/python/python-catalog.yaml",
+    "priority": 10,
+    "estimated_time_minutes": 15
+  }
+}

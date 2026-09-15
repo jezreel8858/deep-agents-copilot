@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "struts-arch-advisor",
+  "name": "Struts Arch Advisor",
+  "version": "1.0.0",
+  "description": "Especialista analítico read-only: arquitetura MVC Struts 1.x/2.x, struts-config.xml, struts.xml, Tiles, interceptors, segurança OGNL e governança de código legado.",
+  "domain": "Arquitetura Java Legado Struts 1.x/2.x, ActionServlet, descritores XML, Tiles, OGNL e manutenibilidade arquitetural",
+  "role": "advisor",
+  "capabilities": [
+    "arquitetura struts",
+    "auditoria struts",
+    "struts 1",
+    "struts 2",
+    "struts-config.xml",
+    "struts.xml",
+    "tiles",
+    "manutenibilidade struts",
+    "governanca struts"
+  ],
+  "skills": [
+    "agent-contracts",
+    "handoff-governance"
+  ],
+  "tools": [
+    "read_file",
+    "file_search",
+    "grep_search",
+    "list_dir",
+    "ask_questions",
+    "run_subagent",
+    "context-mode/ctx_search"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only"
+    ],
+    "least_privilege_level": "strict",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Claude Sonnet 5",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/backend/struts/struts-catalog.yaml",
+    "priority": 10,
+    "estimated_time_minutes": 15
+  }
+}

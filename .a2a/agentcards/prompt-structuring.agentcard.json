@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "prompt-structuring",
+  "name": "Prompt Structuring",
+  "version": "1.0.0",
+  "description": "Passo mandatorio pos-agent-router (excecao R-041): refina o prompt recebido em loop controlado (maximo 5 iteracoes) no formato canonico <task>/<context>/<constraints>/<output_format> e sempre retorna ao agent-router antes de qualquer classificacao de intencao/delegacao downstream.",
+  "domain": "Refinamento estrutural de prompt (passo mandatorio)",
+  "role": "specialist",
+  "capabilities": [
+    "refinar prompt",
+    "estruturar prompt",
+    "prompt loop",
+    "meta-prompting",
+    "clarificacao de prompt"
+  ],
+  "skills": [
+    "prompt-engineering-patterns",
+    "agent-contracts",
+    "confidence-fallback-policy",
+    "efficient-batch-code-modification"
+  ],
+  "tools": [
+    "ask_questions",
+    "run_subagent"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only"
+    ],
+    "least_privilege_level": "standard",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Gemini 3.8 Flash",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/catalog.yaml",
+    "priority": 1.5,
+    "estimated_time_minutes": 5
+  }
+}

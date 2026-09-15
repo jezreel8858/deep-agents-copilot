@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "runtime-verifier",
+  "name": "Runtime Verifier",
+  "version": "1.0.0",
+  "description": "Verifica higienizacao do ambiente antes de disparar testes/codificadores — build limpo, dependencias integras, servicos dependentes disponiveis. Read-only, nunca corrige o ambiente diretamente.",
+  "domain": "Verificacao de saude do ambiente de execucao (build/sandbox)",
+  "role": "gatekeeper",
+  "capabilities": [
+    "ambiente",
+    "build limpo",
+    "sandbox",
+    "dependencias",
+    "health check",
+    "porta ocupada"
+  ],
+  "skills": [
+    "terminal-governance",
+    "agent-contracts"
+  ],
+  "tools": [
+    "read_file",
+    "list_dir",
+    "grep_search",
+    "file_search",
+    "run_in_terminal",
+    "run_subagent",
+    "context-mode/ctx_execute"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only",
+      "execution"
+    ],
+    "least_privilege_level": "elevated",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Gemini 3.8 Flash",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/catalog.yaml",
+    "priority": 3.2,
+    "estimated_time_minutes": 10
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "governance-factory",
+  "name": "Governance Factory",
+  "version": "1.2.0",
+  "description": "Fusao de agent-factory + skill-factory + prompt-factory: cria/revisa agent (.agent.md), skill (SKILL.md), prompt (.prompt.md) ou stack (ecossistema completo com router e especialistas) via parametro type; na criacao, delega compulsoriamente pesquisa previa de melhores diretrizes e skills ao deep-search, com atualizacao atomica de catalogo (R-015).",
+  "domain": "Governanca e autoria de artefatos e stacks (agent/skill/prompt/stack)",
+  "role": "implementer",
+  "capabilities": [
+    "criar agent",
+    "criar skill",
+    "criar prompt",
+    "criar stack",
+    "nova stack",
+    "governanca",
+    "padronizar"
+  ],
+  "skills": [
+    "context-mode",
+    "agent-contracts",
+    "handoff-governance",
+    "agent-evals-lab",
+    "agent-safety-guardrails",
+    "governance-factory-patterns"
+  ],
+  "tools": [
+    "read_file",
+    "insert_edit_into_file",
+    "create_file",
+    "grep_search",
+    "file_search",
+    "list_dir",
+    "get_errors",
+    "ask_questions",
+    "run_subagent",
+    "context-mode/ctx_search",
+    "context-mode/ctx_batch_execute",
+    "context-mode/ctx_execute",
+    "context-mode/ctx_index",
+    "context-mode/ctx_execute_file"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only",
+      "mutating"
+    ],
+    "least_privilege_level": "standard",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Gemini 3.8 Flash",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/catalog.yaml",
+    "priority": 9,
+    "estimated_time_minutes": 30
+  }
+}

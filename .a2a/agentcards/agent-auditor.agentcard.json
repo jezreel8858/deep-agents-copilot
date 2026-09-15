@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "agent-auditor",
+  "name": "Agent Auditor",
+  "version": "1.0.0",
+  "description": "Audita o proprio catalogo de governanca (agents/skills/prompts), detecta smells e gaps estruturais, classifica severidade (Bloqueador/Alto/Sugestao) e recomenda handoff para agentes executores; nunca aplica correcao diretamente.",
+  "domain": "Auditoria semantica de governanca do catalogo (meta-nivel, read-only)",
+  "role": "auditor",
+  "capabilities": [
+    "auditoria de governanca",
+    "agent smell",
+    "gap de perfil",
+    "diretriz redundante",
+    "cobertura de categoria",
+    "auditar catalogo"
+  ],
+  "skills": [
+    "governance-audit-patterns",
+    "agent-contracts",
+    "code-review-patterns",
+    "agent-safety-guardrails",
+    "context-mode",
+    "handoff-governance"
+  ],
+  "tools": [
+    "read_file",
+    "grep_search",
+    "file_search",
+    "list_dir",
+    "run_subagent",
+    "context-mode/ctx_search",
+    "context-mode/ctx_batch_execute"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only"
+    ],
+    "least_privilege_level": "strict",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Gemini 3.8 Flash",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/catalog.yaml",
+    "priority": 8.4,
+    "estimated_time_minutes": 30
+  }
+}

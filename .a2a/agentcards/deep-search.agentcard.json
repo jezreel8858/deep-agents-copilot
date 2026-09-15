@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "deep-search",
+  "name": "Deep Search",
+  "version": "1.0.0",
+  "description": "Pesquisar internamente (repo/context-mode/terminal read-only) e externamente (Tavily), com decisao atômica vs composta, paralelizacao por run_subagent e sintese com citacao de fonte.",
+  "domain": "Pesquisa interna e externa (Retriever/Researcher)",
+  "role": "researcher",
+  "capabilities": [
+    "deep search",
+    "pesquisa interna",
+    "pesquisa externa",
+    "tavily",
+    "context-mode",
+    "retriever",
+    "researcher"
+  ],
+  "skills": [
+    "context-mode",
+    "terminal-governance",
+    "tavily",
+    "prompt-engineering-patterns",
+    "agent-contracts",
+    "handoff-governance",
+    "confidence-fallback-policy"
+  ],
+  "tools": [
+    "read_file",
+    "grep_search",
+    "file_search",
+    "list_dir",
+    "run_subagent",
+    "run_in_terminal",
+    "tavily/tavily_search",
+    "tavily/tavily_extract",
+    "tavily/tavily_crawl",
+    "tavily/tavily_map",
+    "tavily/tavily_research",
+    "context-mode/ctx_execute",
+    "context-mode/ctx_execute_file",
+    "context-mode/ctx_index",
+    "context-mode/ctx_search",
+    "context-mode/ctx_fetch_and_index",
+    "context-mode/ctx_batch_execute"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only",
+      "execution"
+    ],
+    "least_privilege_level": "elevated",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Claude Sonnet 5",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/catalog.yaml",
+    "priority": 7,
+    "estimated_time_minutes": 25
+  }
+}

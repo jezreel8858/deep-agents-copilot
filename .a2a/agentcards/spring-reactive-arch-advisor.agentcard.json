@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "spring-reactive-arch-advisor",
+  "name": "Spring Reactive Arch Advisor",
+  "version": "1.0.0",
+  "description": "Especialista analítico read-only: adequação reativa, dimensionamento de Netty event-loops, análise de gargalos em pipelines Reactor e mitigação de blocking calls.",
+  "domain": "Arquitetura Reativa, Spring WebFlux, Project Reactor e Dimensionamento de Netty",
+  "role": "advisor",
+  "capabilities": [
+    "auditoria reativa",
+    "arquitetura webflux",
+    "reactor",
+    "event loop",
+    "netty",
+    "r2dbc",
+    "backpressure"
+  ],
+  "skills": [
+    "agent-contracts",
+    "handoff-governance"
+  ],
+  "tools": [
+    "read_file",
+    "file_search",
+    "grep_search",
+    "list_dir",
+    "ask_questions",
+    "run_subagent",
+    "context-mode/ctx_search"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only"
+    ],
+    "least_privilege_level": "strict",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Claude Sonnet 5",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/backend/spring-reactive/spring-reactive-catalog.yaml",
+    "priority": 10,
+    "estimated_time_minutes": 15
+  }
+}

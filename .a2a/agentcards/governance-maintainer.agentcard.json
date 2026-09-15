@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "governance-maintainer",
+  "name": "Governance Maintainer",
+  "version": "1.0.0",
+  "description": "Especialista executor em manutenção atômica, refatoração estrutural e sincronização em lote de artefatos de governanca (.github/agents, .github/skills, .github/prompts, catálogos e grafo de roteamento). Aplica rigorosamente efficient-batch-code-modification, priorizando context-mode em batch sobre terminal para zero desperdício de créditos.",
+  "domain": "Manutenção atômica, refatoração e sincronização em lote da governanca",
+  "role": "implementer",
+  "capabilities": [
+    "manutenção de governanca",
+    "refatorar governanca",
+    "atualizar catálogo",
+    "sincronizar agents",
+    "renomear agent",
+    "batch modification governanca",
+    "sincronizar referências",
+    "manter governanca"
+  ],
+  "skills": [
+    "efficient-batch-code-modification",
+    "context-mode",
+    "governance-factory-patterns",
+    "agent-contracts",
+    "handoff-governance",
+    "yaml-governance"
+  ],
+  "tools": [
+    "read_file",
+    "insert_edit_into_file",
+    "create_file",
+    "grep_search",
+    "file_search",
+    "list_dir",
+    "get_errors",
+    "ask_questions",
+    "run_subagent",
+    "context-mode/ctx_batch_execute",
+    "context-mode/ctx_execute",
+    "context-mode/ctx_execute_file",
+    "context-mode/ctx_search",
+    "context-mode/ctx_index"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only",
+      "mutating"
+    ],
+    "least_privilege_level": "standard",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Gemini 3.8 Flash",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/catalog.yaml",
+    "priority": 8.9,
+    "estimated_time_minutes": 20
+  }
+}

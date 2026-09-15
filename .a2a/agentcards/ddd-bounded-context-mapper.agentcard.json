@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "ddd-bounded-context-mapper",
+  "name": "Ddd Bounded Context Mapper",
+  "version": "1.0.0",
+  "description": "Analisa nomenclatura, pacotes e agrupamentos semanticos do codigo-fonte para mapear Bounded Contexts (DDD) por dominio de negocio, revelando fronteiras invadidas, God Classes e candidatos a segregacao de modulos/microservicos. Complementa o mapeamento estrutural deterministico do code-knowledge-graph com analise semantica de dominio. Estritamente read-only.",
+  "domain": "Mapeamento semantico de Bounded Contexts (DDD), dominios de negocio e God Classes",
+  "role": "planner",
+  "capabilities": [
+    "bounded context",
+    "ddd",
+    "dominio de negocio",
+    "fronteira de dominio",
+    "god class",
+    "segregacao de microservico",
+    "acoplamento de dominio"
+  ],
+  "skills": [
+    "context-mode",
+    "agent-contracts",
+    "handoff-governance",
+    "refactoring-planning-patterns"
+  ],
+  "tools": [
+    "read_file",
+    "grep_search",
+    "file_search",
+    "list_dir",
+    "ask_questions",
+    "run_subagent",
+    "context-mode/ctx_search",
+    "context-mode/ctx_index"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only"
+    ],
+    "least_privilege_level": "standard",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Claude Sonnet 5",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/catalog.yaml",
+    "priority": 4.8,
+    "estimated_time_minutes": 25
+  }
+}

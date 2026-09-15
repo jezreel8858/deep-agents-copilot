@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "oracle-query-tuner",
+  "name": "Oracle Query Tuner",
+  "version": "1.0.0",
+  "description": "Especialista analítico read-only: diagnostica consultas lentas em Oracle via EXPLAIN PLAN e DBMS_XPLAN, identifica Full Table Scans indesejados, analisa Predicate Information (Access/Filter) e projeta índices e hints sem alterar código sem aprovação.",
+  "domain": "Análise de Planos de Execução (Explain Plan, DBMS_XPLAN), CBO e Otimização de Consultas em Oracle Database",
+  "role": "specialist",
+  "capabilities": [
+    "tuning oracle",
+    "explain plan oracle",
+    "dbms_xplan",
+    "cbo oracle",
+    "otimizar query oracle",
+    "hint oracle",
+    "full table scan oracle",
+    "indice oracle"
+  ],
+  "skills": [
+    "agent-contracts",
+    "handoff-governance"
+  ],
+  "tools": [
+    "read_file",
+    "file_search",
+    "grep_search",
+    "list_dir",
+    "ask_questions",
+    "run_subagent",
+    "context-mode/ctx_search",
+    "context-mode/ctx_batch_execute"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only"
+    ],
+    "least_privilege_level": "standard",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Claude Sonnet 5",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/backend/database/database-catalog.yaml",
+    "priority": 10,
+    "estimated_time_minutes": 15
+  }
+}

@@ -1,0 +1,396 @@
+{
+  "protocol": "A2A/1.0.0",
+  "total_agentcards": 65,
+  "agents": {
+    "agent-router": {
+      "name": "Agent Router",
+      "role": "router",
+      "domain": "Orquestracao agent-first",
+      "version": "2.0.0"
+    },
+    "prompt-structuring": {
+      "name": "Prompt Structuring",
+      "role": "specialist",
+      "domain": "Refinamento estrutural de prompt (passo mandatorio)",
+      "version": "1.0.0"
+    },
+    "bug-triage": {
+      "name": "Bug Triage",
+      "role": "fixer",
+      "domain": "Triagem de bugs e regressao",
+      "version": "1.0.0"
+    },
+    "test-strategy": {
+      "name": "Test Strategy",
+      "role": "tester",
+      "domain": "Estrategia de testes",
+      "version": "1.0.0"
+    },
+    "refactor-planner": {
+      "name": "Refactor Planner",
+      "role": "planner",
+      "domain": "Planejamento e decomposição macro de refatoração",
+      "version": "1.2.0"
+    },
+    "deep-search": {
+      "name": "Deep Search",
+      "role": "researcher",
+      "domain": "Pesquisa interna e externa (Retriever/Researcher)",
+      "version": "1.0.0"
+    },
+    "tech-solution-architect": {
+      "name": "Tech Solution Architect",
+      "role": "specialist",
+      "domain": "Arquitetura técnica, blueprint, contratos de integração e divisão por stack",
+      "version": "2.1.0"
+    },
+    "agent-auditor": {
+      "name": "Agent Auditor",
+      "role": "auditor",
+      "domain": "Auditoria semantica de governanca do catalogo (meta-nivel, read-only)",
+      "version": "1.0.0"
+    },
+    "governance-factory": {
+      "name": "Governance Factory",
+      "role": "implementer",
+      "domain": "Governanca e autoria de artefatos e stacks (agent/skill/prompt/stack)",
+      "version": "1.2.0"
+    },
+    "governance-maintainer": {
+      "name": "Governance Maintainer",
+      "role": "implementer",
+      "domain": "Manutenção atômica, refatoração e sincronização em lote da governanca",
+      "version": "1.0.0"
+    },
+    "runtime-verifier": {
+      "name": "Runtime Verifier",
+      "role": "gatekeeper",
+      "domain": "Verificacao de saude do ambiente de execucao (build/sandbox)",
+      "version": "1.0.0"
+    },
+    "pr-gatekeeper": {
+      "name": "Pr Gatekeeper",
+      "role": "gatekeeper",
+      "domain": "Preparacao de entrega (PR/commit/changelog)",
+      "version": "1.2.0"
+    },
+    "database-specialist": {
+      "name": "Database Specialist",
+      "role": "specialist",
+      "domain": "Migracoes de schema, otimizacao de query e integridade referencial",
+      "version": "1.0.0"
+    },
+    "ddd-bounded-context-mapper": {
+      "name": "Ddd Bounded Context Mapper",
+      "role": "planner",
+      "domain": "Mapeamento semantico de Bounded Contexts (DDD), dominios de negocio e God Classes",
+      "version": "1.0.0"
+    },
+    "adr-sentinel": {
+      "name": "Adr Sentinel",
+      "role": "auditor",
+      "domain": "Auditoria de conformidade arquitetural contra Architectural Decision Records (ADRs)",
+      "version": "1.0.0"
+    },
+    "repo-hygiene-auditor": {
+      "name": "Repo Hygiene Auditor",
+      "role": "auditor",
+      "domain": "Auditoria de higiene estrutural, documentação essencial e padrões de repositório",
+      "version": "1.0.0"
+    },
+    "oracle-migration-dev": {
+      "name": "Oracle Migration Dev",
+      "role": "implementer",
+      "domain": "Migrações de Schema DDL, Flyway, Sequences, Tablespaces e Integridade Referencial em Oracle Database",
+      "version": "1.0.0"
+    },
+    "oracle-plsql-expert": {
+      "name": "Oracle Plsql Expert",
+      "role": "specialist",
+      "domain": "Desenvolvimento e manutenção de Stored Procedures, Functions, Packages e Triggers em Oracle PL/SQL",
+      "version": "1.0.0"
+    },
+    "oracle-query-tuner": {
+      "name": "Oracle Query Tuner",
+      "role": "specialist",
+      "domain": "Análise de Planos de Execução (Explain Plan, DBMS_XPLAN), CBO e Otimização de Consultas em Oracle Database",
+      "version": "1.0.0"
+    },
+    "informix-migration-dev": {
+      "name": "Informix Migration Dev",
+      "role": "implementer",
+      "domain": "Migrações de Schema DDL, Flyway, Dbspaces, Fragmentação e Tipos Informix (IDS)",
+      "version": "1.0.0"
+    },
+    "informix-spl-expert": {
+      "name": "Informix Spl Expert",
+      "role": "specialist",
+      "domain": "Desenvolvimento e manutenção de Stored Procedures e Funções em Informix SPL (Stored Procedure Language)",
+      "version": "1.0.0"
+    },
+    "informix-query-tuner": {
+      "name": "Informix Query Tuner",
+      "role": "specialist",
+      "domain": "Análise de SET EXPLAIN (sqexplain.out), Níveis de Isolamento e Otimização de Consultas em Informix",
+      "version": "1.0.0"
+    },
+    "ejb-arch-advisor": {
+      "name": "Ejb Arch Advisor",
+      "role": "advisor",
+      "domain": "Arquitetura Java Legado EJB, Jakarta EE, Transações JTA e Planos de Modernização",
+      "version": "1.0.0"
+    },
+    "ejb-feature-developer": {
+      "name": "Ejb Feature Developer",
+      "role": "implementer",
+      "domain": "Desenvolvimento e manutenção de Session Beans (Stateless/Stateful), MDBs, interfaces remotas/locais e DTOs POJO",
+      "version": "1.0.0"
+    },
+    "ejb-bug-fixer": {
+      "name": "Ejb Bug Fixer",
+      "role": "fixer",
+      "domain": "Correções cirúrgicas de TransactionRolledbackLocalException, ConcurrentAccessTimeoutException, vazamentos de Stateful Beans e bugs de concorrência",
+      "version": "1.0.0"
+    },
+    "ejb-perf-tuner": {
+      "name": "Ejb Perf Tuner",
+      "role": "specialist",
+      "domain": "Otimização de pooling de Stateless Beans, timeouts transacionais JTA, isolamento de transação e migração de Stateful para Stateless",
+      "version": "1.0.0"
+    },
+    "ejb-unit-test-writer": {
+      "name": "Ejb Unit Test Writer",
+      "role": "tester",
+      "domain": "Testes unitários puros de lógica de negócio de EJBs como POJOs sem Application Server",
+      "version": "1.0.0"
+    },
+    "ejb-integration-test-writer": {
+      "name": "Ejb Integration Test Writer",
+      "role": "tester",
+      "domain": "Testes de integração com contêiner embarcado (OpenEJB/TomEE Embedded) ou Arquillian e Testcontainers",
+      "version": "1.0.0"
+    },
+    "ejb-test-fixer": {
+      "name": "Ejb Test Fixer",
+      "role": "fixer",
+      "domain": "Diagnóstico e resolução de suítes de teste de contêiner EJB quebradas no Maven/Ant",
+      "version": "1.0.0"
+    },
+    "python-arch-advisor": {
+      "name": "Python Arch Advisor",
+      "role": "advisor",
+      "domain": "Arquitetura Python Backend, Clean Architecture, FastAPI, Flask, Django, Pydantic, tipagem estrita e planos de modernização",
+      "version": "1.0.0"
+    },
+    "python-feature-developer": {
+      "name": "Python Feature Developer",
+      "role": "implementer",
+      "domain": "Desenvolvimento de features Python backend com FastAPI, Flask, Django, SQLAlchemy, Pydantic e async/await sob TDD estrito",
+      "version": "1.0.0"
+    },
+    "python-bug-fixer": {
+      "name": "Python Bug Fixer",
+      "role": "fixer",
+      "domain": "Correção cirúrgica de runtime errors em Python (TypeError, AttributeError, asyncio deadlocks, conexões ORM, unhandled exceptions)",
+      "version": "1.0.0"
+    },
+    "python-perf-tuner": {
+      "name": "Python Perf Tuner",
+      "role": "specialist",
+      "domain": "Otimização de performance Python — event loop asyncio, N+1 queries em ORMs (SQLAlchemy/Django), pool de conexões e profiling",
+      "version": "1.0.0"
+    },
+    "python-unit-test-writer": {
+      "name": "Python Unit Test Writer",
+      "role": "tester",
+      "domain": "Testes unitários puros em Python com pytest, pytest-mock, unittest.mock e fixtures em conftest.py",
+      "version": "1.0.0"
+    },
+    "python-integration-test-writer": {
+      "name": "Python Integration Test Writer",
+      "role": "tester",
+      "domain": "Testes de integração para APIs Python com TestClient (FastAPI/Starlette/Flask/Django), HTTPX e Testcontainers",
+      "version": "1.0.0"
+    },
+    "python-test-fixer": {
+      "name": "Python Test Fixer",
+      "role": "fixer",
+      "domain": "Diagnóstico e reparo de testes quebrados no pytest, asserções desatualizadas e quebras de fixtures",
+      "version": "1.0.0"
+    },
+    "spring-boot-arch-advisor": {
+      "name": "Spring Boot Arch Advisor",
+      "role": "advisor",
+      "domain": "Arquitetura Spring Boot, Clean Architecture, Java LTS, Virtual Threads e Migrações",
+      "version": "1.0.0"
+    },
+    "spring-boot-feature-developer": {
+      "name": "Spring Boot Feature Developer",
+      "role": "implementer",
+      "domain": "Desenvolvimento de endpoints REST, services transacionais, DTOs Records e repositories JPA via TDD estrito",
+      "version": "1.0.0"
+    },
+    "spring-boot-bug-fixer": {
+      "name": "Spring Boot Bug Fixer",
+      "role": "fixer",
+      "domain": "Correções cirúrgicas de exceptions de runtime, transações e bugs em produção",
+      "version": "1.0.0"
+    },
+    "spring-boot-perf-tuner": {
+      "name": "Spring Boot Perf Tuner",
+      "role": "specialist",
+      "domain": "Otimização de queries N+1, pool HikariCP, cache em camadas e Garbage Collection",
+      "version": "1.0.0"
+    },
+    "spring-boot-unit-test-writer": {
+      "name": "Spring Boot Unit Test Writer",
+      "role": "tester",
+      "domain": "Testes unitários puros com JUnit 5 + Mockito sem levantar ApplicationContext",
+      "version": "1.0.0"
+    },
+    "spring-boot-integration-test-writer": {
+      "name": "Spring Boot Integration Test Writer",
+      "role": "tester",
+      "domain": "Testes integrados com @SpringBootTest, @WebMvcTest, @DataJpaTest e Testcontainers",
+      "version": "1.0.0"
+    },
+    "spring-boot-test-fixer": {
+      "name": "Spring Boot Test Fixer",
+      "role": "fixer",
+      "domain": "Diagnóstico e autocorreção de logs de falha de testes em Maven/Gradle",
+      "version": "1.0.0"
+    },
+    "spring-reactive-arch-advisor": {
+      "name": "Spring Reactive Arch Advisor",
+      "role": "advisor",
+      "domain": "Arquitetura Reativa, Spring WebFlux, Project Reactor e Dimensionamento de Netty",
+      "version": "1.0.0"
+    },
+    "spring-reactive-feature-developer": {
+      "name": "Spring Reactive Feature Developer",
+      "role": "implementer",
+      "domain": "Desenvolvimento de endpoints reativos, pipelines funcionais WebFlux, R2DBC e DTOs Records via TDD",
+      "version": "1.0.0"
+    },
+    "spring-reactive-bug-fixer": {
+      "name": "Spring Reactive Bug Fixer",
+      "role": "fixer",
+      "domain": "Correções cirúrgicas de bloqueios acidentais em Event Loop, vazamentos de Subscription e falhas de fluxo reativo",
+      "version": "1.0.0"
+    },
+    "spring-reactive-resilience-tuner": {
+      "name": "Spring Reactive Resilience Tuner",
+      "role": "specialist",
+      "domain": "Ajuste de resiliência, backpressure, circuit breakers (Resilience4j), connection pool R2DBC e dimensionamento Netty",
+      "version": "1.0.0"
+    },
+    "spring-reactive-unit-test-writer": {
+      "name": "Spring Reactive Unit Test Writer",
+      "role": "tester",
+      "domain": "Testes unitários de publishers assíncronos e pipelines reativos com StepVerifier e VirtualTimeScheduler",
+      "version": "1.0.0"
+    },
+    "spring-reactive-integration-test-writer": {
+      "name": "Spring Reactive Integration Test Writer",
+      "role": "tester",
+      "domain": "Testes integrados não-bloqueantes com WebTestClient, Testcontainers R2DBC e streaming SSE",
+      "version": "1.0.0"
+    },
+    "spring-reactive-test-fixer": {
+      "name": "Spring Reactive Test Fixer",
+      "role": "fixer",
+      "domain": "Diagnóstico e resolução de suítes de teste reativas quebradas por timeouts, sinais inesperados ou race conditions",
+      "version": "1.0.0"
+    },
+    "struts-arch-advisor": {
+      "name": "Struts Arch Advisor",
+      "role": "advisor",
+      "domain": "Arquitetura Java Legado Struts 1.x/2.x, ActionServlet, descritores XML, Tiles, OGNL e manutenibilidade arquitetural",
+      "version": "1.0.0"
+    },
+    "struts-feature-developer": {
+      "name": "Struts Feature Developer",
+      "role": "implementer",
+      "domain": "Desenvolvimento de features em Java Legado Struts: Actions, ActionMapping, ActionForm, DynaActionForm, JSP Taglibs sob TDD estrito",
+      "version": "1.0.0"
+    },
+    "struts-bug-fixer": {
+      "name": "Struts Bug Fixer",
+      "role": "fixer",
+      "domain": "Correções cirúrgicas de falhas em Struts: ClassCastException em form-beans, forwards nulos, thread-safety em Actions, vazamentos de sessão",
+      "version": "1.0.0"
+    },
+    "struts-perf-tuner": {
+      "name": "Struts Perf Tuner",
+      "role": "specialist",
+      "domain": "Otimização de performance em Struts — eliminação de session bloat em ActionForms, tuning de Tiles/JSP e conexões JDBC DataSource",
+      "version": "1.0.0"
+    },
+    "struts-unit-test-writer": {
+      "name": "Struts Unit Test Writer",
+      "role": "tester",
+      "domain": "Testes unitários isolados de Actions e FormBeans Struts com Mockito e StrutsTestCase/JUnit sem container de servlet",
+      "version": "1.0.0"
+    },
+    "struts-integration-test-writer": {
+      "name": "Struts Integration Test Writer",
+      "role": "tester",
+      "domain": "Testes de integração do ciclo completo de requisição Struts com container servlet emulado (Tomcat/Jetty embutido) e Testcontainers",
+      "version": "1.0.0"
+    },
+    "struts-test-fixer": {
+      "name": "Struts Test Fixer",
+      "role": "fixer",
+      "domain": "Diagnóstico e reparo de suítes de teste Struts quebradas em builds legados Ant/Maven Surefire",
+      "version": "1.0.0"
+    },
+    "angular-arch-advisor": {
+      "name": "Angular Arch Advisor",
+      "role": "advisor",
+      "domain": "Arquitetura Angular, Standalone, Signals, SSR e Performance CWV",
+      "version": "1.0.0"
+    },
+    "angular-feature-developer": {
+      "name": "Angular Feature Developer",
+      "role": "implementer",
+      "domain": "Desenvolvimento de features novas, componentes standalone e gerenciamento de estado reativo",
+      "version": "1.0.0"
+    },
+    "angular-bug-fixer": {
+      "name": "Angular Bug Fixer",
+      "role": "fixer",
+      "domain": "Correções cirúrgicas de bugs e runtime errors em produção",
+      "version": "1.0.0"
+    },
+    "angular-ui-stylist": {
+      "name": "Angular Ui Stylist",
+      "role": "specialist",
+      "domain": "Templates HTML5, SCSS modular, layout responsivo e acessibilidade WCAG",
+      "version": "1.0.0"
+    },
+    "angular-unit-test-writer": {
+      "name": "Angular Unit Test Writer",
+      "role": "tester",
+      "domain": "Testes unitários de regras de negócio, services, stores e signals com mocks isolados",
+      "version": "1.0.0"
+    },
+    "angular-component-test-writer": {
+      "name": "Angular Component Test Writer",
+      "role": "tester",
+      "domain": "Testes de componentes com TestBed, ComponentFixture e CDK Component Harnesses",
+      "version": "1.0.0"
+    },
+    "angular-test-fixer": {
+      "name": "Angular Test Fixer",
+      "role": "fixer",
+      "domain": "Diagnóstico e autocorreção de logs de falha de runners (Vitest, Karma, Jest)",
+      "version": "1.0.0"
+    },
+    "angular-e2e-writer": {
+      "name": "Angular E2E Writer",
+      "role": "specialist",
+      "domain": "Testes ponta a ponta (E2E) com Playwright e Cypress em aplicações Angular",
+      "version": "1.0.0"
+    }
+  }
+}

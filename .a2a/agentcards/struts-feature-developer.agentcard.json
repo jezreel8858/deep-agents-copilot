@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "struts-feature-developer",
+  "name": "Struts Feature Developer",
+  "version": "1.0.0",
+  "description": "Desenvolvedor de features Struts: implementa Actions, DispatchActions, FormBeans, mapeamentos XML e integrações de serviço sob TDD com JUnit 4/5 e Mockito.",
+  "domain": "Desenvolvimento de features em Java Legado Struts: Actions, ActionMapping, ActionForm, DynaActionForm, JSP Taglibs sob TDD estrito",
+  "role": "implementer",
+  "capabilities": [
+    "feature struts",
+    "action struts",
+    "actionform",
+    "dynaactionform",
+    "dispatchaction",
+    "actionmapping",
+    "tdd struts",
+    "jsp struts taglib"
+  ],
+  "skills": [
+    "agent-contracts",
+    "handoff-governance"
+  ],
+  "tools": [
+    "read_file",
+    "file_search",
+    "grep_search",
+    "list_dir",
+    "ask_questions",
+    "run_subagent",
+    "create_file",
+    "insert_edit_into_file",
+    "get_errors",
+    "run_in_terminal",
+    "context-mode/ctx_search",
+    "context-mode/ctx_batch_execute",
+    "context-mode/ctx_index"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only",
+      "mutating",
+      "execution"
+    ],
+    "least_privilege_level": "elevated",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Gemini 3.8 Flash",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/backend/struts/struts-catalog.yaml",
+    "priority": 10,
+    "estimated_time_minutes": 15
+  }
+}

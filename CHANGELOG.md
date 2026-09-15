@@ -6,6 +6,28 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.8.8] — 2026-09-14
+
+### Adicionado & Aprimorado
+- **Context Engineering & Artifact Offloading em Handoffs (Anthropic 2026 Trends)**:
+  - Atualizada a skill `.github/skills/handoff-governance/SKILL.md` com a formalização dos 4 pilares do Context Engineering (*Write, Select, Compress, Isolate*).
+  - Estabelecido o limiar normativo de offloading de artefatos (2 KB / 50 linhas): payloads volumosos (ASTs de grafo, diffs extensos, contratos OpenAPI, logs longos) deixam de ser transmitidos como texto bruto no chat e passam a trafegar exclusivamente como ponteiros tipados (`tipo: "pointer"`, `artifact_ref`, `hash`, `resumo_executivo`) associados ao `context-mode` e workspace, prevenindo context bloat e KV-cache thrashing.
+- **Multi-Agent Circuit Breakers com Budget de Falhas e Rollback Atômico**:
+  - Implementado em `.github/skills/handoff-governance/SKILL.md` o Circuit Breaker de Falhas com Retry Budget estrito (`MAX_RETRIES_PER_STEP = 2`). Falhas repetidas na mesma etapa desarmam o circuito para `state: OPEN`, suspendendo edições autônomas e acionando escalonamento humano obrigatório (`ask_questions` / R-047).
+  - Instituído o Protocolo de Rollback Atômico de Workspace: rotina determinística de descarte de worktrees temporários isolados ou saneamento cirúrgico de arquivos parciais via `git checkout -- <arquivos>`, garantindo integridade do workspace em caso de falha de cadeia.
+- **Segurança de Ferramentas MCP e Sandboxing (NSA CSI MCP Security 2026 / CSA v1)**:
+  - Adicionada a seção 4.9 em `.github/skills/agent-safety-guardrails/SKILL.md` estabelecendo:
+    - Zoneamento e Least-Privilege Tool Scoping: Zona 1 (Read-Only) para consultivos/advisors, Zona 2 (Mutating) para implementers e Zona 3 (Execution) sob governança de terminal (R-049).
+    - Defesa contra Parameter Tampering e Tool Poisoning (ASI02): validação estrita de schemas de parâmetros JSON contra injeção indireta (CVE-2025-6514).
+    - Defesa contra Tool Squatting e Rug Pulls em servidores MCP e proibição de repasse cego de tokens de autorização (*Token Passthrough*) entre limites de confiança inter-agente.
+- **Padronização e Exportação A2A AgentCard (Linux Foundation v1.0.0 / IETF draft-aevum-agentcard-00)**:
+  - Criado o schema canônico aberto `docs/schemas/agentcard.schema.json` para interoperabilidade e especificação declarativa de agentes.
+  - Implementado o utilitário determinístico `tools/agentcard_exporter/export_agentcards.py`, mapeando os catálogos do repositório em 65 arquivos de especificação `AgentCard` em `.a2a/agentcards/*.agentcard.json` e índice consolidado `.a2a/agentcards/agentcards.index.json`.
+  - Criadas suítes de testes automatizadas em `tests/governance_audit/test_a2a_agentcard_compliance.py` e `tests/operational_flow/test_circuit_breaker_and_context_offloading.py`.
+  - Suíte global de testes expandida para **136 testes**, 100% verde (`pytest` em 12.09s).
+
+---
+
 ## [2.8.7] — 2026-09-14
 
 ### Adicionado & Aprimorado

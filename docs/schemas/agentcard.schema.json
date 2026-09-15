@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deep-agents-copilot/schemas/agentcard.schema.json",
+  "title": "A2A AgentCard Specification Schema (Linux Foundation / IETF draft-aevum-agentcard-00)",
+  "description": "Schema canônico aberto para declaração de identidade, capacidades, ferramentas, perfil de segurança e contratos operacionais de AI Agents em conformidade com o padrão A2A v1.0.0.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "protocol",
+    "id",
+    "name",
+    "version",
+    "description",
+    "domain",
+    "role",
+    "capabilities",
+    "tools",
+    "security_profile",
+    "input_contract",
+    "output_contract"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0.0",
+      "description": "Versão do schema do AgentCard"
+    },
+    "protocol": {
+      "type": "string",
+      "const": "A2A/1.0.0",
+      "description": "Protocolo de interoperabilidade agêntica (A2A standard)"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Identificador kebab-case único do agent"
+    },
+    "name": {
+      "type": "string",
+      "description": "Nome legível do agent"
+    },
+    "version": {
+      "type": "string",
+      "description": "Versão semântica do agent (ex: 1.0.0)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descrição funcional concisa do papel e escopo do agent"
+    },
+    "domain": {
+      "type": "string",
+      "description": "Domínio técnico ou arquitetural do agent"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "router",
+        "supervisor",
+        "implementer",
+        "fixer",
+        "advisor",
+        "tester",
+        "auditor",
+        "planner",
+        "researcher",
+        "gatekeeper",
+        "specialist"
+      ],
+      "description": "Classificação de papel do agent conforme a taxonomia operacional do ecossistema"
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Lista de capacidades funcionais declaradas pelo agent"
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Lista de skills vinculadas e consumidas pelo agent"
+    },
+    "tools": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Lista de ferramentas MCP ou nativas autorizadas para este agent"
+    },
+    "security_profile": {
+      "type": "object",
+      "required": [
+        "tool_zones",
+        "least_privilege_level"
+      ],
+      "properties": {
+        "tool_zones": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["read-only", "mutating", "execution"]
+          },
+          "description": "Zonas de ferramentas permitidas conforme NSA CSI MCP Security 2026"
+        },
+        "least_privilege_level": {
+          "type": "string",
+          "enum": ["strict", "standard", "elevated"],
+          "description": "Nível de isolamento de privilégio do agent"
+        },
+        "data_sensitivity": {
+          "type": "string",
+          "enum": ["confidential", "internal", "public"],
+          "default": "internal"
+        }
+      }
+    },
+    "model_preferences": {
+      "type": "object",
+      "properties": {
+        "recommended_model": {
+          "type": "string"
+        },
+        "cost_tier": {
+          "type": "string",
+          "enum": ["0x", "0.33x", "1x", "3x"]
+        }
+      }
+    },
+    "input_contract": {
+      "type": "object",
+      "required": [
+        "accepts_payload",
+        "required_fields"
+      ],
+      "properties": {
+        "accepts_payload": {
+          "type": "string",
+          "description": "Formato de dados de entrada aceito (ex: markdown, yaml, json, schema-ref)"
+        },
+        "required_fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Campos mínimos necessários no payload de entrada (Intake Guardrail)"
+        }
+      }
+    },
+    "output_contract": {
+      "type": "object",
+      "required": [
+        "expected_format",
+        "emits_handoff"
+      ],
+      "properties": {
+        "expected_format": {
+          "type": "string",
+          "description": "Formato estruturado de saída emitido pelo agent"
+        },
+        "emits_handoff": {
+          "type": "boolean",
+          "description": "Indica se o agent emite handoff para o orquestrador/roteador"
+        },
+        "context_offloading_supported": {
+          "type": "boolean",
+          "default": true,
+          "description": "Indica conformidade com o padrão de Artifact Offloading (pointers > 2KB)"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Metadados auxiliares e anotações específicas do ecossistema"
+    }
+  },
+  "additionalProperties": false
+}
+

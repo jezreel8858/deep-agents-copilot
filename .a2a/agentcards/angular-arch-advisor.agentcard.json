@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "angular-arch-advisor",
+  "name": "Angular Arch Advisor",
+  "version": "1.0.0",
+  "description": "Especialista analítico read-only: diagnósticos arquiteturais, CWV (INP/LCP), SSR/hydration, @defer e planos de upgrade/migração Angular.",
+  "domain": "Arquitetura Angular, Standalone, Signals, SSR e Performance CWV",
+  "role": "advisor",
+  "capabilities": [
+    "auditoria angular",
+    "arquitetura angular",
+    "core web vitals",
+    "inp",
+    "lcp",
+    "ssr",
+    "hydration",
+    "upgrade angular",
+    "deprecations"
+  ],
+  "skills": [
+    "agent-contracts",
+    "handoff-governance"
+  ],
+  "tools": [
+    "read_file",
+    "file_search",
+    "grep_search",
+    "list_dir",
+    "ask_questions",
+    "run_subagent",
+    "context-mode/ctx_search"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only"
+    ],
+    "least_privilege_level": "strict",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Claude Sonnet 5",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/frontend/angular/angular-catalog.yaml",
+    "priority": 10,
+    "estimated_time_minutes": 15
+  }
+}
