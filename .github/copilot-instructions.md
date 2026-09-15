@@ -122,7 +122,7 @@ Esta matriz é **responsabilidade do roteador** — não é regra global.
 ### ⚠️ Pergunte primeiro
 
 - **Clarificação Obrigatória (R-027)**: qualquer dúvida → `ask_questions` com opções descritivas + última opção aberta. **Proibido inferir ou deduzir** intenção.
-- **Não gere documentação automaticamente (R-033)**: nunca gere documentos `.md` se não for solicitado ou sem a aprovação por `ask_questions`.
+- **Documentação Especulativa Proibida vs Sincronização Automática de Docs Vivos (R-033)**: nunca crie documentos `.md` avulsos/especulativos sem pedido. Por outro lado, a **atualização e sincronização da documentação viva existente** do projeto (`docs/`, `README.md`, ADRs, schemas, catálogos) é **obrigatória, automática e orientada por autorreflexão** em qualquer entrega técnica que altere regras, padrões, modelos ou contratos.
 - **Sem instalação autônoma**: aponte a dependência e aguarde confirmação.
 
 ### 🚫 Nunca

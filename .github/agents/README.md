@@ -10,7 +10,7 @@
 - **Agent**: usado quando a tarefa exige decisão de rota, escopo e entrega estruturada.
 - **Skill**: usado quando a tarefa é conhecimento pontual/checklist reutilizável.
 - Regra prática: se precisa classificar intenção e escolher fluxo, use agent.
-- **Workflows Operacionais Determinísticos (R-050)**: toda tarefa segue rigorosamente um dos 5 pipelines determinísticos especificados em [`workflows.md`](workflows.md) (`WORKFLOW-BUG-FIX`, `WORKFLOW-REFACTORING`, `WORKFLOW-TECHNICAL-ANALYSIS`, `WORKFLOW-FEATURE-DEVELOPMENT`, `WORKFLOW-GOVERNANCE-MAINTENANCE`, `WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION`, `WORKFLOW-FRAMEWORK-MIGRATION`, `WORKFLOW-RELEASE-READINESS`).
+- **Workflows Operacionais Determinísticos (R-050)**: toda tarefa segue rigorosamente um dos 8 pipelines determinísticos especificados em [`workflows.md`](workflows.md) (`WORKFLOW-BUG-FIX`, `WORKFLOW-REFACTORING`, `WORKFLOW-TECHNICAL-ANALYSIS`, `WORKFLOW-FEATURE-DEVELOPMENT`, `WORKFLOW-GOVERNANCE-MAINTENANCE`, `WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION`, `WORKFLOW-FRAMEWORK-MIGRATION`, `WORKFLOW-RELEASE-READINESS`).
 
 ## 2) Catálogo Atual (estado verificado)
 

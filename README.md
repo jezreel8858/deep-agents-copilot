@@ -82,7 +82,7 @@ deep-agents-copilot/
 │   │   ├── frontend/angular/                    # Domínio Frontend Angular (sub-catálogo + 8 especialistas)
 │   │   └── backend/                             # Domínios Backend (Spring Boot, Reactive, EJB, Python, DB)
 │   │
-│   ├── skills/                                  # 50+ Skills Especializadas
+│   ├── skills/                                  # 60 Skills Especializadas
 │   │   ├── .index.json                          # Índice estruturado JSON de skills
 │   │   ├── README.md                            # Catálogo descritivo de skills
 │   │   └── ... (skills especializadas)
@@ -318,7 +318,7 @@ flowchart TB
 | **R-034: Health Check Binding** | Novo repositório | Descoberta de adapters |
 | **R-038: Genericidade Obrigatória** | Tudo em `.github/` | Reutilização |
 | **R-031: Plano Auto-Implementável** | Implementação | Zero-interrupção após aprovação |
-| **R-033: Sem Docs Automáticas** | Governança | Aprovação explícita antes de criar `.md` |
+| **R-033: Documentação Viva Auto-Sincronizada** | Governança | Atualização automática de `docs/` e READMEs afetados pela entrega; proibição de arquivos especulativos |
 
 ---
 
@@ -396,7 +396,7 @@ flowchart TB
 1. **Alteração em regra global?** → Edite `CLAUDE.md`, sincronize copilot-instructions.md
 2. **Novo adapter?** → Crie em `.github/instructions/`, registre em `catalog.yaml`
 3. **Nova documentação?** → Use `kebab-case`, valide genericidade (R-038)
-4. **Sem docs autônomas** → Solicite aprovação antes de criar `.md` (R-033)
+4. **Docs vivas auto-sincronizadas** → Atualize `docs/` e READMEs afetados sem esperar pedido manual; nunca crie arquivos especulativos (R-033)
 
 ---
 

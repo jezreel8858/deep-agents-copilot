@@ -84,6 +84,7 @@ Próximo passo mínimo:
 - [ ] Se houver rota nova, componente de navegação (sidenav/menu/tabs) do projeto foi localizado e atualizado (Smell 2.18).
 - [ ] `get_errors` limpo no(s) arquivo(s) tocado(s).
 - [ ] Suíte de testes local executada e resultado reportado.
+- [ ] Autorreflexão documental (R-033): avaliado se a nova feature introduziu rota, modelo ou componente compartilhado e sincronizada a documentação viva em docs/ e README correspondentes.
 ## Quando Delegar
 - [`@angular-ui-stylist`](angular-ui-stylist.agent.md) → quando a tarefa exigir polimento visual profundo, responsividade avançada ou auditoria de acessibilidade WCAG além do essencial da feature.
 - [`@angular-unit-test-writer`](angular-unit-test-writer.agent.md) / [`@angular-component-test-writer`](angular-component-test-writer.agent.md) → quando a cobertura de teste exigir suíte dedicada além do teste mínimo testing-first.

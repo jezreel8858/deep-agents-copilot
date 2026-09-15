@@ -171,10 +171,10 @@ graph TD
 
 Todo desenvolvimento de software é executado através de uma máquina de estados finitos que proíbe desvios informais:
 
-1. **`WORKFLOW-BUG-FIX`**: Triagem de Causa Raiz (`@bug-triage`) → Red Test isolado → Correção Cirúrgica (`bug-fixer`) → Green Test → Quality Gate.
+1. **`WORKFLOW-BUG-FIX`**: Triagem de Causa Raiz (`@bug-triage`) → Red Test isolado (ou Layout Spec/VFL para defeitos visuais) → Correção Cirúrgica (`bug-fixer` para runtime ou `ui-stylist` para layout) → Green Test (com re-inspeção visual VFL para layout) → Quality Gate.
 2. **`WORKFLOW-REFACTORING`**: Mapeamento de Regras (`@business-rules-extractor`) → Blast Radius (`@code-knowledge-graph`) → Plano Mikado (`@refactor-planner`) → Execução em Lote → Validação.
 3. **`WORKFLOW-TECHNICAL-ANALYSIS`**: Despacho analítico Read-Only → Coleta determinística via AST/Grafo → Relatório com Propostas Acionáveis (`[PROPOSTA-1..N]`) → Fast-Chaining (R-050.1).
-4. **`WORKFLOW-FEATURE-DEVELOPMENT`**: Elicitação de Requisitos (`@requirements-analyst`) → Technical Blueprint (`@tech-solution-architect`) → Estratégia de Testes (`@test-strategy`) → Implementação TDD → Quality Gate.
+4. **`WORKFLOW-FEATURE-DEVELOPMENT`**: Elicitação de Requisitos (`@requirements-analyst`) → Technical Blueprint (`@tech-solution-architect`) → Estratégia de Testes (`@test-strategy`) → Implementação Domain TDD (com handoff para `@angular-ui-stylist` em UI) → Duplo Quality Gate (Gate 1: Lógica/OWASP; Gate 2: Design System & Paridade UI).
 5. **`WORKFLOW-GOVERNANCE-MAINTENANCE`**: Auditoria estrutural de smells (`@agent-auditor`) → Aprovação humana → Execução atômica em lote (`@governance-maintainer`).
 6. **`WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION`**: Scan e triagem de severidade (`@security-reviewer`) → Blast Radius de breaking changes → Bump cirúrgico → Adaptação de código → Quality Gate.
 7. **`WORKFLOW-FRAMEWORK-MIGRATION`**: Avaliação de paridade e phasing (`@tech-solution-architect`) → Codemods cirúrgicos e adaptação de APIs → Validação de testes de regressão → Quality Gate.
@@ -260,6 +260,21 @@ flowchart LR
 ### 8.2 Edições em Lote Único e Diffs Cirúrgicos (R-046 / R-051)
 - **Single-Turn Batching**: Edições de múltiplos arquivos são enviadas em lote na mesma rodada de tool calls.
 - **Diff Cirúrgico**: Uso de 2-3 linhas de contexto exclusivo para garantir unicidade e evitar loops de re-submissão.
+
+### 8.4 Visual Feedback Loop (VFL) e Paridade de UI (2026)
+Para eliminar a "cegueira visual" de testes headless (Smell 2.21), o ecossistema adota o ciclo **Visual Feedback Loop (VFL)** agnóstico de tecnologia (`frontend-visual-feedback-loop`):
+1. **Renderização Isolada (Component-Driven)**: Componentes são executados em sandbox (Storybook CSF3 / rota efêmera) desacoplados de backend.
+2. **Dupla Representação**: Inspeção semântica via Árvore de Acessibilidade (AOM) para garantir que nomes de ícone não vazem como texto literal, combinada com capturas nos 3 viewports canônicos (`375px`, `768px`, `1440px`).
+3. **Protocolo "Canonical Sibling First"**: Nenhum componente ou diálogo é criado a partir do zero; agentes inspecionam obrigatoriamente um componente irmão canônico homologado no repositório para clonar hierarquia de tags, grid responsivo e classes utilitárias de scroll.
+4. **Duplo Quality Gate no Workflow de Features**:
+   - **Gate 1**: Lógica, contratos, testes unitários verdes e auditoria OWASP.
+   - **Gate 2**: Design System, paridade visual, validação estrita de `@Input()` em arquivos `.ts` de componentes compartilhados e proibição estrita de cores hexadecimais inline.
+
+### 8.5 Sincronização Automática de Documentação Viva e Autorreflexão de DoD (R-033)
+Para erradicar o "drift documental" e dispensar ordens manuais do desenvolvedor para atualização de documentação, o ecossistema estabelece o princípio da **Living Documentation Orientada a Autorreflexão**:
+- **Gatilho de Autorreflexão**: Antes de finalizar qualquer entrega em `WORKFLOW-FEATURE-DEVELOPMENT`, `WORKFLOW-BUG-FIX` ou `WORKFLOW-REFACTORING`, os agentes executores e o `@pr-gatekeeper` avaliam compulsoriamente: *"Esta entrega introduziu novas rotas, modelos de dados, componentes de UI, padrões visuais ou regras de negócio?"*
+- **Sincronização Atômica Compulsória**: Se afirmativo, os documentos correspondentes em `docs/`, `README.md`, catálogos de componentes compartilhados e ADRs são atualizados e comitados na mesma entrega como critério de *Definition of Done (DoD)*.
+- **Distinção Normativa (R-033)**: Permanece terminantemente proibido criar arquivos `.md` especulativos ou relatórios prolixos desconectados da alteração real; a regra autoriza e exige exclusivamente a **manutenção da documentação viva existente**.
 
 ### 8.3 Segurança e Zoneamento de Ferramentas MCP (NSA CSI MCP Security 2026)
 - **Zona 1 (Read-Only)**: `read_file`, `ast_query`, `grep_search`. Obrigatória para agentes consultivos.

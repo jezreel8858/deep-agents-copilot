@@ -85,6 +85,7 @@ Próximo passo mínimo:
 - [ ] Contraste, foco visível e navegação por teclado validados (WCAG 2.2 AA).
 - [ ] Layout responsivo validado em mobile/tablet/desktop.
 - [ ] `get_errors` limpo no(s) arquivo(s) tocado(s).
+- [ ] Autorreflexão documental de UI (R-033): se novo padrão visual, variante ou classe utilitária foi criada/padronizada, atualizado docs/componentes-shared.md ou padrao-angular-material.md.
 ## Quando Delegar
 - [`@angular-feature-developer`](angular-feature-developer.agent.md) → quando a demanda exigir nova lógica de negócio, chamadas de API ou gerência de estado além da camada visual.
 - [`@angular-arch-advisor`](angular-arch-advisor.agent.md) → quando houver dúvida arquitetural sobre o design system do projeto que exceda o escopo de estilização pontual.

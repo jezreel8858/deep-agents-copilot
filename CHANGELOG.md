@@ -18,6 +18,15 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
   - Teste determinístico `test_smell_2_21_visual_blindness_and_ui_contracts_documented` integrado à suíte Tier 1 de auditoria estática.
 
 ### Aprimorado
+- **Evolução da Regra R-033 e Erradicação do Drift Documental por Autorreflexão**:
+  - Reformulação formal de R-033 no `CLAUDE.md` e `copilot-instructions.md`: distinção entre a proibição estrita de criar arquivos .md especulativos avulsos e a **obrigatoriedade da sincronização automática de documentação viva existente** (`docs/`, README, ADRs, schemas) por autorreflexão contínua em qualquer entrega técnica relevante, eliminando a necessidade de comandos manuais do desenvolvedor.
+  - Inclusão do checkpoint de autorreflexão documental no DoD do `WORKFLOW-FEATURE-DEVELOPMENT`, `WORKFLOW-BUG-FIX` e `WORKFLOW-REFACTORING` (`workflows.md`).
+  - Atualização dos checklists e contratos operacionais de `@pr-gatekeeper`, `@angular-feature-developer`, `@angular-ui-stylist`, `@database-specialist` e da dimensão de conformidade documental em `code-review-patterns`.
+- **Tratamento Especializado de Bugs de Layout no `WORKFLOW-BUG-FIX` (`workflows.md` e agentes)**:
+  - Formalização do Cenário C no Estado 2 com o ciclo VFL (`frontend-visual-feedback-loop`), capturas multi-viewport (375px/768px/1440px) e asserções estritas de AOM.
+  - Roteamento compulsório no Estado 3 de defeitos de layout, SCSS, alinhamento de diálogos e ícones para o especialista de UI (`specialist-ui-stylist`), prevenindo que corretores de lógica pura introduzam regressões cosméticas.
+  - Exigência de validação dupla no Estado 4 para defeitos de layout: testes de componentes verdes E re-inspeção visual VFL/AOM sem texto literal vazando em ícones.
+  - Bifurcação na árvore de decisão de `angular-router` (bugs de runtime -> `angular-bug-fixer`; bugs de layout/CSS -> `angular-ui-stylist`) e atualização do intake de `bug-triage` para acolher evidências visuais.
 - **Duplo Quality Gate no `WORKFLOW-FEATURE-DEVELOPMENT` (`workflows.md`)**:
   - Particionamento do Estado 5 para demandas com interface: 5a (Lógica reativa, stores e regras sob TDD com `angular-feature-developer`) e 5b (Handoff mandatório de apresentação visual e tokens com `angular-ui-stylist`).
   - Implantação do Duplo Gate no Estado 6: Gate 1 (Lógica, Contratos & OWASP com `@security-reviewer`) e Gate 2 (Design System, Paridade Visual, zero hex inline e validação de contratos de componentes `shared/` com `@angular-ui-stylist` e `@code-review`).
@@ -30,6 +39,10 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
   - `design-system-component-contracts`: Diretrizes de verificação de contratos no lado do consumidor e enforcement de tokens semânticos.
   - `angular-v21-frontend.instructions.md`: Normas canônicas de layout de diálogos, classes utilitárias de scroll e proibição de hexadecimais arbitrários.
   - Atualização atômica de catálogos: `.github/skills/.index.json` (60 skills indexadas), `.github/skills/README.md` e `.github/copilot-instructions.md`.
+- **Documentação de Arquitetura e Adapters**:
+  - `docs/architecture/ARCHITECTURE_AND_GOVERNANCE_GUIDE.md`: atualização do `WORKFLOW-FEATURE-DEVELOPMENT` com Duplo Quality Gate e inclusão da seção §8.4 sobre o Visual Feedback Loop (VFL) e mitigação do Smell 2.21.
+  - `README.md` e `.github/agents/README.md`: alinhamento da contagem para 60 skills especializadas e consolidação dos 8 workflows determinísticos.
+  - `.github/instructions/local/<projeto>.instructions.md`: inclusão da Seção 1.3 consolidando paridade visual, protocolo "Canonical Sibling First", leitura estrita de contratos de componentes compartilhados e proibição de hex inline.
 
 ---
 
