@@ -287,7 +287,7 @@ A criação de um novo ecossistema de stack (ex.: EJB, React, Python FastAPI) se
 ### 11.3) Supervisor de Domínio (`<stack>-router.agent.md`)
 - Nome: `<stack>-router`
 - Função: Supervisor hierárquico — recebe tarefas do `agent-router` central e despacha para os especialistas locais.
-- Regras herdadas: aponta para `../../../../CLAUDE.md` e `./<stack>-catalog.yaml`.
+- Dependências documentais: consolidadas no frontmatter 'source_docs:' (CLAUDE.md, copilot-instructions.md, sub-catálogo e skills).
 - Banner obrigatório: `Agente Ativo: <stack>-router`.
 - Anti-sticky session: regra R-042 com retorno ao `@agent-router` em deriva de intenção.
 - Fluxo 2 TDD: consulta prévia ao `@test-strategy` para requisitos de teste complexos antes de acionar test-writers locais.

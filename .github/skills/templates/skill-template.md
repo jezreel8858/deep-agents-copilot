@@ -9,7 +9,7 @@ triggers:
   - "<expressão gatilho 2 em PT-BR>"
 # SSOT e Progressive Disclosure (Anthropic Agent Skills Open Standard):
 # Skills expõem metadados (Nível 1) no frontmatter para descoberta e o blueprint operacional (Nível 2) no corpo.
-# É TERMINANTEMENTE PROIBIDO criar seções de herança ou catálogo no corpo (ex.: '## Regras Herdadas', '## Docs Sempre Anexadas').
+# É TERMINANTEMENTE PROIBIDO criar seções de herança, catálogo ou pré-carregamento no corpo markdown.
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md

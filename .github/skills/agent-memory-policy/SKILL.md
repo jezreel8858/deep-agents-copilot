@@ -130,7 +130,7 @@ Capacidade mais avançada: o agent atualiza instruções comportamentais com bas
 **Pré-requisitos obrigatórios antes de ativar:**
 
 - [ ] **Rollback definido**: como reverter para versão anterior se o comportamento regredir? (Git tag ou arquivo `SKILL.md.bak`)
-- [ ] **Escopo delimitado**: quais seções do prompt o agent pode modificar? (ex.: apenas `<examples>` e `triggers:`, nunca o bloco `CRÍTICO` ou `Regras Herdadas`)
+- [ ] **Escopo delimitado**: quais seções do prompt o agent pode modificar? (ex.: apenas `<examples>` e `triggers:`, nunca o bloco `CRÍTICO` ou `source_docs:`)
 - [ ] **Aprovação humana obrigatória** (R-027): toda atualização procedimental requer confirmação explícita via `ask_questions` — nunca automática
 - [ ] **Baseline de evals**: ao menos 1 caso no `.github/agents/evals/casos-roteamento.yaml` cobrindo o comportamento atual como ground truth pré-atualização
 
@@ -167,7 +167,7 @@ Monitoramento via agent-observability-otel (span: invoke_agent)
 |---|---|
 | Regras normativas globais em `CLAUDE.md` | Governança global — requer decisão explícita |
 | Bloco `CRÍTICO` de qualquer `.agent.md` | Define escopo do agent — mudança é breaking change |
-| Seção `Regras Herdadas` de agents | Garante rastreabilidade para `CLAUDE.md` |
+| Campo `source_docs:` de agents | Garante rastreabilidade para `CLAUDE.md` e skills normativas |
 | Qualquer regra de segurança ou autonomia | Previne violação de R-010 e `agent-safety-guardrails` |
 
 ---

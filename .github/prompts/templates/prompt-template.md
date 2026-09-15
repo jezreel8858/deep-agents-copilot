@@ -9,7 +9,7 @@ argument-hint: '[caminho-do-arquivo | contexto-opcional]'
 # SSOT de Dependências de Prompt (VS Code Copilot Prompt Files Spec):
 # 100% das dependências documentais e skills do prompt DEVEM residir exclusivamente em source_docs: no frontmatter.
 # É TERMINANTEMENTE PROIBIDO criar seções de pré-carregamento documental no corpo markdown
-# (ex.: '## Source Docs', '## Docs Sempre Anexadas', '## Regras Herdadas').
+# (ex.: seções de catálogo, herança ou pré-carregamento documental no corpo).
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md

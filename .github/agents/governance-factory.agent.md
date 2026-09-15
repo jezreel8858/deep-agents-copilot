@@ -146,7 +146,7 @@ Estrutura um ecossistema tecnológico completo em sua própria pasta, com isolam
 
 3. **Supervisor Hierárquico (`<stack>-router.agent.md`)**:
    - Frontmatter com `run_subagent`.
-   - Regras herdadas apontando para `../../../../CLAUDE.md` e `./<stack>-catalog.yaml`.
+   - Dependências documentais consolidadas no frontmatter YAML 'source_docs:' (CLAUDE.md, copilot-instructions.md, sub-catálogo e skills).
    - Decision Tree interna despachando para os especialistas do sub-catálogo local.
    - Banner de visibilidade de fluxo: `Agente Ativo: <stack>-router`.
    - Regra R-042 (retorno ao `@agent-router` em deriva de intenção).
