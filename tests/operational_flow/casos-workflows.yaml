@@ -222,7 +222,7 @@ cenarios:
           exigir_banner: "Agente Ativo: angular-feature-developer"
         output_esperado:
           - "Código da Feature e Testes Passando"
-        proximos_permitidos: ["code-review"]
+        proximos_permitidos: ["security-reviewer", "code-review"]
       - etapa: 5
         nome_etapa: "Quality & Security Gate (OWASP)"
         agente: "security-reviewer"

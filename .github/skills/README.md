@@ -48,6 +48,7 @@ Toda skill deve declarar no topo:
 | `project-scanner` | Tier 2 | Scanner automático de projetos para detecção de stack e convenções |
 | `project-context-builder` | Tier 2 | Preparar, condensar e persistir contexto técnico multi-projeto |
 | `git-governance` | Tier 2 | Convenções de git workflow, branch naming, commit standards e PR guidelines |
+| **`git-worktree-governance`** | 🌲 **Tier 2** | ⭐ ***(NEW)*** Diretrizes de ciclo de vida e isolamento para execução de agentes paralelos e explorações especulativas via Git Worktrees |
 | **`terminal-governance`** | 🔧 **Tier 1** | Boas práticas obrigatórias para uso de `run_in_terminal` — prevenção de poluição de contexto, truncamento de saída, não-interativo, lote e padrões proibidos |
 | **`code-tracing`** | 🔧 **Tier 1** | Rastrear código do sintoma à causa raiz — grep vs semântico, stack trace parsing, call graph, rastreio de API/método, coleta mínima de evidências |
 | **`business-rules-governance`** | 📋 **Tier 1** | Taxonomia, templates e protocolos para extrair, documentar e validar regras de negócio em markdown — ground truth para validação de refatorações |

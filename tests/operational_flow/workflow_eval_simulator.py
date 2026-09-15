@@ -132,6 +132,72 @@ class WorkflowEvaluator:
         """Executa a avaliação estática em todos os cenários cadastrados."""
         return [self.evaluate_static_trajectory(cid) for cid in self.scenarios]
 
+    def simulate_state_bag_transitions(self, scenario_id: str) -> Dict[str, Any]:
+        """Simula a propagação e integridade do Typed State Bag (workflow_state) ao longo da trajetória."""
+        scenario = self.scenarios.get(scenario_id)
+        if not scenario:
+            return {"scenario_id": scenario_id, "status": "ERROR", "reason": "Cenário não encontrado"}
+
+        trajetoria = scenario.get("trajetoria")
+        if not trajetoria:
+            return {"scenario_id": scenario_id, "status": "SKIPPED", "reason": "Sem trajetória sequencial"}
+
+        state_bag: Dict[str, Any] = {
+            "workflow": scenario.get("workflow"),
+            "projeto_alvo": scenario.get("projeto_alvo"),
+            "input_inicial": scenario.get("input_inicial"),
+            "historico_handoffs": [],
+            "artifacts": {},
+            "status": "EM_ANDAMENTO",
+        }
+
+        transitions_log = []
+        for i, step in enumerate(trajetoria):
+            agente = step["agente"]
+            etapa = step["etapa"]
+            outputs = step.get("output_esperado", [])
+            proximos = step.get("proximos_permitidos", [])
+
+            if not state_bag.get("workflow") or not state_bag.get("input_inicial"):
+                return {
+                    "scenario_id": scenario_id,
+                    "status": "FAIL",
+                    "reason": f"Corrupção de state_bag na etapa {etapa}: campos obrigatórios perdidos",
+                }
+
+            state_bag["historico_handoffs"].append({
+                "etapa": etapa,
+                "agente": agente,
+                "banner": step.get("invariantes", {}).get("exigir_banner"),
+                "outputs_produzidos": outputs,
+            })
+            state_bag["artifacts"][f"etapa_{etapa}"] = outputs
+
+            if i < len(trajetoria) - 1:
+                next_agent = trajetoria[i + 1]["agente"]
+                if next_agent not in proximos and proximos != ["*"]:
+                    return {
+                        "scenario_id": scenario_id,
+                        "status": "FAIL",
+                        "reason": f"Transição inválida na etapa {etapa}: '{agente}' -> '{next_agent}' não está em proximos_permitidos: {proximos}",
+                    }
+
+            transitions_log.append({
+                "etapa": etapa,
+                "agente": agente,
+                "status": "OK",
+            })
+
+        state_bag["status"] = "CONCLUIDO"
+        return {
+            "scenario_id": scenario_id,
+            "status": "PASS",
+            "workflow": scenario.get("workflow"),
+            "total_etapas": len(trajetoria),
+            "state_bag_final": state_bag,
+            "transicoes": transitions_log,
+        }
+
 
     def calculate_coverage(self) -> Dict[str, Any]:
         """Calcula as métricas de cobertura das trajetórias contra routing-graph.yaml."""

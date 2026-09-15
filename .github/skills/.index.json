@@ -3,7 +3,7 @@
   "domain": "governanca-ai-generica",
   "generated_at": "2026-08-30T16:00:00Z",
   "summary": {
-    "total_skills": 57
+    "total_skills": 59
   },
   "skills": [
     {
@@ -329,6 +329,21 @@
       "related_agents": [
         "@docs-engineer",
         "@refactor-planner"
+      ]
+    },
+    {
+      "name": "git-worktree-governance",
+      "tier": 2,
+      "category": "governance",
+      "description": "Diretrizes de ciclo de vida e isolamento para execução de agentes paralelos e explorações especulativas via Git Worktrees sem colisão de arquivos ou concorrência de build.",
+      "path": ".github/skills/git-worktree-governance/SKILL.md",
+      "tools": [
+        "run_in_terminal"
+      ],
+      "related_agents": [
+        "@refactor-planner",
+        "@tech-solution-architect",
+        "@governance-maintainer"
       ]
     },
     {
