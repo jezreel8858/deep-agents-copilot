@@ -330,6 +330,11 @@ Esta skill **reaproveita** (não recria) a taxonomia de `code-review-patterns`:
 | **Alto** | Gap que gera desperdício severo de tokens/créditos, duplicação de manutenção ou risco de drift: violação de batching (R-046); divergência de templates canônicos (ausência de escopo ✅/❌ ou workflow); falta de variáveis nativas em prompts; código inline > 8 linhas em skills (R-026); ou sobreposição funcional ativa entre 2 agents. |
 | **Sugestão** | Melhoria técnica não urgente ou cosmética: refinamento de `argument-hint`; ajuste fino de `description` dentro do limite; ou gap taxonômico de categoria intencionalmente não coberta. |
 
+### Smell 2.22 — Sticky Agent e Falha de Reset de Workflow (R-042 / R-052)
+- **Definição**: Ocorre quando o último agente ativo em um turno ou ao término de um workflow canônico retém o controle da conversa e tenta responder a uma nova solicitação do usuário, justificando que o pedido pertence ao mesmo ecossistema/stack técnica, violando a centralidade do `@agent-router` e bypassando o pipeline de requisitos ou triagem do workflow canônico aplicável.
+- **Severidade**: Bloqueador.
+- **Remediação**: Todo agente downstream ao concluir sua entrega deve registrar o workflow como concluído e acionar handoff de retorno ao `@agent-router` (`motivo: "conclusao_de_workflow_anterior"`), proibindo sticky-sessions inter-tarefas.
+
 ## 4) Cross-check de Segurança (Referência, Não Duplicação)
 
 Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), referenciar diretamente `agent-safety-guardrails/SKILL.md` — esta skill **não duplica** aquele conteúdo, apenas sinaliza quando um smell estrutural (ex.: agent com tools muito além do necessário para seu escopo declarado) deve ser cruzado com o checklist de segurança daquela skill.

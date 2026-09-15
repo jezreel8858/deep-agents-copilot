@@ -6,6 +6,23 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.10.0] — 2026-09-15
+
+### Adicionado
+- **Regra R-052 e Erradicação do Anti-Padrão Sticky Agent**:
+  - Nova regra normativa `R-052 (Reset Mandatório pós-Conclusão de Workflow / Post-Task Router Handback — Anti Sticky-Agent)` em `CLAUDE.md` e `.github/copilot-instructions.md`.
+  - Proibição absoluta de o último agente ativo reter o controle de novas solicitações do usuário no chat sob pretexto de ser a "mesma stack/tecnologia".
+  - Todo encerramento de workflow canônico (R-050) encerra formalmente o ciclo operacional e reverte compulsoriamente o controle ao `@agent-router` (`motivo: "conclusao_de_workflow_anterior"`).
+- **Catalogação do Smell 2.22 em `governance-audit-patterns`**:
+  - `Smell 2.22 — Sticky Agent e Falha de Reset de Workflow (R-042 / R-052)`: catalogado com severidade Bloqueador.
+  - Teste determinístico `test_smell_2_22_workflow_reset_and_anti_sticky_agent_rule` adicionado à suíte `tests/governance_audit/test_governance_smells.py` (100% verde).
+
+### Aprimorado
+- **Ajuste Fino na Regra R-042**:
+  - Esclarecida a cláusula de perfil híbrido dos specialists, restringindo a continuidade sem handoff estritamente a refinamentos imediatos de uma mesma tarefa em andamento.
+
+---
+
 ## [2.9.0] — 2026-09-15
 
 ### Adicionado
