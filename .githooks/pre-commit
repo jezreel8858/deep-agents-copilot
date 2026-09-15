@@ -83,6 +83,20 @@ if [ -n "$target_catalog" ]; then
   done
 fi
 
+# 6) Defesa Anti-Truncamento de Histórico para CHANGELOG.md:
+#    O CHANGELOG.md é estritamente aditivo. Qualquer commit que remova cabeçalhos
+#    de versão históricos (linhas iniciadas por '## [') ou reduza drasticamente
+#    o volume do arquivo é bloqueado determinísticamente para prevenir regressão.
+if git diff --cached --name-only | grep -qE '^CHANGELOG\.md$'; then
+  deleted_headers=$(git diff --cached -- CHANGELOG.md | grep -E '^\-##\s+\[' || true)
+  if [ -n "$deleted_headers" ]; then
+    echo "❌ [Anti-Truncamento] Bloqueado: remoção acidental de cabeçalhos de versão histórica em CHANGELOG.md detectada:"
+    echo "$deleted_headers"
+    echo "   → O CHANGELOG.md deve ser estritamente aditivo. Reversões de versões históricas são proibidas."
+    blocked=1
+  fi
+fi
+
 if [ "$blocked" -ne 0 ]; then
   echo ""
   echo "Commit abortado — violação de R-043/R-044. Ver CLAUDE.md § R-043 / § R-044."
