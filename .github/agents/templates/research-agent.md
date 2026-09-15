@@ -6,8 +6,7 @@ model: "Claude Sonnet 5"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'mcp_context-mode_ctx_search']
 # SSOT de Governança e Dependências (Context Engineering Benchmark 2026):
 # 100% das dependências documentais e skills DEVEM residir exclusivamente em source_docs: no frontmatter.
-# É TERMINANTEMENTE PROIBIDO criar seções redundantes no corpo markdown (ex.: '## Regras Herdadas',
-# '## Catálogo / Conhecimento Base', '## Skills Associadas' ou '## Docs Sempre Anexadas').
+# É TERMINANTEMENTE PROIBIDO criar seções redundantes de herança, catálogo, skills ou pré-carregamento no corpo markdown.
 # O gate de testes determinístico (test_template_sections.py) bloqueia compulsoriamente seções não homologadas.
 source_docs:
   - CLAUDE.md

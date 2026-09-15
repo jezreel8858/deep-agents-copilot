@@ -254,7 +254,7 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 
 | Campo | Conteúdo |
 |---|---|
-| Sintoma | Seção `## Regras Herdadas` de um `.agent.md` ou prompt cita um range numérico fechado (ex.: `R-001..R-051`), acoplando o consumidor à cardinalidade exata de regras vigentes em `CLAUDE.md` e forçando *Shotgun Surgery* (edições em massa em 44+ arquivos e queima de créditos a cada nova regra criada) |
+| Sintoma | Acoplamento de range numérico fechado em prompts ou documentação (ex.: `R-001..R-051`), acoplando o consumidor à cardinalidade exata de regras vigentes em `CLAUDE.md` e forçando *Shotgun Surgery* (edições em massa em 44+ arquivos e queima de créditos a cada nova regra criada) |
 | Como detectar | Regex `R-001\.\.R-(\d{3})` em cada `.github/agents/**/*.agent.md` e prompts; qualquer ocorrência de range numérico fechado é um achado. Ver Tier 1: `test_smell_2_15_no_hardcoded_normative_rule_range` |
 | Origem (TrustAgent) | Intrínseco — acoplamento frágil entre consumidores de governança e o contador numérico de regras |
 | Severidade | **Alta em Custo Operacional** (gera retrabalho sistêmico, edições em massa e gasto desnecessário de tokens/créditos em cascata) |

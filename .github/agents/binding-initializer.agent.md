@@ -139,7 +139,7 @@ discovery:
 1. Frontmatter YAML com `name`, `description`, `model`, `tools`.
 2. Nome do arquivo: `binding-initializer.agent.md`.
 3. Bloco **CRÍTICO** separado com ❌ e ✅.
-4. Seção **Regras Herdadas** apontando para CLAUDE.md + copilot-instructions.md.
+4. Frontmatter 'source_docs:' com dependências consolidadas (SSOT).
 5. Documentação da pergunta P1 de forma estruturada.
 6. Validação explícita de YAML antes de criar.
 7. Confiança declarada no handoff (`alta|média|baixa`).

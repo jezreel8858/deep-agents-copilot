@@ -252,7 +252,7 @@ Pedido recebido (já refinado por @prompt-structuring ou via Fast-Path)?
 1. Frontmatter com `name`, `version`, `description`, `tools`.
 2. Nome de arquivo no formato `agent-router.agent.md`.
 3. Bloco **CRÍTICO** com itens `❌` e `✅`.
-4. Seção **Regras Herdadas** apontando para `CLAUDE.md` e `copilot-instructions.md`.
+4. Frontmatter 'source_docs:' com dependências consolidadas (SSOT).
 5. Delegação explícita para agents downstream + fallback para `deep-search` e `tech-solution-architect`.
 6. Decisão sempre explícita em formato estruturado.
 7. Confiança declarada com **score numérico** (0.00–1.00) e nível de routing usado.
