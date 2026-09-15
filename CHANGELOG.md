@@ -6,6 +6,33 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.9.0] — 2026-09-15
+
+### Adicionado
+- **Nova Skill Agnóstica `frontend-visual-feedback-loop`**:
+  - Padrão canônico de mercado (2025–2026) para execução do Visual Feedback Loop (VFL) desacoplado de framework (Angular, React, Vue, Svelte, Web Components).
+  - Suporte a renderização isolada em sandbox (Storybook CSF3 / rota efêmera), captura multi-viewport canônica (`375x667`, `768x1024`, `1440x900`), inspeção da Árvore de Acessibilidade (AOM) e asserções visuais Playwright.
+  - Princípio Think-in-Code para persistência de screenshots em disco sem inflar contexto de chat, e circuit breaker com limite rígido de 2 iterações no critic loop.
+- **Formalização do Smell 2.21 em `governance-audit-patterns`**:
+  - `Smell 2.21 — Cegueira Visual e Suposição de Contratos de UI (Visual Blindness & Unverified UI Contracts)`: cataloga e previne a falsa equivalência entre compilação/testes headless verdes e conformidade visual/contratual real de interface.
+  - Teste determinístico `test_smell_2_21_visual_blindness_and_ui_contracts_documented` integrado à suíte Tier 1 de auditoria estática.
+
+### Aprimorado
+- **Duplo Quality Gate no `WORKFLOW-FEATURE-DEVELOPMENT` (`workflows.md`)**:
+  - Particionamento do Estado 5 para demandas com interface: 5a (Lógica reativa, stores e regras sob TDD com `angular-feature-developer`) e 5b (Handoff mandatório de apresentação visual e tokens com `angular-ui-stylist`).
+  - Implantação do Duplo Gate no Estado 6: Gate 1 (Lógica, Contratos & OWASP com `@security-reviewer`) e Gate 2 (Design System, Paridade Visual, zero hex inline e validação de contratos de componentes `shared/` com `@angular-ui-stylist` e `@code-review`).
+- **Agentes de Domínio Frontend Angular**:
+  - `@angular-feature-developer`: Proibição estrita de suposição de props em inglês, protocolo "Canonical Sibling First" e leitura obrigatória do arquivo `.ts` de componentes `shared/` para validação de `@Input()`.
+  - `@angular-ui-stylist`: Auditoria obrigatória de classes de diálogo (`.app-dialog-content`, `.form-grid`), empty-states de largura total, wrappers de ícone e proibição absoluta de cores hexadecimais inline em SCSS de features.
+  - `@angular-router`: Atualização da árvore de decisão para sequenciar demandas de UI pelo pipeline em duas fases.
+- **Skills e Adapters Compartilhados**:
+  - `angular-implementation-patterns` e `frontend-componentization-patterns`: Incorporação do protocolo "Canonical Sibling First" e leitura estrita de interfaces no passo "Reuso-First".
+  - `design-system-component-contracts`: Diretrizes de verificação de contratos no lado do consumidor e enforcement de tokens semânticos.
+  - `angular-v21-frontend.instructions.md`: Normas canônicas de layout de diálogos, classes utilitárias de scroll e proibição de hexadecimais arbitrários.
+  - Atualização atômica de catálogos: `.github/skills/.index.json` (60 skills indexadas), `.github/skills/README.md` e `.github/copilot-instructions.md`.
+
+---
+
 ## [2.8.10] — 2026-09-14
 
 ### Refatorado & Saneado

@@ -531,3 +531,27 @@ def test_smell_2_1_no_deprecated_agents_in_live_readmes():
         assert not re.search(pattern, skills_readme), (
             f".github/skills/README.md cita agent descontinuado '{dep}'"
         )
+
+# ─────────────────────────────────────────────────────────────
+# SMELL 2.21 — Cegueira Visual e Suposição de Contratos de UI
+# ─────────────────────────────────────────────────────────────
+def test_smell_2_21_visual_blindness_and_ui_contracts_documented():
+    """Smell 2.21: governance-audit-patterns/SKILL.md deve documentar o Smell 2.21
+    (Cegueira Visual e Suposição de Contratos de UI), e os agentes de frontend
+    devem prever o protocolo 'Canonical Sibling First' e contratos de shared components."""
+    gap_file = SKILLS_DIR / "governance-audit-patterns" / "SKILL.md"
+    assert gap_file.exists(), "governance-audit-patterns/SKILL.md deve existir"
+    gap_content = gap_file.read_text(encoding="utf-8")
+    assert "2.21" in gap_content, "governance-audit-patterns/SKILL.md DEVE documentar o Smell 2.21"
+    assert "Cegueira Visual" in gap_content, "Smell 2.21 deve abordar Cegueira Visual"
+
+    # Valida presença do protocolo Canonical Sibling First no angular-feature-developer e angular-ui-stylist
+    afd_file = AGENTS_DIR / "frontend" / "angular" / "angular-feature-developer.agent.md"
+    assert afd_file.exists()
+    afd_content = afd_file.read_text(encoding="utf-8")
+    assert "Canonical Sibling" in afd_content, "angular-feature-developer deve adotar Canonical Sibling First"
+
+    aus_file = AGENTS_DIR / "frontend" / "angular" / "angular-ui-stylist.agent.md"
+    assert aus_file.exists()
+    aus_content = aus_file.read_text(encoding="utf-8")
+    assert "Canonical Sibling" in aus_content, "angular-ui-stylist deve adotar Canonical Sibling First"

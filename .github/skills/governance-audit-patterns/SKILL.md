@@ -310,6 +310,16 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 | Severidade | **Bloqueador** (desperdício financeiro direto de créditos, duplicação de runtime e loops de cancelamento pelo usuário) |
 | Remediação | Declarar explicitamente a Delegação Plana (Flat Delegation) em `agent-router.agent.md` e a exceção em R-047: o router emite apenas o bloco de decisão de rota e encerra o turno sem chamar executores via `run_subagent`. A invocação de `run_subagent` pelo router é restrita a `@prompt-structuring` (R-041) e `@binding-initializer` (R-034). O Orquestrador Raiz despacha o downstream em nível plano exatamente uma única vez |
 
+### 2.21 — Cegueira Visual e Suposição de Contratos de UI (Visual Blindness & Unverified UI Contracts)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Entrega de funcionalidade de frontend concluída com testes unitários e build verdes ("sucesso aparente"), porém com severas divergências visuais em tempo de execução: vazamento de texto de ícone no cabeçalho, diálogos desalinhados sem classes utilitárias de scroll e padding, uso de cores hexadecimais arbitrárias inline em SCSS, componentes de empty-state colapsados no centro da viewport, ou consumo de componentes compartilhados com propriedades inferidas em inglês (`[icon]`, `[title]`) quando o design system modelou em português (`[icone]`, `[titulo]`), fazendo com que o Angular trate atributos não mapeados como atributos HTML nativos inertes sem acusar erro de compilação |
+| Como detectar | Inspeção de arquivos SCSS de features buscando cores hexadecimais (`#[0-9a-fA-F]{3,6}`) em vez de variáveis de tema/tokens semânticos; verificação de templates `.html` contra o arquivo de declaração TypeScript (`.component.ts`) dos componentes `shared/` consumidos; ausência do protocolo "Canonical Sibling First" (inspeção prévia de componente irmão); ausência de classes utilitárias de diálogo (`.app-dialog-content`, `.form-grid`); ausência de handoff entre lógica (`feature-developer`) e estilo (`ui-stylist`) no workflow |
+| Origem (TrustAgent) | Intrínseco/Extrínseco — (a) intrínseco: agent presume que compilação limpa e testes headless equivalem a Definition of Done visual (cegueira visual); supõe inputs em inglês sem ler a definição TypeScript do componente compartilhado; (b) extrínseco: workflow de features (`WORKFLOW-FEATURE-DEVELOPMENT`) sem duplo gate explícito de qualidade visual e design system |
+| Severidade | **Alta** (não impede o build, mas entrega interface quebrada para o usuário final, gerando retrabalho imediato de layout e refatoração de contratos de template) |
+| Remediação | `@governance-factory`/`@governance-maintainer` estabelece: (a) Protocolo "Canonical Sibling First" e leitura obrigatória da interface `.ts` de componentes `shared/` em `angular-implementation-patterns` e `angular-feature-developer`; (b) Proibição estrita de hex colors em SCSS de features e checklist de diálogos em `angular-ui-stylist`; (c) Duplo Gate de Qualidade (Gate 1: Lógica/Testes/OWASP, Gate 2: Design System & Paridade de UI) no `WORKFLOW-FEATURE-DEVELOPMENT` de `workflows.md` |
+
 ## 3) Severidade — Reaproveitamento da Taxonomia Existente
 
 Esta skill **reaproveita** (não recria) a taxonomia de `code-review-patterns`:
@@ -344,7 +354,7 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 
 ## 6) Checklist de Conformidade da Auditoria
 
-- [ ] Todo achado classificado estritamente em uma das 20 categorias de smell (2.1..2.20).
+- [ ] Todo achado classificado estritamente em uma das 21 categorias de smell (2.1..2.21).
 - [ ] Severidade reaproveitada de `code-review-patterns` (Bloqueador/Alto/Sugestão).
 - [ ] Origem classificada como intrínseca ou extrínseca (TrustAgent) quando relevante.
 - [ ] Remediação aponta agent executor real do catálogo (nunca "corrigir diretamente" — agent de auditoria é estritamente read-only).

@@ -3,7 +3,7 @@
   "domain": "governanca-ai-generica",
   "generated_at": "2026-08-30T16:00:00Z",
   "summary": {
-    "total_skills": 59
+    "total_skills": 60
   },
   "skills": [
     {
@@ -319,6 +319,22 @@
         "@angular-router",
         "@tech-solution-architect",
         "@test-strategy"
+      ]
+    },
+    {
+      "name": "frontend-visual-feedback-loop",
+      "tier": 2,
+      "category": "quality",
+      "path": ".github/skills/frontend-visual-feedback-loop/SKILL.md",
+      "description": "Diretrizes e padrões canônicos para executar o Visual Feedback Loop (VFL) em interfaces frontend de qualquer framework (Angular, React, Vue, Svelte) via renderização isolada (Storybook/dev-server), inspeção multimodal multi-viewport (375px/768px/1440px), Árvore de Acessibilidade (AOM) e asserções com Playwright.",
+      "tools": [
+        "context-mode"
+      ],
+      "related_agents": [
+        "@angular-ui-stylist",
+        "@angular-feature-developer",
+        "@code-review",
+        "@tech-solution-architect"
       ]
     },
     {

@@ -15,6 +15,7 @@ source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
   - .github/skills/test-implementation-frontend/SKILL.md
+  - .github/skills/frontend-visual-feedback-loop/SKILL.md
 tools: []
 ---
 
@@ -31,11 +32,12 @@ tools: []
 
 Regra objetiva, aplicável a qualquer stack com camada de UI: **buscar antes de construir**.
 
-1. Inventariar `shared/components/` (ou pasta equivalente do projeto) e seu barrel/index — verificar se já existe componente cobrindo a mesma capacidade (card, filtro, badge, diálogo, form field, empty state, avatar).
+1. Inventariar `shared/components/` e seu barrel/index — verificar se já existe componente cobrindo a mesma capacidade (card, filtro, badge, diálogo, form field, empty state, avatar).
 2. Consultar a documentação interna de design system do projeto quando existir (referenciada pelo adapter local `.github/instructions/local/<projeto>.instructions.md` — ex.: `docs/*componentes*`, `docs/*padrao*`, `STYLEGUIDE.md`).
-3. Se existir componente/pattern equivalente: reaproveitar, nunca recriar em HTML/CSS customizado.
-4. Se não existir: implementar o novo elemento e avaliar explicitamente se deve ser promovido para `shared/` (critério: será reutilizado em 2+ telas).
-5. Se o projeto tiver script de auditoria de padrão de UI (ex.: `npm run <lint-de-padrao-ui>`), executá-lo antes de reportar conclusão.
+3. Se existir componente/pattern equivalente: ler a definição TypeScript (`.ts`) para confirmar inputs/outputs reais e reaproveitar, nunca recriar em HTML/CSS customizado (Smell 2.19 / Smell 2.21).
+4. **Protocolo "Canonical Sibling First"**: antes de criar qualquer tela ou diálogo novo, inspecionar um componente irmão homologado no repositório para mapear tags, grids de formulário e classes utilitárias de scroll.
+5. Se não existir componente equivalente: implementar o novo elemento e avaliar explicitamente se deve ser promovido para `shared/` (critério: será reutilizado em 2+ telas).
+6. Se o projeto tiver script de auditoria de padrão de UI (ex.: `npm run <lint-de-padrao-ui>`), executá-lo antes de reportar conclusão.
 
 ## Princípios de Componentização
 
