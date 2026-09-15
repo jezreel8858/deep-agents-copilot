@@ -36,6 +36,8 @@ Escopo: código TypeScript/JS, configuração (tsconfig/angular.json), build, te
 
 ## 4) Reutilização e organização
 
+- **Protocolo "Canonical Sibling First"**: antes de criar qualquer tela ou diálogo novo, inspecionar compulsoriamente um componente irmão canônico homologado no projeto para replicar tags, grids de formulário e classes utilitárias de scroll.
+- **Contratos Reais de Componentes Compartilhados**: ao consumir componentes de `shared/`, ler compulsoriamente a definição TypeScript (`.component.ts`) para confirmar os nomes reais e tipos dos `@Input()`/`input()`. NUNCA presumir propriedades em inglês (`[icon]`, `[title]`) quando o projeto adotar português (`[icone]`, `[titulo]`), evitando atributos HTML órfãos ignorados silenciosamente (Smell 2.21).
 - Funções puras e reutilizáveis devem ser movidas para classes `*Util` com métodos `static`.
 - Métodos longos devem ser extraídos para privados bem nomeados.
 - Componentes com lógica relevante (>200 linhas, múltiplas chamadas de API ou regras de cruzamento de dados) devem ter um `*.service.ts` local no próprio escopo.
@@ -44,6 +46,9 @@ Escopo: código TypeScript/JS, configuração (tsconfig/angular.json), build, te
 
 ## 5) SCSS e estilização
 
+- **Proibição de Hex Inline**: proibido usar cores hexadecimais arbitrárias inline em SCSS de features (`#...`); utilizar estritamente variáveis CSS de tema ou tokens semânticos do projeto (Smell 2.21).
+- **Layout de Diálogos e Grids**: diálogos devem utilizar classes utilitárias de scroll e grid responsivo de 2 colunas do projeto (`.app-dialog-content`, `.form-grid`) em vez de larguras fixas arbitrárias inline.
+- **Empty States**: componentes de estado vazio devem ser posicionados no container de seção para herdar largura total, evitando caixas colapsadas no centro da tela.
 - Inclua sempre um fallback genérico em `font-family`.
 - Use `:host` e `::ng-deep` com parcimônia; prefira estilos encapsulados quando possível.
 

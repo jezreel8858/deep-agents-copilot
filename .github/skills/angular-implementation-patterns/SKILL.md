@@ -18,6 +18,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/agents/frontend/angular/angular-router.agent.md
   - .github/skills/angular-frontend-patterns/SKILL.md
+  - .github/skills/frontend-visual-feedback-loop/SKILL.md
 tools: []
 ---
 
@@ -39,7 +40,12 @@ tools: []
 
 ## Workflow — Feature Nova
 
-0. **Reuse-First (obrigatório antes de qualquer HTML/CSS novo)**: inventariar `shared/components/` (ou pasta equivalente) e a documentação interna de design system do projeto (referenciada pelo adapter local, ex.: `docs/*componentes*`/`docs/*padrao*`) — reaproveitar componentes/tokens já existentes (cards, filtros, badges, diálogos, form fields) é preferencial a criar HTML/CSS customizado (ver `frontend-componentization-patterns` § Reuso-First). Se o projeto tiver script de auditoria de padrão de UI (ex.: `npm run <lint-de-padrao-ui>`), executá-lo antes de reportar conclusão.
+0. **Reuse-First & Protocolo "Canonical Sibling First" (obrigatório antes de qualquer HTML/CSS novo)**:
+   - **Inventário e Reuso**: inventariar `shared/components/` e a documentação interna de design system do projeto (ex.: `docs/*componentes*`/`docs/*padrao*`) — reaproveitar componentes/tokens existentes (cards, filtros, badges, diálogos, form fields) é preferencial a criar padrão customizado (Smell 2.19).
+   - **Leitura Estrita da Definição TypeScript (`.ts`)**: ao consumir qualquer componente de `shared/`, ler compulsoriamente seu arquivo `.component.ts` para mapear nomes reais e tipos dos `@Input()`/`input()`. NUNCA presumir propriedades em inglês (`[icon]`, `[title]`) quando o design system padroniza em português (`[icone]`, `[titulo]`), evitando que o Angular trate atributos não mapeados como atributos HTML nativos sem acusar erro de compilação (Smell 2.21).
+   - **Inspeção por Paridade (Canonical Sibling First)**: antes de escrever qualquer `*DialogComponent` ou `*PageComponent` novo, ler um componente equivalente 100% funcional no repositório para clonar hierarquia de tags, grid responsivo de 2 colunas, envelopamento de empty-state e classes utilitárias de scroll (`.app-dialog-content`, `.form-grid`).
+   - **Zero Cores Hexadecimais**: proibido utilizar cores hexadecimais arbitrárias inline em SCSS de feature; utilizar estritamente variáveis CSS de tema ou tokens semânticos do projeto.
+   - **Auditoria de Padrão de UI**: Se o projeto tiver script de auditoria de padrão de UI (ex.: `npm run <lint-de-padrao-ui>`), executá-lo antes de reportar conclusão.
 1. Confirmar escopo com `@requirements-analyst`/handoff recebido (critério de aceite testável).
 2. Escrever teste(s) que descrevem o comportamento esperado antes do componente/service (testing-first).
 3. Implementar com **standalone components**, `ChangeDetectionStrategy.OnPush`, `inject()`.
@@ -79,12 +85,17 @@ tools: []
 ## Checklist de PR (implementação)
 
 - [ ] Teste novo/atualizado cobre o comportamento implementado ou corrigido.
+- [ ] Protocolo "Canonical Sibling First" executado: componente irmão canônico inspecionado antes de escrever o template/estilo (Smell 2.21).
+- [ ] Contratos de componentes `shared/` consumidos validados diretamente em seus arquivos `.ts` (sem suposição de props em inglês).
+- [ ] Zero cores hexadecimais arbitrárias inline nos arquivos SCSS (apenas variáveis de tema/design tokens — Smell 2.21).
+- [ ] Diálogos utilizam classes utilitárias de scroll e layout padrão do projeto (sem larguras máximas inline arbitrárias).
+- [ ] Estados vazios envelopados com largura total na seção correspondente.
 - [ ] `OnPush` + `track`/`trackBy` aplicados onde há listas/loops.
 - [ ] Sem lógica de negócio relevante no template.
 - [ ] Convenções do adapter do projeto respeitadas (SCSS, naming, estrutura).
 - [ ] `get_errors` limpo no(s) arquivo(s) tocado(s).
 - [ ] Diff mínimo — sem refactor oportunista fora do escopo pedido.
-- [ ] Toda nova rota está alcançável via componente de navegação do projeto (menu/sidenav/tabs) — não apenas via URL direta.
+- [ ] Toda nova rota está alcançável via componente de navegação do projeto (menu/sidenav/tabs) — não apenas via URL direta (Smell 2.18).
 - [ ] Nenhum padrão visual novo (card, filtro, diálogo, badge, select) foi criado sem antes verificar componentes/design system compartilhados já existentes no projeto (Smell 2.19).
 
 ## Anti-padrões
@@ -96,6 +107,10 @@ tools: []
 - ❌ Reportar "concluído" sem rodar a suíte de teste local.
 - ❌ Entregar rota/feature nova sem vínculo em menu/sidenav/navegação — usuário final não consegue alcançar a funcionalidade (Smell 2.18).
 - ❌ Recriar em HTML/CSS customizado um padrão (card, filtro, diálogo, badge) que já existe como componente compartilhado documentado no projeto (Smell 2.19).
+- ❌ Presumir contratos/inputs de componentes compartilhados em inglês sem abrir e ler o arquivo `.ts` correspondente (Smell 2.21).
+- ❌ Adicionar cores hexadecimais inline em arquivos SCSS de features em vez de tokens de tema (Smell 2.21).
+- ❌ Implementar telas ou diálogos "do zero" sem inspecionar um componente irmão funcional homologado (violação do "Canonical Sibling First").
+- ❌ Declarar entrega concluída baseando-se unicamente em compilação e testes unitários headless sem auditar paridade de layout e contratos de UI (cegueira visual).
 - ❌ Forçar flags de `isLoading = false` ou `isDone = true` para desligar spinners visuais sem resolver a Promise ou Observable de fundo (mascarar sintoma).
 - ❌ Adicionar temporizadores artificiais (`setTimeout`) como band-aid para contornar streams reativos inertes.
 - ❌ Afrouxar regras de validação ou travas de segurança de componentes consumidores para mascarar a ausência de resposta do componente produtor.

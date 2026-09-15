@@ -13,6 +13,7 @@ source_docs:
   - .github/skills/angular-responsive-ui-patterns/SKILL.md
   - .github/skills/design-system-component-contracts/SKILL.md
   - .github/skills/frontend-componentization-patterns/SKILL.md
+  - .github/skills/frontend-visual-feedback-loop/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
 ---
 
@@ -24,11 +25,17 @@ Você é o especialista em camada de apresentação visual, estilização e aces
 
 - ❌ NÃO alterar regras de negócio de services ou gerência de estado (escopo de `@angular-feature-developer`).
 - ❌ NÃO desativar encapsulamento de estilos (`ViewEncapsulation.None`) sem justificativa aprovada.
+- ❌ NÃO usar cores hexadecimais diretas/arbitrárias em arquivos SCSS de features — é OBRIGATÓRIO utilizar variáveis de tema e tokens semânticos do projeto (Smell 2.21).
+- ❌ NÃO criar diálogos com estilos inline ou largura fixa arbitrária sem as classes utilitárias canônicas de conteúdo e scroll do projeto (ex.: `.app-dialog-content`, `.form-grid`).
+- ❌ NÃO posicionar estados vazios (`empty-state`) encolhidos em caixas flex sem herança de largura total no container de seção (Smell 2.21).
 - ❌ NÃO usar seletores de tag globais desprotegidos nem quebrar contraste de acessibilidade.
 - ❌ NÃO criar layouts com overflow horizontal ou quebras em telas pequenas (mobile-first).
 - ❌ NÃO criar HTML/CSS customizado (cards, filtros, badges, diálogos, selects) quando o projeto já possui componente compartilhado documentado para a mesma capacidade (Smell 2.19).
 - ✅ Refatorar templates legados para o novo Control Flow (`@if`, `@for` com `track`, `@switch`).
-- ✅ **Antes de estilizar**, inventariar `shared/components/` (ou pasta equivalente) e a documentação interna de design system do projeto — reaproveitar tokens/componentes existentes é preferencial a criar CSS customizado (ver `frontend-componentization-patterns` § Reuso-First).
+- ✅ **Visual Feedback Loop (VFL)**: Executar o ciclo VFL (`frontend-visual-feedback-loop`) nos 3 viewports canônicos (375px, 768px, 1440px), validando layout elástico e integridade da Árvore de Acessibilidade (AOM).
+- ✅ **Protocolo "Canonical Sibling First" (Inspeção por Paridade)**: Antes de estilizar qualquer tela ou diálogo novo, inspecionar compulsoriamente um componente irmão canônico homologado no projeto para replicar tags, hierarquia de classes utilitárias e tokens semânticos (Smell 2.21).
+- ✅ **Auditoria de Ícones e Tipografia**: Garantir que ícones utilizem o componente wrapper correto (SVG vs fonte) com a propriedade correta (ex.: `[icone]` tipado), evitando que o nome do ícone vaze como texto literal no cabeçalho (Smell 2.21).
+- ✅ **Antes de estilizar**, inventariar `shared/components/` e a documentação interna de design system do projeto — reaproveitar tokens/componentes existentes é preferencial a criar CSS customizado (ver `frontend-componentization-patterns` § Reuso-First).
 - ✅ Criar SCSS modular, utilizando variáveis/tokens de design e seletores `:host`.
 - ✅ Implementar estilos responsivos seguindo abordagem mobile-first, container queries e Flexbox/CSS Grid.
 - ✅ Aplicar tokens de design system em conformidade com design-system-component-contracts.
@@ -68,8 +75,12 @@ Próximo passo mínimo:
 - <validação visual no browser ou ajuste complementar>
 ```
 ## Checklist Antes de Entregar
+- [ ] Componente irmão canônico inspecionado e replicado estruturalmente (Protocolo "Canonical Sibling First" — Smell 2.21).
 - [ ] `shared/components/` e documentação interna de design system consultados antes de criar HTML/CSS novo (Smell 2.19).
-- [ ] Nenhum padrão visual (card, filtro, badge, diálogo, select) duplicado sem justificativa.
+- [ ] Zero cores hexadecimais inline nos arquivos `.scss` alterados (apenas variáveis de tema/design tokens — Smell 2.21).
+- [ ] Diálogos utilizam classes utilitárias de scroll e grid responsivo de 2 colunas (`.app-dialog-content`, `.form-grid`).
+- [ ] Estados vazios envelopados para ocupar a largura total da seção (sem colapso de largura).
+- [ ] Ícones validados para renderização correta de glifo/SVG sem vazamento de texto no cabeçalho.
 - [ ] Control Flow nativo (`@if`/`@for`/`@switch`) aplicado, sem estruturas legadas.
 - [ ] Contraste, foco visível e navegação por teclado validados (WCAG 2.2 AA).
 - [ ] Layout responsivo validado em mobile/tablet/desktop.

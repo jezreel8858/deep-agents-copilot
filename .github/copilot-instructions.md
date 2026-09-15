@@ -338,6 +338,7 @@ Projetos e adapters por-projeto NUNCA são commitados no repositório compartilh
 - `angular-performance-patterns` -> engenharia de performance Angular (Zoneless, Signals, @defer, SSR incremental, CWV).
 - `spring-boot-performance-patterns` -> engenharia de performance Spring Boot (Virtual Threads, pinning, HikariCP, N+1, cache, ZGC).
 - `spring-reactive-performance-patterns` -> engenharia de performance reativa (event-loop, BlockHound, flatMap tuning, backpressure, Netty).
+- `frontend-visual-feedback-loop` -> execução do Visual Feedback Loop agnóstico via Storybook/dev-server, snapshots multi-viewport (375/768/1440px), AOM e Playwright.
 
 **Testes — Genéricos (agnósticos de stack):**
 - `test-implementation-backend` -> padrões agnósticos de testes para qualquer backend.

@@ -349,19 +349,20 @@ flowchart TD
     BlueprintGate -- "Revisar" --> Arch
     BlueprintGate -- "Aprovado" --> TestStrat["<b>4. Estratégia de Testes por Risco</b><br/>Agente: @test-strategy<br/>Ação: Matriz de riscos, casos de borda e cobertura alvo"]
 
-    TestStrat --> TDD["<b>5. Implementação Domain-Driven TDD</b><br/>Agentes: Domain Routers & Specialists<br/>Ação: Contract-First (Red -> Green -> Refactor)"]
+    TestStrat --> TDD["<b>5. Implementação Domain TDD & Paridade UI</b><br/>Agentes: Domain Routers & Specialists<br/>Ação: Contract-First (Red -> Green -> Refactor)<br/>Frontend: 5a Lógica/Store -> 5b Handoff UI Stylist"]
 
     Arch --> CheckDBFeature{"Exige novas<br/>tabelas/colunas?"}
     CheckDBFeature -- "Sim" --> DBFeature["<b>3c. Migração de Schema</b><br/>Agente: @database-specialist<br/>Ação: DDL idempotente + rollback documentado"]
     DBFeature --> CheckScope
 
-    TDD --> SecReview["<b>6a. Security Review (OWASP)</b><br/>Agente: @security-reviewer<br/>Ação: Verificação de injeções, IDOR, auth e inputs"]
+    TDD --> SecReview["<b>6a. Gate 1: Security Review (OWASP) & Lógica</b><br/>Agente: @security-reviewer<br/>Ação: Verificação de testes, injeções, IDOR, auth"]
 
-    SecReview --> CheckSec{"Aprovado em<br/>Segurança?"}
+    SecReview --> CheckSec{"Aprovado em<br/>Gate 1?"}
     CheckSec -- "Vulnerabilidade (tentativa N/2)" --> CheckSecCap{"Tentativas<br/>remediação < 2?"}
     CheckSecCap -- "Sim" --> TDD
     CheckSecCap -- "Não (teto esgotado)" --> SecEscalate["<b>6b. Escalonamento de Segurança</b><br/>ask_questions: revisão manual pareada com dev"]
-    CheckSec -- "Limpo" --> Gate["<b>6. Quality Gate & PR Preparation</b><br/>Agentes: @code-review → @pr-gatekeeper<br/>Ação: Revisão geral de diff e geração de PR semântico"]
+    CheckSec -- "Limpo" --> UIGate["<b>6c. Gate 2: Design System & Paridade UI</b><br/>Agentes: @angular-ui-stylist / @code-review<br/>Ação: Tokens, zero hex inline, classes diálogo/scroll"]
+    UIGate --> Gate["<b>6d. PR Preparation & Quality Gate Final</b><br/>Agentes: @code-review → @pr-gatekeeper<br/>Ação: Revisão de diff e geração de PR semântico"]
 
     Gate --> EndFeat(["✅ Feature Concluída com Sucesso"])
 ```
@@ -374,12 +375,16 @@ flowchart TD
    - Particionamento de escopo: isola se a demanda é **Fullstack**, **Backend-Only** ou **Frontend-Only**.
    - *Estado 3b (Checkpoint de Blueprint)*: Apresenta o blueprint estruturado e aguarda autorização humana explícita via `ask_questions` antes de iniciar qualquer codificação.
 4. **Estado 4 — Estratégia de Testes por Risco (`@test-strategy`)**: Mapeia casos de borda, matriz de risco e cobertura recomendada (mínimo 80%) antes de codificar.
-5. **Estado 5 — Implementação Domain TDD (`domain routers & specialists`)**:
+5. **Estado 5 — Implementação Domain TDD & Paridade UI (`domain routers & specialists`)**:
    - Padrão **Contract-First**: o contrato OpenAPI / DTO é a SSOT.
    - Execução estrita TDD: primeiro o teste automatizado (Red), depois a implementação (Green), seguida da refatoração limpa com diffs cirúrgicos em lote (R-046).
-6. **Estado 6 — Quality Gate, Segurança & PR (`@security-reviewer`, `@code-review` e `@pr-gatekeeper`)**:
-   - *Sub-rotina 6a (Security Gate)*: O `@security-reviewer` audita novos endpoints contra OWASP Top 10 (SQL Injection, IDOR, Broken Authentication, sanitização).
-   - O `@code-review` realiza a revisão de conformidade e boas práticas.
+   - **Pipeline de Frontend (2 Etapas Obrigatórias para Telas/Diálogos)**:
+     - *Estado 5a (Lógica, Store & Services)*: O `@angular-feature-developer` constrói a gerência de estado (Signals/NgRx), serviços e regras de negócio sob TDD.
+     - *Estado 5b (Handoff Mandatório de Apresentação & Paridade de UI)*: Handoff obrigatório para o `@angular-ui-stylist` para validação do protocolo "Canonical Sibling First" (inspeção prévia de componente irmão canônico homologado), auditoria de design tokens (zero hex inline), classes utilitárias de layout/scroll para diálogos e verificação estrita dos inputs de componentes compartilhados em seus arquivos `.ts` (Smell 2.21).
+6. **Estado 6 — Duplo Quality Gate, Segurança & PR (`@security-reviewer`, `@angular-ui-stylist`, `@code-review` e `@pr-gatekeeper`)**:
+   - *Sub-rotina 6a — Gate 1: Security Review (OWASP), Lógica & Contratos*: O `@security-reviewer` audita novos endpoints contra OWASP Top 10 (SQL Injection, IDOR, Broken Authentication, sanitização); validação de testes verdes e compilação limpa (`get_errors`).
+   - *Gate 2 (Design System & Paridade de UI)*: Auditoria visual estrita — proibição absoluta de cores hexadecimais inline em SCSS de feature, conferência de propriedades tipadas de componentes `shared/` contra o TypeScript real (prevenindo que atributos não mapeados passem silenciosamente), alinhamento estrutural de diálogos/seções e execução de linters/scripts de auditoria visual do projeto (ex.: `npm run material:auditar`).
+   - O `@code-review` realiza a revisão holística de conformidade e boas práticas.
    - O `@pr-gatekeeper` gera a mensagem de commit semântico, descrição estruturada de PR e atualiza o CHANGELOG.md (sem push autônomo — R-031).
 
 #### Typed State Bag (`workflow_state`):
@@ -778,8 +783,8 @@ Para que o usuário nunca fique no escuro quanto ao fluxo em andamento, o `@agen
 - [⏳] **Etapa 2: Elicitação de Requisitos** → `@requirements-analyst` / `@feature-planner` *(Pendente: critérios de aceitação BDD/EARS)*
 - [⏳] **Etapa 3: Technical Blueprint & Contratos** → `@tech-solution-architect` *(Pendente: OpenAPI, modelo de dados e divisão por stack)*
 - [⏳] **Etapa 4: Estratégia de Testes (TDD)** → `@test-strategy` *(Pendente: matriz de riscos e casos de borda)*
-- [⏳] **Etapa 5: Implementação Domain TDD** → `Domain Routers & Specialists` *(Pendente: ciclo Red-Green-Refactor)*
-- [⏳] **Etapa 6: Quality Gate & PR Preparation** → `@code-review` -> `@pr-gatekeeper` *(Pendente: revisão final e PR)*
+- [⏳] **Etapa 5: Implementação Domain TDD & Paridade UI** → `Domain Routers & Specialists` *(Pendente: Red-Green-Refactor + Handoff UI 5a->5b)*
+- [⏳] **Etapa 6: Duplo Quality Gate & PR Preparation** → `Gate 1 (Lógica/Sec) + Gate 2 (UI Parity) → @pr-gatekeeper` *(Pendente: validação dupla e PR)*
 ```
 
 #### WORKFLOW 5: `WORKFLOW-GOVERNANCE-MAINTENANCE` (3 etapas)

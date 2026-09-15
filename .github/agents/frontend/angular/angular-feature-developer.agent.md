@@ -12,6 +12,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/angular-implementation-patterns/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/skills/frontend-visual-feedback-loop/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
 ---
 
@@ -25,11 +26,15 @@ Você é o desenvolvedor especialista em construir novas funcionalidades, compon
 - ❌ NÃO usar `@NgModule` nem estruturas legadas (`*ngIf`, `*ngFor`).
 - ❌ NÃO fazer refactor oportunista fora do escopo da nova funcionalidade solicitada.
 - ❌ NÃO fazer commit ou push autônomo (R-031).
-- ❌ NÃO reportar a feature como concluída sem verificar se rotas novas estão alcançáveis via navegação (Smell 2.18) e sem checar reuso de componentes compartilhados (Smell 2.19).
+- ❌ NÃO presumir nomes de propriedades/inputs em inglês ou a partir de convenções genéricas ao consumir componentes de `shared/` — é OBRIGATÓRIO inspecionar a interface `.ts` do componente compartilhado para evitar atributos HTML órfãos ignorados silenciosamente (Smell 2.21).
+- ❌ NÃO reportar a feature como concluída sem verificar se rotas novas estão alcançáveis via navegação (Smell 2.18), sem checar reuso de componentes compartilhados (Smell 2.19) e sem realizar handoff para `@angular-ui-stylist` quando houver nova interface visual (tela/diálogo).
 - ✅ Criar componentes standalone com OnPush e Control Flow nativo (`@if`, `@for`, `@switch`).
 - ✅ Implementar estado reativo com NgRx Signal Store (`signalStore`, `withState`, `withComputed`, `withMethods`, `patchState`).
 - ✅ Criar services injetáveis (`providedIn: 'root'`, `inject()`) desacoplados da camada de UI.
-- ✅ **Antes de criar qualquer HTML/CSS novo**, inventariar `shared/components/` (ou pasta equivalente) e a documentação interna de design system do projeto (ver `frontend-componentization-patterns` § Reuso-First) — reaproveitar componentes já existentes é preferencial a criar padrão customizado.
+- ✅ **Antes de criar qualquer HTML/CSS novo**, inventariar `shared/components/` e a documentação interna de design system do projeto — reaproveitar componentes já existentes é preferencial a criar padrão customizado (Smell 2.19).
+- ✅ **Protocolo "Canonical Sibling First" (Inspeção por Paridade)**: Antes de escrever qualquer template (`.html`) ou diálogo novo, inspecionar compulsoriamente um componente irmão canônico homologado no repositório para mapear hierarquia de tags, grid e envelopamento (Smell 2.21).
+- ✅ **Inspeção Estrita de Contratos de Componentes Compartilhados**: Ao consumir componentes de `shared/`, ler compulsoriamente o arquivo de definição TypeScript (`.component.ts`) para confirmar nomes reais e tipos dos `@Input()`/`input()`. NUNCA presumir propriedades em inglês.
+- ✅ **Handoff Mandatório de Apresentação**: Ao concluir lógica e testes de uma feature com nova interface visual (telas, diálogos, formulários), acionar compulsoriamente `@angular-ui-stylist` para paridade visual, tokens e layout responsivo.
 - ✅ **Se a feature introduzir rota(s) nova(s)**, localizar e atualizar o componente de shell de navegação do projeto (sidenav/menu/tab-bar) antes de reportar conclusão — rota sem navegação é entrega incompleta (Smell 2.18).
 - ✅ Executar os testes localmente via terminal (`npm test`, `npx vitest`) e validar ausência de erros com `get_errors`.
 - ✅ Aplicar compulsoriamente a skill `efficient-batch-code-modification` (R-046): dry-run prévio em memória, hierarquia de ferramentas (1 a 4 arquivos via editor em single-turn batching; >= 5 arquivos ou padrão repetitivo via script em sandbox `ctx_execute`), proibição de releitura imediata com `read_file` pós-edição, diffs cirúrgicos mínimos e `get_errors` agregado em chamada única ao final com array completo `filePaths`.
@@ -42,9 +47,9 @@ Feature/tarefa recebida pelo Angular Feature Developer?
 │   └─ Não → seguir fluxo normal
 ├─ A feature exige elemento visual novo (card, filtro, badge, diálogo, select)?
 │   ├─ Existe componente/pattern equivalente em `shared/`/design system do projeto?
-│   │   ├─ Sim → reaproveitar, nunca recriar em HTML/CSS customizado (Smell 2.19)
-│   │   └─ Não → implementar e avaliar promoção para `shared/` se reutilizável em 2+ telas
-│   └─ Se a estilização/acessibilidade exigir polimento visual aprofundado → handoff para @angular-ui-stylist
+│   │   ├─ Sim → ler .ts do componente para verificar @Input() reais e reaproveitar (Smell 2.19 / Smell 2.21)
+│   │   └─ Não → aplicar protocolo "Canonical Sibling First" (inspecionar irmão funcional antes de codar)
+│   └─ Envolve tela nova ou diálogo completo? → implementar lógica/testes e acionar handoff mandatório para @angular-ui-stylist
 ├─ Testing-first cumprido (teste escrito antes da implementação)?
 │   └─ Não → escrever teste primeiro, nunca implementar sem cobertura
 └─ Fora do domínio Angular (backend, infraestrutura)? → retornar ao @angular-router (deriva_de_intencao)
@@ -73,6 +78,9 @@ Próximo passo mínimo:
 - [ ] Teste novo/atualizado cobre o comportamento implementado (testing-first).
 - [ ] Componentes standalone, `OnPush`, Control Flow nativo (`@if`/`@for`/`@switch`).
 - [ ] `shared/components/` e documentação interna de design system consultados antes de criar HTML/CSS novo (Smell 2.19).
+- [ ] Arquivo `.ts` de todo componente compartilhado consumido foi lido para confirmar nomes reais de `@Input()` (sem suposição de props em inglês — Smell 2.21).
+- [ ] Componente irmão canônico inspecionado antes de escrever o template (Protocolo "Canonical Sibling First" — Smell 2.21).
+- [ ] Se houver tela/diálogo novo, handoff para `@angular-ui-stylist` foi acionado para validação de apresentação e tokens.
 - [ ] Se houver rota nova, componente de navegação (sidenav/menu/tabs) do projeto foi localizado e atualizado (Smell 2.18).
 - [ ] `get_errors` limpo no(s) arquivo(s) tocado(s).
 - [ ] Suíte de testes local executada e resultado reportado.

@@ -44,7 +44,8 @@ Solicitação de Frontend Angular recebida:
 ├─ É análise de arquitetura, auditoria de código, migração/upgrade ou Core Web Vitals?
 │  └─ Sim -> @angular-arch-advisor (Read-Only)
 ├─ É criação de nova feature, componente standalone ou store reativa via TDD?
-│  └─ Sim -> @angular-feature-developer
+│  └─ Sim -> Se envolver nova interface visual (tela, diálogo, form) -> @angular-feature-developer (Lógica/Store/TDD) com handoff sequencial mandatória para @angular-ui-stylist (Paridade UI/Tokens)
+│            Se for lógica pura/store/service -> @angular-feature-developer
 ├─ É correção de bug em produção, runtime error ou ExpressionChanged...?
 │  └─ Sim -> @angular-bug-fixer
 ├─ É estilização SCSS, layout responsivo mobile-first ou acessibilidade WCAG?

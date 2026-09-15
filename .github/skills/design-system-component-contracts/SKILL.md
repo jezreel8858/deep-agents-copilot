@@ -37,6 +37,8 @@ tools: []
 | Compatibilidade retroativa por padrão | Mudanças devem preservar contratos existentes até janela formal de remoção | Alterações incompatíveis só entram com major + plano de migração |
 | Acessibilidade como requisito de contrato | Componente deve atender critérios WCAG/WAI-ARIA relevantes ao seu papel | Nome acessível, foco visível, navegação por teclado e roles/aria validados |
 | Documentação como artefato de release | Toda mudança de contrato deve atualizar documentação e changelog no mesmo ciclo | Release bloqueada se API docs, notas de versão e impacto ao consumidor não estiverem atualizados |
+| Consumo guiado por definição | O consumidor DEVE inspecionar a declaração tipada de inputs antes de instanciar componentes `shared` | Zero bindings inferidos em inglês; zero atributos HTML órfãos ignorados pelo framework (Smell 2.21) |
+| Proibição de hex inline | Estilização consome exclusivamente tokens e variáveis de tema do design system | Zero códigos hexadecimais inline (`#[0-9a-fA-F]{3,6}`) em SCSS de features |
 
 ## Checklist (critérios verificáveis)
 
