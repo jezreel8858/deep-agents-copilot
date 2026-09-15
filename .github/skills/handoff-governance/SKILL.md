@@ -246,6 +246,57 @@ Todo agent acionado como subagente via `run_subagent` DEVE executar uma verifica
 - **Teto Rígido**: `MAX_DEPTH = 3`. Se `call_stack_depth >= 3`, o Circuit Breaker é desarmado: o agent interrompe qualquer delegação subsequente e força o retorno imediato ao `parent_agent` ou `@agent-router` com `motivo: "circuit_breaker_max_depth_exceeded"`.
 - **Detecção de Ciclos Imediatos (Anti-Ping-Pong)**: se o nó de destino proposto for idêntico ao `parent_agent` imediato sem que nenhum artefato ou descoberta nova tenha sido gerada, o handoff é bloqueado com `motivo: "circuit_breaker_cycle_detected"`.
 
+#### 3. Circuit Breaker de Falhas & Retry Budget (Anti-Loop de Correção)
+- **Retry Budget por Etapa**: `MAX_RETRIES_PER_STEP = 2`.
+- **Transição de Estados (`CLOSED` → `OPEN`)**:
+  - `CLOSED` (Normal): O fluxo prossegue normalmente entre os agentes da máquina de estados do workflow.
+  - `OPEN` (Disparado): Se um agente executor (ex.: `bug-fixer`, `test-fixer`, `feature-developer`) falhar por 2 vezes consecutivas na mesma etapa de execução (ex.: testes continuam falhando após 2 tentativas cirúrgicas de fix), o Circuit Breaker é compulsoriamente desarmado (`state: OPEN`).
+  - **Ação Imediata**: O agente suspende imediatamente qualquer nova tentativa autônoma de alteração de código e escala o caso para decisão humana via `ask_questions` (R-047/R-027), acompanhado do diagnóstico da falha, evitando queima descontrolada de créditos e poluição do histórico de commits.
+
+#### 4. Protocolo de Rollback Atômico de Workspace em Disparo de Circuit Breaker
+Quando o Circuit Breaker desarmar ou a cadeia abortar por erro irrecuperável durante uma etapa mutativa:
+- **Com Git Worktree Ativo (Isolamento R-049 / `git-worktree-governance`)**:
+  - O agente/orquestrador executa o descarte seguro do worktree temporário:
+    ```bash
+    git --no-pager worktree remove --force .worktrees/<task-id>
+    git --no-pager branch -D worktree/<task-id>
+    ```
+- **No Workspace Principal**:
+  - Se a falha ocorreu no workspace principal, o agente DEVE reportar o diff exato e orientar ou executar o rollback cirúrgico dos arquivos parciais afetados:
+    ```bash
+    git --no-pager checkout -- <arquivos-alterados-na-etapa>
+    ```
+  - Nenhuma alteração incompleta, parcial ou quebrada deve permanecer no workspace sem aprovação expressa do usuário.
+- **Registro do Incidente**:
+  - O evento de desarme é registrado conforme o schema canônico `docs/schemas/workflow-incident.schema.json` para auditoria e retroalimentação da memória operacional.
+
+---
+
+### 2.5) Governança de Context Engineering & Offloading de Artefatos em Handoffs (2026)
+
+O aumento da complexidade de workflows multi-agente exige a transição formal de "Prompt Engineering" para **Context Engineering** (*Write, Select, Compress, Isolate*), garantindo eficiência de custos, preservação de KV-cache e prevenção de *Context Poisoning*.
+
+#### 1. Os 4 Pilares de Context Engineering em Handoffs
+- **Write**: Definição rigorosa e declarativa do contrato e dos boundaries de cada tarefa no payload de handoff, sem ambiguidades contextuais.
+- **Select**: O agente receptor busca e carrega informações sob demanda (*just-in-time*) via `ctx_search` (FTS5/BM25) ou leitura cirúrgica, em vez de o emissor despejar todo o conhecimento histórico no payload.
+- **Compress**: Resumo executivo estruturado (máx. 5 linhas) no campo `contexto`, eliminando transcrições de turnos de chat e saídas intermediárias de ferramentas.
+- **Isolate**: Subagentes executores operam com isolamento de contexto (recebem apenas o payload estrito da sua etapa, sem carregar o ruído de conversas anteriores).
+
+#### 2. Regra de Ouro: Limiar de Offloading de Artefatos (2 KB / 50 Linhas)
+- **Proibição de Bloat**: Todo artefato técnico que ultrapassar **2 KB** (ou aproximadamente **50 linhas** de código, JSON, YAML, AST de grafo, especificações OpenAPI ou logs de erro) **NÃO PODE ser embutido como texto bruto** no campo `evidencias` ou `contexto` do payload de handoff.
+- **Padrão Pointer / Artifact Reference**:
+  - O agente emissor deve persistir o artefato no workspace ou indexar no `context-mode` (`ctx_index`), preenchendo o payload de handoff exclusivamente com o ponteiro tipado:
+    ```yaml
+    evidencias:
+      - tipo: "pointer"
+        artifact_ref: "docs/architecture/technical-blueprint.md" # ou "ctx:code-knowledge-graph:ast-dump"
+        hash: "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        mime_type: "text/markdown"
+        tamanho_bytes: 8420
+        resumo_executivo: "Technical Blueprint com 5 endpoints REST, contratos OpenAPI v3 e modelo de entidades para o domínio de pagamentos."
+    ```
+- **Consumo pelo Receptor**: O agente receptor inspeciona o `resumo_executivo` e, se e somente se necessitar dos detalhes brutos do artefato, realiza a consulta cirúrgica do `artifact_ref` via `read_file` pontual ou `ctx_search(source: ...)` com escopo delimitado.
+
 ---
 
 ## 3) Fluxos de Delegação Comuns

@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "informix-query-tuner",
+  "name": "Informix Query Tuner",
+  "version": "1.0.0",
+  "description": "Especialista analítico read-only: analisa planos de execução do IBM Informix via SET EXPLAIN ON/FILE TO, diagnostica varreduras sequenciais em sqexplain.out, calibra níveis de isolamento (DIRTY READ, COMMITTED READ) e projeta diretivas de otimização ({+INDEX}).",
+  "domain": "Análise de SET EXPLAIN (sqexplain.out), Níveis de Isolamento e Otimização de Consultas em Informix",
+  "role": "specialist",
+  "capabilities": [
+    "tuning informix",
+    "set explain informix",
+    "sqexplain.out",
+    "otimizar query informix",
+    "dirty read informix",
+    "isolation informix",
+    "diretiva informix",
+    "update statistics"
+  ],
+  "skills": [
+    "agent-contracts",
+    "handoff-governance"
+  ],
+  "tools": [
+    "read_file",
+    "file_search",
+    "grep_search",
+    "list_dir",
+    "ask_questions",
+    "run_subagent",
+    "context-mode/ctx_search",
+    "context-mode/ctx_batch_execute"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only"
+    ],
+    "least_privilege_level": "standard",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Claude Sonnet 5",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/backend/database/database-catalog.yaml",
+    "priority": 10,
+    "estimated_time_minutes": 15
+  }
+}

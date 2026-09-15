@@ -215,6 +215,23 @@ Controles de comportamento autônomo e interação humana:
 3. Proibição de Aninhamento Não Autorizado: O agent-router opera sob Delegação Plana; subagentes não podem instanciar enxames autônomos fora do grafo declarado.
 ```
 
+### 4.9) Segurança de Ferramentas MCP e Sandboxing (NSA CSI MCP Security 2026 / CSA v1)
+
+```
+Diretrizes normativas para segurança no uso e exposição do Model Context Protocol (MCP):
+
+1. Zoneamento e Least-Privilege Tool Scoping:
+   - Zona 1 (Read-Only / Consulta): read_file, get_errors, ast_query, buscas. Obrigatório para perfis Advisory/Reviewer/Auditor.
+   - Zona 2 (Mutating / Alteração de Código): replace_string_in_file, insert_edit_into_file, create_file. Estritamente reservado para Implementers e Fixers com autorização em workflow canônico.
+   - Zona 3 (Execution / Lifecycle): run_in_terminal estritamente vinculado à governança de terminal (R-049 / terminal-governance). Proibido em agentes estritamente analíticos.
+2. Defesa contra Tool Squatting e Rug Pulls:
+   - Proibida a sobreposição dinâmica de ferramentas ou substituição de metadados em runtime. Ferramentas válidas são fixadas deterministicamente nos manifestos de configuração dos clientes MCP.
+3. Parameter Tampering e Validação de Schema (ASI02):
+   - Todo parâmetro repassado para chamadas de ferramentas MCP deve obedecer ao schema JSON formal do protocolo. É terminantemente vedada a concatenação cega de strings com comandos de shell ou queries SQL não parametrizadas (defesa contra CVE-2025-6514).
+4. Proibição de Token Passthrough não Seguro:
+   - Tokens de autorização e credenciais de upstream NUNCA devem ser repassados de forma cega entre fronteiras de confiança inter-agente. Cada servidor MCP deve validar sua própria autorização contextual.
+```
+
 ---
 
 ## 5) Checklist por Fase de Execução

@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "pr-gatekeeper",
+  "name": "Pr Gatekeeper",
+  "version": "1.2.0",
+  "description": "Prepara submissao de PR pos-aprovacao do quality gate — sintetiza diff, aplica guardrail de segredos e template semantico SSOT (/commit), gera titulo e descricao de PR com matriz de risco e atualiza CHANGELOG.md. Nunca executa git add/commit/push (R-031).",
+  "domain": "Preparacao de entrega (PR/commit/changelog)",
+  "role": "gatekeeper",
+  "capabilities": [
+    "pull request",
+    "commit semantico",
+    "changelog",
+    "matriz de risco",
+    "git hygiene"
+  ],
+  "skills": [
+    "git-governance",
+    "agent-contracts",
+    "terminal-governance"
+  ],
+  "tools": [
+    "read_file",
+    "insert_edit_into_file",
+    "grep_search",
+    "file_search",
+    "list_dir",
+    "run_in_terminal",
+    "ask_questions",
+    "run_subagent",
+    "context-mode/ctx_search"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only",
+      "mutating",
+      "execution"
+    ],
+    "least_privilege_level": "elevated",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Gemini 3.8 Flash",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/catalog.yaml",
+    "priority": 4.5,
+    "estimated_time_minutes": 15
+  }
+}

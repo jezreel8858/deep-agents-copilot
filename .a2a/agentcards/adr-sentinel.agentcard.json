@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "adr-sentinel",
+  "name": "Adr Sentinel",
+  "version": "1.0.0",
+  "description": "Audita propostas tecnicas, blueprints e diffs contra o repositorio de Architectural Decision Records (ADRs) e politicas corporativas do projeto, identificando violacoes, decisoes obsoletas e ausencia de ADR para mudancas estruturais relevantes. Estritamente read-only — nunca implementa codigo.",
+  "domain": "Auditoria de conformidade arquitetural contra Architectural Decision Records (ADRs)",
+  "role": "auditor",
+  "capabilities": [
+    "adr",
+    "architectural decision record",
+    "decisao arquitetural",
+    "conformidade arquitetural",
+    "adr obsoleto",
+    "auditoria de adr"
+  ],
+  "skills": [
+    "context-mode",
+    "agent-contracts",
+    "handoff-governance",
+    "documentation-writing-patterns"
+  ],
+  "tools": [
+    "read_file",
+    "grep_search",
+    "file_search",
+    "list_dir",
+    "ask_questions",
+    "run_subagent",
+    "context-mode/ctx_search"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only"
+    ],
+    "least_privilege_level": "strict",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Claude Sonnet 5",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/catalog.yaml",
+    "priority": 4.7,
+    "estimated_time_minutes": 20
+  }
+}

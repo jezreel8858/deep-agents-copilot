@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "test-strategy",
+  "name": "Test Strategy",
+  "version": "1.0.0",
+  "description": "Planejar cobertura, cenarios e criterios de aceitacao por risco",
+  "domain": "Estrategia de testes",
+  "role": "tester",
+  "capabilities": [
+    "testes",
+    "cobertura",
+    "criterios",
+    "estrategia"
+  ],
+  "skills": [
+    "context-mode",
+    "agent-contracts",
+    "agent-evals-lab",
+    "confidence-fallback-policy",
+    "test-coverage-governance",
+    "test-implementation-backend",
+    "test-implementation-frontend"
+  ],
+  "tools": [
+    "read_file",
+    "grep_search",
+    "file_search",
+    "list_dir",
+    "get_errors",
+    "run_subagent",
+    "context-mode/ctx_execute",
+    "context-mode/ctx_index",
+    "context-mode/ctx_search",
+    "context-mode/ctx_batch_execute",
+    "context-mode/ctx_execute_file"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only"
+    ],
+    "least_privilege_level": "standard",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Gemini 3.8 Flash",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/catalog.yaml",
+    "priority": 3,
+    "estimated_time_minutes": 25
+  }
+}

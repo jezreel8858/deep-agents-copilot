@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "agent-router",
+  "name": "Agent Router",
+  "version": "2.0.0",
+  "description": "Entry point obrigatorio para classificar intencao e delegar para agents downstream",
+  "domain": "Orquestracao agent-first",
+  "role": "router",
+  "capabilities": [
+    "router",
+    "triagem",
+    "entrypoint",
+    "roteamento"
+  ],
+  "skills": [
+    "context-mode",
+    "agent-contracts",
+    "handoff-governance",
+    "confidence-fallback-policy",
+    "agent-observability-otel"
+  ],
+  "tools": [
+    "read_file",
+    "file_search",
+    "grep_search",
+    "ask_questions",
+    "run_subagent",
+    "context-mode/ctx_search"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only"
+    ],
+    "least_privilege_level": "standard",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Claude Sonnet 5",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/catalog.yaml",
+    "priority": 1,
+    "estimated_time_minutes": 15
+  }
+}

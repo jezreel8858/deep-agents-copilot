@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "repo-hygiene-auditor",
+  "name": "Repo Hygiene Auditor",
+  "version": "1.0.0",
+  "description": "Audita a higiene estrutural, documentacao essencial, seguranca de versionamento e praticas de engenharia em qualquer repositorio de software (agnostico de stack), identificando ausencia de README/CONTRIBUTING/LICENSE, vazamentos de .env, gaps de CI/CD e linters. Estritamente read-only — nunca implementa ou altera arquivos.",
+  "domain": "Auditoria de higiene estrutural, documentação essencial e padrões de repositório",
+  "role": "auditor",
+  "capabilities": [
+    "higiene de repositorio",
+    "boas praticas",
+    "documentacao essencial",
+    "readme",
+    "contributing",
+    "license",
+    "gitignore",
+    "ci-cd",
+    "padroes de engenharia"
+  ],
+  "skills": [
+    "agent-contracts",
+    "handoff-governance",
+    "repository-hygiene-patterns"
+  ],
+  "tools": [
+    "read_file",
+    "grep_search",
+    "file_search",
+    "list_dir",
+    "ask_questions",
+    "run_subagent"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only"
+    ],
+    "least_privilege_level": "strict",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Gemini 3.8 Flash",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/catalog.yaml",
+    "priority": 4.8,
+    "estimated_time_minutes": 15
+  }
+}

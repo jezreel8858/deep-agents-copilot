@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "tech-solution-architect",
+  "name": "Tech Solution Architect",
+  "version": "2.1.0",
+  "description": "Arquiteto de solução técnica: viabilidade, blueprint técnico, contratos de API (OpenAPI/AsyncAPI/gRPC), modelo de dados e divisão macro do trabalho em seções isoladas ([BACKEND_TASKS], [FRONTEND_TASKS]) com metodologia B1/B2/B3.",
+  "domain": "Arquitetura técnica, blueprint, contratos de integração e divisão por stack",
+  "role": "specialist",
+  "capabilities": [
+    "blueprint técnico",
+    "tech solution architect",
+    "desenho de arquitetura",
+    "contrato de api",
+    "divisão de tarefas por stack",
+    "analise tecnica",
+    "impacto",
+    "fluxo ponta a ponta",
+    "ecossistema",
+    "integracao cross-sistema",
+    "contrato",
+    "breaking change",
+    "openapi",
+    "asyncapi",
+    "grpc",
+    "dependencias cross-sistema",
+    "blast radius",
+    "fluxo de dados",
+    "acoplamento"
+  ],
+  "skills": [
+    "context-mode",
+    "agent-contracts",
+    "handoff-governance",
+    "agent-evals-lab",
+    "agent-observability-otel",
+    "integration-contract-analysis",
+    "task-decomposition-patterns",
+    "mermaid-diagrams",
+    "code-tracing"
+  ],
+  "tools": [
+    "read_file",
+    "grep_search",
+    "file_search",
+    "list_dir",
+    "ask_questions",
+    "run_subagent",
+    "context-mode/ctx_execute",
+    "context-mode/ctx_execute_file",
+    "context-mode/ctx_index",
+    "context-mode/ctx_search",
+    "context-mode/ctx_fetch_and_index",
+    "context-mode/ctx_batch_execute",
+    "context-mode/ctx_stats",
+    "context-mode/ctx_doctor",
+    "context-mode/ctx_upgrade",
+    "context-mode/ctx_purge",
+    "context-mode/ctx_insight"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only"
+    ],
+    "least_privilege_level": "standard",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Claude Sonnet 5",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/catalog.yaml",
+    "priority": 8,
+    "estimated_time_minutes": 45
+  }
+}

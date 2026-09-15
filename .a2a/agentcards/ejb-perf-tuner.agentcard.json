@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "ejb-perf-tuner",
+  "name": "Ejb Perf Tuner",
+  "version": "1.0.0",
+  "description": "Especialista em performance: dimensiona pools de EJBs, calibra @TransactionTimeout, elimina chamadas remotas redundantes (RMI/IIOP) e otimiza DAOs legados.",
+  "domain": "Otimização de pooling de Stateless Beans, timeouts transacionais JTA, isolamento de transação e migração de Stateful para Stateless",
+  "role": "specialist",
+  "capabilities": [
+    "performance ejb",
+    "pool stateless",
+    "tuning jta",
+    "transaction timeout",
+    "overhead rmi iiop",
+    "otimizacao dao legado"
+  ],
+  "skills": [
+    "agent-contracts",
+    "handoff-governance"
+  ],
+  "tools": [
+    "read_file",
+    "file_search",
+    "grep_search",
+    "list_dir",
+    "ask_questions",
+    "run_subagent",
+    "insert_edit_into_file",
+    "get_errors",
+    "run_in_terminal",
+    "context-mode/ctx_search",
+    "context-mode/ctx_batch_execute"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only",
+      "mutating",
+      "execution"
+    ],
+    "least_privilege_level": "elevated",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Gemini 3.8 Flash",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/backend/ejb/ejb-catalog.yaml",
+    "priority": 10,
+    "estimated_time_minutes": 15
+  }
+}

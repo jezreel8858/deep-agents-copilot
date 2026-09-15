@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "python-arch-advisor",
+  "name": "Python Arch Advisor",
+  "version": "1.0.0",
+  "description": "Especialista analítico read-only: arquitetura Python 3.11+, Clean Architecture, design de APIs REST/async, tipagem PEP 484/mypy strict, auditoria de dependências e estratégias de modernização.",
+  "domain": "Arquitetura Python Backend, Clean Architecture, FastAPI, Flask, Django, Pydantic, tipagem estrita e planos de modernização",
+  "role": "advisor",
+  "capabilities": [
+    "arquitetura python",
+    "auditoria python",
+    "fastapi",
+    "django",
+    "flask",
+    "clean architecture python",
+    "mypy strict",
+    "design api python"
+  ],
+  "skills": [
+    "agent-contracts",
+    "handoff-governance"
+  ],
+  "tools": [
+    "read_file",
+    "file_search",
+    "grep_search",
+    "list_dir",
+    "ask_questions",
+    "run_subagent",
+    "context-mode/ctx_search"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only"
+    ],
+    "least_privilege_level": "strict",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Claude Sonnet 5",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/backend/python/python-catalog.yaml",
+    "priority": 10,
+    "estimated_time_minutes": 15
+  }
+}

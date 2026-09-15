@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "bug-triage",
+  "name": "Bug Triage",
+  "version": "1.0.0",
+  "description": "Classificar bugs, reproduzir erro, analisar blast radius e propor plano minimo de correcao",
+  "domain": "Triagem de bugs e regressao",
+  "role": "fixer",
+  "capabilities": [
+    "bug",
+    "regressao",
+    "erro",
+    "severidade",
+    "blast-radius"
+  ],
+  "skills": [
+    "context-mode",
+    "terminal-governance",
+    "code-tracing",
+    "structured-intake-patterns",
+    "refactoring-planning-patterns",
+    "business-rules-governance",
+    "efficient-batch-code-modification",
+    "agent-contracts",
+    "confidence-fallback-policy",
+    "agent-evals-lab"
+  ],
+  "tools": [
+    "read_file",
+    "grep_search",
+    "file_search",
+    "list_dir",
+    "get_errors",
+    "run_in_terminal",
+    "ask_questions",
+    "run_subagent",
+    "context-mode/ctx_execute",
+    "context-mode/ctx_execute_file",
+    "context-mode/ctx_index",
+    "context-mode/ctx_search",
+    "context-mode/ctx_batch_execute"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only",
+      "mutating",
+      "execution"
+    ],
+    "least_privilege_level": "elevated",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Gemini 3.8 Flash",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/catalog.yaml",
+    "priority": 2,
+    "estimated_time_minutes": 25
+  }
+}

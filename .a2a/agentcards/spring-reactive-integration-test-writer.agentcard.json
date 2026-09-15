@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "spring-reactive-integration-test-writer",
+  "name": "Spring Reactive Integration Test Writer",
+  "version": "1.0.0",
+  "description": "Escreve testes de integração ponta a ponta com WebTestClient, valida contratos de endpoints reativos, streaming de dados e repositórios R2DBC reais.",
+  "domain": "Testes integrados não-bloqueantes com WebTestClient, Testcontainers R2DBC e streaming SSE",
+  "role": "tester",
+  "capabilities": [
+    "webtestclient",
+    "teste integracao webflux",
+    "testcontainers r2dbc",
+    "teste sse",
+    "teste streaming reativo"
+  ],
+  "skills": [
+    "agent-contracts",
+    "handoff-governance"
+  ],
+  "tools": [
+    "read_file",
+    "file_search",
+    "grep_search",
+    "list_dir",
+    "ask_questions",
+    "run_subagent",
+    "create_file",
+    "insert_edit_into_file",
+    "get_errors",
+    "run_in_terminal",
+    "context-mode/ctx_search",
+    "context-mode/ctx_batch_execute"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only",
+      "mutating",
+      "execution"
+    ],
+    "least_privilege_level": "elevated",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Gemini 3.8 Flash",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/backend/spring-reactive/spring-reactive-catalog.yaml",
+    "priority": 10,
+    "estimated_time_minutes": 15
+  }
+}
