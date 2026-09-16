@@ -653,6 +653,7 @@ agents:
       - "file_search"
       - "list_dir"
       - "run_in_terminal"
+      - "context-mode/ctx_execute"
       - "ask_questions"
       - "run_subagent"
       - "context-mode/ctx_search"

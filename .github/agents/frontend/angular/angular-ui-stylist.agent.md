@@ -6,7 +6,7 @@ description: >-
   e acessibilidade WCAG 2.2 AA para aplicações Angular — focado na experiência de usuário,
   tokens de design e fidelidade de interface.
 model: "Gemini 3.8 Flash"
-tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'insert_edit_into_file', 'get_errors', 'run_in_terminal', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
+tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'insert_edit_into_file', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
@@ -14,6 +14,7 @@ source_docs:
   - .github/skills/design-system-component-contracts/SKILL.md
   - .github/skills/frontend-componentization-patterns/SKILL.md
   - .github/skills/frontend-visual-feedback-loop/SKILL.md
+  - .github/skills/context-mode/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
 ---
 

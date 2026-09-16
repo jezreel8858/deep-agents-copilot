@@ -151,7 +151,16 @@ Exemplos EN:
 - [ ] Nomes descritivos e autoexplicativos
 - [ ] Sem código duplicado (helpers/builders para dados de teste comuns)
 
+## 6.1) Execução de Testes com Zero Ruído (R-008 / R-049)
+
+Ao validar suites de teste, os agentes de IA devem proteger ativamente a janela de contexto contra poluição de logs (INFO, WARNING, download de dependências e banners de framework):
+
+1. **Prioridade 1 — Sandbox `ctx_execute` (Think-in-Code)**: Execute o runner de teste (`mvn test`, `pytest`, `vitest`) dentro do sandbox isolado. Capture o stdout/stderr em código, filtre linhas de compilação/INFO e imprima apenas o resumo de testes ou stack traces estritos de falha.
+2. **Prioridade 2 — Terminal Silencioso com Filtro**: Se executar diretamente no terminal via `run_in_terminal`, é **OBRIGATÓRIO** usar a flag silenciosa da stack (`-q`, `--quiet`, `-B`) e canalizar a saída através de filtro (`grep -E "ERROR|FAILURE|BUILD|Tests run"` ou PowerShell `Select-String`) limitado a 40 linhas (`head -40`).
+3. **Proibição Absoluta**: É terminantemente proibido executar comandos de teste "bare" (`mvn test`, `pytest`) sem flags de supressão ou sem filtros.
+
 ## 7) Anti-padrões Universais
+- ❌ Executar comandos de teste sem filtro de ruído ou flags silenciosas no terminal
 
 - ❌ Testes que dependem de ordem de execução
 - ❌ Shared mutable state entre testes (pode causar flakiness)

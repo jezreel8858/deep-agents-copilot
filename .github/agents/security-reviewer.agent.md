@@ -7,7 +7,7 @@ description: >-
   analisa e reporta; complementa code-review (dimensão genérica) com
   profundidade de security specialist. Read-only.
 model: "Gemini 3.8 Flash"
-tools: ['read_file', 'list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_search']
+tools: ['read_file', 'list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'context-mode/ctx_execute', 'run_subagent', 'context-mode/ctx_search']
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md

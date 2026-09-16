@@ -99,13 +99,15 @@ def salvar(dados: dict) -> None:
     logger.info("Salvamento concluído com sucesso")
 ```
 
-### Testes
+### Testes & Execução com Zero Ruído (R-008 / R-049)
 
 - Base: **pytest** com `pytest-mock` e `pytest-cov`.
 - Fixtures em `conftest.py` — reutilizáveis por escopo de sessão/módulo/função.
 - Padrão de nome: `test_deve_[acao]_quando_[condicao]`.
 - Mock de dependências com `MagicMock(spec=Classe)` — nunca mock parcial sem spec.
 - Cobertura mínima: 80% de linhas, 70% de branches.
+- **Higiene de Execução (Zero-Noise)**: Priorizar execução via `ctx_execute` (Think in Code). Se usar terminal, aplicar compulsoriamente `-q --tb=short` e filtro pipe:
+  `pytest -q --tb=short tests/unit/test_arquivo.py 2>&1 | grep -E "FAILED|ERROR|passed in" | head -40`
 
 Para padrões detalhados de testes, consulte `test-implementation-python`.
 

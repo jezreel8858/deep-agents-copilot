@@ -5,12 +5,13 @@ description: >-
   Especialista em performance e tuning para Java Legado EJB — dimensiona pool de Stateless e MDB,
   elimina transações JTA longas, afina DataSources JNDI e otimiza JVM/Garbage Collection.
 model: "Gemini 3.8 Flash"
-tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'insert_edit_into_file', 'get_errors', 'run_in_terminal', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
+tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'insert_edit_into_file', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
   - .github/skills/performance-engineering-patterns/SKILL.md
   - .github/skills/java-jdk-backend-governance/SKILL.md
+  - .github/skills/context-mode/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
 ---
 

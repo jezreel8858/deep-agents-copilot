@@ -6,13 +6,14 @@ description: >-
   standalone, gerência de estado reativo com NgRx Signal Store, services e lógica de domínio
   seguindo rigorosamente o workflow testing-first (TDD).
 model: "Gemini 3.8 Flash"
-tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'create_file', 'insert_edit_into_file', 'get_errors', 'run_in_terminal', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index']
+tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'create_file', 'insert_edit_into_file', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index']
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
   - .github/skills/angular-implementation-patterns/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
   - .github/skills/frontend-visual-feedback-loop/SKILL.md
+  - .github/skills/context-mode/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
 ---
 
@@ -38,6 +39,7 @@ Você é o desenvolvedor especialista em construir novas funcionalidades, compon
 - ✅ **Se a feature introduzir rota(s) nova(s)**, localizar e atualizar o componente de shell de navegação do projeto (sidenav/menu/tab-bar) antes de reportar conclusão — rota sem navegação é entrega incompleta (Smell 2.18).
 - ✅ Executar os testes localmente via terminal (`npm test`, `npx vitest`) e validar ausência de erros com `get_errors`.
 - ✅ Aplicar compulsoriamente a skill `efficient-batch-code-modification` (R-046): dry-run prévio em memória, hierarquia de ferramentas (1 a 4 arquivos via editor em single-turn batching; >= 5 arquivos ou padrão repetitivo via script em sandbox `ctx_execute`), proibição de releitura imediata com `read_file` pós-edição, diffs cirúrgicos mínimos e `get_errors` agregado em chamada única ao final com array completo `filePaths`.
+- ✅ Execução de testes com ZERO RUÍDO DE CONTEXTO: priorizar ctx_execute (Think in Code) para capturar apenas resumo/erros; se usar terminal, é obrigatório modo silencioso (-q/--silent) e filtro via pipe (grep/Select-String). Jamais rodar comando de teste bare.
 
 ## Decision Tree
 ```text

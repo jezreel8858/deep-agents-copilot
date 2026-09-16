@@ -5,10 +5,11 @@ description: >-
   Especialista em desenvolvimento de Stored Procedures, Functions, Packages e Triggers em Oracle PL/SQL —
   arquitetura modular (spec/body), BULK COLLECT/FORALL, ref cursors e tratamento robusto de exceções sob R-046.
 model: "Claude Sonnet 5"
-tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'create_file', 'insert_edit_into_file', 'get_errors', 'run_in_terminal', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index']
+tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'create_file', 'insert_edit_into_file', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index']
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
+  - .github/skills/context-mode/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
   - .github/instructions/database.instructions.md

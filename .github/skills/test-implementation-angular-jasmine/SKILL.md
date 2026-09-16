@@ -249,22 +249,32 @@ await page.locator('.modal', { timeout: 5000 }).waitFor({ state: 'visible' });
 
 ## 5) Comandos Angular / Istanbul
 
+> **Zero-Noise Test Policy (R-008 / R-049)**: Sempre desativar watch e progresso, e filtrar saída via pipe ou executar via `ctx_execute` (Think-in-Code).
+
+### A) Via `ctx_execute` (Think-in-Code — Recomendado)
+
+```javascript
+const { execSync } = require('child_process');
+try {
+  const out = execSync("ng test --include='**/[nome].component.spec.ts' --watch=false --progress=false --no-color", { encoding: 'utf8' });
+  console.log(out.trim());
+} catch (err) {
+  const full = (err.stdout || '') + '\n' + (err.stderr || '');
+  console.log(full.split('\n').filter(l => /(FAILED|Executed|Error:)/i).slice(0, 30).join('\n'));
+}
+```
+
+### B) Via Terminal com Filtro Obrigatório
+
 ```bash
+# Arquivo específico (sem watch, sem progresso, filtrado)
+ng test --include='**/[nome].component.spec.ts' --watch=false --progress=false --no-color 2>&1 | grep -E "FAILED|SUCCESS|Executed" | head -40
+
 # Unit tests com coverage
-ng test --code-coverage --watch=false
+ng test --code-coverage --watch=false --progress=false --no-color 2>&1 | grep -E "FAILED|SUCCESS|Executed|TOTAL" | head -40
 
 # CI mode
-npm run test-ci
-npm run test-coverage
-
-# E2E com Playwright
-npx playwright test
-
-# Arquivo específico
-ng test --include='**/[nome].component.spec.ts'
-
-# Relatório de coverage
-open coverage/<projeto>/index.html
+npm run test-ci 2>&1 | grep -E "FAILED|SUCCESS|Executed" | head -40
 ```
 
 ## 6) Anti-padrões

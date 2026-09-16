@@ -52,14 +52,15 @@ Escopo: código TypeScript/JS, configuração (tsconfig/angular.json), build, te
 - Inclua sempre um fallback genérico em `font-family`.
 - Use `:host` e `::ng-deep` com parcimônia; prefira estilos encapsulados quando possível.
 
-## 6) Testes e cobertura
+## 6) Testes e cobertura & Execução com Zero Ruído (R-008 / R-049)
 
 - Prefira os runners já configurados no projeto (`ng test`, `test-ci`, `test-coverage` e Playwright para E2E); só migre para Vitest após validação explícita.
 - Nomes de `describe` e `it` em Português (Brasil), no formato: "deve [ação] quando [condição]".
-- Mockar todas as dependências injetadas com `jasmine.createSpyObj`.
+- Mockar todas as dependências injetadas com `jasmine.createSpyObj` ou `vi.fn()` (Vitest).
 - Quando necessário, use `as unknown as Tipo` para tipar mocks complexos.
 - Evite testar membros privados; se estritamente necessário, acesse via `(component as any).privateMember` com comentário justificando.
 - Todo novo código de teste deve buscar 100% de cobertura do arquivo alvo (linhas, ramos e funções).
+- **Higiene de Execução (Zero-Noise)**: É terminantemente proibido rodar testes com watch ativo ou flags verbosas no terminal. Agentes DEVEM priorizar `ctx_execute` (Think in Code) ou terminal com flags silenciosas (`--watch=false --progress=false` para Angular CLI / Karma; `--silent --reporter=basic` para Vitest) combinadas com filtro via pipe (`grep -E "FAIL|PASS|Tests"`).
 
 ## 7) Documentação de componentes
 

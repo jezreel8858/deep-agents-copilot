@@ -5,11 +5,12 @@ description: >-
   Especialista em testes de integração para Java Legado Struts — valida ciclo completo de requisição
   com container servlet emulado (Tomcat/Jetty embutido), cadeia de interceptors e Testcontainers para banco de dados real.
 model: "Gemini 3.8 Flash"
-tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'create_file', 'insert_edit_into_file', 'get_errors', 'run_in_terminal', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
+tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'create_file', 'insert_edit_into_file', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
   - .github/skills/test-implementation-backend/SKILL.md
+  - .github/skills/context-mode/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
@@ -31,6 +32,7 @@ Você é o especialista em testes de integração para aplicações Java Legadas
 - ✅ Validar consistência do `struts-config.xml` (mapeamentos, plug-ins, data-sources e global-forwards).
 - ✅ Validar execução com sucesso via terminal e `get_errors`.
 - ✅ Aplicar compulsoriamente a skill `efficient-batch-code-modification` (R-046): dry-run prévio em memória, emissão de tool calls de escrita em lote agrupadas no mesmo turno (single-turn batching) e diffs cirúrgicos mínimos.
+- ✅ Execução de testes com ZERO RUÍDO DE CONTEXTO: priorizar ctx_execute (Think in Code) para capturar apenas resumo/erros; se usar terminal, é obrigatório modo silencioso (-q/--silent) e filtro via pipe (grep/Select-String). Jamais rodar comando de teste bare.
 
 ## Formato de Saída
 
