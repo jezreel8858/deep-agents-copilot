@@ -576,23 +576,27 @@ workflow_state:
 
 ### 3.7 WORKFLOW 7: `WORKFLOW-FRAMEWORK-MIGRATION` (Migração de Framework, Plataforma ou Major Version)
 
-- **Objetivo**: Conduzir elevações estruturais de versão maior de framework ou plataforma (ex.: Angular standalone/signals, Spring Boot 2→3, Java 17→21/25, EJB→Spring) de forma previsível e particionada em fases entregáveis, combinando codemods automatizados, testes de paridade funcional e checkpoints humanos obrigatórios.
-- **Gatilhos**: `"migrar framework"`, `"migração angular"`, `"migrar spring boot"`, `"upgrade major"`, `"modernizar stack"`, `"migrar para standalone"`, `"migrar para signals"`, `"migrar para virtual threads"`.
+- **Objetivo**: Conduzir elevações estruturais de versão maior de framework ou plataforma (ex.: Angular standalone/signals, Spring Boot 2→3, Java 17→21/25, EJB→Spring, Struts→Spring Boot) de forma previsível e particionada em fases entregáveis, combinando codemods automatizados, testes de paridade funcional e checkpoints humanos obrigatórios.
+- **Gatilhos**: `"migrar framework"`, `"migração angular"`, `"migrar spring boot"`, `"upgrade major"`, `"modernizar stack"`, `"migrar para standalone"`, `"migrar para signals"`, `"migrar para virtual threads"`, `"migrar ejb"`, `"migrar struts"`, `"modernizar legado"`.
 - **Política R-041**: **Bypass** caso a meta e a stack estejam claras; se o pedido for ambíguo ("modernize nosso sistema"), aciona `@prompt-structuring`.
+- **⚠️ Invariante de Colaboração Dual-Stack (não-negociável)**: Sempre que a migração for **cross-stack** (stack de origem ≠ stack de destino — ex.: `ejb-router` → `spring-boot-router`, `struts-router` → `spring-boot-router`, `angular-router` versões AngularJS → Angular moderno), **AMBOS os domain routers participam ativamente de TODAS as etapas do pipeline**, não apenas da Etapa 1. O router da stack de origem nunca é dispensado após o pre-flight — ele atua como **oráculo de comportamento legado** (via `@business-rules-extractor`) durante o codemod (Etapa 3) e a validação de paridade (Etapa 4), fazendo o sign-off final na Etapa 5. É **proibido** ao `@tech-solution-architect` produzir um blueprint ou bloco de "Pipeline de Execução do Workflow" citando apenas o router de destino — isso é o anti-padrão que motivou este invariante (ver § 5, invariante 8).
+- **⚠️ Invariante de Exclusividade do Motor de Grafo (R-045, não-negociável)**: `@code-knowledge-graph` é **co-agente obrigatório** — não apenas sub-rotina opcional — nas Etapas 1, 3, 4 e 5. Migração de framework é refatoração estrutural em larga escala: blast radius, dependências, ciclos e dead-code NUNCA são mapeados manualmente por `@tech-solution-architect` ou pelos domain routers. Omitir `@code-knowledge-graph` de qualquer etapa além da 1 é a mesma classe de violação tratada em `WORKFLOW-REFACTORING` (Invariante 3, § 5) e em `WORKFLOW-TECHNICAL-ANALYSIS`.
 
 ```mermaid
 flowchart TD
-    Start(["🚀 Solicitação de Migração de Framework / Major Version"]) --> PreFlight["<b>1. Pre-Flight Compatibility Assessment</b><br/>Agente: @tech-solution-architect + @code-knowledge-graph<br/>Ação: Inventário de compatibilidade de libs, flags e APIs obsoletas"]
+    Start(["🚀 Solicitação de Migração de Framework / Major Version"]) --> IdentifyStacks["<b>0. Identificação de Stacks Origem/Destino</b><br/>Agente: @tech-solution-architect<br/>Ação: Determina se é cross-stack (ex.: legado→moderno) ou upgrade in-stack (mesma stack, versão maior)"]
 
-    PreFlight --> PlanPhasing["<b>2. Migration Phasing & Blueprint</b><br/>Agente: @tech-solution-architect<br/>Ação: Decomposição em fases autônomas entregáveis"]
+    IdentifyStacks --> PreFlight["<b>1. Pre-Flight Compatibility Assessment</b><br/>Agentes: @tech-solution-architect + @code-knowledge-graph (obrigatório, R-045)<br/>Co-agente: domain-router-ORIGEM (ex.: @ejb-router/@struts-router) + @business-rules-extractor<br/>Ação: Blast radius/dependências/ciclos do legado (grafo) + inventário de compatibilidade + extração de regras de negócio"]
+
+    PreFlight --> PlanPhasing["<b>2. Migration Phasing & Blueprint</b><br/>Agente: @tech-solution-architect<br/>Co-agentes: domain-router-ORIGEM + domain-router-DESTINO<br/>Ação: Decomposição em fases autônomas entregáveis (ordem segura definida pelo mapa de dependências da Etapa 1), com papéis de origem/destino explícitos por fase"]
 
     PlanPhasing --> PhaseGate{"<b>2b. Checkpoint Humano de Fases</b><br/>Aprovação obrigatória via ask_questions"}
     PhaseGate -- "Revisar" --> PlanPhasing
-    PhaseGate -- "Aprovado" --> BatchCodemod["<b>3. Codemod & Transformação em Lote</b><br/>Agente: specialist-developer<br/>Ação: Execução de codemods oficiais (ng update / OpenRewrite) no sandbox"]
+    PhaseGate -- "Aprovado" --> BatchCodemod["<b>3. Codemod & Transformação em Lote</b><br/>Agente: domain-router-DESTINO (specialist-feature-developer)<br/>Co-agentes: domain-router-ORIGEM (oráculo consultivo, permanece ativo) + @code-knowledge-graph (obrigatório, R-045 — blast radius por lote)<br/>Ação: Execução de codemods oficiais (ng update / OpenRewrite) no sandbox"]
 
-    BatchCodemod --> ParityRefine["<b>4. Refinamento & Paridade Funcional</b><br/>Agente: specialist-developer + specialist-unit-test-writer<br/>Ação: Adoção de convenções modernas da stack e testes de paridade"]
+    BatchCodemod --> ParityRefine["<b>4. Refinamento & Paridade Funcional (Dual-Verification)</b><br/>Agentes: domain-router-DESTINO + specialist-unit-test-writer<br/>Co-agentes: domain-router-ORIGEM + @business-rules-extractor (modo validate) + @code-knowledge-graph (obrigatório, R-045 — find_cycles/dead-code)<br/>Ação: Convenções modernas da stack + Golden Master + cobertura de regras de negócio + zero ciclos/dead-code novos"]
 
-    ParityRefine --> QualityGateMig["<b>5. Baseline & Quality Gate de Migração</b><br/>Agente: runtime-verifier + @code-review<br/>Ação: 100% testes verdes, linter limpo e PR semântico"]
+    ParityRefine --> QualityGateMig["<b>5. Baseline & Quality Gate de Migração</b><br/>Agente: runtime-verifier + @code-review<br/>Sign-off: domain-router-ORIGEM (paridade confirmada) + @code-knowledge-graph (obrigatório, R-045 — verificação final de zero ciclos/dead-code)<br/>Ação: 100% testes verdes, linter limpo e PR semântico"]
 
     QualityGateMig --> CheckMig{"Todas as fases<br/>concluídas?"}
     CheckMig -- "Sim" --> EndMigDone(["✅ Migração de Framework Concluída com Sucesso"])
@@ -600,22 +604,31 @@ flowchart TD
 ```
 
 #### Cadeia Sequencial e Papéis:
-1. **Estado 1 — Pre-Flight Compatibility Assessment (`@tech-solution-architect`)**:
-   - *Ação*: Análise do inventário de compatibilidade: bibliotecas de terceiros, flags de compilação, descontinuações e dependências nativas. Coleta de evidências via `@code-knowledge-graph`.
-2. **Estado 2 — Migration Phasing & Blueprint (`@tech-solution-architect`)**:
-   - *Ação*: Decomposição da migração em fases entregáveis autônomas (*Phased Migration* — ex.: Fase 1: Sintaxe de controle; Fase 2: Standalone; Fase 3: Reatividade).
+1. **Estado 0 — Identificação de Stacks Origem/Destino (`@tech-solution-architect`)**:
+   - *Ação*: Antes de qualquer análise, o arquiteto classifica a migração como **cross-stack** (stack de origem e de destino distintas — legado→moderno) ou **in-stack** (mesma stack, apenas major version). Essa classificação determina `colaboracao_dual_stack.obrigatorio_quando` em `routing-graph.yaml` e é registrada em `workflow_state.stack_origem`/`stack_destino`.
+2. **Estado 1 — Pre-Flight Compatibility Assessment (`@tech-solution-architect` + `@code-knowledge-graph` + `domain-router-ORIGEM`)**:
+   - *Ação*: `@code-knowledge-graph` (co-agente **obrigatório**, R-045 — não sub-rotina opcional) mapeia dependências, blast radius e ciclos do código legado via `run_subagent`, produzindo o inventário estrutural que alimenta o blueprint. Em paralelo, `@tech-solution-architect` analisa bibliotecas de terceiros, flags de compilação e descontinuações.
+   - *Sub-rotina 1a (obrigatória se cross-stack)*: `@tech-solution-architect` invoca via `run_subagent` o domain router da stack **legada/origem** (ex.: `@ejb-router`, `@struts-router`) para inventariar comportamento observável, transações e regras de negócio via `@business-rules-extractor` — sem esse inventário, a Etapa 2 não pode ser aprovada.
+3. **Estado 2 — Migration Phasing & Blueprint (`@tech-solution-architect`)**:
+   - *Ação*: Decomposição da migração em fases entregáveis autônomas (*Phased Migration* — ex.: Fase 1: Sintaxe de controle; Fase 2: Standalone; Fase 3: Reatividade), usando o mapa de dependências/ciclos da Etapa 1 para definir a ordem segura das fases. O blueprint declara explicitamente qual domain router atua como **origem (oráculo)** e qual atua como **destino (executor)** em cada fase.
    - *Checkpoint Humano (Estado 2b)*: Apresentação da estratégia e aprovação obrigatória do plano de fases via `ask_questions`.
-3. **Estado 3 — Codemod & Transformação em Lote (`specialist-developer`)**:
+4. **Estado 3 — Codemod & Transformação em Lote (`domain-router-DESTINO` + `specialist-feature-developer`)**:
    - *Ação*: Execução de scripts de migração oficiais (`ng update`, OpenRewrite recipes) ou transformações de sintaxe via sandbox `context-mode` (R-046).
-4. **Estado 4 — Refinamento e Paridade Funcional (`specialist-developer` + `specialist-unit-test-writer`)**:
+   - *Colaboração Contínua (não apenas Etapa 1)*: O `domain-router-ORIGEM` permanece ativo como co-agente consultivo durante toda a execução do codemod — validando regra a regra que o comportamento legado foi preservado. `@code-knowledge-graph` (obrigatório, R-045) recalcula blast radius antes de cada micro-lote, prevenindo quebra de consumidores fora do escopo da fase corrente.
+5. **Estado 4 — Refinamento e Paridade Funcional / Dual-Verification (`domain-router-DESTINO` + `specialist-unit-test-writer`)**:
    - *Ação*: Ajuste de convenções idiomáticas da nova versão e execução de testes de paridade comprovando comportamento idêntico ao baseline.
-5. **Estado 5 — Baseline & Quality Gate de Migração (`runtime-verifier` + `@code-review`)**:
+   - *Gate de Dual-Verification (ver § 3.7.1)*: exige **(1)** testes de caracterização (Golden Master) 100% verdes, **(2)** confirmação do `domain-router-ORIGEM` + `@business-rules-extractor` (modo validate) de que 100% das regras de negócio extraídas na Etapa 1 foram cobertas, e **(3)** `@code-knowledge-graph` (obrigatório, R-045) confirmando via `find_cycles`/dead-code que o codemod não introduziu ciclos ou código morto novo — nenhum dos três critérios dispensa os demais.
+6. **Estado 5 — Baseline & Quality Gate de Migração (`runtime-verifier` + `@code-review`)**:
    - *Ação*: Verificação de build limpo, execução de 100% da suíte de testes de ponta a ponta e preparação de PR semântico pelo `@pr-gatekeeper`.
+   - *Sign-off Final*: em migrações cross-stack, o `domain-router-ORIGEM` confirma explicitamente no relatório final que nenhuma regra de negócio do legado foi perdida; `@code-knowledge-graph` confirma zero ciclos novos e zero dead-code introduzido — ambos os sign-offs são pré-requisito do veredito de conclusão.
 
 #### Typed State Bag (`workflow_state`):
 ```yaml
 workflow_state:
-  stack_migracao: "angular | spring_boot | java_jdk | ejb_to_spring"
+  stack_migracao: "angular | spring_boot | java_jdk | ejb_to_spring | struts_to_spring"
+  cross_stack: true  # true -> aciona colaboracao_dual_stack obrigatoria (routing-graph.yaml)
+  stack_origem_router: "ejb-router"       # null se in-stack (mesma stack, apenas major version)
+  stack_destino_router: "spring-boot-router"
   versao_origem: "17"
   versao_destino: "20"
   fase_atual: 1
@@ -624,15 +637,24 @@ workflow_state:
   codemods_executados:
     - "control-flow"
     - "standalone-components"
+  regras_negocio_extraidas_origem: "docs/business-rules/regras-legado-<alvo>.md"  # obrigatorio se cross_stack
+  grafo_blast_radius_legado:
+    total_callers_afetados: 0
+    ciclos_detectados_pre_migracao: 0
+    consultado_via: "code-knowledge-graph"  # obrigatorio (R-045), nunca varredura manual
   paridade_funcional_validada: true
+  dual_verification_gate: "golden_master_ok + regras_negocio_100_cobertas + zero_ciclos_dead_code_novos"
+  sign_off_domain_router_origem: "confirmado | pendente"  # obrigatorio se cross_stack
+  sign_off_code_knowledge_graph: "confirmado | pendente"  # obrigatorio (R-045) — zero ciclos/dead-code novos
   checkpoint_aprovacao_humana: "aprovado | pendente"
 ```
 
+
 #### 3.7.1 Sub-Padrão Canônico: Motor Agnóstico de Migração de Tecnologias Legadas (IR-Based & Dual-Verification)
 - **Princípio de Zero Acoplamento:** Workflows e processos de migração operam estritamente sobre contratos neutros e a **Representação Intermediária Semântica (Semantic IR)** definida em `docs/schemas/migration-ir.schema.json`. O núcleo do workflow é 100% agnóstico e desconhece sintaxes ou bibliotecas concretas de frameworks.
-- **Validação Compulsória de Stacks Envolvidas (Fase 0):** O motor de migração valida e exige que ambas as stacks (origem legada e destino moderno) possuam governança formal de domínio registrada em `.github/agents/<camada>/<stack>/` contendo supervisor hierárquico (`*-router`), sub-catálogo (`*-catalog.yaml`) e especialistas canônicos antes de permitir qualquer avanço (REQ-002 / RNF-003).
+- **Validação Compulsória de Stacks Envolvidas (Fase 0):** O motor de migração valida e exige que ambas as stacks (origem legada e destino moderno) possuam governança formal de domínio registrada em `.github/agents/<camada>/<stack>/` contendo supervisor hierárquico (`*-router`), sub-catálogo (`*-catalog.yaml`) e especialistas canônicos antes de permitir qualquer avanço (REQ-002 / RNF-003). **Esta validação não é apenas um gate de existência estático** — uma vez confirmada a governança de ambas as stacks, o motor DEVE manter o domain router de origem como participante ativo (co-agente) em todas as fases subsequentes (1 a 5 de § 3.7), nunca apenas na fase de pré-voo (ver Invariante 8 em § 5 e `colaboracao_dual_stack` em `routing-graph.yaml`).
 - **Bootstrapping Interativo de Novo Projeto com Human-in-the-Loop (Fase 3a):** Caso o destino da migração seja um projeto novo (green-field) ou novo módulo autônomo, o especialista da stack alvo é compulsoriamente instruído a consultar o desenvolvedor via `ask_questions` para escolha de ferramentas de build (ex.: Maven vs Gradle), versão de runtime/LTS e formato de empacotamento antes de gerar o esqueleto base oficial (REQ-007 / RNF-005).
-- **Dual-Verification Gate de Paridade (Fase 4):** A aprovação da migração exige duplo critério determinístico: (1) 100% de sucesso em testes de caracterização automatizados (*Golden Master*) executados contra o baseline legado; e (2) comprovação de cobertura integral da matriz de regras de negócio extraídas via `@business-rules-extractor` (REQ-005 / REQ-006).
+- **Dual-Verification Gate de Paridade (Fase 4):** A aprovação da migração exige duplo critério determinístico: (1) 100% de sucesso em testes de caracterização automatizados (*Golden Master*) executados contra o baseline legado; e (2) comprovação de cobertura integral da matriz de regras de negócio extraídas via `@business-rules-extractor`, com o domain router de **origem** atestando explicitamente que nenhuma regra do inventário da Fase 1 foi perdida (REQ-005 / REQ-006).
 - **Referência Técnica e Contratos:** Especificação de requisitos em [`docs/requirements/REQ-migration-engine.md`](../../docs/requirements/REQ-migration-engine.md) e Technical Blueprint em [`docs/plan/plano-motor-migracao-agnostica.md`](../../docs/plan/plano-motor-migracao-agnostica.md).
 
 ---
@@ -736,6 +758,8 @@ handoff_payload:
 5. **Invariante de Deriva e Reset de Workflow (R-042 / R-052)**: Caso o usuário mude o escopo no meio do workflow (ex.: durante um bugfix, peça uma nova funcionalidade), ou **ao concluir qualquer workflow com sucesso**, o agente ativo encerra seu ciclo e DEVE acionar retorno imediato ao `@agent-router` com `motivo: "deriva_de_intencao"` ou `"conclusao_de_workflow_anterior"`. É expressamente proibido ao último agente ativo reter a sessão para a próxima solicitação (Anti Sticky-Agent).
 6. **Invariante de Separação Declarador/Executor em Circuit Breaker**: Nenhum agente estritamente read-only/advisory (`runtime-verifier`, `@code-review`, `@refactor-planner`, `@agent-auditor`, etc. — mesma classe validada em `test_readonly_advisory_agents_do_not_contain_mutation_tools`) pode executar a mutação de reversão (`git checkout`/`git restore`) de um Circuit Breaker. Esse agente apenas DETECTA e DECLARA o veredito; a execução física é sempre delegada, via `run_subagent`, ao especialista com ferramentas de edição/terminal que originou o diff (`specialist-bug-fixer`/`specialist-test-fixer` em Workflow 1; domain router/specialist por nó do DAG em Workflow 2). Violação desta invariante é tratada com a mesma severidade de uma violação de contrato de agent (ver § 8.1, item 2).
 7. **Invariante de Resolução de Papel Genérico**: Nenhum agente invoca `run_subagent` com um nome `specialist-<papel>` literal — todo despacho tático passa primeiro pela resolução do domain router para o `id` concreto do catálogo (§ 1.3).
+8. **Invariante de Colaboração Dual-Stack em Migração (WORKFLOW-FRAMEWORK-MIGRATION)**: Em toda migração **cross-stack** (stack de origem legada ≠ stack de destino moderna — ex.: `ejb-router`→`spring-boot-router`, `struts-router`→`spring-boot-router`), o `@tech-solution-architect` NUNCA elabora blueprint ou renderiza o bloco `### 🗺️ Pipeline de Execução do Workflow` citando apenas o domain router de destino. Ambos os routers (origem e destino) DEVEM constar explicitamente como agentes participantes em TODAS as etapas do pipeline (1 a 5), com o router de origem atuando como oráculo de comportamento legado até o sign-off final (Estado 5). Omitir o router de origem é tratado como a mesma classe de violação que pular um estado do workflow (ver § 3.7, item "Invariante de Colaboração Dual-Stack").
+9. **Invariante de Exclusividade do Motor de Grafo em Migração (R-045)**: `@code-knowledge-graph` é co-agente OBRIGATÓRIO (nunca sub-rotina meramente permitida) nas Etapas 1, 3, 4 e 5 do `WORKFLOW-FRAMEWORK-MIGRATION`. `@tech-solution-architect` e os domain routers NUNCA mapeiam blast radius, dependências ou ciclos manualmente durante uma migração — toda essa análise estrutural é delegada via `run_subagent` ao `@code-knowledge-graph`, com o mesmo rigor já aplicado em `WORKFLOW-REFACTORING` (Invariante 3). O `sign_off_code_knowledge_graph` (zero ciclos/dead-code novos) é pré-requisito do veredito final na Etapa 5, junto ao sign-off do domain router de origem.
 
 ---
 
@@ -798,6 +822,17 @@ Para que o usuário nunca fique no escuro quanto ao fluxo em andamento, o `@agen
 - [⏳] **Etapa 2: Checkpoint de Aprovação Humana** → `ask_questions` *(Pendente: aprovação explícita do plano)*
 - [⏳] **Etapa 3: Execução Governada em Lote** → `@governance-maintainer` / `@governance-factory` *(Pendente: sincronização em lote R-046)*
 ```
+
+#### WORKFLOW 7: `WORKFLOW-FRAMEWORK-MIGRATION` (5 etapas — Cross-Stack exige Router Origem + Destino + Grafo)
+```markdown
+### 🗺️ Pipeline de Execução: WORKFLOW-FRAMEWORK-MIGRATION (5 etapas)
+- [▶] **Etapa 1: Pre-Flight Compatibility Assessment** → `@tech-solution-architect` + `@code-knowledge-graph` (obrigatório) + `@domain-router-ORIGEM` (ex.: `@ejb-router`) + `@business-rules-extractor` *(Em Andamento: blast radius/ciclos do legado + inventário de compatibilidade + extração de regras)*
+- [⏳] **Etapa 2: Migration Phasing & Blueprint** → `@tech-solution-architect` + `@domain-router-ORIGEM` + `@domain-router-DESTINO` (ex.: `@spring-boot-router`) *(Pendente: fases entregáveis + checkpoint humano)*
+- [⏳] **Etapa 3: Codemod & Transformação em Lote** → `@domain-router-DESTINO` (executor) + `@domain-router-ORIGEM` (oráculo consultivo contínuo) + `@code-knowledge-graph` (obrigatório, blast radius por lote) *(Pendente: codemods no sandbox R-046)*
+- [⏳] **Etapa 4: Refinamento & Paridade Funcional (Dual-Verification)** → `@domain-router-DESTINO` + `@domain-router-ORIGEM` + `@business-rules-extractor` + `@code-knowledge-graph` (obrigatório, find_cycles/dead-code) *(Pendente: Golden Master + 100% regras de negócio cobertas + zero ciclos/dead-code novos)*
+- [⏳] **Etapa 5: Baseline & Quality Gate** → `runtime-verifier` + `@code-review` + sign-off de `@domain-router-ORIGEM` + sign-off de `@code-knowledge-graph` *(Pendente: build limpo, testes verdes e PR)*
+```
+**Nota obrigatória (Invariantes 8 e 9, § 5)**: se a migração for cross-stack, `@domain-router-ORIGEM` NUNCA é omitido do bloco acima após a Etapa 1 — ele permanece listado até a Etapa 5. `@code-knowledge-graph` é co-agente obrigatório (R-045) nas Etapas 1, 3, 4 e 5 — nunca apenas sub-rotina opcional.
 
 ---
 

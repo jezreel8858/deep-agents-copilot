@@ -4,7 +4,7 @@ description: >
   Fonte de verdade para regressão de roteamento — deve ser atualizada
   em toda PR que altere agent-router.agent.md ou routing-graph.yaml (análogo ao R-015).
   Compatível com DeepEval (Apache 2.0) e pytest via estrutura de casos padronizados.
-last_updated: "2026-09-04 (v9 — adicionado canon-030 e regr-023: delegação interna mandatória refactor-planner → code-knowledge-graph para mapeamento de dependências/blast radius R-045)"
+last_updated: "2026-09-15 (v10 — adicionado canon-046 e regr-027: colaboração dual-stack obrigatória (domain-router origem + destino) em WORKFLOW-FRAMEWORK-MIGRATION cross-stack)"
 responsavel: "agent-evals-lab + docs-engineer + test-strategy"
 
 # ─────────────────────────────────────────────
@@ -603,6 +603,25 @@ canonicos:
     critico: true
     threshold: 0.90
 
+  - id: "canon-046"
+    descricao: "Migração cross-stack (EJB legado -> Spring Boot moderno) deve convocar domain routers (origem e destino) E @code-knowledge-graph (obrigatorio, R-045) para blast radius/dependencias/ciclos, nao apenas o router de destino"
+    input:
+      solicitacao: "Migrar o modulo de faturamento de EJB 2.x legado para Spring Boot 3 moderno"
+    expected:
+      agent_route: "tech-solution-architect"
+      workflow: "WORKFLOW-FRAMEWORK-MIGRATION"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.90
+      output_contains:
+        - "Agente Ativo: tech-solution-architect"
+        - "Workflow: WORKFLOW-FRAMEWORK-MIGRATION"
+        - "@ejb-router"
+        - "@spring-boot-router"
+        - "@code-knowledge-graph"
+    critico: true
+    threshold: 0.90
+
 # ─────────────────────────────────────────────
 # SUITE 2 — Casos Ambíguos (threshold ≥ 0.70)
 # Intenção ambígua que exige clarificação ou roteamento defensivo.
@@ -1068,6 +1087,19 @@ regressao:
       etapa_inicial: "triage_and_root_cause"
     nao_deve:
       comportamento: "agent-router delegar para prompt-structuring para reformatar o prompt ou fazer perguntas de clarificação antes da triagem do bug"
+    critico: true
+    threshold: 1.00
+
+  - id: "regr-027"
+    descricao: "REGRESSAO: em WORKFLOW-FRAMEWORK-MIGRATION cross-stack, o Pipeline de Execucao do Workflow NUNCA deve omitir o domain-router de origem legada (ex.: @ejb-router/@struts-router) apos a Etapa 1, NEM omitir @code-knowledge-graph (obrigatorio, R-045) das Etapas 1, 3, 4 e 5"
+    input:
+      solicitacao: "Migrar o servico de calculo de sinistro de EJB para Spring Boot"
+    expected:
+      agent_route: "tech-solution-architect"
+      workflow: "WORKFLOW-FRAMEWORK-MIGRATION"
+      pipeline_deve_conter: ["domain-router-ORIGEM", "domain-router-DESTINO", "code-knowledge-graph"]
+    nao_deve:
+      comportamento: "renderizar o bloco Pipeline de Execucao do Workflow apenas com @spring-boot-router/@spring-boot-feature-developer, sem nenhuma mencao ao @ejb-router OU sem nenhuma mencao a @code-knowledge-graph nas etapas 3 a 5"
     critico: true
     threshold: 1.00
 
