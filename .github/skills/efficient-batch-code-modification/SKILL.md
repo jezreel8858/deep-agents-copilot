@@ -126,15 +126,17 @@ Antes de iniciar a gravação de alterações:
 - [ ] O `oldString` contém apenas o contexto estrito para ser unívoco (2-3 linhas)?
 - [ ] Evitei releituras desnecessárias de arquivos que eu mesmo acabei de editar?
 - [ ] O `get_errors` final foi consolidado em uma única chamada com o array completo `filePaths`?
-- [ ] Arquivo-alvo > 200 linhas, `.yaml`/`.yml`/`.json`, ou consumido por CI? Se sim, apliquei o padrão verificado da § 5 (R-051) em vez de `insert_edit_into_file`?
+- [ ] Arquivo-alvo > 200 linhas, `.yaml`/`.yml`/`.json`, **Markdown estruturado** (`.agent.md`/`.instructions.md`) ou consumido por CI? Se sim, apliquei o padrão verificado da § 5 (R-051) com checagem de unicidade da âncora (`count === 1`)?
 
 ---
 
-## 5. Proteção Anti-Corrupção em Arquivo Único Grande/Estruturado (R-051)
+## 5. Proteção Anti-Corrupção em Arquivo Único Grande/Estruturado e Markdown com Âncoras Repetidas (R-051)
 
-> ⚠️ **INCIDENTE REAL (2026-09)**: durante uma auditoria de workflows, `insert_edit_into_file` foi usado para inserir um pequeno bloco em `workflows.md` (~600 linhas, Markdown+Mermaid) e em `routing-graph.yaml` (~1200 linhas, YAML). Em três ocasiões distintas, a tool truncou o arquivo para menos de 20 linhas — descartando quase todo o conteúdo — sem que a mensagem de retorno indicasse falha de forma confiável. Isso exigiu rollback manual via IDE (Local History/git) pelo desenvolvedor, gerando custo real de créditos e retrabalho.
+> ⚠️ **INCIDENTES REAIS PREVENIDOS (2026-09)**:
+> 1. **Truncamento por `insert_edit_into_file`**: durante uma auditoria de workflows, `insert_edit_into_file` foi usado para inserir um pequeno bloco em `workflows.md` (~600 linhas, Markdown+Mermaid) e em `routing-graph.yaml` (~1200 linhas, YAML). Em três ocasiões distintas, a tool truncou o arquivo para menos de 20 linhas — descartando quase todo o conteúdo — sem aviso confiável.
+> 2. **Corrupção e Wiping por `replace_string_in_file` com Fuzzy Matching**: durante a inclusão de co-agentes em `code-knowledge-graph.agent.md`, `replace_string_in_file` foi invocado com um trecho-âncora que colidia com seções repetidas e tabelas similares. O motor do editor ativou estratégias de fallback de correspondência aproximada (fuzzy/multiple matching), casando no ponto errado, apagando o frontmatter YAML e as primeiras 70 linhas do arquivo, além de duplicar linhas de tabela no final.
 
-### 5.1 Regra (R-051): Quando `insert_edit_into_file` é Proibido
+### 5.1 Regra (R-051): Escopo de Proteção Obrigatória
 
 Independentemente do número de arquivos (mesmo 1 único arquivo), se o **arquivo-alvo** atender a QUALQUER destes critérios:
 
@@ -142,21 +144,26 @@ Independentemente do número de arquivos (mesmo 1 único arquivo), se o **arquiv
 |---|---|
 | Tamanho | Mais de **200 linhas** |
 | Formato | Extensão `.yaml`, `.yml` ou `.json` (sintaxe sensível a indentação/estrutura) |
+| Estrutura | **Markdown estruturado** (`.agent.md`, `.instructions.md`, arquivos `.md` com frontmatter YAML, seções repetitivas ou tabelas com entradas parecidas) |
 | Consumo | Arquivo lido/parseado diretamente por testes automatizados ou pipeline de CI |
 
-...então `insert_edit_into_file` é **ANTI-PADRÃO BLOQUEANTE**. O agente DEVE usar o **Padrão de Edição Segura Verificada** via `context-mode` (`ctx_execute`): ler o arquivo inteiro → contar ocorrências exatas do texto-âncora em memória → abortar se != 1 → só então escrever (`fs.writeFileSync`) → reler do disco para confirmar. Template de referência (R-026 — código real fora do corpo da skill): [`snippets/safe-single-file-edit-pattern.js`](snippets/safe-single-file-edit-pattern.js).
+...então `insert_edit_into_file` é **ANTI-PADRÃO BLOQUEANTE** e `replace_string_in_file` NUNCA deve ser invocado sem garantia prévia de unicidade estrita da âncora (`count === 1`). O agente DEVE priorizar o **Padrão de Edição Segura Verificada** via `context-mode` (`ctx_execute`): ler o arquivo inteiro do disco → contar ocorrências exatas do texto-âncora em memória (`content.split(oldStr).length - 1`) → abortar compulsoriamente se `count !== 1` (nunca adivinhar ou deixar o editor aplicar fuzzy matching) → só então escrever (`fs.writeFileSync`) → reler do disco e validar que seções críticas (como frontmatter `---`, cabeçalhos `#` e contagem de linhas) permanecem íntegras. Template de referência (R-026 — código real fora do corpo da skill): [`snippets/safe-single-file-edit-pattern.js`](snippets/safe-single-file-edit-pattern.js).
 
-### 5.2 Regra Complementar: Nunca Confiar Cegamente no Retorno da Tool
+### 5.2 O Perigo do Fallback Fuzzy de `replace_string_in_file` e a Regra de Unicidade Estrita
 
-Mesmo com `replace_string_in_file` (fora do escopo de proibição acima), o agente:
-1. **NÃO deve presumir sucesso** só porque a tool não reportou erro — para arquivos consumidos por CI/testes, confirme com uma leitura independente (`read_file`, `ctx_execute` ou `get_errors`) antes de prosseguir para a próxima edição.
-2. **NÃO deve presumir falha** só porque a tool reportou erro — verifique o estado real do arquivo antes de tentar novamente; foram observados falsos-negativos (a edição aplicou corretamente apesar da mensagem de "não encontrado").
-3. Após qualquer sequência de edições em arquivo grande/estruturado, rode uma validação estrutural mínima antes de considerar a tarefa concluída: `yaml.safe_load` para YAML, contagem de colchetes/chaves balanceados para blocos Mermaid, ou equivalente para o formato do arquivo.
+Por que `replace_string_in_file` falha em Markdown estruturado?
+A documentação da ferramenta explicita: *"The system will try multiple matching strategies if exact matching fails"*. Quando o agente passa um `oldString` curto ou com poucas linhas de contexto em arquivos que possuem tabelas repetidas, títulos similares (ex.: `### 3.7` e `#### 3.7.1`), ou múltiplos blocos com texto parecido, o matching exato falha e o motor tenta correspondência aproximada (fuzzy). O resultado é desastroso: o editor casa no primeiro ponto similar que encontrar, substituindo blocos enormes anteriores (apagando frontmatter e títulos) ou duplicando trechos no final do arquivo.
+
+Regras inegociáveis para edição segura:
+1. **Verificação de Unicidade de Âncora Obrigatória**: conte as ocorrências do âncora em memória antes de invocar qualquer tool de substituição (`count = content.split(oldStr).length - 1`). Se `count !== 1` (0 ou >1), **ABORTAR imediatamente**; nunca deixar a tool tentar casamento aproximado. Forneça de 3 a 5 linhas de contexto inequívoco acima e abaixo ou aplique o script via `ctx_execute`.
+2. **NÃO presumir sucesso nem falha pelo retorno da tool**: confirme o estado real do arquivo após a escrita via `read_file`, `ctx_execute` ou `get_errors`.
+3. **Validação Pós-Escrita de Integridade Estrutural**: confirme imediatamente que o arquivo mantém suas seções essenciais (`---` no início se for agent/adapter, contagem de linhas próxima do esperado, ausência de duplicatas em tabelas) e rode validação sintática (`yaml.safe_load`, etc.) antes de considerar a edição concluída.
 
 ### 5.3 Checklist Rápido
 
-- [ ] Arquivo-alvo tem > 200 linhas OU é `.yaml`/`.yml`/`.json` OU é consumido por testes/CI?
-  - [ ] **Sim** → usar exclusivamente o padrão verificado (`ctx_execute` + `snippets/safe-single-file-edit-pattern.js`); `insert_edit_into_file` proibido.
-  - [ ] **Não** → `replace_string_in_file`/`insert_edit_into_file` permitidos, mas ainda seguindo 5.2.
-- [ ] Após escrever, reli o arquivo (ou rodei validação de sintaxe) para confirmar o resultado real?
+- [ ] Arquivo-alvo tem > 200 linhas OU é `.yaml`/`.yml`/`.json` OU é **Markdown estruturado** (`.agent.md`, `.instructions.md`) OU é consumido por testes/CI?
+  - [ ] **Sim** → aplicar o padrão verificado (`ctx_execute` + `snippets/safe-single-file-edit-pattern.js`) com contagem de unicidade (`count === 1`); `insert_edit_into_file` proibido e `replace_string_in_file` só com contexto estrito e validação imediata.
+  - [ ] **Não** → `replace_string_in_file` permitido, mas ainda verificando unicidade de âncora e seguindo 5.2.
+- [ ] Contei ocorrências da âncora em memória e confirmei que `count === 1` antes de substituir?
+- [ ] Após escrever, reli o arquivo (ou rodei validação de sintaxe/integridade de seções) para confirmar o resultado real?
 

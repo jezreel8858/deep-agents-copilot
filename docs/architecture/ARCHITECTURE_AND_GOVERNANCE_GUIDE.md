@@ -260,6 +260,7 @@ flowchart LR
 ### 8.2 Edições em Lote Único e Diffs Cirúrgicos (R-046 / R-051)
 - **Single-Turn Batching**: Edições de múltiplos arquivos são enviadas em lote na mesma rodada de tool calls.
 - **Diff Cirúrgico**: Uso de 2-3 linhas de contexto exclusivo para garantir unicidade e evitar loops de re-submissão.
+- **Proteção Anti-Corrupção e Unicidade de Âncora (R-051)**: Para arquivos >200 linhas, formato `.yaml`/`.yml`/`.json` ou **Markdown estruturado** (`.agent.md`, `.instructions.md`, tabelas com entradas parecidas), é proibido usar `insert_edit_into_file` ou `replace_string_in_file` com âncoras ambíguas. O agente deve verificar a unicidade estrita da âncora em memória (`count === 1`), abortando caso haja risco de colisão (evitando o fallback de casamento aproximado/fuzzy da tool que pode corromper ou apagar blocos inteiros), e validar imediatamente a integridade estrutural pós-escrita.
 
 ### 8.4 Visual Feedback Loop (VFL) e Paridade de UI (2026)
 Para eliminar a "cegueira visual" de testes headless (Smell 2.21), o ecossistema adota o ciclo **Visual Feedback Loop (VFL)** agnóstico de tecnologia (`frontend-visual-feedback-loop`):

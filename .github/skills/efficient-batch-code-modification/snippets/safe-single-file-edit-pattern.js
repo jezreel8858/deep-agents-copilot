@@ -1,7 +1,8 @@
 /**
- * Padrão de Edição Segura para Arquivo Único Grande/Estruturado (R-051)
+ * Padrão de Edição Segura para Arquivo Único Grande/Estruturado e Markdown com Âncoras Repetidas (R-051)
  * ----------------------------------------------------------------------
  * Use este padrão via context-mode (ctx_execute) SEMPRE que o arquivo-alvo:
+ *   - for Markdown estruturado (.agent.md, .instructions.md, .md com frontmatter YAML ou tabelas com entradas parecidas), OU
  *   - tiver mais de 200 linhas, OU
  *   - for .yaml/.yml/.json (sintaxe sensível a indentação), OU
  *   - for consumido diretamente por testes automatizados/CI.
@@ -10,6 +11,11 @@
  * (2026-09): a tool truncou/corrompeu arquivos de 600-1200 linhas ao tentar
  * aplicar uma edição pequena com âncoras insuficientes, reduzindo-os a
  * dezenas de linhas sem aviso confiável.
+ *
+ * NUNCA confie cegamente no `replace_string_in_file` quando houver risco de colisão de âncoras:
+ * (2026-09): a tool possui fallback fuzzy quando o casamento exato falha, podendo casar no
+ * ponto errado em Markdown estruturado, apagando frontmatter e títulos iniciais (incidente real
+ * em code-knowledge-graph.agent.md).
  *
  * Contrato do padrão:
  *   1. Ler o arquivo inteiro do disco (fonte da verdade real, nunca a

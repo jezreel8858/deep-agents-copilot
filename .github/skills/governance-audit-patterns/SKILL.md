@@ -264,10 +264,10 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 
 | Campo | Conteúdo |
 |---|---|
-| Sintoma | Agent com `insert_edit_into_file` e/ou `replace_string_in_file` no frontmatter `tools:` não referencia `efficient-batch-code-modification` em `source_docs:`/`skills:` — fica sem o guardrail que previne corrupção de arquivo único grande/estruturado (R-051) |
+| Sintoma | Agent com `insert_edit_into_file` e/ou `replace_string_in_file` no frontmatter `tools:` não referencia `efficient-batch-code-modification` em `source_docs:`/`skills:` — fica sem o guardrail que previne corrupção de arquivo único grande/estruturado e Markdown com seções/âncoras repetidas (R-051) |
 | Como detectar | Para cada `.agent.md` com `insert_edit_into_file` ou `replace_string_in_file` em `tools:`, verificar se `efficient-batch-code-modification` aparece em `source_docs:` ou nas listas `skills:` de sub-catálogos. Ver Tier 1: `test_smell_2_16_mutating_agents_reference_safe_editing_skill` |
 | Origem (TrustAgent) | Intrínseco — agent herda tool de mutação sem herdar o protocolo de segurança correspondente |
-| Severidade | **Bloqueador** (mesmo risco de corrupção documentado em R-051, incidente real de 2026-09 que corrompeu `workflows.md`/`routing-graph.yaml` três vezes) |
+| Severidade | **Bloqueador** (risco de corrupção documentado em R-051: truncamento por `insert_edit_into_file` em `workflows.md`/`routing-graph.yaml` e corrupção/wiping por `replace_string_in_file` com fuzzy matching em `code-knowledge-graph.agent.md`) |
 | Remediação | Adicionar `.github/skills/efficient-batch-code-modification/SKILL.md` a `source_docs:` (ou `skills:` no sub-catálogo) do agent afetado via `@governance-maintainer` |
 
 ### 2.17 — Comando Git Sem Desativação de Pager (Violação R-035)

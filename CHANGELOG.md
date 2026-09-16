@@ -16,6 +16,12 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 - **Catalogação do Smell 2.22 em `governance-audit-patterns`**:
   - `Smell 2.22 — Sticky Agent e Falha de Reset de Workflow (R-042 / R-052)`: catalogado com severidade Bloqueador.
   - Teste determinístico `test_smell_2_22_workflow_reset_and_anti_sticky_agent_rule` adicionado à suíte `tests/governance_audit/test_governance_smells.py` (100% verde).
+- **Fortalecimento da Regra R-051 e Proteção Anti-Corrupção em Markdown Estruturado**:
+  - Extensão formal da regra `R-051 (Proteção Anti-Corrupção em Edição de Arquivo Único Grande/Estruturado e Markdown com Âncoras Repetidas)` em `CLAUDE.md`, `.github/copilot-instructions.md`, `efficient-batch-code-modification` e `governance-audit-patterns` (Smell 2.16).
+  - Proibição absoluta de invocar `replace_string_in_file` com âncoras ambíguas ou sem verificação prévia de unicidade estrita em memória (`count === 1`), prevenindo o fallback de correspondência aproximada (fuzzy matching) que corrompe/trunca blocos em arquivos com tabelas e seções parecidas (incidente real documentado em `code-knowledge-graph.agent.md`).
+  - Atualização do snippet `snippets/safe-single-file-edit-pattern.js` e obrigatoriedade de validação imediata da integridade estrutural pós-escrita (frontmatter `---`, cabeçalhos canônicos e contagem de linhas).
+- **Invariantes Dual-Stack e Co-Agência Obrigatória de `@code-knowledge-graph` em `WORKFLOW-FRAMEWORK-MIGRATION` (R-050)**:
+  - Formalização das Invariantes 8 e 9 em `workflows.md` § 3.7 e § 5: em migrações cross-stack, o domain router da stack de origem legada (`@ejb-router`, `@struts-router`) e o motor de grafo (`@code-knowledge-graph`, R-045) são co-agentes obrigatórios em todas as etapas (1 a 5), nunca dispensados após o pre-flight.
 
 ### Aprimorado
 - **Ajuste Fino na Regra R-042**:
