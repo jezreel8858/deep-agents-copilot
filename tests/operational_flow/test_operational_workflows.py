@@ -429,6 +429,33 @@ def test_workflow_framework_migration_edge_scenarios_and_state_bag(routing_graph
     assert "aprovacao_fases_migracao" in str(etapa2.get("checkpoint_humano", ""))
 
 
+def test_workflow_framework_migration_depara_matrix_and_brownfield_reconciliation(routing_graph):
+    """Valida garantias contratuais de eliminação de gaps em WORKFLOW-FRAMEWORK-MIGRATION:
+    - Decomposição exaustiva nas 5 Dimensões Críticas
+    - Sub-estado 1b de Reconciliação Delta em cenários Brownfield In-Flight
+    - Obrigatoriedade da Matriz De-Para com taxonomia estrita de status
+    - Dual-Verification Gate com resolução integral (zero pendentes/divergentes)
+    """
+    content_wf = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    assert "A Estratégia de Prevenção de Gaps em 5 Dimensões Críticas:" in content_wf
+    assert "Dimensão 1: Borda, Contratos de Entrada & Validações Fail-Fast" in content_wf
+    assert "Dimensão 3: Pegada de Persistência Relacional & Transações" in content_wf
+    assert "Dimensão 4: Efeitos Colaterais & Integrações Downstream" in content_wf
+    assert "A Matriz De-Para de Migração & Rastreabilidade de Gaps" in content_wf
+    assert "Reconciliação Delta & Auditoria de Gaps Pré-Existentes" in content_wf
+    assert "matriz_de_para_ref:" in content_wf
+    assert "cenario_migracao:" in content_wf
+
+    wf7 = next((wf for wf in routing_graph.get("workflows", []) if wf["id"] == "WORKFLOW-FRAMEWORK-MIGRATION"), None)
+    assert wf7 is not None
+    assert "matriz_de_para_obrigatoria" in wf7
+    assert wf7["matriz_de_para_obrigatoria"]["taxonomia_status"] == ["MIGRADO", "PENDENTE", "DIVERGENTE", "DESACOPLADO", "OBSOLETO"]
+    
+    estados = wf7.get("estados", [])
+    etapa4 = next((e for e in estados if e["etapa"] == 4), {})
+    assert "matriz_de_para_100_resolvida" in etapa4.get("gate", "")
+
+
 def test_workflow_release_readiness_edge_scenarios_and_state_bag(routing_graph):
     """Valida que WORKFLOW-RELEASE-READINESS cobre auditoria de contratos OpenAPI, rollout DDL
     com rollback testado, varredura de segredos, packaging semântico e State Bag."""

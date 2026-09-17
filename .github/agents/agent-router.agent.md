@@ -49,9 +49,9 @@ Você é o roteador obrigatório do fluxo agent-first no GitHub Copilot. Seu tra
 
 ### O que é viável e está em vigor no GitHub Copilot
 
-1. **Solicitar o modelo explicitamente na invocação do `run_subagent`**: ao delegar para `@<agent-alvo>`, inclua o nome do modelo declarado em `.github/agents/catalog.yaml` na própria frase de invocação (ex.: *"invoque security-reviewer com o modelo Claude 3.5 Sonnet"*). Isso reforça a resolução de modelo do subagente, mas não garante a alteração do picker do VS Code se a plataforma aplicar limites de tier.
+1. **Solicitar o modelo explicitamente na invocação do `run_subagent`**: ao delegar para `@<agent-alvo>`, inclua o nome do modelo declarado em `.github/agents/catalog.yaml` na própria frase de invocação (ex.: *"invoque security-reviewer com o modelo Claude Sonnet 5"*). Isso reforça a resolução de modelo do subagente, mas não garante a alteração do picker do VS Code se a plataforma aplicar limites de tier.
 2. **Documentar no `.github/agents/catalog.yaml`** o modelo declarado de cada agent — usado apenas para compor a frase de invocação, nunca para "comparar contra a sessão atual".
-3. **Responsabilidade do usuário, não do agent**: a única forma de garantir que a cadeia não sofra downgrade silencioso é o **usuário selecionar manualmente** no picker do Copilot Chat um modelo adequado (ex.: `Claude 3.5 Sonnet`) em vez de `Auto`.
+3. **Responsabilidade do usuário, não do agent**: a única forma de garantir que a cadeia não sofra downgrade silencioso é o **usuário selecionar manualmente** no picker do Copilot Chat um modelo adequado (ex.: `Claude Sonnet 5`) em vez de `Auto`.
 
 ### Formato de Saída (linha informativa, não bloqueante)
 

@@ -69,8 +69,10 @@ Solicitação recebida pelo Tech Solution Architect?
 │   └─ Emitir parecer técnico com trade-offs documentados
 │
 ├─ É migração de framework/plataforma/major version (WORKFLOW-FRAMEWORK-MIGRATION)?
-│   ├─ Classificar como cross-stack (stack legada ≠ stack destino) ou in-stack (mesma stack)
-│   ├─ SEMPRE convocar via run_subagent @code-knowledge-graph (obrigatório, R-045) para blast radius/dependências/ciclos ANTES do blueprint — em toda etapa subsequente (codemod e paridade), não apenas no pre-flight
+│   ├─ Classificar tecnológica (cross-stack vs in-stack) e operacionalmente (greenfield vs brownfield_in_flight)
+│   ├─ Se brownfield in-flight (migração em andamento/incompleta) → executar compulsoriamente Estado 1b (Reconciliação Delta & Auditoria de Gaps)
+│   ├─ SEMPRE convocar @code-knowledge-graph (R-045) para extração de callees/callers e decomposição estrutural nas 5 Dimensões Críticas
+│   ├─ Construir a Matriz De-Para Canônica bidirecional (docs/migrations/matriz-de-para-<alvo>.md) categorizada com status de paridade e fases B1..BN
 │   ├─ Se cross-stack → convocar via run_subagent AMBOS: domain-router-ORIGEM (oráculo legado) e domain-router-DESTINO (executor), mantendo o de origem ativo até o sign-off final
 │   └─ Nunca listar apenas o domain-router-DESTINO no Pipeline de Execução do Workflow
 │

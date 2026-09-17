@@ -6,6 +6,26 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.11.0] — 2026-09-16
+
+### Adicionado
+- **Matriz De-Para Bidirecional & Prevenção Canônica de Gaps em `WORKFLOW-FRAMEWORK-MIGRATION` (R-050)**:
+  - Instituição da **Matriz De-Para de Migração & Rastreabilidade de Gaps** (`docs/migrations/matriz-de-para-<alvo>.md`) como Single Source of Truth obrigatória para qualquer migração tecnológica cross-stack ou elevação de plataforma.
+  - Taxonomia rigorosa de status de paridade com 5 estados determinísticos: `[✅ MIGRADO]`, `[⏳ PENDENTE]`, `[⚠️ DIVERGENTE]`, `[ℹ️ DESACOPLADO]` e `[🚫 OBSOLETO]`.
+  - Critério de fechamento bloqueante: zero itens `PENDENTE` ou `DIVERGENTE` no módulo ao final do pipeline.
+- **Decomposição Estrutural Exaustiva em 5 Dimensões Críticas (Estado 1)**:
+  - Eliminação de avaliações superficiais ou limitadas ao "happy path": decomposição sistemática e obrigatória em (1) Borda, Contratos de Entrada & Validações Fail-Fast; (2) Regras de Negócio e Ramificações Condicionais; (3) Pegada de Persistência Relacional & Transações (tabelas pai, filhas, rateios, snapshots, sequências, isolamento); (4) Efeitos Colaterais & Integrações Downstream (SOAP, REST, filas, PDFs/relatórios, e-mails, uploads, webhooks); e (5) Contratos de Saída & DTOs de Resposta.
+- **Protocolo Brownfield In-Flight (Reconciliação Delta & Auditoria de Gaps Pré-Existentes — Estado 1b)**:
+  - Mecanismo específico e obrigatório para migrações já iniciadas, parciais ou inacabadas no repositório de destino (prevenção do cenário real observado de dezenas de gaps descobertos tardiamente).
+  - Comparação cruzada entre a árvore 5D do legado e os artefatos existentes no destino, gerando imediatamente a Matriz De-Para com todos os GAPs catalogados (`GAP-01..GAP-NN`) antes da elaboração do plano de fases.
+- **Faseamento Orientado a Risco e Impacto Ancorado na Matriz De-Para (Estado 2)**:
+  - Fases autônomas entregáveis (B1..BN) onde cada fase possui uma lista explícita de IDs De-Para sob sua responsabilidade, com critérios de aceite determinísticos.
+  - Dashboard Executivo da Matriz De-Para exibido no chat e no Checkpoint Humano 2b para visibilidade e transparência completa a desenvolvedores humanos.
+- **Dual-Verification Gate Expandido (Quádruplo Critério de Paridade — Estado 4)**:
+  - Aprovação de fase exige simultaneamente: (1) 100% Golden Master verde; (2) 100% de resolução dos IDs De-Para da fase; (3) sign-off do domain-router de origem como oráculo; e (4) atesto estrutural de zero novos ciclos e zero dead-code pelo `@code-knowledge-graph`.
+- **Teste de Regressão e Governança**:
+  - Novo teste `test_workflow_framework_migration_depara_matrix_and_brownfield_reconciliation` adicionado à suíte operacional (`test_operational_workflows.py`), garantindo 100% de conformidade automatizada.
+
 ## [2.10.0] — 2026-09-15
 
 ### Adicionado

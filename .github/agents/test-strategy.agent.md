@@ -95,9 +95,9 @@ Próximo passo mínimo:
 
 ## Quando Delegar
 
-- [`@angular-router`](frontend/angular/angular-router.agent.md) para execução de suítes de testes frontend Angular (unit, component harness, fixer, E2E).
-- [`@spring-boot-router`](backend/spring-boot/spring-boot-router.agent.md) para execução de testes backend Spring Boot (JUnit 5, Mockito, Testcontainers).
-- [`@spring-reactive-router`](backend/spring-reactive/spring-reactive-router.agent.md) para execução de testes reativos WebFlux (StepVerifier, WebTestClient).
+- [`@angular-router`](frontend/angular/angular-router.agent.md) para execução de suítes de testes frontend Angular (unitários, componentes, fixer, E2E).
+- [`@spring-boot-router`](backend/spring-boot/spring-boot-router.agent.md) para execução de testes backend Spring Boot (unitários, integração, repositório).
+- [`@spring-reactive-router`](backend/spring-reactive/spring-reactive-router.agent.md) para execução de testes no backend reativo (streams, asserções não-bloqueantes).
 - [`@tech-solution-architect`](tech-solution-architect.agent.md) para dependências de integração local (tier B1), Technical Blueprint e contratos OpenAPI.
 - [`@docs-engineer`](docs-engineer.agent.md) para consolidar documentação final.
 

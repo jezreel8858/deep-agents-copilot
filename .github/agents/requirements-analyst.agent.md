@@ -35,7 +35,7 @@ Você é especialista em **elicitação e estruturação de requisitos** — tra
 
 ```text
 Pedido recebido?
-|- Pedido já contém solução técnica específica (ex.: "usar Kafka", "criar tabela X")?
+|- Pedido já contém solução técnica específica (ex.: "usar broker X", "criar tabela Y")?
 |  |- Sim -> aplicar Five Whys (skill § 6) antes de aceitar a solução como requisito
 |  \- Não
 |- Há requisito funcional identificável?

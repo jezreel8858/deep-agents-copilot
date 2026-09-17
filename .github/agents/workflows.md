@@ -289,7 +289,7 @@ flowchart TD
    - *Arquitetura Estrutural & Grafo*: `@code-knowledge-graph` (dependências/ciclos), `@ddd-bounded-context-mapper` (domínios/God Classes), `@adr-sentinel` (conformidade arquitetural).
    - *Segurança & Governança*: `@security-reviewer` (OWASP/CVE/secrets), `@compliance-guardrails` (LGPD/SOC 2).
    - *Engenharia de Performance*: `@performance-agent` (CWV/N+1/profiling), `@oracle-query-tuner` / `@informix-query-tuner` (planos de execução SQL).
-   - *Arquitetura de Telas & Fluxos por Stack*: `@angular-arch-advisor` (reatividade Signals, memory leaks, OnPush, SSR), `@spring-boot-arch-advisor` (Virtual Threads, JPA/Hibernate, clean architecture), `@spring-reactive-arch-advisor` (WebFlux, backpressure, event-loop non-blocking), `@ejb-arch-advisor` (transações JTA, Stateless pools).
+   - *Arquitetura de Telas & Fluxos por Stack*: `@angular-arch-advisor` (reatividade de estado, memory leaks, detecção de mudança, SSR), `@spring-boot-arch-advisor` (concorrência, camada de persistência, clean architecture), `@spring-reactive-arch-advisor` (reatividade não-bloqueante, backpressure, event-loop), `@ejb-arch-advisor` (transações distribuídas, Stateless pools).
    - *Viabilidade Técnica & Contratos*: `@tech-solution-architect` (Technical Blueprint, OpenAPI, modelo de dados).
    - *Infraestrutura & DevOps*: `@devops-engineer` (Dockerfile, Kubernetes, pipelines CI/CD, Infrastructure-as-Code — read-only).
    - *Sub-rotina 1d (Fan-out Multidimensional)*: Se a solicitação abranger **2+ categorias independentes simultâneas** (ex.: "avalie segurança E performance deste módulo"), marcada `[P]` por R-018, o `@agent-router` aplica o padrão **Fan-out/Fan-in (Orchestrator-Workers)** já definido em `handoff-governance/SKILL.md` § 5.1: dispara os N especialistas em paralelo (cada um estritamente read-only, sem efeito colateral, portanto seguro paralelizar) e agrega os achados em UM relatório único no Estado 3 (fan-in obrigatório — nunca fragmentar em múltiplas respostas sem síntese).
@@ -576,57 +576,128 @@ workflow_state:
 
 ### 3.7 WORKFLOW 7: `WORKFLOW-FRAMEWORK-MIGRATION` (Migração de Framework, Plataforma ou Major Version)
 
-- **Objetivo**: Conduzir elevações estruturais de versão maior de framework ou plataforma (ex.: Angular standalone/signals, Spring Boot 2→3, Java 17→21/25, EJB→Spring, Struts→Spring Boot) de forma previsível e particionada em fases entregáveis, combinando codemods automatizados, testes de paridade funcional e checkpoints humanos obrigatórios.
-- **Gatilhos**: `"migrar framework"`, `"migração angular"`, `"migrar spring boot"`, `"upgrade major"`, `"modernizar stack"`, `"migrar para standalone"`, `"migrar para signals"`, `"migrar para virtual threads"`, `"migrar ejb"`, `"migrar struts"`, `"modernizar legado"`.
+- **Objetivo**: Conduzir elevações estruturais de versão maior de framework ou plataforma (ex.: Angular standalone/signals, Spring Boot 2→3, Java 17→21/25, EJB→Spring, Struts→Spring Boot) em cenários *greenfield* (do zero) ou *brownfield in-flight* (migrações pré-existentes ou inacabadas) de forma determinística, particionada em fases entregáveis orientadas a risco, combinando decomposição exaustiva em 5 dimensões, matriz de rastreabilidade De-Para, codemods automatizados, testes de paridade funcional e checkpoints humanos obrigatórios.
+- **Gatilhos**: `"migrar framework"`, `"migração angular"`, `"migrar spring boot"`, `"upgrade major"`, `"modernizar stack"`, `"migrar para standalone"`, `"migrar para signals"`, `"migrar para virtual threads"`, `"migrar ejb"`, `"migrar struts"`, `"modernizar legado"`, `"continuar migração"`, `"gaps de migração"`, `"paridade de migração"`.
 - **Política R-041**: **Bypass** caso a meta e a stack estejam claras; se o pedido for ambíguo ("modernize nosso sistema"), aciona `@prompt-structuring`.
-- **⚠️ Invariante de Colaboração Dual-Stack (não-negociável)**: Sempre que a migração for **cross-stack** (stack de origem ≠ stack de destino — ex.: `ejb-router` → `spring-boot-router`, `struts-router` → `spring-boot-router`, `angular-router` versões AngularJS → Angular moderno), **AMBOS os domain routers participam ativamente de TODAS as etapas do pipeline**, não apenas da Etapa 1. O router da stack de origem nunca é dispensado após o pre-flight — ele atua como **oráculo de comportamento legado** (via `@business-rules-extractor`) durante o codemod (Etapa 3) e a validação de paridade (Etapa 4), fazendo o sign-off final na Etapa 5. É **proibido** ao `@tech-solution-architect` produzir um blueprint ou bloco de "Pipeline de Execução do Workflow" citando apenas o router de destino — isso é o anti-padrão que motivou este invariante (ver § 5, invariante 8).
+- **⚠️ Invariante de Colaboração Dual-Stack (não-negociável)**: Sempre que a migração for **cross-stack** (stack de origem ≠ stack de destino — ex.: `ejb-router` → `spring-boot-router`, `struts-router` → `spring-boot-router`, `angular-router` versões AngularJS → Angular moderno), **AMBOS os domain routers participam ativamente de TODAS as etapas do pipeline**, não apenas da Etapa 1. O router da stack de origem nunca é dispensado após o pre-flight — ele atua como **oráculo de comportamento legado** (via `@business-rules-extractor` e `@code-knowledge-graph`) durante a elaboração do De-Para (Etapa 2), execução do codemod (Etapa 3) e validação de paridade (Etapa 4), fazendo o sign-off final na Etapa 5. É **proibido** ao `@tech-solution-architect` produzir um blueprint ou bloco de "Pipeline de Execução do Workflow" citando apenas o router de destino — isso é o anti-padrão que motivou este invariante (ver § 5, invariante 8).
 - **⚠️ Invariante de Exclusividade do Motor de Grafo (R-045, não-negociável)**: `@code-knowledge-graph` é **co-agente obrigatório** — não apenas sub-rotina opcional — nas Etapas 1, 3, 4 e 5. Migração de framework é refatoração estrutural em larga escala: blast radius, dependências, ciclos e dead-code NUNCA são mapeados manualmente por `@tech-solution-architect` ou pelos domain routers. Omitir `@code-knowledge-graph` de qualquer etapa além da 1 é a mesma classe de violação tratada em `WORKFLOW-REFACTORING` (Invariante 3, § 5) e em `WORKFLOW-TECHNICAL-ANALYSIS`.
+- **⚠️ Invariante da Matriz De-Para e Prevenção de Gaps (não-negociável)**: Nenhuma migração de tecnologia é conduzida sem a **Matriz De-Para de Migração & Rastreabilidade de Gaps** (`docs/migrations/matriz-de-para-<alvo>.md` ou seção explícita no plano canônico). É terminantemente proibido avançar para codemods sem mapear 100% dos elementos do legado nas **5 Dimensões Críticas**. O faseamento de migração (Fases B1..BN) deve ser estritamente derivado dos IDs da Matriz De-Para (`GAP-xx`). Uma migração NUNCA atinge o Quality Gate final (Etapa 5) se houver qualquer item com status `[⏳ PENDENTE]` ou `[⚠️ DIVERGENTE]`.
+- **⚠️ Invariante do Protocolo Brownfield In-Flight (não-negociável)**: Caso o repositório de destino já possua código de migração pré-existente ou incompleto (cenário *brownfield in-flight*), o workflow PROÍBE planejar novas fases ou codificar antes de executar o **Estado 1b (Reconciliação Delta & Auditoria de Gaps Pré-Existentes)**. A comparação cruzada entre a árvore 5D do legado e o código moderno já escrito deve levantar e numerar todos os GAPs de imediato (`GAP-01..GAP-NN`), eliminando o anti-padrão de descoberta tardia e desordenada de gaps em fases avançadas.
 
 ```mermaid
 flowchart TD
-    Start(["🚀 Solicitação de Migração de Framework / Major Version"]) --> IdentifyStacks["<b>0. Identificação de Stacks Origem/Destino</b><br/>Agente: @tech-solution-architect<br/>Ação: Determina se é cross-stack (ex.: legado→moderno) ou upgrade in-stack (mesma stack, versão maior)"]
+    Start(["🚀 Solicitação de Migração de Framework / Major Version"]) --> IdentifyStacks["<b>0. Identificação de Stacks & Detecção de Cenário</b><br/>Agente: @tech-solution-architect<br/>Classificação: Cross-Stack vs In-Stack | Greenfield vs Brownfield In-Flight"]
 
-    IdentifyStacks --> PreFlight["<b>1. Pre-Flight Compatibility Assessment</b><br/>Agentes: @tech-solution-architect + @code-knowledge-graph (obrigatório, R-045)<br/>Co-agente: domain-router-ORIGEM (ex.: @ejb-router/@struts-router) + @business-rules-extractor<br/>Ação: Blast radius/dependências/ciclos do legado (grafo) + inventário de compatibilidade + extração de regras de negócio"]
+    IdentifyStacks --> PreFlight["<b>1. Pre-Flight Assessment & Decomposição Estrutural 5D</b><br/>Agentes: @tech-solution-architect + @code-knowledge-graph (obrigatório, R-045)<br/>Co-agentes: domain-router-ORIGEM + @business-rules-extractor<br/>Ação: Decomposição em 5 dimensões (Borda/Validações, Regras, Persistência, Downstream, Saída)"]
 
-    PreFlight --> PlanPhasing["<b>2. Migration Phasing & Blueprint</b><br/>Agente: @tech-solution-architect<br/>Co-agentes: domain-router-ORIGEM + domain-router-DESTINO<br/>Ação: Decomposição em fases autônomas entregáveis (ordem segura definida pelo mapa de dependências da Etapa 1), com papéis de origem/destino explícitos por fase"]
+    PreFlight --> CheckBrownfield{"Cenário é<br/>Brownfield In-Flight<br/>(migração parcial)?"}
+    CheckBrownfield -- "Sim (In-Flight)" --> DeltaReconcile["<b>1b. Reconciliação Delta & Auditoria de Gaps</b><br/>Agentes: @tech-solution-architect + domain-router-DESTINO<br/>Ação: Cruza código moderno já escrito x árvore 5D do legado; gera matriz De-Para preliminar e cataloga GAP-01..GAP-NN"]
+    CheckBrownfield -- "Não (Greenfield)" --> PlanPhasing
 
-    PlanPhasing --> PhaseGate{"<b>2b. Checkpoint Humano de Fases</b><br/>Aprovação obrigatória via ask_questions"}
+    DeltaReconcile --> PlanPhasing["<b>2. Migration Phasing & Blueprint com Matriz De-Para</b><br/>Agente: @tech-solution-architect<br/>Co-agentes: domain-router-ORIGEM + domain-router-DESTINO<br/>Ação: Matriz De-Para canônica completa + fases autônomas B1..BN ancoradas nos IDs De-Para"]
+
+    PlanPhasing --> PhaseGate{"<b>2b. Checkpoint Humano de Fases</b><br/>Aprovação obrigatória via ask_questions<br/>Exibe Dashboard Executivo da Matriz De-Para"}
     PhaseGate -- "Revisar" --> PlanPhasing
-    PhaseGate -- "Aprovado" --> BatchCodemod["<b>3. Codemod & Transformação em Lote</b><br/>Agente: domain-router-DESTINO (specialist-feature-developer)<br/>Co-agentes: domain-router-ORIGEM (oráculo consultivo, permanece ativo) + @code-knowledge-graph (obrigatório, R-045 — blast radius por lote)<br/>Ação: Execução de codemods oficiais (ng update / OpenRewrite) no sandbox"]
+    PhaseGate -- "Aprovado" --> BatchCodemod["<b>3. Codemod & Transformação em Lote por Fase</b><br/>Agente: domain-router-DESTINO (specialist-feature-developer)<br/>Co-agentes: domain-router-ORIGEM (oráculo consultivo) + @code-knowledge-graph (blast radius por lote)<br/>Ação: Codemods e diffs cirúrgicos estritamente orientados aos IDs De-Para da fase ativa"]
 
-    BatchCodemod --> ParityRefine["<b>4. Refinamento & Paridade Funcional (Dual-Verification)</b><br/>Agentes: domain-router-DESTINO + specialist-unit-test-writer<br/>Co-agentes: domain-router-ORIGEM + @business-rules-extractor (modo validate) + @code-knowledge-graph (obrigatório, R-045 — find_cycles/dead-code)<br/>Ação: Convenções modernas da stack + Golden Master + cobertura de regras de negócio + zero ciclos/dead-code novos"]
+    BatchCodemod --> ParityRefine["<b>4. Refinamento, Paridade Funcional & Resolução De-Para</b><br/>Agentes: domain-router-DESTINO + specialist-unit-test-writer<br/>Co-agentes: domain-router-ORIGEM + @business-rules-extractor + @code-knowledge-graph<br/>Ação: Dual-Verification Expandido (Golden Master 100% + De-Para 100% resolvido na fase + 0 ciclos)"]
 
-    ParityRefine --> QualityGateMig["<b>5. Baseline & Quality Gate de Migração</b><br/>Agente: runtime-verifier + @code-review<br/>Sign-off: domain-router-ORIGEM (paridade confirmada) + @code-knowledge-graph (obrigatório, R-045 — verificação final de zero ciclos/dead-code)<br/>Ação: 100% testes verdes, linter limpo e PR semântico"]
+    ParityRefine --> CheckPhaseItems{"Todos os IDs De-Para<br/>da fase estão [MIGRADO]<br/>ou [DESACOPLADO]?"}
+    CheckPhaseItems -- "Não (Gaps Detectados)" --> BatchCodemod
+    CheckPhaseItems -- "Sim" --> QualityGateMig["<b>5. Baseline & Quality Gate de Migração</b><br/>Agente: runtime-verifier + @code-review<br/>Sign-offs: domain-router-ORIGEM (100% De-Para coberto) + @code-knowledge-graph (0 ciclos/dead-code)<br/>Ação: Fechamento formal da Matriz De-Para, build/testes verdes e PR semântico"]
 
     QualityGateMig --> CheckMig{"Todas as fases<br/>concluídas?"}
-    CheckMig -- "Sim" --> EndMigDone(["✅ Migração de Framework Concluída com Sucesso"])
+    CheckMig -- "Sim" --> EndMigDone(["✅ Migração de Framework Concluída com Sucesso (Zero Gaps)"])
     CheckMig -- "Não (Próxima Fase)" --> BatchCodemod
 ```
 
+#### A Estratégia de Prevenção de Gaps em 5 Dimensões Críticas:
+A causa raiz de migrações incompletas com dezenas de gaps descobertos tardiamente é a inspeção superficial restrita ao "happy path" do ponto de entrada principal. O workflow exige a decomposição exaustiva do artefato legado em 5 dimensões ortogonais e agnósticas a tecnologia:
+1. **Dimensão 1: Borda, Contratos de Entrada & Validações Fail-Fast**:
+   - Mapeamento de 100% das interfaces de entrada (APIs síncronas, endpoints RPC/REST, listeners de mensageria/eventos, handlers de UI/CLI).
+   - Levantamento de todas as validações pré-voo (ex.: pré-condições de estado, validação de payload/parâmetros, regras de bloqueio de entrada, validações de concorrência ou versão).
+   - Mapeamento exaustivo de todos os códigos de erro, mensagens descritivas e exceções de domínio disparadas.
+2. **Dimensão 2: Regras de Negócio e Ramificações Condicionais**:
+   - Todas as decisões de fluxo e bifurcações condicionais (ex.: flags de tipo de cliente/canal, fluxos alternativos de exceção, regras de cálculo e desvios por perfil ou segmento).
+   - Mapeamento reverso de regras em formato declarativo (EARS/INVEST) via `@business-rules-extractor`.
+3. **Dimensão 3: Pegada de Persistência Relacional & Transações (Database/State Touches)**:
+   - 100% dos repositórios, entidades e tabelas tocadas:
+     - Entidades/tabelas principais ou agregados raiz (ex.: `ENTIDADE_PRINCIPAL_LEGADA`, `ENTIDADE_VERSAO_LEGADA`).
+     - Entidades/tabelas filhas e itens em cascata (ex.: `ENTIDADE_ITEM_FILHO`, `ENTIDADE_DETALHE`).
+     - Entidades/tabelas de rateio, agregação ou valores consolidados (ex.: `ENTIDADE_TOTAL_RATEIO`, `ENTIDADE_TOTAL_CONSOLIDADO`).
+     - Entidades/tabelas de auditoria, histórico de movimentação e snapshots de estado (ex.: `ENTIDADE_HISTORICO_MOVIMENTO`, `ENTIDADE_SNAPSHOT_VALOR`).
+     - Entidades/tabelas de anotações técnicas, comentários e regras de visibilidade (ex.: `ENTIDADE_NOTAS_AUDITORIA`, `ENTIDADE_VISIBILIDADE`).
+     - Sequências de persistência, chaves primárias compostas, índices e triggers de banco.
+   - Demarcações transacionais (escopos de transação autônoma, níveis de isolamento, garantias ACID/consistência eventual, condições de rollback).
+4. **Dimensão 4: Efeitos Colaterais & Integrações Downstream**:
+   - Clientes legados de integração remota (protocolos legados, chamadas RPC/SOAP, stubs de rede).
+   - Clientes modernos de comunicação síncrona e reativa.
+   - Publicação/consumo de mensagens e eventos (tópicos, filas, message brokers).
+   - Motores de geração de relatórios, binários ou documentos (migração para engines e templates declarativos modernos).
+   - Notificações de saída (e-mails, mensagens formatadas, assuntos dinâmicos e anexos).
+   - Processos secundários de ingestão/upload de arquivos e documentos.
+   - Webhooks de alerta e observabilidade ativa (canais de monitoramento e alertas de incidentes) em caso de falha.
+5. **Dimensão 5: Contratos de Saída & DTOs de Resposta**:
+   - Código de sucesso explícito e padronizado.
+   - Payloads de retorno aos clientes da API/interface.
+   - Headers, status codes e formatação padronizada de responses.
+
+#### A Matriz De-Para de Migração & Rastreabilidade de Gaps (Padrão Canônico):
+Documentada em `docs/migrations/matriz-de-para-<alvo>.md` (ou incorporada ao blueprint canônico em `docs/`), constitui a **Single Source of Truth** visual e auditável da paridade:
+
+| ID | Dimensão | Elemento Legado (Módulo.Método / Tabela) | Regra / Comportamento Observável | Elemento Destino (Módulo.Método / Tabela) | Status Paridade | Evidência de Paridade | Fase Alvo |
+|:---:|---|---|---|---|:---:|---|:---:|
+| `GAP-01` | Borda | `ServicoOrigemLegado.atualizarStatusProcesso` | Transição de status legado conforme condição A/B | `StatusEnumDestino` + `PersistirStatusDestinoFunction` | `[✅ MIGRADO]` | `PersistirStatusDestinoFunctionTest` | Fase B2 |
+| `GAP-02` | Saída | `ServicoOrigemLegado.processarOperacao` (sucesso) | Retorno de código de sucesso e mensagem canônica | `ContextChainDestino.andFinallyExecute` | `[✅ MIGRADO]` | `OperacaoParityTest` | Fase B1 |
+| `GAP-03` | Persistência | `DominioOrigemBusiness.salvarNotasAuditoria` | Gravação sequencial de notas em `ENTIDADE_NOTAS_AUDITORIA` | `NotaAuditoriaRepository` + `PersistirDadosDestinoFunction` | `[✅ MIGRADO]` | `PersistirDadosDestinoFunctionTest` | Fase B2 |
+| `GAP-04` | Downstream | `GeradorRelatorioLegado.gerarDocumento` | Relatório corporativo gerado via template moderno | `GerarRelatorioDestinoServiceImpl` | `[✅ MIGRADO]` | `GerarRelatorioDestinoServiceImplTest` | Fase B4 |
+| `GAP-05` | Persistência | `DominioOrigemBusiness.calcularRateioDivisao` | Rateio de valores totais em `ENTIDADE_TOTAL_RATEIO` | `DivisaoTotalRepository` + `PersistirDadosDestinoFunction` | `[✅ MIGRADO]` | `PersistirDadosDestinoFunctionTest` | Fase B2 |
+| `GAP-06` | Downstream | `ServicoAssincronoLegado.dispararScoreRisco` | Predição assíncrona desacoplada em serviço externo | Microsserviço de Analytics / IA | `[ℹ️ DESACOPLADO]` | Desacoplado no pipeline assíncrono correspondente | Arquitetura |
+
+##### Taxonomia Estrita de Status da Matriz:
+- `[✅ MIGRADO]`: Portado com paridade comprovada por teste automatizado verde.
+- `[⏳ PENDENTE]`: Inventariado no escopo da migração, aguardando execução na fase alvo.
+- `[⚠️ DIVERGENTE]`: Portado parcialmente (ex.: stub com retorno fixo, tratamento incompleto de status ou divergência contratual).
+- `[ℹ️ DESACOPLADO]`: Intencionalmente extraído para outro serviço/módulo moderno na arquitetura, com justificativa técnica documentada.
+- `[🚫 OBSOLETO]`: Código morto ou descontinuado no legado, com aprovação explícita de descarte.
+
 #### Cadeia Sequencial e Papéis:
-1. **Estado 0 — Identificação de Stacks Origem/Destino (`@tech-solution-architect`)**:
-   - *Ação*: Antes de qualquer análise, o arquiteto classifica a migração como **cross-stack** (stack de origem e de destino distintas — legado→moderno) ou **in-stack** (mesma stack, apenas major version). Essa classificação determina `colaboracao_dual_stack.obrigatorio_quando` em `routing-graph.yaml` e é registrada em `workflow_state.stack_origem`/`stack_destino`.
-2. **Estado 1 — Pre-Flight Compatibility Assessment (`@tech-solution-architect` + `@code-knowledge-graph` + `domain-router-ORIGEM`)**:
-   - *Ação*: `@code-knowledge-graph` (co-agente **obrigatório**, R-045 — não sub-rotina opcional) mapeia dependências, blast radius e ciclos do código legado via `run_subagent`, produzindo o inventário estrutural que alimenta o blueprint. Em paralelo, `@tech-solution-architect` analisa bibliotecas de terceiros, flags de compilação e descontinuações.
-   - *Sub-rotina 1a (obrigatória se cross-stack)*: `@tech-solution-architect` invoca via `run_subagent` o domain router da stack **legada/origem** (ex.: `@ejb-router`, `@struts-router`) para inventariar comportamento observável, transações e regras de negócio via `@business-rules-extractor` — sem esse inventário, a Etapa 2 não pode ser aprovada.
-3. **Estado 2 — Migration Phasing & Blueprint (`@tech-solution-architect`)**:
-   - *Ação*: Decomposição da migração em fases entregáveis autônomas (*Phased Migration* — ex.: Fase 1: Sintaxe de controle; Fase 2: Standalone; Fase 3: Reatividade), usando o mapa de dependências/ciclos da Etapa 1 para definir a ordem segura das fases. O blueprint declara explicitamente qual domain router atua como **origem (oráculo)** e qual atua como **destino (executor)** em cada fase.
-   - *Checkpoint Humano (Estado 2b)*: Apresentação da estratégia e aprovação obrigatória do plano de fases via `ask_questions`.
-4. **Estado 3 — Codemod & Transformação em Lote (`domain-router-DESTINO` + `specialist-feature-developer`)**:
-   - *Ação*: Execução de scripts de migração oficiais (`ng update`, OpenRewrite recipes) ou transformações de sintaxe via sandbox `context-mode` (R-046).
-   - *Colaboração Contínua (não apenas Etapa 1)*: O `domain-router-ORIGEM` permanece ativo como co-agente consultivo durante toda a execução do codemod — validando regra a regra que o comportamento legado foi preservado. `@code-knowledge-graph` (obrigatório, R-045) recalcula blast radius antes de cada micro-lote, prevenindo quebra de consumidores fora do escopo da fase corrente.
-5. **Estado 4 — Refinamento e Paridade Funcional / Dual-Verification (`domain-router-DESTINO` + `specialist-unit-test-writer`)**:
-   - *Ação*: Ajuste de convenções idiomáticas da nova versão e execução de testes de paridade comprovando comportamento idêntico ao baseline.
-   - *Gate de Dual-Verification (ver § 3.7.1)*: exige **(1)** testes de caracterização (Golden Master) 100% verdes, **(2)** confirmação do `domain-router-ORIGEM` + `@business-rules-extractor` (modo validate) de que 100% das regras de negócio extraídas na Etapa 1 foram cobertas, e **(3)** `@code-knowledge-graph` (obrigatório, R-045) confirmando via `find_cycles`/dead-code que o codemod não introduziu ciclos ou código morto novo — nenhum dos três critérios dispensa os demais.
-6. **Estado 5 — Baseline & Quality Gate de Migração (`runtime-verifier` + `@code-review`)**:
-   - *Ação*: Verificação de build limpo, execução de 100% da suíte de testes de ponta a ponta e preparação de PR semântico pelo `@pr-gatekeeper`.
-   - *Sign-off Final*: em migrações cross-stack, o `domain-router-ORIGEM` confirma explicitamente no relatório final que nenhuma regra de negócio do legado foi perdida; `@code-knowledge-graph` confirma zero ciclos novos e zero dead-code introduzido — ambos os sign-offs são pré-requisito do veredito de conclusão.
+1. **Estado 0 — Identificação de Stacks & Detecção de Cenário (`@tech-solution-architect`)**:
+   - *Ação*: O arquiteto classifica a migração em duas dimensões determinísticas:
+     1. **Classificação Tecnológica**: **cross-stack** (stack de origem e de destino distintas — legado→moderno) ou **in-stack** (mesma stack, apenas major version). Determina a obrigatoriedade da colaboração dual-stack.
+     2. **Classificação de Cenário**: **greenfield** (projeto do zero, sem código moderno prévio) ou **brownfield_in_flight** (migração já iniciada ou incompleta no repositório moderno).
+2. **Estado 1 — Pre-Flight Compatibility Assessment & Decomposição Estrutural 5D (`@tech-solution-architect` + `@code-knowledge-graph` + `domain-router-ORIGEM` + `@business-rules-extractor`)**:
+   - *Ação*: `@code-knowledge-graph` (co-agente **obrigatório**, R-045) extrai a árvore completa de chamadas (`callees`/`callers`), referências e ciclos do legado. `@tech-solution-architect` lidera a decomposição exaustiva nas **5 Dimensões Críticas** (Borda, Regras, Persistência Relacional, Downstream, Saída), garantindo que tabelas secundárias e efeitos colaterais não passem despercebidos.
+   - *Sub-rotina 1a (obrigatória se cross-stack)*: `domain-router-ORIGEM` (ex.: `@ejb-router`, `@struts-router`) atua como oráculo legado, validando a semântica da stack legada (gestão transacional, contratos remotos, componentes de sessão/estado, convenções de framework) e extraindo regras de negócio via `@business-rules-extractor`.
+3. **Estado 1b — Reconciliação Delta & Auditoria de Gaps Pré-Existentes (Obrigatório em Cenários `brownfield_in_flight`) (`@tech-solution-architect` + `domain-router-DESTINO`)**:
+   - *Ação*: Quando a migração já estiver em andamento (cenário *brownfield in-flight* com código parcial ou inacabado no destino), o arquiteto cruza o inventário 5D do legado contra o código moderno já implementado no repositório de destino.
+   - *Saída*: Produz a **Matriz De-Para Preliminar**, catalogando e numerando de imediato todos os gaps encontrados (`GAP-01..GAP-NN`) com status `[⚠️ DIVERGENTE]` (stubs, implementações parciais) ou `[⏳ PENDENTE]` (itens não implementados). Elimina completamente o risco de descobrir dezenas de gaps tardiamente.
+4. **Estado 2 — Migration Phasing & Blueprint com Matriz De-Para (`@tech-solution-architect` + `domain-router-ORIGEM` + `domain-router-DESTINO`)**:
+   - *Ação*: Elaboração do Technical Blueprint canônico e consolidação da **Matriz De-Para de Migração**.
+   - *Phased Architecture Ancorada*: A decomposição em fases autônomas entregáveis (Fases B1..BN — ex.: Fase B1: Validações Pré-Voo, Fase B2: Persistência Relacional Core, Fase B3: Integrações Downstream, Fase B4: Efeitos Colaterais & Relatórios, Fase B5: Paridade & Cutover) vincula expressamente a lista de IDs da Matriz De-Para atribuídos a cada fase.
+   - *Checkpoint Humano (Estado 2b)*: Apresentação da estratégia e aprovação obrigatória do plano via `ask_questions`, exibindo o **Dashboard Executivo da Matriz De-Para**:
+     ```
+     📊 Dashboard Executivo da Matriz De-Para:
+     - Total de Itens: <N> | ✅ Migrados: <N> (<%>)| ⏳ Pendentes: <N> (<%>) | ⚠️ Divergentes: <N> (<%>) | ℹ️ Desacoplados: <N> (<%>)
+     ```
+5. **Estado 3 — Codemod & Transformação em Lote por Fase (`domain-router-DESTINO` + `specialist-feature-developer`)**:
+   - *Ação*: Execução dos codemods oficiais (`ng update`, OpenRewrite recipes) ou transformações cirúrgicas via sandbox `context-mode` (R-046) estritamente restritas aos IDs De-Para da fase ativa.
+   - *Colaboração Contínua*: `domain-router-ORIGEM` permanece ativo como oráculo consultivo validando paridade regra a regra; `@code-knowledge-graph` recalcula blast radius antes de cada micro-lote.
+6. **Estado 4 — Refinamento, Paridade Funcional & Resolução De-Para (`domain-router-DESTINO` + `specialist-unit-test-writer`)**:
+   - *Ação*: Ajuste idiomático da nova versão e execução de testes comprovando comportamento idêntico ao baseline.
+   - *Gate de Dual-Verification Expandido*: exige **(1)** testes de caracterização (Golden Master) 100% verdes, **(2)** resolução de 100% dos IDs De-Para da fase corrente (zero `PENDENTE` ou `DIVERGENTE`), **(3)** confirmação do `domain-router-ORIGEM` + `@business-rules-extractor` (modo validate) de que nenhuma regra ou efeito colateral da fase foi perdido, e **(4)** `@code-knowledge-graph` confirmando zero ciclos ou dead-code novos.
+   - Se aprovado, transiciona os itens da fase para `[✅ MIGRADO]` e avança para a próxima fase (loop até a última fase).
+7. **Estado 5 — Baseline & Quality Gate de Migração (`runtime-verifier` + `@code-review`)**:
+   - *Ação*: Build limpo, execução de 100% da suíte de testes de ponta a ponta e preparação de PR semântico pelo `@pr-gatekeeper`.
+   - *Auditoria de Fechamento da Matriz De-Para*: Confirmação de que 100% dos itens inventariados no módulo estão em `[✅ MIGRADO]` ou `[ℹ️ DESACOPLADO]` (com link de rastreabilidade). Zero gaps órfãos ou pendentes.
+   - *Sign-off Final Conjunto*: `domain-router-ORIGEM` (paridade funcional e ausência de perdas confirmadas) + `@code-knowledge-graph` (zero ciclos novos e zero dead-code) + `domain-router-DESTINO` (conformidade com padrões da stack moderna).
 
 #### Typed State Bag (`workflow_state`):
 ```yaml
 workflow_state:
   stack_migracao: "angular | spring_boot | java_jdk | ejb_to_spring | struts_to_spring"
   cross_stack: true  # true -> aciona colaboracao_dual_stack obrigatoria (routing-graph.yaml)
+  cenario_migracao: "greenfield | brownfield_in_flight"
   stack_origem_router: "ejb-router"       # null se in-stack (mesma stack, apenas major version)
   stack_destino_router: "spring-boot-router"
   versao_origem: "17"
@@ -634,6 +705,14 @@ workflow_state:
   fase_atual: 1
   total_fases: 3
   blueprint_migracao: "docs/migrations/plano-migracao-<alvo>.md"
+  matriz_de_para_ref: "docs/migrations/matriz-de-para-<alvo>.md"
+  de_para_status:
+    total_itens: 0
+    itens_migrados: 0
+    itens_pendentes: 0
+    itens_desacoplados: 0
+    itens_divergentes: 0
+  gaps_criticos_detectados: []
   codemods_executados:
     - "control-flow"
     - "standalone-components"
@@ -643,21 +722,19 @@ workflow_state:
     ciclos_detectados_pre_migracao: 0
     consultado_via: "code-knowledge-graph"  # obrigatorio (R-045), nunca varredura manual
   paridade_funcional_validada: true
-  dual_verification_gate: "golden_master_ok + regras_negocio_100_cobertas + zero_ciclos_dead_code_novos"
+  dual_verification_gate: "golden_master_ok + matriz_de_para_100_resolvida + regras_negocio_100_cobertas + zero_ciclos_dead_code_novos"
   sign_off_domain_router_origem: "confirmado | pendente"  # obrigatorio se cross_stack
   sign_off_code_knowledge_graph: "confirmado | pendente"  # obrigatorio (R-045) — zero ciclos/dead-code novos
   checkpoint_aprovacao_humana: "aprovado | pendente"
 ```
 
-
-#### 3.7.1 Sub-Padrão Canônico: Motor Agnóstico de Migração de Tecnologias Legadas (IR-Based & Dual-Verification)
+#### 3.7.1 Sub-Padrão Canônico: Motor Agnóstico de Migração de Tecnologias Legadas (IR-Based, Matriz De-Para & Dual-Verification)
 - **Princípio de Zero Acoplamento:** Workflows e processos de migração operam estritamente sobre contratos neutros e a **Representação Intermediária Semântica (Semantic IR)** definida em `docs/schemas/migration-ir.schema.json`. O núcleo do workflow é 100% agnóstico e desconhece sintaxes ou bibliotecas concretas de frameworks.
-- **Validação Compulsória de Stacks Envolvidas (Fase 0):** O motor de migração valida e exige que ambas as stacks (origem legada e destino moderno) possuam governança formal de domínio registrada em `.github/agents/<camada>/<stack>/` contendo supervisor hierárquico (`*-router`), sub-catálogo (`*-catalog.yaml`) e especialistas canônicos antes de permitir qualquer avanço (REQ-002 / RNF-003). **Esta validação não é apenas um gate de existência estático** — uma vez confirmada a governança de ambas as stacks, o motor DEVE manter o domain router de origem como participante ativo (co-agente) em todas as fases subsequentes (1 a 5 de § 3.7), nunca apenas na fase de pré-voo (ver Invariante 8 em § 5 e `colaboracao_dual_stack` em `routing-graph.yaml`).
+- **Validação Compulsória de Stacks Envolvidas (Fase 0):** O motor de migração valida e exige que ambas as stacks (origem legada e destino moderno) possuam governança formal de domínio registrada em `.github/agents/<camada>/<stack>/` contendo supervisor hierárquico (`*-router`), sub-catálogo (`*-catalog.yaml`) e especialistas canônicos antes de permitir qualquer avanço (REQ-002 / RNF-003). Uma vez confirmada a governança de ambas as stacks, o motor DEVE manter o domain router de origem como participante ativo (co-agente) em todas as fases subsequentes (1 a 5 de § 3.7), nunca apenas na fase de pré-voo (ver Invariante 8 em § 5 e `colaboracao_dual_stack` em `routing-graph.yaml`).
+- **Reconciliação Delta em Migrações Parciais (Fase 1b):** Em cenários brownfield in-flight, a comparação cruzada entre a árvore 5D do legado e os artefatos existentes no destino é pré-requisito mandatório antes de qualquer geração de plano ou emissão de código, produzindo a Matriz De-Para com os GAPs identificados desde o D0.
 - **Bootstrapping Interativo de Novo Projeto com Human-in-the-Loop (Fase 3a):** Caso o destino da migração seja um projeto novo (green-field) ou novo módulo autônomo, o especialista da stack alvo é compulsoriamente instruído a consultar o desenvolvedor via `ask_questions` para escolha de ferramentas de build (ex.: Maven vs Gradle), versão de runtime/LTS e formato de empacotamento antes de gerar o esqueleto base oficial (REQ-007 / RNF-005).
-- **Dual-Verification Gate de Paridade (Fase 4):** A aprovação da migração exige duplo critério determinístico: (1) 100% de sucesso em testes de caracterização automatizados (*Golden Master*) executados contra o baseline legado; e (2) comprovação de cobertura integral da matriz de regras de negócio extraídas via `@business-rules-extractor`, com o domain router de **origem** atestando explicitamente que nenhuma regra do inventário da Fase 1 foi perdida (REQ-005 / REQ-006).
+- **Dual-Verification Gate com Resolução Integral de De-Para (Fase 4):** A aprovação da migração exige quadruplo critério determinístico: (1) 100% de sucesso em testes de caracterização automatizados (*Golden Master*) executados contra o baseline legado; (2) 100% de resolução dos itens da Matriz De-Para no escopo da fase (`[✅ MIGRADO]` ou `[ℹ️ DESACOPLADO]`); (3) comprovação de cobertura integral da matriz de regras de negócio extraídas via `@business-rules-extractor`, com o domain router de **origem** atestando explicitamente que nenhuma regra ou efeito colateral do inventário 5D foi omitido (REQ-005 / REQ-006); e (4) atesto estrutural do `@code-knowledge-graph` comprovando zero ciclos e zero código morto novo introduzido.
 - **Referência Técnica e Contratos:** Especificação de requisitos em [`docs/requirements/REQ-migration-engine.md`](../../docs/requirements/REQ-migration-engine.md) e Technical Blueprint em [`docs/plan/plano-motor-migracao-agnostica.md`](../../docs/plan/plano-motor-migracao-agnostica.md).
-
----
 
 ### 3.8 WORKFLOW 8: `WORKFLOW-RELEASE-READINESS` (Prontidão de Release, Breaking Changes & Deploy Pre-Flight)
 

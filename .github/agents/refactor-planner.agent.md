@@ -52,7 +52,7 @@ Pedido recebido?
 |  │   5. Plano Aprovado para Execução?
 |  │      |- Etapa Angular -> delegar para @angular-router (modo Implementação)
 |  │      |- Etapa Spring Boot -> delegar para @spring-boot-router (modo Implementação)
-|  │      |- Etapa WebFlux/Reativo -> delegar para @spring-reactive-router (modo Implementação)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |  │      |- Etapa Reativa -> delegar para @spring-reactive-router (modo Implementação)
 |  │      \- Etapa Banco/DDL (Oracle/Informix) -> delegar para @database-router (modo Implementação)
 |  \- Não -> Retornar ao @agent-router
 ```
@@ -125,7 +125,7 @@ Próximo Passo Mínimo:
 - [`@tech-solution-architect`](tech-solution-architect.agent.md) para impacto local relevante (tier B1) e impacto cross-sistema.
 - [`@angular-router`](frontend/angular/angular-router.agent.md) para executar etapas de refatoração no frontend Angular (modo Implementação, testing-first).
 - [`@spring-boot-router`](backend/spring-boot/spring-boot-router.agent.md) para executar etapas de refatoração no backend Spring Boot / Java (modo Implementação, testing-first).
-- [`@spring-reactive-router`](backend/spring-reactive/spring-reactive-router.agent.md) para executar etapas de refatoração no backend Spring WebFlux / Reactor (modo Implementação, testing-first).
+- [`@spring-reactive-router`](backend/spring-reactive/spring-reactive-router.agent.md) para executar etapas de refatoração no backend reativo (modo Implementação, testing-first).
 - [`@database-router`](backend/database/database-router.agent.md) para etapas que envolvam migrações de schema, DDL, Stored Procedures ou queries complexas em Oracle/Informix (fallback `@database-specialist` para outros SGBDs).
 - [`@code-knowledge-graph`](code-knowledge-graph.agent.md) para mapeamento determinístico de blast radius, dependências e ciclos antes de estruturar o plano.
 

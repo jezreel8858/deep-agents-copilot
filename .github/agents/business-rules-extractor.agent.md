@@ -105,8 +105,8 @@ Aplicar o padrão canônico da skill [`structured-intake-patterns`](../skills/st
 # Listar arquivos do módulo
 list_dir src/modulo/
 
-# Identificar entry points (controllers, handlers, facades)
-grep_search "@RestController\|@Component\|@Service\|router\.\|@Injectable"
+# Identificar entry points (controllers, handlers, rotas, facades)
+grep_search "class.*Controller\|class.*Handler\|router\.\|def\s+[a-z_]+_handler"
 
 # Identificar arquivos de domínio/negócio (excluir infra/config)
 file_search "src/**/*Service*" ou "src/**/*Business*" ou "src/**/*Domain*"
