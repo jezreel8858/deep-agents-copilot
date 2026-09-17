@@ -6,6 +6,25 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.12.0] — 2026-09-17
+
+### Adicionado
+- **Blindagem Determinística contra "Cleverness Trap" & State-Locking Universal (R-050 / R-054)**:
+  - Implementação compulsória do protocolo de **State-Locking** (`[CURRENT_STATE_LOCK: ...]`) e **Halting Conditions** em 28 agentes do ecossistema de governança, prevenindo iniciativas espúrias, antecipação de código e desvios de pipeline em modelos de alta capacidade (Claude Sonnet 5, Opus) e garantindo execução atômica em modelos leves (Gemini Flash).
+  - Mapeamento fechado de estados e saídas tipadas em 3 perfis operacionais: (A) Parecer Compacto de Gate/Checkpoint, (B) Technical Blueprint & Context Firewall e (C) Matriz De-Para 5D.
+
+### Aprimorado
+- **Endurecimento dos Agentes Planejadores / Deliberativos (Grupo 1)**:
+  - `@tech-solution-architect`, `@refactor-planner`, `@feature-planner`, `@requirements-analyst` e `@test-strategy`: saneamento de ferramentas com remoção de `ctx_execute`/`ctx_execute_file`, proibição terminante de gerar código executável e exigência de DAGs/matrizes estruturadas com pontos de parada (*STOP TOTAL*).
+- **Endurecimento dos Supervisores Hierárquicos / Domain Routers (Grupo 2)**:
+  - `@angular-router`, `@spring-boot-router`, `@spring-reactive-router`, `@ejb-router`, `@database-router`, `@python-router` e `@struts-router`: aplicação de *Delegação Plana (Flat Delegation)*, proibição absoluta de ferramentas mutativas e resolução estrita de papéis genéricos (`specialist-<papel>`) para agentes concretos do catálogo.
+- **Endurecimento dos Executores Táticos (Grupo 3)**:
+  - 17 agentes executores (`*-feature-developer`, `*-bug-fixer`, `*-ui-stylist`, `*-migration-dev`, `*-spl-expert`, `*-plsql-expert`): trava de execução em TDD estrito (Red Test prévio obrigatório, Single-Turn Batching com diff cirúrgico mínimo ≤ 20 linhas e validação agregada imediata com `get_errors`).
+- **Sincronização SSOT & Qualidade**:
+  - Atualização de versões no catálogo central `.github/agents/catalog.yaml`.
+  - Reexportação de 65 AgentCards A2A em `.a2a/agentcards/`.
+  - 100% de conformidade com 147 testes automatizados passando no `pytest`.
+
 ## [2.11.0] — 2026-09-16
 
 ### Adicionado

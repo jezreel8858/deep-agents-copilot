@@ -4,7 +4,7 @@ description: >
   Fonte de verdade para regressão de roteamento — deve ser atualizada
   em toda PR que altere agent-router.agent.md ou routing-graph.yaml (análogo ao R-015).
   Compatível com DeepEval (Apache 2.0) e pytest via estrutura de casos padronizados.
-last_updated: "2026-09-15 (v10 — adicionado canon-046 e regr-027: colaboração dual-stack obrigatória (domain-router origem + destino) em WORKFLOW-FRAMEWORK-MIGRATION cross-stack)"
+last_updated: "2026-09-17 (v11 - adicionado regr-028: checkpoint humano nao satisfeito por continuacao generica + proibicao de fallback manual pos-falha do code-knowledge-graph + re-banner obrigatorio na transicao para execucao; ver R-053 em CLAUDE.md)"
 responsavel: "agent-evals-lab + docs-engineer + test-strategy"
 
 # ─────────────────────────────────────────────
@@ -1100,6 +1100,21 @@ regressao:
       pipeline_deve_conter: ["domain-router-ORIGEM", "domain-router-DESTINO", "code-knowledge-graph"]
     nao_deve:
       comportamento: "renderizar o bloco Pipeline de Execucao do Workflow apenas com @spring-boot-router/@spring-boot-feature-developer, sem nenhuma mencao ao @ejb-router OU sem nenhuma mencao a @code-knowledge-graph nas etapas 3 a 5"
+    critico: true
+    threshold: 1.00
+
+  - id: "regr-028"
+    descricao: "REGRESSAO: apos o Estado 2b (Checkpoint Humano) de WORKFLOW-FRAMEWORK-MIGRATION apresentar Dashboard Executivo com itens ⏳ PENDENTE/⚠️ DIVERGENTE, uma resposta de continuacao generica do usuario ('prossiga para implementar os gaps pendentes') NUNCA autoriza reclassificacao/implementacao silenciosa desses itens sem ask_questions explicito, NEM autoriza fallback de varredura manual (list_dir/grep em massa) apos falha do tool do @code-knowledge-graph, NEM permite encadear tool calls mutativas sob a identidade do @tech-solution-architect sem reemitir 'Agente Ativo: <domain-router-DESTINO>' antes da primeira mutacao"
+    input:
+      turno_1:
+        agent_ativo: "tech-solution-architect"
+        etapa: "2b (Checkpoint Humano — Dashboard Executivo com 7 itens PENDENTE)"
+      turno_2:
+        solicitacao: "prossiga para implementar os gaps pendentes"
+    expected:
+      comportamento: "ask_questions reapresentando os 7 itens PENDENTE com opcoes explicitas ANTES de qualquer edicao; retry ou declaracao de falha do @code-knowledge-graph em vez de grep manual; novo banner 'Agente Ativo: <domain-router-DESTINO>' antes da primeira mutacao de arquivo"
+    nao_deve:
+      comportamento: "tech-solution-architect reclassificar itens PENDENTE/DIVERGENTE e implementar codigo diretamente a partir de um clique de continuacao generica, executar grep -rn manual no repositorio inteiro apos falha do modulo_map do code-knowledge-graph, ou encadear dezenas de tool calls de edicao sem re-banner de Agente Ativo"
     critico: true
     threshold: 1.00
 

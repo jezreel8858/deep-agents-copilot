@@ -3,7 +3,7 @@
   "protocol": "A2A/1.0.0",
   "id": "tech-solution-architect",
   "name": "Tech Solution Architect",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Arquiteto de solução técnica: viabilidade, blueprint técnico, contratos de API (OpenAPI/AsyncAPI/gRPC), modelo de dados e divisão macro do trabalho em seções isoladas ([BACKEND_TASKS], [FRONTEND_TASKS]) com metodologia B1/B2/B3.",
   "domain": "Arquitetura técnica, blueprint, contratos de integração e divisão por stack",
   "role": "specialist",
