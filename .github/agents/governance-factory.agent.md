@@ -162,7 +162,7 @@ Estrutura um ecossistema tecnológico completo em sua própria pasta, com isolam
 
 4. **Pacote Canônico de Especialistas (.agent.md)**:
    - **Backend**: `arch-advisor`, `feature-developer`, `bug-fixer`, `perf-tuner` (ou `resilience-tuner`), `unit-test-writer`, `integration-test-writer`, `test-fixer`.
-   - **Frontend**: `arch-advisor`, `feature-developer`, `bug-fixer`, `ui-stylist`, `unit-test-writer`, `component-test-writer`, `test-fixer`, `e2e-writer`.
+   - **Frontend (Padrão Test-Last & Isenção de UI)**: `arch-advisor`, `feature-developer` (Test-Last / Implementation-First), `bug-fixer` (Test-Last cirúrgico), `ui-stylist` (estritamente visual, **isento de criar ou executar testes unitários**), `unit-test-writer`, `component-test-writer`, `test-fixer`, `e2e-writer`.
 
 5. **Integração Atômica Global (R-015 — obrigatória na mesma entrega)**:
    - **`.github/agents/catalog.yaml`**: Adicionar APENAS a entrada do `<stack>-router`, mantendo a raiz enxuta.

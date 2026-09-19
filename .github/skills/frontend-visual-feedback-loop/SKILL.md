@@ -49,6 +49,7 @@ Esta skill formaliza o **Visual Feedback Loop (VFL)** agnóstico de framework:
 - Para validar responsividade e quebras em breakpoints padronizados (mobile 375px, tablet 768px, desktop 1440px).
 - Para auditar se elementos utilizam tokens semânticos do Design System em vez de cores hexadecimais inline.
 - Como base de conhecimento para o Gate 2 de Paridade Visual do `WORKFLOW-FEATURE-DEVELOPMENT`.
+- Como método de validação primário para agentes focados em UI e estilização (`ui-stylist`), os quais são **isentos** de criar ou rodar testes unitários.
 
 ### ❌ Quando NÃO Usar
 - Para testes unitários de lógica de negócio, cálculo matemático, stores ou services puros (usar `test-implementation-*`).

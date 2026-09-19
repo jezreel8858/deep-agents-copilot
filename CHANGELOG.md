@@ -6,6 +6,17 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.17.0] — 2026-09-19
+
+### Adicionado
+- **Metodologia Test-Last e Isenção de Testes Unitários para UI na Stack Frontend**:
+  - Instituição da abordagem **Test-Last com Verification Gate Obrigatório** (Implementation-First) para agentes especialistas de frontend (`angular-feature-developer`, `angular-bug-fixer`), eliminando os gargalos de ciclos repetitivos de inicialização de test runners e context poisoning por mocks prematuros de DOM.
+  - Isenção formal de criação e execução de testes unitários para agentes e tarefas de pura estilização e apresentação visual (`angular-ui-stylist`), consolidando que validações de UI são 100% visuais (Visual Feedback Loop, WCAG 2.2, design tokens e `get_errors` limpo).
+  - Atualização do `WORKFLOW-FEATURE-DEVELOPMENT` em `workflows.md` (Estado 5a/5b), formalizando que a escrita de testes unitários/componentes de regressão é delegada aos test-writers ao final da etapa.
+  - Sincronização em lote (R-046 / R-055) das skills `angular-implementation-patterns/SKILL.md`, `frontend-visual-feedback-loop/SKILL.md` e `test-implementation-frontend/SKILL.md`.
+  - Padronização em `governance-factory.agent.md` e `governance-factory-patterns/SKILL.md` para que futuros ecossistemas de frontend herdem compulsoriamente a isenção de UI e a metodologia Test-Last.
+  - Criação da suíte determinística de testes em `tests/governance_audit/test_frontend_test_last_governance.py` (160 testes verdes no pytest).
+
 ## [2.16.0] — 2026-09-19
 
 ### Adicionado

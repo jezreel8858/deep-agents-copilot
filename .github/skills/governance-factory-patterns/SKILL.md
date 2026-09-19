@@ -314,8 +314,12 @@ A criação de um novo ecossistema de stack (ex.: EJB, React, Python FastAPI) se
   - `<stack>-unit-test-writer` (Testes unitários isolados com mocks)
   - `<stack>-integration-test-writer` (Testes integrados com banco/container real)
   - `<stack>-test-fixer` (Diagnóstico e correção de falhas em suítes de teste)
-- **Frontend (ex.: React)**:
-  - `<stack>-arch-advisor`, `<stack>-feature-developer`, `<stack>-bug-fixer`, `<stack>-ui-stylist`, `<stack>-unit-test-writer`, `<stack>-component-test-writer`, `<stack>-test-fixer`, `<stack>-e2e-writer`.
+- **Frontend (ex.: React, Angular, Vue)**:
+  - `<stack>-arch-advisor` (Read-Only: arquitetura, migrações, performance CWV)
+  - `<stack>-feature-developer` (Test-Last / Implementation-First: componentes, stores, lógica de domínio com testes posteriores)
+  - `<stack>-bug-fixer` (Fixer: runtime errors, memory leaks, diff mínimo sob Test-Last)
+  - `<stack>-ui-stylist` (Apresentação: HTML/CSS/SCSS modular, design tokens, layout responsivo — estritamente visual, **isento de criar ou executar testes unitários**)
+  - `<stack>-unit-test-writer`, `<stack>-component-test-writer`, `<stack>-test-fixer`, `<stack>-e2e-writer` (Especialistas dedicados de teste: cobrem testes unitários, de componente e E2E pós-estabilização sob o modelo Test-Last).
 
 ### 11.5) Quádrupla Sincronização Global Obrigatória (R-015)
 Ao criar a stack, o `governance-factory` DEVE atualizar atomicamente:

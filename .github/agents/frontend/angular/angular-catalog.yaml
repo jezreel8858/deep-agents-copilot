@@ -59,14 +59,15 @@ agents:
     model: "Gemini 3.8 Flash"
     role: "implementer"
     domain: "Desenvolvimento de features novas, componentes standalone e gerenciamento de estado reativo"
-    description: "Desenvolvedor de features: cria componentes standalone, NgRx Signal Stores, services e diretivas sob workflow testing-first (TDD)."
+    description: "Desenvolvedor de features: cria componentes standalone, NgRx Signal Stores, services e diretivas sob workflow Test-Last (Implementation-First com testes posteriores)."
     keywords:
       - "feature angular"
       - "componente standalone"
       - "signal store"
       - "signals"
       - "service angular"
-      - "tdd angular"
+      - "test-last angular"
+      - "implementation-first"
     tools:
       - "read_file"
       - "file_search"
@@ -129,7 +130,7 @@ agents:
     model: "Gemini 3.8 Flash"
     role: "stylist"
     domain: "Templates HTML5, SCSS modular, layout responsivo e acessibilidade WCAG"
-    description: "Especialista de apresentação: refatora templates com Control Flow (@if/@for), implementa SCSS modular (:host), layout responsivo mobile-first e conformidade WCAG 2.2 AA."
+    description: "Especialista de apresentação: refatora templates com Control Flow (@if/@for), implementa SCSS modular (:host), layout responsivo mobile-first e conformidade WCAG 2.2 AA (estritamente visual, isento de criar ou rodar testes unitários)."
     keywords:
       - "scss angular"
       - "css angular"
