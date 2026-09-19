@@ -6,6 +6,17 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.20.0] — 2026-09-19
+
+### Adicionado
+- **Consolidação Documental sob Framework Diátaxis & Padrões Globais de Governança de IA (NIST AI RMF, ISO 42001, OWASP Agentic AI)**:
+  - Criação do **Portal Central de Documentação** em `docs/README.md`, organizando 100% dos artefatos técnicos do ecossistema nos 4 quadrantes Diátaxis (Tutoriais, Guias Práticos / How-To, Referência Técnica e Conceitos & Arquitetura).
+  - Formalização do **Guia Canônico de Boas Práticas de Documentação em Governança de IA** (`docs/architecture/AI_GOVERNANCE_DOCUMENTATION_GUIDE.md`), integrando os pilares de governança responsável (NIST AI RMF 1.0, ISO/IEC 42001 e OWASP Agentic AI 2026).
+  - Alinhamento de documentação de agentes ao padrão aberto **Agent Card** (A2A Protocol / Linux Foundation / IETF Draft 2026) com suporte a manifestos estruturados máquina-máquina via `docs/schemas/agentcard.schema.json`.
+  - Atualização do `README.md` principal na raiz integrando o Nível 4 de documentação e sincronizando o status de governança global (169 testes determinísticos no pytest).
+
+---
+
 ## [2.19.0] — 2026-09-19
 
 ### Adicionado

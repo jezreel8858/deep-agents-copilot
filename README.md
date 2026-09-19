@@ -41,17 +41,24 @@ Exemplos:
 
 ### Nível 3: Contexto de Binding e Artefatos de Governança
 
-**Local:** `.github/instructions/`
+**Local:** `.github/instructions/` e `.github/agents/`
 
-- **`catalog.yaml`** — Manifest único de adapters, projetos e mapping stack → instrução; inclui seção `governance_artefacts` com artefatos estruturais de IA
-- **`binding.md`** — Documentação de binding e descoberta
+- **`instructions/README.md`** — Mapa de adapters registrados, `applyTo` patterns e carregamento hierárquico
+- **`catalog.yaml`** — Catálogo central de agents com modelos recomendados e papéis
 - **`routing-graph.yaml`** — ⭐ **Grafo de roteamento declarado** (nós = agents, arestas = condições, política de cascata) — fonte de verdade estrutural do `agent-router` (R-040)
+- **`evals/casos-roteamento.yaml`** — Suíte de casos de teste de regressão de roteamento (canônicos, ambíguos, regressão, segurança)
 
-**Suítes de Evals:**
-- **`.github/agents/evals/casos-roteamento.yaml`** — Suíte de casos de teste de regressão de roteamento (canônicos, ambíguos, regressão, segurança)
+### Nível 4: Portal Unificado de Documentação (Diátaxis & arc42)
+
+**Local:** [`docs/README.md`](docs/README.md)
+
+Centraliza todo o conhecimento técnico em quatro quadrantes Diátaxis:
+- 🎓 **Tutoriais**: Primeiros passos, setup de ambiente e motor de grafo.
+- 🛠️ **Guias Práticos (How-To)**: Execução dos 8 workflows determinísticos, scanner de projetos e context-mode.
+- 📖 **Referência Técnica**: Catálogos de agentes/skills, regras normativas R-001..R-056 e Schemas JSON (AgentCard, Semantic IR, Incidentes).
+- 💡 **Conceitos & Arquitetura**: [Guia de Arquitetura arc42](docs/architecture/ARCHITECTURE_AND_GOVERNANCE_GUIDE.md) e [Guia de Documentação em Governança de IA](docs/architecture/AI_GOVERNANCE_DOCUMENTATION_GUIDE.md) (alinhado a NIST AI RMF, ISO 42001 e OWASP Agentic AI).
 
 ---
-
 
 ## Estrutura Física do Repositório
 
@@ -338,13 +345,17 @@ flowchart TB
 
 ---
 
-## Status Atual (2026-09-10)
+## Status Atual (2026-09-19 — Versão 2.19.0)
 
-### Governança Global
-- ✅ Regras normativas consolidadas (`CLAUDE.md`)
-- ✅ Roteamento operacional (`copilot-instructions.md`)
-- ✅ Genericidade explícita em todas as regras globais (R-038)
-- ✅ Re-triagem obrigatória por turno (R-042 — anti sticky-session), fechando o gap de agent downstream que perdia a inteligência de roteamento após o 1º turno
+### Governança Global & Blindagem Sistêmica
+- ✅ **Regras normativas consolidadas** (`CLAUDE.md` — Regras R-001 a R-056).
+- ✅ **Governança Estrita de Routers (R-054 / Smell 2.23)**: Least privilege com baseline de 7 tools, Zero Pre-Routing Discovery e Flat Delegation universal para eliminar consumo inútil de créditos.
+- ✅ **Portão de Reúso e Generalização Sistêmica (R-055 — Anti-Silo Fix)**: Avaliação compulsória de impacto em peers (Q1), templates canônicos (Q2) e testes determinísticos (Q3) em qualquer manutenção.
+- ✅ **Precedência Mandatória de Context Mode (R-056 / Smell 2.24)**: Primazia absoluta de sandboxing e Think-in-Code para escritas/refatorações, erradicando o anti-padrão de editor tool sprawl no chat.
+- ✅ **Workflows Canônicos Determinísticos (R-050)**: 8 workflows operacionais com State Machines rígidas e banners visuais anti-cegueira.
+- ✅ **Migração Determinística com Tríplice Redundância Pós-Migração**: Elevação do `WORKFLOW-FRAMEWORK-MIGRATION` para 6 etapas canônicas com Symbol Exhaustion Gate, Anti-Omission AST Validator, Reverse Orphan Audit, Mutation Parity e Differential Shadow Replay.
+- ✅ **Portal Unificado de Documentação & Framework Diátaxis**: Centralização em [`docs/README.md`](docs/README.md) e formalização do [`AI_GOVERNANCE_DOCUMENTATION_GUIDE.md`](docs/architecture/AI_GOVERNANCE_DOCUMENTATION_GUIDE.md) alinhado a NIST AI RMF, ISO 42001 e OWASP Agentic AI.
+- ✅ **Suíte de Testes Automatizados**: **169 testes determinísticos 100% passando** no pytest.
 
 ### Adapters de Stack
 - ✅ `spring-boot-backend.instructions.md` — Java/Spring Boot
