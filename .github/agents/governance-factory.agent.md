@@ -172,7 +172,7 @@ Estrutura um ecossistema tecnológico completo em sua própria pasta, com isolam
 
 ## 🔒 Baseline R-054 — Governança Estrita de Todo Agent com Perfil de Router
 
-Todo agent com perfil de roteador (central `@agent-router`, supervisores hierárquicos `*-router` ou qualquer agent com papel de despacho) deve ser gerado ou revisado sob o template canônico `.github/agents/templates/router-agent.md` e cumprir compulsoriamente os 3 pilares normativos de R-054 (evitando o Smell 2.23):
+Todo agent com perfil de roteador (central `@agent-router`, supervisores hierárquicos `*-router` ou qualquer agent com papel de despachante) deve ser gerado ou revisado sob o template canônico `.github/agents/templates/router-agent.md` e cumprir compulsoriamente os 3 pilares normativos de R-054 (evitando o Smell 2.23):
 
 1. **Least Privilege de Ferramentas (Baseline Canônico de 7 Tools)**:
    O frontmatter `tools:` é estritamente restrito a:
@@ -223,6 +223,7 @@ Executar o checklist genérico de `governance-factory-patterns` §3, mais:
 - [ ] Se `type: stack`: router configurado com R-042, banner de fluxo e consulta ao `@test-strategy` (Fluxo 2 TDD).
 - [ ] Se `type: stack`: quádrupla sincronização global executada (`catalog.yaml`, `routing-graph.yaml`, `agent-router.agent.md`, `README.md`).
 - [ ] Se artefato for router (`*-router` ou supervisor/despachante): Baseline R-054 aplicado (template router-agent.md, baseline de 7 tools, Zero Pre-Routing Discovery, Delegação Plana e validação via test_router_agents.py).
+- [ ] Se artefato possuir ferramentas mutativas (`insert_edit_into_file`, `create_file`): inclusão compulsória da regra de precedência de context-mode (R-056) no bloco CRÍTICO e inclusão de `.github/skills/efficient-batch-code-modification/SKILL.md` em `source_docs` (R-046 / R-051 / Smell 2.16 / Smell 2.24).
 - [ ] Portão de Reúso Sistêmico (R-055 / Q1-Q2-Q3) avaliado: checado se a melhoria deve ser propagada para artefatos irmãos (Q1), templates canônicos (Q2) e testes determinísticos (Q3).
 - [ ] Catálogo(s) correspondente(s) ao tipo mapeado para atualização atômica (R-015).
 - [ ] `model:` (quando presente) validado via `get_errors`.

@@ -341,6 +341,17 @@ Esta skill **reaproveita** (não recria) a taxonomia de `code-review-patterns`:
 | Remediação | (a) Restringir ferramentas de todos os routers estritamente ao baseline canônico de 7 ferramentas: `['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search']`; (b) Declarar a regra de Zero Discovery no bloco CRÍTICO de todos os routers e no template canônico `router-agent.md`; (c) Fazer o router operar sob Delegação Plana sem invocar downstream internamente via `run_subagent` |
 
 ---
+### 2.24 — Omissão de Precedência de Context-Mode em Agentes Mutadores (Editor Tool Sprawl / R-056)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Agente executor com capacidade de escrita utiliza repetidamente ferramentas manuais de editor (`replace_string_in_file`, `insert_edit_into_file`) em série no chat para modificar arquivos estruturados, em vez de priorizar a execução em processo único no sandbox (`ctx_execute` / `ctx_execute_file`), gerando poluição conversacional, queima de contexto e risco de truncamento |
+| Como detectar | Agente possui ferramentas mutativas (`insert_edit_into_file`, `replace_string_in_file`, `create_file`), mas seu contrato operacional (`.agent.md` ou template) omite a cláusula de precedência mandatória de `context-mode` (R-056); ou agente dispara 3+ chamadas de editor tools em sequência no chat para uma mesma tarefa |
+| Origem (TrustAgent) | Intrínseco — comodismo do modelo em recorrer a primitivas do editor em vez de compor o script all-or-nothing no sandbox via Think-in-Code (R-008 / R-051) |
+| Severidade | **Alta** (desperdício severo de créditos, ineficiência de contexto e risco de corrupção em arquivos grandes) |
+| Remediação | Injeção da cláusula de precedência mandatória de `context-mode` no bloco CRÍTICO e diretrizes de todos os agentes mutadores e templates operacionais, reservando ferramentas de editor como fallback estrito de última instância |
+
+---
 ### Smell 2.22 — Sticky Agent e Falha de Reset de Workflow (R-042 / R-052)
 - **Definição**: Ocorre quando o último agente ativo em um turno ou ao término de um workflow canônico retém o controle da conversa e tenta responder a uma nova solicitação do usuário, justificando que o pedido pertence ao mesmo ecossistema/stack técnica, violando a centralidade do `@agent-router` e bypassando o pipeline de requisitos ou triagem do workflow canônico aplicável.
 - **Severidade**: Bloqueador.

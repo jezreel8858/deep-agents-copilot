@@ -41,16 +41,16 @@ Esta skill estabelece o protocolo operacional obrigatório para execução de al
 
 ---
 
-## 0. Hierarquia de Decisão de Ferramenta (Antes de Tudo)
+## 0. Hierarquia e Precedência de Ferramentas (R-056 — Context-Mode First)
 
-Antes de executar qualquer edição, o agente DEVE classificar o escopo da tarefa para escolher a ferramenta com menor custo de créditos:
+Antes de executar qualquer edição, o agente DEVE seguir a ordem de precedência mandatória para escrita e modificação de arquivos, eliminando o anti-padrão de editor tool sprawl (Smell 2.24):
 
-| Escopo da Modificação | Ferramenta Obrigatória | Mecanismo de Execução | Custo de Créditos |
-|---|---|---|:---:|
-| **1 a 4 arquivos** (edição pontual, contextos heterogêneos) | `replace_string_in_file` ou `insert_edit_into_file` (Editor) | Single-Turn Batching (todas as tool calls na mesma rodada) | Baixo (~1 tool call por arquivo) |
-| **5+ arquivos** OU **padrão repetitivo** em múltiplos arquivos (rename, atualização de campo, injeção de bullet em N agents/skills) | `ctx_execute`, `ctx_execute_file` ou `ctx_batch_execute` (Context-Mode) | Script inline (Node.js/Python) que lê, altera via regex/replace e salva em processo único no sandbox | **Mínimo (~zero créditos de LLM por arquivo, 1 única tool call)** |
+| Nível de Precedência | Escopo / Cenário | Ferramenta Obrigatória | Mecanismo de Execução | Custo de Créditos |
+|---|---|---|---|:---:|
+| **Nível 1 (Primário / Compulsório)** | Arquivo único grande (>100 linhas), YAML/JSON, Markdown estruturado (.agent.md, .instructions.md), **5+ arquivos** OU **padrão repetitivo** em múltiplos arquivos | `ctx_execute`, `ctx_execute_file` ou `ctx_batch_execute` (Context-Mode) | Script inline (Node.js/Python) que lê, valida unicidade em memória e salva em processo único all-or-nothing no sandbox (R-051 / R-056) | **Mínimo (~1 única tool call, zero overhead de chat)** |
+| **Nível 2 (Fallback Restrito de Última Instância)** | Edição micro e pontual (1 a 2 linhas isoladas em arquivo simples/plano) onde o sandbox for comprovadamente desnecessário ou indisponível | `replace_string_in_file` (Editor) | Single-Turn Batching cirúrgico com 2-3 linhas de contexto exclusivo. **Proibido encadear múltiplas chamadas em série no chat.** | Baixo (~1 tool call) |
 
-> ⚠️ **INCIDENTE PREVENIDO**: Executar 20+ chamadas de editor sequenciais ou em lote no chat reenvia histórico massivo a cada retorno de tool, podendo drenar centenas de créditos por refactor. Em operações massivas (>= 5 arquivos) ou padrões repetitivos, o uso de script via `ctx_execute`/`ctx_execute_file`/`ctx_batch_execute` é **COMPULSÓRIO**.
+> ⚠️ **INCIDENTE PREVENIDO**: Executar chamadas de editor sequenciais no chat reenvia histórico massivo a cada retorno de tool, podendo drenar centenas de créditos por refactor. Para qualquer arquivo estruturado, lote multi-arquivo ou padrão repetitivo, o uso de script via `ctx_execute`/`ctx_execute_file`/`ctx_batch_execute` é **COMPULSÓRIO (R-056)**.
 
 ---
 

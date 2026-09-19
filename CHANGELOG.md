@@ -6,6 +6,17 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.18.0] — 2026-09-19
+
+### Adicionado
+- **Precedência Mandatória de Context Mode em Modificação de Arquivos (R-056 / Smell 2.24 — Anti-Editor Tool Sprawl)**:
+  - Instituição da regra normativa R-056 em `CLAUDE.md` e `copilot-instructions.md`, estabelecendo o `context-mode` (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_index`, `ctx_search`) como canal primário e compulsório de escrita, criação e refatoração de código e governança.
+  - Rebaixamento formal de ferramentas manuais de editor (`replace_string_in_file`, `insert_edit_into_file`) a fallbacks restritos de última instância (apenas micro-edições pontuais de 1-2 linhas ou indisponibilidade de sandbox), proibindo terminantemente encadeamento de chamadas de editor em série no chat.
+  - Catalogação do **Smell 2.24 (Omissão de Precedência de Context-Mode em Agentes Mutadores / Editor Tool Sprawl)** em `.github/skills/governance-audit-patterns/SKILL.md`.
+  - Reestruturação da Seção 0 de `.github/skills/efficient-batch-code-modification/SKILL.md` com a hierarquia de precedência Nível 1 (Context-Mode compulsório para arquivos estruturados e lote) e Nível 2 (Editor fallback).
+  - Atualização dos templates canônicos operacionais (`operational-agent.md`, `agent-template.md`) e do `governance-factory.agent.md` com trava de herança compulsória da precedência de `context-mode` para novos agentes mutadores.
+  - Criação da suíte determinística em `tests/governance_audit/test_context_mode_precedence_governance.py` (166 testes verdes no pytest).
+
 ## [2.17.0] — 2026-09-19
 
 ### Adicionado
@@ -406,7 +417,7 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ### Refatorado
 - **Desacoplamento de Cardinalidade Normativa (Herança Aberta de Governança)**:
-  - Substituição da referência rígida ao contador fechado (`R-001..R-051`) pela herança aberta desacoplada (`regras normativas globais em CLAUDE.md`) em 45 agents/templates e todos os prompts, skills e catálogos.
+  - Substituição da referência rígida ao contador fechado (`R-001..R-051`) pela herança aberta desacoplada (`regras normativas globais em CLAUDE.md`) em 45 agents/templates e todos os prompts e catálogos.
   - Eliminação definitiva do problema de *Shotgun Surgery* (manutenção em cascata e gasto desnecessário de créditos Copilot a cada nova regra adicionada ao `CLAUDE.md`).
 - **Redefinição do Smell 2.15 (`governance-audit-patterns/SKILL.md` & `test_governance_smells.py`)**:
   - Inversão de sentido do Smell 2.15 de "range desatualizado" para "Acoplamento Rígido de Range Normativo (Hardcoded Range Coupling)".
