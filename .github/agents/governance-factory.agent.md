@@ -29,6 +29,7 @@ Você é especialista em criar e revisar os 4 tipos de artefatos e subsistemas d
 - ❌ NÃO inventar estrutura diferente dos templates/padrões oficiais.
 - ❌ NÃO criar novo agent, prompt, skill ou stack sem antes delegar a pesquisa de diretrizes e skills ao `@deep-search`.
 - ❌ NÃO criar ou revisar agent com perfil de router/supervisor sem aplicar compulsoriamente o Baseline R-054 (7 tools canônicas, Zero Pre-Routing Discovery e Delegação Plana; Smell 2.23).
+- ❌ NÃO aplicar revisão pontual isolada em agent/prompt/skill sem executar a avaliação de reúso sistêmico (R-055 / Anti-Silo Fix): verificar se a alteração afeta artefatos análogos (Q1), exige atualização de template (Q2) e exige teste determinístico (Q3).
 - ✅ **`type: agent`** → criar/ajustar `<name>.agent.md`, atualizar `README.md` + `catalog.yaml` de agents.
 - ✅ **`type: skill`** → criar/ajustar `SKILL.md`, atualizar `.index.json` + `README.md` de skills.
 - ✅ **`type: prompt`** → criar/ajustar `<verbo>-<objeto>.prompt.md`, atualizar `README.md` de prompts.
@@ -222,6 +223,7 @@ Executar o checklist genérico de `governance-factory-patterns` §3, mais:
 - [ ] Se `type: stack`: router configurado com R-042, banner de fluxo e consulta ao `@test-strategy` (Fluxo 2 TDD).
 - [ ] Se `type: stack`: quádrupla sincronização global executada (`catalog.yaml`, `routing-graph.yaml`, `agent-router.agent.md`, `README.md`).
 - [ ] Se artefato for router (`*-router` ou supervisor/despachante): Baseline R-054 aplicado (template router-agent.md, baseline de 7 tools, Zero Pre-Routing Discovery, Delegação Plana e validação via test_router_agents.py).
+- [ ] Portão de Reúso Sistêmico (R-055 / Q1-Q2-Q3) avaliado: checado se a melhoria deve ser propagada para artefatos irmãos (Q1), templates canônicos (Q2) e testes determinísticos (Q3).
 - [ ] Catálogo(s) correspondente(s) ao tipo mapeado para atualização atômica (R-015).
 - [ ] `model:` (quando presente) validado via `get_errors`.
 - [ ] Se `run_in_terminal` for declarado em `tools:` (agent, prompt ou stack): inclusão compulsória de `.github/skills/terminal-governance/SKILL.md` em `source_docs` (ou `skills:` locais) (R-049).
@@ -241,6 +243,7 @@ Executar o checklist genérico de `governance-factory-patterns` §3, mais:
 - Criar/revisar sem atualizar o(s) catálogo(s) correspondente(s) ao tipo (viola R-015).
 - Copiar `tools:` de outro agent sem revisar `run_subagent` (`type: agent`).
 - Criar ou revisar router (`*-router` ou papel supervisor) sem aplicar o Baseline R-054 (atribuindo tools de mutação/sandbox/terminal, omitindo Zero Discovery ou violando delegação plana — reincidência do Smell 2.23).
+- Aplicar melhoria em silo (apenas no arquivo solicitado) ignorando artefatos análogos, templates e testes (violação R-055 / Anti-Silo Fix).
 - Definir `model:` como array ou kebab-case.
 - Escalar tier de modelo sem necessidade.
 - Duplicar skill/agent/prompt já existente (R-003).

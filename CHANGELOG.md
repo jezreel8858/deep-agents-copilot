@@ -6,6 +6,24 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.16.0] — 2026-09-19
+
+### Adicionado
+- **Portão de Reúso e Generalização Sistêmica em Governança (R-055 / Anti-Silo Fix)**:
+  - Instituição da regra normativa R-055 em `CLAUDE.md`, `copilot-instructions.md` e `workflows.md` (`WORKFLOW-GOVERNANCE-MAINTENANCE`), tornando compulsória a avaliação prévia de reúso sistêmico antes de qualquer implementação de melhoria ou ajuste em agents, prompts e skills.
+  - Eliminação estrutural do anti-padrão de correções em silo (*one-off fixes*): todo agente de governança deve responder obrigatoriamente às 3 perguntas canônicas de generalização:
+    - **Q1 (Impacto Horizontal / Peers)**: avaliar e expandir em lote (*Single-Turn Batching*, R-046) para artefatos análogos do mesmo perfil ou camada.
+    - **Q2 (Prevenção Futura / Templates)**: atualizar compulsoriamente o template canônico em `templates/` para que futuras criações herdem a diretriz.
+    - **Q3 (Blindagem por Teste / Quality Gate)**: criar ou expandir asserções determinísticas no pytest (`tests/governance_audit/`).
+  - Criação da suíte determinística de testes em `tests/governance_audit/test_systemic_reuse_gate.py` validando R-055, workflows, skills e os 3 agentes de governança (155 testes verdes).
+
+### Aprimorado
+- **Integração do Gate nos Agentes de Governança**:
+  - `@agent-auditor`: inclusão de avaliação compulsória de reúso sistêmico (Q1/Q2/Q3) na `Decision Tree`, `Formato de Saída` e `Checklist Antes de Auditar`.
+  - `@governance-factory`: adição da trava no bloco `CRÍTICO` e `Checklist Antes de Codar`, vedando revisões em silo.
+  - `@governance-maintainer`: adição da etapa de reúso sistêmico na Fase 1 (Dry-Run & Mapeamento em Memória) e no checklist de conclusão.
+  - `governance-factory-patterns/SKILL.md`: formalização da subseção §3.2 detalhando o protocolo de decisão para o gate de generalização.
+
 ## [2.15.0] — 2026-09-19
 
 ### Adicionado
