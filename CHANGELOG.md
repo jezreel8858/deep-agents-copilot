@@ -6,6 +6,22 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.15.0] — 2026-09-19
+
+### Adicionado
+- **Prevenção Compulsória de R-054 no `@governance-factory` (v1.3.0)**:
+  - Adição da seção normativa *Baseline R-054 — Governança Estrita de Todo Agent com Perfil de Router*, exigindo esqueleto base de `templates/router-agent.md`, Least Privilege com 7 ferramentas canônicas, Zero Pre-Routing Discovery e Delegação Plana.
+  - Detecção automática de perfil router no fluxo `type: agent` (quando `name` termina em `-router` ou `description` indica papel supervisor/despachante).
+  - Gate de validação formal em `tests/governance_audit/test_router_agents.py` incorporado aos fluxos de scaffolding de router em `type: stack` e `type: agent`.
+  - Inclusão de `.github/skills/governance-audit-patterns/SKILL.md` em `source_docs`.
+
+### Aprimorado
+- **Auditoria Dinâmica de Smells e R-054 no `@agent-auditor` (v1.2.0)**:
+  - Substituição da contagem estática ("14/13 categorias de smell") por referência dinâmica a `governance-audit-patterns/SKILL.md` § 2 (atualmente até o Smell 2.23).
+  - Adição de verificação explícita de conformidade com R-054 e Smell 2.23 na Decision Tree e Checklist ao auditar artefatos com perfil router (`*-router.agent.md` e `templates/router-agent.md`).
+- **Saneamento Documental em `@governance-factory`**:
+  - Remoção de bloco de texto corrompido/órfão remanescente no final do arquivo.
+
 ## [2.14.0] — 2026-09-19
 
 ### Adicionado
