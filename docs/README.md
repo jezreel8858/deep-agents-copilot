@@ -79,6 +79,7 @@ APRENDIZADO ────────────────────┼─�
 
 - [**Guia Canônico de Arquitetura e Governança (arc42)**](architecture/ARCHITECTURE_AND_GOVERNANCE_GUIDE.md): Documento mestre em 12 seções arc42 cobrindo metas, restrições, contexto, building blocks, runtime view e conceitos transversais.
 - [**Guia de Boas Práticas de Documentação em Governança de IA**](architecture/AI_GOVERNANCE_DOCUMENTATION_GUIDE.md): Alinhamento com NIST AI RMF, ISO/IEC 42001, OWASP Agentic AI, Diátaxis e living documentation.
+- [**Guia Canônico de Segurança de Aplicação e Vulnerabilidades (AppSec)**](architecture/APPLICATION_SECURITY_GUIDE.md): Matriz dos 6 pilares de AppSec (SAST, SCA + Reachability, DAST, IAST, Secrets e ASPM), OWASP Top 10, ASVS 5.0 e SLAs de remediação CVSS.
 - **Planos e Decisões de Arquitetura (ADR / Blueprints)**:
   - [Plano do Motor Agnóstico de Migração](plan/plano-motor-migracao-agnostica.md): Blueprint técnico do motor IR-based com paridade funcional e redundância pós-migração.
   - [Taxonomia de Perfis de Agentes](plan/agent-profiles-taxonomy.md): Categorização de agentes segundo benchmarks de mercado (Anthropic, OpenAI, LangGraph).

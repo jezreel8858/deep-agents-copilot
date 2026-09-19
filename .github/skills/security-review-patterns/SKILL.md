@@ -41,14 +41,26 @@ tools: []
 - Ao investigar relato de vulnerabilidade ou CVE em dependência do projeto.
 - Ao desenhar endpoint de API que recebe input externo.
 
-## 1) Standards Consolidados (2025-2026)
+## 1) Standards e Pilares AppSec Consolidados (2025-2026)
 
+### 1.1 Normas e Padrões Globais
 | Standard | Versão | Foco |
 |---|---|---|
 | **OWASP Top 10** | 2025 | Vulnerabilidades web — 3 categorias renomeadas vs. 2021, não usar IDs antigos |
-| **OWASP ASVS** | 5.0.0 | Requisitos de verificação de segurança (Level 1/2/3), toda a estrutura de capítulos foi renumerada vs. 4.0 |
+| **OWASP ASVS** | 5.0.0 | Requisitos de verificação de segurança (Level 1/2/3), estrutura renumerada vs. 4.0 |
+| **OWASP API Security Top 10** | 2024/2025 | Segurança de APIs modernas (BOLA, Broken Authentication, Mass Assignment) |
+| **CWE Top 25** | Mais recente | Fraquezas de software mais perigosas e recorrentes no mercado |
 | **OWASP Top 10 for LLM Apps** | 2025 | Riscos LLM01-LLM10 para chatbots, RAG, tool-calling apps |
 | **OWASP Agentic AI Security** | 2026.1 (dez/2025) | Riscos ASI01-ASI10 para sistemas de agents autônomos — **escopo do agent de IA em si**, não da aplicação revisada |
+
+### 1.2 A Matriz Canônica de Segurança de Aplicação (AppSec Stack)
+O ecossistema implementa a cobertura em profundidade através de 6 pilares complementares (detalhes em [`docs/architecture/APPLICATION_SECURITY_GUIDE.md`](../../docs/architecture/APPLICATION_SECURITY_GUIDE.md)):
+1. **SAST (Static Application Security Testing)**: Varredura de código-fonte proprietário (Shift-Left) via AST e *Taint Analysis* (Semgrep, SonarQube, CodeQL).
+2. **SCA (Software Composition Analysis) + Reachability**: Análise de dependências com verificação de alcançabilidade no grafo de chamadas (Trivy, Snyk, pip-audit, npm audit).
+3. **DAST (Dynamic Application Security Testing)**: Testes de caixa preta em runtime contra APIs e endpoints (OWASP ZAP, StackHawk).
+4. **IAST (Interactive Application Security Testing)**: Instrumentação de runtime durante execução de testes com zero falso-positivo.
+5. **Secrets Detection**: Varredura pré-commit e pós-merge com análise de entropia e prefixos conhecidos (Gitleaks, TruffleHog).
+6. **ASPM (Application Security Posture Management)**: Camada de correlação e orquestração de risco consolidada.
 
 ## 2) Taxonomia de Achados de Segurança
 
@@ -74,7 +86,7 @@ Antes de reportar um achado como vulnerabilidade, confirmar 3 critérios:
 
 Sem os 3 critérios confirmados → rebaixar para 🟡 sugestão ou não reportar.
 
-## 4) SCA — Análise de Dependências (CVE Scanning)
+## 4) SCA — Análise de Dependências & Reachability Analysis (CVE Scanning)
 
 | Ferramenta | Uso |
 |---|---|
@@ -83,7 +95,13 @@ Sem os 3 critérios confirmados → rebaixar para 🟡 sugestão ou não reporta
 | **OWASP Dependency-Check** | Scan de dependências Java/Node open-source |
 | **npm audit / pip-audit** | Scan nativo de linguagem, baixo custo |
 
-Critério de bloqueio: CVE com CVSS ≥ 7.0 (Alto/Crítico) em dependência de produção sem patch disponível → 🔴 Bloqueador. CVSS 4.0-6.9 → 🟠 Alta prioridade com prazo de correção.
+### 4.1 Protocolo de Reachability Analysis (Redução de Ruído)
+Ao analisar uma CVE reportada em dependência transitiva:
+1. **Alcançabilidade no Grafo de Chamadas**: A classe ou método vulnerável da biblioteca de fato é invocado pelo código da aplicação (verificável via `@code-knowledge-graph` / callee trace)?
+2. **Critério de Severidade Efetiva**:
+   - CVE com CVSS ≥ 7.0 (Alto/Crítico) **e alcançável pelo código da aplicação** → 🔴 **Bloqueador Imediato**.
+   - CVE com CVSS ≥ 7.0 **mas comprovadamente inalcançável (dead code/unreachable path)** → 🟠 **Alta Prioridade** (remediação programada, sem travamento de hotfix emergencial).
+   - CVE 4.0–6.9 → 🟡 **Média Prioridade** (correção na sprint ou no próximo ciclo do `WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION`).
 
 ## 5) Detecção de Secrets
 

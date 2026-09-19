@@ -6,6 +6,18 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.21.0] — 2026-09-19
+
+### Adicionado
+- **Consolidação de Segurança de Aplicação (AppSec) e Gestão Holística de Vulnerabilidades (SAST, DAST, IAST, SCA, Secrets, ASPM)**:
+  - Criação do **Guia Canônico de Segurança de Aplicação e Vulnerabilidades** (`docs/architecture/APPLICATION_SECURITY_GUIDE.md`), detalhando a matriz dos 6 pilares de AppSec: SAST (análise estática e taint tracking), SCA com *Reachability Analysis*, DAST (testes dinâmicos de runtime e APIs), IAST (instrumentação de testes), Secrets Detection (análise de entropia e pre-commit) e ASPM (gestão de postura e orquestração).
+  - Alinhamento explícito com as normas e padrões globais consolidados: OWASP Top 10:2025, OWASP ASVS 5.0, OWASP API Security Top 10, CWE Top 25 e OWASP Agentic AI Security (ASI01..ASI10:2026).
+  - Formalização da taxonomia de severidade CVSS v3/v4 e definição de SLAs compulsórios de remediação (Crítico ≤ 24h, Alto ≤ 7 dias, Médio ≤ 30 dias, Baixo ≤ 90 dias) integrados aos Quality Gates dos workflows canônicos.
+  - Atualização da skill `security-review-patterns` integrando o protocolo de *Reachability Analysis* para redução drástica de falso-positivo em CVEs transitivas.
+  - Atualização do Portal de Documentação em `docs/README.md` vinculando as diretrizes de AppSec aos quadrantes de How-To e Conceitos & Arquitetura.
+
+---
+
 ## [2.20.0] — 2026-09-19
 
 ### Adicionado
