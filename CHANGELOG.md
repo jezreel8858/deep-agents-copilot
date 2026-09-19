@@ -6,6 +6,22 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.14.0] — 2026-09-19
+
+### Adicionado
+- **Governança Estrita de Routers (R-054 / Smell 2.23 — Anti-Overthinking Router & Zero Discovery)**:
+  - Instituição da regra mandatória de **Zero Pre-Routing Discovery**: proibição absoluta de tool calls de leitura exploratória de código, varredura de diretórios ou scripts de sandbox para investigar o conteúdo de solicitações ou arquivos anexados (`#file:...`) antes de rotear, prevenindo latência e consumo desproporcional de créditos em modelos topo de linha (Claude Sonnet 5).
+  - Formalização do **Smell 2.23 (Router Over-Empowerment e Pre-Routing Discovery Bloat)** em `.github/skills/governance-audit-patterns/SKILL.md`, baseado no consenso de mercado de 2025/2026 (*Anthropic, LangChain, Vercel, Atlan/Snowflake via arXiv:2603.17787, Patronus AI e Splunk*).
+  - Ampliação da suíte determinística de testes em `tests/governance_audit/test_router_agents.py` com validação estática de Least Privilege universal de ferramentas, presença de Zero Discovery e Delegação Plana em todos os roteadores (150 testes passando no `pytest`).
+
+### Aprimorado
+- **Saneamento Universal de Ferramentas em Routers**:
+  - Restrição estrita de ferramentas no `agent-router` central, nos 7 supervisores de domínio (`angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `database-router`, `python-router`, `struts-router`) e no template canônico `router-agent.md` ao baseline exclusivo de 7 ferramentas de leitura, busca, clarificação e despacho (`read_file`, `file_search`, `grep_search`, `list_dir`, `ask_questions`, `run_subagent`, `context-mode/ctx_search`).
+  - Extirpação completa de ferramentas mutativas (`create_file`, `insert_edit_into_file`, `replace_string_in_file`, `apply_patch`), comandos de terminal (`run_in_terminal`) e sandbox de código (`context-mode/ctx_execute*`) de todos os roteadores.
+- **Blindagem Total da Delegação Plana (Flat Delegation / Smell 2.20)**:
+  - Proibição expressa de invocar especialistas ou executores downstream via `run_subagent` por dentro de qualquer roteador, garantindo que o despacho seja realizado exclusivamente pelo orquestrador raiz em nível plano.
+  - Sincronização atômica de catálogos e governança em `CLAUDE.md` (R-054), `.github/copilot-instructions.md`, `.github/agents/catalog.yaml` e `.a2a/agentcards/agent-router.agentcard.json`.
+
 ## [2.13.0] — 2026-09-19
 
 ### Aprimorado

@@ -24,6 +24,7 @@
     "read_file",
     "file_search",
     "grep_search",
+    "list_dir",
     "ask_questions",
     "run_subagent",
     "context-mode/ctx_search"
