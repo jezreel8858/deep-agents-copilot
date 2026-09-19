@@ -51,13 +51,13 @@ agents:
     id: "prompt-structuring"
     model: "Gemini 3.8 Flash"
     priority: 1.5
-    version: "1.0.0"
+    version: "2.0.0"
     domain: "Refinamento estrutural de prompt (passo mandatorio)"
     description: >-
-      Passo mandatorio pos-agent-router (excecao R-041): refina o prompt recebido
-      em loop controlado (maximo 5 iteracoes) no formato canonico
-      <task>/<context>/<constraints>/<output_format> e sempre retorna ao
-      agent-router antes de qualquer classificacao de intencao/delegacao downstream.
+      Refinamento estrutural de prompt sob autonomia delimitada (3 Tiers, R-041):
+      transforma a solicitacao no formato canonico <task>/<context>/<constraints>/<output_format>
+      com Gate Pattern de 1-clique (Tier 2) ou loop interativo (Tier 3 — max. 5 iteracoes)
+      estritamente no Problem Space sem invadir o Solution Space dos especialistas.
     keywords:
       - "refinar prompt"
       - "estruturar prompt"

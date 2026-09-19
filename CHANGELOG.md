@@ -13,6 +13,10 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
   - Inserção do banner universal de visibilidade `Agente Ativo: <slug>` e `[Se aplicável] Handoff: <origem> → <destino>` nos blocos de código Markdown de 20 agentes raiz (`bug-triage`, `code-review`, `debugger`, `runtime-verifier`, `code-style-enforcer`, `compliance-guardrails`, `security-reviewer`, `performance-agent`, `devops-engineer`, `pr-gatekeeper`, `database-specialist`, `agentic-memory-manager`, `business-rules-extractor`, `code-knowledge-graph`, `deep-search`, `docs-engineer`, `governance-factory`, `prompt-structuring`, `adapter-generator`, `binding-initializer`).
   - Harmonização dos 7 Stack Routers (`angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `python-router`, `struts-router`, `database-router`) e do template `router-agent.md` com campos de especificação de modelo (`[Model] Delegando para...`), métricas de confiança (`Confiança`, `Confidence Score`) e entradas consideradas.
   - 100% de conformidade com a suíte de testes de governança (147 testes passando no pytest).
+- **Evolução de Autonomia Delimitada (3 Tiers) & Gate Pattern no `@prompt-structuring` (R-041)**:
+  - Implementação do modelo de 3 Tiers para mitigar anti-padrões de mercado em sistemas multi-agentes (Approval Fatigue, Agency Stripping e Latency Tax): Tier 1 (Fast-Path com bypass para tarefas determinísticas), Tier 2 (Gate Pattern "Prepare, Don't Submit" com preview e confirmação de 1-clique via ask_questions em 1 turno) e Tier 3 (loop interativo multi-turno limitado a 5 iterações para ambiguidade alta).
+  - Instituição formal da fronteira Problem Space vs Solution Space: o estruturador delimita exclusivamente o *Quê*, requisitos funcionais e critérios de aceitação, sendo terminantemente vedada a prescrição de implementação técnica interna que pertence aos especialistas de stack.
+  - Sincronização do agente `prompt-structuring.agent.md`, diretriz R-041 em `CLAUDE.md` e catálogo `catalog.yaml`.
 
 ## [2.12.0] — 2026-09-17
 
