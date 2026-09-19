@@ -6,6 +6,14 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.13.0] — 2026-09-19
+
+### Aprimorado
+- **Padronização Canônica de Formato de Saída (R-042 / R-050 / agent-contracts § 0 e § 8)**:
+  - Inserção do banner universal de visibilidade `Agente Ativo: <slug>` e `[Se aplicável] Handoff: <origem> → <destino>` nos blocos de código Markdown de 20 agentes raiz (`bug-triage`, `code-review`, `debugger`, `runtime-verifier`, `code-style-enforcer`, `compliance-guardrails`, `security-reviewer`, `performance-agent`, `devops-engineer`, `pr-gatekeeper`, `database-specialist`, `agentic-memory-manager`, `business-rules-extractor`, `code-knowledge-graph`, `deep-search`, `docs-engineer`, `governance-factory`, `prompt-structuring`, `adapter-generator`, `binding-initializer`).
+  - Harmonização dos 7 Stack Routers (`angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `python-router`, `struts-router`, `database-router`) e do template `router-agent.md` com campos de especificação de modelo (`[Model] Delegando para...`), métricas de confiança (`Confiança`, `Confidence Score`) e entradas consideradas.
+  - 100% de conformidade com a suíte de testes de governança (147 testes passando no pytest).
+
 ## [2.12.0] — 2026-09-17
 
 ### Adicionado
