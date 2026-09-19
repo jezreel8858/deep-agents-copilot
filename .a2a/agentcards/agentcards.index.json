@@ -30,7 +30,7 @@
       "name": "Refactor Planner",
       "role": "planner",
       "domain": "Planejamento e decomposição macro de refatoração",
-      "version": "1.2.0"
+      "version": "2.0.0"
     },
     "deep-search": {
       "name": "Deep Search",
@@ -42,7 +42,7 @@
       "name": "Tech Solution Architect",
       "role": "specialist",
       "domain": "Arquitetura técnica, blueprint, contratos de integração e divisão por stack",
-      "version": "2.1.0"
+      "version": "2.2.0"
     },
     "agent-auditor": {
       "name": "Agent Auditor",

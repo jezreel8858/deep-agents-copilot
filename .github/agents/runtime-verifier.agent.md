@@ -57,6 +57,9 @@ Pedido recebido (geralmente pré-requisito de @test-strategy ou codificador)?
 ## Formato de Saída
 
 ```markdown
+Agente Ativo: runtime-verifier
+[Se aplicável] Handoff: <agent-origem> → runtime-verifier (motivo: <motivo>)
+
 🩺 VERIFICAÇÃO DE AMBIENTE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Stack: <stack identificada>

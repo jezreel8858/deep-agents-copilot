@@ -589,31 +589,35 @@ function codigoNaoTestavel() {
 
 ## 10) Comandos
 
+> **Zero-Noise Test Policy (R-008 / R-049)**: Nunca rodar comandos de teste interativos ou bare. Use flags silenciosas (`--silent`, `--reporter=basic`) e filtros pipe, ou execute via `ctx_execute` (Think-in-Code).
+
+### A) Via `ctx_execute` (Think-in-Code — Recomendado)
+
+```javascript
+const { execSync } = require('child_process');
+try {
+  const out = execSync('npx vitest run src/app/features/[caminho]/[nome].spec.ts --silent --reporter=basic', { encoding: 'utf8' });
+  console.log(out.trim());
+} catch (err) {
+  const full = (err.stdout || '') + '\n' + (err.stderr || '');
+  console.log(full.split('\n').filter(l => /(FAIL|Error:|Tests.*failed)/i).slice(0, 30).join('\n'));
+}
+```
+
+### B) Via Terminal com Filtro Obrigatório
+
 ```bash
-# Rodar todos os testes (via Angular CLI — recomendado)
-ng test
+# Arquivo específico via Vitest (silencioso e sem watch)
+npx vitest run src/app/features/[caminho]/[nome].spec.ts --silent --reporter=basic 2>&1 | grep -E "FAIL|PASS|Tests" | head -40
 
-# Watch mode
-ng test --watch
+# Arquivo específico via Angular CLI (sem watch, sem progresso)
+ng test --include="**/[nome].component.spec.ts" --watch=false --progress=false 2>&1 | grep -E "FAILED|SUCCESS|Executed" | head -40
 
-# Com coverage
-ng test --coverage
+# Coverage conciso
+npx vitest run --coverage --silent --reporter=basic 2>&1 | grep -E "FAIL|PASS|All files|TOTAL" | head -40
 
-# Arquivo específico (pattern)
-ng test --include="**/[nome].component.spec.ts"
-
-# Rodar diretamente com Vitest (sem Angular CLI)
-npx vitest
-
-# Vitest UI (modo visual no browser)
-npx vitest --ui
-
-# Coverage com relatório HTML
-npx vitest run --coverage
-open coverage/index.html
-
-# Atualizar snapshots
-npx vitest --update-snapshots
+# Em PowerShell / Windows:
+npx vitest run src/app/features/[caminho]/[nome].spec.ts --silent --reporter=basic
 ```
 
 ---

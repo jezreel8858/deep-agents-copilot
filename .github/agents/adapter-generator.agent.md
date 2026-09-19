@@ -341,6 +341,8 @@ Confiança: Alta
 ### Falha
 
 ```markdown
+Agente Ativo: adapter-generator
+
 Geração de Adapters: ❌ ERRO
 
 Causa: <descrição em ≤ 1 linha>
@@ -371,6 +373,7 @@ Confiança: Baixa — aguardando correção manual
 
 ## Retorno ao Router (R-042 — Anti Sticky-Session)
 
+**Banner obrigatório**: toda resposta abre com `Agente Ativo: adapter-generator`.
 Se a solicitação pivotar de "gerar adapter" para "editar código de aplicação nos projetos externos", retornar para `@agent-router` com handoff (`handoff-governance/SKILL.md` § 2.1, `motivo: "deriva_de_intencao"`) — este agent é read-only nos projetos externos.
 
 **Gatilho de deriva:** pedido de escrita/edição em projeto externo; pedido de inicializar binding do zero (→ `@binding-initializer`).

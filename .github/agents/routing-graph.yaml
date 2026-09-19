@@ -3,7 +3,7 @@ description: >
   Grafo de roteamento declarado — fonte de verdade estrutural para o agent-router.
   Nós = agents disponíveis; arestas = condições de roteamento (keywords, sinais R-006, score threshold).
   A Decision Tree em agent-router.agent.md é documentação derivada deste arquivo.
-last_updated: "2026-09-09 (v8 — adicionado gate R-048/R-048.1: banner obrigatório pós-ask_questions e checkpoint de segurança para mudanças em autenticação/identidade)"
+last_updated: "2026-09-15 (v9 — WORKFLOW-FRAMEWORK-MIGRATION: adicionado colaboracao_dual_stack e co_agentes de domain-router-origem/destino em todas as etapas, corrigindo omissao do router legado em migracoes cross-stack)"
 
 # ─────────────────────────────────────────────
 # NÓS — agents disponíveis no catálogo
@@ -457,25 +457,53 @@ workflows:
       - "migrar para standalone"
       - "migrar para signals"
       - "migrar para virtual threads"
+      - "migrar ejb"
+      - "migrar struts"
+      - "modernizar legado"
+      - "continuar migração"
+      - "gaps de migração"
+      - "paridade de migração"
+    colaboracao_dual_stack:
+      obrigatorio_quando: "stack_origem != stack_destino (migracao_cross_stack, ex: ejb->spring_boot, struts->spring_boot, angularjs->angular)"
+      papel_domain_router_origem: "co-agente consultivo obrigatorio em TODAS as etapas (nao apenas etapa 1) — oraculo de comportamento legado, extracao de regras de negocio via business-rules-extractor, validacao de paridade e corresponsavel pela Matriz De-Para"
+      papel_domain_router_destino: "executor principal do codemod e paridade, consulta o router de origem antes de fechar cada etapa e mantem a Matriz De-Para atualizada"
+      violacao_bloqueante: "tech-solution-architect NUNCA elabora blueprint de migracao cross-stack citando apenas o domain-router de destino no pipeline; ambos os routers (origem e destino) devem constar explicitamente no bloco de Pipeline de Execucao do Workflow"
+    matriz_de_para_obrigatoria:
+      regra: "R-050"
+      entregavel: "docs/migrations/matriz-de-para-<alvo>.md"
+      taxonomia_status: ["MIGRADO", "PENDENTE", "DIVERGENTE", "DESACOPLADO", "OBSOLETO"]
+      criterio_fechamento: "zero itens PENDENTE ou DIVERGENTE no modulo; 100% dos elementos em MIGRADO com teste ou DESACOPLADO com justificativa"
+    exclusividade_motor_grafo:
+      regra: "R-045"
+      obrigatorio: "code-knowledge-graph e co-agente OBRIGATORIO (nao apenas sub-rotina) nas etapas 1, 3, 4 e 5 - migracao de framework e refatoracao estrutural em larga escala; blast radius/ciclos/dead-code NUNCA sao mapeados manualmente por tech-solution-architect ou domain routers"
     estados:
       - etapa: 1
         nome: "pre_flight_compatibility_assessment"
         agent: "tech-solution-architect"
-        sub_rotinas_permitidas: ["code-knowledge-graph", "deep-search"]
+        co_agentes: ["code-knowledge-graph (obrigatorio, R-045 - inventario de dependencias/blast radius/ciclos do legado)", "domain-router-stack-origem (obrigatorio se cross-stack, ex: ejb-router|struts-router)", "business-rules-extractor"]
+        sub_rotinas_permitidas: ["deep-search"]
+        nota: "code-knowledge-graph mapeia dependencias, blast radius e ciclos do codigo legado ANTES do blueprint; domain-router-stack-origem eh convocado via run_subagent para inventariar regras de negocio nas 5 dimensoes criticas (borda, regras, persistencia, downstream, saida); em cenario brownfield_in_flight, executa compulsoriamente o sub-estado 1b de Reconciliacao Delta e auditoria de gaps pre-existentes"
       - etapa: 2
         nome: "migration_blueprint_and_phasing"
         agent: "tech-solution-architect"
+        co_agentes: ["domain-router-stack-origem", "domain-router-stack-destino"]
         checkpoint_humano: "ask_questions (aprovacao_fases_migracao)"
+        nota: "blueprint gera a Matriz De-Para bidirecional canonica (docs/migrations/matriz-de-para-<alvo>.md) vinculando 100% dos elementos legados a componentes destino e fases B1/B2/B3 com dashboard de visibilidade humana; declara papeis de origem (oraculo) e destino (executor)"
       - etapa: 3
         nome: "codemod_and_batch_rewrite"
-        agent: "domain-router | specialist-feature-developer"
+        agent: "domain-router-stack-destino | specialist-feature-developer"
+        co_agentes: ["domain-router-stack-origem (consultivo, obrigatorio se cross-stack)", "code-knowledge-graph (obrigatorio, R-045 - blast radius por lote antes de cada micro-batch)"]
         protocolo: "efficient-batch-code-modification"
+        nota: "execucao dos codemods estritamente orientada aos IDs da Matriz De-Para da fase ativa; domain-router-stack-origem permanece ativo validando paridade; code-knowledge-graph recalcula blast radius"
       - etapa: 4
         nome: "refinement_and_parity_testing"
-        agent: "domain-router | specialist-unit-test-writer | specialist-component-test-writer"
+        agent: "domain-router-stack-destino | specialist-unit-test-writer | specialist-component-test-writer"
+        co_agentes: ["domain-router-stack-origem (dual_verification)", "business-rules-extractor (modo validate)", "code-knowledge-graph (obrigatorio, R-045 - find_cycles e dead-code pos-codemod)"]
+        gate: "dual_verification_gate (golden_master_100 + matriz_de_para_100_resolvida + regras_de_negocio_100_cobertas + zero_ciclos_dead_code_novos, ver workflows.md § 3.7.1)"
       - etapa: 5
         nome: "baseline_and_quality_gate"
         agent: "runtime-verifier | code-review"
+        co_agentes: ["domain-router-stack-origem (sign-off final de paridade e fechamento de 100% da Matriz De-Para, obrigatorio se cross-stack)", "code-knowledge-graph (obrigatorio, R-045 - verificacao final de zero ciclos novos e zero dead-code introduzido)"]
 
   - id: WORKFLOW-RELEASE-READINESS
     nome: "Prontidão de Release, Breaking Changes & Deploy Pre-Flight"

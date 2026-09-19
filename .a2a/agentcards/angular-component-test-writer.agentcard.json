@@ -29,6 +29,7 @@
     "insert_edit_into_file",
     "get_errors",
     "run_in_terminal",
+    "context-mode/ctx_execute",
     "context-mode/ctx_search",
     "context-mode/ctx_batch_execute"
   ],

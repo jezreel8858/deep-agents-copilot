@@ -122,6 +122,46 @@ find src -name "*.ts" | head -50
 comando | head -30 && echo "...[truncado]..." && comando | tail -10
 ```
 
+### 3.1) Diretriz de Execução de Testes com Zero Ruído (Zero-Noise Test Policy — R-008 / R-049)
+
+Execuções de teste (especialmente suítes Maven/Spring Boot, Gradle, Pytest e Vitest) são a principal fonte de vazamento de logs desnecessários (`[INFO]`, download de plugins, avisos de compilação, banners de framework e logs de inicialização de infraestrutura como Tomcat/Hibernate/HikariCP).
+
+**REGRA INVIOLÁVEL**: É TERMINANTEMENTE PROIBIDO executar comandos de teste "bare" (`mvn test`, `pytest`, `npm test`) sem filtragem de saída ou supressão de nível de log.
+
+#### A) Nível 1 (Padrão Ouro — Think in Code via `ctx_execute`)
+O comando de teste é disparado dentro do sandbox Node.js via `child_process.execSync` ou `spawnSync`. Os bytes brutos do processo ficam confinados no sandbox e NUNCA entram na conversa do Copilot. O script filtra e devolve exclusivamente 1 linha de sucesso ou o bloco estrito de falha:
+
+```javascript
+// Exemplo canônico para Maven / Spring Boot em ctx_execute:
+const { execSync } = require('child_process');
+try {
+  const out = execSync('mvn test -Dtest=MinhaClasseTest -q', { encoding: 'utf8', cwd: 'caminho/do/projeto' });
+  console.log(out.trim() || 'BUILD SUCCESS — Todos os testes executados com sucesso (0 falhas).');
+} catch (err) {
+  const full = (err.stdout || '') + '\n' + (err.stderr || '');
+  const lines = full.split('\n');
+  const failures = lines.filter(l => /(FAILURE|ERROR|<<< FAILURE|Tests run:.*Failures: [1-9]|Exception|AssertionFailed)/i.test(l));
+  console.log('FALHAS DETECTADAS:\n' + failures.slice(0, 40).join('\n'));
+}
+```
+
+#### B) Nível 2 (Fallback de Terminal — Flags Silenciosas + Pipe Obrigatório)
+Quando o terminal for estritamente necessário (ex.: pipelines específicos, variáveis de ambiente do host), utilize compulsoriamente os comandos abaixo:
+
+| Stack | Comando Recomendado (POSIX / Git Bash) | Comando Windows (PowerShell) |
+|---|---|---|
+| **Spring Boot / Maven** | `./mvnw test -Dtest=[Classe] -q 2>&1 \| grep -E "ERROR\|FAILURE\|BUILD\|Tests run" \| head -40` | `mvn test -Dtest=[Classe] -q` ou com pipe `\| Select-String -Pattern "ERROR\|FAILURE\|BUILD\|Tests run"` |
+| **Java / Gradle** | `./gradlew test -Ptest.single=[Classe] -q 2>&1 \| grep -E "FAILED\|SUCCESS" \| head -40` | `./gradlew test -Ptest.single=[Classe] -q` |
+| **Python / pytest** | `pytest -q --tb=short tests/unit/test_[nome].py 2>&1 \| grep -E "FAILED\|ERROR\|passed in" \| head -40` | `pytest -q --tb=short tests/unit/test_[nome].py` |
+| **Angular / Vitest** | `npx vitest run [arquivo] --reporter=basic --silent 2>&1 \| grep -E "FAIL\|PASS\|Tests" \| head -40` | `npx vitest run [arquivo] --reporter=basic --silent` |
+| **Angular / Jasmine** | `ng test --watch=false --progress=false --no-color 2>&1 \| grep -E "FAILED\|SUCCESS\|Executed" \| head -40` | `ng test --watch=false --progress=false --no-color` |
+
+#### C) Nível 3 (Spill-to-File + Análise Cirúrgica)
+Para suítes extensas ou depuração de erros complexos com stack traces longos:
+1. Redirecionar para arquivo: `mvn test -Dtest=[Classe] > target/test-run.log 2>&1`
+2. Inspecionar exclusivamente via `ctx_execute_file(path: "target/test-run.log", ...)` localizando o trecho da falha.
+3. NUNCA fazer `cat target/test-run.log` no terminal.
+
 ### Estratégia "spill-to-file" para outputs extensos
 
 Quando o output é grande demais para filtrar:

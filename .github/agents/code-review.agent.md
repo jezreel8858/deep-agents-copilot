@@ -6,7 +6,7 @@ description: >-
   impacto, testes e performance. Classifica achados por severidade, nunca
   corrige o código e delega para agents especializados quando necessário.
 model: "Gemini 3.8 Flash"
-tools: ['read_file', 'list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_search']
+tools: ['read_file', 'list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'context-mode/ctx_execute', 'run_subagent', 'context-mode/ctx_search']
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
@@ -73,6 +73,9 @@ Pedido recebido?
 ## Formato de Saída
 
 ```markdown
+Agente Ativo: code-review
+[Se aplicável] Handoff: <agent-origem> → code-review (motivo: <motivo>)
+
 📋 REVISÃO DE CÓDIGO
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Arquivo(s): <lista>

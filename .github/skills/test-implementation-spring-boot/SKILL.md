@@ -251,23 +251,37 @@ class [Entidade]IntegrationTest {
 | Ramos | 60% | 70%+ |
 | Funções | 75% | 85%+ |
 
-## 6) Comandos Maven / JaCoCo
+## 6) Comandos Maven / JaCoCo — Execução com Zero Ruído (R-008 / R-049)
+
+> **ATENÇÃO**: É terminantemente proibido rodar `mvn test` bare no terminal (despeja centenas de linhas de logs INFO, Spring banner e download de plugins no contexto). Utilize sempre o padrão silencioso com filtro ou Think-in-Code via `ctx_execute`.
+
+### A) Via `ctx_execute` (Think-in-Code — Recomendado)
+
+```javascript
+const { execSync } = require('child_process');
+try {
+  const out = execSync('mvn test -Dtest=[Entidade]ServiceImplTest -q', { encoding: 'utf8' });
+  console.log(out.trim() || 'BUILD SUCCESS — 0 failures');
+} catch (err) {
+  const full = (err.stdout || '') + '\n' + (err.stderr || '');
+  console.log(full.split('\n').filter(l => /(FAILURE|ERROR|<<<|Tests run)/.test(l)).slice(0, 30).join('\n'));
+}
+```
+
+### B) Via Terminal com Filtro Obrigatório
 
 ```bash
-# Todos os unit tests
-mvn test
+# Apenas uma classe (modo silencioso + filtro)
+./mvnw test -Dtest=[Entidade]ServiceImplTest -q 2>&1 | grep -E "ERROR|FAILURE|BUILD|Tests run" | head -40
 
-# Com relatório JaCoCo
-mvn test jacoco:report
+# Apenas um método específico
+./mvnw test -Dtest=[Entidade]ServiceImplTest#deveSalvar_quandoDadosValidos -q 2>&1 | grep -E "ERROR|FAILURE|BUILD|Tests run" | head -40
 
-# Apenas uma classe
-mvn test -Dtest=[Entidade]ServiceImplTest
+# Com relatório JaCoCo (batch mode silencioso)
+./mvnw test jacoco:report -B -q 2>&1 | grep -E "ERROR|FAILURE|BUILD|Tests run" | head -40
 
-# Apenas um método
-mvn test -Dtest=[Entidade]ServiceImplTest#deveSalvar_quandoDadosValidos
-
-# Relatório HTML
-open target/site/jacoco/index.html
+# Em PowerShell / Windows:
+mvn test -Dtest=[Entidade]ServiceImplTest -q
 ```
 
 ## 7) Test Data Builders (Pattern)

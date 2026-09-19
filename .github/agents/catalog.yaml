@@ -202,7 +202,7 @@ agents:
     id: "refactor-planner"
     model: "Claude Sonnet 5"
     priority: 4
-    version: "1.2.0"
+    version: "2.0.0"
     domain: "Planejamento e decomposição macro de refatoração"
     description: "Planejar e decompor refatorações estruturais em DAG de etapas atômicas (Mikado, Branch by Abstraction, Strangler Fig) com safety net e rollback multicamada"
     keywords:
@@ -328,7 +328,7 @@ agents:
     id: "tech-solution-architect"
     model: "Claude Sonnet 5"
     priority: 8
-    version: "2.1.0"
+    version: "2.2.0"
     domain: "Arquitetura técnica, blueprint, contratos de integração e divisão por stack"
     description: >-
       Arquiteto de solução técnica: viabilidade, blueprint técnico, contratos de
@@ -653,6 +653,7 @@ agents:
       - "file_search"
       - "list_dir"
       - "run_in_terminal"
+      - "context-mode/ctx_execute"
       - "ask_questions"
       - "run_subagent"
       - "context-mode/ctx_search"

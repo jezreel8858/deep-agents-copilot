@@ -44,13 +44,16 @@ applyTo: ["**/*.java"]
 - Trate explicitamente `BusinessException`, `IntegrationException`, validação (`MethodArgumentNotValidException`) e exceções genéricas.
 - Não engula exceções; preserve a causa e registre `log.error(...)` quando necessário.
 
-### Testes Unitários
+### Testes Unitários & Execução com Zero Ruído (R-008 / R-049)
 
 - Base: JUnit 5 + Mockito (`@ExtendWith(MockitoExtension.class)`).
 - Preferir padrão AAA (Arrange, Act, Assert).
 - Evitar `@SpringBootTest` em teste unitário puro.
 - `@DisplayName` em PT-BR descritivo.
 - Para testes que dependem de contexto Spring, use `@ExtendWith(SpringExtension.class)` + `@ContextConfiguration(classes = {ClasseTestada.class})` + `@MockBean`.
+- **Higiene de Execução (Zero-Noise)**: É terminantemente proibido rodar `mvn test` bare no terminal. Agentes DEVEM priorizar execução no sandbox via `ctx_execute` (Think in Code) para capturar apenas o resumo/falhas, ou utilizar modo silencioso com filtro:
+  - Linux / Git Bash: `./mvnw test -Dtest=ClasseTest -q 2>&1 | grep -E "ERROR|FAILURE|BUILD|Tests run" | head -40`
+  - PowerShell: `mvn test -Dtest=ClasseTest -q`
 
 ### Regras de Persistência e Banco
 

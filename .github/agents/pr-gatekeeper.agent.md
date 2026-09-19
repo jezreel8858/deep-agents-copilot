@@ -7,7 +7,7 @@ description: >-
   matriz de risco e atualiza CHANGELOG.md. Nunca executa git add/commit/push (R-031) —
   apenas gera artefatos textuais para o desenvolvedor aplicar manualmente.
 model: "Gemini 3.8 Flash"
-tools: ['read_file', 'insert_edit_into_file', 'grep_search', 'file_search', 'list_dir', 'run_in_terminal', 'ask_questions', 'run_subagent', 'context-mode/ctx_search']
+tools: ['read_file', 'insert_edit_into_file', 'grep_search', 'file_search', 'list_dir', 'run_in_terminal', 'context-mode/ctx_execute', 'ask_questions', 'run_subagent', 'context-mode/ctx_search']
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
@@ -63,6 +63,9 @@ Pedido recebido?
 ## Formato de Saída
 
 ```markdown
+Agente Ativo: pr-gatekeeper
+[Se aplicável] Handoff: <agent-origem> → pr-gatekeeper (motivo: <motivo>)
+
 📦 PREPARAÇÃO DE PULL REQUEST
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Pré-requisito: Code Review = <APROVADO | APROVADO COM RESSALVAS>

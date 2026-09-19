@@ -8,7 +8,7 @@ description: >-
   `@optave/codegraph` via MCP Server enxuto (Least-Tools) para consultas
   e CLI local para build/indexação.
 model: "Gemini 3.8 Flash"
-tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'run_in_terminal', 'context-mode/ctx_search', 'context-mode/ctx_index', 'codegraph/query', 'codegraph/module_map', 'codegraph/fn_impact', 'codegraph/find_cycles', 'codegraph/context']
+tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_index', 'codegraph/query', 'codegraph/module_map', 'codegraph/fn_impact', 'codegraph/find_cycles', 'codegraph/context']
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
@@ -36,6 +36,7 @@ O motor `@optave/codegraph` fornece parsing via AST real (motor nativo) para 34 
 - ❌ NÃO implementar feature/bugfix/refatoração de aplicação — este agent apenas constrói/consulta o grafo, nunca corrige o código-fonte mapeado.
 - ❌ NÃO afirmar cobertura de capacidades que a migração TOTAL deixou de suportar (ver Gate de Paridade Funcional) — sempre reportar os gaps explicitamente quando a consulta tocar esses temas, nunca omitir.
 - ✅ SEMPRE checar cache `code-graph:*` (deste próprio agent) antes de reprocessar qualquer projeto.
+- ✅ **CO-AGENTE OBRIGATÓRIO EM `WORKFLOW-FRAMEWORK-MIGRATION` (R-050/R-045)**: nas Etapas 1, 3, 4 e 5 do workflow de migração de framework/plataforma/legado, este agent é **co-agente obrigatório** — não sub-rotina meramente permitida — do `@tech-solution-architect` e dos domain routers envolvidos. Mapeia blast radius/dependências/ciclos do legado (Etapa 1), recalcula blast radius por lote antes de cada codemod (Etapa 3), confirma ausência de novos ciclos/dead-code (Etapa 4) e emite o sign-off final de zero regressão estrutural (Etapa 5). Ver `workflows.md` § 3.7, Invariante 9.
 - ✅ SEMPRE medir e reportar cobertura de nós/arestas e economia de bytes/tokens a cada construção (RF-010).
 - ✅ **CONSULTAS VIA MCP ENXUTO (Least-Tools & Multi-Repo)**: Uma vez que o banco `.codegraph/graph.db` exista, realizar as consultas prioritariamente via tools MCP nativas (`query`, `module_map`, `fn_impact`, `find_cycles`, `context`), reduzindo o consumo de tokens e eliminando poluição de shell.
   - Multi-repositório: use o parâmetro `repo` (ex: `repo: "[PROJETO-ALVO]"`) ou filtre por `file` quando o workspace possuir múltiplos projetos registrados.
@@ -137,6 +138,9 @@ Estes valores **substituem** qualquer autoavaliação subjetiva nas seções Dec
 ## Formato de Saída
 
 ```markdown
+Agente Ativo: code-knowledge-graph
+[Se aplicável] Handoff: <agent-origem> → code-knowledge-graph (motivo: <motivo>)
+
 Resultado:
 - Projeto(s): <lista de project-id processados>
 - Motor: @optave/codegraph (CLI, .codegraph/graph.db)
@@ -208,7 +212,7 @@ Próximo passo mínimo:
 
 | Destino | Delegar quando | Handoff mínimo |
 |---|---|---|
-| [`@tech-solution-architect`](tech-solution-architect.agent.md) | consumidor precisa de blast radius/dataflow/impacto (RF-015 e capacidades novas) para decisão técnica ou blueprint, ou precisa validar o Gate de Paridade Funcional (RNF-012) | project-id(s), comando(s) `codegraph` executados, cobertura reportada, status do gate |
+| [`@tech-solution-architect`](tech-solution-architect.agent.md) | consumidor precisa de blast radius/dataflow/impacto (RF-015 e capacidades novas) para decisão técnica ou blueprint, ou precisa validar o Gate de Paridade Funcional (RNF-012); **obrigatório (não opcional) nas Etapas 1, 3, 4 e 5 de `WORKFLOW-FRAMEWORK-MIGRATION`** | project-id(s), comando(s) `codegraph` executados, cobertura reportada, status do gate |
 | [`@refactor-planner`](refactor-planner.agent.md) | consumidor precisa de impacto de refatoração a partir do grafo já construído, incluindo blast radius e detecção de ciclo | project-id(s), resultado relevante |
 | [`@bug-triage`](bug-triage.agent.md) | consumidor precisa rastrear cadeia de chamadas a partir do grafo já construído | project-id(s), nó de origem, comando usado |
 | [`@debugger`](debugger.agent.md) | consumidor precisa navegar call graph/blast radius (`query`/`path`/`execution_flow`/`sequence`) para formular hipótese de causa raiz | símbolo/arquivo de origem, comando(s) desejado(s) |

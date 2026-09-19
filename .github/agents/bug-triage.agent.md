@@ -288,6 +288,9 @@ C) PARCIALMENTE — Preciso de mais informações ou há outro componente afetad
 ## Formato de Saída
 
 ```markdown
+Agente Ativo: bug-triage
+[Se aplicável] Handoff: <agent-origem> → bug-triage (motivo: <motivo>)
+
 ## Triagem — [Referência ou título do bug]
 
 **Pré-contexto:**

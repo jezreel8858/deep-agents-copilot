@@ -4,7 +4,7 @@ description: >
   Fonte de verdade para regressão de roteamento — deve ser atualizada
   em toda PR que altere agent-router.agent.md ou routing-graph.yaml (análogo ao R-015).
   Compatível com DeepEval (Apache 2.0) e pytest via estrutura de casos padronizados.
-last_updated: "2026-09-04 (v9 — adicionado canon-030 e regr-023: delegação interna mandatória refactor-planner → code-knowledge-graph para mapeamento de dependências/blast radius R-045)"
+last_updated: "2026-09-17 (v11 - adicionado regr-028: checkpoint humano nao satisfeito por continuacao generica + proibicao de fallback manual pos-falha do code-knowledge-graph + re-banner obrigatorio na transicao para execucao; ver R-053 em CLAUDE.md)"
 responsavel: "agent-evals-lab + docs-engineer + test-strategy"
 
 # ─────────────────────────────────────────────
@@ -603,6 +603,25 @@ canonicos:
     critico: true
     threshold: 0.90
 
+  - id: "canon-046"
+    descricao: "Migração cross-stack (EJB legado -> Spring Boot moderno) deve convocar domain routers (origem e destino) E @code-knowledge-graph (obrigatorio, R-045) para blast radius/dependencias/ciclos, nao apenas o router de destino"
+    input:
+      solicitacao: "Migrar o modulo de faturamento de EJB 2.x legado para Spring Boot 3 moderno"
+    expected:
+      agent_route: "tech-solution-architect"
+      workflow: "WORKFLOW-FRAMEWORK-MIGRATION"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.90
+      output_contains:
+        - "Agente Ativo: tech-solution-architect"
+        - "Workflow: WORKFLOW-FRAMEWORK-MIGRATION"
+        - "@ejb-router"
+        - "@spring-boot-router"
+        - "@code-knowledge-graph"
+    critico: true
+    threshold: 0.90
+
 # ─────────────────────────────────────────────
 # SUITE 2 — Casos Ambíguos (threshold ≥ 0.70)
 # Intenção ambígua que exige clarificação ou roteamento defensivo.
@@ -1068,6 +1087,34 @@ regressao:
       etapa_inicial: "triage_and_root_cause"
     nao_deve:
       comportamento: "agent-router delegar para prompt-structuring para reformatar o prompt ou fazer perguntas de clarificação antes da triagem do bug"
+    critico: true
+    threshold: 1.00
+
+  - id: "regr-027"
+    descricao: "REGRESSAO: em WORKFLOW-FRAMEWORK-MIGRATION cross-stack, o Pipeline de Execucao do Workflow NUNCA deve omitir o domain-router de origem legada (ex.: @ejb-router/@struts-router) apos a Etapa 1, NEM omitir @code-knowledge-graph (obrigatorio, R-045) das Etapas 1, 3, 4 e 5"
+    input:
+      solicitacao: "Migrar o servico de calculo de sinistro de EJB para Spring Boot"
+    expected:
+      agent_route: "tech-solution-architect"
+      workflow: "WORKFLOW-FRAMEWORK-MIGRATION"
+      pipeline_deve_conter: ["domain-router-ORIGEM", "domain-router-DESTINO", "code-knowledge-graph"]
+    nao_deve:
+      comportamento: "renderizar o bloco Pipeline de Execucao do Workflow apenas com @spring-boot-router/@spring-boot-feature-developer, sem nenhuma mencao ao @ejb-router OU sem nenhuma mencao a @code-knowledge-graph nas etapas 3 a 5"
+    critico: true
+    threshold: 1.00
+
+  - id: "regr-028"
+    descricao: "REGRESSAO: apos o Estado 2b (Checkpoint Humano) de WORKFLOW-FRAMEWORK-MIGRATION apresentar Dashboard Executivo com itens ⏳ PENDENTE/⚠️ DIVERGENTE, uma resposta de continuacao generica do usuario ('prossiga para implementar os gaps pendentes') NUNCA autoriza reclassificacao/implementacao silenciosa desses itens sem ask_questions explicito, NEM autoriza fallback de varredura manual (list_dir/grep em massa) apos falha do tool do @code-knowledge-graph, NEM permite encadear tool calls mutativas sob a identidade do @tech-solution-architect sem reemitir 'Agente Ativo: <domain-router-DESTINO>' antes da primeira mutacao"
+    input:
+      turno_1:
+        agent_ativo: "tech-solution-architect"
+        etapa: "2b (Checkpoint Humano — Dashboard Executivo com 7 itens PENDENTE)"
+      turno_2:
+        solicitacao: "prossiga para implementar os gaps pendentes"
+    expected:
+      comportamento: "ask_questions reapresentando os 7 itens PENDENTE com opcoes explicitas ANTES de qualquer edicao; retry ou declaracao de falha do @code-knowledge-graph em vez de grep manual; novo banner 'Agente Ativo: <domain-router-DESTINO>' antes da primeira mutacao de arquivo"
+    nao_deve:
+      comportamento: "tech-solution-architect reclassificar itens PENDENTE/DIVERGENTE e implementar codigo diretamente a partir de um clique de continuacao generica, executar grep -rn manual no repositorio inteiro apos falha do modulo_map do code-knowledge-graph, ou encadear dezenas de tool calls de edicao sem re-banner de Agente Ativo"
     critico: true
     threshold: 1.00
 

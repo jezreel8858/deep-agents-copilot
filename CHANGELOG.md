@@ -6,6 +6,53 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.13.0] — 2026-09-19
+
+### Aprimorado
+- **Padronização Canônica de Formato de Saída (R-042 / R-050 / agent-contracts § 0 e § 8)**:
+  - Inserção do banner universal de visibilidade `Agente Ativo: <slug>` e `[Se aplicável] Handoff: <origem> → <destino>` nos blocos de código Markdown de 20 agentes raiz (`bug-triage`, `code-review`, `debugger`, `runtime-verifier`, `code-style-enforcer`, `compliance-guardrails`, `security-reviewer`, `performance-agent`, `devops-engineer`, `pr-gatekeeper`, `database-specialist`, `agentic-memory-manager`, `business-rules-extractor`, `code-knowledge-graph`, `deep-search`, `docs-engineer`, `governance-factory`, `prompt-structuring`, `adapter-generator`, `binding-initializer`).
+  - Harmonização dos 7 Stack Routers (`angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `python-router`, `struts-router`, `database-router`) e do template `router-agent.md` com campos de especificação de modelo (`[Model] Delegando para...`), métricas de confiança (`Confiança`, `Confidence Score`) e entradas consideradas.
+  - 100% de conformidade com a suíte de testes de governança (147 testes passando no pytest).
+
+## [2.12.0] — 2026-09-17
+
+### Adicionado
+- **Blindagem Determinística contra "Cleverness Trap" & State-Locking Universal (R-050 / R-054)**:
+  - Implementação compulsória do protocolo de **State-Locking** (`[CURRENT_STATE_LOCK: ...]`) e **Halting Conditions** em 28 agentes do ecossistema de governança, prevenindo iniciativas espúrias, antecipação de código e desvios de pipeline em modelos de alta capacidade (Claude Sonnet 5, Opus) e garantindo execução atômica em modelos leves (Gemini Flash).
+  - Mapeamento fechado de estados e saídas tipadas em 3 perfis operacionais: (A) Parecer Compacto de Gate/Checkpoint, (B) Technical Blueprint & Context Firewall e (C) Matriz De-Para 5D.
+
+### Aprimorado
+- **Endurecimento dos Agentes Planejadores / Deliberativos (Grupo 1)**:
+  - `@tech-solution-architect`, `@refactor-planner`, `@feature-planner`, `@requirements-analyst` e `@test-strategy`: saneamento de ferramentas com remoção de `ctx_execute`/`ctx_execute_file`, proibição terminante de gerar código executável e exigência de DAGs/matrizes estruturadas com pontos de parada (*STOP TOTAL*).
+- **Endurecimento dos Supervisores Hierárquicos / Domain Routers (Grupo 2)**:
+  - `@angular-router`, `@spring-boot-router`, `@spring-reactive-router`, `@ejb-router`, `@database-router`, `@python-router` e `@struts-router`: aplicação de *Delegação Plana (Flat Delegation)*, proibição absoluta de ferramentas mutativas e resolução estrita de papéis genéricos (`specialist-<papel>`) para agentes concretos do catálogo.
+- **Endurecimento dos Executores Táticos (Grupo 3)**:
+  - 17 agentes executores (`*-feature-developer`, `*-bug-fixer`, `*-ui-stylist`, `*-migration-dev`, `*-spl-expert`, `*-plsql-expert`): trava de execução em TDD estrito (Red Test prévio obrigatório, Single-Turn Batching com diff cirúrgico mínimo ≤ 20 linhas e validação agregada imediata com `get_errors`).
+- **Sincronização SSOT & Qualidade**:
+  - Atualização de versões no catálogo central `.github/agents/catalog.yaml`.
+  - Reexportação de 65 AgentCards A2A em `.a2a/agentcards/`.
+  - 100% de conformidade com 147 testes automatizados passando no `pytest`.
+
+## [2.11.0] — 2026-09-16
+
+### Adicionado
+- **Matriz De-Para Bidirecional & Prevenção Canônica de Gaps em `WORKFLOW-FRAMEWORK-MIGRATION` (R-050)**:
+  - Instituição da **Matriz De-Para de Migração & Rastreabilidade de Gaps** (`docs/migrations/matriz-de-para-<alvo>.md`) como Single Source of Truth obrigatória para qualquer migração tecnológica cross-stack ou elevação de plataforma.
+  - Taxonomia rigorosa de status de paridade com 5 estados determinísticos: `[✅ MIGRADO]`, `[⏳ PENDENTE]`, `[⚠️ DIVERGENTE]`, `[ℹ️ DESACOPLADO]` e `[🚫 OBSOLETO]`.
+  - Critério de fechamento bloqueante: zero itens `PENDENTE` ou `DIVERGENTE` no módulo ao final do pipeline.
+- **Decomposição Estrutural Exaustiva em 5 Dimensões Críticas (Estado 1)**:
+  - Eliminação de avaliações superficiais ou limitadas ao "happy path": decomposição sistemática e obrigatória em (1) Borda, Contratos de Entrada & Validações Fail-Fast; (2) Regras de Negócio e Ramificações Condicionais; (3) Pegada de Persistência Relacional & Transações (tabelas pai, filhas, rateios, snapshots, sequências, isolamento); (4) Efeitos Colaterais & Integrações Downstream (SOAP, REST, filas, PDFs/relatórios, e-mails, uploads, webhooks); e (5) Contratos de Saída & DTOs de Resposta.
+- **Protocolo Brownfield In-Flight (Reconciliação Delta & Auditoria de Gaps Pré-Existentes — Estado 1b)**:
+  - Mecanismo específico e obrigatório para migrações já iniciadas, parciais ou inacabadas no repositório de destino (prevenção do cenário real observado de dezenas de gaps descobertos tardiamente).
+  - Comparação cruzada entre a árvore 5D do legado e os artefatos existentes no destino, gerando imediatamente a Matriz De-Para com todos os GAPs catalogados (`GAP-01..GAP-NN`) antes da elaboração do plano de fases.
+- **Faseamento Orientado a Risco e Impacto Ancorado na Matriz De-Para (Estado 2)**:
+  - Fases autônomas entregáveis (B1..BN) onde cada fase possui uma lista explícita de IDs De-Para sob sua responsabilidade, com critérios de aceite determinísticos.
+  - Dashboard Executivo da Matriz De-Para exibido no chat e no Checkpoint Humano 2b para visibilidade e transparência completa a desenvolvedores humanos.
+- **Dual-Verification Gate Expandido (Quádruplo Critério de Paridade — Estado 4)**:
+  - Aprovação de fase exige simultaneamente: (1) 100% Golden Master verde; (2) 100% de resolução dos IDs De-Para da fase; (3) sign-off do domain-router de origem como oráculo; e (4) atesto estrutural de zero novos ciclos e zero dead-code pelo `@code-knowledge-graph`.
+- **Teste de Regressão e Governança**:
+  - Novo teste `test_workflow_framework_migration_depara_matrix_and_brownfield_reconciliation` adicionado à suíte operacional (`test_operational_workflows.py`), garantindo 100% de conformidade automatizada.
+
 ## [2.10.0] — 2026-09-15
 
 ### Adicionado
@@ -16,6 +63,12 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 - **Catalogação do Smell 2.22 em `governance-audit-patterns`**:
   - `Smell 2.22 — Sticky Agent e Falha de Reset de Workflow (R-042 / R-052)`: catalogado com severidade Bloqueador.
   - Teste determinístico `test_smell_2_22_workflow_reset_and_anti_sticky_agent_rule` adicionado à suíte `tests/governance_audit/test_governance_smells.py` (100% verde).
+- **Fortalecimento da Regra R-051 e Proteção Anti-Corrupção em Markdown Estruturado**:
+  - Extensão formal da regra `R-051 (Proteção Anti-Corrupção em Edição de Arquivo Único Grande/Estruturado e Markdown com Âncoras Repetidas)` em `CLAUDE.md`, `.github/copilot-instructions.md`, `efficient-batch-code-modification` e `governance-audit-patterns` (Smell 2.16).
+  - Proibição absoluta de invocar `replace_string_in_file` com âncoras ambíguas ou sem verificação prévia de unicidade estrita em memória (`count === 1`), prevenindo o fallback de correspondência aproximada (fuzzy matching) que corrompe/trunca blocos em arquivos com tabelas e seções parecidas (incidente real documentado em `code-knowledge-graph.agent.md`).
+  - Atualização do snippet `snippets/safe-single-file-edit-pattern.js` e obrigatoriedade de validação imediata da integridade estrutural pós-escrita (frontmatter `---`, cabeçalhos canônicos e contagem de linhas).
+- **Invariantes Dual-Stack e Co-Agência Obrigatória de `@code-knowledge-graph` em `WORKFLOW-FRAMEWORK-MIGRATION` (R-050)**:
+  - Formalização das Invariantes 8 e 9 em `workflows.md` § 3.7 e § 5: em migrações cross-stack, o domain router da stack de origem legada (`@ejb-router`, `@struts-router`) e o motor de grafo (`@code-knowledge-graph`, R-045) são co-agentes obrigatórios em todas as etapas (1 a 5), nunca dispensados após o pre-flight.
 
 ### Aprimorado
 - **Ajuste Fino na Regra R-042**:

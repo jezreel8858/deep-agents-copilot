@@ -207,30 +207,37 @@ def test_deve_chamar_api_externa():
 | Branches | 60% | 70%+ |
 | Funções | 75% | 85%+ |
 
-## 6) Comandos pytest / coverage.py
+## 6) Comandos pytest / coverage.py — Execução com Zero Ruído (R-008 / R-049)
+
+> **ATENÇÃO**: Evite `pytest` sem flags de supressão no terminal. Use `-q` e `--tb=short` combinados com filtros ou Think-in-Code via `ctx_execute` para manter o contexto livre de ruído.
+
+### A) Via `ctx_execute` (Think-in-Code — Recomendado)
+
+```javascript
+const { execSync } = require('child_process');
+try {
+  const out = execSync('pytest -q --tb=short tests/unit/test_[entidade]_service.py', { encoding: 'utf8' });
+  console.log(out.trim());
+} catch (err) {
+  const full = (err.stdout || '') + '\n' + (err.stderr || '');
+  console.log(full.split('\n').filter(l => /(FAILED|ERROR|passed in|===)/).slice(0, 30).join('\n'));
+}
+```
+
+### B) Via Terminal com Filtro Obrigatório
 
 ```bash
-# Todos os testes
-pytest
-
-# Com relatório de cobertura
-pytest --cov=src --cov-report=term-missing
-
-# Relatório HTML
-pytest --cov=src --cov-report=html
-open htmlcov/index.html
-
-# Apenas unit tests
-pytest tests/unit/
-
-# Apenas um arquivo
-pytest tests/unit/test_[entidade]_service.py
+# Executar arquivo específico (modo silencioso + traceback curto)
+pytest -q --tb=short tests/unit/test_[entidade]_service.py 2>&1 | grep -E "FAILED|ERROR|passed in" | head -40
 
 # Apenas um teste
-pytest tests/unit/test_[entidade]_service.py::Test[Entidade]Service::test_deve_salvar_quando_dados_validos
+pytest -q --tb=short tests/unit/test_[entidade]_service.py::Test[Entidade]Service::test_deve_salvar_quando_dados_validos
 
-# Falhar se cobertura < 80%
-pytest --cov=src --cov-fail-under=80
+# Com relatório de cobertura conciso
+pytest -q --cov=src --cov-report=term-missing --tb=short 2>&1 | grep -E "FAILED|ERROR|TOTAL|passed" | head -40
+
+# Em PowerShell / Windows:
+pytest -q --tb=short tests/unit/test_[entidade]_service.py
 ```
 
 ### pyproject.toml (configuração)

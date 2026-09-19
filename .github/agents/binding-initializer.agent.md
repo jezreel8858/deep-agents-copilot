@@ -150,6 +150,8 @@ discovery:
 ### Sucesso
 
 ```markdown
+Agente Ativo: binding-initializer
+
 Inicialização: ✅ OK
 
 Arquivos criados (NESTE repositório de governança):
@@ -179,6 +181,8 @@ Confiança: Alta
 ### Falha
 
 ```markdown
+Agente Ativo: binding-initializer
+
 Inicialização: ❌ ERRO
 
 Causa: <descrição em ≤ 1 linha>
