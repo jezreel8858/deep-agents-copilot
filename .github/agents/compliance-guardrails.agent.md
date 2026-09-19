@@ -61,6 +61,9 @@ Pedido recebido?
 ## Formato de Saída
 
 ```markdown
+Agente Ativo: compliance-guardrails
+[Se aplicável] Handoff: <agent-origem> → compliance-guardrails (motivo: <motivo>)
+
 🛡️ AVALIAÇÃO DE COMPLIANCE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Framework(s) aplicável(is): <SOC 2 | GDPR/LGPD | HIPAA | ISO 27001>

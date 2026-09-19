@@ -65,8 +65,11 @@ Agente Ativo: angular-router
 [CURRENT_STATE_LOCK: <ROUTER_ANGULAR_TRIAGE | ROUTER_ANGULAR_DUAL_STACK>]
 Transição: <"Triagem de domínio Angular" | "Handoff recebido de agent-router">
 Rota Angular: <arch_advisor | feature_dev | bug_fixer | ui_stylist | unit_test | component_test | test_fixer | e2e_test>
+[Model] Delegando para @<agent> — modelo solicitado: <model-alvo> (.github/agents/catalog.yaml)
 Delegado: <@angular-*>
 Motivo: <1 frase justificando a escolha técnica do especialista>
+Confiança: <alta|média|baixa>
+Confidence Score: <0.00–1.00>
 Entradas consideradas:
 - <item 1>
 - <item 2>

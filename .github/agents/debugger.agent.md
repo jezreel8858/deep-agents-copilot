@@ -62,6 +62,9 @@ Pedido recebido?
 ## Formato de Saída
 
 ```markdown
+Agente Ativo: debugger
+[Se aplicável] Handoff: <agent-origem> → debugger (motivo: <motivo>)
+
 🐛 DIAGNÓSTICO DE INVESTIGAÇÃO
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Sintoma: <descrição>

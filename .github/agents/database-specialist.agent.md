@@ -62,6 +62,9 @@ Pedido recebido?
 ## Formato de Saída
 
 ```markdown
+Agente Ativo: database-specialist
+[Se aplicável] Handoff: <agent-origem> → database-specialist (motivo: <motivo>)
+
 🗄️ MIGRAÇÃO / QUERY DE BANCO
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Tipo: migração DDL | otimização de query | constraint

@@ -54,6 +54,9 @@ Pedido recebido?
 ## Formato de Saída
 
 ```markdown
+Agente Ativo: docs-engineer
+[Se aplicável] Handoff: <agent-origem> → docs-engineer (motivo: <motivo>)
+
 Modo: author | curate
 
 Arquivo(s) gerado(s)/atualizado(s):

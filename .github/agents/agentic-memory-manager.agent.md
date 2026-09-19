@@ -56,6 +56,9 @@ Pedido recebido?
 ## Formato de Saída
 
 ```markdown
+Agente Ativo: agentic-memory-manager
+[Se aplicável] Handoff: <agent-origem> → agentic-memory-manager (motivo: <motivo>)
+
 🧠 MEMÓRIA — <PERSISTIR | RECUPERAR>
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Tipo: <episódica | semântica | procedimental>

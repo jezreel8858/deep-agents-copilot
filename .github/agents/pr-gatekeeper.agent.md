@@ -63,6 +63,9 @@ Pedido recebido?
 ## Formato de Saída
 
 ```markdown
+Agente Ativo: pr-gatekeeper
+[Se aplicável] Handoff: <agent-origem> → pr-gatekeeper (motivo: <motivo>)
+
 📦 PREPARAÇÃO DE PULL REQUEST
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Pré-requisito: Code Review = <APROVADO | APROVADO COM RESSALVAS>

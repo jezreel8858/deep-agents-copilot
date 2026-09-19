@@ -270,6 +270,9 @@ Próximo passo mínimo:
 ## Formato de Saída
 
 ```markdown
+Agente Ativo: business-rules-extractor
+[Se aplicável] Handoff: <agent-origem> → business-rules-extractor (motivo: <motivo>)
+
 Resultado:
 - <modo executado> em <módulo>
 - <contagem de regras>

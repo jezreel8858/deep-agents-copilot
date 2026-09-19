@@ -55,8 +55,11 @@ Solicitação de <Domínio> recebida:
 Agente Ativo: <dominio>-router
 Transição: <"Triagem de domínio" | "Handoff recebido de agent-router">
 Rota: <especialista_alvo>
+[Model] Delegando para @<agent> — modelo solicitado: <model-alvo> (.github/agents/catalog.yaml)
 Delegado: <@<dominio>-*>
 Motivo: <1 frase justificando a escolha técnica do especialista>
+Confiança: <alta|média|baixa>
+Confidence Score: <0.00–1.00>
 Entradas consideradas:
 - <item 1>
 - <item 2>

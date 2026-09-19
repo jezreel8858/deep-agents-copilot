@@ -65,6 +65,9 @@ Pedido de pesquisa recebido
 ## Formato de Saída
 
 ```markdown
+Agente Ativo: deep-search
+[Se aplicável] Handoff: <agent-origem> → deep-search (motivo: <motivo>)
+
 Rota: [RESPOSTA_DIRETA | PESQUISA_PARALELA | @tech-solution-architect | @agent-router | RETORNO_PARENT_AGENT]
 Motivo: <1 frase objetiva>
 Confiança: <alta|média|baixa>

@@ -171,6 +171,9 @@ Executar `governance-factory-patterns/SKILL.md` § 9 antes de finalizar qualquer
 Seguir o template parametrizável de `governance-factory-patterns` §4, com campos adicionais:
 
 ```markdown
+Agente Ativo: governance-factory
+[Se aplicável] Handoff: <agent-origem> → governance-factory (motivo: <motivo>)
+
 Tipo de artefato: agent | skill | prompt | stack
 Ação: criação | revisão
 Pesquisa prévia via @deep-search (se criação): [executada — síntese incorporada | N/A — revisão]

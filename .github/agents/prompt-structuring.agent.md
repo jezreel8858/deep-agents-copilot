@@ -66,6 +66,9 @@ Prompt recebido do agent-router (loop_count = 0)
 ## Formato de Saída
 
 ```markdown
+Agente Ativo: prompt-structuring
+[Se aplicável] Handoff: <agent-origem> → prompt-structuring (motivo: <motivo>)
+
 Loop: <loop_count>/5
 Status: <refinado|limite_atingido>
 

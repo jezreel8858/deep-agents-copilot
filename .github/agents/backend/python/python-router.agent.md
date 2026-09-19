@@ -58,9 +58,14 @@ Solicitação de Python Backend recebida:
 Agente Ativo: python-router
 [CURRENT_STATE_LOCK: <ROUTER_PYTHON_TRIAGE | ROUTER_PYTHON_DUAL_STACK>]
 Transição: <transição ou "Delegando internamente no domínio Python">
+[Model] Delegando para @<agent> — modelo solicitado: <model-alvo> (.github/agents/catalog.yaml)
 Delegado: <@python-arch-advisor | @python-feature-developer | @python-bug-fixer | @python-perf-tuner | @python-unit-test-writer | @python-integration-test-writer | @python-test-fixer>
 Motivo: <justificativa objetiva em 1 linha>
 Confiança: <alta|média|baixa>
+Confidence Score: <0.00–1.00>
+Entradas consideradas:
+- <item 1>
+- <item 2>
 Próximo passo mínimo:
 - <ação do especialista delegado>
 ```

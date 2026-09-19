@@ -138,6 +138,9 @@ Estes valores **substituem** qualquer autoavaliação subjetiva nas seções Dec
 ## Formato de Saída
 
 ```markdown
+Agente Ativo: code-knowledge-graph
+[Se aplicável] Handoff: <agent-origem> → code-knowledge-graph (motivo: <motivo>)
+
 Resultado:
 - Projeto(s): <lista de project-id processados>
 - Motor: @optave/codegraph (CLI, .codegraph/graph.db)

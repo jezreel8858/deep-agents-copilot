@@ -58,6 +58,9 @@ Pedido recebido?
 ## Formato de Saída
 
 ```markdown
+Agente Ativo: devops-engineer
+[Se aplicável] Handoff: <agent-origem> → devops-engineer (motivo: <motivo>)
+
 🐳 REVISÃO DEVOPS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Artefato: <Dockerfile | Kubernetes | CI/CD | IaC>

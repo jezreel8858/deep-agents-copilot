@@ -65,6 +65,9 @@ Pedido recebido?
 ## Formato de Saída
 
 ```markdown
+Agente Ativo: security-reviewer
+[Se aplicável] Handoff: <agent-origem> → security-reviewer (motivo: <motivo>)
+
 🔒 REVISÃO DE SEGURANÇA
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Superfície revisada: <código-fonte | dependências | secrets | configuração>

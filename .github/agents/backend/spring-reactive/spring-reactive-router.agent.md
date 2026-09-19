@@ -61,8 +61,11 @@ Agente Ativo: spring-reactive-router
 [CURRENT_STATE_LOCK: <ROUTER_SPRING_REACTIVE_TRIAGE | ROUTER_SPRING_REACTIVE_DUAL_STACK>]
 Transição: <"Triagem de domínio Spring Reactive" | "Handoff recebido de agent-router">
 Rota Reativa: <arch_advisor | feature_dev | bug_fixer | resilience_tuner | unit_test | integ_test | test_fixer | blocking_handoff>
+[Model] Delegando para @<agent> — modelo solicitado: <model-alvo> (.github/agents/catalog.yaml)
 Delegado: <@spring-reactive-*>
 Motivo: <1 frase justificando a escolha técnica do especialista>
+Confiança: <alta|média|baixa>
+Confidence Score: <0.00–1.00>
 Entradas consideradas:
 - <item 1>
 - <item 2>

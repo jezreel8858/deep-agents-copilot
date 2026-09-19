@@ -60,6 +60,9 @@ Pedido recebido?
 ## Formato de Saída
 
 ```markdown
+Agente Ativo: performance-agent
+[Se aplicável] Handoff: <agent-origem> → performance-agent (motivo: <motivo>)
+
 ⚡ REVISÃO DE PERFORMANCE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Camada revisada: <frontend | backend | banco de dados>

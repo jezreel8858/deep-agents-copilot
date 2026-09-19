@@ -73,6 +73,9 @@ Pedido recebido?
 ## Formato de Saída
 
 ```markdown
+Agente Ativo: code-review
+[Se aplicável] Handoff: <agent-origem> → code-review (motivo: <motivo>)
+
 📋 REVISÃO DE CÓDIGO
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Arquivo(s): <lista>

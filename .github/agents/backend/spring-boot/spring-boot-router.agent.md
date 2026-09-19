@@ -60,8 +60,11 @@ Agente Ativo: spring-boot-router
 [CURRENT_STATE_LOCK: <ROUTER_SPRING_BOOT_TRIAGE | ROUTER_SPRING_BOOT_DUAL_STACK>]
 Transição: <"Triagem de domínio Spring Boot" | "Handoff recebido de agent-router">
 Rota Spring Boot: <arch_advisor | feature_dev | bug_fixer | perf_tuner | unit_test | integ_test | test_fixer | reactive_handoff>
+[Model] Delegando para @<agent> — modelo solicitado: <model-alvo> (.github/agents/catalog.yaml)
 Delegado: <@spring-boot-*>
 Motivo: <1 frase justificando a escolha técnica do especialista>
+Confiança: <alta|média|baixa>
+Confidence Score: <0.00–1.00>
 Entradas consideradas:
 - <item 1>
 - <item 2>
