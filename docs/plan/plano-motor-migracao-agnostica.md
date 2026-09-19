@@ -166,7 +166,8 @@ O motor de migração opera através de 6 fases estritas e determinísticas, ger
 | **Fase 3a** | **Target Project Bootstrapping (Human-in-the-Loop)** | `target-stack-feature-developer` | IR validada & projeto alvo novo | Decisões de build/runtime (Maven vs Gradle, Java LTS) confirmadas pelo usuário via `ask_questions` e esqueleto base inicializado |
 | **Fase 3b** | **Idiomatic Code Emission** | `target-stack-feature-developer` | Projeto alvo inicializado/existente | Código moderno implementado sob TDD a partir da IR, com diffs cirúrgicos em lote (R-046) e zero menção a classes legadas |
 | **Fase 4** | **Dual-Verification Parity Gate** | `target-stack-test-fixer` + `@runtime-verifier` | Código emitido | 100% dos testes Golden Master passando verdes e 100% das regras comprovadas por asserções |
-| **Fase 5** | **Quality Gate & PR Readiness** | `@code-review` + `@security-reviewer` + `@pr-gatekeeper` | Paridade comprovada | Build limpo, zero vulnerabilidades OWASP, changelog e PR estruturado |
+| **Fase 5** | **Baseline Quality Gate & PR Readiness** | `@code-review` + `@security-reviewer` + `@pr-gatekeeper` | Paridade comprovada | Build limpo, zero vulnerabilidades OWASP, changelog e PR estruturado preliminar |
+| **Fase 6** | **Post-Migration Verification & Redundancy Gate** | `@code-review` + `@test-strategy` + `@business-rules-extractor` + `@runtime-verifier` | Fase 5 aprovada | Tríplice redundância aprovada: zero órfãos no Reverse Orphan Audit, 100% mutantes eliminados no Mutation Parity e zero discrepâncias no Differential Shadow Replay. Emissão de Certificado de Paridade Total |
 
 ### 3.1 Sub-rotina Fase 3a: Target Project Bootstrapping (Interactive Human Gate)
 
@@ -191,6 +192,14 @@ Quando o destino da migração for um novo repositório ou módulo autônomo (Ce
 
 ---
 
+
+
+### 3.3 Sub-rotina Fase 6: Post-Migration Verification & Redundancy Gate (Tríplice Camada)
+A última camada de segurança antes do cutover definitivo opera em três etapas independentes e estritamente auditáveis:
+1. **Reverse Orphan Audit**: Varredura reversa mecânica pelo `@code-review` + `@code-knowledge-graph` contra a árvore de arquivos, métodos, queries e configurações da aplicação legada. Todo símbolo legado deve possuir vínculo auditado no moderno (`[✅ MIGRADO]`) ou justificativa explícita (`[ℹ️ DESACOPLADO]` / `[🚫 OBSOLETO]`). Qualquer símbolo desacompanhado gera bloqueio imediato com a flag `ORPHAN_CODE_DETECTED`.
+2. **Mutation Parity Resilience**: O `@test-strategy` comanda a injeção de mutantes sintéticos controlados no código moderno para comprovar a sensibilidade da suíte Golden Master. Se qualquer teste permanecer verde durante a mutação de uma regra de negócio, a suíte é reprovada por fragilidade/falso-positivo até o reforço das asserções.
+3. **Differential Shadow Replay**: Replay das fixtures canônicas em paralelo nos dois ambientes, validando a igualdade estrita de payloads de saída, integridade de tabelas secundárias de banco de dados (histórico, rateio, snapshots) e eventos emitidos.
+Ao final, emite-se formalmente o **Certificado de Paridade Total & Cutover Autorizado** (`docs/migrations/certificado-paridade-<alvo>.md`).
 ## 4. Context Firewall — Divisão de Tarefas por Stack
 
 ### [CORE_ENGINE_TASKS] — Orquestração & Governança (Agnóstico)
@@ -198,6 +207,7 @@ Quando o destino da migração for um novo repositório ou módulo autônomo (Ce
 2. **`CORE-02`**: Formalizar o workflow canônico `WORKFLOW-LEGACY-MIGRATION` (ou especialização de `WORKFLOW-FRAMEWORK-MIGRATION`) em `.github/agents/workflows.md` com a máquina de estados e o banner visual de progresso.
 3. **`CORE-03`**: Implementar o checklist de pré-voo determinístico no `@tech-solution-architect` e `@agent-router` para validação de existência dos ecossistemas de domínio envolvidos (`.github/agents/<camada>/<stack>/`).
 4. **`CORE-04`**: Criar testes automatizados em pytest (`tests/governance_audit/test_migration_engine_governance.py`) validando o desacoplamento do motor e a rejeição de stacks não cadastradas.
+5. **`CORE-05`**: Formalizar a Tríplice Camada de Redundância Pós-Migração (Fase 6) e o Symbol Exhaustion Gate em `workflows.md` e suíte de testes de regressão de governança.
 
 ### [SOURCE_STACK_TASKS] — Adapters de Extração de Legado
 1. **`SRC-01` (Struts)**: Capacitar o `@struts-arch-advisor` com prompts e skills para mapear `struts-config.xml`, `Action` e `ActionForm` para os nós `entryPoints` e `domainEntities` da IR.

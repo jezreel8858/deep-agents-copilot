@@ -75,7 +75,7 @@ Agent ativo de turno anterior? (R-042)
     ├─ WORKFLOW-FEATURE-DEVELOPMENT: requirements → blueprint → test-strategy → TDD → gate
     ├─ WORKFLOW-GOVERNANCE-MAINTENANCE: audit → human approval → batch execution
     ├─ WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION: scan → blast-radius → bump → adapt → quality-gate
-    ├─ WORKFLOW-FRAMEWORK-MIGRATION: assessment (5D + delta se in-flight) → blueprint & matriz de-para → codemod por fase → dual-verification parity → quality-gate
+    ├─ WORKFLOW-FRAMEWORK-MIGRATION: assessment (5D + symbol exhaustion) → blueprint & matriz de-para → codemod anti-omission → dual-verification parity → quality-gate baseline → post-migration redundancy gate
     └─ WORKFLOW-RELEASE-READINESS: contracts → db-rollout → security/hygiene → changelog → verdict
     ↓ (toda resposta abre com "Agente Ativo: <name>" — visibilidade de fluxo, agent-contracts § 0)
 Turno seguinte muda de fase/escopo? (R-042)

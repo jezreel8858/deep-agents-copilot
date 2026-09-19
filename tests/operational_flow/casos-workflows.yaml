@@ -388,6 +388,17 @@ cenarios:
         output_esperado:
           - "Build de Produção Limpo"
           - "Zero Regressões Detectadas"
+        proximos_permitidos: ["code-review"]
+      - etapa: 6
+        nome_etapa: "Post-Migration Verification & Redundancy Gate"
+        agente: "code-review"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: code-review"
+        output_esperado:
+          - "Reverse Orphan Audit Limpo (Zero Órfãos)"
+          - "Mutation Parity Resilience 100%"
+          - "Certificado de Paridade Total Emitido"
         proximos_permitidos: ["pr-gatekeeper"]
 
   # ─────────────────────────────────────────────────────────────

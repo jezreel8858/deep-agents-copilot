@@ -6,6 +6,26 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.19.0] — 2026-09-19
+
+### Adicionado
+- **Blindagem Determinística do Workflow de Migração e Camada de Redundância Pós-Migração (WORKFLOW-FRAMEWORK-MIGRATION / REQ-008 / REQ-009)**:
+  - Elevação do `WORKFLOW-FRAMEWORK-MIGRATION` em `workflows.md` de 5 para **6 etapas canônicas**, adicionando o **Estado 6 (Post-Migration Verification & Redundancy Gate)** como barreira obrigatória antes de qualquer autorização de cutover.
+  - Instituição do **Symbol Exhaustion Gate (Inventário Mecânico de Símbolos)** nas Etapas 1 e 2: exige que a Matriz De-Para mapeie compulsoriamente 100% dos símbolos, métodos (públicos e privados), queries e nós da AST inventariados mecanicamente via `@code-knowledge-graph`, erradicando gaps por inferência superficial.
+  - Instituição do **Anti-Omission AST Validator** na Etapa 3: verificação no sandbox do código emitido contra a Representação Intermediária (IR) para impedir truncamento e omissão silenciosa de branches de exceção e tabelas secundárias.
+  - Instituição da **Tríplice Camada de Redundância Pós-Migração (Estado 6)**:
+    - *Sub-rotina 6a (Reverse Orphan Audit)*: Varredura reversa determinística de 100% dos símbolos, métodos, queries e arquivos legados contra a base moderna e a Matriz De-Para para detectar qualquer código legado órfão sem correspondência.
+    - *Sub-rotina 6b (Mutation Parity Resilience)*: Injeção de mutantes sintéticos em regras para comprovar que a suíte Golden Master detecta desvios e eliminar testes falsos-verdes ou frágeis.
+    - *Sub-rotina 6c (Differential Shadow Replay)*: Comparação semântica paralela de payloads de retorno, integridade de tabelas secundárias de banco de dados e eventos emitidos.
+    - Emissão compulsória do *Certificado de Paridade Total & Cutover Autorizado* em `docs/migrations/certificado-paridade-<alvo>.md`.
+  - Formalização do **Invariante 13 em `workflows.md` § 5**, e atualização dos Invariantes 8 e 9 para cobrir as 6 etapas canônicas.
+  - Especificação dos requisitos funcionais **REQ-008** e **REQ-009** em `docs/requirements/REQ-migration-engine.md` e atualização da Máquina de Estados em `docs/plan/plano-motor-migracao-agnostica.md` (Fase 6 e CORE-05).
+  - Alinhamento de governança global em `CLAUDE.md` e `.github/copilot-instructions.md`.
+  - Atualização do cenário de validação operacional `WF-MIG-001` em `tests/operational_flow/casos-workflows.yaml` com a Etapa 6.
+  - Expansão da suíte de testes em `tests/governance_audit/test_migration_engine_governance.py` validando Symbol Exhaustion Gate, Tríplice Redundância Pós-Migração e declaração das 6 etapas (169 testes verdes no pytest).
+
+---
+
 ## [2.18.0] — 2026-09-19
 
 ### Adicionado
