@@ -41,7 +41,7 @@ APRENDIZADO ────────────────────┼─�
 *Procedimentos operacionais focados em objetivos concretos e problemas específicos do dia a dia de engenharia.*
 
 - **Como Rodar Workflows Canônicos**:
-  - [Workflows Operacionais Determinísticos](../.github/agents/workflows.md): Especificação dos 8 workflows (Bug-Fix, Refactoring, Technical Analysis, Feature, Governance, CVE, Framework Migration com 6 etapas e Release Readiness).
+  - [Workflows Operacionais Determinísticos](../.github/agents/workflows.md): Especificação dos 8 workflows canônicos, com endurecimento determinístico e paridade de rigor entre Migração (6 etapas, Symbol Exhaustion e Tríplice Redundância), Bug-Fix (RCA estruturado 5 Whys/Fishbone com dupla evidência observável, classificação flaky vs regressão real, pré-declaração de blast radius e rollback plan, mini mutation-check anti falso-verde e observação pós-fix/canary) e Refatoração (Contract Testing Pact-style / consumer-driven, camada de redundância proporcional com auditoria reversa de símbolos, mini mutation gate e differential replay leve, e rollback com registro de blast_radius_revertido).
 - **Como Adicionar Contexto de Novo Projeto**:
   - [Project Context Builder](../.github/skills/project-context-builder/SKILL.md): Como executar `/add-project-context` para gerar adapters em `local/` sem vazar dados para o repositório público (R-043/R-044).
 - **Como Operar em Modo Context Mode**:
@@ -94,4 +94,3 @@ Ao adicionar ou editar documentação neste repositório:
 2. **Genericidade Absoluta (R-038)**: Nunca vincule nomes de projetos privados, classes de negócio ou dados proprietários em documentos compartilhados.
 3. **Headings Hierárquicos**: Mantenha sequência estrita de títulos (`#` → `##` → `###`) para garantir chunking limpo por ferramentas de IA e RAG.
 4. **Living Documentation (R-033)**: Toda alteração arquitetural, de regra ou de workflow exige atualização sincronizada dos documentos correlatos na mesma entrega.
-

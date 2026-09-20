@@ -171,13 +171,13 @@ graph TD
 
 Todo desenvolvimento de software é executado através de uma máquina de estados finitos que proíbe desvios informais:
 
-1. **`WORKFLOW-BUG-FIX`**: Triagem de Causa Raiz (`@bug-triage`) → Red Test isolado (ou Layout Spec/VFL para defeitos visuais) → Correção Cirúrgica (`bug-fixer` para runtime ou `ui-stylist` para layout) → Green Test (com re-inspeção visual VFL para layout) → Quality Gate.
-2. **`WORKFLOW-REFACTORING`**: Mapeamento de Regras (`@business-rules-extractor`) → Blast Radius (`@code-knowledge-graph`) → Plano Mikado (`@refactor-planner`) → Execução em Lote → Validação.
+1. **`WORKFLOW-BUG-FIX`**: Triagem com RCA estruturado (5 Whys / Fishbone) e regra *evidence before hypothesis* (mínimo de 2 fontes independentes de evidência observável) + classificação determinística `flaky` vs `regressao_real` (`@bug-triage`) → Caracterização e Reprodução Automatizada via Red Test isolado ou spec de layout/VFL (`specialist-unit-test-writer`/`specialist-component-test-writer`/`specialist-ui-stylist`) com pré-voo de baseline → Declaração antecipada de `blast_radius_estimado` e `rollback_plan` atômico + Correção Cirúrgica Mínima (`specialist-bug-fixer` ou `specialist-ui-stylist`) → Green Test, Linter e **Mini Mutation-Check** proporcional ao risco (1 a 3 mutantes sintéticos eliminados pelo Red Test contra falsos-verdes) (`runtime-verifier`) → Quality Gate, autorreflexão documental (R-033) e **Observação Pós-Fix / Canary Gate** para defeitos críticos (P0/P1, auth, integridade de dados) (`@code-review` / `@pr-gatekeeper`).
+2. **`WORKFLOW-REFACTORING`**: Mapeamento de Regras Vigentes / Ground Truth (`@business-rules-extractor`) → Blast Radius determinístico via grafo (`@code-knowledge-graph`, R-045) com **Contract Testing (Pact-style consumer-driven ou OpenAPI / JSON Schema Diff)** no gate de contratos (Estado 2a) e Golden Master Safety Net (Estado 2b) → Plano Macro Mikado com árvore de pré-requisitos e pontos de rollback (`@refactor-planner` + `@test-strategy`) com checkpoint humano se alto risco → Execução Incremental em Lote cirúrgico (`domain router / specialists`, R-046) → Validação de Ground Truth (100% preservadas) e **Camada de Redundância Proporcional ao Blast Radius** (Auditoria Reversa de Símbolos `reverse_symbol_audit` via grafo, Mini Mutation Gate `mini_mutation_gate` e Differential Replay Leve `differential_replay_leve`) (`@business-rules-extractor` + `@code-review`), com governança de Rollback no Estado 5b calculando e registrando formalmente o **`blast_radius_revertido`** (nós Mikado, arquivos e callers restaurados) no `workflow_state`.
 3. **`WORKFLOW-TECHNICAL-ANALYSIS`**: Despacho analítico Read-Only → Coleta determinística via AST/Grafo → Relatório com Propostas Acionáveis (`[PROPOSTA-1..N]`) → Fast-Chaining (R-050.1).
 4. **`WORKFLOW-FEATURE-DEVELOPMENT`**: Elicitação de Requisitos (`@requirements-analyst`) → Technical Blueprint (`@tech-solution-architect`) → Estratégia de Testes (`@test-strategy`) → Implementação Domain TDD (com handoff para `@angular-ui-stylist` em UI) → Duplo Quality Gate (Gate 1: Lógica/OWASP; Gate 2: Design System & Paridade UI).
 5. **`WORKFLOW-GOVERNANCE-MAINTENANCE`**: Auditoria estrutural de smells (`@agent-auditor`) → Aprovação humana → Execução atômica em lote (`@governance-maintainer`).
 6. **`WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION`**: Scan e triagem de severidade (`@security-reviewer`) → Blast Radius de breaking changes → Bump cirúrgico → Adaptação de código → Quality Gate.
-7. **`WORKFLOW-FRAMEWORK-MIGRATION`**: Avaliação de paridade e phasing (`@tech-solution-architect`) → Codemods cirúrgicos e adaptação de APIs → Validação de testes de regressão → Quality Gate.
+7. **`WORKFLOW-FRAMEWORK-MIGRATION`**: Pre-Flight Assessment com 5D e Symbol Exhaustion Gate (`@tech-solution-architect` + `@code-knowledge-graph` + router de origem) → Migration Phasing com Matriz De-Para → Codemod em Lote por Fase com Anti-Omission AST Validator → Paridade Funcional Dual-Verification → Baseline Quality Gate → Post-Migration Verification & Redundancy Gate (Estado 6: Tríplice Redundância com Reverse Orphan Audit, Mutation Parity e Differential Shadow Replay).
 8. **`WORKFLOW-RELEASE-READINESS`**: Verificação de contratos de API e integridade de schema → Auditoria de segurança e higiene de repositório (`@repo-hygiene-auditor`) → Geração de CHANGELOG e PR (`@pr-gatekeeper`) → Veredito de Release.
 
 ### 6.2 Ciclo de Vida do Handoff e Banner Universal (R-042 / R-048)
@@ -211,13 +211,26 @@ stateDiagram-v2
     HALF_OPEN --> OPEN: Nova falha imediata
 ```
 
+### 6.4 Endurecimento Determinístico e Paridade de Governança nos Workflows Operacionais
+
+O ecossistema multi-agente estabelece **paridade horizontal de rigor determinístico** entre fluxos de migração, correção de defeitos e modernização estrutural:
+
+| Conceito-Chave | `WORKFLOW-BUG-FIX` | `WORKFLOW-REFACTORING` | `WORKFLOW-FRAMEWORK-MIGRATION` |
+|---|---|---|---|
+| **Investigação Baseada em Fatos** | **RCA Estruturado (5 Whys / Fishbone)** com regra estrita de *evidence before hypothesis* (mínimo de 2 fontes observáveis: stack trace, runtime log, payload HTTP, APM). | **Mapeamento de Regras Vigentes / Ground Truth** extraído formalmente via `@business-rules-extractor` antes de qualquer mutação. | **Symbol Exhaustion Gate**: inventário mecânico via AST/Grafo de 100% dos métodos públicos/privados, queries e nós. |
+| **Classificação & Pré-Voo** | **Classificação `flaky` vs `regressao_real`** no Estado 1; pré-voo limpo na suíte vizinha para isolar instabilidade de ambiente/concorrência. | **Análise de Blast Radius via Grafo** (`@code-knowledge-graph`, R-045) identificando callers, callees e acoplamento transitivo. | **5 Dimensões Críticas & Brownfield Delta**: reconciliação delta obrigatória antes do blueprint. |
+| **Blindagem de Contratos** | **Pré-declaração de `blast_radius_estimado` e `rollback_plan`** no `workflow_state` antes de autorizar qualquer diff cirúrgico. | **Contract Testing (Pact-style / consumer-driven ou OpenAPI / JSON Schema Diff)** no Estado 2a para APIs públicas e contratos compartilhados. | **Matriz De-Para Unívoca**: rastreabilidade 100% dos contratos e entidades mapeadas entre origem e destino. |
+| **Resiliência contra Falsos-Verdes** | **Mini Mutation-Check** proporcional ao risco no Estado 4 (1 a 3 mutantes sintéticos eliminados pelo Red Test). | **Mini Mutation Gate** no Estado 5 validando a sensibilidade e precisão da suíte Golden Master / caracterização. | **Mutation Parity Resilience**: injeção de mutantes sintéticos comprovando resiliência da suíte Golden Master. |
+| **Redundância & Verificação Pós-Execução** | **Observação Pós-Fix / Canary Gate** no Estado 5 com métricas de telemetria (5xx, APM, latência) para bugs críticos (P0/P1, auth, integridade). | **Camada de Redundância Proporcional ao Blast Radius** no Estado 5 (Auditoria Reversa de Símbolos, Mini Mutation Gate e Differential Replay Leve). | **Tríplice Redundância Pós-Migração**: Reverse Orphan Audit + Mutation Parity + Differential Shadow Replay (Estado 6). |
+| **Governança de Rollback** | Circuit Breaker (teto de 3 iterações) com reversão atômica estritamente amparada pelo `rollback_plan`. | Reversão atômica dos nós do DAG Mikado com cálculo, registro e auditoria quantitativa de **`blast_radius_revertido`**. | Reversão completa de cutover amparada pela preservação integral do sistema e testes de paridade dual. |
+
 ---
 
 ## 7. Visão de Implantação e Ambiente (arc42 §7)
 
 ```mermaid
 flowchart LR
-    subgraph LocalMachine["Estação de Desenvolvimento (Local Developer Workspace)"]
+    subgraph LocalMachine["Estação de Desenvolvedor (Local Developer Workspace)"]
         IDE["JetBrains IDEA / VS Code"]
         GitRepo["Repositório Git Principal"]
         Worktrees[".worktrees/<task-id>\n(Worktrees Isolados R-049)"]

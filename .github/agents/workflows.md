@@ -68,13 +68,17 @@ flowchart TD
 
 ### 3.1 WORKFLOW 1: `WORKFLOW-BUG-FIX` (Resolução de Bugs, Falhas de Layout e Regressões)
 
-- **Objetivo**: Identificar a causa raiz, reproduzir via teste automatizado isolado (Red Test) ou layout spec, aplicar correção cirúrgica mínima (Green Test) e validar não-regressão.
+- **Objetivo**: Identificar a causa raiz via RCA estruturado (5 Whys / Fishbone) sob a regra *evidence before hypothesis* (mínimo de 2 fontes independentes de evidência técnica observável), classificar determinísticamente o defeito (`flaky` vs `regressao_real`), reproduzir via teste automatizado isolado (Red Test) ou layout spec, quantificar blast radius estimado e plano de reversão, aplicar correção cirúrgica mínima (Green Test) com mini mutation-check proporcional ao risco (anti falso-verde), validar não-regressão e aplicar observação pós-fix/canary para defeitos críticos.
 - **Gatilhos de Fast-Path**: `"bug"`, `"erro"`, `"falha"`, `"500"`, `"NPE"`, `"não funciona"`, `"quebrou"`, `"layout quebrado"`, `"desalinhado"`, `"CSS quebrado"`, `"NullPointerException"`, `"regressão"`.
 - **Política R-041**: **Bypass Total** de `@prompt-structuring`. Não reformatar prompt; o relato técnico é despachado imediatamente.
+- **⚠️ Invariante de RCA Estruturado e Dupla Fonte de Evidência (não-negociável)**: Proibido formular hipótese causal ou propor correção sem correlacionar no mínimo **2 fontes independentes de evidência técnica observável** (*evidence before hypothesis* — ex.: stack trace + log em runtime; ou payload de rede HTTP + teste isolado reprodutível; ou métrica de observabilidade APM + call graph determinístico). Hipóteses baseadas em intuição pura sem dupla evidência são proibidas.
+- **⚠️ Invariante de Classificação Flaky vs Regressão Real (não-negociável)**: Toda falha deve ser categorizada no Estado 1/Pré-voo como `flaky` (instabilidade intermitente decorrente de race conditions, poluição de estado entre suítes, delays de concorrência ou timeouts de ambiente) ou `regressao_real` (quebra determinística de invariante de negócio ou contrato). Se classificado como `flaky`, o fluxo isola os fatores de concorrência/ambiente antes de qualquer modificação de código funcional.
+- **⚠️ Invariante de Pré-Declaração de Blast Radius e Rollback Plan (não-negociável)**: É terminantemente vedado aplicar qualquer diff de correção no Estado 3 sem antes quantificar o `blast_radius_estimado` (callers diretos, módulos vizinhos afetados, dependências) e registrar o `rollback_plan` atômico no `workflow_state`.
+- **⚠️ Invariante de Mini Mutation-Check e Observação Pós-Fix (não-negociável)**: No Estado 4, todo teste de regressão para bug de severidade média/alta deve passar por mini mutation-check pontual proporcional ao risco (1 a 3 mutantes sintéticos injetados) para comprovar a eliminação de falsos-verdes. No Estado 5, bugs de criticidade alta/crítica (P0/P1, segurança, integridade de dados, indisponibilidade ou memory leak) exigem plano formal de observação pós-fix/canary com telemetria definida.
 
 ```mermaid
 flowchart TD
-    Start(["⚡ Solicitação de Bug (Fast-Path)"]) --> Triage["<b>1. Triagem & Isolamento</b><br/>Agente: @bug-triage<br/>Ação: Análise de sintomas, logs e reprodução"]
+    Start(["⚡ Solicitação de Bug (Fast-Path)"]) --> Triage["<b>1. Triagem & RCA Estruturado</b><br/>Agente: @bug-triage<br/>Ação: RCA 5 Whys/Fishbone + 2 fontes independentes"]
 
     Triage --> CheckRepro{"Reprodução clara<br/>e determinística?"}
     CheckRepro -- "Não (Intermitente/Sem Logs)" --> ReproGate["<b>1b. Repro Gate & Probe</b><br/>Agente: @debugger / ask_questions<br/>Ação: Logpoint em runtime ou coleta de payload mínimo (tentativa N/2)"]
@@ -82,7 +86,11 @@ flowchart TD
     CheckReproCap -- "Sim" --> Triage
     CheckReproCap -- "Não (teto esgotado)" --> NonRepro["<b>1c. Não Reproduzível — Escalonamento</b><br/>Agente: ask_questions<br/>Opções: prosseguir com hipótese | aguardar evidência | encerrar não-reproduzível"]
     NonRepro --> EndNonRepro(["🟡 Pausado — Aguardando Evidência/Decisão"])
-    CheckRepro -- "Sim" --> CheckDiag{"Causa raiz<br/>multi-camada?"}
+    CheckRepro -- "Sim" --> CheckFlaky{"Classificação da Falha"}
+
+    CheckFlaky -- "Flaky (Intermitência/Race Condition)" --> FlakyIsolate["<b>Isolamento de Concorrência/Ambiente</b><br/>Agente: @debugger / specialist-unit-test-writer<br/>Ação: Isola poluição de estado, timing e concorrência"]
+    CheckFlaky -- "Regressão Real" --> CheckDiag{"Causa raiz<br/>multi-camada?"}
+    FlakyIsolate --> CheckDiag
 
     CheckDiag -- "Sim" --> Diagnosis["<b>Diagnóstico Profundo</b><br/>Agente: @debugger / @code-knowledge-graph<br/>Ação: Inspeção de call graph e stack trace"]
     CheckDiag -- "Não" --> CheckKind{"Tipo de Defeito"}
@@ -102,23 +110,28 @@ flowchart TD
     DBMigration --> CheckAuth
 
     CheckAuth -- "Sim" --> SecGate["<b>3c. Security Checkpoint (R-048.1)</b><br/>Agente: @tech-solution-architect + @security-reviewer<br/>Ação: Valida viabilidade e superfície de risco ANTES do diff"]
-    CheckAuth -- "Não" --> Fix["<b>3. Correção Cirúrgica Mínima</b><br/>Agente: specialist-bug-fixer / ui-stylist<br/>Ação: Diff cirúrgico mínimo (R-002 e R-046)"]
-    SecGate --> Fix
+    CheckAuth -- "Não" --> BlastRollbackCheck["<b>Declaração de Blast Radius & Rollback Plan</b><br/>Agente: specialist-bug-fixer<br/>Ação: Quantifica callers/módulos e define estratégia de rollback"]
+    SecGate --> BlastRollbackCheck
 
-    Fix --> GreenTest["<b>4. Green Test & Linter</b><br/>Agente: runtime-verifier / test-fixer<br/>Ação: Suíte verde e linter limpo (máx 3x)"]
+    BlastRollbackCheck --> Fix["<b>3. Correção Cirúrgica Mínima</b><br/>Agente: specialist-bug-fixer / ui-stylist<br/>Ação: Diff cirúrgico mínimo (R-002 e R-046)"]
 
-    GreenTest --> CheckPass{"Testes passaram<br/>dentro do teto 3x?"}
-    CheckPass -- "Sim" --> QualityGate["<b>5. Quality Gate & Resumo</b><br/>Agente: @code-review / @pr-gatekeeper<br/>Ação: Validação de segurança/diff e preparação de PR"]
-    CheckPass -- "Não (Falha Persistente)" --> CircuitBreaker["<b>4b. Circuit Breaker & Rollback</b><br/>Agente: runtime-verifier (DECLARA veredito, read-only)<br/>Ação: Aciona specialist-bug-fixer/test-fixer para reversão atômica (git checkout) + Escalation humana (ask_questions)"]
+    Fix --> GreenTest["<b>4. Green Test, Linter & Mini Mutation-Check</b><br/>Agente: runtime-verifier / test-fixer<br/>Ação: Suíte verde + mini mutation-check proporcional ao risco"]
+
+    GreenTest --> CheckPass{"Testes passaram<br/>e mutantes eliminados (máx 3x)?"}
+    CheckPass -- "Sim" --> QualityGate["<b>5. Quality Gate & Observação Pós-Fix</b><br/>Agente: @code-review / @pr-gatekeeper<br/>Ação: Validação de segurança/diff, autorreflexão e canary para bugs críticos"]
+    CheckPass -- "Não (Falha Persistente)" --> CircuitBreaker["<b>4b. Circuit Breaker & Rollback</b><br/>Agente: runtime-verifier (DECLARA veredito, read-only)<br/>Ação: Aciona specialist-bug-fixer/test-fixer para reversão atômica via rollback_plan + Escalation (ask_questions)"]
 
     QualityGate --> EndBug(["✅ Concluído com Sucesso"])
     CircuitBreaker --> EndFail(["🛑 Interrompido com Reversão Segura"])
 ```
 
 #### Cadeia Sequencial e Papéis:
-1. **Estado 1 — Triagem & Hipótese (`@bug-triage`)**:
+1. **Estado 1 — Triagem, RCA Estruturado & Hipótese Causal (`@bug-triage`)**:
    - *Entrada*: Sintoma relatado, logs, stack trace ou print/descrição de layout.
-   - *Saída*: Hipótese de causa raiz, componente afetado e passos de reprodução.
+   - *RCA Estruturado (5 Whys / Fishbone)*: O `@bug-triage` conduz formalmente Análise de Causa Raiz através da técnica dos **5 Porquês (5 Whys)** ou **Diagrama de Ishikawa (Fishbone)**, decompondo o defeito em camadas (código, dados, concorrência, contratos, configuração).
+   - *Regra Obrigatória: Evidence Before Hypothesis*: É terminantemente vedado formular hipótese causal sem correlacionar no mínimo **2 fontes independentes de evidência técnica observável** (ex.: stack trace + log em runtime; ou payload de rede HTTP + teste isolado reprodutível; ou métrica de observabilidade APM + call graph determinístico). Hipóteses baseadas em intuição pura sem dupla evidência são proibidas.
+   - *Classificação Determinística: `flaky` vs `regressao_real`*: O `@bug-triage` categoriza a falha em `flaky` (instabilidade intermitente decorrente de race conditions, poluição de estado entre suítes, delays de concorrência ou timeouts de ambiente) ou `regressao_real` (quebra determinística de invariante de negócio ou contrato). Se classificado como `flaky`, o fluxo isola os fatores de concorrência/ambiente antes de qualquer modificação de código funcional.
+   - *Saída*: RCA formalizado com 2 fontes de evidência, hipótese causal validada, classificação (`flaky` ou `regressao_real`), componente afetado e passos de reprodução.
    - *Sub-rotina 1a (Diagnóstico Profundo)*: Se envolver call graph multi-camada complexo, invoca `@debugger` com `call_type: "subroutine"`.
    - *Sub-rotina 1b (Repro Gate)*: Se o bug for intermitente ou faltar evidência mínima, o `@bug-triage` NÃO avança cegamente para o Estado 2. Ele aciona o `@debugger` com logpoint/tracepoint (`logExpression` com `suspendPolicy=NONE`) ou dispara `ask_questions` (R-027) com 1 pergunta solicitando o payload/passos mínimos.
    - *Sub-rotina 1c (Circuit Breaker de Reprodução)*: O Repro Gate tem **teto de 2 tentativas**. Se após 2 rodadas a reprodução determinística ainda falhar, o `@bug-triage` PARA de repetir o ciclo e aciona `ask_questions` com 3 opções objetivas: **(A)** prosseguir para o Estado 2 com a hipótese de maior confiança disponível, registrando o risco assumido no `workflow_state`; **(B)** pausar o workflow aguardando evidência adicional (log/observabilidade) do solicitante; **(C)** encerrar a triagem classificando `status_reproducao: "nao_reproduzivel"` e registrar achados parciais para backlog. Este é um estado terminal distinto (🟡 Pausado), não um retorno silencioso ao loop.
@@ -128,18 +141,21 @@ flowchart TD
    - *Cenário C (Layout / CSS / Estilo / Responsividade / Smell 2.21)*: `specialist-ui-stylist` e `specialist-component-test-writer` mapeiam a falha visual através do ciclo VFL (`frontend-visual-feedback-loop`), identificando quebras de hierarquia em relação ao componente irmão canônico, ausência de classes utilitárias de diálogo (`.app-dialog-content`, `.form-grid`), textos literais de ícones vazando e cores hexadecimais arbitrárias. Geram teste de componente com asserção estrita de DOM/AOM ou especificação de layout multi-viewport (375px/768px/1440px).
 3. **Estado 3 — Correção Cirúrgica Mínima (`specialist-bug-fixer` ou `specialist-ui-stylist`)**:
    - *Entrada*: Arquivo alvo e teste falhando ou layout spec.
+   - *Pré-requisito Mandatório: Blast Radius Estimado & Rollback Plan*: Antes de emitir o primeiro diff cirúrgico, o especialista DEVE declarar no `workflow_state`: **(a)** `blast_radius_estimado` (contagem de callers diretos e módulos dependentes via consulta determinística ao grafo quando multi-camada) e **(b)** `rollback_plan` (estratégia de restauração atômica, pontos de restauração e lista de arquivos reversíveis em caso de escalonamento/circuit breaker).
    - *Roteamento Especializado por Tipo de Defeito*: Falhas de runtime/lógica/reatividade são corrigidas por `specialist-bug-fixer`; **defeitos de layout, SCSS, alinhamento de diálogos, ícones ou responsividade são atribuídos compulsoriamente a `specialist-ui-stylist`**, aplicando estritamente variáveis de tema (zero hex inline) e classes utilitárias canônicas.
    - *Sub-rotina 3a (Dependência de Banco/DDL)*: Se a falha envolver truncamento de dados, coluna ausente ou constraint de banco, o `@database-specialist` gera previamente o script de migração DDL idempotente antes de tocar no código de aplicação.
    - *Sub-rotina 3c (Security Checkpoint — R-048.1)*: Se a correção tocar autenticação, credenciais, provedores de identidade ou sessão/token, o Estado 3 aciona compulsoriamente o gate de segurança já declarado em `routing-graph.yaml` (`@tech-solution-architect` + `@security-reviewer`, quando disponível) **ANTES** de aplicar o diff — tratamento equivalente ao de mudanças sensíveis de persistência/banco. Proibido implementar o fix de autenticação sem declarar este checkpoint no handoff.
    - *Saída*: Diff cirúrgico mínimo (2 a 3 linhas de contexto), sem alterar código não relacionado (R-002 e R-046).
-4. **Estado 4 — Verificação Green Test, Linter & VFL (`runtime-verifier`)**:
+4. **Estado 4 — Verificação Green Test, Linter, VFL & Mini Mutation-Check (`runtime-verifier`)**:
    - *Entrada*: Código alterado e suíte de testes.
    - *Saída*: Confirmação de 100% dos testes passando e `get_errors` limpo em lote único (R-046).
+   - *Mini Mutation-Check Proporcional ao Risco (Anti Falso-Verde)*: Para eliminar o risco crítico de falsos-verdes (onde o teste de regressão passa mesmo na presença do bug, por asserção frágil ou tautológica), o especialista executor aplica um **mini mutation-check cirúrgico** proporcional ao risco: injeta de 1 a 3 mutantes sintéticos pontuais na linha alterada (ex.: invertendo a condição de guarda booleana ou revertendo temporariamente a correção). O teste de regressão criado no Estado 2 DEVE obrigatoriamente falhar ao rodar contra o código mutado (100% de mutantes eliminados). Se o teste continuar verde diante do mutante, o teste é classificado como falso-positivo / frágil e a aprovação é bloqueada até o teste ser corrigido e robustecido.
    - *Verificação Estrita para Bugs de Layout*: Para defeitos visuais, a validação do Estado 4 exige aprovação dupla: testes de componente verdes E re-inspeção visual/AOM (`frontend-visual-feedback-loop`), confirmando eliminação de texto literal de ícones, preservação de dimensões elásticas e ausência de hex inline antes de liberar para o Quality Gate. Se quebrar, aciona `specialist-test-fixer` ou `specialist-ui-stylist` (máx. 3 iterações).
    - **Nota de precedência**: quando `specialist-test-fixer` esgota seu próprio teto interno, o escalonamento genérico do sub-catálogo ("retornar ao `@agent-router`") é **substituído**, dentro de um `WORKFLOW-BUG-FIX` ativo, pelo protocolo formal do Estado 4b abaixo — a regra de workflow tem precedência sobre o comportamento default do catálogo de domínio (R-050 > comportamento genérico).
-   - *Estado 4b — Circuit Breaker & Rollback (contrato corrigido)*: Se após 3 tentativas os testes não passarem, o `runtime-verifier` — **estritamente read-only, nunca executa mutação** — apenas DECLARA o veredito de bloqueio (`PRONTO | BLOQUEADO` conforme seu próprio contrato) e aciona via `run_subagent` o `specialist-bug-fixer`/`specialist-test-fixer` ativo (que já possuem `run_in_terminal` + `insert_edit_into_file`) para executar a reversão atômica dos diffs desta sessão (`git checkout -- <arquivos>` / `git restore`). **Jamais o `runtime-verifier` reverte diretamente** — isso violaria seu próprio contrato read-only (mesma classe de agent validada em `test_readonly_advisory_agents_do_not_contain_mutation_tools`). Após confirmação da reversão, o especialista escala para intervenção humana via `ask_questions`.
-5. **Estado 5 — Quality Gate & Resumo (`@code-review` / `@pr-gatekeeper`)**:
+   - *Estado 4b — Circuit Breaker & Rollback (contrato corrigido)*: Se após 3 tentativas os testes não passarem, o `runtime-verifier` — **estritamente read-only, nunca executa mutação** — apenas DECLARA o veredito de bloqueio (`PRONTO | BLOQUEADO` conforme seu próprio contrato) e aciona via `run_subagent` o `specialist-bug-fixer`/`specialist-test-fixer` ativo para executar a reversão atômica estritamente orientada ao `rollback_plan` previamente declarado (`git checkout -- <arquivos>` / `git restore`). **Jamais o `runtime-verifier` reverte diretamente** — isso violaria seu próprio contrato read-only (mesma classe de agent validada em `test_readonly_advisory_agents_do_not_contain_mutation_tools`). Após confirmação da reversão, o especialista escala para intervenção humana via `ask_questions`.
+5. **Estado 5 — Quality Gate, Autorreflexão & Observação Pós-Fix / Canary (`@code-review` / `@pr-gatekeeper`)**:
    - *Entrada*: Diff final e evidências de teste.
+   - *Observação Pós-Fix / Canary Gate (para Bugs Críticos)*: Se o defeito for de severidade crítica/alta (P0/P1, falha de autenticação/sessão, corrupção ou perda de dados, indisponibilidade ou memory leak), o Quality Gate exige compulsoriamente a declaração formal de critérios de **observação pós-fix / canary**: janela de monitoramento pós-deploy (ex.: 15m a 30m), verificação de ausência de novos erros 5xx/APM e estabilização de latência antes do encerramento definitivo do incidente.
    - *Autorreflexão Documental pós-Correção (R-033)*: O agente avalia autonomamente se a resolução do bug revelou regra de negócio oculta, contrato divergente ou padrão de layout (ex.: Smell 2.21). Se sim, atualiza a documentação viva de padrões (`docs/*padrao*`, `docs/componentes-shared.md` ou adapter local) para blindar o ecossistema contra reincidência, sem esperar ordem manual.
    - *Saída*: Resumo estruturado em 5 seções (R-028) ou preparação de PR via `@pr-gatekeeper`.
 
@@ -147,8 +163,27 @@ flowchart TD
 ```yaml
 workflow_state:
   tipo_bug: "runtime_exception | layout_css | business_logic | database_constraint"
+  classificacao_defeito: "regressao_real | flaky"  # categorização compulsória no Estado 1
   sintoma: "<descrição do sintoma observado>"
+  rca_estruturado:
+    metodologia: "5_whys | fishbone"
+    fontes_evidencia:
+      - "<fonte 1: ex.: stack_trace_apmlog>"
+      - "<fonte 2: ex.: runtime_debug_payload_ou_teste_isolado>"
+    evidencia_confirmada: true  # 'evidence before hypothesis' exige min. 2 fontes independentes
+    causa_raiz_identificada: "<classe.metodo:linha e mecanismo causal primário>"
   causa_raiz: "<classe.metodo:linha e mecanismo da falha>"
+  blast_radius_estimado:
+    callers_diretos: 2
+    modulos_afetados:
+      - "<modulo/camada>"
+    nivel_risco: "baixo | medio | alto"
+  rollback_plan:
+    estrategia: "git_checkout_atomico | restore_snapshot"
+    arquivos_reversao:
+      - "<caminho/arquivo.ext>"
+    blast_radius_revertido:
+      - "<modulo_restaurado>"
   arquivos_alvo:
     - "<caminho/arquivo.ext>"
   teste_regressao:
@@ -161,17 +196,31 @@ workflow_state:
   tentativas_reproducao: 1  # teto: 2 (Sub-rotina 1c)
   exige_migracao_ddl: false
   exige_security_checkpoint: false  # true -> aciona 3c (R-048.1) antes do diff
+  mini_mutation_check:
+    aplicavel: true  # proporcional ao risco do bug
+    mutantes_testados: 2
+    mutantes_eliminados: 2
+    status: "pass | fail"  # pass = 100% mutantes eliminados pelo Red Test
   tentativas_correcao: 1  # teto: 3 (Estado 4b)
   circuit_breaker_acionado: false
+  observacao_pos_fix:
+    requer_canary: false  # true para bugs criticos (P0/P1/Auth/Perda de Dados)
+    janela_observacao: "30m"
+    metricas_telemetria:
+      - "taxa_erro_5xx < 0.01%"
+      - "ausencia_reincidencia_npe"
 ```
 
 ---
 
 ### 3.2 WORKFLOW 2: `WORKFLOW-REFACTORING` (Refatoração Estrutural e Modernização)
 
-- **Objetivo**: Modificar a estrutura interna do código sem alterar seu comportamento observável, amparado por testes de caracterização (Golden Master), análise de blast radius via grafo, plano incremental Mikado com rollback atômico e validação estrita contra ground truth de regras de negócio.
+- **Objetivo**: Modificar a estrutura interna do código sem alterar seu comportamento observável, amparado por testes de caracterização (Golden Master), análise de blast radius via grafo, **Contract Testing (Pact-style / consumer-driven)** para contratos compartilhados, plano incremental Mikado com rollback atômico, **camada de redundância proporcional ao blast radius** (auditoria reversa de símbolos, mini mutation gate e differential replay leve quando aplicável) e validação estrita contra ground truth de regras de negócio com **registro formal de `blast_radius_revertido`** em caso de reversão.
 - **Gatilhos de Fast-Path**: `"refatorar"`, `"refatoração"`, `"desacoplar"`, `"eliminar god class"`, `"clean architecture"`, `"modularizar"`, `"remover duplicação"`, `"extrair interface"`.
 - **Política R-041**: **Bypass** se o alvo estiver claro. Se o pedido for genérico ("melhore a arquitetura"), aciona `@prompt-structuring`.
+- **⚠️ Invariante de Contract Testing no Gate de Contratos (não-negociável)**: Sempre que a refatoração atingir APIs públicas, DTOs compartilhados, contratos RPC/REST ou interfaces consumidas por múltiplos microsserviços/módulos, o Estado 2/Sub-rotina 2a exige **Contract Testing formal (Pact-style consumer-driven contract tests ou OpenAPI / JSON Schema Diff)** comprovando que nenhum pacto de consumidor existente é quebrado.
+- **⚠️ Invariante de Redundância Proporcional ao Blast Radius (não-negociável)**: Para refatorações com blast radius médio ou alto (múltiplos callers/callees, componentes core ou desacoplamento estrutural), a validação no Estado 5 exige compulsoriamente a tríade de redundância proporcional: *(a)* **Auditoria Reversa de Símbolos** (`reverse_symbol_audit` via grafo garantindo zero métodos/interfaces omitidos); *(b)* **Mini Mutation Gate** (`mini_mutation_gate` comprovando que a rede Golden Master elimina mutantes sintéticos sem falsos-verdes); e *(c)* **Differential Replay Leve** (`differential_replay_leve`, quando aplicável, comparando snapshots de entrada/saída pré e pós-refatoração para funções de cálculo/transformação).
+- **⚠️ Invariante de Rollback com Blast Radius Revertido (não-negociável)**: Em caso de falha de validação ou violação de ground truth no Estado 5b, a governança de rollback obriga o registro quantitativo do `blast_radius_revertido` no `workflow_state` (inventário exato dos nós Mikado revertidos, callers e arquivos restaurados), mantendo rastreabilidade total da reversão atômica.
 
 ```mermaid
 flowchart TD
@@ -180,7 +229,7 @@ flowchart TD
     GroundTruth --> BlastRadius["<b>2. Blast Radius & Dependências</b><br/>Agente: @code-knowledge-graph (R-045)<br/>Ação: Mapeia callers, callees, ciclos e acoplamento"]
 
     BlastRadius --> CheckContract{"Afeta APIs públicas<br/>ou Consumidores?"}
-    CheckContract -- "Sim" --> ContractGate["<b>2a. Contract & Deprecation Plan</b><br/>Agente: @tech-solution-architect<br/>Ação: Branch by Abstraction / Parallel Run"]
+    CheckContract -- "Sim" --> ContractGate["<b>2a. Contract Testing (Pact-Style) & Deprecation Plan</b><br/>Agente: @tech-solution-architect<br/>Ação: Pact-style consumer-driven tests / Branch by Abstraction"]
     CheckContract -- "Não" --> CheckSafetyNet{"Cobertura de Testes<br/>suficiente por risco?"}
     ContractGate --> CheckSafetyNet
 
@@ -197,18 +246,18 @@ flowchart TD
     CheckRiskGate -- "Não (escopo local claro)" --> Execution["<b>4. Execução Incremental em Lote</b><br/>Agente: Domain Router / Specialist Developer<br/>Ação: Execução em micro-lotes com diffs cirúrgicos (R-046)"]
     PlanGate --> Execution
 
-    Execution --> Validation["<b>5. Validação de Ground Truth & Não-Regressão</b><br/>Agente: @business-rules-extractor (Validate) + @code-review<br/>Ação: Validação contra regras do Estado 1 e quality gate"]
+    Execution --> Validation["<b>5. Validação de Ground Truth & Redundância Proporcional</b><br/>Agente: @business-rules-extractor (Validate) + @code-review<br/>Ação: Ground Truth 100% + Reverse Symbol Audit + Mini Mutation Gate + Differential Replay"]
 
-    Validation --> CheckRefactor{"Regras e testes<br/>100% preservados?"}
+    Validation --> CheckRefactor{"Regras, testes e<br/>redundância 100% aprovados?"}
     CheckRefactor -- "Sim" --> EndRefactor(["✅ Concluído com Sucesso"])
-    CheckRefactor -- "Não (Violação de Regra)" --> RefactorRollback["<b>5b. Rollback Decidido pelo Planner</b><br/>Agente: @refactor-planner (decide escopo, read-only) → domain router/specialist (executa)<br/>Ação: Reversão dos nós do DAG afetados + Relatório 3-linhas"]
+    CheckRefactor -- "Não (Violação de Regra)" --> RefactorRollback["<b>5b. Rollback Decidido pelo Planner & Blast Radius Revertido</b><br/>Agente: @refactor-planner (decide escopo) → domain router/specialist (executa)<br/>Ação: Reversão dos nós DAG afetados + registro de blast_radius_revertido"]
     RefactorRollback --> EndRefactorFail(["🛑 Refatoração Revertida com Segurança"])
 ```
 
 #### Cadeia Sequencial e Papéis:
 1. **Estado 1 — Mapeamento de Regras Vigentes (`@business-rules-extractor`)**: Extrai regras de negócio do código atual em arquivos `.md` estruturados (modo Extract), servindo como baseline de verdade inegociável.
 2. **Estado 2 — Blast Radius & Análise de Contratos (`@code-knowledge-graph`)**: Executa análise estrita determinística (R-045) via `@optave/codegraph` para identificar dependências transitivas, acoplamento e pontos de quebra. Proibido varredura manual.
-   - *Sub-rotina 2a (Contract & Deprecation Gate)*: Se a refatoração atingir métodos públicos ou contratos consumidos por múltiplos módulos, o `@tech-solution-architect` desenha a transição suave (Branch by Abstraction / Deprecation prévia).
+   - *Sub-rotina 2a (Contract & Deprecation Gate com Contract Testing Pact-Style / Consumer-Driven)*: Se a refatoração atingir métodos públicos, DTOs compartilhados ou interfaces consumidas por múltiplos módulos/microsserviços, o `@tech-solution-architect` e os especialistas de testes aplicam compulsoriamente **Contract Testing (Pact-style consumer-driven contract tests ou OpenAPI / JSON Schema Diff)** para comprovar matematicamente que nenhum consumidor existente será quebrado. Desenha também a transição suave (Branch by Abstraction / Deprecation prévia).
    - *Sub-rotina 2b (Golden Master / Safety Net Gate)*: Se a área a ser refatorada não possuir cobertura automatizada mínima, o `specialist-unit-test-writer` DEVE escrever testes de caracterização que congelem o comportamento existente antes de qualquer alteração estrutural. **Threshold por risco (não flat 80%)**: consultar a matriz de `test-coverage-governance/SKILL.md` § 1 — lógica crítica de negócio exige 90%+, integração API/BD 80%+, controllers/handlers 70%+; `@test-strategy` determina o threshold aplicável ao alvo antes desta decisão, e a medição real usa a ferramenta configurada no projeto (JaCoCo/Istanbul/coverage.py via adapter de stack).
 3. **Estado 3 — Plano Macro Mikado & Estratégia de Rollback (`@refactor-planner` + `@test-strategy`)**:
    - Decompõe a meta usando a técnica **Mikado Method**: gera a árvore de pré-requisitos (folhas primeiro, raiz por último) em micro-passos independentes.
@@ -216,9 +265,13 @@ flowchart TD
    - *Sub-rotina 3c (Checkpoint de Aprovação do Plano)*: Se a refatoração envolver **breaking change de contrato**, **schema de banco** ou **blast radius grande** (muitos callers/callees no Estado 2), o `@refactor-planner` apresenta o DAG completo e aciona `ask_questions` para aprovação humana explícita **antes** de iniciar o Estado 4 — mesmo padrão de checkpoint usado em `WORKFLOW-FEATURE-DEVELOPMENT` (Estado 3b) e `WORKFLOW-GOVERNANCE-MAINTENANCE` (Estado 2b). Para refatorações de escopo local claro e baixo risco, a aprovação pode ser contextual/implícita (R-031).
    - *Limite de Escala do DAG*: cada nó já é limitado a 1-3 arquivos (contrato do `@refactor-planner`); se o DAG total ultrapassar **15 nós**, o plano DEVE ser fatiado em fases entregáveis independentes (múltiplas sessões/PRs), cada uma terminando em estado *always deployable* — nunca um plano monolítico de execução única inviável.
 4. **Estado 4 — Execução Incremental em Lote (`domain router / specialists`)**: Aplica as alterações respeitando o protocolo R-046 (Single-Turn Batching / context-mode para 5+ arquivos) em micro-lotes. Cada nó do DAG tem seu próprio Gate Out (compilação limpa, testes 100% verdes, diff mínimo — conforme o template de saída do `@refactor-planner`), validando incrementalmente contra a suíte de caracterização a cada micro-lote, não apenas ao final.
-5. **Estado 5 — Validação de Não-Regressão e Compliance (`@business-rules-extractor` + `@code-review`)**:
+5. **Estado 5 — Validação de Não-Regressão, Redundância Proporcional e Compliance (`@business-rules-extractor` + `@code-review`)**:
    - O `@business-rules-extractor` executa o modo Validate comparando o código final com as regras documentadas no Estado 1.
-   - *Estado 5b — Rollback Decidido pelo Planner, Executado pelo Especialista (contrato corrigido)*: Se qualquer regra de negócio for violada ou os testes de caracterização falharem, o `@refactor-planner` — **que não possui nenhuma ferramenta de edição ou terminal** — apenas DECIDE o escopo do rollback (quais nós do DAG revertem, com base na árvore de dependências do Estado 3; preferencialmente incremental, não o plano inteiro) e aciona via `run_subagent` o(s) domain router(s)/specialist(s) que executaram cada nó afetado para reverter fisicamente seus próprios arquivos. **Jamais o `@refactor-planner` executa a reversão diretamente** (ver § 5, invariante 6). Gera relatório de divergência e escala para decisão humana via `ask_questions`.
+   - *Redundância Proporcional ao Blast Radius*: Quando o blast radius for médio ou alto (múltiplos callers, componentes estruturais ou extração de interfaces), a validação incorpora compulsoriamente a tríade de redundância:
+     1. **Auditoria Reversa de Símbolos (`reverse_symbol_audit`)**: O `@code-knowledge-graph` compara o inventário de símbolos, métodos públicos e interfaces pré-refatoração contra o código final para assegurar que nenhum símbolo público ou contrato foi acidentalmente omitido, descontinuado ou tornado privado sem aprovação.
+     2. **Mini Mutation Gate (`mini_mutation_gate`)**: Injeção controlada de mutantes sintéticos nas áreas refatoradas para comprovar que a suíte de caracterização / Golden Master é resiliente e acurada (eliminando falsos-verdes).
+     3. **Differential Replay Leve (`differential_replay_leve`, quando aplicável)**: Para rotinas determinísticas de transformação de dados, parsers, cálculo ou regras de negócio, replay comparativo de fixtures de entrada e saída capturadas no Estado 1/2 antes da mutação, comprovando equivalência de comportamento com zero drift.
+   - *Estado 5b — Rollback Decidido pelo Planner, Executado pelo Especialista com `blast_radius_revertido` (contrato corrigido)*: Se qualquer regra de negócio for violada, o gate de contratos falhar ou os testes de caracterização quebrarem, o `@refactor-planner` — **que não possui nenhuma ferramenta de edição ou terminal** — apenas DECIDE o escopo do rollback (quais nós do DAG revertem, com base na árvore de dependências do Estado 3; preferencialmente incremental, não o plano inteiro) e aciona via `run_subagent` o(s) domain router(s)/specialist(s) que executaram cada nó afetado para reverter fisicamente seus próprios arquivos. **Jamais o `@refactor-planner` executa a reversão diretamente** (ver § 5, invariante 6). A reversão calcula e registra quantitativamente o **`blast_radius_revertido`** (inventário de nós revertidos, arquivos restaurados e callers preservados) no `workflow_state` e escala para decisão humana via `ask_questions`.
 
 #### Typed State Bag (`workflow_state`):
 ```yaml
@@ -231,6 +284,13 @@ workflow_state:
     total_callees: 6
     tem_ciclo: false
     tem_breaking_change: false
+  contract_testing:
+    exigido: true  # true se afetar APIs publicas ou contratos de consumidores
+    tipo: "pact_consumer_driven | openapi_diff | schema_compatibility"
+    consumidores_validados:
+      - "app-mobile"
+      - "web-portal"
+    status: "pass | fail | dispensado"
   safety_net_cobertura:
     testes_caracterizacao_presentes: true
     threshold_aplicavel: "90 (critico) | 80 (integracao) | 70 (controller)"
@@ -244,8 +304,19 @@ workflow_state:
   dag_total_nos: 6  # se > 15, fatiar em fases entregáveis independentes
   requer_checkpoint_aprovacao: false  # true -> breaking change | schema | blast radius grande
   status_aprovacao_plano: "aprovado | pendente | contextual_implicita"
+  redundancia_proporcional:
+    nivel_blast_radius: "baixo | medio | alto"
+    auditoria_reversa_simbolos: "pass | fail | dispensado"  # code-knowledge-graph
+    mini_mutation_gate: "pass | fail | dispensado"          # test-strategy / tests
+    differential_replay_leve: "pass | fail | dispensado"    # replay de fixtures
   status_validacao_regras: "100_preservadas | violacao_detectada"
   snapshot_reversao: "<tag_de_reversao_ou_stash>"
+  rollback_execucao:
+    nos_dag_revertidos: []
+    arquivos_restaurados: []
+    blast_radius_revertido:
+      total_callers_restaurados: 0
+      modulos_restaurados: []
 ```
 
 ---
@@ -480,7 +551,7 @@ flowchart TD
      - `test_local_project_isolation.py` (100% isolamento de projetos locais — R-038/R-043/R-044).
      - `test_routing_quality_gate.py` (integridade do grafo e alcançabilidade).
    - **Suíte de Evals Comportamental**: para nova rota/agent, valida adicionalmente contra os 60 casos de `.github/agents/evals/casos-roteamento.yaml` (`agent-evals-lab`) — regressão estrutural (pytest) não substitui regressão comportamental de roteamento.
-   - **Circuit Breaker (Estado 4b)**: teto de **3 tentativas** de autocorreção. Havendo regressão, o `@governance-maintainer` autocorrige a inconsistência; se a 3ª tentativa ainda falhar, escala via `ask_questions` para revisão manual do diff — nunca autocorreção indefinida.
+   - **Circuit Breaker (Estado 4b)**: teto de **3 tentativas** de autocorreção. Havendo regressão, o `@governance-maintainer` executa autocorreção cirúrgica; se a 3ª tentativa ainda falhar, escala via `ask_questions` para revisão manual do diff — nunca autocorreção indefinida.
 
 #### Typed State Bag (`workflow_state`):
 ```yaml
@@ -511,7 +582,7 @@ workflow_state:
 
 ### 3.6 WORKFLOW 6: `WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION` (Remediação de Vulnerabilidades, CVEs e Atualização de Dependências)
 
-- **Objetivo**: Detectar, isolar e sanar vulnerabilidades (CVE/SCA) em bibliotecas de terceiros ou executar atualização programada de dependências, mapeando o blast radius no código-fonte, aplicando bumps de versão em arquivos de manifesto (Maven `pom.xml`, NPM `package.json`, Python `pyproject.toml`) e resolvendo cirurgicamente breaking changes de APIs atualizadas com suíte de testes 100% verde.
+- **Objetivo**: Detectar, isolar e sanar vulnerabilidades (CVE/SCA) em bibliotecas de terceiros ou executar atualização programada de dependências, mapeando o blast radius no código-fonte, aplicando bumps de versão em arquivos de manifesto (Maven `pom.xml`, NPM `package.json`, Python `pyproject.toml`) e resolvendo cirúrgicamente breaking changes de APIs atualizadas com suíte de testes 100% verde.
 - **Gatilhos de Fast-Path**: `"atualizar dependência"`, `"atualizar dependencias"`, `"atualizar pacote"`, `"remediar cve"`, `"vulnerabilidade snyk"`, `"trivy alert"`, `"dependabot"`, `"npm audit fix"`, `"upgrade lib"`, `"cve remediation"`.
 - **Política R-041**: **Bypass Total** de `@prompt-structuring`. O alerta técnico de SCA ou pedido de bump é despachado imediatamente.
 
@@ -586,8 +657,8 @@ workflow_state:
 - **⚠️ Invariante de Colaboração Dual-Stack (não-negociável)**: Sempre que a migração for **cross-stack** (stack de origem ≠ stack de destino — ex.: `ejb-router` → `spring-boot-router`, `struts-router` → `spring-boot-router`, `angular-router` versões AngularJS → Angular moderno), **AMBOS os domain routers participam ativamente de TODAS as etapas do pipeline (1 a 6)**, não apenas da Etapa 1. O router da stack de origem nunca é dispensado após o pre-flight — ele atua como **oráculo de comportamento legado** (via `@business-rules-extractor` e `@code-knowledge-graph`) durante a elaboração do De-Para (Etapa 2), execução do codemod (Etapa 3), validação de paridade (Etapa 4), baseline (Etapa 5) e na camada de auditoria reversa de órfãos pós-migração (Etapa 6). É **proibido** ao `@tech-solution-architect` produzir um blueprint ou bloco de "Pipeline de Execução do Workflow" citando apenas o router de destino — isso é o anti-padrão que motivou este invariante (ver § 5, invariante 8).
 - **⚠️ Invariante de Exclusividade do Motor de Grafo (R-045, não-negociável)**: `@code-knowledge-graph` é **co-agente obrigatório** — não apenas sub-rotina opcional — nas Etapas 1, 3, 4, 5 e 6. Migração de framework é refatoração estrutural em larga escala: blast radius, dependências, ciclos, dead-code e auditoria reversa de símbolos NUNCA são mapeados manualmente por `@tech-solution-architect` ou pelos domain routers. Omitir `@code-knowledge-graph` de qualquer etapa é a mesma classe de violação tratada em `WORKFLOW-REFACTORING` (Invariante 3, § 5) e em `WORKFLOW-TECHNICAL-ANALYSIS`.
 - **⚠️ Invariante da Matriz De-Para e Symbol Exhaustion Gate (não-negociável)**: Nenhuma migração de tecnologia é conduzida sem a **Matriz De-Para de Migração & Rastreabilidade de Gaps** (`docs/migrations/matriz-de-para-<alvo>.md` ou seção explícita no plano canônico). É terminantemente proibido avançar para codemods sem mapear 100% dos elementos do legado nas **5 Dimensões Críticas**. O faseamento de migração (Fases B1..BN) deve ser estritamente derivado dos IDs da Matriz De-Para (`GAP-xx`). **Symbol Exhaustion Gate**: a Matriz De-Para deve cobrir obrigatoriamente 100% dos símbolos, métodos (públicos e privados) e nós condicionais extraídos deterministamente pelo grafo na Etapa 1. Uma migração NUNCA atinge o Quality Gate ou o Pós-Migração se houver qualquer item com status `[⏳ PENDENTE]` ou `[⚠️ DIVERGENTE]`.
-- **⚠️ Invariante do Protocolo Brownfield In-Flight (não-negociável)**: Caso o repositório de destino já possua código de migração pré-existente ou incompleto (cenário *brownfield in-flight*), o workflow PROÍBE planejar novas fases ou codificar antes de executar o **Estado 1b (Reconciliação Delta & Auditoria de Gaps Pré-Existentes)**. A comparação cruzada entre a árvore 5D do legado e o código moderno já escrito deve levantar e numerar todos os GAPs de imediato (`GAP-01..GAP-NN`), eliminando o anti-padrão de descoberta tardia e desordenada de gaps em fases avançadas.
-- **⚠️ Invariante de Validação e Redundância Pós-Migração (não-negociável)**: É expressamente vedado considerar uma migração concluída apenas pelo sucesso de build e testes da Etapa 5. O workflow exige compulsoriamente a execução do **Estado 6 (Post-Migration Verification & Redundancy Gate)**, constituído pela tríplice camada independente: *(a)* **Reverse Orphan Audit** (varredura reversa do legado contra o moderno buscando métodos, queries e arquivos esquecidos); *(b)* **Mutation Parity Resilience** (injeção de mutações sintéticas para comprovar que a suíte Golden Master detecta desvios e não possui falsos-verdes); e *(c)* **Differential Shadow Replay** (comparação determinística de payloads, estados de banco e eventos de saída entre legado e moderno).
+- **⚠️ Invariante de Protocolo Brownfield In-Flight (não-negociável)**: Caso o repositório de destino já possua código de migração pré-existente ou incompleto (cenário *brownfield in-flight*), o workflow PROÍBE planejar novas fases ou codificar antes de executar o **Estado 1b (Reconciliação Delta & Auditoria de Gaps Pré-Existentes)**. A comparação cruzada entre a árvore 5D do legado e o código moderno já escrito deve levantar e numerar todos os GAPs de imediato (`GAP-01..GAP-NN`), eliminando o anti-padrão de descoberta tardia e desordenada de gaps em fases avançadas.
+- **⚠️ Invariante de Validação e Redundância Pós-Migração (não-negociável)**: É expressamente vedado considerar uma migração concluída apenas pelo sucesso de build e testes da Etapa 5. O workflow exige compulsoriamente a execução do **Estado 6 (Post-Migration Verification & Redundancy Gate)**, constituído pela tríplice camada independente: *(a)* **Reverse Orphan Audit** (varredura reversa do legado contra o moderno buscando métodos, queries e arquivos esquecidos); *(b)* **Mutation Parity Resilience** (injeção de mutantes sintéticos para comprovar que a suíte Golden Master detecta desvios e não possui falsos-verdes); e *(c)* **Differential Shadow Replay** (comparação determinística de payloads, estados de banco e eventos de saída entre legado e moderno).
 
 ```mermaid
 flowchart TD
@@ -688,7 +759,7 @@ Documentada em `docs/migrations/matriz-de-para-<alvo>.md` (ou incorporada ao blu
 2. **Estado 1 — Pre-Flight Compatibility Assessment, 5D & Symbol Exhaustion (`@tech-solution-architect` + `@code-knowledge-graph` + `domain-router-ORIGEM` + `@business-rules-extractor`)**:
    - *Ação*: `@code-knowledge-graph` (co-agente **obrigatório**, R-045) extrai a árvore completa de chamadas (`callees`/`callers`), referências, ciclos e o inventário completo de símbolos do legado (Symbol Exhaustion Gate). `@tech-solution-architect` lidera a decomposição exaustiva nas **5 Dimensões Críticas** (Borda, Regras, Persistência Relacional, Downstream, Saída), garantindo que tabelas secundárias e efeitos colaterais não passem despercebidos.
    - *Sub-rotina 1a (obrigatória se cross-stack)*: `domain-router-ORIGEM` (ex.: `@ejb-router`, `@struts-router`) atua como oráculo legado, validando a semântica da stack legada (gestão transacional, contratos remotos, componentes de sessão/estado, convenções de framework) e extraindo regras de negócio via `@business-rules-extractor`.
-3. **Estado 1b — Reconciliação Delta & Auditoria de Gaps Pré-Existentes (Obrigatório em Cenários `brownfield_in_flight`) (`@tech-solution-architect` + `domain-router-DESTINO`)**:
+3. **Estado 1b — Reconciliação Delta & Auditoria de Gaps Pré-Existentes (Obrigatório em Cenários `brownfield in-flight`)**:
    - *Ação*: Quando a migração já estiver em andamento (cenário *brownfield in-flight* com código parcial ou inacabado no destino), o arquiteto cruza o inventário 5D do legado contra o código moderno já implementado no repositório de destino.
    - *Saída*: Produz a **Matriz De-Para Preliminar**, catalogando e numerando de imediato todos os gaps encontrados (`GAP-01..GAP-NN`) com status `[⚠️ DIVERGENTE]` (stubs, implementações parciais) ou `[⏳ PENDENTE]` (itens não implementados). Elimina completamente o risco de descobrir dezenas de gaps tardiamente.
 4. **Estado 2 — Migration Phasing & Blueprint com Matriz De-Para (`@tech-solution-architect` + `domain-router-ORIGEM` + `domain-router-DESTINO`)**:
@@ -699,10 +770,10 @@ Documentada em `docs/migrations/matriz-de-para-<alvo>.md` (ou incorporada ao blu
      📊 Dashboard Executivo da Matriz De-Para:
      - Total de Itens: <N> | ✅ Migrados: <N> (<%>)| ⏳ Pendentes: <N> (<%>) | ⚠️ Divergentes: <N> (<%>) | ℹ️ Desacoplados: <N> (<%>)
      ```
-   - **Gate Anti-Continuação-Genérica (Invariante 11, § 5)**: Se o Dashboard listar qualquer item `⏳ PENDENTE` ou `⚠️ DIVERGENTE`, o Estado 2b NÃO é considerado satisfeito por uma resposta de continuação genérica do usuário (ex.: clique em sugestão "prossiga para implementar"). O `@tech-solution-architect` DEVE reapresentar cada item pendente com opções explícitas (`ask_questions`: "implementar nesta fase" | "reclassificar [DESACOPLADO] com justificativa" | "adiar para fase futura") e só then avançar para o Estado 3 com a decisão registrada em `de_para_status` por item. Ao retomar a execução, o domain-router-DESTINO que assumir a implementação (Estados 3/4) DEVE reemitir o banner `Agente Ativo: <domain-router-DESTINO>` antes da primeira mutação de arquivo (Invariante 12).
+   - **Gate Anti-Continuação-Genérica (Invariante 11, § 5)**: Se o Dashboard listar qualquer item `⏳ PENDENTE` ou `⚠️ DIVERGENTE` (stubs, implementações parciais, itens não implementados), o Estado 2b NÃO é considerado satisfeito por uma resposta de continuação genérica do usuário (ex.: clique em sugestão "prossiga para implementar"). O `@tech-solution-architect` DEVE reapresentar cada item pendente com opções explícitas (`ask_questions`: "implementar nesta fase" | "reclassificar [DESACOPLADO] com justificativa" | "adiar para fase futura") e só then avançar para o Estado 3 com a decisão registrada em `de_para_status` por item. Ao retomar a execução, o domain-router-DESTINO que assumir a implementação (Estados 3/4) DEVE reemitir o banner `Agente Ativo: <domain-router-DESTINO>` antes da primeira mutação de arquivo (Invariante 12).
 5. **Estado 3 — Codemod & Transformação em Lote com Anti-Omission AST Validator (`domain-router-DESTINO` + `specialist-feature-developer`)**:
    - *Ação*: Execução dos codemods oficiais (`ng update`, OpenRewrite recipes) ou transformações cirúrgicas via sandbox `context-mode` (R-046) estritamente restritas aos IDs De-Para da fase ativa.
-   - *Validação Anti-Omissão*: Um validador via AST inspeciona o código transformado garantindo que nenhuma branch, exception handler ou persistência secundária mapeada na IR foi omitida. Em caso de omissão (*silent dropping*), o especialista é forçado a corrigir o micro-lote antes dos testes.
+   - *Validação Anti-Omission*: Um validador no sandbox (`ctx_execute`) inspeciona o código transformado garantindo que nenhuma branch, exception handler ou persistência secundária mapeada na IR foi omitida. Em caso de omissão (*silent dropping*), o especialista é forçado a corrigir o micro-lote antes dos testes.
    - *Colaboração Contínua*: `domain-router-ORIGEM` permanece ativo como oráculo consultivo validando paridade regra a regra; `@code-knowledge-graph` recalcula blast radius antes de cada micro-lote.
 6. **Estado 4 — Refinamento, Paridade Funcional & Resolução De-Para (`domain-router-DESTINO` + `specialist-unit-test-writer`)**:
    - *Ação*: Ajuste idiomático da nova versão e execução de testes comprovando comportamento idêntico ao baseline.
@@ -714,9 +785,9 @@ Documentada em `docs/migrations/matriz-de-para-<alvo>.md` (ou incorporada ao blu
    - *Sign-off Final Conjunto*: `domain-router-ORIGEM` (paridade funcional e ausência de perdas confirmadas) + `@code-knowledge-graph` (zero ciclos novos e zero dead-code) + `domain-router-DESTINO` (conformidade com padrões da stack moderna).
 8. **Estado 6 — Post-Migration Verification & Redundancy Gate (`@code-review` + `@test-strategy` + `@business-rules-extractor` + `@runtime-verifier`)**:
    - *Ação*: Camada autônoma de redundância e certificação pós-migração para garantir totalidade absoluta e zero código esquecido antes do cutover final para produção:
-     - **Sub-rotina 6a: Reverse Orphan Audit (Auditoria Reversa de Órfãos)**: O `@code-review` em conjunto com o `@code-knowledge-graph` varre todo o código-fonte legado contra o código moderno e a Matriz De-Para. Se existir qualquer método legado, endpoint, query nativa, arquivo de configuração XML/properties ou entidade que não possua mapeamento ativo (`[✅ MIGRADO]`) ou descarte explicitamente aprovado (`[ℹ️ DESACOPLADO]` / `[🚫 OBSOLETO]`), o gate gera um `GAP-REVERSO` imediato e força o retorno à Etapa 3.
+     - **Sub-rotina 6a: Reverse Orphan Audit (Auditoria Reversa de Órfãos)**: O `@code-review` em conjunto com o `@code-knowledge-graph` varre todo o código-fonte legado contra o código moderno e a Matriz De-Para. Se existir qualquer método legado, endpoint, query nativa, arquivo de configuração XML/properties ou entidade que não possua mapeamento ativo (`[✅ MIGRADO]` ou `[ℹ️ DESACOPLADO]` / `[🚫 OBSOLETO]`), o gate gera um `GAP-REVERSO` imediato e força o retorno à Etapa 3.
      - **Sub-rotina 6b: Mutation Parity Resilience (Testes de Mutação de Paridade)**: O `@test-strategy` orienta a injeção de mutantes sintéticos controlados no código moderno (inversão de operadores booleanos, omissão proposital de escrita em tabelas secundárias de auditoria/histórico, alteração de status codes). A suíte de testes Golden Master DEVE obrigatoriamente quebrar com 100% dos mutantes eliminados. Se qualquer teste continuar verde na presença de uma mutação de regra de negócio, o teste é classificado como falso-positivo / frágil e a aprovação é bloqueada até o reforço das asserções.
-     - **Sub-rotina 6c: Differential Shadow Replay & Invariant Comparator**: Execução em paralelo das fixtures canônicas Golden Master nas duas aplicações (legada e moderna), comparando semanticamente via comparador normalizado: *(1)* payload e status de resposta; *(2)* estado final do banco de dados (todas as tabelas filhas, registros de rateio e histórico); *(3)* mensagens disparadas para mensageria. Qualquer divergência de negócio emite relatório de discrepância de paridade.
+     - **Sub-rotina 6c: Differential Shadow Replay & Invariant Comparator**: Execução em paralelo das fixtures canônicas Golden Master nas duas aplicações (legada e moderna), comparando semanticamente via comparador normalizado: *(1)* payload e status de resposta; *(2)* estado final do banco de dados (todas as tabelas filhas, registros de rateio e histórico); *(3)* mensagens disparadas para mensageria. Qualquer discrepância de negócio emite relatório de discrepância de paridade.
    - *Certificado de Paridade Total & Cutover Autorizado*: Emissão do artefato formal de encerramento em `docs/migrations/certificado-paridade-<alvo>.md`, com atesto unânime e autorização definitiva de deploy/cutover.
 
 #### Typed State Bag (`workflow_state`):
@@ -771,8 +842,8 @@ workflow_state:
 ```
 
 #### 3.7.1 Sub-Padrão Canônico: Motor Agnóstico de Migração de Tecnologias Legadas (IR-Based, Matriz De-Para & Dual-Verification)
-- **Princípio de Zero Acoplamento:** Workflows e processos de migração operam estritamente sobre contratos neutros e a **Representação Intermediária Semântica (Semantic IR)** definida em `docs/schemas/migration-ir.schema.json`. O núcleo do workflow é 100% agnóstico e desconhece sintaxes ou bibliotecas concretas de frameworks.
-- **Validação Compulsória de Stacks Envolvidas (Fase 0):** O motor de migração valida e exige que ambas as stacks (origem legada e destino moderno) possuam governança formal de domínio registrada em `.github/agents/<camada>/<stack>/` contendo supervisor hierárquico (`*-router`), sub-catálogo (`*-catalog.yaml`) e especialistas canônicos antes de permitir qualquer avanço (REQ-002 / RNF-003). Uma vez confirmada a governança de ambas as stacks, o motor DEVE manter o domain router de origem como participante ativo (co-agente) em todas as fases subsequentes (1 a 6 de § 3.7), nunca apenas na fase de pré-voo (ver Invariante 8 em § 5 e `colaboracao_dual_stack` em `routing-graph.yaml`).
+- **Princípio de Zero Acoplamento**: Workflows e processos de migração operam estritamente sobre contratos neutros e a **Representação Intermediária Semântica (Semantic IR)** definida em `docs/schemas/migration-ir.schema.json`. O núcleo do workflow é 100% agnóstico e desconhece sintaxes ou bibliotecas concretas de frameworks.
+- **Validação Compulsória de Stacks Envolvidas (Fase 0)**: O motor de migração valida e exige que ambas as stacks (origem legada e destino moderno) possuam governança formal de domínio registrada em `.github/agents/<camada>/<stack>/` contendo supervisor hierárquico (`*-router`), sub-catálogo (`*-catalog.yaml`) e especialistas canônicos antes de permitir qualquer avanço (REQ-002 / RNF-003). Uma vez confirmada a governança de ambas as stacks, o motor DEVE manter o domain router de origem como participante ativo (co-agente) em todas as fases subsequentes (1 a 6 de § 3.7), nunca apenas na fase de pré-voo (ver Invariante 8 em § 5 e `colaboracao_dual_stack` em `routing-graph.yaml`).
 - **Reconciliação Delta em Migrações Parciais (Fase 1b):** Em cenários brownfield in-flight, a comparação cruzada entre a árvore 5D do legado e os artefatos existentes no destino é pré-requisito mandatório antes de qualquer geração de plano ou emissão de código, produzindo a Matriz De-Para com os GAPs identificados desde o D0.
 - **Bootstrapping Interativo de Novo Projeto com Human-in-the-Loop (Fase 3a):** Caso o destino da migração seja um projeto novo (green-field) ou novo módulo autônomo, o especialista da stack alvo é compulsoriamente instruído a consultar o desenvolvedor via `ask_questions` para escolha de ferramentas de build (ex.: Maven vs Gradle), versão de runtime/LTS e formato de empacotamento antes de gerar o esqueleto base oficial (REQ-007 / RNF-005).
 - **Dual-Verification Gate com Resolução Integral de De-Para (Fase 4):** A aprovação da migração exige quadruplo critério determinístico: (1) 100% de sucesso em testes de caracterização automatizados (*Golden Master*) executados contra o baseline legado; (2) 100% de resolução dos itens da Matriz De-Para no escopo da fase (`[✅ MIGRADO]` ou `[ℹ️ DESACOPLADO]`); (3) comprovação de cobertura integral da matriz de regras de negócio extraídas via `@business-rules-extractor`, com o domain router de **origem** atestando explicitamente que nenhuma regra ou efeito colateral do inventário 5D foi omitido (REQ-005 / REQ-006); e (4) atesto estrutural do `@code-knowledge-graph` comprovando zero ciclos e zero código morto novo introduzido.
@@ -878,7 +949,7 @@ handoff_payload:
 5. **Invariante de Deriva e Reset de Workflow (R-042 / R-052)**: Caso o usuário mude o escopo no meio do workflow (ex.: durante um bugfix, peça uma nova funcionalidade), ou **ao concluir qualquer workflow com sucesso**, o agente ativo encerra seu ciclo e DEVE acionar retorno imediato ao `@agent-router` com `motivo: "deriva_de_intencao"` ou `"conclusao_de_workflow_anterior"`. É expressamente proibido ao último agente ativo reter a sessão para a próxima solicitação (Anti Sticky-Agent).
 6. **Invariante de Separação Declarador/Executor em Circuit Breaker**: Nenhum agente estritamente read-only/advisory (`runtime-verifier`, `@code-review`, `@refactor-planner`, `@agent-auditor`, etc. — mesma classe validada em `test_readonly_advisory_agents_do_not_contain_mutation_tools`) pode executar a mutação de reversão (`git checkout`/`git restore`) de um Circuit Breaker. Esse agente apenas DETECTA e DECLARA o veredito; a execução física é sempre delegada, via `run_subagent`, ao especialista com ferramentas de edição/terminal que originou o diff (`specialist-bug-fixer`/`specialist-test-fixer` em Workflow 1; domain router/specialist por nó do DAG em Workflow 2). Violação desta invariante é tratada com a mesma severidade de uma violação de contrato de agent (ver § 8.1, item 2).
 7. **Invariante de Resolução de Papel Genérico**: Nenhum agente invoca `run_subagent` com um nome `specialist-<papel>` literal — todo despacho tático passa primeiro pela resolução do domain router para o `id` concreto do catálogo (§ 1.3).
-8. **Invariante de Colaboração Dual-Stack em Migração (WORKFLOW-FRAMEWORK-MIGRATION)**: Em toda migração **cross-stack** (stack de origem legada ≠ stack de destino moderna — ex.: `ejb-router`→`spring-boot-router`, `struts-router`→`spring-boot-router`), o `@tech-solution-architect` NUNCA elabora blueprint ou renderiza o bloco `### 🗺️ Pipeline de Execução do Workflow` citando apenas o domain router de destino. Ambos os routers (origem e destino) DEVEM constar explicitamente como agentes participantes em TODAS as etapas do pipeline (1 a 6), com o router de origem atuando como oráculo de comportamento legado até o sign-off da auditoria reversa de órfãos pós-migração (Estado 6). Omitir o router de origem é tratado como a mesma classe de violação que pular um estado do workflow (ver § 3.7, item "Invariante de Colaboração Dual-Stack").
+8. **Invariante de Colaboração Dual-Stack em Migração (WORKFLOW-FRAMEWORK-MIGRATION)**: Em toda migração **cross-stack** (stack de origem legada ≠ stack de destino moderno — ex.: `ejb-router`→`spring-boot-router`, `struts-router`→`spring-boot-router`), o `@tech-solution-architect` NUNCA elabora blueprint ou renderiza o bloco `### 🗺️ Pipeline de Execução do Workflow` citando apenas o domain router de destino. Ambos os routers (origem e destino) DEVEM constar explicitamente como agentes participantes em TODAS as etapas do pipeline (1 a 6), com o router de origem atuando como oráculo de comportamento legado até o sign-off da auditoria reversa de órfãos pós-migração (Estado 6). Omitir o router de origem é tratado como a mesma classe de violação que pular um estado do workflow (ver § 3.7, item "Invariante de Colaboração Dual-Stack").
 9. **Invariante de Exclusividade do Motor de Grafo em Migração (R-045)**: `@code-knowledge-graph` é co-agente OBRIGATÓRIO (nunca sub-rotina meramente permitida) nas Etapas 1, 3, 4, 5 e 6 do `WORKFLOW-FRAMEWORK-MIGRATION`. `@tech-solution-architect` e os domain routers NUNCA mapeiam blast radius, dependências, ciclos ou auditoria reversa de símbolos manualmente durante uma migração — toda essa análise estrutural é delegada via `run_subagent` ao `@code-knowledge-graph`, com o mesmo rigor já aplicado em `WORKFLOW-REFACTORING` (Invariante 3). O `sign_off_code_knowledge_graph` (zero ciclos/dead-code novos e zero órfãos detectados) é pré-requisito do veredito final na Etapa 6, junto ao sign-off do domain router de origem.
 10. **Invariante de Fallback Proibido do Motor de Grafo (Falha de Tool Call)**: Se a chamada de tool do `@code-knowledge-graph` (ex.: `module_map`, `query`, `impact_analysis`) **falhar ou retornar erro/timeout**, é terminantemente proibido a qualquer agente (incluindo `@tech-solution-architect` e domain routers) recorrer a varredura manual substituta (`list_dir`, `grep`/`grep_search` em massa no repositório inteiro, leitura sequencial de dezenas de arquivos) como compensação silenciosa. A única ação permitida é: **(a)** retry da mesma consulta ao `@code-knowledge-graph` (build incremental se o índice estiver desatualizado) ou **(b)** declarar explicitamente ao usuário via relatório de 3 linhas (Causa/Local/Ação sugerida) que a análise estrutural determinística falhou e aguardar decisão (`ask_questions`) antes de prosseguir com qualquer heurística manual. Tratar a falha do tool como "gap silencioso" e prosseguir com grep manual é a mesma classe de violação de R-045 (ver `regr-023` e `regr-028`).
 11. **Invariante de Checkpoint Humano Não-Satisfeito por Continuação Genérica**: Em qualquer Etapa marcada como *Checkpoint Humano Obrigatório* (ex.: Estado 2b de `WORKFLOW-FRAMEWORK-MIGRATION`, Estado 3b de `WORKFLOW-FEATURE-DEVELOPMENT`, Estado 2b de `WORKFLOW-GOVERNANCE-MAINTENANCE`), se o Dashboard/relatório apresentado contiver **qualquer item marcado `⚠️`, `[⏳ PENDENTE]` ou `[⚠️ DIVERGENTE]`** exigindo decisão de negócio ou arquitetura, uma resposta genérica do usuário ("prossiga", "continue", clique em sugestão automática de continuação) **NUNCA** é interpretada como aprovação explícita das decisões pendentes específicas. O agente ativo DEVE, antes de avançar para a próxima etapa mutativa: **(a)** re-listar objetivamente cada item pendente com opções concretas (ex.: manter `[PENDENTE]` para implementação nesta fase vs. reclassificar `[DESACOPLADO]` com justificativa) via `ask_questions`; **(b)** só então prosseguir com a decisão explicitamente escolhida. É proibido o agente decidir unilateralmente a reclassificação de itens `⚠️`/`[⏳ PENDENTE]` da Matriz De-Para com base apenas em um "prossiga" genérico.
@@ -887,6 +958,15 @@ handoff_payload:
     **(a) Avançar para codemod sem Symbol Exhaustion de 100%**: A Matriz De-Para (Etapa 2) deve ter correspondência auditada mecanicamente via `@code-knowledge-graph` para 100% dos métodos públicos/privados, queries e nós condicionais do legado. Proibido inventário parcial por mera amostragem de happy path.
     **(b) Aceitar código com omissão silenciosa de AST**: A Etapa 3 exige o Anti-Omission AST Validator no sandbox para comprovar que branches de exceção e tabelas de persistência secundária foram portadas.
     **(c) Considerar migração concluída sem a Etapa 6**: Nenhuma migração pode ser dada como concluída ou aprovada para cutover sem passar pela Tríplice Camada de Redundância no Estado 6 (Reverse Orphan Audit, Mutation Parity Resilience e Differential Shadow Replay), com emissão formal do Certificado de Paridade Total em `docs/migrations/certificado-paridade-<alvo>.md`.
+14. **Invariante de RCA Estruturado, Dupla Evidência e Mini Mutation em Bugfix (WORKFLOW-BUG-FIX)**: É terminantemente proibido:
+    **(a) Formular hipótese causal sem dupla evidência**: Toda RCA exige formalização (5 Whys / Fishbone) e correlação obrigatória de no mínimo **2 fontes independentes de evidência técnica observável** (*evidence before hypothesis* — ex.: stack trace + log em runtime; ou payload de rede HTTP + teste isolado reprodutível; ou métrica de observabilidade APM + call graph determinístico).
+    **(b) Omitir a classificação de falha**: Toda ocorrência deve ser classificada explicitamente como `flaky` (instabilidade intermitente/race condition) vs `regressao_real`.
+    **(c) Aplicar fix sem declarar blast radius e rollback**: O Estado 3 exige compulsoriamente a declaração prévia de `blast_radius_estimado` e `rollback_plan` no `workflow_state` antes de emitir qualquer diff cirúrgico.
+    **(d) Aceitar falso-verde no teste de regressão**: O Estado 4 exige mini mutation-check proporcional ao risco (1 a 3 mutantes sintéticos injetados) para comprovar que o Red Test elimina os mutantes. Para defeitos críticos, o Estado 5 exige observação pós-fix/canary com critérios de telemetria definidos.
+15. **Invariante de Contract Testing, Redundância Proporcional e Rollback com Blast Radius Revertido em Refatoração (WORKFLOW-REFACTORING)**: É terminantemente proibido:
+    **(a) Refatorar contratos compartilhados sem Contract Testing**: Alterações em APIs públicas ou limites de bounded context exigem compulsoriamente testes de contrato no Estado 2a (Pact-style consumer-driven ou OpenAPI / JSON Schema Diff).
+    **(b) Dispensar redundância em blast radius médio/alto**: Se o blast radius for moderado ou alto, o Estado 5 exige compulsoriamente a camada de redundância proporcional (auditoria reversa de símbolos via `@code-knowledge-graph`, mini mutation gate e differential replay leve em rotinas determinísticas).
+    **(c) Reversão sem métrica de restauração**: Em caso de ativação do Circuit Breaker / Rollback (Estado 5b), é mandatório calcular e registrar formalmente o `blast_radius_revertido` no `workflow_state` e no handoff de escalonamento.
 
 ---
 
@@ -906,21 +986,21 @@ Para que o usuário nunca fique no escuro quanto ao fluxo em andamento, o `@agen
 #### WORKFLOW 1: `WORKFLOW-BUG-FIX` (5 etapas)
 ```markdown
 ### 🗺️ Pipeline de Execução: WORKFLOW-BUG-FIX (5 etapas)
-- [▶] **Etapa 1: Triagem & Causa Raiz** → `@bug-triage` *(Em Andamento: reprodução mínima e isolamento)*
-- [⏳] **Etapa 2: Red Test de Caracterização** → `specialist-unit-test-writer` *(Pendente: teste automatizado que falha comprovando o bug)*
-- [⏳] **Etapa 3: Correção Cirúrgica Mínima** → `specialist-bug-fixer` *(Pendente: diff cirúrgico R-002/R-046)*
-- [⏳] **Etapa 4: Validação Green Test & Linter** → `runtime-verifier` *(Pendente: 100% testes passando e linter limpo)*
-- [⏳] **Etapa 5: Quality Gate & Resumo** → `@code-review` / `@pr-gatekeeper` *(Pendente: revisão final e PR)*
+- [▶] **Etapa 1: Triagem & RCA Estruturado (2 Fontes)** → `@bug-triage` *(Em Andamento: 5 Whys/Fishbone, evidência dupla e classificação flaky vs regressão real)*
+- [⏳] **Etapa 2: Red Test de Caracterização & Baseline** → `specialist-unit-test-writer` *(Pendente: teste automatizado que falha comprovando o bug)*
+- [⏳] **Etapa 3: Correção Cirúrgica Mínima** → `specialist-bug-fixer` *(Pendente: blast radius estimado & rollback plan declarados, diff cirúrgico R-002/R-046)*
+- [⏳] **Etapa 4: Validação Green Test & Mini Mutation-Check** → `runtime-verifier` *(Pendente: 100% testes passando, linter limpo e mini mutation anti falso-verde)*
+- [⏳] **Etapa 5: Quality Gate & Observação Pós-Fix / Canary** → `@code-review` / `@pr-gatekeeper` *(Pendente: revisão final, autorreflexão R-033 e canary para bugs críticos)*
 ```
 
 #### WORKFLOW 2: `WORKFLOW-REFACTORING` (5 etapas)
 ```markdown
 ### 🗺️ Pipeline de Execução: WORKFLOW-REFACTORING (5 etapas)
 - [▶] **Etapa 1: Mapeamento de Regras Vigentes** → `@business-rules-extractor` *(Em Andamento: extração de ground truth em .md)*
-- [⏳] **Etapa 2: Blast Radius & Dependências** → `@code-knowledge-graph` *(Pendente: análise determinística via @optave/codegraph)*
-- [⏳] **Etapa 3: Plano Macro & Safety Net** → `@refactor-planner` + `@test-strategy` *(Pendente: Mikado/Strangler e testes de caracterização)*
-- [⏳] **Etapa 4: Execução Incremental em Lote** → `Domain Router / Specialists` *(Pendente: batch execution R-046)*
-- [⏳] **Etapa 5: Validação de Regras & Não-Regressão** → `@business-rules-extractor` + `@code-review` *(Pendente: checagem contra regras do Estado 1)*
+- [⏳] **Etapa 2: Blast Radius & Contract Testing** → `@code-knowledge-graph` + `@tech-solution-architect` *(Pendente: grafo determinístico via @optave/codegraph e Contract Testing Pact-style)*
+- [⏳] **Etapa 3: Plano Macro Mikado & Safety Net** → `@refactor-planner` + `@test-strategy` *(Pendente: árvore Mikado, threshold de caracterização e rollback planejado)*
+- [⏳] **Etapa 4: Execução Incremental em Lote** → `Domain Router / Specialists` *(Pendente: micro-lotes com Gate Out por nó R-046)*
+- [⏳] **Etapa 5: Validação de Regras & Redundância Proporcional** → `@business-rules-extractor` + `@code-review` *(Pendente: ground truth 100% + auditoria reversa de símbolos + mini mutation gate + blast radius revertido se falha)*
 ```
 
 #### WORKFLOW 3: `WORKFLOW-TECHNICAL-ANALYSIS` (3 etapas)
@@ -1001,15 +1081,15 @@ Nenhum workflow mutativo pode deixar o repositório em estado quebrado, sujo ou 
    - Em `WORKFLOW-BUG-FIX` (Etapa 4), o `specialist-test-fixer` possui um teto absoluto de **3 tentativas** para corrigir testes quebrados (mesmo `max_iteracoes: 3` declarado no sub-catálogo de domínio — precedência de workflow, ver § 3.1 Estado 4).
    - Se os testes não passarem na 3ª tentativa, o fluxo **NÃO** prossegue para o Quality Gate nem continua tentando cegamente.
 2. **Ativação Compulsória do Estado de Rollback (Estado 4b) — Separação Declarador/Executor**:
-   - **2a. `WORKFLOW-BUG-FIX` (contrato corrigido)**: o `runtime-verifier` (agente estritamente read-only, sem ferramentas de mutação) apenas DETECTA o esgotamento do teto e DECLARA o veredito de bloqueio. A reversão física dos diffs (`git checkout -- <arquivos>`) é sempre EXECUTADA pelo `specialist-bug-fixer`/`specialist-test-fixer` ativo (que possuem `run_in_terminal` + `insert_edit_into_file`) via `run_subagent` acionado pelo `runtime-verifier`. **Um agente read-only nunca executa a mutação de rollback diretamente** — essa separação declarador/executor é invariante de arquitetura (ver Seção 5, item 6).
-   - **2b. `WORKFLOW-REFACTORING` (Estado 5b — contrato corrigido)**: o `@refactor-planner` não possui **nenhuma** ferramenta de edição ou terminal em seu frontmatter (nem `run_in_terminal`) — é ainda mais estritamente read-only que o `runtime-verifier`. Ele DETECTA a violação (via relatório `@business-rules-extractor` modo Validate) e DECIDE o escopo do rollback (quais nós do DAG Mikado precisam reverter, com base na árvore de dependências que ele mesmo desenhou no Estado 3 — pode ser rollback parcial dos últimos micro-lotes, não necessariamente do plano inteiro). A EXECUÇÃO física da reversão é sempre delegada, nó a nó, ao domain router/specialist que aplicou aquele nó especificamente (`@angular-router`, `@spring-boot-router`, `@spring-reactive-router`, `@database-router` — cada um reverte apenas os arquivos que executou).
+   - **2a. `WORKFLOW-BUG-FIX` (contrato corrigido)**: o `runtime-verifier` (agente estritamente read-only, sem ferramentas de mutação) apenas DETECTA o esgotamento do teto e DECLARA o veredito de bloqueio. A reversão física dos diffs (`git checkout -- <arquivos>`) é sempre EXECUTADA pelo `specialist-bug-fixer`/`specialist-test-fixer` ativo (que possuem `run_in_terminal` + `insert_edit_into_file`) via `run_subagent` acionado pelo `runtime-verifier`, estritamente amparado pelo `rollback_plan` previamente declarado no Estado 3. **Um agente read-only nunca executa a mutação de rollback diretamente** — essa separação declarador/executor é invariante de arquitetura (ver Seção 5, item 6).
+   - **2b. `WORKFLOW-REFACTORING` (Estado 5b — contrato corrigido)**: o `@refactor-planner` não possui **nenhuma** ferramenta de edição ou terminal em seu frontmatter (nem `run_in_terminal`) — é ainda mais estritamente read-only que o `runtime-verifier`. Ele DETECTA a violação (via relatório `@business-rules-extractor` modo Validate) e DECIDE o escopo do rollback (quais nós do DAG Mikado precisam reverter, com base na árvore de dependências que ele mesmo desenhou no Estado 3 — pode ser rollback parcial dos últimos micro-lotes, não necessariamente do plano inteiro). A EXECUÇÃO física da reversão é sempre delegada, nó a nó, ao domain router/specialist que aplicou aquele nó especificamente (`@angular-router`, `@spring-boot-router`, `@spring-reactive-router`, `@database-router` — cada um reverte apenas os arquivos que executou), registrando compulsoriamente o `blast_radius_revertido` no `workflow_state`.
    - Em ambos os casos, o agente responsável gera um relatório compacto de falha (3 linhas: Causa, Local, Ação sugerida) e aciona `ask_questions` para decisão humana:
      - *Opção A: Ajustar a estratégia de teste manualmente.*
      - *Opção B: Revisar hipótese de causa raiz.*
      - *Opção C: Cancelar a tarefa mantendo o workspace limpo.*
-3. **Rollback em Refatoração (Estado 5b) — Granularidade e Acionamento**:
-   - Se o `@business-rules-extractor` detectar no Estado 5 que qualquer regra de negócio do ground truth (Estado 1) foi alterada ou violada, OU se um Gate Out de qualquer nó do DAG (Estado 4) falhar de forma persistente, o `@refactor-planner` aciona o plano de rollback desenhado no Estado 3 **antes** de qualquer aprovação humana adicional — mas a reversão física é sempre executada pelo(s) specialist(s) de stack que tocaram os nós afetados (nunca pelo `@refactor-planner` diretamente, ver item 2b).
-   - Rollback é preferencialmente **incremental** (reverte apenas os nós do DAG posteriores ao ponto de violação identificado), não obrigatoriamente o plano inteiro — o Gate Out por nó (compilação limpa + testes verdes) já valida cada micro-lote durante o Estado 4, reduzindo o blast radius de uma violação tardia.
+3. **Rollback em Refatoração (Estado 5b) — Granularidade, Acionamento & Blast Radius Revertido**:
+   - Se o `@business-rules-extractor` detectar no Estado 5 que qualquer regra de negócio do ground truth (Estado 1) foi alterada ou violada, se o gate de contratos falhar, OU se um Gate Out de qualquer nó do DAG (Estado 4) falhar de forma persistente, o `@refactor-planner` aciona o plano de rollback desenhado no Estado 3 **antes** de qualquer aprovação humana adicional — mas a reversão física é sempre executada pelo(s) specialist(s) de stack que tocaram os nós afetados (nunca pelo `@refactor-planner` diretamente, ver item 2b).
+   - Rollback é preferencialmente **incremental** (reverte apenas os nós do DAG posteriores ao ponto de violação identificado), não obrigatoriamente o plano inteiro — o Gate Out por nó (compilação limpa + testes verdes) já valida cada micro-lote durante o Estado 4, reduzindo o blast radius de uma violação tardia. O relatório final de rollback registra expressamente o `blast_radius_revertido` (nós revertidos, callers e arquivos restaurados) no `workflow_state`.
 4. **Circuit Breaker Complementar de Delegação (`handoff-governance/SKILL.md` § 2.4)**: o teto de 3 tentativas acima trata de *retry de teste*; um mecanismo **distinto e complementar** protege contra loop infinito de *handoff entre agentes* (`call_stack_depth >= 3` ou ciclo A→B→A) — ambos podem estar ativos simultaneamente sem conflito, pois medem falhas de naturezas diferentes.
 
 ---
@@ -1044,6 +1124,3 @@ workflow_tracking:
       diagnostico_previo: "3 memory leaks detectados em subscriptions manuais sem takeUntil"
 ```
 Com esse bloco, qualquer especialista na cadeia sequencial sabe exatamente onde ler, onde testar e quais convenções de stack aplicar, sem ambiguidades.
-
-
-

@@ -301,32 +301,87 @@ def test_workflow_bug_fix_edge_scenarios_and_state_bag(routing_graph):
     assert "Layout Spec" in content_wf, "workflows.md deve especificar a ramificação de Layout/CSS"
     assert "Migração DDL" in content_wf, "workflows.md deve cobrir dependência de DDL via database-specialist"
     assert "workflow_state:" in content_wf, "workflows.md deve definir o Typed State Bag do Workflow 1"
+    assert "RCA estruturado" in content_wf or "5 Whys" in content_wf or "Fishbone" in content_wf, "workflows.md deve especificar RCA estruturado"
+    assert "evidence before hypothesis" in content_wf, "workflows.md deve exigir evidence before hypothesis com 2 fontes independentes"
+    assert "flaky" in content_wf and "regressao_real" in content_wf, "workflows.md deve classificar flaky vs regressao_real"
+    assert "blast_radius_estimado:" in content_wf, "workflows.md deve declarar blast_radius_estimado no State Bag"
+    assert "rollback_plan:" in content_wf, "workflows.md deve declarar rollback_plan no State Bag"
+    assert "mini_mutation_check:" in content_wf, "workflows.md deve declarar mini_mutation_check no State Bag"
+    assert "observacao_pos_fix:" in content_wf, "workflows.md deve declarar observacao_pos_fix no State Bag"
 
     # Validação estrutural no routing-graph.yaml
     wf1 = next((wf for wf in routing_graph.get("workflows", []) if wf["id"] == "WORKFLOW-BUG-FIX"), None)
     assert wf1 is not None, "WORKFLOW-BUG-FIX deve existir no routing-graph.yaml"
+    assert "rca_estruturado" in wf1, "Workflow 1 deve ter bloco rca_estruturado no routing-graph.yaml"
+    assert wf1["rca_estruturado"]["regra_evidencia"] == "evidence_before_hypothesis_2_fontes_independentes"
+    assert "blast_radius_e_rollback" in wf1, "Workflow 1 deve declarar blast_radius_e_rollback"
+    assert "validacao_anti_falso_verde" in wf1, "Workflow 1 deve declarar validacao_anti_falso_verde"
+    assert "observacao_pos_fix" in wf1, "Workflow 1 deve declarar observacao_pos_fix"
+
     estados = wf1.get("estados", [])
     assert any("ui-stylist" in e.get("agent", "") for e in estados), "Workflow 1 deve incluir ui-stylist para layout"
     assert any("database-specialist" in str(e.get("sub_rotinas_permitidas", [])) for e in estados), "Workflow 1 deve suportar database-specialist"
+    
+    etapa1 = next((e for e in estados if e["etapa"] == 1), {})
+    assert "rca_gate" in etapa1, "Etapa 1 deve definir rca_gate"
+    assert "classificacao_defeito" in etapa1, "Etapa 1 deve definir classificacao_defeito"
+
+    etapa3 = next((e for e in estados if e["etapa"] == 3), {})
+    assert "pre_requisito_diff" in etapa3, "Etapa 3 deve exigir pre_requisito_diff com blast radius e rollback"
+
+    etapa4 = next((e for e in estados if e["etapa"] == 4), {})
+    assert "mini_mutation_check" in etapa4, "Etapa 4 deve exigir mini_mutation_check"
+
+    etapa5 = next((e for e in estados if e["etapa"] == 5), {})
+    assert "observacao_pos_fix" in etapa5, "Etapa 5 deve exigir observacao_pos_fix"
 
 def test_workflow_refactoring_edge_scenarios_and_state_bag(routing_graph):
     """Valida que WORKFLOW-REFACTORING cobre cenários de Golden Master, Breaking Changes,
     Expand and Contract (BD), Árvore Mikado e Typed State Bag."""
     content_wf = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
     assert "Golden Master" in content_wf, "workflows.md deve especificar Golden Master Safety Net para código legado"
-    assert "Contract & Deprecation Plan" in content_wf, "workflows.md deve cobrir gate de breaking change"
+    assert "Contract & Deprecation Plan" in content_wf or "Contract Testing" in content_wf, "workflows.md deve cobrir gate de breaking change/contratos"
+    assert "Pact-style" in content_wf or "consumer-driven" in content_wf, "workflows.md deve especificar Contract Testing (Pact-style / consumer-driven)"
     assert "Expand and Contract" in content_wf, "workflows.md deve cobrir refatoração de schema de banco"
     assert "Mikado Method" in content_wf, "workflows.md deve documentar decomposição Mikado"
     assert "alvo_refatoracao:" in content_wf, "workflows.md deve definir o Typed State Bag do Workflow 2"
+    assert "contract_testing:" in content_wf, "workflows.md deve definir contract_testing no State Bag do Workflow 2"
+    assert "redundancia_proporcional:" in content_wf, "workflows.md deve definir redundancia_proporcional no State Bag"
+    assert "blast_radius_revertido:" in content_wf, "workflows.md deve definir blast_radius_revertido no State Bag"
 
     # Validação estrutural no routing-graph.yaml
     wf2 = next((wf for wf in routing_graph.get("workflows", []) if wf["id"] == "WORKFLOW-REFACTORING"), None)
     assert wf2 is not None, "WORKFLOW-REFACTORING deve existir no routing-graph.yaml"
+    assert "contract_testing" in wf2, "Workflow 2 deve declarar contract_testing"
+    assert "redundancia_proporcional_blast_radius" in wf2, "Workflow 2 deve declarar redundancia_proporcional_blast_radius"
+    assert "rollback_governado" in wf2, "Workflow 2 deve declarar rollback_governado"
+
     estados = wf2.get("estados", [])
     assert any("golden master" in str(e.get("safety_net_gate", "")) for e in estados), "Workflow 2 deve ter safety_net_gate"
     assert any("tech-solution-architect" in str(e.get("sub_rotinas_permitidas", [])) for e in estados), "Workflow 2 deve ter sub-rotina de contratos"
     assert any("database-specialist" in str(e.get("sub_rotinas_permitidas", [])) for e in estados), "Workflow 2 deve suportar database-specialist"
     assert any("mikado_method" in str(e.get("estrategia_decomposicao", "")) for e in estados), "Workflow 2 deve declarar mikado_method"
+
+    etapa2 = next((e for e in estados if e["etapa"] == 2), {})
+    assert "contract_gate" in etapa2, "Etapa 2 deve ter contract_gate"
+
+    etapa5 = next((e for e in estados if e["etapa"] == 5), {})
+    assert "redundancia_proporcional" in etapa5, "Etapa 5 deve ter redundancia_proporcional"
+    assert "blast_radius_revertido" in etapa5.get("circuit_breaker", ""), "Etapa 5 deve registrar blast_radius_revertido no circuit breaker"
+
+def test_workflow_bug_fix_and_refactoring_rigor_and_governance_parity(routing_graph):
+    """Valida garantias contratuais e invariantes de governança R-050/R-055 para WORKFLOW-BUG-FIX e WORKFLOW-REFACTORING:
+    - Invariante 14: RCA estruturado (5 Whys / Fishbone) com dupla fonte observável, classificação flaky vs real,
+      declaração prévia de blast radius/rollback, mini mutation-check e observação pós-fix canary.
+    - Invariante 15: Contract Testing (Pact-style consumer-driven), redundância proporcional ao blast radius
+      (auditoria reversa de símbolos, mini mutation gate, differential replay leve) e rollback com blast radius revertido.
+    """
+    content_wf = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    assert "14. **Invariante de RCA Estruturado, Dupla Evidência e Mini Mutation em Bugfix (WORKFLOW-BUG-FIX)**:" in content_wf
+    assert "15. **Invariante de Contract Testing, Redundância Proporcional e Rollback com Blast Radius Revertido em Refatoração (WORKFLOW-REFACTORING)**:" in content_wf
+    assert "reverse_symbol_audit" in content_wf or "Auditoria Reversa de Símbolos" in content_wf
+    assert "mini_mutation_gate" in content_wf or "Mini Mutation Gate" in content_wf
+    assert "differential_replay_leve" in content_wf or "Differential Replay Leve" in content_wf
 
 def test_workflow_technical_analysis_edge_scenarios_and_proposals(routing_graph):
     """Valida que WORKFLOW-TECHNICAL-ANALYSIS cobre arquitetura de stack (Angular, Spring, EJB),
@@ -389,7 +444,7 @@ def test_workflow_governance_maintenance_edge_scenarios_and_state_bag(routing_gr
     assert etapa3.get("sincronizacao_quadrupla_r015") is True, "Workflow 5 deve declarar sincronizacao_quadrupla_r015"
 
     etapa4 = next((e for e in estados if e["etapa"] == 4), {})
-    assert "pytest" in str(etapa4.get("validacao_automatizada", "")), "Workflow 5 deve ter validação automatizada na etapa 4"
+    assert "pytest" in str(etapa4.get("validacao_automatizada", "")), "Workflow 5 deve ter validacao_automatizada na etapa 4"
 
 
 

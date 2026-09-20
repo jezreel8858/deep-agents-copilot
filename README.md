@@ -345,7 +345,7 @@ flowchart TB
 
 ---
 
-## Status Atual (2026-09-19 — Versão 2.19.0)
+## Status Atual (2026-09-19 — Versão 2.23.0)
 
 ### Governança Global & Blindagem Sistêmica
 - ✅ **Regras normativas consolidadas** (`CLAUDE.md` — Regras R-001 a R-056).
@@ -353,9 +353,12 @@ flowchart TB
 - ✅ **Portão de Reúso e Generalização Sistêmica (R-055 — Anti-Silo Fix)**: Avaliação compulsória de impacto em peers (Q1), templates canônicos (Q2) e testes determinísticos (Q3) em qualquer manutenção.
 - ✅ **Precedência Mandatória de Context Mode (R-056 / Smell 2.24)**: Primazia absoluta de sandboxing e Think-in-Code para escritas/refatorações, erradicando o anti-padrão de editor tool sprawl no chat.
 - ✅ **Workflows Canônicos Determinísticos (R-050)**: 8 workflows operacionais com State Machines rígidas e banners visuais anti-cegueira.
+- ✅ **Endurecimento Determinístico e Paridade de Governança em Bugfix e Refatoração (`WORKFLOW-BUG-FIX` e `WORKFLOW-REFACTORING`)**: Paridade estrita de rigor determinístico equivalente à migração de frameworks, erradicando intuições causais e efeitos colaterais silenciosos:
+  - **`WORKFLOW-BUG-FIX`**: RCA estruturado (5 Whys / Fishbone) sob a regra inegociável *evidence before hypothesis* (mínimo de 2 fontes independentes de evidência técnica observável: stack trace, runtime log, payload de rede, APM ou teste isolado); classificação determinística compulsória entre falha `flaky` (instabilidade intermitente por concorrência/ambiente/poluição de estado) vs `regressao_real`; pré-requisito mandatório de declaração antecipada de `blast_radius_estimado` (callers e módulos afetados) e `rollback_plan` no `workflow_state` antes de emitir diff cirúrgico; **Mini Mutation-Check** proporcional ao risco no Estado 4 (injeção de 1 a 3 mutantes sintéticos eliminados pelo Red Test, erradicando falsos-verdes); e **Observação Pós-Fix / Canary Gate** no Estado 5 com métricas de telemetria e janela de observação definidas para defeitos críticos (P0/P1, segurança, autenticação e integridade de dados).
+  - **`WORKFLOW-REFACTORING`**: **Contract Testing** formal (**Pact-style / consumer-driven** contract tests ou OpenAPI / JSON Schema Diff) no gate de contratos (Estado 2a) para proteção de APIs públicas e contratos entre múltiplos módulos; **Camada de Redundância Proporcional ao Blast Radius** no Estado 5 para blast radius moderado ou alto, composta por: (1) Auditoria Reversa de Símbolos (`reverse_symbol_audit` via grafo determinístico), (2) Mini Mutation Gate (`mini_mutation_gate` na Golden Master) e (3) Differential Replay Leve (`differential_replay_leve` comparando snapshots de entrada e saída pré/pós refatoração); e governança de Rollback fortalecida no Estado 5b com cálculo, registro e reporte quantitativo do **`blast_radius_revertido`** (nós Mikado revertidos, arquivos e callers restaurados) no `workflow_state`.
 - ✅ **Migração Determinística com Tríplice Redundância Pós-Migração**: Elevação do `WORKFLOW-FRAMEWORK-MIGRATION` para 6 etapas canônicas com Symbol Exhaustion Gate, Anti-Omission AST Validator, Reverse Orphan Audit, Mutation Parity e Differential Shadow Replay.
 - ✅ **Portal Unificado de Documentação & Framework Diátaxis**: Centralização em [`docs/README.md`](docs/README.md) e formalização do [`AI_GOVERNANCE_DOCUMENTATION_GUIDE.md`](docs/architecture/AI_GOVERNANCE_DOCUMENTATION_GUIDE.md) alinhado a NIST AI RMF, ISO 42001 e OWASP Agentic AI.
-- ✅ **Suíte de Testes Automatizados**: **169 testes determinísticos 100% passando** no pytest.
+- ✅ **Suíte de Testes Automatizados**: **170 testes determinísticos 100% passando** no pytest.
 
 ### Adapters de Stack
 - ✅ `spring-boot-backend.instructions.md` — Java/Spring Boot
