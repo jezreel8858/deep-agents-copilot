@@ -6,6 +6,27 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.23.0] — 2026-09-19
+
+### Adicionado
+- **Consolidação Determinística dos Workflows de Resolução de Bugs e Refatoração Estrutural (`WORKFLOW-BUG-FIX` e `WORKFLOW-REFACTORING`)**:
+  - **`WORKFLOW-BUG-FIX`**:
+    - Formalização de RCA estruturado via 5 Whys ou Fishbone (Ishikawa), com regra estrita de *evidence before hypothesis* exigindo no mínimo 2 fontes independentes de evidência técnica observável (stack trace, runtime log, payload de rede, APM ou teste isolado).
+    - Classificação compulsória e determinística entre falha `flaky` (instabilidade intermitente por concorrência/ambiente/poluição de estado) e `regressao_real` no Estado 1 e no baseline check.
+    - Pré-requisito mandatório no Estado 3: declaração antecipada de `blast_radius_estimado` (callers e módulos afetados) e `rollback_plan` no `workflow_state` antes de autorizar qualquer diff cirúrgico.
+    - Inclusão do **Mini Mutation-Check Proporcional ao Risco** no Estado 4 para erradicar falsos-verdes nos testes de regressão (injeção de 1 a 3 mutantes sintéticos que devem ser 100% eliminados pelo Red Test).
+    - Instituição do **Observação Pós-Fix / Canary Gate** no Estado 5 para defeitos críticos (P0/P1, segurança, autenticação e integridade de dados) com métricas de telemetria e janela de observação definidas.
+  - **`WORKFLOW-REFACTORING`**:
+    - Formalização explícita de **Contract Testing (Pact-style / consumer-driven contract tests ou OpenAPI / JSON Schema Diff)** no gate de contratos (Sub-rotina 2a / Estado 2) sempre que a refatoração atingir APIs públicas ou interfaces consumidas por múltiplos módulos.
+    - Instituição de **Camada de Redundância Proporcional ao Blast Radius** no Estado 5 para blast radius moderado ou alto, composta por: (1) **Auditoria Reversa de Símbolos** (`reverse_symbol_audit` via `@code-knowledge-graph`), (2) **Mini Mutation Gate** (`mini_mutation_gate` para testar a sensibilidade da suíte Golden Master) e (3) **Differential Replay Leve** (`differential_replay_leve` comparando snapshots de entrada e saída pré/pós refatoração).
+    - Governança de Rollback fortalecida no Estado 5b com cálculo, registro e reporte quantitativo do **`blast_radius_revertido`** (nós Mikado revertidos, arquivos e callers restaurados) no `workflow_state`.
+  - **Blindagem Sistêmica & R-055 (Q1/Q2/Q3)**:
+    - Sincronização atômica em `workflows.md` (especificações de fluxo, State Bags tipados, diagramas Mermaid, Invariantes 14 e 15, e templates visuais anti-cegueira).
+    - Sincronização estrutural em `routing-graph.yaml` (metadados estruturais de RCA, blast radius, mini mutation, contract testing, redundância e rollback).
+    - Expansão da suíte de testes determinísticos em `tests/operational_flow/test_operational_workflows.py`, adicionando validações contratuais e novo teste `test_workflow_bug_fix_and_refactoring_rigor_and_governance_parity`.
+
+---
+
 ## [2.22.0] — 2026-09-19
 
 ### Removido & Descomissionado

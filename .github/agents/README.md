@@ -11,6 +11,9 @@
 - **Skill**: usado quando a tarefa é conhecimento pontual/checklist reutilizável.
 - Regra prática: se precisa classificar intenção e escolher fluxo, use agent.
 - **Workflows Operacionais Determinísticos (R-050)**: toda tarefa segue rigorosamente um dos 8 pipelines determinísticos especificados em [`workflows.md`](workflows.md) (`WORKFLOW-BUG-FIX`, `WORKFLOW-REFACTORING`, `WORKFLOW-TECHNICAL-ANALYSIS`, `WORKFLOW-FEATURE-DEVELOPMENT`, `WORKFLOW-GOVERNANCE-MAINTENANCE`, `WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION`, `WORKFLOW-FRAMEWORK-MIGRATION`, `WORKFLOW-RELEASE-READINESS`).
+  - **Paridade de Endurecimento Determinístico**: Bugfix (`WORKFLOW-BUG-FIX`) e Refatoração (`WORKFLOW-REFACTORING`) operam sob o mesmo rigor determinístico e blindagem já consolidados para a migração de frameworks:
+    - *Bugfix*: RCA estruturado (5 Whys / Fishbone) exigindo dupla fonte independente de evidência técnica observável (*evidence before hypothesis*), classificação determinística `flaky` vs `regressao_real`, pré-declaração de `blast_radius_estimado` e `rollback_plan` no `workflow_state`, mini mutation-check proporcional ao risco (anti falso-verde) e observação pós-fix / canary gate para defeitos críticos.
+    - *Refatoração*: Contract Testing formal (Pact-style consumer-driven ou OpenAPI / JSON Schema Diff) no gate de contratos (Estado 2a), camada de redundância proporcional ao blast radius no Estado 5 (auditoria reversa de símbolos `reverse_symbol_audit` via grafo, mini mutation gate e differential replay leve) e rollback com registro e reporte de `blast_radius_revertido`.
 
 ## 2) Catálogo Atual (estado verificado)
 
@@ -138,6 +141,7 @@ Antes de tarefas não triviais, anexar ao contexto:
 - **Re-triagem por turno (R-042)**: todo agent downstream deve declarar seção **"Retorno ao Router"** com gatilho objetivo de deriva de intenção — roteamento não é evento único da conversa.
 - **Ferramentas mínimas obrigatórias (Tooling Baseline)**: TODO agent deve incluir `run_subagent` no frontmatter `tools:` — sem essa tool, o handoff de retorno exigido por R-042 não é executável (descrever em texto não basta). Ver tabela de baseline por perfil em `agent-contracts/SKILL.md` § 9. `agent-factory` valida essa regra em toda criação/revisão de agent.
 - **Visibilidade de fluxo (Banner de Identidade)**: TODO agent — não apenas o `agent-router` — abre toda resposta com `Agente Ativo: <name>`, mesmo continuando em `task_mode` sem handoff neste turno; se houve handoff/re-triagem, adiciona `Handoff: <origem> → <destino> (motivo: ...)`. Padrão de mercado (OpenAI Agents SDK `HandoffOutputItem`, LangGraph `active_agent` streaming) — detalhes em `agent-contracts/SKILL.md` § 0. Sem isso, o usuário perde visibilidade do fluxo assim que a conversa passa a ser respondida por um downstream por vários turnos.
+- **Endurecimento Determinístico e Paridade de Governança (Invariantes 13, 14 e 15)**: É terminantemente vedado aplicar correções de bugs ou refatorações estruturais sem as salvaguardas contratuais equivalentes à migração de frameworks — RCA de dupla evidência, blast radius e rollback plan declarados e mini mutation em bugfix; contract testing de contratos públicos, camada de redundância proporcional ao blast radius e registro de `blast_radius_revertido` em refatoração.
 
 ## 9) Skills-base por função
 

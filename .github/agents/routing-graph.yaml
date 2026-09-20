@@ -204,11 +204,24 @@ workflows:
       - "CSS quebrado"
       - "NullPointerException"
       - "regressão"
+    rca_estruturado:
+      metodologia: "5_whys | fishbone"
+      regra_evidencia: "evidence_before_hypothesis_2_fontes_independentes"
+      classificacao_falha: "flaky vs regressao_real"
+    blast_radius_e_rollback:
+      blast_radius_estimado_obrigatorio: true
+      rollback_plan_obrigatorio: true
+    validacao_anti_falso_verde:
+      mini_mutation_check_proporcional: true
+    observacao_pos_fix:
+      canary_obrigatorio_para_bugs_criticos: true
     estados:
       - etapa: 1
         nome: "triage_and_root_cause"
         agent: "bug-triage"
         sub_rotinas_permitidas: ["debugger", "code-knowledge-graph"]
+        rca_gate: "5_whys | fishbone com 2 fontes independentes de evidencia (logs, traces, network, APM)"
+        classificacao_defeito: "flaky vs regressao_real (isolar concorrencia/ambiente se flaky)"
         repro_gate: "debugger (tracepoint) | ask_questions"
         max_tentativas_repro_gate: 2
         escalonamento_nao_reproduzivel: "ask_questions (prosseguir_com_hipotese | aguardar_evidencia | encerrar_nao_reproduzivel)"
@@ -221,15 +234,18 @@ workflows:
         nome: "surgical_bug_fix"
         agent: "specialist-bug-fixer | specialist-ui-stylist"
         sub_rotinas_permitidas: ["database-specialist"]
+        pre_requisito_diff: "declaracao de blast_radius_estimado e rollback_plan antes de aplicar a correcao"
         security_checkpoint_condicional: "R-048.1 (tech-solution-architect + security-reviewer) obrigatorio se o diff tocar autenticacao/credenciais/identidade, antes de aplicar o fix"
       - etapa: 4
         nome: "green_test_and_linter_validation"
         agent: "runtime-verifier | specialist-test-fixer"
         max_retries: 3
-        circuit_breaker: "runtime-verifier (declara_veredito_readonly, nunca reverte) -> specialist-bug-fixer|specialist-test-fixer (executa_revert_via_git) -> ask_questions"
+        mini_mutation_check: "mini mutation-check proporcional ao risco para erradicar falsos-verdes no teste de regressao"
+        circuit_breaker: "runtime-verifier (declara_veredito_readonly, nunca reverte) -> specialist-bug-fixer|specialist-test-fixer (executa_revert_via_git conforme rollback_plan) -> ask_questions"
       - etapa: 5
         nome: "quality_gate_and_pr"
         agent: "code-review | pr-gatekeeper"
+        observacao_pos_fix: "criterios de canary e telemetria de observacao pos-fix obrigatorios para bugs criticos (P0/P1)"
 
   - id: WORKFLOW-REFACTORING
     nome: "Refatoração Estrutural, Modernização e Desacoplamento"
@@ -244,6 +260,15 @@ workflows:
       - "modularizar"
       - "remover duplicação"
       - "extrair interface"
+    contract_testing:
+      pact_consumer_driven: true
+      openapi_diff: true
+    redundancia_proporcional_blast_radius:
+      reverse_symbol_audit: true
+      mini_mutation_gate: true
+      differential_replay_leve: true
+    rollback_governado:
+      registro_blast_radius_revertido: true
     estados:
       - etapa: 1
         nome: "ground_truth_rules_extraction"
@@ -252,6 +277,7 @@ workflows:
         nome: "blast_radius_and_graph_mapping"
         agent: "code-knowledge-graph"
         sub_rotinas_permitidas: ["tech-solution-architect"]
+        contract_gate: "contract_testing (Pact-style consumer-driven ou OpenAPI diff) se afetar APIs publicas ou consumidores"
         safety_net_gate: "specialist-unit-test-writer (golden master check)"
         threshold_cobertura_por_risco: "test-coverage-governance/SKILL.md § 1 (90 critico | 80 integracao | 70 controller)"
       - etapa: 3
@@ -271,7 +297,8 @@ workflows:
         nome: "ground_truth_validation_and_review"
         agent: "business-rules-extractor"
         co_agentes: ["code-review"]
-        circuit_breaker: "refactor-planner (decide_escopo_readonly) -> domain-router/specialist por no (executa_revert)"
+        redundancia_proporcional: "auditoria reversa de simbolos (code-knowledge-graph) + mini mutation gate (test-strategy) + differential replay leve proporcionais ao blast radius"
+        circuit_breaker: "refactor-planner (decide_escopo_readonly) -> domain-router/specialist por no (executa_revert registrando blast_radius_revertido)"
 
   - id: WORKFLOW-TECHNICAL-ANALYSIS
     nome: "Análise Técnica, Diagnóstico e Auditoria Especializada"
