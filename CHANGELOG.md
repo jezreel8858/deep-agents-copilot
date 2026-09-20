@@ -6,6 +6,18 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.22.0] — 2026-09-19
+
+### Removido & Descomissionado
+- **Descomissionamento Definitivo e Higienização do `agentic-memory-manager`**:
+  - Remoção física do arquivo `.github/agents/agentic-memory-manager.agent.md`.
+  - Remoção do nó e arestas correspondentes em `.github/agents/routing-graph.yaml` e das rotas de despacho em `.github/agents/agent-router.agent.md`.
+  - Saneamento atômico em cascata sem deixar rastros em `.github/agents/catalog.yaml`, `.github/agents/README.md`, `.github/skills/.index.json`, `.github/skills/agent-memory-policy/SKILL.md`, `CLAUDE.md`, `README.md`, `docs/plan/` e `tools/context-insight-visualizer/`.
+  - Justificativa arquitetural: o agente era órfão dos 8 workflows canônicos, conceptualmente arriscado em relação à "memória procedimental" em tempo de execução e 100% redundante com os hooks automáticos de sessão (26 categorias de eventos), FTS5 nativo e comandos (`/ctx-resume`, `/ctx-checkpoint`) do `context-mode` MCP. A skill neutra `agent-memory-policy` foi preservada como referência de governança.
+  - Atualização do total de agentes catalogados no ecossistema de 36 para 35 agentes.
+
+---
+
 ## [2.21.0] — 2026-09-19
 
 ### Adicionado

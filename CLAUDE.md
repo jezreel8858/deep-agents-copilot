@@ -218,7 +218,7 @@ Solicitação do Usuário (turno N)
   - `database-specialist` — migrações de schema e integridade referencial
 - **Qualidade & Validação**: `bug-triage`, `debugger`, `test-strategy`, `code-review`, `code-style-enforcer`, `security-reviewer`, `performance-agent`, `devops-engineer`, `runtime-verifier`, `repo-hygiene-auditor`
 - **Documentação**: `docs-engineer` (modos `author`/`curate`), `context-builder`
-- **Governança & Orquestração**: `governance-factory` (unifica criação/revisão de agents, skills, prompts e stacks), `governance-maintainer`, `agent-auditor`, `binding-initializer`, `adapter-generator`, `agentic-memory-manager`, `compliance-guardrails`, `pr-gatekeeper`
+- **Governança & Orquestração**: `governance-factory` (unifica criação/revisão de agents, skills, prompts e stacks), `governance-maintainer`, `agent-auditor`, `binding-initializer`, `adapter-generator`, `compliance-guardrails`, `pr-gatekeeper`
 
 ### Artefatos Estruturais de Orquestração
 - `.github/agents/routing-graph.yaml` — grafo de roteamento (R-040): 37 nós de agents + 5 nós de workflows, arestas com condições, política de cascata

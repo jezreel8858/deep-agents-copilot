@@ -220,9 +220,6 @@ Pedido recebido (já refinado por @prompt-structuring ou via Fast-Path)?
 |- É criação, padronização ou revisão de agents (.agent.md), skills (SKILL.md) ou prompts (.prompt.md)?
 |  |- Sim -> @governance-factory
 |  \- Não
-|- É persistência/recuperação de memória entre sessões (não consolidação pontual)?
-|  |- Sim -> @agentic-memory-manager
-|  \- Não
 |- É mapeamento de Bounded Contexts (DDD), domínios de negócio semânticos por nomenclatura ou identificação de God Classes/fronteiras invadidas?
 |  |- Sim -> @ddd-bounded-context-mapper
 |  \- Não
@@ -388,7 +385,6 @@ Próximo passo mínimo:
 - [@agent-auditor](agent-auditor.agent.md) para auditoria semântica/estrutural do catálogo de governança (agents, skills, prompts), detecção de gaps, smells, redundância/verbosidade de saída e conformidade (read-only) — sempre o primeiro passo antes de qualquer correção.
 - [@governance-maintainer](governance-maintainer.agent.md) para manutenção atômica, refatoração em cascata, renomeações em lote e sincronização de catálogos e referências de governança — não confundir com `@agent-auditor` (que diagnostica smells/gaps primeiro; governance-maintainer só aplica a correção já aprovada pelo usuário).
 - [@adapter-generator](adapter-generator.agent.md) para geração automática de adapters (.instructions.md) via scanner de convenções de projetos adicionados.
-- [@agentic-memory-manager](agentic-memory-manager.agent.md) para persistência/recuperação de memória entre sessões.
 - [@ddd-bounded-context-mapper](ddd-bounded-context-mapper.agent.md) para mapeamento semântico de domínios de negócio por nomenclatura, identificação de Bounded Contexts e God Classes.
 - [@adr-sentinel](adr-sentinel.agent.md) para auditoria de conformidade de blueprints, propostas e diffs contra Architectural Decision Records (ADRs) documentados.
 - [@repo-hygiene-auditor](repo-hygiene-auditor.agent.md) para auditoria de higiene estrutural, documentação essencial (README/CONTRIBUTING/LICENSE) e práticas de CI/CD.

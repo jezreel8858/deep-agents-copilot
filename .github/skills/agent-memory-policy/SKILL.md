@@ -105,7 +105,7 @@ semantica:
 
 Para evitar que decisões de design críticas sejam descartadas pelo TTL de 7 dias da telemetria episódica, o sistema adota um pipeline de consolidação disparado por marcos explícitos (ex.: via prompt `/ctx-checkpoint`, ao concluir planos com `@refactor-planner`, ou fechamento de Technical Blueprint com `@tech-solution-architect`):
 
-1. **Gatilho de Marco**: O agent `@agentic-memory-manager` é acionado para revisar a telemetria recente (`source: "handoff-telemetry:<projeto>"`).
+1. **Gatilho de Marco**: A telemetria recente (`source: "handoff-telemetry:<projeto>"`) é revisada sob supervisão de governança ou solicitação explícita do desenvolvedor.
 2. **Filtro Anti-Poisoning**: Apenas registros marcados com tags de decisão aprovada (`[DECISION]`, `[SUCCESS]`) ou itens com validação explícita do usuário são candidatos a consolidação. Tentativas falhas (`[LOOP_LIMIT]`), desvios (`[INTENT_DRIFT]`) e código intermediário são descartados.
 3. **Deduplicação & Destilação**: Os fragmentos aprovados são resumidos em *átomos semânticos permanentes* (invariantes de arquitetura, contratos de integração e regras de domínio confirmadas).
 4. **Persistência Permanente**:
