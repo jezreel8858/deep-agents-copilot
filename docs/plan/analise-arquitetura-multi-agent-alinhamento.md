@@ -67,7 +67,7 @@ flowchart TD
 2. **Agente de Contexto / RAG:** Coberto por `@code-knowledge-graph`, `@code-summarizer`, `@context-builder`, `@deep-search` e `@business-rules-extractor`.
 3. **Agente Codificador:** Especialistas por stack (`@angular`, `@spring-boot`, `@spring-reactive`) e executores cirúrgicos (`@refactor-executor`, `@debugger`).
 4. **Agente de Testes:** Coberto pela tríade `@test-strategy` (planejamento), `@test-implementation` (geração) e `@test-fix` (correção direcionada).
-5. **Estado Compartilhado / Memória:** Gerenciado pelo protocolo `context-mode` (MCP), buffers de diff git e `@agentic-memory-manager`.
+5. **Estado Compartilhado / Memória:** Gerenciado pelo protocolo `context-mode` (MCP) e buffers de diff git.
 6. **Agente Revisor / Crítico:** Coberto pela malha de inspeção read-only (`@code-review`, `@security-reviewer`, `@performance-agent`, `@compliance-guardrails`, `@code-style-enforcer`).
 7. **Loop de Refatoração & PR:** Roteamento via `handoff-governance` acionado quando o quality gate rejeita o artefato.
 
@@ -85,7 +85,7 @@ Com base na literatura de Engenharia de AI (ACM, IEEE, ArXiv SWE-bench, MetaGPT,
 | **G4** | **Engenharia de Qualidade & Testes (QA/Testers)** | *Test Planner, Test Generator, Test Healer* | `test-strategy`, `test-implementation`, `test-fix` | Planejamento de cobertura por risco, geração de suítes completas (Unit, Integration, E2E) e correção automatizada de testes quebrados (Self-Healing Tests). |
 | **G5** | **Crítico, Auditoria & Guardrails (Reviewers)** | *Evaluator-Optimizer, Security Auditor, Linter* | `code-review`, `security-reviewer`, `performance-agent`, `compliance-guardrails`, `code-style-enforcer`, `agent-auditor` | Malha de revisão estritamente read-only. Avaliação multifacetada: qualidade, OWASP/CVE, Core Web Vitals/N+1, LGPD/SOC2, estilo e integridade do meta-catálogo. |
 | **G6** | **Análise Arquitetural & Diagnóstico de Integração** | *System Architect, Contract Validator* | `analysis-architect`, `bug-triage` | Análise de impacto cross-sistema, contratos OpenAPI/GraphQL/gRPC, blast radius e diagnóstico causal de defeitos antes do planejamento. |
-| **G7** | **Gestão de Estado & Memória Persistente** | *Memory Engine (Episodic/Procedural)* | `agentic-memory-manager` | Persistência e recuperação de memória procedimental e semântica entre sessões de desenvolvimento. |
+| **G7** | **Gestão de Estado & Memória Persistente** | *Memory Engine (Episodic/Procedural)* | `context-mode` MCP | Persistência e recuperação de memória episódica e semântica entre sessões de desenvolvimento via hooks e FTS5. |
 | **G8** | **Meta-Governança, Fábricas & DevOps** | *Meta-Agents, Scaffolders, Infra Automation* | `agent-factory`, `skill-factory`, `prompt-factory`, `binding-initializer`, `adapter-generator`, `docs-curator`, `docs-writer`, `devops-engineer` | Geração e manutenção de artefatos de governança (Agents, Skills, Prompts, Adapters), documentação Diátaxis/ADR e revisão de IaC/Pipelines CI-CD. |
 
 ### Tabela Detalhada de Mapeamento por Agent
@@ -119,7 +119,6 @@ Com base na literatura de Engenharia de AI (ACM, IEEE, ArXiv SWE-bench, MetaGPT,
 │ agent-auditor            │ G5 - Crítico & Guardrails   │ Read-Only    │ Sonnet (1x)   │ CRÍTICO (Meta-Governança)     │
 │ analysis-architect       │ G6 - Análise Arquitetural   │ Read-Only    │ Sonnet (1x)   │ Validação de Contratos/Design │
 │ bug-triage               │ G6 - Análise Arquitetural   │ Read-Only    │ Haiku (0x)    │ Triagem de Defeitos           │
-│ agentic-memory-manager   │ G7 - Memória & Estado       │ Read/Write   │ Haiku (0x)    │ ESTADO COMPARTILHADO/MEMÓRIA  │
 │ agent-factory            │ G8 - Meta & Infra           │ Read/Write   │ Sonnet (1x)   │ Fábrica de Agents             │
 │ skill-factory            │ G8 - Meta & Infra           │ Read/Write   │ Sonnet (1x)   │ Fábrica de Skills             │
 │ prompt-factory           │ G8 - Meta & Infra           │ Read/Write   │ Sonnet (1x)   │ Fábrica de Prompts            │

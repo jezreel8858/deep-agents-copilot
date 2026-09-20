@@ -6,6 +6,133 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.22.0] — 2026-09-19
+
+### Removido & Descomissionado
+- **Descomissionamento Definitivo e Higienização do `agentic-memory-manager`**:
+  - Remoção física do arquivo `.github/agents/agentic-memory-manager.agent.md`.
+  - Remoção do nó e arestas correspondentes em `.github/agents/routing-graph.yaml` e das rotas de despacho em `.github/agents/agent-router.agent.md`.
+  - Saneamento atômico em cascata sem deixar rastros em `.github/agents/catalog.yaml`, `.github/agents/README.md`, `.github/skills/.index.json`, `.github/skills/agent-memory-policy/SKILL.md`, `CLAUDE.md`, `README.md`, `docs/plan/` e `tools/context-insight-visualizer/`.
+  - Justificativa arquitetural: o agente era órfão dos 8 workflows canônicos, conceptualmente arriscado em relação à "memória procedimental" em tempo de execução e 100% redundante com os hooks automáticos de sessão (26 categorias de eventos), FTS5 nativo e comandos (`/ctx-resume`, `/ctx-checkpoint`) do `context-mode` MCP. A skill neutra `agent-memory-policy` foi preservada como referência de governança.
+  - Atualização do total de agentes catalogados no ecossistema de 36 para 35 agentes.
+
+---
+
+## [2.21.0] — 2026-09-19
+
+### Adicionado
+- **Consolidação de Segurança de Aplicação (AppSec) e Gestão Holística de Vulnerabilidades (SAST, DAST, IAST, SCA, Secrets, ASPM)**:
+  - Criação do **Guia Canônico de Segurança de Aplicação e Vulnerabilidades** (`docs/architecture/APPLICATION_SECURITY_GUIDE.md`), detalhando a matriz dos 6 pilares de AppSec: SAST (análise estática e taint tracking), SCA com *Reachability Analysis*, DAST (testes dinâmicos de runtime e APIs), IAST (instrumentação de testes), Secrets Detection (análise de entropia e pre-commit) e ASPM (gestão de postura e orquestração).
+  - Alinhamento explícito com as normas e padrões globais consolidados: OWASP Top 10:2025, OWASP ASVS 5.0, OWASP API Security Top 10, CWE Top 25 e OWASP Agentic AI Security (ASI01..ASI10:2026).
+  - Formalização da taxonomia de severidade CVSS v3/v4 e definição de SLAs compulsórios de remediação (Crítico ≤ 24h, Alto ≤ 7 dias, Médio ≤ 30 dias, Baixo ≤ 90 dias) integrados aos Quality Gates dos workflows canônicos.
+  - Atualização da skill `security-review-patterns` integrando o protocolo de *Reachability Analysis* para redução drástica de falso-positivo em CVEs transitivas.
+  - Atualização do Portal de Documentação em `docs/README.md` vinculando as diretrizes de AppSec aos quadrantes de How-To e Conceitos & Arquitetura.
+
+---
+
+## [2.20.0] — 2026-09-19
+
+### Adicionado
+- **Consolidação Documental sob Framework Diátaxis & Padrões Globais de Governança de IA (NIST AI RMF, ISO 42001, OWASP Agentic AI)**:
+  - Criação do **Portal Central de Documentação** em `docs/README.md`, organizando 100% dos artefatos técnicos do ecossistema nos 4 quadrantes Diátaxis (Tutoriais, Guias Práticos / How-To, Referência Técnica e Conceitos & Arquitetura).
+  - Formalização do **Guia Canônico de Boas Práticas de Documentação em Governança de IA** (`docs/architecture/AI_GOVERNANCE_DOCUMENTATION_GUIDE.md`), integrando os pilares de governança responsável (NIST AI RMF 1.0, ISO/IEC 42001 e OWASP Agentic AI 2026).
+  - Alinhamento de documentação de agentes ao padrão aberto **Agent Card** (A2A Protocol / Linux Foundation / IETF Draft 2026) com suporte a manifestos estruturados máquina-máquina via `docs/schemas/agentcard.schema.json`.
+  - Atualização do `README.md` principal na raiz integrando o Nível 4 de documentação e sincronizando o status de governança global (169 testes determinísticos no pytest).
+
+---
+
+## [2.19.0] — 2026-09-19
+
+### Adicionado
+- **Blindagem Determinística do Workflow de Migração e Camada de Redundância Pós-Migração (WORKFLOW-FRAMEWORK-MIGRATION / REQ-008 / REQ-009)**:
+  - Elevação do `WORKFLOW-FRAMEWORK-MIGRATION` em `workflows.md` de 5 para **6 etapas canônicas**, adicionando o **Estado 6 (Post-Migration Verification & Redundancy Gate)** como barreira obrigatória antes de qualquer autorização de cutover.
+  - Instituição do **Symbol Exhaustion Gate (Inventário Mecânico de Símbolos)** nas Etapas 1 e 2: exige que a Matriz De-Para mapeie compulsoriamente 100% dos símbolos, métodos (públicos e privados), queries e nós da AST inventariados mecanicamente via `@code-knowledge-graph`, erradicando gaps por inferência superficial.
+  - Instituição do **Anti-Omission AST Validator** na Etapa 3: verificação no sandbox do código emitido contra a Representação Intermediária (IR) para impedir truncamento e omissão silenciosa de branches de exceção e tabelas secundárias.
+  - Instituição da **Tríplice Camada de Redundância Pós-Migração (Estado 6)**:
+    - *Sub-rotina 6a (Reverse Orphan Audit)*: Varredura reversa determinística de 100% dos símbolos, métodos, queries e arquivos legados contra a base moderna e a Matriz De-Para para detectar qualquer código legado órfão sem correspondência.
+    - *Sub-rotina 6b (Mutation Parity Resilience)*: Injeção de mutantes sintéticos em regras para comprovar que a suíte Golden Master detecta desvios e eliminar testes falsos-verdes ou frágeis.
+    - *Sub-rotina 6c (Differential Shadow Replay)*: Comparação semântica paralela de payloads de retorno, integridade de tabelas secundárias de banco de dados e eventos emitidos.
+    - Emissão compulsória do *Certificado de Paridade Total & Cutover Autorizado* em `docs/migrations/certificado-paridade-<alvo>.md`.
+  - Formalização do **Invariante 13 em `workflows.md` § 5**, e atualização dos Invariantes 8 e 9 para cobrir as 6 etapas canônicas.
+  - Especificação dos requisitos funcionais **REQ-008** e **REQ-009** em `docs/requirements/REQ-migration-engine.md` e atualização da Máquina de Estados em `docs/plan/plano-motor-migracao-agnostica.md` (Fase 6 e CORE-05).
+  - Alinhamento de governança global em `CLAUDE.md` e `.github/copilot-instructions.md`.
+  - Atualização do cenário de validação operacional `WF-MIG-001` em `tests/operational_flow/casos-workflows.yaml` com a Etapa 6.
+  - Expansão da suíte de testes em `tests/governance_audit/test_migration_engine_governance.py` validando Symbol Exhaustion Gate, Tríplice Redundância Pós-Migração e declaração das 6 etapas (169 testes verdes no pytest).
+
+---
+
+## [2.18.0] — 2026-09-19
+
+### Adicionado
+- **Precedência Mandatória de Context Mode em Modificação de Arquivos (R-056 / Smell 2.24 — Anti-Editor Tool Sprawl)**:
+  - Instituição da regra normativa R-056 em `CLAUDE.md` e `copilot-instructions.md`, estabelecendo o `context-mode` (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_index`, `ctx_search`) como canal primário e compulsório de escrita, criação e refatoração de código e governança.
+  - Rebaixamento formal de ferramentas manuais de editor (`replace_string_in_file`, `insert_edit_into_file`) a fallbacks restritos de última instância (apenas micro-edições pontuais de 1-2 linhas ou indisponibilidade de sandbox), proibindo terminantemente encadeamento de chamadas de editor em série no chat.
+  - Catalogação do **Smell 2.24 (Omissão de Precedência de Context-Mode em Agentes Mutadores / Editor Tool Sprawl)** em `.github/skills/governance-audit-patterns/SKILL.md`.
+  - Reestruturação da Seção 0 de `.github/skills/efficient-batch-code-modification/SKILL.md` com a hierarquia de precedência Nível 1 (Context-Mode compulsório para arquivos estruturados e lote) e Nível 2 (Editor fallback).
+  - Atualização dos templates canônicos operacionais (`operational-agent.md`, `agent-template.md`) e do `governance-factory.agent.md` com trava de herança compulsória da precedência de `context-mode` para novos agentes mutadores.
+  - Criação da suíte determinística em `tests/governance_audit/test_context_mode_precedence_governance.py` (166 testes verdes no pytest).
+
+## [2.17.0] — 2026-09-19
+
+### Adicionado
+- **Metodologia Test-Last e Isenção de Testes Unitários para UI na Stack Frontend**:
+  - Instituição da abordagem **Test-Last com Verification Gate Obrigatório** (Implementation-First) para agentes especialistas de frontend (`angular-feature-developer`, `angular-bug-fixer`), eliminando os gargalos de ciclos repetitivos de inicialização de test runners e context poisoning por mocks prematuros de DOM.
+  - Isenção formal de criação e execução de testes unitários para agentes e tarefas de pura estilização e apresentação visual (`angular-ui-stylist`), consolidando que validações de UI são 100% visuais (Visual Feedback Loop, WCAG 2.2, design tokens e `get_errors` limpo).
+  - Atualização do `WORKFLOW-FEATURE-DEVELOPMENT` em `workflows.md` (Estado 5a/5b), formalizando que a escrita de testes unitários/componentes de regressão é delegada aos test-writers ao final da etapa.
+  - Sincronização em lote (R-046 / R-055) das skills `angular-implementation-patterns/SKILL.md`, `frontend-visual-feedback-loop/SKILL.md` e `test-implementation-frontend/SKILL.md`.
+  - Padronização em `governance-factory.agent.md` e `governance-factory-patterns/SKILL.md` para que futuros ecossistemas de frontend herdem compulsoriamente a isenção de UI e a metodologia Test-Last.
+  - Criação da suíte determinística de testes em `tests/governance_audit/test_frontend_test_last_governance.py` (160 testes verdes no pytest).
+
+## [2.16.0] — 2026-09-19
+
+### Adicionado
+- **Portão de Reúso e Generalização Sistêmica em Governança (R-055 / Anti-Silo Fix)**:
+  - Instituição da regra normativa R-055 em `CLAUDE.md`, `copilot-instructions.md` e `workflows.md` (`WORKFLOW-GOVERNANCE-MAINTENANCE`), tornando compulsória a avaliação prévia de reúso sistêmico antes de qualquer implementação de melhoria ou ajuste em agents, prompts e skills.
+  - Eliminação estrutural do anti-padrão de correções em silo (*one-off fixes*): todo agente de governança deve responder obrigatoriamente às 3 perguntas canônicas de generalização:
+    - **Q1 (Impacto Horizontal / Peers)**: avaliar e expandir em lote (*Single-Turn Batching*, R-046) para artefatos análogos do mesmo perfil ou camada.
+    - **Q2 (Prevenção Futura / Templates)**: atualizar compulsoriamente o template canônico em `templates/` para que futuras criações herdem a diretriz.
+    - **Q3 (Blindagem por Teste / Quality Gate)**: criar ou expandir asserções determinísticas no pytest (`tests/governance_audit/`).
+  - Criação da suíte determinística de testes em `tests/governance_audit/test_systemic_reuse_gate.py` validando R-055, workflows, skills e os 3 agentes de governança (155 testes verdes).
+
+### Aprimorado
+- **Integração do Gate nos Agentes de Governança**:
+  - `@agent-auditor`: inclusão de avaliação compulsória de reúso sistêmico (Q1/Q2/Q3) na `Decision Tree`, `Formato de Saída` e `Checklist Antes de Auditar`.
+  - `@governance-factory`: adição da trava no bloco `CRÍTICO` e `Checklist Antes de Codar`, vedando revisões em silo.
+  - `@governance-maintainer`: adição da etapa de reúso sistêmico na Fase 1 (Dry-Run & Mapeamento em Memória) e no checklist de conclusão.
+  - `governance-factory-patterns/SKILL.md`: formalização da subseção §3.2 detalhando o protocolo de decisão para o gate de generalização.
+
+## [2.15.0] — 2026-09-19
+
+### Adicionado
+- **Prevenção Compulsória de R-054 no `@governance-factory` (v1.3.0)**:
+  - Adição da seção normativa *Baseline R-054 — Governança Estrita de Todo Agent com Perfil de Router*, exigindo esqueleto base de `templates/router-agent.md`, Least Privilege com 7 ferramentas canônicas, Zero Pre-Routing Discovery e Delegação Plana.
+  - Detecção automática de perfil router no fluxo `type: agent` (quando `name` termina em `-router` ou `description` indica papel supervisor/despachante).
+  - Gate de validação formal em `tests/governance_audit/test_router_agents.py` incorporado aos fluxos de scaffolding de router em `type: stack` e `type: agent`.
+  - Inclusão de `.github/skills/governance-audit-patterns/SKILL.md` em `source_docs`.
+
+### Aprimorado
+- **Auditoria Dinâmica de Smells e R-054 no `@agent-auditor` (v1.2.0)**:
+  - Substituição da contagem estática ("14/13 categorias de smell") por referência dinâmica a `governance-audit-patterns/SKILL.md` § 2 (atualmente até o Smell 2.23).
+  - Adição de verificação explícita de conformidade com R-054 e Smell 2.23 na Decision Tree e Checklist ao auditar artefatos com perfil router (`*-router.agent.md` e `templates/router-agent.md`).
+- **Saneamento Documental em `@governance-factory`**:
+  - Remoção de bloco de texto corrompido/órfão remanescente no final do arquivo.
+
+## [2.14.0] — 2026-09-19
+
+### Adicionado
+- **Governança Estrita de Routers (R-054 / Smell 2.23 — Anti-Overthinking Router & Zero Discovery)**:
+  - Instituição da regra mandatória de **Zero Pre-Routing Discovery**: proibição absoluta de tool calls de leitura exploratória de código, varredura de diretórios ou scripts de sandbox para investigar o conteúdo de solicitações ou arquivos anexados (`#file:...`) antes de rotear, prevenindo latência e consumo desproporcional de créditos em modelos topo de linha (Claude Sonnet 5).
+  - Formalização do **Smell 2.23 (Router Over-Empowerment e Pre-Routing Discovery Bloat)** em `.github/skills/governance-audit-patterns/SKILL.md`, baseado no consenso de mercado de 2025/2026 (*Anthropic, LangChain, Vercel, Atlan/Snowflake via arXiv:2603.17787, Patronus AI e Splunk*).
+  - Ampliação da suíte determinística de testes em `tests/governance_audit/test_router_agents.py` com validação estática de Least Privilege universal de ferramentas, presença de Zero Discovery e Delegação Plana em todos os roteadores (150 testes passando no `pytest`).
+
+### Aprimorado
+- **Saneamento Universal de Ferramentas em Routers**:
+  - Restrição estrita de ferramentas no `agent-router` central, nos 7 supervisores de domínio (`angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `database-router`, `python-router`, `struts-router`) e no template canônico `router-agent.md` ao baseline exclusivo de 7 ferramentas de leitura, busca, clarificação e despacho (`read_file`, `file_search`, `grep_search`, `list_dir`, `ask_questions`, `run_subagent`, `context-mode/ctx_search`).
+  - Extirpação completa de ferramentas mutativas (`create_file`, `insert_edit_into_file`, `replace_string_in_file`, `apply_patch`), comandos de terminal (`run_in_terminal`) e sandbox de código (`context-mode/ctx_execute*`) de todos os roteadores.
+- **Blindagem Total da Delegação Plana (Flat Delegation / Smell 2.20)**:
+  - Proibição expressa de invocar especialistas ou executores downstream via `run_subagent` por dentro de qualquer roteador, garantindo que o despacho seja realizado exclusivamente pelo orquestrador raiz em nível plano.
+  - Sincronização atômica de catálogos e governança em `CLAUDE.md` (R-054), `.github/copilot-instructions.md`, `.github/agents/catalog.yaml` e `.a2a/agentcards/agent-router.agentcard.json`.
+
 ## [2.13.0] — 2026-09-19
 
 ### Aprimorado
@@ -13,6 +140,10 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
   - Inserção do banner universal de visibilidade `Agente Ativo: <slug>` e `[Se aplicável] Handoff: <origem> → <destino>` nos blocos de código Markdown de 20 agentes raiz (`bug-triage`, `code-review`, `debugger`, `runtime-verifier`, `code-style-enforcer`, `compliance-guardrails`, `security-reviewer`, `performance-agent`, `devops-engineer`, `pr-gatekeeper`, `database-specialist`, `agentic-memory-manager`, `business-rules-extractor`, `code-knowledge-graph`, `deep-search`, `docs-engineer`, `governance-factory`, `prompt-structuring`, `adapter-generator`, `binding-initializer`).
   - Harmonização dos 7 Stack Routers (`angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `python-router`, `struts-router`, `database-router`) e do template `router-agent.md` com campos de especificação de modelo (`[Model] Delegando para...`), métricas de confiança (`Confiança`, `Confidence Score`) e entradas consideradas.
   - 100% de conformidade com a suíte de testes de governança (147 testes passando no pytest).
+- **Evolução de Autonomia Delimitada (3 Tiers) & Gate Pattern no `@prompt-structuring` (R-041)**:
+  - Implementação do modelo de 3 Tiers para mitigar anti-padrões de mercado em sistemas multi-agentes (Approval Fatigue, Agency Stripping e Latency Tax): Tier 1 (Fast-Path com bypass para tarefas determinísticas), Tier 2 (Gate Pattern "Prepare, Don't Submit" com preview e confirmação de 1-clique via ask_questions em 1 turno) e Tier 3 (loop interativo multi-turno limitado a 5 iterações para ambiguidade alta).
+  - Instituição formal da fronteira Problem Space vs Solution Space: o estruturador delimita exclusivamente o *Quê*, requisitos funcionais e critérios de aceitação, sendo terminantemente vedada a prescrição de implementação técnica interna que pertence aos especialistas de stack.
+  - Sincronização do agente `prompt-structuring.agent.md`, diretriz R-041 em `CLAUDE.md` e catálogo `catalog.yaml`.
 
 ## [2.12.0] — 2026-09-17
 
@@ -341,7 +472,7 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ### Refatorado
 - **Desacoplamento de Cardinalidade Normativa (Herança Aberta de Governança)**:
-  - Substituição da referência rígida ao contador fechado (`R-001..R-051`) pela herança aberta desacoplada (`regras normativas globais em CLAUDE.md`) em 45 agents/templates e todos os prompts, skills e catálogos.
+  - Substituição da referência rígida ao contador fechado (`R-001..R-051`) pela herança aberta desacoplada (`regras normativas globais em CLAUDE.md`) em 45 agents/templates e todos os prompts e catálogos.
   - Eliminação definitiva do problema de *Shotgun Surgery* (manutenção em cascata e gasto desnecessário de créditos Copilot a cada nova regra adicionada ao `CLAUDE.md`).
 - **Redefinição do Smell 2.15 (`governance-audit-patterns/SKILL.md` & `test_governance_smells.py`)**:
   - Inversão de sentido do Smell 2.15 de "range desatualizado" para "Acoplamento Rígido de Range Normativo (Hardcoded Range Coupling)".

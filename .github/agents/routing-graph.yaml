@@ -131,9 +131,6 @@ nos:
     tipo: downstream
     descricao: "Decomposição de requisito de feature nova em subtasks executáveis com dependências e paralelização; distinto de refactor-planner (refatoração de código existente)"
 
-  - id: agentic-memory-manager
-    tipo: downstream
-    descricao: "Persistência/recuperação de memória long-term entre sessões (episódica/semântica/procedimental); memória procedimental exige aprovação humana explícita"
 
   - id: devops-engineer
     tipo: downstream
@@ -716,20 +713,6 @@ arestas:
       nao_confundir_com:
         - "refatoração de código existente"  # → refactor-planner
 
-  # Memória long-term de agent
-  - de: agent-router
-    para: agentic-memory-manager
-    prioridade: 1.65
-    threshold_score: 0.90
-    nivel_routing: rule-based
-    condicoes:
-      keywords:
-        - "memória de agent"
-        - "agent memory"
-        - "memória entre sessões"
-        - "memória procedimental"
-      sinal_r006: "É persistência/recuperação de memória ENTRE SESSÕES (não consolidação pontual)?"
-      nao_confundir_com:
 
   # Revisão de artefatos DevOps
   - de: agent-router

@@ -31,6 +31,7 @@ Você foi concebido para **eliminar a queima de tokens e créditos** que ocorre 
 - ❌ NÃO fazer chamadas fragmentadas de `get_errors` arquivo por arquivo. Execute `get_errors` uma única vez ao final com o array completo `filePaths: [...]`.
 - ✅ SEMPRE realizar **Dry-Run prévio em memória**: inspecione todas as ocorrências e mapeie os alvos antes de invocar a primeira ferramenta de edição.
 - ✅ SEMPRE aplicar **Diffs Cirúrgicos**: modifique apenas as linhas necessárias com 2 a 3 linhas de contexto para unicidade (`oldString`). Nunca reescreva arquivos inteiros para mudar 5% do conteúdo.
+- ✅ SEMPRE aplicar o **Portão de Reúso Sistêmico (R-055 / Anti-Silo Fix)**: antes de iniciar as edições, responder a Q1 (impacto em artefatos irmãos/peers), Q2 (atualização de template canônico) e Q3 (teste determinístico no pytest), expandindo o escopo do lote para cobrir a governança sistêmica completa.
 - ✅ SEMPRE garantir a regra **R-015 / R-040 (Sincronização Atômica)**: ao renomear, mover ou atualizar qualquer artefato de governança, atualize na mesma entrega:
   1. O arquivo do artefato (`.agent.md`, `SKILL.md`, `.prompt.md`)
   2. `catalog.yaml` (catálogo estruturado de agents)
@@ -48,12 +49,13 @@ Solicitação de Manutenção / Refatoração de Governança
                      │
                      ▼
   [ FASE 1: DRY-RUN & MAPEAMENTO EM MEMÓRIA ]
-  ├─ 1. Mapear todas as referências cruzadas via grep_search ou ctx_search
-  ├─ 2. Listar em memória todos os arquivos afetados
-  ├─ 3. Avaliar limiar de ferramenta (Hierarquia de Decisão):
+  ├─ 1. Avaliar Portão de Reúso Sistêmico (R-055 / Q1-Q2-Q3): mapear artefatos irmãos, templates e testes
+  ├─ 2. Mapear todas as referências cruzadas via grep_search ou ctx_search
+  ├─ 3. Listar em memória todos os arquivos afetados
+  ├─ 4. Avaliar limiar de ferramenta (Hierarquia de Decisão):
   │     ├─ Se >= 5 arquivos OU padrão repetitivo: OBRIGATÓRIO ctx_execute com script
   │     └─ Se 1 a 4 arquivos pontuais: Single-Turn Batching via editor tools
-  └─ 4. Planejar as substituições exatas (oldString -> newString ou script regex)
+  └─ 5. Planejar as substituições exatas (oldString -> newString ou script regex)
                      │
                      ▼
   [ FASE 2: EXECUÇÃO EM LOTE ]
@@ -90,6 +92,7 @@ Agente Ativo: governance-maintainer
 - [ ] Hierarquia respeitada: `ctx_execute` para >=5 arquivos ou repetitivo; editor batch para 1-4.
 - [ ] Edições aplicadas em lote sem roundtrips intermediários.
 - [ ] Diffs cirúrgicos com 2-3 linhas de contexto para unicidade.
+- [ ] Portão de Reúso Sistêmico (R-055 / Q1-Q2-Q3) avaliado e cumprido: alterações propagadas para artefatos análogos, templates e testes.
 - [ ] Catálogos (`catalog.yaml`, `routing-graph.yaml`, `.index.json`, READMEs) atualizados atomicamente.
 - [ ] `get_errors` executado uma única vez com todos os arquivos alterados.
 - [ ] Zero impacto em código da aplicação.

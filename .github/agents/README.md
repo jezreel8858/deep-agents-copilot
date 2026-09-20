@@ -48,7 +48,6 @@
 | Agent | `performance-agent` | ⚡ ***(NEW)*** Revisa código por performance especializada — Core Web Vitals (frontend), N+1/latência (backend), otimização de query (banco); read-only |
 | Agent | `compliance-guardrails` | 🛡️ ***(NEW)*** Avalia conformidade regulatória de aplicação (SOC 2, GDPR/LGPD, HIPAA, ISO 27001) — audit trails, least privilege, retenção de dado pessoal; distinto de `agent-safety-guardrails` (segurança do próprio agent de IA); read-only |
 | Agent | `feature-planner` | 📋 ***(NEW)*** Decompõe requisito de feature nova em subtasks executáveis com dependências e paralelização; distinto de `refactor-planner` (refatoração de código existente) |
-| Agent | `agentic-memory-manager` | 🧠 ***(NEW)*** Persiste/recupera memória long-term entre sessões (episódica, semântica, procedimental) via `agent-memory-policy`; memória procedimental exige aprovação humana explícita |
 | Agent | `devops-engineer` | 🐳 ***(NEW)*** Revisa Dockerfile, Kubernetes, CI/CD e IaC por segurança/resiliência/boas práticas; read-only |
 | Agent | `debugger` | 🐛 ***(NEW)*** Investiga causa raiz a partir de stack trace/log — call graph, hipótese testável, reprodução mínima; não corrige, complementa `bug-triage` com investigação mais profunda |
 | Agent | `code-style-enforcer` | 🎨 ***(NEW)*** Verifica aderência a convenções de estilo documentadas no adapter de stack; nunca bloqueador, apenas sugestão |
@@ -89,7 +88,6 @@
 | ⚡ Revisão especializada de performance (Core Web Vitals, N+1, query), read-only | `performance-agent` |
 | 🛡️ Avaliação de conformidade regulatória de aplicação (SOC 2, GDPR/LGPD, HIPAA), read-only | `compliance-guardrails` |
 | 📋 Decomposição de feature nova em subtasks executáveis | `feature-planner` |
-| 🧠 Persistência/recuperação de memória long-term entre sessões | `agentic-memory-manager` |
 | 🐳 Revisão de artefatos DevOps (Dockerfile/K8s/CI-CD/IaC), read-only | `devops-engineer` |
 | 🐛 Investigação de causa raiz a partir de stack trace/log | `debugger` |
 | 🎨 Verificação de aderência a convenções de estilo documentadas | `code-style-enforcer` |

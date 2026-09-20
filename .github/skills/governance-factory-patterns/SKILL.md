@@ -39,6 +39,9 @@ Tipo de artefato? → agent | skill | prompt | stack
     ↓
 Já existe artefato/ecossistema equivalente? (busca por nome + escopo semântico)
     ├─ Sim → propor REVISÃO do existente (nunca duplicar)
+    │        [OBRIGATÓRIO - R-055 Systemic Reuse Gate (§3.2)]
+    │        Avaliar Q1 (impacto em peers/irmãos), Q2 (atualização de template) e Q3 (testes no pytest)
+    │        antes de aplicar a alteração, agrupando em lote sistêmico único.
     └─ Não → prosseguir para CRIAÇÃO
     ↓
 [Se CRIAÇÃO — OBRIGATÓRIO] Delegar ao @deep-search via run_subagent:
@@ -100,7 +103,8 @@ Reportar no Formato de Saída (§4 desta skill)
 - [ ] Se `prompt`: nomenclatura `.prompt.md`, frontmatter mínimo (`description`, `model` quando aplicável), separação de responsabilidade clara com `.instructions.md` (não duplicar regra já coberta por adapter).
 - [ ] Se `stack`: diretório isolado criado em `.github/agents/<camada>/<stack>/` contendo `<stack>-catalog.yaml`, `<stack>-router.agent.md` e pacote canônico de especialistas (.agent.md) — ver §11.
 - [ ] Se `stack`: `<stack>-router.agent.md` implementa R-042, banner de visibilidade de fluxo, e consulta ao `@test-strategy` (Fluxo 2 TDD).
-- [ ] Se `stack`: sincronização atômica em 4 arquivos globais (`catalog.yaml` [apenas o router], `routing-graph.yaml`, `agent-router.agent.md`, `README.md`).
+- [ ] [se stack]: sincronização atômica em 4 arquivos globais (`catalog.yaml` [apenas o router], `routing-graph.yaml`, `agent-router.agent.md`, `README.md`).
+- [ ] [se revisão / R-055]: Portão de Reúso Sistêmico avaliado (Q1: peers análogos, Q2: template correspondente, Q3: teste determinístico).
 - [ ] Se `agent`/`prompt`/`stack`: `model:` é string única (nunca array), Title Case oficial (nunca kebab-case), e validado via `get_errors` sem `Unknown model` (§9).
 - [ ] `description` do frontmatter ≤ 500 caracteres (alvo ≤ 400), 1 parágrafo, sem RF-ID/RNF-ID/changelog embutido (§10).
 
@@ -116,6 +120,14 @@ Antes de finalizar o conteúdo (antes do Checklist §3), responder objetivamente
 
 Se qualquer resposta indicar inconsistência: corrigir o conteúdo (remover referência indevida, ajustar redação) **antes** de prosseguir para o Checklist §3 — máximo 1 round de correção automática (alinhado a R-011/regra "Sem Loops"); se ainda inconsistente após 1 round, reportar como bloqueante (R-020) e aguardar orientação.
 
+### 3.2) Portão de Reúso e Generalização Sistêmica (R-055 / Anti-Silo Fix — obrigatório em revisões)
+
+Toda revisão de agent, prompt ou skill DEVE obrigatoriamente passar pelo crivo do *Systemic Reuse Gate* antes de aplicar qualquer alteração, eliminando o anti-padrão de correções em silo (*one-off fixes*):
+
+1. **Q1 (Impacto Horizontal / Peers)**: *Esta melhoria ou correção se aplica a outros artefatos do mesmo perfil, camada ou família (ex.: outros routers, outros testers, outros advisors)?* Se sim, expandir compulsoriamente o lote de alteração para cobrir todos os artefatos análogos na mesma entrega (R-046).
+2. **Q2 (Prevenção Futura / Templates)**: *O template canônico em `templates/` (`router-agent.md`, `operational-agent.md`, etc.) reflete essa nova regra?* Se não, atualizar o template correspondente na mesma entrega para que futuros artefatos gerados pelo `@governance-factory` já nasçam em conformidade.
+3. **Q3 (Blindagem por Teste / Quality Gate)**: *A suíte determinística em `tests/governance_audit/` já valida essa regra?* Se não, criar asserção no pytest para impedir regressões futuras.
+
 ## 4) Formato de Saída — Bloco de Validações ✅/❌ (parametrizável)
 
 ```markdown
@@ -126,6 +138,7 @@ Validações:
 - Campo obrigatório do tipo presente: ✅/❌
 - Não duplica artefato existente: ✅/❌
 - [se criação] Pesquisa prévia via @deep-search executada e incorporada: ✅/❌
+- [se revisão] Portão de Reúso Sistêmico avaliado (R-055 / Q1-Q2-Q3): ✅/❌
 - Catálogo/índice atualizado atomicamente (R-015): ✅/❌
 - README atualizado atomicamente: ✅/❌
 - [se agent] run_subagent presente (R-042): ✅/❌
@@ -301,8 +314,12 @@ A criação de um novo ecossistema de stack (ex.: EJB, React, Python FastAPI) se
   - `<stack>-unit-test-writer` (Testes unitários isolados com mocks)
   - `<stack>-integration-test-writer` (Testes integrados com banco/container real)
   - `<stack>-test-fixer` (Diagnóstico e correção de falhas em suítes de teste)
-- **Frontend (ex.: React)**:
-  - `<stack>-arch-advisor`, `<stack>-feature-developer`, `<stack>-bug-fixer`, `<stack>-ui-stylist`, `<stack>-unit-test-writer`, `<stack>-component-test-writer`, `<stack>-test-fixer`, `<stack>-e2e-writer`.
+- **Frontend (ex.: React, Angular, Vue)**:
+  - `<stack>-arch-advisor` (Read-Only: arquitetura, migrações, performance CWV)
+  - `<stack>-feature-developer` (Test-Last / Implementation-First: componentes, stores, lógica de domínio com testes posteriores)
+  - `<stack>-bug-fixer` (Fixer: runtime errors, memory leaks, diff mínimo sob Test-Last)
+  - `<stack>-ui-stylist` (Apresentação: HTML/CSS/SCSS modular, design tokens, layout responsivo — estritamente visual, **isento de criar ou executar testes unitários**)
+  - `<stack>-unit-test-writer`, `<stack>-component-test-writer`, `<stack>-test-fixer`, `<stack>-e2e-writer` (Especialistas dedicados de teste: cobrem testes unitários, de componente e E2E pós-estabilização sob o modelo Test-Last).
 
 ### 11.5) Quádrupla Sincronização Global Obrigatória (R-015)
 Ao criar a stack, o `governance-factory` DEVE atualizar atomicamente:

@@ -128,6 +128,45 @@ Enquanto o destino da migração for um projeto novo (green-field) ou novo módu
     Então o especialista da stack deve reutilizar a infraestrutura de build existente sem solicitar redefinição de scaffolding.
   ```
 
+### REQ-008 [EARS - Invariante]: Auditoria Reversa e Detecção Mecânica de Órfãos Pós-Migração (Reverse Orphan Audit)
+Após o término da implementação e antes de qualquer autorização de cutover para produção, o motor de migração deve acionar uma auditoria reversa determinística e independente (@code-review + @code-knowledge-graph) que varre 100% da base legada em busca de métodos, queries nativas, classes, tags de configuração XML/properties ou regras de negócio que não possuam correspondência ativa na aplicação moderna ([✅ MIGRADO]) ou justificativa formal de descarte aprovada ([ℹ️ DESACOPLADO] / [🚫 OBSOLETO]). Se qualquer símbolo legado estiver órfão ou omitido, o cutover deve ser sumariamente bloqueado.
+- **Rastreabilidade:** *"preciso consolidar nossa estrategia para o deixar mais deterministico possivel nao dando margem para o agents envolvidos deixarem passar algum código com isso gerando gaps que o usuario precisa indentificar, outro ponto que vc deve pesquisar é sobre o pos migracao para termos uma redundancia"*
+- **Prioridade:** Must Have (MoSCoW)
+- **Critério de Aceite (Gherkin):**
+  ```gherkin
+  Cenário: Bloqueio por detecção de método legado órfão
+    Dado que o módulo legado possui um método privado ou query SQL que não foi contemplado na Matriz De-Para
+    Quando a Etapa 6 de pós-migração executa a auditoria reversa de órfãos
+    Então o sistema deve acusar a divergência ORPHAN_CODE_DETECTED
+    E deve bloquear o cutover final
+    E deve gerar um novo ID de GAP para correção obrigatória no codemod.
+
+  Cenário: Aprovação unânime de exaustão de símbolos legados
+    Dado que 100% dos métodos, queries e rotas legadas possuem correspondência rastreada ou descarte aprovado
+    Quando a auditoria reversa de órfãos conclui a varredura
+    Então o veredito da Reverse Orphan Audit deve ser aprovado com zero órfãos.
+  ```
+
+### REQ-009 [EARS - Invariante]: Testes de Mutação de Paridade & Replay Diferencial (Mutation Resilience & Differential Replay)
+O motor de migração deve executar uma camada redundante de segurança pós-migração constituída por: (1) testes de mutação sintéticos que alteram temporariamente regras e operadores no código moderno para garantir que a suíte Golden Master detecta a mutação (eliminando testes falsos-verdes); e (2) replay diferencial das fixtures canônicas entre o ambiente legado e o moderno, validando paridade exata de outputs, payloads de retorno, eventos de mensageria e integridade de tabelas secundárias de banco de dados.
+- **Rastreabilidade:** *"ter uma redundancia na garantia de que nada passou com isso tendo outra camada de seguranca para que a migracao seja feita na totalidade"*
+- **Prioridade:** Must Have (MoSCoW)
+- **Critério de Aceite (Gherkin):**
+  ```gherkin
+  Cenário: Rejeição de teste de paridade falso-positivo por mutação sobrevivente
+    Dado que uma mutação sintética foi injetada no código moderno alterando uma regra de negócio
+    Quando a suíte de paridade Golden Master é executada contra o código mutado
+    E o teste continua verde (mutante sobreviveu)
+    Então o gate pós-migração deve classificar o teste como frágil/falso-positivo
+    E deve rejeitar a aprovação da migração até que as asserções de paridade sejam reforçadas.
+
+  Cenário: Aprovação em Replay Diferencial com equivalência semântica de 100%
+    Dado que as fixtures são executadas em paralelo contra as stacks de origem e destino
+    Quando o comparador semântico valida respostas, banco de dados e eventos
+    E zero divergências de negócio são registradas
+    Então o Certificado de Paridade Total deve ser gerado autorizando o cutover.
+  ```
+
 ---
 
 ## 3. Requisitos Não-Funcionais (FURPS+)
@@ -173,6 +212,8 @@ O motor de migração deve emitir evidências estruturadas de cada fase:
 | **REQ-005** | Dual-Verification de Paridade Funcional | Funcional | **Must Have** |
 | **REQ-006** | Bloqueio por Desvio de Comportamento (Circuit Breaker) | Funcional | **Must Have** |
 | **REQ-007** | Bootstrapping Interativo de Novo Projeto com Human-in-the-Loop | Funcional | **Must Have** |
+| **REQ-008** | Auditoria Reversa de Órfãos Pós-Migração | Funcional | **Must Have** |
+| **REQ-009** | Testes de Mutação de Paridade & Replay Diferencial | Funcional | **Must Have** |
 | **RNF-001** | Extensibilidade Combinatória $O(N + M)$ | Não-Funcional | **Must Have** |
 | **RNF-002** | Fidelidade Semântica e Limiar Zero de Regressão Silenciosa | Não-Funcional | **Must Have** |
 | **RNF-003** | Conformidade com Governança de Domínio | Não-Funcional | **Must Have** |

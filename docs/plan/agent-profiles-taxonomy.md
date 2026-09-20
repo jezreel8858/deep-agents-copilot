@@ -26,7 +26,7 @@
 | Performance Agent | 🔴 P1 | ✅ **RESOLVIDO** | `performance-agent.agent.md` | `performance-engineering-patterns/SKILL.md` |
 | Compliance Guardrails | 🔴 P1 | ✅ **RESOLVIDO** | `compliance-guardrails.agent.md` | `compliance-governance-patterns/SKILL.md` |
 | Feature Planner (genérico) | 🟡 P2 | ✅ **RESOLVIDO** | `feature-planner.agent.md` | `task-decomposition-patterns/SKILL.md` |
-| Agentic Memory (write) | 🟡 P2 | ✅ **RESOLVIDO** | `agentic-memory-manager.agent.md` | Reaproveitou `agent-memory-policy` existente (R-003) |
+| Agentic Memory (write) | 🟡 P2 | ℹ️ **DESACOPLADO** | `context-mode` FTS5 + `agent-memory-policy` | Gerenciado nativamente pelo context-mode MCP sem agent dedicado (R-008/R-042) |
 | ~~Integration Contract Analysis~~ | ~~🟡 P2~~ | ❌ **NÃO ERA GAP** | — já coberto por `tech-solution-architect` | já existia `integration-contract-analysis` |
 | DevOps Engineer | 🟠 P3 | ✅ **RESOLVIDO** | `devops-engineer.agent.md` | `devops-agent-patterns/SKILL.md` |
 | Debugger (genérico) | 🟠 P3 | ✅ **RESOLVIDO** | `debugger.agent.md` | Reaproveitou `code-tracing` existente (R-003) |

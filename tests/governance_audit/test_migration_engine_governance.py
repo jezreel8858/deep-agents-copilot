@@ -286,3 +286,93 @@ def test_target_project_bootstrapping_requires_human_confirmation():
     ok_existing, msg_existing = evaluate_bootstrapping_flow(is_new_project=False, user_confirmed_options=None)
     assert ok_existing is True
     assert "Projeto existente" in msg_existing
+
+
+# ── Testes de Symbol Exhaustion Gate (REQ-001 / Invariante 13) ──────────────
+
+def test_symbol_exhaustion_gate_contract_evaluation():
+    """Valida que o gate de exaustão de símbolos bloqueia o avanço caso a cobertura seja inferior a 100%"""
+    def evaluate_symbol_exhaustion(total_legacy_symbols: int, mapped_de_para_symbols: int) -> tuple[bool, str]:
+        if total_legacy_symbols <= 0:
+            return False, "Total de símbolos legados deve ser superior a zero para validação mecânica."
+        if mapped_de_para_symbols < total_legacy_symbols:
+            missing = total_legacy_symbols - mapped_de_para_symbols
+            coverage = (mapped_de_para_symbols / total_legacy_symbols) * 100
+            return False, f"Symbol Exhaustion Gate bloqueado: {missing} símbolos legados omitidos na Matriz De-Para (cobertura: {coverage:.1f}% < 100%)."
+        return True, "Symbol Exhaustion comprovado: 100% dos símbolos legados mapeados na Matriz De-Para."
+
+    # Cenário de Sucesso: 100% de símbolos mapeados
+    ok, msg = evaluate_symbol_exhaustion(120, 120)
+    assert ok is True
+    assert "Symbol Exhaustion comprovado" in msg
+
+    # Cenário de Falha: Símbolos esquecidos pelo agente
+    fail_missing, msg_fail = evaluate_symbol_exhaustion(120, 115)
+    assert fail_missing is False
+    assert "5 símbolos legados omitidos" in msg_fail
+
+
+# ── Testes de Validação e Redundância Pós-Migração (REQ-008 / REQ-009 / Etapa 6) ─
+
+def test_post_migration_verification_redundancy_gate_contract():
+    """Valida a tríplice camada de redundância pós-migração exigindo aprovação unânime nos 3 pilares"""
+    def evaluate_post_migration_redundancy(
+        orphans_detected: int,
+        mutants_killed_ratio: float,
+        differential_discrepancies: int
+    ) -> tuple[bool, str]:
+        if orphans_detected > 0:
+            return False, f"Bloqueio de Cutover (Reverse Orphan Audit): {orphans_detected} símbolos/queries legados órfãos detectados sem paridade."
+        if mutants_killed_ratio < 1.0:
+            survived_pct = (1.0 - mutants_killed_ratio) * 100
+            return False, f"Bloqueio de Cutover (Mutation Parity): suíte frágil/falso-positivo detectada ({survived_pct:.1f}% de mutantes sobreviveram)."
+        if differential_discrepancies > 0:
+            return False, f"Bloqueio de Cutover (Differential Shadow Replay): {differential_discrepancies} divergências semânticas em payloads/banco de dados."
+        return True, "Certificado de Paridade Total emitido: tríplice redundância aprovada, cutover autorizado."
+
+    # Cenário 1: Sucesso absoluto (zero órfãos, 100% mutantes eliminados, zero divergências)
+    ok_full, msg_full = evaluate_post_migration_redundancy(0, 1.0, 0)
+    assert ok_full is True
+    assert "Certificado de Paridade Total emitido" in msg_full
+
+    # Cenário 2: Falha por código legado órfão esquecido
+    fail_orphan, msg_orphan = evaluate_post_migration_redundancy(2, 1.0, 0)
+    assert fail_orphan is False
+    assert "Reverse Orphan Audit" in msg_orphan
+    assert "2 símbolos/queries legados órfãos" in msg_orphan
+
+    # Cenário 3: Falha por testes de paridade frágeis (falso-positivo com mutante sobrevivente)
+    fail_mut, msg_mut = evaluate_post_migration_redundancy(0, 0.90, 0)
+    assert fail_mut is False
+    assert "Mutation Parity" in msg_mut
+    assert "mutantes sobreviveram" in msg_mut
+
+    # Cenário 4: Falha por divergência semântica em replay diferencial
+    fail_diff, msg_diff = evaluate_post_migration_redundancy(0, 1.0, 1)
+    assert fail_diff is False
+    assert "Differential Shadow Replay" in msg_diff
+    assert "1 divergências semânticas" in msg_diff
+
+
+# ── Teste Estrutural de Conformidade do WORKFLOW-FRAMEWORK-MIGRATION ─────────
+
+def test_workflow_7_declares_six_canonical_steps_and_post_migration_invariants():
+    """Valida estaticamente em workflows.md que o Workflow 7 possui as 6 etapas canônicas e seus invariantes"""
+    workflows_file = REPO_ROOT / ".github" / "agents" / "workflows.md"
+    assert workflows_file.exists(), "workflows.md deve existir"
+    content = workflows_file.read_text(encoding="utf-8")
+
+    # 1. Deve declarar 6 etapas canônicas no objetivo
+    assert "6 etapas canônicas" in content, "Workflow 7 deve declarar formalmente 6 etapas canônicas"
+
+    # 2. Deve declarar o Estado 6 formalmente
+    assert "Estado 6 — Post-Migration Verification & Redundancy Gate" in content, "Estado 6 deve estar detalhado na cadeia sequencial"
+    assert "Reverse Orphan Audit" in content, "Reverse Orphan Audit deve estar presente"
+    assert "Mutation Parity Resilience" in content, "Mutation Parity Resilience deve estar presente"
+    assert "Differential Shadow Replay" in content, "Differential Shadow Replay deve estar presente"
+
+    # 3. Deve declarar o Invariante 13 em § 5
+    assert "13. **Invariante de Exaustão de Símbolos e Tríplice Redundância Pós-Migração" in content, "Invariante 13 deve estar formalizado em § 5"
+
+    # 4. Deve declarar o template de 6 etapas na Seção 6.2
+    assert "Pipeline de Execução: WORKFLOW-FRAMEWORK-MIGRATION (6 etapas)" in content, "Template visual deve ter 6 etapas"

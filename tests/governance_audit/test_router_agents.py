@@ -220,27 +220,42 @@ def test_central_router_output_format_contract():
 # 5. Tooling Estrito: Menor Privilégio & Sem Ferramentas Mutativas em Domain Routers
 # ─────────────────────────────────────────────────────────────
 
-def test_domain_routers_tooling_least_privilege_and_no_mutation():
+def test_all_routers_and_template_tooling_strict_least_privilege():
     """
-    Valida restrições de ferramentas para supervisores hierárquicos de domínio:
+    Valida restrições de ferramentas para TODOS os routers (central, domain routers e template) (R-054 / Smell 2.23):
     - OBRIGATÓRIO: run_subagent (R-042 - fundamental para despacho)
-    - OBRIGATÓRIO: ferramentas de leitura e busca (read_file, list_dir, file_search, etc.)
-    - PROIBIDO: ferramentas mutativas de código (insert_edit_into_file, create_file, replace_string_in_file)
+    - CONJUNTO PERMITIDO: estritamente o baseline canônico de roteamento
+    - PROIBIDO: ferramentas mutativas de código (insert_edit_into_file, create_file, replace_string_in_file, apply_patch)
+    - PROIBIDO: ferramentas de execução pesada, terminal ou sandbox (run_in_terminal, ctx_execute, ctx_execute_file, ctx_batch_execute)
     """
-    mutation_tools = {"insert_edit_into_file", "create_file", "replace_string_in_file"}
+    all_routers = get_all_router_agents() + [ROUTER_TEMPLATE]
+    prohibited_tools = {
+        "insert_edit_into_file", "create_file", "replace_string_in_file", "apply_patch",
+        "run_in_terminal", "context-mode/ctx_execute", "context-mode/ctx_execute_file",
+        "context-mode/ctx_batch_execute"
+    }
+    allowed_tools = {
+        "read_file", "file_search", "grep_search", "list_dir",
+        "ask_questions", "run_subagent", "context-mode/ctx_search"
+    }
 
-    for router_path in get_domain_router_agents():
+    for router_path in all_routers:
         fm = parse_frontmatter(router_path.read_text(encoding="utf-8"))
         tools = set(fm.get("tools", []))
         rel_path = router_path.relative_to(REPO_ROOT)
 
         assert "run_subagent" in tools, (
-            f"[{rel_path}] Domain router não possui 'run_subagent' em tools: (R-042)"
+            f"[{rel_path}] Router não possui 'run_subagent' em tools: (R-042)"
         )
-        
-        prohibited = tools.intersection(mutation_tools)
+
+        prohibited = tools.intersection(prohibited_tools)
         assert not prohibited, (
-            f"[{rel_path}] Domain router possui ferramentas mutativas proibidas para supervisor: {prohibited}"
+            f"[{rel_path}] Router possui ferramentas proibidas de mutação/execução: {prohibited}"
+        )
+
+        unapproved = tools - allowed_tools
+        assert not unapproved, (
+            f"[{rel_path}] Router possui ferramentas fora do baseline canônico de Least Privilege: {unapproved}"
         )
 
 
@@ -290,3 +305,47 @@ def test_domain_routers_conform_to_canonical_router_template():
             f"  Esperado: {tpl_h2s}\n"
             f"  Encontrado: {actual_h2s}"
         )
+
+
+# ─────────────────────────────────────────────────────────────
+# 8. R-054 — Zero Discovery, Flat Delegation e Smell 2.23
+# ─────────────────────────────────────────────────────────────
+
+def test_all_routers_declare_zero_discovery_guardrail():
+    """Valida se TODOS os routers (central, domain routers e template) declaram formalmente
+    a regra mandatória de ZERO TOOL CALLS DE DISCOVERY em suas restrições críticas (R-054 / Smell 2.23)."""
+    all_routers = get_all_router_agents() + [ROUTER_TEMPLATE]
+
+    for router_path in all_routers:
+        content = router_path.read_text(encoding="utf-8")
+        rel_path = router_path.relative_to(REPO_ROOT)
+
+        assert "ZERO TOOL CALLS DE DISCOVERY" in content or "Zero Discovery" in content, (
+            f"[{rel_path}] Router não declara o guardrail obrigatório de 'ZERO TOOL CALLS DE DISCOVERY' (R-054)"
+        )
+
+
+def test_all_routers_declare_flat_delegation_rule():
+    """Valida se TODOS os routers (central, domain routers e template) declaram formalmente
+    o modelo de Delegação Plana (Flat Delegation) (R-047 / R-054 / Smell 2.20)."""
+    all_routers = get_all_router_agents() + [ROUTER_TEMPLATE]
+
+    for router_path in all_routers:
+        content = router_path.read_text(encoding="utf-8")
+        rel_path = router_path.relative_to(REPO_ROOT)
+
+        assert "Flat Delegation" in content or "Delegação Plana" in content, (
+            f"[{rel_path}] Router não declara a regra de 'Delegação Plana (Flat Delegation)' (R-054)"
+        )
+
+
+def test_smell_2_23_router_over_empowerment_documented():
+    """Valida se o Smell 2.23 (Router Over-Empowerment e Pre-Routing Discovery Bloat)
+    está documentado em governance-audit-patterns/SKILL.md."""
+    skill_path = REPO_ROOT / ".github" / "skills" / "governance-audit-patterns" / "SKILL.md"
+    assert skill_path.exists()
+    content = skill_path.read_text(encoding="utf-8")
+    assert "2.23" in content, "Smell 2.23 deve estar documentado em governance-audit-patterns/SKILL.md"
+    assert "ZERO TOOL CALLS DE DISCOVERY" in content or "Zero Discovery" in content, (
+        "Smell 2.23 deve documentar a regra de Zero Discovery"
+    )

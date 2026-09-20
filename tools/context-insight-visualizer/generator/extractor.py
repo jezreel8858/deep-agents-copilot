@@ -24,7 +24,7 @@ from typing import Any, Dict, List, Optional, Tuple
 def load_known_agents() -> set:
     """Carrega dinamicamente a lista de agentes do catálogo e inclui agentes canônicos."""
     known = {
-        "adapter-generator", "agent-auditor", "agent-router", "agentic-memory-manager",
+        "adapter-generator", "agent-auditor", "agent-router",
         "analysis-architect", "angular-arch-advisor", "angular-bug-fixer",
         "angular-component-test-writer", "angular-e2e-writer", "angular-feature-developer",
         "angular-router", "angular-test-fixer", "angular-ui-stylist", "angular-unit-test-writer",

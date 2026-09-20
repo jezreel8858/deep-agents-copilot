@@ -4,7 +4,7 @@
   "id": "angular-ui-stylist",
   "name": "Angular Ui Stylist",
   "version": "1.0.0",
-  "description": "Especialista de apresentação: refatora templates com Control Flow (@if/@for), implementa SCSS modular (:host), layout responsivo mobile-first e conformidade WCAG 2.2 AA.",
+  "description": "Especialista de apresentação: refatora templates com Control Flow (@if/@for), implementa SCSS modular (:host), layout responsivo mobile-first e conformidade WCAG 2.2 AA (estritamente visual, isento de criar ou rodar testes unitários).",
   "domain": "Templates HTML5, SCSS modular, layout responsivo e acessibilidade WCAG",
   "role": "specialist",
   "capabilities": [

@@ -41,17 +41,24 @@ Exemplos:
 
 ### Nível 3: Contexto de Binding e Artefatos de Governança
 
-**Local:** `.github/instructions/`
+**Local:** `.github/instructions/` e `.github/agents/`
 
-- **`catalog.yaml`** — Manifest único de adapters, projetos e mapping stack → instrução; inclui seção `governance_artefacts` com artefatos estruturais de IA
-- **`binding.md`** — Documentação de binding e descoberta
+- **`instructions/README.md`** — Mapa de adapters registrados, `applyTo` patterns e carregamento hierárquico
+- **`catalog.yaml`** — Catálogo central de agents com modelos recomendados e papéis
 - **`routing-graph.yaml`** — ⭐ **Grafo de roteamento declarado** (nós = agents, arestas = condições, política de cascata) — fonte de verdade estrutural do `agent-router` (R-040)
+- **`evals/casos-roteamento.yaml`** — Suíte de casos de teste de regressão de roteamento (canônicos, ambíguos, regressão, segurança)
 
-**Suítes de Evals:**
-- **`.github/agents/evals/casos-roteamento.yaml`** — Suíte de casos de teste de regressão de roteamento (canônicos, ambíguos, regressão, segurança)
+### Nível 4: Portal Unificado de Documentação (Diátaxis & arc42)
+
+**Local:** [`docs/README.md`](docs/README.md)
+
+Centraliza todo o conhecimento técnico em quatro quadrantes Diátaxis:
+- 🎓 **Tutoriais**: Primeiros passos, setup de ambiente e motor de grafo.
+- 🛠️ **Guias Práticos (How-To)**: Execução dos 8 workflows determinísticos, scanner de projetos e context-mode.
+- 📖 **Referência Técnica**: Catálogos de agentes/skills, regras normativas R-001..R-056 e Schemas JSON (AgentCard, Semantic IR, Incidentes).
+- 💡 **Conceitos & Arquitetura**: [Guia de Arquitetura arc42](docs/architecture/ARCHITECTURE_AND_GOVERNANCE_GUIDE.md) e [Guia de Documentação em Governança de IA](docs/architecture/AI_GOVERNANCE_DOCUMENTATION_GUIDE.md) (alinhado a NIST AI RMF, ISO 42001 e OWASP Agentic AI).
 
 ---
-
 
 ## Estrutura Física do Repositório
 
@@ -186,7 +193,7 @@ flowchart TD
     E & WF --> G3["💻 Implementation (Domain Routers & Specialists)\nangular-router · spring-boot-router · spring-reactive-router\nejb-router · python-router · database-router · database-specialist"]
     E & WF --> G4["✅ Quality/Validation\nbug-triage · debugger · test-strategy\ncode-review · code-style-enforcer · security-reviewer\nperformance-agent · devops-engineer · runtime-verifier\nrepo-hygiene-auditor"]
     E & WF --> G5["📚 Documentation/Learning\ndocs-engineer"]
-    E & WF --> G6["🔄 Governance/Orchestration\ngovernance-factory · governance-maintainer\nagent-auditor · binding-initializer\nadapter-generator · agentic-memory-manager\ncompliance-guardrails · pr-gatekeeper"]
+    E & WF --> G6["🔄 Governance/Orchestration\ngovernance-factory · governance-maintainer\nagent-auditor · binding-initializer\nadapter-generator · compliance-guardrails · pr-gatekeeper"]
 
     G1 & G2 & G3 & G4 & G5 & G6 --> K["Resultado\n(turno N)"]
     K --> L["/commit\nmensagem gerada"]
@@ -234,7 +241,7 @@ Frameworks de referência (Claude Code/Agent SDK da Anthropic, Microsoft Agent F
 | 💻 Implementation | Coder por stack, Debugger, DB Specialist | `angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `python-router`, `database-router`, `database-specialist` | ✅ 100% |
 | ✅ Quality & Validation | Test Strategy/Impl, Reviewer, Security, Performance, QA, Runtime | `bug-triage`, `debugger`, `test-strategy`, `code-review`, `code-style-enforcer`, `security-reviewer`, `performance-agent`, `devops-engineer`, `runtime-verifier`, `repo-hygiene-auditor` | ✅ 100% |
 | 📚 Documentation & Learning | Docs Engineer, Context Builder | `docs-engineer` | ✅ 100% |
-| 🔄 Governance & Orchestration | Router, Memory Manager, Guardrails, Factories, Gatekeeper, Maintainer | `agent-router`, `prompt-structuring`, `governance-factory`, `governance-maintainer`, `agent-auditor`, `binding-initializer`, `adapter-generator`, `agentic-memory-manager`, `compliance-guardrails`, `pr-gatekeeper` | ✅ 100% |
+| 🔄 Governance & Orchestration | Router, Memory Manager, Guardrails, Factories, Gatekeeper, Maintainer | `agent-router`, `prompt-structuring`, `governance-factory`, `governance-maintainer`, `agent-auditor`, `binding-initializer`, `adapter-generator`, `compliance-guardrails`, `pr-gatekeeper` | ✅ 100% |
 
 **Resultado**: **36 agents ativos**, cobrindo **~95% dos 22 perfis consolidados de mercado** — nível de maturidade comparável ao modelo de referência SpecWeave (11 agents core, expandido aqui com granularidade enterprise adicional em segurança/performance/compliance/banco de dados).
 
@@ -280,7 +287,7 @@ flowchart TB
         subgraph CAT6["🔄 GOVERNANCE &amp; ORCHESTRATION"]
             direction TB
             F1["agent-router ⭐"] ~~~ F2[prompt-structuring] ~~~ F3[governance-factory] ~~~ F4[agent-auditor] ~~~ F5[binding-initializer]
-            F6[adapter-generator] ~~~ F7["agentic-memory-manager 🧠"] ~~~ F8["compliance-guardrails 🛡️"] ~~~ F9["pr-gatekeeper 📦"] ~~~ F10["governance-maintainer 🛠️"]
+            F6[adapter-generator] ~~~ F8["compliance-guardrails 🛡️"] ~~~ F9["pr-gatekeeper 📦"] ~~~ F10["governance-maintainer 🛠️"]
         end
 
         CAT4 ~~~ CAT5 ~~~ CAT6
@@ -338,13 +345,17 @@ flowchart TB
 
 ---
 
-## Status Atual (2026-09-10)
+## Status Atual (2026-09-19 — Versão 2.19.0)
 
-### Governança Global
-- ✅ Regras normativas consolidadas (`CLAUDE.md`)
-- ✅ Roteamento operacional (`copilot-instructions.md`)
-- ✅ Genericidade explícita em todas as regras globais (R-038)
-- ✅ Re-triagem obrigatória por turno (R-042 — anti sticky-session), fechando o gap de agent downstream que perdia a inteligência de roteamento após o 1º turno
+### Governança Global & Blindagem Sistêmica
+- ✅ **Regras normativas consolidadas** (`CLAUDE.md` — Regras R-001 a R-056).
+- ✅ **Governança Estrita de Routers (R-054 / Smell 2.23)**: Least privilege com baseline de 7 tools, Zero Pre-Routing Discovery e Flat Delegation universal para eliminar consumo inútil de créditos.
+- ✅ **Portão de Reúso e Generalização Sistêmica (R-055 — Anti-Silo Fix)**: Avaliação compulsória de impacto em peers (Q1), templates canônicos (Q2) e testes determinísticos (Q3) em qualquer manutenção.
+- ✅ **Precedência Mandatória de Context Mode (R-056 / Smell 2.24)**: Primazia absoluta de sandboxing e Think-in-Code para escritas/refatorações, erradicando o anti-padrão de editor tool sprawl no chat.
+- ✅ **Workflows Canônicos Determinísticos (R-050)**: 8 workflows operacionais com State Machines rígidas e banners visuais anti-cegueira.
+- ✅ **Migração Determinística com Tríplice Redundância Pós-Migração**: Elevação do `WORKFLOW-FRAMEWORK-MIGRATION` para 6 etapas canônicas com Symbol Exhaustion Gate, Anti-Omission AST Validator, Reverse Orphan Audit, Mutation Parity e Differential Shadow Replay.
+- ✅ **Portal Unificado de Documentação & Framework Diátaxis**: Centralização em [`docs/README.md`](docs/README.md) e formalização do [`AI_GOVERNANCE_DOCUMENTATION_GUIDE.md`](docs/architecture/AI_GOVERNANCE_DOCUMENTATION_GUIDE.md) alinhado a NIST AI RMF, ISO 42001 e OWASP Agentic AI.
+- ✅ **Suíte de Testes Automatizados**: **169 testes determinísticos 100% passando** no pytest.
 
 ### Adapters de Stack
 - ✅ `spring-boot-backend.instructions.md` — Java/Spring Boot
@@ -353,7 +364,7 @@ flowchart TB
 - ✅ `database.instructions.md` — Banco de dados / Migrações
 - ✅ `devops.instructions.md` — Docker, Kubernetes, CI/CD
 
-### Agents (36 catalogados — ver [§ Cobertura de Mercado](#cobertura-de-mercado--perfis-de-agents) para o mapa completo)
+### Agents (35 catalogados — ver [§ Cobertura de Mercado](#cobertura-de-mercado--perfis-de-agents) para o mapa completo)
 - ✅ `agent-router` v1.5.0 — PASSO 0.3 de re-triagem por deriva de intenção (R-042), output com campo `Agente Ativo`, roteamento direto para todos os 32 agents downstream
 - ✅ `prompt-structuring` — passo mandatório pós-Health Check (R-041), loop de auto-refinamento (máx. 5 iterações)
 - ✅ 34 agents downstream especializados, agrupados por função:
@@ -362,17 +373,17 @@ flowchart TB
   - **Implementação (Domain Routers & Specialists):** `angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `python-router`, `database-router`, `database-specialist`
   - **Qualidade/Validação:** `bug-triage`, `debugger`, `test-strategy`, `code-review`, `code-style-enforcer`, `security-reviewer`, `performance-agent`, `devops-engineer`, `runtime-verifier`
   - **Documentação:** `docs-engineer` (modos `author`/`curate`)
-  - **Governança de Agents/Skills/Prompts/Memória/Entrega:** `governance-factory`, `governance-maintainer`, `agent-auditor`, `binding-initializer`, `adapter-generator`, `agentic-memory-manager`, `compliance-guardrails`, `pr-gatekeeper`
+  - **Governança de Agents/Skills/Prompts/Memória/Entrega:** `governance-factory`, `governance-maintainer`, `agent-auditor`, `binding-initializer`, `adapter-generator`, `compliance-guardrails`, `pr-gatekeeper`
 
 ### Skills (58 indexadas)
 - ✅ Tier 1 (Core): `context-mode`, `efficient-batch-code-modification`, `agent-contracts`, `handoff-governance`, `confidence-fallback-policy`, `agent-safety-guardrails`, `terminal-governance`, `code-tracing`, `business-rules-governance`, `java-jdk-backend-governance`
 - ✅ Tier 2 (Support): 42 skills cobrindo testing (backend/frontend/Spring Boot/Angular/Python), observability, quality, tooling, research, frontend patterns, backend patterns, **documentation** (`documentation-writing-patterns`), **requisitos** (`requirements-engineering-patterns`), **segurança** (`security-review-patterns`), **performance** (`performance-engineering-patterns`), **compliance** (`compliance-governance-patterns`), **decomposição de tarefas** (`task-decomposition-patterns`) e **DevOps** (`devops-agent-patterns`)
-- ✅ Tier 3 (Experimental): `agent-memory-policy` — memória episódica/semântica/procedimental (reaproveitada por `agentic-memory-manager`)
+- ✅ Tier 3 (Experimental): `agent-memory-policy` — memória episódica/semântica/procedimental
 
 ### Consolidações e Gaps de Mercado Fechados (2026-09-02)
 - ✅ Fusões canônicas para redução de redundância semântica: `test-strategy` (estratégia e matriz de risco), `docs-engineer` (unifica author/curate) e `governance-factory` (unifica agent/skill/prompt factory).
 - ✅ Novos perfis especializados enterprise integrados: `runtime-verifier` (read-only pre-flight), `pr-gatekeeper` (preparação de PR pós quality gate) e `database-specialist` (migrações de schema e integridade).
-- ✅ 9 agents de maturidade enterprise adicionados anteriormente: `security-reviewer`, `performance-agent`, `compliance-guardrails`, `feature-planner`, `agentic-memory-manager`, `devops-engineer`, `debugger`, `code-style-enforcer`, `refactor-executor`.
+- ✅ 9 agents de maturidade enterprise adicionados anteriormente: `security-reviewer`, `performance-agent`, `compliance-guardrails`, `feature-planner`, `devops-engineer`, `debugger`, `code-style-enforcer`, `refactor-executor`.
 - ✅ Governança sincronizada atomicamente (R-015/R-040): `catalog.yaml`, `README.md` (raiz e agents), `routing-graph.yaml` (42 nós) e `casos-roteamento.yaml`.
 - ✅ Cobertura de perfis de mercado: **~95% dos 22 perfis consolidados**.
 
