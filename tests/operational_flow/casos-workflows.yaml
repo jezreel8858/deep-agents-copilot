@@ -189,7 +189,7 @@ cenarios:
         nome_etapa: "Elicitação de Requisitos"
         agente: "requirements-analyst"
         invariantes:
-          proibir_mutacao: true
+          proibir_mutacao: false
           exigir_banner: "Agente Ativo: requirements-analyst"
         output_esperado:
           - "Critérios de Aceite (Gherkin)"

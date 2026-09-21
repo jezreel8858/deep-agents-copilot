@@ -224,3 +224,101 @@ def test_all_mutating_agents_declare_r056_and_explicit_prohibition():
         f"Violação de R-056 / Smell 2.24 em {len(violations)} agentes mutadores:\n"
         + "\n".join(violations)
     )
+
+
+def test_smell_2_26_documented_in_governance_audit_patterns():
+    """Valida se o Smell 2.26 está catalogado na skill de auditoria com remediação e detecção."""
+    skill_file = SKILLS_DIR / "governance-audit-patterns" / "SKILL.md"
+    assert skill_file.exists()
+    content = skill_file.read_text(encoding="utf-8")
+
+    assert "2.26" in content, "governance-audit-patterns/SKILL.md DEVE catalogar o Smell 2.26"
+    assert "MCP Tool Chaining Sequencial no Chat" in content, (
+        "Smell 2.26 DEVE identificar o anti-padrão de MCP Tool Chaining Sequencial no Chat"
+    )
+    assert "ctx_batch_execute" in content, (
+        "Smell 2.26 DEVE referenciar ctx_batch_execute"
+    )
+    assert "Single-Turn MCP Batching" in content, (
+        "Smell 2.26 DEVE referenciar a exigência de Single-Turn MCP Batching"
+    )
+
+
+def test_mcp_batch_execution_and_tool_chaining_prohibition_in_normative_docs():
+    """Valida se CLAUDE.md, copilot-instructions.md, efficient-batch e context-mode proíbem tool chaining sequencial."""
+    claude_file = REPO_ROOT / "CLAUDE.md"
+    ci_file = REPO_ROOT / ".github" / "copilot-instructions.md"
+    eff_file = SKILLS_DIR / "efficient-batch-code-modification" / "SKILL.md"
+    ctx_file = SKILLS_DIR / "context-mode" / "SKILL.md"
+
+    for path_obj, name in [
+        (claude_file, "CLAUDE.md"),
+        (ci_file, "copilot-instructions.md"),
+        (eff_file, "efficient-batch-code-modification/SKILL.md"),
+        (ctx_file, "context-mode/SKILL.md"),
+    ]:
+        assert path_obj.exists(), f"{name} deve existir"
+        c = path_obj.read_text(encoding="utf-8")
+        assert "Single-Turn MCP Batching" in c or "Single-Turn Batching" in c, (
+            f"[{name}] DEVE referenciar Single-Turn Batching"
+        )
+        assert "Smell 2.26" in c or "Tool Chaining" in c or "tool chaining" in c, (
+            f"[{name}] DEVE referenciar Smell 2.26 ou proibição de tool chaining sequencial"
+        )
+        assert "ctx_batch_execute" in c, f"[{name}] DEVE citar ctx_batch_execute"
+
+
+def test_all_agents_with_ctx_execute_declare_ctx_batch_execute():
+    """
+    Valida que 100% dos agentes que declaram context-mode/ctx_execute
+    também declaram compulsoriamente context-mode/ctx_batch_execute em tools: (Smell 2.26).
+    """
+    import re
+
+    agent_files = [
+        p for p in AGENTS_DIR.glob("**/*.agent.md")
+        if "templates" not in p.parts
+    ]
+    assert len(agent_files) >= 40
+
+    missing_batch = []
+    for af in agent_files:
+        c = af.read_text(encoding="utf-8")
+        fm_match = re.match(r"^---s*\n(.*?)\n---", c, re.DOTALL)
+        if not fm_match:
+            continue
+        fm_text = fm_match.group(1)
+        tools_match = re.search(r"tools:\s*(\[[^\]]*\])", fm_text)
+        if not tools_match:
+            continue
+        tools_str = tools_match.group(1)
+        if "context-mode/ctx_execute" in tools_str and "context-mode/ctx_batch_execute" not in tools_str:
+            missing_batch.append(str(af.relative_to(REPO_ROOT)))
+
+    assert not missing_batch, (
+        f"Smell 2.26: {len(missing_batch)} agentes possuem ctx_execute mas não possuem ctx_batch_execute:\n"
+        + "\n".join(missing_batch)
+    )
+
+
+def test_catalog_yaml_declares_ctx_batch_execute_for_all_ctx_execute_agents():
+    """
+    Valida que toda entrada em catalog.yaml que declara context-mode/ctx_execute
+    também declara context-mode/ctx_batch_execute em tools:.
+    """
+    import yaml
+
+    cat_file = AGENTS_DIR / "catalog.yaml"
+    assert cat_file.exists()
+    cat_data = yaml.safe_load(cat_file.read_text(encoding="utf-8"))
+
+    agents = cat_data.get("agents", {})
+    missing_in_cat = []
+    for ag_id, ag_info in agents.items():
+        tools = ag_info.get("tools", [])
+        if "context-mode/ctx_execute" in tools and "context-mode/ctx_batch_execute" not in tools:
+            missing_in_cat.append(ag_id)
+
+    assert not missing_in_cat, (
+        f"catalog.yaml possui agentes com ctx_execute sem ctx_batch_execute: {missing_in_cat}"
+    )

@@ -154,6 +154,7 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 | **Fixer / Bug-Fixer / Test-Fixer**<br>*(ex.: `*-bug-fixer`, `*-test-fixer`)* | `read_file`, `insert_edit_into_file`, `get_errors`, `run_in_terminal`, `ask_questions`, `run_subagent`, `context-mode/*` | ❌ Ausência de `get_errors` | `code-tracing` (para bug-fixer), skill da stack |
 | **Tester / Test-Writer**<br>*(ex.: `*-unit-test-writer`, `*-component-test-writer`, `*-integration-test-writer`, `*-e2e-writer`)* | `read_file`, `create_file`, `insert_edit_into_file`, `get_errors`, `run_in_terminal`, `ask_questions`, `run_subagent`, `context-mode/*` | ❌ Ausência de `get_errors` | `test-implementation-*` correspondente |
 | **Domain Router / Supervisor**<br>*(ex.: `*-router`)* | `read_file`, `file_search`, `grep_search`, `list_dir`, `ask_questions`, `run_subagent`, `context-mode/ctx_search` | ❌ `create_file`, `insert_edit_into_file`, `run_in_terminal` | `agent-contracts`, `handoff-governance` |
+| **Analista / Híbrido Documental**<br>*(ex.: `business-rules-extractor`, `requirements-analyst`)* | `read_file`, `grep_search`, `file_search`, `list_dir`, `create_file`, `insert_edit_into_file`, `get_errors`, `ask_questions`, `run_subagent`, `context-mode/*` | ❌ `run_in_terminal`, alteração fora de `docs/` | `agent-contracts`, `efficient-batch-code-modification`, skill de domínio |
 
 #### Invariantes Transversais de Tooling:
 1. **Tool `run_in_terminal` presente** ➔ **OBRIGATÓRIO** declarar a skill `terminal-governance` nas `skills:` e/ou `source_docs:` de `.agent.md`, `.prompt.md` e em `catalog.yaml` / sub-catálogos locais (R-049).
@@ -364,13 +365,24 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 | Severidade | **Bloqueador** (interrompe o fluxo autônomo agent-first e desrespeita a divisão de responsabilidades entre agentes analíticos e executores). |
 | Remediação | (a) Injeção da cláusula R-057 no bloco CRÍTICO de todos os agentes analíticos/read-only e templates canônicos (`research-agent.md`, `agent-template.md`, `router-agent.md`); (b) Blindagem dos workflows canônicos em `workflows.md` com invariante explícito de avanço compulsório da etapa diagnóstica para a etapa executora; (c) Formalização de teste determinístico no pytest (`test_anti_manual_user_delegation_governance.py`). |
 
+---
+### 2.26 — MCP Tool Chaining Sequencial no Chat / Omissão de ctx_batch_execute e Script Consolidado (R-008 / R-046 / R-056)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Um agente executa múltiplas chamadas individuais de `ctx_execute` sequenciais em turnos separados do chat para analisar diffs, arquivos, branches ou comandos (ex.: 10+ turnos sucessivos), reenviando todo o histórico acumulado do chat a cada turno e drenando tokens e créditos desnecessariamente, em vez de consolidar a análise em uma única rodada via `ctx_batch_execute` ou via script Node.js/Python iterativo consolidado no sandbox |
+| Como detectar | (a) Histórico de chamadas evidenciando sucessivos turnos com `ctx_execute` unitários para inspecionar alvos correlacionados; (b) Agente com `context-mode/ctx_execute` em `tools:` que omite `context-mode/ctx_batch_execute`; (c) Ausência da regra mandatória de Single-Turn MCP Batching e da proibição de Tool Chaining sequencial no bloco CRÍTICO/Diretrizes do agente ou template |
+| Origem (TrustAgent) | Intrínseco — miopia conversacional e ausência de agregação em memória, onde o modelo trata cada arquivo ou comando como um turno conversacional separado em vez de orquestrar a operação em lote no sandbox |
+| Severidade | **Bloqueador** (desperdício exponencial de créditos e tokens LLM, latência excessiva por roundtrips desnecessários e risco de exaustão da janela de contexto) |
+| Remediação | (a) Declarar compulsoriamente `'context-mode/ctx_batch_execute'` no frontmatter `tools:` de todos os agentes que operam com context-mode; (b) Injetar a cláusula de proibição de MCP Tool Chaining sequencial no bloco CRÍTICO/Diretrizes do agente e templates; (c) Consolidar inspeções múltiplas em `ctx_batch_execute` (com comandos e queries unificadas) ou em script síncrono único em `ctx_execute` |
+
 ## 3) Severidade — Reaproveitamento da Taxonomia Existente
 
 Esta skill **reaproveita** (não recria) a taxonomia de `code-review-patterns`:
 
 | Severidade | Critério Objetivo de Enquadramento |
 |---|---|
-| **Bloqueador** | Gap que impede o funcionamento técnico ou a governança do artefato: falta de `run_subagent` (R-042); `model:` inválido ou desconhecido (`Unknown model`); tool de escrita em agent read-only; uso de terminal sem `terminal-governance`; vazamento de evidência real de projeto (R-044); dessincronização crítica no catálogo (R-015); ou terceirização manual ao usuário por agent analítico (R-057 / Smell 2.25). |
+| **Bloqueador** | Gap que impede o funcionamento técnico ou a governança do artefato: falta de `run_subagent` (R-042); `model:` inválido ou desconhecido (`Unknown model`); tool de escrita em agent read-only; uso de terminal sem `terminal-governance`; vazamento de evidência real de projeto (R-044); dessincronização crítica no catálogo (R-015); terceirização manual ao usuário por agent analítico (R-057 / Smell 2.25); ou MCP tool chaining sequencial no chat / omissão de ctx_batch_execute (Smell 2.26). |
 | **Alto** | Gap que gera desperdício severo de tokens/créditos, duplicação de manutenção ou risco de drift: violação de batching (R-046); divergência de templates canônicos (ausência de escopo ✅/❌ ou workflow); falta de variáveis nativas em prompts; código inline > 8 linhas em skills (R-026); ou sobreposição funcional ativa entre 2 agents. |
 | **Sugestão** | Melhoria técnica não urgente ou cosmética: refinamento de `argument-hint`; ajuste fino de `description` dentro do limite; ou gap taxonômico de categoria intencionalmente não coberta. |
 
@@ -385,7 +397,7 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 
 | Smell | Local(is) afetado(s) | Severidade | Remediação sugerida | Agent a acionar |
 |---|---|---|---|---|
-| <2.1..2.25> | <arquivo(s)> | Bloqueador/Alto/Sugestão | <ação objetiva> | <@governance-factory/@docs-engineer/@governance-maintainer> |
+| <2.1..2.26> | <arquivo(s)> | Bloqueador/Alto/Sugestão | <ação objetiva> | <@governance-factory/@docs-engineer/@governance-maintainer> |
 
 ## Resumo por Severidade
 - Bloqueador: N
@@ -398,7 +410,7 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 
 ## 6) Checklist de Conformidade da Auditoria
 
-- [ ] Todo achado classificado estritamente em uma das 21 categorias de smell (2.1..2.21).
+- [ ] Todo achado classificado estritamente em uma das 26 categorias de smell (2.1..2.26).
 - [ ] Severidade reaproveitada de `code-review-patterns` (Bloqueador/Alto/Sugestão).
 - [ ] Origem classificada como intrínseca ou extrínseca (TrustAgent) quando relevante.
 - [ ] Remediação aponta agent executor real do catálogo (nunca "corrigir diretamente" — agent de auditoria é estritamente read-only).
@@ -413,7 +425,7 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 ## 7) Anti-padrões
 
 - ❌ Agent de auditoria aplicar a correção diretamente (deve ser read-only — só análise e recomendação).
-- ❌ Inventar categoria de smell fora das 20 catalogadas nesta skill.
+- ❌ Inventar categoria de smell fora das 26 catalogadas nesta skill.
 - ❌ Duplicar taxonomia de severidade ou checklist de segurança já existentes em outras skills.
 - ❌ Reportar achado sem apontar agent executor de remediação (relatório inacionável).
 - ❌ Classificar achados como Bloqueadores sem critério estrutural comprovado.
