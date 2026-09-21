@@ -7,13 +7,14 @@ description:
   ecossistema via `ask_questions` (1 pergunta) e gera o esqueleto dos artefatos.
   Projetos são adicionados depois via `/add-project-context`.
 model: "Gemini 3.8 Flash"
-tools: ['ask_questions', 'read_file', 'create_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
+tools: ['ask_questions', 'context-mode/ctx_execute', 'read_file', 'create_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
   - .github/skills/project-scanner/SKILL.md
   - .github/skills/project-context-builder/SKILL.md
   - .github/skills/context-mode/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 
 # Inicializador de Binding Context
@@ -44,10 +45,12 @@ Você é um agente operacional especializado em inicializar a **infraestrutura d
 - ❌ Não perguntar sobre projetos, stacks ou adapter types — isso é responsabilidade de `/add-project-context`.
 - ❌ **NUNCA criar arquivos fora de `./.github/` deste repositório.**
 - ❌ **Não disparar `adapter-generator` automaticamente — `adapter-generator` é chamado por `/add-project-context`.**
+- ❌ NÃO usar ferramentas nativas de editor (`read_file`, `insert_edit_into_file`, `replace_string_in_file`, `create_file`) nem comandos de leitura/inspeção em terminal quando o context-mode estiver disponível no ambiente. O uso de `context-mode` (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_search`, `ctx_index`) é 100% OBRIGATÓRIO para ler e modificar arquivos (R-008 / R-056 / Smell 2.24).
 - ✅ APENAS coletar o nome do ecossistema (1 pergunta) e gerar esqueleto.
 - ✅ Gerar o esqueleto **inline** a partir do template fixo neste próprio agent (seção "Esqueletos Inline") — não há mais arquivos `catalog-base.yaml`/`binding-base.md` externos (removidos por obsolescência: divergiam estruturalmente de `catalog.yaml` real e tornavam o fluxo de regeneração destrutivo).
 - ✅ Arquivos criados são SEMPRE relativos à raiz deste repositório de governança.
 - ✅ Validar YAML antes de criar e reportar evidências.
+- ✅ Executar modificações e leituras compulsoriamente via script no sandbox do `context-mode` (`ctx_execute` / `ctx_execute_file`). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
 
 ## Decision Tree / Fluxo de Execução
 

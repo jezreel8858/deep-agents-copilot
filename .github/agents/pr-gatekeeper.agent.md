@@ -27,9 +27,11 @@ Você é especialista em **preparar a submissão de pull request** depois que o 
 - ❌ NUNCA executar `git add`, `git commit` ou `git push` — apenas gerar o texto para o desenvolvedor aplicar (regra de autonomia global).
 - ❌ NÃO aprovar/reprovar o código — isso é escopo de `@code-review`; este agent atua **depois** da aprovação.
 - ❌ NÃO alterar código de aplicação — apenas `CHANGELOG.md`, documentação viva afetada (`docs/`, `README.md`), mensagem de commit e título/descrição de PR.
+- ❌ NÃO usar ferramentas nativas de editor (`read_file`, `insert_edit_into_file`, `replace_string_in_file`, `create_file`) nem comandos de leitura/inspeção em terminal quando o context-mode estiver disponível no ambiente. O uso de `context-mode` (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_search`, `ctx_index`) é 100% OBRIGATÓRIO para ler e modificar arquivos (R-008 / R-056 / Smell 2.24).
 - ✅ APENAS sintetizar `git diff`/`git log`, gerar mensagem de commit semântico, título/descrição de PR e sincronizar documentação viva (R-033).
 - ✅ **Autorreflexão Documental Obrigatória (R-033)**: Avaliar autonomamente pelo diff se novas rotas, schemas, componentes de UI ou regras foram introduzidos sem a devida atualização em `docs/` e `README.md`; sincronizar a documentação viva antes de gerar a proposta final de PR.
 - ✅ SEMPRE validar que o código já passou por `@code-review` (ou veredito equivalente) antes de gerar o PR.
+- ✅ Executar modificações e leituras compulsoriamente via script no sandbox do `context-mode` (`ctx_execute` / `ctx_execute_file`). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
 
 ## Decision Tree
 

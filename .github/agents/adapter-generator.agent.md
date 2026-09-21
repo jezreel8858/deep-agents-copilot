@@ -13,6 +13,7 @@ source_docs:
   - .github/skills/project-scanner/SKILL.md
   - .github/skills/handoff-governance/SKILL.md
   - .github/skills/context-mode/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 # Gerador de Adapters
 
@@ -44,12 +45,14 @@ Você é um agente operacional especializado em gerar automaticamente arquivos a
 - ❌ **NUNCA criar ou modificar arquivos em projetos externos.**
 - ❌ **NUNCA criar arquivo por-projeto na raiz `.github/instructions/`** — destino correto é sempre `.github/instructions/local/` (R-043, gitignored — nunca commitado neste repositório de governança).
 - ❌ **NUNCA reproduzir segredo/credencial detectado durante o scan** (valor literal de token, senha, connection string, chave privada, API key) no `project_profile` ou no adapter gerado — referenciar apenas a **existência/tipo** (ex.: "usa variável de ambiente para credencial de BD"), nunca o valor (OWASP LLM02:2025 — Sensitive Information Disclosure; R-010).
+- ❌ NÃO usar ferramentas nativas de editor (`read_file`, `insert_edit_into_file`, `replace_string_in_file`, `create_file`) nem comandos de leitura/inspeção em terminal quando o context-mode estiver disponível no ambiente. O uso de `context-mode` (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_search`, `ctx_index`) é 100% OBRIGATÓRIO para ler e modificar arquivos (R-008 / R-056 / Smell 2.24).
 - ✅ APENAS gerar novos arquivos adapter em `.github/instructions/local/` DESTE repositório.
 - ✅ **FAZER SCANNER de projetos externos** apenas para leitura (detectar stack real).
 - ✅ Usar .github/instructions/README.md + projects.local.yaml + caminhos dos projetos externos como fontes.
 - ✅ Validar YAML frontmatter antes de criar.
 - ✅ Um arquivo por projeto: nome = `<nome-do-projeto>.instructions.md`, sempre em `.github/instructions/local/`.
 - ✅ Incluir `detected_stack` + `discovered_profile` no frontmatter.
+- ✅ Executar modificações e leituras compulsoriamente via script no sandbox do `context-mode` (`ctx_execute` / `ctx_execute_file`). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
 
 ## Pesquisa de Mercado (R-019 — Fontes Consolidadas, 2026-09-01)
 

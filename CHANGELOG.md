@@ -6,6 +6,19 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.26.0] — 2026-09-21
+
+### Modificado & Endurecido
+- **Blindagem Completa e Sistêmica de Precedência de Context-Mode em Todos os Agentes Mutadores (R-008, R-056 / Smell 2.24)**:
+  - **Varredura Universal e Blindagem em Lote**: Aplicada a blindagem em 100% dos 49 agentes executores/mutadores do repositório em todas as stacks (`backend/spring-boot`, `backend/spring-reactive`, `backend/python`, `backend/struts`, `backend/ejb`, `backend/database`, `frontend/angular`, raiz).
+  - **Cláusula de Proibição Incondicional (CRÍTICO / NÃO-ESCOPO)**: Inserida a proibição estrita de uso de ferramentas nativas de editor (`read_file`, `insert_edit_into_file`, `replace_string_in_file`, `create_file`) e de comandos de leitura/inspeção em terminal quando `context-mode` estiver disponível no ambiente, estabelecendo que o uso de `context-mode` (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_search`, `ctx_index`) é 100% OBRIGATÓRIO para ler e modificar arquivos (R-008 / R-056 / Smell 2.24).
+  - **Diretriz Mandatória Positiva**: Inserida a obrigatoriedade de executar modificações e leituras compulsoriamente via script no sandbox do `context-mode` (`ctx_execute` / `ctx_execute_file`), rebaixando ferramentas manuais de editor a fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
+  - **Alinhamento de Ferramentas e Skills**: Adicionado `'context-mode/ctx_execute'` em `binding-initializer` e `docs-engineer`, e declarada a skill `efficient-batch-code-modification` em `adapter-generator` e `binding-initializer`.
+  - **Templates Canônicos e Fábrica**: Templates operacionais (`operational-agent.md`, `agent-template.md`) e `governance-factory.agent.md` atualizados com as cláusulas padronizadas e checklist de herança compulsória para novos agentes gerados.
+  - **Qualidade e Não-Regressão**: Atualizado `tests/governance_audit/test_context_mode_precedence_governance.py` com o teste dinâmico e assertivo `test_all_mutating_agents_declare_r056_and_explicit_prohibition()` inspecionando todos os agentes mutadores do repositório, alcançando 100% de aprovação (179/179 testes verdes).
+
+---
+
 ## [2.25.0] — 2026-09-20
 
 ### Modificado & Endurecido
