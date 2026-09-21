@@ -6,6 +6,23 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.25.0] — 2026-09-20
+
+### Modificado & Endurecido
+- **Endurecimento da Precedência Mandatória de Context Mode (R-008 e R-056 / Smell 2.24 — 100% Context-Mode Obligation & Editor Tool Prohibition)**:
+  - **Uso 100% Obrigatório do Context-Mode**: O uso de `context-mode` (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_index`, `ctx_search`) passa a ser **100% OBRIGATÓRIO** tanto para LEITURAS quanto para MODIFICAÇÃO/CRIAÇÃO de arquivos SEMPRE que a ferramenta context-mode estiver disponível no ambiente, eliminando a fragmentação de dezenas de tool calls no chat, prevenindo truncamentos e erradicando o vazamento de bytes para a janela de contexto.
+  - **Proibição Estrita de Ferramentas Nativas de Editor e Terminal**: Ferramentas manuais de editor (`read_file`, `replace_string_in_file`, `insert_edit_into_file`, `create_file`) e comandos de leitura no terminal são **estritamente proibidos quando o context-mode estiver disponível**, sendo rebaixados a **fallback exclusivo** única e estritamente para quando o servidor MCP context-mode estiver comprovadamente indisponível ou desconectado.
+  - **Alinhamento Normativo**: Atualizados `CLAUDE.md` (R-008, R-046, R-056) e `.github/copilot-instructions.md` (Seção 2 e Seção 2.1).
+  - **Reestruturação de Skills de Governança**:
+    - `.github/skills/efficient-batch-code-modification/SKILL.md`: Seção 0 e Seção 5 reestruturadas definindo Nível 1 como 100% Compulsório para context-mode e Nível 2 como Fallback Exclusivo de indisponibilidade de MCP.
+    - `.github/skills/governance-audit-patterns/SKILL.md`: Smell 2.24 elevado para Bloqueador ao identificar uso indevido de editor tools ou omissão de precedência mandatória de context-mode.
+  - **Systemic Reuse Gate (R-055 / Q1, Q2, Q3)**:
+    - **Q1 (Impacto em Peers)**: Propagada a regra endurecida para `.github/agents/governance-maintainer.agent.md` e 7 agentes executores/fixers (`ejb-test-fixer`, `python-test-fixer`, `spring-boot-test-fixer`, `spring-reactive-test-fixer`, `struts-test-fixer`, `database-specialist`, `angular-test-fixer`).
+    - **Q2 (Templates Canônicos)**: Atualizados `.github/agents/templates/operational-agent.md`, `.github/agents/templates/agent-template.md` e `.github/agents/governance-factory.agent.md`.
+    - **Q3 (Testes Determinísticos)**: Ampliada a suíte `tests/governance_audit/test_context_mode_precedence_governance.py` com 7 novos testes determinísticos verdes cobrindo a proibição e fallback exclusivo.
+
+---
+
 ## [2.24.0] — 2026-09-20
 
 ### Adicionado

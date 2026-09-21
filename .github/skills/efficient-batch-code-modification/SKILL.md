@@ -43,14 +43,14 @@ Esta skill estabelece o protocolo operacional obrigatório para execução de al
 
 ## 0. Hierarquia e Precedência de Ferramentas (R-056 — Context-Mode First)
 
-Antes de executar qualquer edição, o agente DEVE seguir a ordem de precedência mandatória para escrita e modificação de arquivos, eliminando o anti-padrão de editor tool sprawl (Smell 2.24):
+O uso de `context-mode` (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_index`, `ctx_search`) é **100% OBRIGATÓRIO tanto para LEITURAS quanto para MODIFICAÇÃO/CRIAÇÃO de arquivos** SEMPRE que a ferramenta context-mode estiver disponível no ambiente, eliminando categoricamente o anti-padrão de editor tool sprawl (Smell 2.24):
 
 | Nível de Precedência | Escopo / Cenário | Ferramenta Obrigatória | Mecanismo de Execução | Custo de Créditos |
 |---|---|---|---|:---:|
-| **Nível 1 (Primário / Compulsório)** | Arquivo único grande (>100 linhas), YAML/JSON, Markdown estruturado (.agent.md, .instructions.md), **5+ arquivos** OU **padrão repetitivo** em múltiplos arquivos | `ctx_execute`, `ctx_execute_file` ou `ctx_batch_execute` (Context-Mode) | Script inline (Node.js/Python) que lê, valida unicidade em memória e salva em processo único all-or-nothing no sandbox (R-051 / R-056) | **Mínimo (~1 única tool call, zero overhead de chat)** |
-| **Nível 2 (Fallback Restrito de Última Instância)** | Edição micro e pontual (1 a 2 linhas isoladas em arquivo simples/plano) onde o sandbox for comprovadamente desnecessário ou indisponível | `replace_string_in_file` (Editor) | Single-Turn Batching cirúrgico com 2-3 linhas de contexto exclusivo. **Proibido encadear múltiplas chamadas em série no chat.** | Baixo (~1 tool call) |
+| **Nível 1 (Primário / 100% Compulsório)** | **Qualquer leitura, busca, inspeção, modificação ou criação de arquivos** sempre que a ferramenta context-mode estiver disponível no ambiente | `ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_index` ou `ctx_search` (Context-Mode) | Script inline (Node.js/Python) que lê, valida unicidade em memória e salva em processo único all-or-nothing no sandbox (R-051 / R-056) | **Mínimo (~1 única tool call, zero overhead de chat)** |
+| **Nível 2 (Fallback Exclusivo quando Context-Mode Indisponível)** | **Estritamente proibidas quando context-mode estiver disponível**. Permitidas única e exclusivamente como fallback quando o servidor MCP context-mode estiver comprovadamente indisponível ou desconectado | `read_file`, `replace_string_in_file`, `insert_edit_into_file`, `create_file` (Editor) | Single-Turn Batching cirúrgico com 2-3 linhas de contexto exclusivo. **Proibido encadear múltiplas chamadas em série no chat.** | Baixo (~1 tool call) |
 
-> ⚠️ **INCIDENTE PREVENIDO**: Executar chamadas de editor sequenciais no chat reenvia histórico massivo a cada retorno de tool, podendo drenar centenas de créditos por refactor. Para qualquer arquivo estruturado, lote multi-arquivo ou padrão repetitivo, o uso de script via `ctx_execute`/`ctx_execute_file`/`ctx_batch_execute` é **COMPULSÓRIO (R-056)**.
+> ⚠️ **REGRA NORMATIVA INEGOCIÁVEL (R-008 / R-056)**: Ferramentas nativas de editor (`read_file`, `replace_string_in_file`, `insert_edit_into_file`, `create_file`) e terminal são **estritamente proibidas quando o context-mode estiver disponível no ambiente**, sendo rebaixadas a **fallback exclusivo** para quando o servidor MCP context-mode estiver comprovadamente indisponível ou desconectado. Executar chamadas manuais de editor reenvia histórico massivo e arrisca corrupção por truncamento/fuzzy match.
 
 ---
 
@@ -70,7 +70,7 @@ Nos ambientes de AI Chat (VS Code / JetBrains Copilot):
 ### 2.1. Diretriz 1: Análise de Impacto Prévia (Dry-Run em Memória)
 
 Antes de invocar ferramentas de escrita (`ctx_execute`, `replace_string_in_file`, `insert_edit_into_file`, `create_file`):
-1. **Mapeamento Cirúrgico e Decisão de Ferramenta:** Inspecione a árvore e identifique de antemão todas as ocorrências necessárias (via `grep_search` focado ou leitura rápida dos arquivos conhecidos). **Decida automaticamente a ferramenta**: se >= 5 arquivos ou padrão repetitivo, prepare script para `ctx_execute`/`ctx_batch_execute`; se 1 a 4 arquivos pontuais, prepare tool calls do editor.
+1. **Mapeamento Cirúrgico e Decisão de Ferramenta:** Inspecione a árvore e identifique de antemão todas as ocorrências necessárias (via `ctx_execute` ou busca programática no sandbox). Se context-mode estiver disponível, o uso de `ctx_execute`/`ctx_batch_execute` com script é **100% obrigatório**; ferramentas nativas de editor são reservadas exclusivamente como fallback se o MCP estiver comprovadamente indisponível.
 2. **Resumo Compacto:** No planejamento mental ou resposta inicial, estruture a lista de arquivos afetados e os blocos específicos antes de tocar no disco.
 3. **Validação de Precondição:** Certifique-se de que os arquivos existem e não possuem conflitos óbvios antes de iniciar a primeira edição.
 
@@ -105,7 +105,7 @@ Antes de qualquer dry-run ou inspeção para batch edit, o agente NÃO DEVE ler 
 
 ## 3. Matriz Comparativa: Execução Ingênua vs. Batch de Editor vs. Context-Mode Script
 
-| Aspecto | Execução Ingênua (Anti-Padrão) | Batch de Editor (1 a 4 arquivos) | Context-Mode Script (>= 5 arquivos / Repetitivo) |
+| Aspecto | Execução Ingênua (Anti-Padrão) | Fallback de Editor (Apenas se Context-Mode Indisponível) | Context-Mode Script (100% Obrigatório quando disponível) |
 |---|---|---|---|
 | **Mecanismo** | `replace` sequencial (1 por turno) | `replace` paralelo em lote único | Script Node/Python via `ctx_execute` |
 | **Tool Calls de Editor** | 20 a 50 chamadas sequenciais | 1 a 4 chamadas no mesmo turno | **0 chamadas de editor** (1 chamada MCP) |
@@ -121,7 +121,7 @@ Antes de qualquer dry-run ou inspeção para batch edit, o agente NÃO DEVE ler 
 
 Antes de iniciar a gravação de alterações:
 - [ ] O mapeamento de todos os arquivos impactados já está claro na memória?
-- [ ] **Hierarquia de Ferramenta**: Se >= 5 arquivos ou padrão repetitivo, usei `ctx_execute`/`ctx_batch_execute` com script em vez de tool calls de editor unitárias?
+- [ ] **Hierarquia de Ferramenta**: Utilizei `ctx_execute`/`ctx_batch_execute` com script inline no sandbox (100% obrigatório quando context-mode disponível), evitando ferramentas manuais de editor?
 - [ ] Se < 5 arquivos pontuais, todas as chamadas de substituição para arquivos independentes foram agrupadas no mesmo turno (Single-Turn Batching)?
 - [ ] O `oldString` contém apenas o contexto estrito para ser unívoco (2-3 linhas)?
 - [ ] Evitei releituras desnecessárias de arquivos que eu mesmo acabei de editar?

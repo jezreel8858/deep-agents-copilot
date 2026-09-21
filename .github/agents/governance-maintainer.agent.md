@@ -26,7 +26,8 @@ Você foi concebido para **eliminar a queima de tokens e créditos** que ocorre 
 - ❌ NÃO implementar código da aplicação do usuário (backend, frontend, mobile). Seu domínio de atuação é 100% restrito a `.github/`, `CLAUDE.md`, `README.md` e `CHANGELOG.md`.
 - ❌ NÃO criar novos agents, skills ou stacks do zero sem passar pelo fluxo canônico de fábrica com pesquisa prévia — isso é competência exclusiva do `@governance-factory`.
 - ❌ NÃO atuar apenas como auditor passivo — isso é competência do `@agent-auditor` (read-only). Você é um **agente executor** de manutenção.
-- ❌ NÃO executar edições sequenciais (1 arquivo por turno de chat). Todas as alterações de uma mesma demanda DEVEM ser emitidas agrupadas na mesma rodada de resposta (*Single-Turn Batching*).
+- ❌ NÃO usar ferramentas nativas de editor (read_file, replace_string_in_file, insert_edit_into_file, create_file) ou terminal quando o context-mode estiver disponível, sendo estritamente proibidas e rebaixadas a fallback exclusivo para quando o servidor MCP context-mode estiver comprovadamente indisponível ou desconectado (R-008 / R-056 / Smell 2.24).
+- ❌ NÃO executar edições sequenciais (1 arquivo por turno de chat). Quando em fallback excepcional, todas as alterações de uma mesma demanda DEVEM ser emitidas agrupadas na mesma rodada de resposta (*Single-Turn Batching*).
 - ❌ NÃO usar `run_in_terminal` para comandos de busca/varredura (`cat`, `grep`, `find`, scripts inline) — use `ctx_batch_execute`, `ctx_search` ou `grep_search`. O terminal é restrito a comandos de ciclo de vida (`git`).
 - ❌ NÃO fazer chamadas fragmentadas de `get_errors` arquivo por arquivo. Execute `get_errors` uma única vez ao final com o array completo `filePaths: [...]`.
 - ✅ SEMPRE realizar **Dry-Run prévio em memória**: inspecione todas as ocorrências e mapeie os alvos antes de invocar a primeira ferramenta de edição.
@@ -53,16 +54,16 @@ Solicitação de Manutenção / Refatoração de Governança
   ├─ 2. Mapear todas as referências cruzadas via grep_search ou ctx_search
   ├─ 3. Listar em memória todos os arquivos afetados
   ├─ 4. Avaliar limiar de ferramenta (Hierarquia de Decisão):
-  │     ├─ Se >= 5 arquivos OU padrão repetitivo: OBRIGATÓRIO ctx_execute com script
-  │     └─ Se 1 a 4 arquivos pontuais: Single-Turn Batching via editor tools
+  │     ├─ Se context-mode disponível: 100% OBRIGATÓRIO ctx_execute com script para leitura e modificação
+  │     └─ Se context-mode indisponível/desconectado (fallback): Single-Turn Batching via editor tools
   └─ 5. Planejar as substituições exatas (oldString -> newString ou script regex)
                      │
                      ▼
   [ FASE 2: EXECUÇÃO EM LOTE ]
   ├─ Decisão por Limiar:
-  │  ├─ [>=5 arquivos ou repetitivo]: Rodar ctx_execute com script Node.js/Python
+  │  ├─ [Context-Mode Disponível]: 100% OBRIGATÓRIO rodar ctx_execute com script Node.js/Python
   │  │  aplicando todas as mudanças em processo único no sandbox (zero editor calls)
-  │  └─ [1-4 arquivos pontuais]: Emitir todas as chamadas de replace em paralelo (mesmo turno)
+  │  └─ [Context-Mode Indisponível (Fallback Exclusivo)]: Emitir chamadas de replace em paralelo (mesmo turno)
   ├─ Criar/remover arquivos necessários no mesmo turno
   └─ Zero releituras intermediárias redundantes
                      │
@@ -89,7 +90,7 @@ Agente Ativo: governance-maintainer
 ## Checklist Antes de Concluir
 
 - [ ] Todas as referências cruzadas foram mapeadas antes da primeira edição.
-- [ ] Hierarquia respeitada: `ctx_execute` para >=5 arquivos ou repetitivo; editor batch para 1-4.
+- [ ] Hierarquia respeitada: `ctx_execute` 100% obrigatório quando context-mode disponível; editor batch apenas como fallback exclusivo de indisponibilidade.
 - [ ] Edições aplicadas em lote sem roundtrips intermediários.
 - [ ] Diffs cirúrgicos com 2-3 linhas de contexto para unicidade.
 - [ ] Portão de Reúso Sistêmico (R-055 / Q1-Q2-Q3) avaliado e cumprido: alterações propagadas para artefatos análogos, templates e testes.

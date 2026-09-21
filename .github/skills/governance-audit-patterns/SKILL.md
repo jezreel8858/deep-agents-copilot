@@ -343,15 +343,15 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 | Remediação | (a) Restringir ferramentas de todos os routers estritamente ao baseline canônico de 7 ferramentas: `['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search']`; (b) Declarar a regra de Zero Discovery no bloco CRÍTICO de todos os routers e no template canônico `router-agent.md`; (c) Fazer o router operar sob Delegação Plana sem invocar downstream internamente via `run_subagent` |
 
 ---
-### 2.24 — Omissão de Precedência de Context-Mode em Agentes Mutadores (Editor Tool Sprawl / R-056)
+### 2.24 — Omissão de Precedência de Context-Mode em Agentes Mutadores e Leitores (Editor Tool Sprawl / R-056)
 
 | Campo | Conteúdo |
 |---|---|
-| Sintoma | Agente executor com capacidade de escrita utiliza repetidamente ferramentas manuais de editor (`replace_string_in_file`, `insert_edit_into_file`) em série no chat para modificar arquivos estruturados, em vez de priorizar a execução em processo único no sandbox (`ctx_execute` / `ctx_execute_file`), gerando poluição conversacional, queima de contexto e risco de truncamento |
-| Como detectar | Agente possui ferramentas mutativas (`insert_edit_into_file`, `replace_string_in_file`, `create_file`), mas seu contrato operacional (`.agent.md` ou template) omite a cláusula de precedência mandatória de `context-mode` (R-056); ou agente dispara 3+ chamadas de editor tools em sequência no chat para uma mesma tarefa |
-| Origem (TrustAgent) | Intrínseco — comodismo do modelo em recorrer a primitivas do editor em vez de compor o script all-or-nothing no sandbox via Think-in-Code (R-008 / R-051) |
-| Severidade | **Alta** (desperdício severo de créditos, ineficiência de contexto e risco de corrupção em arquivos grandes) |
-| Remediação | Injeção da cláusula de precedência mandatória de `context-mode` no bloco CRÍTICO e diretrizes de todos os agentes mutadores e templates operacionais, reservando ferramentas de editor como fallback estrito de última instância |
+| Sintoma | Agente ou prompt utiliza ferramentas manuais nativas de editor (`read_file`, `replace_string_in_file`, `insert_edit_into_file`, `create_file`) ou terminal para leitura ou modificação/criação de arquivos quando context-mode está disponível no ambiente, em vez de cumprir a obrigatoriedade de 100% de execução no sandbox (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_search`), gerando poluição conversacional, queima de contexto e risco de truncamento/corrupção |
+| Como detectar | Agente possui ferramentas mutativas ou de leitura, mas seu contrato operacional (`.agent.md` ou template) omite a cláusula de uso 100% obrigatório de `context-mode` (R-008 / R-056) para leituras e escritas/criações, ou não proíbe estritamente ferramentas nativas de editor e terminal quando context-mode estiver disponível (rebaixando-as a fallback exclusivo de indisponibilidade comprovada); ou agente dispara chamadas de editor tools no chat com context-mode ativo |
+| Origem (TrustAgent) | Intrínseco — comodismo do modelo em recorrer a primitivas do editor em vez de compor o script all-or-nothing no sandbox via Think-in-Code (R-008 / R-051 / R-056) |
+| Severidade | **Bloqueador** (desperdício severo de créditos, ineficiência crítica de contexto e violação direta de R-008 e R-056) |
+| Remediação | Injeção da cláusula de uso 100% obrigatório de `context-mode` para leituras e escritas/criações no bloco CRÍTICO e diretrizes de todos os agentes mutadores, operacionais e templates, declarando expressamente a proibição estrita de ferramentas nativas de editor e terminal quando context-mode estiver disponível, rebaixadas a fallback exclusivo de indisponibilidade comprovada |
 
 ---
 ### 2.25 — Terceirização Indevida de Edição ao Usuário por Agentes Analíticos / Read-Only (Anti-Manual User Delegation & Dead-End Analysis / R-057)
