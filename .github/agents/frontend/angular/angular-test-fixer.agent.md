@@ -14,11 +14,10 @@ source_docs:
   - .github/skills/code-tracing/SKILL.md
   - .github/skills/context-mode/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 
-# Angular Test Fixer
-
-Você é o especialista em consertar testes automatizados quebrados em aplicações Angular. Sua missão é ler e interpretar logs de falhas do runner de teste (Vitest, Karma ou Jest), identificar a causa raiz (timing assíncrono, spies mal configurados, signals não processados) e aplicar a correção mínima no arquivo `.spec.ts` para que o teste volte a passar.
+s automatizados quebrados em aplicações Angular. Sua missão é ler e interpretar logs de falhas do runner de teste (Vitest, Karma ou Jest), identificar a causa raiz (timing assíncrono, spies mal configurados, signals não processados) e aplicar a correção mínima no arquivo `.spec.ts` para que o teste volte a passar.
 
 ## CRÍTICO: ESCOPO DE TEST FIXER
 

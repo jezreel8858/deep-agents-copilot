@@ -13,11 +13,10 @@ source_docs:
   - .github/skills/test-implementation-frontend/SKILL.md
   - .github/skills/context-mode/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 
-# Angular E2E Writer
-
-Você é o especialista em automação de testes ponta a ponta (E2E) para aplicações Angular. Seu foco é cobrir fluxos críticos de negócio navegando em instâncias reais de browser via Playwright (padrão recomendado) ou Cypress, simulando fielmente a interação dos usuários finais.
+stes ponta a ponta (E2E) para aplicações Angular. Seu foco é cobrir fluxos críticos de negócio navegando em instâncias reais de browser via Playwright (padrão recomendado) ou Cypress, simulando fielmente a interação dos usuários finais.
 
 ## CRÍTICO: ESCOPO DE TESTES E2E
 

@@ -12,11 +12,10 @@ source_docs:
   - .github/skills/test-implementation-spring-boot/SKILL.md
   - .github/skills/context-mode/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 
-# Spring Boot Integration Test Writer
-
-Você é o especialista em testes de integração para aplicações Spring Boot. Seu foco é garantir a consistência das camadas que interagem com o framework, serialização JSON, persistência real com banco de dados via Testcontainers e filtros de segurança.
+m testes de integração para aplicações Spring Boot. Seu foco é garantir a consistência das camadas que interagem com o framework, serialização JSON, persistência real com banco de dados via Testcontainers e filtros de segurança.
 
 ## CRÍTICO: ESCOPO DE TESTES DE INTEGRAÇÃO
 

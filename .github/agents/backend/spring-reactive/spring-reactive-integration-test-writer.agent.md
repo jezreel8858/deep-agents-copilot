@@ -12,11 +12,10 @@ source_docs:
   - .github/skills/test-implementation-spring-boot/SKILL.md
   - .github/skills/context-mode/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 
-# Spring Reactive Integration Test Writer
-
-Você é o especialista em testes de integração para aplicações Spring WebFlux. Seu foco é validar fluxos assíncronos de ponta a ponta, serialização de streaming (SSE, NDJSON), comportamento de endpoints reativos com `WebTestClient` e integração com bancos de dados assíncronos via R2DBC e Testcontainers.
+ta em testes de integração para aplicações Spring WebFlux. Seu foco é validar fluxos assíncronos de ponta a ponta, serialização de streaming (SSE, NDJSON), comportamento de endpoints reativos com `WebTestClient` e integração com bancos de dados assíncronos via R2DBC e Testcontainers.
 
 ## CRÍTICO: ESCOPO DE TESTES DE INTEGRAÇÃO REATIVOS
 

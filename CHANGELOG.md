@@ -6,6 +6,24 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.29.0] — 2026-09-21
+
+### Adicionado & Endurecido
+- **Extensão Universal da Precedência Mandatória de Context-Mode e `ctx_batch_execute` a 100% dos Agentes e Prompts (R-008, R-056 / Smell 2.24, Smell 2.26)**:
+  - **Diagnóstico e Eliminação de Gaps**: Identificado que 13 agentes não-roteadores (especialmente os `*-arch-advisor` de todas as stacks, `adr-sentinel`, `compliance-guardrails`, `ddd-bounded-context-mapper`, `devops-engineer`, `feature-planner`, `repo-hygiene-auditor`) e múltiplos prompts (`commit.prompt.md`, `review.prompt.md`, `eval-workflows.prompt.md`, `visualize-graph.prompt.md`) não possuíam `context-mode/ctx_batch_execute` ou as diretrizes mandatórias de precedência, induzindo o uso de dezenas de `read_file` e `grep_search` sequenciais no chat.
+  - **Blindagem em 100% dos Agentes Não-Roteadores (78 Agentes)**:
+    - Habilitadas compulsoriamente as ferramentas `'context-mode/ctx_execute'`, `'context-mode/ctx_batch_execute'` e `'context-mode/ctx_search'` em 100% dos 78 agentes não-roteadores do catálogo.
+    - Inserida em 100% dos agentes a cláusula de Não-Escopo proibindo expressamente o uso de ferramentas nativas de editor (`read_file`, `insert_edit_into_file`, `replace_string_in_file`, `create_file`) e comandos de leitura em terminal quando `context-mode` estiver ativo, rebaixadas a fallback exclusivo de contingência.
+    - Inserida a diretriz positiva exigindo inspeções e varreduras no sandbox com Single-Turn MCP Batching para zero desperdício de créditos.
+  - **Blindagem de Prompts e Templates**:
+    - Atualizados `commit.prompt.md`, `review.prompt.md`, `eval-workflows.prompt.md`, `visualize-graph.prompt.md`, `del-project-context.prompt.md` e os templates `research-agent.md` e `prompt-template.md` com as ferramentas MCP em lote e a regra mandatória de context-mode.
+  - **Sincronização Atômica de Catálogos**:
+    - Atualizados `catalog.yaml`, os 7 sub-catálogos locais (`angular-catalog.yaml`, `spring-boot-catalog.yaml`, `spring-reactive-catalog.yaml`, `python-catalog.yaml`, `struts-catalog.yaml`, `ejb-catalog.yaml`, `database-catalog.yaml`) e os agentcards A2A.
+  - **Quality Gate e Testes Determinísticos (Q3)**:
+    - Adicionados testes determinísticos em `tests/governance_audit/test_context_mode_precedence_governance.py` validando que 100% dos agentes não-roteadores possuem `ctx_batch_execute`, `ctx_execute` e declaram a proibição de editor tools. Total da suíte expandido para **192 testes automatizados (100% verdes)**.
+
+---
+
 ## [2.28.0] — 2026-09-21
 
 ### Adicionado & Endurecido

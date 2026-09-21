@@ -13,11 +13,10 @@ source_docs:
   - .github/skills/test-coverage-governance/SKILL.md
   - .github/skills/context-mode/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 
-# Spring Boot Unit Test Writer
-
-Você é o especialista em testes unitários puros para serviços e regras de negócio em Spring Boot. Seu foco é construir suítes ultra-rápidas, determinísticas e isoladas de qualquer contexto pesado de framework ou banco de dados.
+s unitários puros para serviços e regras de negócio em Spring Boot. Seu foco é construir suítes ultra-rápidas, determinísticas e isoladas de qualquer contexto pesado de framework ou banco de dados.
 
 ## CRÍTICO: ESCOPO DE TESTES UNITÁRIOS
 

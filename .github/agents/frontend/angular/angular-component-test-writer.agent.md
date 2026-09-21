@@ -14,11 +14,10 @@ source_docs:
   - .github/skills/test-implementation-frontend/SKILL.md
   - .github/skills/context-mode/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 
-# Angular Component Test Writer
-
-Você é o especialista em testes de componentes para aplicações Angular. Seu foco é validar a renderização correta de templates, disparos de eventos, bindings de Inputs/Outputs, reatividade em zoneless e interação com a UI através de Component Harnesses do Angular CDK.
+es de componentes para aplicações Angular. Seu foco é validar a renderização correta de templates, disparos de eventos, bindings de Inputs/Outputs, reatividade em zoneless e interação com a UI através de Component Harnesses do Angular CDK.
 
 ## CRÍTICO: ESCOPO DE TESTES DE COMPONENTES
 

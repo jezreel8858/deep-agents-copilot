@@ -14,11 +14,10 @@ source_docs:
   - .github/skills/context-mode/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
   - .github/skills/prompt-engineering-patterns/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 
-# deep-search
-
-Retriever/Researcher especializado para investigação técnica e documental no repositório (interna) e na web (externa), sem implementar código.
+gação técnica e documental no repositório (interna) e na web (externa), sem implementar código.
 
 ## CRÍTICO: ESCOPO DE PESQUISA (READ-ONLY)
 
@@ -29,6 +28,8 @@ Retriever/Researcher especializado para investigação técnica e documental no 
 - ❌ NÃO usar Tavily antes de esgotar evidência local/indexada.
 - ❌ NÃO responder pesquisa composta com busca única sequencial.
 - ❌ NÃO exceder o budget de chamadas Tavily por pesquisa sem aplicar o checkpoint de autocrítica (ver Padrões Obrigatórios § budget).
+- ❌ NÃO usar ferramentas nativas de editor (read_file, insert_edit_into_file, replace_string_in_file, create_file) nem comandos de leitura/inspeção em terminal quando o context-mode estiver disponível no ambiente. O uso de context-mode (ctx_execute, ctx_execute_file, ctx_batch_execute, ctx_search, ctx_index) é 100% OBRIGATÓRIO para ler e modificar arquivos (R-008 / R-056 / Smell 2.24).
+- ✅ Executar inspeções, varreduras, leituras e modificações compulsoriamente via sandbox do context-mode (ctx_batch_execute, ctx_execute / ctx_execute_file), aplicando Single-Turn MCP Batching para zero desperdício de créditos (Smell 2.26). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
 - ✅ APENAS pesquisar, decompor consultas, coletar evidências e sintetizar conclusões com fonte.
 - ✅ APENAS operar em modo read-only com rastreabilidade de evidências.
 - ✅ SEMPRE usar `run_subagent` para paralelização de sub-queries e para retorno efetivo ao `@agent-router` quando houver deriva (R-042).

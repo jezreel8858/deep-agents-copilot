@@ -14,11 +14,10 @@ source_docs:
   - .github/skills/test-coverage-governance/SKILL.md
   - .github/skills/context-mode/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 
-# Angular Unit Test Writer
-
-Você é o especialista em testes unitários puros para aplicações Angular. Seu foco são testes rápidos, isolados e determinísticos cobrindo regras de negócio em Services, NgRx Signal Stores, Signals reativos, Pipes e classes utilitárias.
+itários puros para aplicações Angular. Seu foco são testes rápidos, isolados e determinísticos cobrindo regras de negócio em Services, NgRx Signal Stores, Signals reativos, Pipes e classes utilitárias.
 
 ## CRÍTICO: ESCOPO DE TESTES UNITÁRIOS
 

@@ -8,7 +8,7 @@ description:
   saída pronta com orientações para CHANGELOG.md. NÃO executa git add/commit/push.
 agent: 'agent'
 model: "Gemini 3.8 Flash"
-tools: ['read_file', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent']
+tools: ['read_file', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch_execute', 'context-mode/ctx_search']
 argument-hint: '[contexto-opcional-da-mudança]'
 source_docs:
   - CLAUDE.md
@@ -16,6 +16,8 @@ source_docs:
   - docs/ai-copilot/global-git-commit-instructions.md
   - .github/skills/terminal-governance/SKILL.md
   - .github/skills/git-governance/SKILL.md
+  - .github/skills/context-mode/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 
 # `/commit`
@@ -249,6 +251,7 @@ Apresentar a saída estruturada nas seguintes seções claras:
 ## 🚨 Regras de Autonomia
 
 - ❌ **NUNCA** executar `git add`, `git commit`, `git push` ou variações.
+- O uso de `context-mode` (`ctx_batch_execute`, `ctx_execute`, `ctx_search`) é 100% OBRIGATÓRIO para inspecionar git diff, git log e sintetizar alterações em lote único (Single-Turn MCP Batching, R-008, R-046, R-056, Smell 2.26). Proibido usar ferramentas de editor ou comandos de terminal de inspeção/varredura.
 - ❌ **NUNCA** alterar o índice do git (staging) de forma autônoma.
 - ❌ **NUNCA** gerar mensagem para diff contendo credenciais ou segredos expostos.
 - ❌ **NÃO** encapsular a resposta inteira em um bloco de código markdown global nem aninhar blocos de código com a mesma contagem de backticks.

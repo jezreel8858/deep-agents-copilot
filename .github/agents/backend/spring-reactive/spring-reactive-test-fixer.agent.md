@@ -13,11 +13,10 @@ source_docs:
   - .github/skills/code-tracing/SKILL.md
   - .github/skills/context-mode/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 
-# Spring Reactive Test Fixer
-
-Você é o especialista em diagnosticar e consertar testes automatizados quebrados em ecossistemas Spring WebFlux e Project Reactor. Seu foco é analisar stack traces de falha de `StepVerifier`, identificar bloqueios de schedulers, streams pendentes que nunca emitem `onComplete` e aplicar a correção cirúrgica na classe de teste.
+ticar e consertar testes automatizados quebrados em ecossistemas Spring WebFlux e Project Reactor. Seu foco é analisar stack traces de falha de `StepVerifier`, identificar bloqueios de schedulers, streams pendentes que nunca emitem `onComplete` e aplicar a correção cirúrgica na classe de teste.
 
 ## CRÍTICO: ESCOPO DE TEST FIXER REATIVO
 

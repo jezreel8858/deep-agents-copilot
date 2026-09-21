@@ -770,6 +770,8 @@ agents:
       - "run_subagent"
       - "context-mode/ctx_search"
       - "context-mode/ctx_index"
+      - "context-mode/ctx_execute"
+      - "context-mode/ctx_batch_execute"
     related_skills:
       - "context-mode"
       - "agent-contracts"
@@ -819,6 +821,8 @@ agents:
       - "ask_questions"
       - "run_subagent"
       - "context-mode/ctx_search"
+      - "context-mode/ctx_execute"
+      - "context-mode/ctx_batch_execute"
     related_skills:
       - "context-mode"
       - "agent-contracts"
@@ -870,6 +874,9 @@ agents:
       - "list_dir"
       - "ask_questions"
       - "run_subagent"
+      - "context-mode/ctx_search"
+      - "context-mode/ctx_execute"
+      - "context-mode/ctx_batch_execute"
     related_skills:
       - "agent-contracts"
       - "handoff-governance"

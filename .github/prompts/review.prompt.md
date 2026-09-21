@@ -6,7 +6,7 @@ description:
   NÃO executa alterações.
 agent: 'agent'
 model: "Gemini 3.8 Flash"
-tools: ['read_file', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent']
+tools: ['read_file', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch_execute', 'context-mode/ctx_search']
 argument-hint: '[caminho-do-arquivo | diff]'
 source_docs:
   - CLAUDE.md
@@ -14,6 +14,8 @@ source_docs:
   - .github/instructions/README.md
   - .github/skills/terminal-governance/SKILL.md
   - .github/skills/code-review-patterns/SKILL.md
+  - .github/skills/context-mode/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
   - .github/agents/code-review.agent.md
 ---
 
@@ -89,6 +91,7 @@ O relatório e o veredito final (`APROVADO | APROVADO COM RESSALVAS | BLOQUEADO`
 
 - ❌ **NUNCA** alterar o código sendo revisado
 - ❌ **NUNCA** criar commits ou arquivos derivados da revisão
+- O uso de `context-mode` (`ctx_batch_execute`, `ctx_execute`, `ctx_search`) é 100% OBRIGATÓRIO para inspecionar arquivos e diffs sob Single-Turn MCP Batching (R-008, R-046, R-056, Smell 2.26). É terminantemente proibido o uso de `read_file` ou comandos de varredura no terminal quando o context-mode estiver ativo.
 - ✅ **APENAS** analisar e reportar achados (delegado ao agent `@code-review`)
 - ✅ Se achado exige ação complexa → sugerir o agent correto via handoff
 

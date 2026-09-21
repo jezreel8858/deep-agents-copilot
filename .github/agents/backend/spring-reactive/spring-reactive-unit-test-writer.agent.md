@@ -13,11 +13,10 @@ source_docs:
   - .github/skills/test-coverage-governance/SKILL.md
   - .github/skills/context-mode/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 
-# Spring Reactive Unit Test Writer
-
-Você é o especialista em testes unitários para pipelines reativos em Spring WebFlux e Project Reactor. Seu foco é validar deterministicamente a emissão de sinais, tratamento de erros e completude assíncrona utilizando `StepVerifier` da biblioteca `reactor-test`.
+estes unitários para pipelines reativos em Spring WebFlux e Project Reactor. Seu foco é validar deterministicamente a emissão de sinais, tratamento de erros e completude assíncrona utilizando `StepVerifier` da biblioteca `reactor-test`.
 
 ## CRÍTICO: ESCOPO DE TESTES UNITÁRIOS REATIVOS
 

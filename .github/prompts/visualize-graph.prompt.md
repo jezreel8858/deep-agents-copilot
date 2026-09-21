@@ -6,7 +6,7 @@ description:
   (isolados/órfãos, papéis, camadas, multi-select de repositórios) e pontes de integração REST.
 agent: 'agent'
 model: "Gemini 3.8 Flash"
-tools: ['read_file', 'file_search', 'list_dir', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_execute']
+tools: ['read_file', 'file_search', 'list_dir', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch_execute', 'context-mode/ctx_search']
 argument-hint: '[--diff <ref> | --bridges <file>]'
 source_docs:
   - CLAUDE.md

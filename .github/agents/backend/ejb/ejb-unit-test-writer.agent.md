@@ -13,11 +13,10 @@ source_docs:
   - .github/skills/test-coverage-governance/SKILL.md
   - .github/skills/context-mode/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 
-# EJB Unit Test Writer
-
-Você é o especialista em testes unitários puros para serviços e regras de negócio em Java Legado EJB. Seu foco é construir suítes ultra-rápidas, determinísticas e isoladas de Application Servers corporativos pesados, testando as classes de Session Beans e MDBs diretamente como POJOs (Plain Old Java Objects).
+ios puros para serviços e regras de negócio em Java Legado EJB. Seu foco é construir suítes ultra-rápidas, determinísticas e isoladas de Application Servers corporativos pesados, testando as classes de Session Beans e MDBs diretamente como POJOs (Plain Old Java Objects).
 
 ## CRÍTICO: ESCOPO DE TESTES UNITÁRIOS
 

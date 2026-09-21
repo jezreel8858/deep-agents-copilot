@@ -3,7 +3,7 @@ name: 'eval-workflows'
 description: 'Avalia a conformidade de trajetórias dos workflows canônicos (R-050) com Gemini 3.8 Flash'
 agent: 'agent'
 model: "Gemini 3.8 Flash"
-tools: ['read_file', 'get_errors']
+tools: ['read_file', 'get_errors', 'context-mode/ctx_execute', 'context-mode/ctx_batch_execute', 'context-mode/ctx_search']
 argument-hint: '[cenario-id | todos]'
 source_docs:
   - CLAUDE.md
