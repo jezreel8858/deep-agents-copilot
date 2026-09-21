@@ -119,6 +119,8 @@ fix(entity): corrige NPE em PecaEntity ao buscar por ID nulo
 
 **Template mínimo de PR:**
 
+> **Diretriz de Renderização Anti-Corrupção**: Na seção "Como testar", prefira comandos formatados como código inline (`pytest tests/modulo -v` ou `mvn test`) para evitar conflito de cercas aninhadas quando a descrição for encapsulada em blocos markdown de documentação ou PRs.
+
 ```markdown
 ## O que foi feito
 - <item 1>
@@ -131,8 +133,8 @@ fix(entity): corrige NPE em PecaEntity ao buscar por ID nulo
 - [ ] Docs
 
 ## Como testar
-1. <passo 1>
-2. <passo 2>
+1. Executar testes: `pytest tests/modulo -v`
+2. Validar comportamento funcional: <passo 2>
 
 ## Checklist
 - [ ] Testes adicionados/atualizados

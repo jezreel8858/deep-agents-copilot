@@ -104,6 +104,7 @@ Este prompt utiliza as variáveis de contexto nativas do VS Code Copilot:
 ## 🚨 Regras de Autonomia
 
 - ❌ **NUNCA** executar comandos de exclusão, git push, migrações de banco ou reescrita massiva sem confirmação humana.
+- ❌ **NÃO** encapsular a resposta inteira em bloco global de código markdown nem aninhar cercas de mesma quantidade de backticks quando gerar múltiplos artefatos copiáveis.
 - ✅ **SEMPRE** expor evidências com referências de linhas e arquivos tocados.
 
 ---

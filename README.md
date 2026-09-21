@@ -386,7 +386,7 @@ flowchart TB
 
 ### Consolidações e Gaps de Mercado Fechados (2026-09-02)
 - ✅ Fusões canônicas para redução de redundância semântica: `test-strategy` (estratégia e matriz de risco), `docs-engineer` (unifica author/curate) e `governance-factory` (unifica agent/skill/prompt factory).
-- ✅ Novos perfis especializados enterprise integrados: `runtime-verifier` (read-only pre-flight), `pr-gatekeeper` (preparação de PR pós quality gate) e `database-specialist` (migrações de schema e integridade).
+- ✅ Novos perfis especializados enterprise integrados: `runtime-verifier` (read-only pre-flight), `pr-gatekeeper` (preparação de PR pós quality gate blindado contra quebra de fences de markdown) e `database-specialist` (migrações de schema e integridade).
 - ✅ 9 agents de maturidade enterprise adicionados anteriormente: `security-reviewer`, `performance-agent`, `compliance-guardrails`, `feature-planner`, `devops-engineer`, `debugger`, `code-style-enforcer`, `refactor-executor`.
 - ✅ Governança sincronizada atomicamente (R-015/R-040): `catalog.yaml`, `README.md` (raiz e agents), `routing-graph.yaml` (42 nós) e `casos-roteamento.yaml`.
 - ✅ Cobertura de perfis de mercado: **~95% dos 22 perfis consolidados**.
