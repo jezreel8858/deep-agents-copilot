@@ -6,6 +6,27 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.27.0] — 2026-09-21
+
+### Modificado & Endurecido
+- **Blindagem Completa de Renderização de Blocos de Código e Formatação de PR no `pr-gatekeeper` e Prompts Correlatos (Anti-Fences-Corruption & Isolated Artifacts Blocks)**:
+  - **Eliminação da Corrupção por Fences Aninhados**: Identificada e corrigida a causa raiz da quebra de renderização em visualizadores de markdown (fences de mesma contagem de backticks ````text```` / ````bash```` / ````markdown```` dentro de um outer codeblock global ````markdown```` que forçava os LLMs a emitir a resposta inteira encapsulada e causava truncamento prematuro de fences).
+  - **Reestruturação Mandatória do Formato de Saída (5 Blocos Autocontidos)**:
+    - Removido o outer block markdown que encapsulava o template de saída.
+    - Estabelecida a entrega de 5 blocos copiáveis isolados e autocontidos:
+      - **Bloco 1 (Mensagem de Commit)**: emitido em bloco ````text```` isolado (Formatos A e B).
+      - **Bloco 2 (Comando Bash de Aplicação Manual)**: emitido em bloco ````bash```` isolado e autocontido com heredoc limpo (`git commit -F - << 'EOF' ... EOF`).
+      - **Bloco 3 (Título do PR)**: emitido em bloco ````text```` isolado formatado em Conventional Commits (≤72 cols).
+      - **Bloco 4 (Descrição Estruturada do PR)**: emitido em bloco delimitado estritamente por 4 backticks (` ``` ` + ` ` ) para cópia direta e sem quebras no GitHub, com instrução explícita para que comandos na seção "Como validar / testar" utilizem inline code (`pytest tests/modulo -v`).
+      - **Bloco 5 (CHANGELOG.md)**: emitido em bloco ````diff```` isolado com a entrada semver sugerida.
+  - **Guardrail Anti-Corrupção no CRÍTICO**: Adicionadas cláusulas no escopo crítico de `pr-gatekeeper.agent.md` proibindo incondicionalmente o encapsulamento de toda a resposta em markdown global e o aninhamento de fences de mesma quantidade de backticks.
+  - **Systemic Reuse Gate (R-055 / Q1, Q2, Q3)**:
+    - **Q1 (Peers e Prompts Correlatos)**: Propagadas as regras de isolamento dos 5 blocos e anti-corrupção para `.github/prompts/commit.prompt.md` (PASSO 5, checklist e regras de autonomia) e para `.github/skills/git-governance/SKILL.md` (§ 3 Pull Request Guidelines).
+    - **Q2 (Templates Canônicos)**: Atualizados `.github/agents/templates/agent-template.md` e `.github/prompts/templates/prompt-template.md` com diretrizes explícitas de não-encapsulamento global e isolamento de artefatos.
+    - **Q3 (Testes Determinísticos)**: Criada a suíte `tests/governance_audit/test_pr_gatekeeper_render_integrity.py` com 6 testes determinísticos validando o balanceamento de fences, ausência de outer fences no formato de saída, presença de guardrails anti-corrupção e paridade no prompt `/commit`.
+
+---
+
 ## [2.26.0] — 2026-09-21
 
 ### Modificado & Endurecido

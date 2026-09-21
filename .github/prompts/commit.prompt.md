@@ -216,15 +216,17 @@ Co-authored-by: Nome <email@exemplo.com>
 
 ### PASSO 5 — Apresentar a Mensagem, Título/Descrição de PR e Instruções de Aplicação
 
+> **REGRA MANDATÓRIA DE RENDERIZAÇÃO (Anti-Corrupção de Markdown)**:
+> NUNCA encapsule toda a resposta em um bloco markdown global (```markdown ou ````markdown). A resposta deve ser emitida diretamente como texto markdown, e cada artefato copiável deve ser um bloco isolado e autocontido (Blocos 1 a 5).
+
 Apresentar a saída estruturada nas seguintes seções claras:
 
-1. **Bloco de Mensagem Formatada**: a mensagem pronta para revisão (Formato A ou Formato B).
-2. **Comando para Execução Manual**: bloco bash utilizando `git commit -F - << 'EOF'` para facilitar a cópia e preservar quebras de linha e caracteres especiais.
-3. **Pull Request (Título e Descrição)**:
-   - **Título do PR**: formato Conventional Commits (≤72 cols, imperativo, PT-BR).
-   - **Descrição do PR**: Markdown com seções "O que foi feito", "Tipo de mudança", "Matriz de Risco", "Como testar" e "Checklist" (alinhado a `.github/skills/git-governance/SKILL.md` § 3).
-4. **CHANGELOG.md (Entrada Sugerida)**: diff sugerido no formato Keep a Changelog / SemVer.
-5. Se houver sugestão de staging prévio, exibir o `git add <arquivos>` correspondente antes do commit.
+1. **Bloco 1 (Mensagem de Commit)**: bloco ```text isolado pronto para revisão (Formato A ou Formato B).
+2. **Bloco 2 (Comando para Execução Manual)**: bloco ```bash isolado utilizando `git commit -F - << 'EOF' ... EOF` para facilitar a cópia e preservar quebras de linha e caracteres especiais, sem cercas aninhadas.
+3. **Bloco 3 (Título do PR)**: bloco ```text isolado no formato Conventional Commits (≤72 cols, imperativo, PT-BR).
+4. **Bloco 4 (Descrição do PR)**: bloco ````markdown isolado (delimitado por 4 backticks) com seções "O que foi feito", "Tipo de mudança", "Matriz de Risco", "Como testar" e "Checklist" (alinhado a `.github/skills/git-governance/SKILL.md` § 3). Na seção "Como testar", comandos DEVEM utilizar inline code (ex.: `pytest tests/... -v`) para evitar conflito de cercas.
+5. **Bloco 5 (CHANGELOG.md - Entrada Sugerida)**: bloco ```diff isolado sugerido no formato Keep a Changelog / SemVer.
+6. Se houver sugestão de staging prévio, exibir o `git add <arquivos>` correspondente antes do commit.
 
 ---
 
@@ -239,6 +241,7 @@ Apresentar a saída estruturada nas seguintes seções claras:
 - [ ] **Validação**: Seção `Como validar:` presente com comando executável?
 - [ ] **Pull Request**: Título de PR e Descrição estruturada de PR gerados no formato padrão?
 - [ ] **CHANGELOG**: Entrada sugerida para o `CHANGELOG.md` compatível com SemVer?
+- [ ] **Anti-Corrupção de Markdown**: Resposta NÃO encapsulada em bloco global; cada artefato emitido em bloco isolado e autocontido (Blocos 1 a 5); comandos em testes formatados como inline code sem fences quebrados?
 - [ ] **Autonomia**: Nenhum comando `git add`, `git commit` ou `git push` executado automaticamente.
 
 ---
@@ -248,7 +251,8 @@ Apresentar a saída estruturada nas seguintes seções claras:
 - ❌ **NUNCA** executar `git add`, `git commit`, `git push` ou variações.
 - ❌ **NUNCA** alterar o índice do git (staging) de forma autônoma.
 - ❌ **NUNCA** gerar mensagem para diff contendo credenciais ou segredos expostos.
-- ✅ **SEMPRE** exibir a mensagem estruturada e o comando pronto para execução manual pelo dev.
+- ❌ **NÃO** encapsular a resposta inteira em um bloco de código markdown global nem aninhar blocos de código com a mesma contagem de backticks.
+- ✅ **SEMPRE** exibir a mensagem estruturada e o comando pronto para execução manual pelo dev em blocos autocontidos e isolados.
 
 ---
 

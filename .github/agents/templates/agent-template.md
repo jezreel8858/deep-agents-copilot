@@ -138,6 +138,7 @@ Retorne IMEDIATAMENTE para `@agent-router` caso a solicitação fuja do escopo d
 | Esquecer banner de visibilidade | Perda de rastreabilidade do fluxo | Abrir com `Agente Ativo: <slug-kebab-case>` |
 | Omitir `run_subagent` no frontmatter | Incapacidade de retorno ao router (violação R-042) | Manter `run_subagent` sempre na lista de tools |
 | Encerramento passivo sem tools | Violação de R-047 (Dead-End) | Invocar obrigatoriamente `run_subagent` ou `ask_questions` |
+| Encapsular resposta inteira em bloco de código global | Corrupção de markdown e quebra de renderização de artefatos aninhados | Emitir saída em markdown direto e isolar cada artefato copiável em bloco próprio autocontido |
 
 ---
 
