@@ -161,7 +161,7 @@ def test_governance_maintainer_and_peer_agents_align_with_context_mode_precedenc
     for pf in peer_files:
         assert pf.exists(), f"Peer agent {pf.name} deve existir"
         c = pf.read_text(encoding="utf-8")
-        assert "100% obrigatório" in c, f"[{pf.name}] DEVE declarar context-mode 100% obrigatório"
+        assert "100% OBRIGATÓRIO" in c or "100% obrigatório" in c, f"[{pf.name}] DEVE declarar context-mode 100% obrigatório"
         assert "fallback exclusivo" in c, f"[{pf.name}] DEVE citar fallback exclusivo de editor"
 
 
@@ -413,3 +413,32 @@ def test_prompts_declare_context_mode_precedence_and_batching():
         c = p.read_text(encoding="utf-8")
         assert "ctx_batch_execute" in c, f"[{name}] DEVE declarar ctx_batch_execute"
         assert "100% OBRIGATÓRIO" in c or "100% obrigatório" in c, f"[{name}] DEVE declarar context-mode 100% obrigatório"
+
+
+def test_all_non_router_agents_prohibit_mcp_tool_chaining():
+    """
+    Valida que 100% dos agentes não-roteadores contêm a proibição explícita
+    contra MCP Tool Chaining sequencial no chat (Smell 2.26).
+    """
+    all_agents = [
+        p for p in AGENTS_DIR.glob("**/*.agent.md")
+        if "templates" not in p.parts
+    ]
+    non_routers = [
+        p for p in all_agents
+        if not p.name.endswith("-router.agent.md") and p.name != "agent-router.agent.md" and p.name != "prompt-structuring.agent.md"
+    ]
+
+    violations = []
+    for af in non_routers:
+        rel = str(af.relative_to(REPO_ROOT))
+        content = af.read_text(encoding="utf-8")
+        if "NÃO encadear chamadas unitárias sequenciais de `ctx_execute`" not in content and "NÃO encadear chamadas unitárias sequenciais de ctx_execute" not in content:
+            violations.append(f"[{rel}] ausência de proibição de MCP Tool Chaining sequencial")
+        if "Regra de Ouro do Single-Turn MCP" not in content:
+            violations.append(f"[{rel}] ausência da Regra de Ouro do Single-Turn MCP")
+
+    assert not violations, (
+        f"Violação de Smell 2.26 (MCP Tool Chaining) em {len(violations)} agentes:\n"
+        + "\n".join(violations)
+    )

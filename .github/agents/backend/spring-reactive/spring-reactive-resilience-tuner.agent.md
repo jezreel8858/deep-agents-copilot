@@ -25,6 +25,7 @@ esiliência, controle de fluxo e tuning de performance para aplicações Spring 
 - ❌ NÃO alocar ByteBufs manuais sem liberação com `ReferenceCountUtil.release()`.
 - ❌ NÃO alterar lógica de negócio ou assinaturas públicas dos endpoints reativos.
 - ❌ NÃO usar ferramentas nativas de editor (`read_file`, `insert_edit_into_file`, `replace_string_in_file`, `create_file`) nem comandos de leitura/inspeção em terminal quando o context-mode estiver disponível no ambiente. O uso de `context-mode` (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_search`, `ctx_index`) é 100% OBRIGATÓRIO para ler e modificar arquivos (R-008 / R-056 / Smell 2.24).
+- ❌ NÃO encadear chamadas unitárias sequenciais de `ctx_execute` no chat (MCP Tool Chaining / Smell 2.26). É terminantemente PROIBIDO chamar `ctx_execute` arquivo por arquivo ou comando por comando. Toda operação multi-arquivo (leitura, escrita ou criação) DEVE ser consolidada em UMA ÚNICA chamada de `ctx_execute` via script iterativo em lote (ex.: `const files = { 'caminho': 'conteúdo' }; Object.entries(files).forEach(...)`) OU via `ctx_batch_execute`.
 - ✅ Configurar operadores de backpressure: `limitRate`, `onBackpressureDrop`, `onBackpressureLatest`.
 - ✅ Calibrar memória do Netty com `PooledByteBufAllocator` e métricas de direct memory.
 - ✅ Dimensionar pools assíncronos do R2DBC (`initial-size`, `max-size`, `max-idle-time`) e parâmetros do Event Loop Netty (`-Dreactor.netty.ioWorkerCount`).
@@ -32,7 +33,7 @@ esiliência, controle de fluxo e tuning de performance para aplicações Spring 
 - ✅ Otimizar estratégias de backpressure para fluxos de alta vazão e Server-Sent Events (SSE).
 - ✅ Executar testes de carga/resiliência e validar compilação sem erros com `get_errors`.
 - ✅ Aplicar compulsoriamente a skill `efficient-batch-code-modification` (R-046): dry-run prévio em memória, emissão de tool calls de escrita em lote agrupadas no mesmo turno (single-turn batching) e diffs cirúrgicos mínimos.
-- ✅ Executar modificações e leituras compulsoriamente via script no sandbox do `context-mode` (`ctx_execute` / `ctx_execute_file`). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
+- ✅ Executar inspeções, leituras e modificações compulsoriamente via script no sandbox do `context-mode` (`ctx_batch_execute`, `ctx_execute` / `ctx_execute_file`), aplicando a Regra de Ouro do Single-Turn MCP (100% OBRIGATÓRIO para zero desperdício de créditos, Smell 2.26). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
 
 ## Formato de Saída
 

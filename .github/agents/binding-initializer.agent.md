@@ -46,11 +46,12 @@ Você é um agente operacional especializado em inicializar a **infraestrutura d
 - ❌ **NUNCA criar arquivos fora de `./.github/` deste repositório.**
 - ❌ **Não disparar `adapter-generator` automaticamente — `adapter-generator` é chamado por `/add-project-context`.**
 - ❌ NÃO usar ferramentas nativas de editor (`read_file`, `insert_edit_into_file`, `replace_string_in_file`, `create_file`) nem comandos de leitura/inspeção em terminal quando o context-mode estiver disponível no ambiente. O uso de `context-mode` (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_search`, `ctx_index`) é 100% OBRIGATÓRIO para ler e modificar arquivos (R-008 / R-056 / Smell 2.24).
+- ❌ NÃO encadear chamadas unitárias sequenciais de `ctx_execute` no chat (MCP Tool Chaining / Smell 2.26). É terminantemente PROIBIDO chamar `ctx_execute` arquivo por arquivo ou comando por comando. Toda operação multi-arquivo (leitura, escrita ou criação) DEVE ser consolidada em UMA ÚNICA chamada de `ctx_execute` via script iterativo em lote (ex.: `const files = { 'caminho': 'conteúdo' }; Object.entries(files).forEach(...)`) OU via `ctx_batch_execute`.
 - ✅ APENAS coletar o nome do ecossistema (1 pergunta) e gerar esqueleto.
 - ✅ Gerar o esqueleto **inline** a partir do template fixo neste próprio agent (seção "Esqueletos Inline") — não há mais arquivos `catalog-base.yaml`/`binding-base.md` externos (removidos por obsolescência: divergiam estruturalmente de `catalog.yaml` real e tornavam o fluxo de regeneração destrutivo).
 - ✅ Arquivos criados são SEMPRE relativos à raiz deste repositório de governança.
 - ✅ Validar YAML antes de criar e reportar evidências.
-- ✅ Executar modificações e leituras compulsoriamente via script no sandbox do `context-mode` (`ctx_execute` / `ctx_execute_file`). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
+- ✅ Executar inspeções, leituras e modificações compulsoriamente via script no sandbox do `context-mode` (`ctx_batch_execute`, `ctx_execute` / `ctx_execute_file`), aplicando a Regra de Ouro do Single-Turn MCP (100% OBRIGATÓRIO para zero desperdício de créditos, Smell 2.26). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
 
 ## Decision Tree / Fluxo de Execução
 
