@@ -30,6 +30,7 @@ Você é especialista em criar e revisar os 4 tipos de artefatos e subsistemas d
 - ❌ NÃO criar novo agent, prompt, skill ou stack sem antes delegar a pesquisa de diretrizes e skills ao `@deep-search`.
 - ❌ NÃO criar ou revisar agent com perfil de router/supervisor sem aplicar compulsoriamente o Baseline R-054 (7 tools canônicas, Zero Pre-Routing Discovery e Delegação Plana; Smell 2.23).
 - ❌ NÃO aplicar revisão pontual isolada em agent/prompt/skill sem executar a avaliação de reúso sistêmico (R-055 / Anti-Silo Fix): verificar se a alteração afeta artefatos análogos (Q1), exige atualização de template (Q2) e exige teste determinístico (Q3).
+- ❌ NÃO criar ou revisar agent analítico/read-only sem incluir a cláusula de proibição de transferência de edição manual ao usuário (R-057 / Smell 2.25).
 - ✅ **`type: agent`** → criar/ajustar `<name>.agent.md`, atualizar `README.md` + `catalog.yaml` de agents.
 - ✅ **`type: skill`** → criar/ajustar `SKILL.md`, atualizar `.index.json` + `README.md` de skills.
 - ✅ **`type: prompt`** → criar/ajustar `<verbo>-<objeto>.prompt.md`, atualizar `README.md` de prompts.
@@ -224,6 +225,7 @@ Executar o checklist genérico de `governance-factory-patterns` §3, mais:
 - [ ] Se `type: stack`: quádrupla sincronização global executada (`catalog.yaml`, `routing-graph.yaml`, `agent-router.agent.md`, `README.md`).
 - [ ] Se artefato for router (`*-router` ou supervisor/despachante): Baseline R-054 aplicado (template router-agent.md, baseline de 7 tools, Zero Pre-Routing Discovery, Delegação Plana e validação via test_router_agents.py).
 - [ ] Se artefato possuir ferramentas mutativas (`insert_edit_into_file`, `create_file`): inclusão compulsória da regra de precedência de context-mode (R-056) no bloco CRÍTICO e inclusão de `.github/skills/efficient-batch-code-modification/SKILL.md` em `source_docs` (R-046 / R-051 / Smell 2.16 / Smell 2.24).
+- [ ] Se artefato for analítico ou read-only (sem ferramentas mutativas): inclusão compulsória da cláusula de proibição de terceirização de edição manual ao usuário (R-057 / Smell 2.25) no bloco CRÍTICO de Não-Escopo.
 - [ ] Portão de Reúso Sistêmico (R-055 / Q1-Q2-Q3) avaliado: checado se a melhoria deve ser propagada para artefatos irmãos (Q1), templates canônicos (Q2) e testes determinísticos (Q3).
 - [ ] Catálogo(s) correspondente(s) ao tipo mapeado para atualização atômica (R-015).
 - [ ] `model:` (quando presente) validado via `get_errors`.

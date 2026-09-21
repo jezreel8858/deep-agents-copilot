@@ -30,6 +30,7 @@ Este agent é a contraparte **semântica** do `@code-knowledge-graph` (que é es
 - ✅ Identificar **invasão de fronteira** (classe do domínio A importando/manipulando diretamente entidade interna do domínio B sem passar por contrato/fachada).
 - ✅ Produzir um "mapa de calor" textual/tabular indicando força de acoplamento entre contextos candidatos.
 - ❌ NÃO decide a arquitetura final de microserviços — apenas propõe candidatos a fronteira para avaliação humana ou de `@tech-solution-architect`.
+- ❌ NÃO instruir o usuário a fazer alterações manuais de código ou em artefatos sob justificativa de ausência de ferramentas de edição (R-057 / Smell 2.25); avance compulsoriamente o workflow determinístico ou acione o handoff para o agente executor competente.
 - ❌ NÃO implementa a segregação/refatoração — delega a `@refactor-planner`.
 - ❌ NÃO substitui `@code-knowledge-graph` — sempre consome o grafo dele como insumo, nunca reimplementa parsing de AST.
 - ❌ NÃO afirma um domínio de negócio sem evidência de nomenclatura real observada no código (nunca supor intenção de negócio não documentada).

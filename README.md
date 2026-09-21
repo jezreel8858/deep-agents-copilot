@@ -345,13 +345,14 @@ flowchart TB
 
 ---
 
-## Status Atual (2026-09-19 — Versão 2.23.0)
+## Status Atual (2026-09-20 — Versão 2.24.0)
 
 ### Governança Global & Blindagem Sistêmica
-- ✅ **Regras normativas consolidadas** (`CLAUDE.md` — Regras R-001 a R-056).
+- ✅ **Regras normativas consolidadas** (`CLAUDE.md` — Regras R-001 a R-057).
 - ✅ **Governança Estrita de Routers (R-054 / Smell 2.23)**: Least privilege com baseline de 7 tools, Zero Pre-Routing Discovery e Flat Delegation universal para eliminar consumo inútil de créditos.
 - ✅ **Portão de Reúso e Generalização Sistêmica (R-055 — Anti-Silo Fix)**: Avaliação compulsória de impacto em peers (Q1), templates canônicos (Q2) e testes determinísticos (Q3) em qualquer manutenção.
 - ✅ **Precedência Mandatória de Context Mode (R-056 / Smell 2.24)**: Primazia absoluta de sandboxing e Think-in-Code para escritas/refatorações, erradicando o anti-padrão de editor tool sprawl no chat.
+- ✅ **Proibição Estrita de Terceirização de Edição Manual ao Usuário (R-057 / Smell 2.25 — Anti-Manual User Delegation)**: Erradicação de becos sem saída onde agentes analíticos e de triagem (read-only) instruíam o usuário a editar código por falta de tools; avanço determinístico de workflow e delegação plana obrigatória para executores downstream.
 - ✅ **Workflows Canônicos Determinísticos (R-050)**: 8 workflows operacionais com State Machines rígidas e banners visuais anti-cegueira.
 - ✅ **Endurecimento Determinístico e Paridade de Governança em Bugfix e Refatoração (`WORKFLOW-BUG-FIX` e `WORKFLOW-REFACTORING`)**: Paridade estrita de rigor determinístico equivalente à migração de frameworks, erradicando intuições causais e efeitos colaterais silenciosos:
   - **`WORKFLOW-BUG-FIX`**: RCA estruturado (5 Whys / Fishbone) sob a regra inegociável *evidence before hypothesis* (mínimo de 2 fontes independentes de evidência técnica observável: stack trace, runtime log, payload de rede, APM ou teste isolado); classificação determinística compulsória entre falha `flaky` (instabilidade intermitente por concorrência/ambiente/poluição de estado) vs `regressao_real`; pré-requisito mandatório de declaração antecipada de `blast_radius_estimado` (callers e módulos afetados) e `rollback_plan` no `workflow_state` antes de emitir diff cirúrgico; **Mini Mutation-Check** proporcional ao risco no Estado 4 (injeção de 1 a 3 mutantes sintéticos eliminados pelo Red Test, erradicando falsos-verdes); e **Observação Pós-Fix / Canary Gate** no Estado 5 com métricas de telemetria e janela de observação definidas para defeitos críticos (P0/P1, segurança, autenticação e integridade de dados).

@@ -229,6 +229,10 @@ limites_execucao:
 - ❌ `allow_redelegation: true` sem `max_delegation_depth` (recursão irrestrita)
 - ❌ Agent que chama ferramentas externas sem `max_execution_time_min`
 
+### 6.1) Proibição Estrita de Terceirização ao Usuário em Agentes Analíticos / Read-Only (R-057 / Smell 2.25)
+
+Agentes analíticos, consultivos e supervisores desprovidos de ferramentas de escrita são expressamente proibidos de transferir tarefas manuais de edição de código para o usuário sob o pretexto de ausência de ferramentas. Quando sua análise identificar necessidade de alteração técnica, o agente deve compulsoriamente avançar para a próxima etapa do workflow canônico ou acionar o agente executor correspondente (R-047 / R-050).
+
 ---
 
 ## 7) Context Engineering por Agent
