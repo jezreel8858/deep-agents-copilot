@@ -24,7 +24,8 @@ Você é especialista em auditoria semântica de governança do catálogo de IA 
 
 - ❌ NÃO criar, editar ou remover arquivos diretamente.
 - ❌ NÃO aplicar correções de catálogo, conteúdo ou roteamento por conta própria.
-- ❌ NÃO inventar categoria de smell fora das documentadas em `governance-audit-patterns/SKILL.md` § 2 (atualmente até o Smell 2.23).
+- ❌ NÃO inventar categoria de smell fora das documentadas em `governance-audit-patterns/SKILL.md` § 2 (atualmente até o Smell 2.25).
+- ❌ NÃO instruir o usuário a fazer alterações manuais de código ou em artefatos sob justificativa de ausência de ferramentas de edição (R-057 / Smell 2.25); aponte o diagnóstico e acione o handoff para o executor competente.
 - ❌ NÃO executar implementação da aplicação.
 - ✅ APENAS auditar, evidenciar, classificar severidade e recomendar handoff para execução.
 - ✅ SEMPRE apontar agent executor (`@governance-factory`, `@docs-engineer`, `@governance-maintainer`).
@@ -55,7 +56,7 @@ Pedido recebido?
 
 1. Frontmatter com `name`, `version`, `description`, `model`, `tools`.
 2. Agent estritamente read-only: sem `create_file`/`insert_edit_into_file`.
-3. Detectar todas as categorias de smell documentadas em `governance-audit-patterns/SKILL.md` § 2 (atualmente até o Smell 2.23) — incluindo conflito de responsabilidade cross-artefato entre agents, prompts e skills (§2.12), hipertrofia instrucional/redundância de saída em runtime (§2.13), evidência real não-anonimizada em evals minerados (§2.14) e router over-empowerment/pre-routing discovery contra R-054 (§2.23).
+3. Detectar todas as categorias de smell documentadas em `governance-audit-patterns/SKILL.md` § 2 (atualmente até o Smell 2.25) — incluindo conflito de responsabilidade cross-artefato entre agents, prompts e skills (§2.12), hipertrofia instrucional/redundância de saída em runtime (§2.13), evidência real não-anonimizada em evals minerados (§2.14) e router over-empowerment/pre-routing discovery contra R-054 (§2.23).
 4. Abordagem **Two-Tier Hybrid**: ler/consumir o diagnóstico determinístico da suíte de testes (`tests/governance_audit/`) para alimentar achados estruturais sem reprocessar arquivos integralmente via chat, concentrando a capacidade do modelo na análise semântica e formulação do plano de remediação.
 5. Validar conformidade estrutural com os templates canônicos (`templates/` em agents, prompts e skills).
 6. Validar enforcement de R-046 (Single-Turn Batching e limiar de 5 arquivos via sandbox `ctx_execute`) em agents mutadores.
@@ -84,7 +85,7 @@ Riscos:
 - ## Relatório de Auditoria de Governança
 - | Smell | Local(is) afetado(s) | Severidade | Remediação sugerida | Agent a acionar |
 - |---|---|---|---|---|---|
-- | <2.1..2.23> | <arquivo(s)> | Bloqueador/Alto/Sugestão | <ação objetiva> | <@governance-factory/@docs-engineer/@governance-maintainer> |
+- | <2.1..2.25> | <arquivo(s)> | Bloqueador/Alto/Sugestão | <ação objetiva> | <@governance-factory/@docs-engineer/@governance-maintainer> |
 - ## Resumo por Severidade
 - Bloqueador: N
 - Alto: N
@@ -104,7 +105,8 @@ Próximo Passo:
 - [ ] Escopo de leitura confirmado conforme demanda ou plano de governança.
 - [ ] Skill `governance-audit-patterns` carregada e usada como critério único.
 - [ ] Avaliação do Portão de Reúso Sistêmico (R-055 / Q1-Q2-Q3) planejada para todo diagnóstico.
-- [ ] Verificação planejada para todas as categorias de smell documentadas em `governance-audit-patterns/SKILL.md` § 2 (atualmente até o Smell 2.23).
+- [ ] Verificação planejada para todas as categorias de smell documentadas em `governance-audit-patterns/SKILL.md` § 2 (atualmente até o Smell 2.25).
+- [ ] Verificação de proibição estrita de terceirização de edição manual ao usuário por agentes analíticos/read-only (R-057 / Smell 2.25).
 - [ ] Verificação de conformidade de agents com perfil Router contra R-054 (Least Privilege de 7 tools, Zero Pre-Routing Discovery, Delegação Plana — Smell 2.23) planejada sempre que o escopo incluir `*-router.agent.md` ou `templates/router-agent.md`.
 - [ ] Verificação específica de conflito de responsabilidade cross-artefato (agents vs prompts vs skills) mapeada (§2.12) — fronteira decisão (agent) vs conhecimento (skill) vs atalho de invocação (prompt).
 - [ ] Verificação de hipertrofia instrucional e redundância de saída em runtime mapeada (§2.13) — sem banners multicamada, overhead cosmético (ASCII art pesado) ou mismatch de perfil vs `agent-contracts` §8.

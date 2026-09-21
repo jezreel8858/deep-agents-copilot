@@ -6,6 +6,20 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.24.0] — 2026-09-20
+
+### Adicionado
+- **Proibição Estrita de Terceirização de Edição Manual ao Usuário por Agentes Analíticos / Read-Only (R-057 / Smell 2.25 — Anti-Manual User Delegation & Automated Workflow Continuity)**:
+  - Formalização da regra normativa **R-057** em `CLAUDE.md` e `.github/copilot-instructions.md`, vedando que agentes analíticos, supervisores, auditores e advisors sem ferramentas de mutação instruam o usuário a editar código manualmente sob pretexto de ausência de tools.
+  - Catalogação do **Smell 2.25 (Terceirização Indevida de Edição ao Usuário por Agentes Analíticos / Read-Only / Dead-End Analysis)** em `.github/skills/governance-audit-patterns/SKILL.md`, classificado como **Bloqueador** por violar R-047 (Anti Beco Sem Saída).
+  - Instituição do **Invariante 16** em `.github/agents/workflows.md` (Regras de Não-Desvio), blindando a transição automática da etapa diagnóstica/analítica para a etapa executora nos workflows operacionais (`WORKFLOW-GOVERNANCE-MAINTENANCE`, `WORKFLOW-BUG-FIX`, `WORKFLOW-REFACTORING`, etc.).
+  - Formalização da sub-seção 6.1 em `.github/skills/agent-contracts/SKILL.md` e anti-padrão na skill `.github/skills/handoff-governance/SKILL.md`.
+  - Injeção da cláusula preventiva de não-escopo em templates canônicos (`research-agent.md`, `agent-template.md`, `router-agent.md`) e em 12 agentes analíticos canônicos (`agent-auditor`, `code-review`, `adr-sentinel`, `repo-hygiene-auditor`, `requirements-analyst`, `test-strategy`, `bug-triage`, `refactor-planner`, `runtime-verifier`, `deep-search`, `tech-solution-architect`, `ddd-bounded-context-mapper`).
+  - Atualização do checklist de conformidade no `governance-factory.agent.md` para auditar a presença compulsória de R-057 em novos agentes analíticos.
+  - Criação da suíte determinística de testes em `tests/governance_audit/test_anti_manual_user_delegation_governance.py` (7 novos testes verdes).
+
+---
+
 ## [2.23.0] — 2026-09-19
 
 ### Adicionado

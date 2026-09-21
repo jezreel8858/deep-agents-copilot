@@ -394,6 +394,8 @@ fan_out:
 
 ## 6) Anti-padrões
 
+- ❌ **Terceirização Indevida de Execução ao Usuário por Agente Analítico/Read-Only (Smell 2.25 / R-057)**: O agente analítico/read-only constata que não possui ferramentas para editar os arquivos e transfere instruções manuais de edição para o usuário, em vez de realizar o handoff para o executor responsável ou avançar para a próxima etapa do workflow determinístico (R-050).
+
 - ❌ Handoff sem payload de contexto (downstream começa do zero)
 - ❌ Delegar para evitar trabalho ("lazy handoff")
 - ❌ Loop de delegação (A → B → A) — detectar e interromper

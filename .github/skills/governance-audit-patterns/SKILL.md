@@ -320,16 +320,18 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 | Severidade | **Alta** (não impede o build, mas entrega interface quebrada para o usuário final, gerando retrabalho imediato de layout e refatoração de contratos de template) |
 | Remediação | `@governance-factory`/`@governance-maintainer` estabelece: (a) Protocolo "Canonical Sibling First" e leitura obrigatória da interface `.ts` de componentes `shared/` em `angular-implementation-patterns` e `angular-feature-developer`; (b) Proibição estrita de hex colors em SCSS de features e checklist de diálogos em `angular-ui-stylist`; (c) Duplo Gate de Qualidade (Gate 1: Lógica/Testes/OWASP, Gate 2: Design System & Paridade de UI) no `WORKFLOW-FEATURE-DEVELOPMENT` de `workflows.md` |
 
-## 3) Severidade — Reaproveitamento da Taxonomia Existente
+---
+### 2.22 — Sticky Agent e Falha de Reset de Workflow (R-042 / R-052)
 
-Esta skill **reaproveita** (não recria) a taxonomia de `code-review-patterns`:
-
-| Severidade | Critério Objetivo de Enquadramento |
+| Campo | Conteúdo |
 |---|---|
-| **Bloqueador** | Gap que impede o funcionamento técnico ou a governança do artefato: falta de `run_subagent` (R-042); `model:` inválido ou desconhecido (`Unknown model`); tool de escrita em agent read-only; uso de terminal sem `terminal-governance`; vazamento de evidência real de projeto (R-044); ou dessincronização crítica no catálogo (R-015). |
-| **Alto** | Gap que gera desperdício severo de tokens/créditos, duplicação de manutenção ou risco de drift: violação de batching (R-046); divergência de templates canônicos (ausência de escopo ✅/❌ ou workflow); falta de variáveis nativas em prompts; código inline > 8 linhas em skills (R-026); ou sobreposição funcional ativa entre 2 agents. |
-| **Sugestão** | Melhoria técnica não urgente ou cosmética: refinamento de `argument-hint`; ajuste fino de `description` dentro do limite; ou gap taxonômico de categoria intencionalmente não coberta. |
+| Sintoma | O último agente ativo em um turno ou ao término de um workflow canônico retém o controle da conversa e tenta responder a uma nova solicitação do usuário, justificando que o pedido pertence ao mesmo ecossistema/stack técnica, violando a centralidade do `@agent-router` e bypassando o pipeline de requisitos ou triagem do workflow canônico aplicável. |
+| Como detectar | Agente downstream aceita nova tarefa diretamente sem handoff de retorno ao router; ausência de reset de workflow ao concluir entrega técnica. |
+| Origem (TrustAgent) | Intrínseco — inércia conversacional e afinidade de stack (Sticky Session / Sticky Agent). |
+| Severidade | **Bloqueador** (violação R-042 e R-052). |
+| Remediação | Todo agente downstream ao concluir sua entrega deve registrar o workflow como concluído e acionar handoff de retorno ao `@agent-router` (`motivo: "conclusao_de_workflow_anterior"`), proibindo sticky-sessions inter-tarefas. |
 
+---
 ### 2.23 — Router Over-Empowerment e Pre-Routing Discovery Bloat (R-054)
 
 | Campo | Conteúdo |
@@ -352,10 +354,25 @@ Esta skill **reaproveita** (não recria) a taxonomia de `code-review-patterns`:
 | Remediação | Injeção da cláusula de precedência mandatória de `context-mode` no bloco CRÍTICO e diretrizes de todos os agentes mutadores e templates operacionais, reservando ferramentas de editor como fallback estrito de última instância |
 
 ---
-### Smell 2.22 — Sticky Agent e Falha de Reset de Workflow (R-042 / R-052)
-- **Definição**: Ocorre quando o último agente ativo em um turno ou ao término de um workflow canônico retém o controle da conversa e tenta responder a uma nova solicitação do usuário, justificando que o pedido pertence ao mesmo ecossistema/stack técnica, violando a centralidade do `@agent-router` e bypassando o pipeline de requisitos ou triagem do workflow canônico aplicável.
-- **Severidade**: Bloqueador.
-- **Remediação**: Todo agente downstream ao concluir sua entrega deve registrar o workflow como concluído e acionar handoff de retorno ao `@agent-router` (`motivo: "conclusao_de_workflow_anterior"`), proibindo sticky-sessions inter-tarefas.
+### 2.25 — Terceirização Indevida de Edição ao Usuário por Agentes Analíticos / Read-Only (Anti-Manual User Delegation & Dead-End Analysis / R-057)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Um agente analítico, read-only, supervisor ou de triagem (ex.: `@agent-router`, `@agent-auditor`, `@code-review`, `@adr-sentinel`, `@repo-hygiene-auditor`, `@requirements-analyst`, `@test-strategy`, `@bug-triage`), desprovido de ferramentas mutativas em seu frontmatter, ao constatar a necessidade de alteração no código ou em artefatos de governança, em vez de acionar a próxima etapa do workflow determinístico ou transferir o controle via handoff para o agente executor competente (ex.: `@governance-maintainer`, `@bug-fixer`, `@feature-developer`), emite instruções de edição manual para o usuário ("edite você mesmo no arquivo X", "não possuo ferramentas de escrita, faça a alteração Y"), gerando quebra do ciclo autônomo, frustração do usuário e beco sem saída (violação R-047). |
+| Como detectar | (a) Resposta de agente analítico contendo orientações para que o próprio usuário edite código ou execute alterações manuais por ausência de ferramentas no agente; (b) Encerramento de turno de agente de análise com pendências técnicas sem acionamento de `run_subagent` ou avanço de etapa no pipeline do workflow; (c) Ausência da cláusula explícita de proibição de transferência de edição ao usuário (R-057) no bloco "CRÍTICO: ESCOPO E NÃO-ESCOPO" de agentes analíticos e templates canônicos (`research-agent.md`, `agent-template.md`, `router-agent.md`). |
+| Origem (TrustAgent) | Intrínseco — falha de alinhamento de agência e beco sem saída (R-047), onde o modelo constata a ausência de tools mutativas e tenta suprir a lacuna transferindo a execução manual ao usuário em vez de navegar a máquina de estados do workflow determinístico. |
+| Severidade | **Bloqueador** (interrompe o fluxo autônomo agent-first e desrespeita a divisão de responsabilidades entre agentes analíticos e executores). |
+| Remediação | (a) Injeção da cláusula R-057 no bloco CRÍTICO de todos os agentes analíticos/read-only e templates canônicos (`research-agent.md`, `agent-template.md`, `router-agent.md`); (b) Blindagem dos workflows canônicos em `workflows.md` com invariante explícito de avanço compulsório da etapa diagnóstica para a etapa executora; (c) Formalização de teste determinístico no pytest (`test_anti_manual_user_delegation_governance.py`). |
+
+## 3) Severidade — Reaproveitamento da Taxonomia Existente
+
+Esta skill **reaproveita** (não recria) a taxonomia de `code-review-patterns`:
+
+| Severidade | Critério Objetivo de Enquadramento |
+|---|---|
+| **Bloqueador** | Gap que impede o funcionamento técnico ou a governança do artefato: falta de `run_subagent` (R-042); `model:` inválido ou desconhecido (`Unknown model`); tool de escrita em agent read-only; uso de terminal sem `terminal-governance`; vazamento de evidência real de projeto (R-044); dessincronização crítica no catálogo (R-015); ou terceirização manual ao usuário por agent analítico (R-057 / Smell 2.25). |
+| **Alto** | Gap que gera desperdício severo de tokens/créditos, duplicação de manutenção ou risco de drift: violação de batching (R-046); divergência de templates canônicos (ausência de escopo ✅/❌ ou workflow); falta de variáveis nativas em prompts; código inline > 8 linhas em skills (R-026); ou sobreposição funcional ativa entre 2 agents. |
+| **Sugestão** | Melhoria técnica não urgente ou cosmética: refinamento de `argument-hint`; ajuste fino de `description` dentro do limite; ou gap taxonômico de categoria intencionalmente não coberta. |
 
 ## 4) Cross-check de Segurança (Referência, Não Duplicação)
 
@@ -368,7 +385,7 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 
 | Smell | Local(is) afetado(s) | Severidade | Remediação sugerida | Agent a acionar |
 |---|---|---|---|---|
-| <2.1..2.14> | <arquivo(s)> | Bloqueador/Alto/Sugestão | <ação objetiva> | <@governance-factory/@docs-engineer/@governance-maintainer> |
+| <2.1..2.25> | <arquivo(s)> | Bloqueador/Alto/Sugestão | <ação objetiva> | <@governance-factory/@docs-engineer/@governance-maintainer> |
 
 ## Resumo por Severidade
 - Bloqueador: N

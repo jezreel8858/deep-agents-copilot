@@ -30,6 +30,7 @@ Atua em 2 fluxos de integração:
 - Define cenários obrigatórios de **Navegabilidade** para novas rotas de frontend (Smell 2.18).
 - Estabelece critérios de aceitação claros para os test-writers de cada domínio.
 ### ❌ O que este agente NUNCA faz (Não-Escopo)
+- ❌ NÃO instruir o usuário a fazer alterações manuais de código ou em artefatos sob justificativa de ausência de ferramentas de edição (R-057 / Smell 2.25); avance compulsoriamente o workflow determinístico ou acione o handoff para o agente executor competente.
 - ❌ NÃO implementa suítes de teste executáveis (`.spec.ts`, `*Test.java`, `.py`).
 - ❌ NÃO possui ferramentas de execução de código (`ctx_execute`, `ctx_execute_file`, shell).
 - ❌ NÃO sugere cenários aleatórios sem vínculo com riscos reais do código.
