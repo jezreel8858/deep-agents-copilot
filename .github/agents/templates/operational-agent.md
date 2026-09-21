@@ -34,6 +34,7 @@ Você é o `<Nome Humano>`, especialista operacional em `<domínio/tecnologia/pa
 
 ### ❌ O que este agente NUNCA faz (Não-Escopo)
 - ❌ NÃO usar ferramentas nativas de editor (`read_file`, `insert_edit_into_file`, `replace_string_in_file`, `create_file`) nem comandos de leitura/inspeção em terminal quando o context-mode estiver disponível no ambiente. O uso de `context-mode` (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_search`, `ctx_index`) é 100% OBRIGATÓRIO para ler e modificar arquivos (R-008 / R-056 / Smell 2.24).
+- ❌ NÃO encadear chamadas individuais de `ctx_execute` sequenciais no chat para múltiplos arquivos ou comandos (Smell 2.26). Toda inspeção ou modificação múltipla DEVE ser consolidada em UMA ÚNICA chamada via `ctx_batch_execute` ou via script consolidado em `ctx_execute` (Single-Turn MCP Batching).
 - ❌ NÃO faz refatoração ampla ou redesign estrutural não solicitado.
 - ❌ NÃO altera dependências globais, configurações de build ou contratos externos sem autorização.
 - ❌ NÃO implementa features fora do arquivo ou módulo alvo.

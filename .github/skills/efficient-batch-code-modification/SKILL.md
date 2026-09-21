@@ -61,7 +61,8 @@ Nos ambientes de AI Chat (VS Code / JetBrains Copilot):
 - Se uma tarefa toca 15 arquivos e o agente executa:
   `read_file (1)` → *turno* → `replace (1)` → *turno* → `read_file (2)` → *turno* → `replace (2)` ...
   O agente realiza **30+ turnos sequenciais**. Com um histórico médio de 25k tokens, são processados mais de **750.000 tokens de entrada**, drenando rapidamente centenas de créditos de modelos premium (Claude Sonnet / GPT-5).
-- **A Solução Canônica:** Pré-análise em memória (Dry-Run) + Execução em Lote Paralela (*Single-Turn Batching*) + Diffs Cirúrgicos.
+- **O Anti-Padrão MCP Tool Chaining Sequencial no Chat (Smell 2.26)**: O mesmo dreno ocorre quando o agente substitui ferramentas de editor por `ctx_execute`, mas o invoca de forma sequencial turno a turno no chat (ex.: 10+ turnos sucessivos disparando um `ctx_execute` para cada arquivo/diff). Cada turno reenvia todo o histórico acumulado da conversa.
+- **A Solução Canônica:** Pré-análise em memória (Dry-Run) + Execução em Lote Único (*Single-Turn Batching* via `ctx_batch_execute` ou script consolidado em `ctx_execute`) + Diffs Cirúrgicos.
 
 ---
 
@@ -100,6 +101,36 @@ Antes de qualquer dry-run ou inspeção para batch edit, o agente NÃO DEVE ler 
 2. **Proibição de Reescrita Integral:**
    - **NUNCA** reescreva arquivos inteiros do zero via `create_file` ou replace integral se a alteração afeta apenas 10% a 30% do arquivo.
    - Reescrita total só é justificável se o arquivo for novo ou se >80% do seu conteúdo foi descartado.
+
+### 2.4. Diretriz 4: Single-Turn MCP Batching Compulsório (Anti-MCP Tool Chaining / Smell 2.26)
+
+Toda inspeção, análise, validação ou modificação envolvendo múltiplos alvos (diffs, arquivos, status, branches) DEVE ser consolidada em **UMA ÚNICA chamada de ferramenta MCP**:
+
+1. **Via A — Múltiplos comandos shell/leituras:** Usar compulsoriamente `ctx_batch_execute` com comandos rotulados e queries unificadas em uma única rodada:
+   ```javascript
+   ctx_batch_execute({
+     commands: [
+       { label: "git-diff", command: "git --no-pager diff --stat" },
+       { label: "git-log", command: "git --no-pager log -n 3 --oneline" },
+       { label: "status", command: "git status -s" }
+     ],
+     queries: ["arquivos modificados", "mensagens de commit recentes"],
+     concurrency: 2
+   })
+   ```
+2. **Via B — Múltiplos arquivos no filesystem:** Usar um único script síncrono em `ctx_execute` que itere por todos os alvos e emita um resumo consolidado:
+   ```javascript
+   ctx_execute({
+     language: "javascript",
+     code: `
+       const fs = require('fs');
+       const targets = ['src/a.ts', 'src/b.ts', 'src/c.ts'];
+       const summary = targets.map(f => ({ file: f, lines: fs.readFileSync(f, 'utf8').split('\\n').length }));
+       console.log(JSON.stringify(summary, null, 2));
+     `
+   })
+   ```
+3. **Proibição Absoluta**: É terminantemente proibido disparar turnos separados no chat chamando `ctx_execute` para cada arquivo/comando individualmente.
 
 ---
 

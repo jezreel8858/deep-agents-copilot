@@ -96,6 +96,7 @@ A regra **R-048** estabelece critérios objetivos para evitar o tráfego desnece
 
 ## 4) Guardrails de economia (token budget)
 
+- **Single-Turn MCP Batching Compulsório (Smell 2.26)**: É terminantemente proibido encadear múltiplas chamadas unitárias de `ctx_execute` no chat para analisar múltiplos alvos; usar compulsoriamente `ctx_batch_execute(commands, queries)` em rodada única OU um script síncrono consolidado em `ctx_execute`.
 - Sempre agrupar perguntas no mesmo `queries: [...]`.
 - Sempre informar `source` quando houver múltiplas fontes indexadas.
 - Em `ctx_batch_execute`, preferir `query_scope: "batch"` quando o foco for apenas a coleta atual.
@@ -109,6 +110,7 @@ A regra **R-048** estabelece critérios objetivos para evitar o tráfego desnece
 
 ## 6) Anti-padrões (proibidos)
 
+- **MCP Tool Chaining Sequencial no Chat (Smell 2.26)**: disparar múltiplas chamadas individuais de `ctx_execute` em turnos sucessivos para investigar arquivos, diffs ou logs um a um, reenviando todo o histórico do chat a cada turno em vez de consolidar em `ctx_batch_execute` ou script único no sandbox.
 - Rodar comando verboso em terminal só para "ver rapidamente".
 - Fazer várias chamadas `ctx_search` unitárias para perguntas relacionadas.
 - Passar dados grandes em `ctx_index(content)`.

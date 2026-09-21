@@ -6,6 +6,24 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.28.0] — 2026-09-21
+
+### Adicionado & Endurecido
+- **Single-Turn MCP Batching Compulsório e Erradicação de MCP Tool Chaining Sequencial no Chat (R-008, R-046, R-056 / Smell 2.26)**:
+  - **Diagnóstico e Causa Raiz**: Identificado que agentes operacionais e de preparação (como `pr-gatekeeper` e outros) incorriam no anti-padrão de disparar 10+ chamadas unitárias sequenciais de `ctx_execute` turno a turno no chat para analisar diffs, arquivos, branches e categorias, reenviando todo o histórico acumulado da conversa a cada turno e drenando créditos de IA desnecessariamente.
+  - **Single-Turn MCP Batching Mandatório**: Instituída a regra normativa que exige que qualquer inspeção, levantamento ou mutação envolvendo múltiplos alvos seja consolidada em chamada única:
+    - **Via A (`ctx_batch_execute`)**: Para múltiplos comandos shell/git e queries unificadas em uma única rodada de ferramenta.
+    - **Via B (script consolidado em `ctx_execute`)**: Para múltiplos arquivos no filesystem processados em loop iterativo interno em processo único no sandbox, retornando um resumo agregado único.
+    - **Proibição Absoluta**: Terminantemente vedado o MCP Tool Chaining sequencial no chat.
+  - **Systemic Reuse Gate (R-055 / Q1, Q2, Q3)**:
+    - **Q1 (Peers e Catálogos)**: Habilitado compulsoriamente `'context-mode/ctx_batch_execute'` em 100% dos agentes do catálogo que possuíam `context-mode/ctx_execute` (`code-knowledge-graph`, `code-review`, `code-style-enforcer`, `database-specialist`, `debugger`, `performance-agent`, `pr-gatekeeper`, `runtime-verifier`, `security-reviewer`), garantindo paridade total; sincronizado `catalog.yaml` para `runtime-verifier` e `pr-gatekeeper`; atualizado `pr-gatekeeper.agent.md` com as diretrizes consolidadas de batching pré-PR.
+    - **Q2 (Templates Canônicos e Fábrica)**: Atualizados `agent-template.md`, `operational-agent.md` e `governance-factory.agent.md` com a cláusula de Single-Turn MCP Batching, proibição de encadeamento sequencial e verificação compulsória de `ctx_batch_execute` no checklist de novos agentes.
+    - **Q3 (Testes Determinísticos no pytest)**: Adicionados 4 testes determinísticos em `tests/governance_audit/test_context_mode_precedence_governance.py` (`test_smell_2_26_documented_in_governance_audit_patterns`, `test_mcp_batch_execution_and_tool_chaining_prohibition_in_normative_docs`, `test_all_agents_with_ctx_execute_declare_ctx_batch_execute`, `test_catalog_yaml_declares_ctx_batch_execute_for_all_ctx_execute_agents`), atingindo 100% de aprovação (189/189 testes verdes).
+  - **Catálogo de Smells de Governança**: Catalogado o **Smell 2.26** ("MCP Tool Chaining Sequencial no Chat / Omissão de ctx_batch_execute e Script Consolidado") em `.github/skills/governance-audit-patterns/SKILL.md` com severidade Bloqueador, critérios de detecção e remediação.
+  - **Alinhamento Normativo**: Sincronizados `CLAUDE.md` (R-008, R-046, R-056), `.github/copilot-instructions.md` (Seção 2 e 2.1), `.github/skills/efficient-batch-code-modification/SKILL.md` e `.github/skills/context-mode/SKILL.md`.
+
+---
+
 ## [2.27.0] — 2026-09-21
 
 ### Modificado & Endurecido
