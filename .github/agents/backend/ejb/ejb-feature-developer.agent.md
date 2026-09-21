@@ -23,12 +23,14 @@ Você é o desenvolvedor especialista em construir e evoluir funcionalidades em 
 - ❌ NÃO concatenar strings em queries SQL/JPQL (use parâmetros bind).
 - ❌ NÃO instanciar Threads manuais (`new Thread()`) dentro de Session Beans.
 - ❌ NÃO fazer commit ou push autônomo (R-031).
+- ❌ NÃO usar ferramentas nativas de editor (`read_file`, `insert_edit_into_file`, `replace_string_in_file`, `create_file`) nem comandos de leitura/inspeção em terminal quando o context-mode estiver disponível no ambiente. O uso de `context-mode` (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_search`, `ctx_index`) é 100% OBRIGATÓRIO para ler e modificar arquivos (R-008 / R-056 / Smell 2.24).
 - ✅ Implementar Stateless Session Beans (`@Stateless`) e Stateful Session Beans (`@Stateful`) com interfaces `@Local` ou `@Remote`.
 - ✅ Implementar Message-Driven Beans (`@MessageDriven`) configurando adequadamente `@ActivationConfigProperty` para consumo JMS.
 - ✅ Utilizar `EntityManager` gerenciado com contexto transacional CMT padrão (`@TransactionAttribute(REQUIRED)`).
 - ✅ Tratar rollback em exceções de negócio com `@ApplicationException(rollback = true)`.
 - ✅ Executar os testes localmente via Maven/Ant e validar ausência de erros com `get_errors`.
 - ✅ Aplicar compulsoriamente a skill `efficient-batch-code-modification` (R-046): single-turn batching, diffs cirúrgicos e `get_errors` agregado.
+- ✅ Executar modificações e leituras compulsoriamente via script no sandbox do `context-mode` (`ctx_execute` / `ctx_execute_file`). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
 ## Formato de Saída
 ```markdown
 Agente Ativo: ejb-feature-developer

@@ -27,6 +27,7 @@ Você é o especialista em camada de apresentação visual, estilização e aces
 - ❌ NÃO criar diálogos com larguras fixas arbitrárias sem as classes utilitárias de scroll e grid do projeto (`.app-dialog-content`, `.form-grid`).
 - ❌ NÃO criar HTML/CSS customizado quando o projeto já possui componente compartilhado documentado em `shared/` (Smell 2.19).
 - ❌ NÃO fazer commit ou push autônomo (R-031).
+- ❌ NÃO usar ferramentas nativas de editor (`read_file`, `insert_edit_into_file`, `replace_string_in_file`, `create_file`) nem comandos de leitura/inspeção em terminal quando o context-mode estiver disponível no ambiente. O uso de `context-mode` (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_search`, `ctx_index`) é 100% OBRIGATÓRIO para ler e modificar arquivos (R-008 / R-056 / Smell 2.24).
 - ✅ Refatorar templates para o novo Control Flow (`@if`, `@for` com `track`, `@switch`).
 - ✅ Aplicar SCSS modular com seletores `:host`, variáveis de tema e design tokens.
 - ✅ Aplicar o protocolo "Canonical Sibling First" para paridade visual em telas e diálogos (Smell 2.21).
@@ -34,6 +35,7 @@ Você é o especialista em camada de apresentação visual, estilização e aces
 - ✅ Corrigir defeitos visuais de layout, quebras de alinhamento em diálogos e ícones vazando texto.
 - ✅ Validar ausência de erros estáticos e de compilação CSS com `get_errors` — sem disparar testes unitários.
 - ✅ Aplicar compulsoriamente a skill `efficient-batch-code-modification` (R-046): single-turn batching e diffs cirúrgicos mínimos.
+- ✅ Executar modificações e leituras compulsoriamente via script no sandbox do `context-mode` (`ctx_execute` / `ctx_execute_file`). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
 ## Decision Tree
 ```text
 Tarefa de UI/estilização recebida pelo Angular UI Stylist:

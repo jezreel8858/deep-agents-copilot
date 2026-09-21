@@ -163,3 +163,64 @@ def test_governance_maintainer_and_peer_agents_align_with_context_mode_precedenc
         c = pf.read_text(encoding="utf-8")
         assert "100% obrigatório" in c, f"[{pf.name}] DEVE declarar context-mode 100% obrigatório"
         assert "fallback exclusivo" in c, f"[{pf.name}] DEVE citar fallback exclusivo de editor"
+
+
+def test_all_mutating_agents_declare_r056_and_explicit_prohibition():
+    """
+    Varredura dinâmica e assertiva (R-056 / Smell 2.24):
+    Todo .agent.md no repositório que declare insert_edit_into_file ou create_file em tools:
+    DEVE conter a regra R-056 e a proibição explícita no seu texto.
+    """
+    import re
+
+    agent_files = [
+        p for p in AGENTS_DIR.glob("**/*.agent.md")
+        if "templates" not in p.parts
+    ]
+    assert len(agent_files) >= 40, "Deve haver ao menos 40 agents no catálogo"
+
+    mutating_agents = []
+    for af in agent_files:
+        content = af.read_text(encoding="utf-8")
+        fm_match = re.match(r"^---\s*\n(.*?)\n---", content, re.DOTALL)
+        if not fm_match:
+            continue
+        fm_text = fm_match.group(1)
+        tools_match = re.search(r"tools:\s*(\[[^\]]*\])", fm_text)
+        if not tools_match:
+            continue
+        tools_str = tools_match.group(1)
+        if "insert_edit_into_file" in tools_str or "create_file" in tools_str:
+            mutating_agents.append(af)
+
+    assert len(mutating_agents) >= 45, f"Esperado ao menos 45 agentes mutadores, encontrados {len(mutating_agents)}"
+
+    violations = []
+    for ma in mutating_agents:
+        rel = ma.relative_to(REPO_ROOT)
+        text = ma.read_text(encoding="utf-8")
+
+        # 1. R-056
+        if "R-056" not in text:
+            violations.append(f"[{rel}] ausência da citação explícita a 'R-056'")
+
+        # 2. Cláusula de proibição estrita de editor tools
+        if "NÃO usar ferramentas nativas de editor" not in text:
+            violations.append(f"[{rel}] ausência da cláusula 'NÃO usar ferramentas nativas de editor'")
+
+        # 3. 100% OBRIGATÓRIO
+        if "100% OBRIGATÓRIO" not in text and "100% obrigatório" not in text:
+            violations.append(f"[{rel}] ausência de '100% OBRIGATÓRIO'")
+
+        # 4. Fallback exclusivo
+        if "fallback exclusivo" not in text.lower():
+            violations.append(f"[{rel}] ausência de 'fallback exclusivo'")
+
+        # 5. Diretriz positiva de execução no sandbox
+        if "sandbox do `context-mode`" not in text and "sandbox do context-mode" not in text:
+            violations.append(f"[{rel}] ausência da diretriz positiva de execução no sandbox do context-mode")
+
+    assert not violations, (
+        f"Violação de R-056 / Smell 2.24 em {len(violations)} agentes mutadores:\n"
+        + "\n".join(violations)
+    )
