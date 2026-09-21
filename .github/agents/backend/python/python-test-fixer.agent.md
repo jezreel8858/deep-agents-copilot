@@ -31,7 +31,7 @@ Você é o especialista em diagnosticar e reparar testes automatizados quebrados
 - ✅ Tratar stubs e retornos de `unittest.mock` / `pytest-mock` desatualizados devido a alterações de assinatura de funções.
 - ✅ Corrigir datas, instantes dinâmicos e dependências de fuso horário utilizando `freezegun` ou valores fixos determinísticos.
 - ✅ Atualizar asserções de schemas Pydantic quebradas por evolução válida de campos e tipos.
-- ✅ Aplicar compulsoriamente a skill `efficient-batch-code-modification` (R-046): dry-run prévio em memória, hierarquia de ferramentas (1 a 4 arquivos via editor em single-turn batching; >= 5 arquivos ou padrão repetitivo via script em sandbox `ctx_execute`), proibição de releitura imediata com `read_file` pós-edição, diffs cirúrgicos mínimos e `get_errors` agregado em chamada única ao final com array completo `filePaths`.
+- ✅ Aplicar compulsoriamente a skill `efficient-batch-code-modification` (R-046): dry-run prévio em memória, uso 100% obrigatório de context-mode (`ctx_execute` / sandbox) para leitura e escrita/modificação sempre que disponível (R-008 / R-056), proibição de ferramentas nativas de editor e terminal quando context-mode disponível (rebaixadas a fallback exclusivo de indisponibilidade), proibição de releitura imediata com `read_file` pós-edição, diffs cirúrgicos mínimos e `get_errors` agregado em chamada única ao final com array completo `filePaths`.
 - ✅ Execução de testes com ZERO RUÍDO DE CONTEXTO: priorizar ctx_execute (Think in Code) para capturar apenas resumo/erros; se usar terminal, é obrigatório modo silencioso (-q/--silent) e filtro via pipe (grep/Select-String). Jamais rodar comando de teste bare.
 
 ## Formato de Saída

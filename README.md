@@ -345,13 +345,13 @@ flowchart TB
 
 ---
 
-## Status Atual (2026-09-20 — Versão 2.24.0)
+## Status Atual (2026-09-20 — Versão 2.25.0)
 
 ### Governança Global & Blindagem Sistêmica
 - ✅ **Regras normativas consolidadas** (`CLAUDE.md` — Regras R-001 a R-057).
 - ✅ **Governança Estrita de Routers (R-054 / Smell 2.23)**: Least privilege com baseline de 7 tools, Zero Pre-Routing Discovery e Flat Delegation universal para eliminar consumo inútil de créditos.
 - ✅ **Portão de Reúso e Generalização Sistêmica (R-055 — Anti-Silo Fix)**: Avaliação compulsória de impacto em peers (Q1), templates canônicos (Q2) e testes determinísticos (Q3) em qualquer manutenção.
-- ✅ **Precedência Mandatória de Context Mode (R-056 / Smell 2.24)**: Primazia absoluta de sandboxing e Think-in-Code para escritas/refatorações, erradicando o anti-padrão de editor tool sprawl no chat.
+- ✅ **Precedência Mandatória e Uso 100% Obrigatório de Context Mode (R-008 e R-056 / Smell 2.24)**: Primazia absoluta de sandboxing para leitura, modificação e criação de arquivos (Think-in-Code), com proibição estrita de ferramentas nativas de editor e terminal quando context-mode disponível (rebaixadas a fallback exclusivo de indisponibilidade).
 - ✅ **Proibição Estrita de Terceirização de Edição Manual ao Usuário (R-057 / Smell 2.25 — Anti-Manual User Delegation)**: Erradicação de becos sem saída onde agentes analíticos e de triagem (read-only) instruíam o usuário a editar código por falta de tools; avanço determinístico de workflow e delegação plana obrigatória para executores downstream.
 - ✅ **Workflows Canônicos Determinísticos (R-050)**: 8 workflows operacionais com State Machines rígidas e banners visuais anti-cegueira.
 - ✅ **Endurecimento Determinístico e Paridade de Governança em Bugfix e Refatoração (`WORKFLOW-BUG-FIX` e `WORKFLOW-REFACTORING`)**: Paridade estrita de rigor determinístico equivalente à migração de frameworks, erradicando intuições causais e efeitos colaterais silenciosos:
@@ -359,7 +359,7 @@ flowchart TB
   - **`WORKFLOW-REFACTORING`**: **Contract Testing** formal (**Pact-style / consumer-driven** contract tests ou OpenAPI / JSON Schema Diff) no gate de contratos (Estado 2a) para proteção de APIs públicas e contratos entre múltiplos módulos; **Camada de Redundância Proporcional ao Blast Radius** no Estado 5 para blast radius moderado ou alto, composta por: (1) Auditoria Reversa de Símbolos (`reverse_symbol_audit` via grafo determinístico), (2) Mini Mutation Gate (`mini_mutation_gate` na Golden Master) e (3) Differential Replay Leve (`differential_replay_leve` comparando snapshots de entrada e saída pré/pós refatoração); e governança de Rollback fortalecida no Estado 5b com cálculo, registro e reporte quantitativo do **`blast_radius_revertido`** (nós Mikado revertidos, arquivos e callers restaurados) no `workflow_state`.
 - ✅ **Migração Determinística com Tríplice Redundância Pós-Migração**: Elevação do `WORKFLOW-FRAMEWORK-MIGRATION` para 6 etapas canônicas com Symbol Exhaustion Gate, Anti-Omission AST Validator, Reverse Orphan Audit, Mutation Parity e Differential Shadow Replay.
 - ✅ **Portal Unificado de Documentação & Framework Diátaxis**: Centralização em [`docs/README.md`](docs/README.md) e formalização do [`AI_GOVERNANCE_DOCUMENTATION_GUIDE.md`](docs/architecture/AI_GOVERNANCE_DOCUMENTATION_GUIDE.md) alinhado a NIST AI RMF, ISO 42001 e OWASP Agentic AI.
-- ✅ **Suíte de Testes Automatizados**: **170 testes determinísticos 100% passando** no pytest.
+- ✅ **Suíte de Testes Automatizados**: **178 testes determinísticos 100% passando** no pytest.
 
 ### Adapters de Stack
 - ✅ `spring-boot-backend.instructions.md` — Java/Spring Boot
