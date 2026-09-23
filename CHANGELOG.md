@@ -6,6 +6,26 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.30.0] — 2026-09-23
+
+### Adicionado & Formalizado
+- **Instituição do 9º Workflow Canônico: `WORKFLOW-PROMPT-SYNTHESIS` e Comando Operacional `/craft-prompt` (R-050, R-041)**:
+  - **Propósito**: Conduzir o refinamento estrutural de solicitações, mineração determinística de contexto no codebase e síntese de prompts canônicos encapsulados em blocos Markdown (`.md`) prontos para sessões limpas com Prompt Caching otimizado.
+  - **Máquina de Estados de 5 Etapas**:
+    - *Etapa 1*: Elicitação & Problem Space (`@requirements-analyst` para demandas de negócio / `@prompt-structuring` para tarefas técnicas).
+    - *Etapa 2*: Context Grounding & AST Mining (`@code-knowledge-graph` via `run_subagent`).
+    - *Etapa 3*: Mapeamento de Restrições e Não-Escopo (`@prompt-structuring` + R-046).
+    - *Etapa 4*: Síntese Estruturada & Otimização de Caching (`@prompt-structuring`).
+    - *Etapa 5*: Quality Gate & Emissão do Bloco Markdown (`@prompt-structuring`).
+  - **Invariante 17 (Visibilidade Progressiva e Anti-Blackbox Execution)**: Veda entregas em caixa-preta; torna compulsória a renderização do Painel de Evidências por Etapa no chat antes do bloco final.
+  - **Invariante 18 (Exclusividade do Motor de Grafo & Anti-Tool Chaining / R-045)**: Torna obrigatória a chamada de `@code-knowledge-graph` via `run_subagent` na Etapa 2, proibindo varreduras manuais `fs` no sandbox e MCP Tool Chaining sequencial (Smell 2.26).
+  - **Invariante 19 (Interrupção por Ambiguidade & Anti-Alucinação / R-027)**: Proíbe alucinar regras de negócio; impõe parada obrigatória na Etapa 1 via `ask_questions` com opções estruturadas para o usuário definir premissas e regras de domínio.
+  - **Prompt Operacional `/craft-prompt`**: Criado `.github/prompts/craft-prompt.prompt.md` e registrado em `.github/prompts/README.md`.
+  - **Isolamento de Projetos Locais & Genericidade (R-038/R-043/R-044)**: Typed State Bag 100% genérico e nova asserção determinística `test_no_concrete_local_project_file_paths_in_governance_files` em `test_local_project_isolation.py`.
+  - **Quality Gate e Testes Automatizados**: Suíte de testes expandida para **195 testes determinísticos (100% verdes)**, incluindo novos cenários em `casos-roteamento.yaml` (`canon-047`) e `casos-workflows.yaml` (`WF-PROMPT-001`).
+
+---
+
 ## [2.29.0] — 2026-09-21
 
 ### Adicionado & Endurecido
