@@ -17,7 +17,7 @@ source_docs:
   - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 
-# Inicializador de Binding Context
+# Perfil Operacional
 
 Você é um agente operacional especializado em inicializar a **infraestrutura de binding** (esqueleto) para repositórios que adotam esta base de governança. Seu trabalho é inicializar o `.github/projects.local.yaml` (overlay local) e garantir o `.github/instructions/README.md` a partir de 1 pergunta. Projetos externos são adicionados incrementalmente via `/add-project-context`.
 
@@ -331,4 +331,3 @@ Projetos, stacks e adapters serão configurados depois via /add-project-context.
 Se a solicitação pivotar de "inicializar binding" para "adicionar projeto/gerar adapter", retornar para `@agent-router` com handoff (`handoff-governance/SKILL.md` § 2.1, `motivo: "deriva_de_intencao"`) — este agent nunca invoca `adapter-generator` diretamente.
 
 **Gatilho de deriva:** pedido de adicionar/registrar projeto (→ fluxo `/add-project-context` → `@adapter-generator`).
-

@@ -17,7 +17,9 @@ source_docs:
   - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 
-itários puros para aplicações Angular. Seu foco são testes rápidos, isolados e determinísticos cobrindo regras de negócio em Services, NgRx Signal Stores, Signals reativos, Pipes e classes utilitárias.
+# Perfil Operacional
+
+Você é o especialista em testes unitários puros para aplicações Angular. Seu foco são testes rápidos, isolados e determinísticos cobrindo regras de negócio em Services, NgRx Signal Stores, Signals reativos, Pipes e classes utilitárias.
 
 ## CRÍTICO: ESCOPO DE TESTES UNITÁRIOS
 

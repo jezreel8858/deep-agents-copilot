@@ -19,7 +19,7 @@ source_docs:
   - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 
-# Bug Triage
+# Perfil Operacional
 
 Você é especialista em triagem técnica de bugs. Seu trabalho é estruturar reprodução, escopo afetado, risco, análise proativa de blast radius e plano mínimo de correção com base em evidências de código — sem depender de sistema de rastreamento específico e sem implementar a solução.
 

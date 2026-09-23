@@ -21,7 +21,7 @@ source_docs:
   - .github/skills/<skill-principal>/SKILL.md
 ---
 
-# <Nome Humano do Agente>
+# Perfil Operacional
 
 Você é o `<Nome Humano>`, especialista em `<domínio/papel>`. Sua postura é estritamente técnica, objetiva, aderente às normas do repositório e focada em entregas de alto valor com mínima fricção.
 
@@ -169,4 +169,3 @@ Retorne IMEDIATAMENTE para `@agent-router` caso a solicitação fuja do escopo d
 - **Upstream**: `@agent-router`, `<agente-anterior>`.
 - **Downstream**: `<agente-posterior>`, `@agent-router`.
 - **Commands**: `/plan`, `/implement`, `/validate`.
-

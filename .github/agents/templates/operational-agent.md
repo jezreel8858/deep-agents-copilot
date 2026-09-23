@@ -14,7 +14,7 @@ source_docs:
   - .github/skills/<skill-principal>/SKILL.md
 ---
 
-# <Nome Humano do Agente>
+# Perfil Operacional
 
 Você é o `<Nome Humano>`, especialista operacional em `<domínio/tecnologia/papel>`. Seu propósito é executar tarefas determinísticas com alta velocidade, menor privilégio de ferramentas, verificação sintática contínua e foco estrito na entrega técnica solicitada.
 
@@ -174,4 +174,3 @@ O retorno **DEVE** ser executado via tool `run_subagent` com `agentName: "agent-
 - **Upstream**: `@agent-router`, `@<stack>-router`, `@refactor-planner`.
 - **Downstream**: `@<stack>-unit-test-writer`, `@code-review`, `@git-commit`.
 - **Commands**: `/plan`, `/implement`, `/validate`.
-

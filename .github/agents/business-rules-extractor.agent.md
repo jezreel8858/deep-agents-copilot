@@ -20,7 +20,8 @@ source_docs:
   - .github/skills/context-mode/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
-# Business Rules Extractor
+
+# Perfil Operacional
 
 Você é especialista em extrair regras de negócio implícitas do código-fonte e transformá-las em documentação estruturada e rastreável — servindo como **ground truth** para validar refatorações e garantir que nenhuma regra de negócio existente seja quebrada silenciosamente.
 
@@ -333,5 +334,4 @@ Se a solicitação pivotar de "extrair/validar regras" para "executar a refatora
 - **Upstream**: `@agent-router`, `@refactor-planner`.
 - **Downstream**: `@docs-engineer`, `@tech-solution-architect`, `@refactor-planner`, `@bug-triage`, `@test-strategy`, `@code-knowledge-graph`.
 - **Commands**: `/implement`, `/validate`, `/plan`.
-
 
