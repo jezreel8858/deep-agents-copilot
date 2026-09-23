@@ -1,5 +1,9 @@
 ﻿from __future__ import annotations
 import glob
+import json
+import re
+import subprocess
+import sys
 from pathlib import Path
 import pytest
 
@@ -11,6 +15,10 @@ CKG_AGENT = REPO_ROOT / ".github" / "agents" / "code-knowledge-graph.agent.md"
 CODEGRAPH_SKILL = REPO_ROOT / ".github" / "skills" / "codegraph-optave-usage" / "SKILL.md"
 EFFICIENT_BATCH_SKILL = REPO_ROOT / ".github" / "skills" / "efficient-batch-code-modification" / "SKILL.md"
 CHANGELOG_MD = REPO_ROOT / "CHANGELOG.md"
+
+PROTOCOL_FRAGMENT = REPO_ROOT / "tools" / "agent_protocol_sync" / "_execution-protocol-fragment.md"
+PROTOCOL_SYNC_SCRIPT = REPO_ROOT / "tools" / "agent_protocol_sync" / "sync_execution_protocol.py"
+PROTOCOL_ROLES = REPO_ROOT / "tools" / "agent_protocol_sync" / "protocol_roles.json"
 
 AGENTS_DIR = REPO_ROOT / ".github" / "agents"
 
@@ -101,6 +109,51 @@ def test_all_non_router_agents_declare_r060_turn_budget():
     )
 
 
+def test_execution_protocol_sync_tool_reports_zero_drift():
+    """
+    Guardrail de FIDELIDADE EXATA (substitui a checagem fraca de substring
+    'R-060' in text): invoca tools/agent_protocol_sync/sync_execution_protocol.py
+    --check, que compara byte-a-byte o bloco <execution_protocol> de cada um
+    dos 77 agentes executores contra a fonte canonica unica em
+    .github/agents/templates/_execution-protocol-fragment.md (papel MUTATING
+    ou READONLY conforme tools/agent_protocol_sync/protocol_roles.json).
+
+    Previne a reincidencia de drift silencioso: um agente pode conter a
+    substring "R-060" e ainda assim divergir do texto canonico em qualquer
+    outro trecho (ex.: item 1-4 do Protocolo Plan-Then-Batch).
+    """
+    assert PROTOCOL_FRAGMENT.exists(), f"Fonte canonica ausente: {PROTOCOL_FRAGMENT}"
+    assert PROTOCOL_ROLES.exists(), f"Mapa de papeis ausente: {PROTOCOL_ROLES}"
+
+    result = subprocess.run(
+        [sys.executable, str(PROTOCOL_SYNC_SCRIPT), "--check"],
+        cwd=str(REPO_ROOT),
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, (
+        "Drift detectado entre o execution_protocol de 1+ agentes e a fonte "
+        f"canonica (_execution-protocol-fragment.md). Saida do script:\n{result.stdout}\n{result.stderr}"
+    )
+
+
+def test_protocol_roles_map_covers_all_non_router_agents():
+    """
+    Garante que tools/agent_protocol_sync/protocol_roles.json permaneca
+    sincronizado com o conjunto real de agentes nao-roteadores no catalogo -
+    nenhum agente novo pode ficar fora do mecanismo de sync canonico.
+    """
+    role_map = json.loads(PROTOCOL_ROLES.read_text(encoding="utf-8"))
+    non_routers = {p.stem.removesuffix(".agent") if p.stem.endswith(".agent") else p.name.replace(".agent.md", "")
+                   for p in get_non_router_agent_files()}
+    non_routers_ids = {p.name.replace(".agent.md", "") for p in get_non_router_agent_files()}
+    missing_from_map = non_routers_ids - set(role_map.keys())
+    assert not missing_from_map, (
+        f"Agentes nao-roteadores ausentes de protocol_roles.json ({len(missing_from_map)}): "
+        + ", ".join(sorted(missing_from_map))
+    )
+
+
 def test_no_control_character_corruption_in_governance_files():
     """
     Guardrail anti-regressao: escapes Python (\\a, \\b, \\f) executados via
@@ -116,6 +169,8 @@ def test_no_control_character_corruption_in_governance_files():
         CODEGRAPH_SKILL,
         EFFICIENT_BATCH_SKILL,
         CHANGELOG_MD,
+        PROTOCOL_FRAGMENT,
+        PROTOCOL_SYNC_SCRIPT,
     ]
     violations = []
     for fp in files_to_scan:
