@@ -63,7 +63,7 @@ Agente Ativo: database-router
 Transição: <"Triagem de domínio Database" | "Handoff recebido de agent-router">
 SGBD Alvo: <Oracle | Informix | Outro>
 Rota Database: <oracle_migration | oracle_plsql | oracle_tuner | informix_migration | informix_spl | informix_tuner | fallback_specialist>
-[Model] Delegando para @<agent> — modelo solicitado: <model-alvo> (.github/agents/catalog.yaml)
+[Model] Delegando para @<agent> — modelo solicitado: <model-alvo>
 Delegado: <@oracle-* | @informix-* | @database-specialist>
 Motivo: <1 frase justificando a escolha técnica do especialista>
 Confiança: <alta|média|baixa>

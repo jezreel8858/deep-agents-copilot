@@ -23,9 +23,6 @@
     "terminal-governance"
   ],
   "tools": [
-    "read_file",
-    "insert_edit_into_file",
-    "create_file",
     "grep_search",
     "file_search",
     "list_dir",
@@ -41,7 +38,6 @@
   "security_profile": {
     "tool_zones": [
       "read-only",
-      "mutating",
       "execution"
     ],
     "least_privilege_level": "elevated",

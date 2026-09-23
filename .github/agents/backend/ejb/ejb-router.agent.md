@@ -62,7 +62,7 @@ Agente Ativo: ejb-router
 [CURRENT_STATE_LOCK: <ROUTER_EJB_TRIAGE | ROUTER_EJB_DUAL_STACK>]
 Transição: <"Triagem de domínio EJB Legado" | "Handoff recebido de agent-router">
 Rota EJB: <arch_advisor | feature_dev | bug_fixer | perf_tuner | unit_test | integ_test | test_fixer | modernizacao_handoff>
-[Model] Delegando para @<agent> — modelo solicitado: <model-alvo> (.github/agents/catalog.yaml)
+[Model] Delegando para @<agent> — modelo solicitado: <model-alvo>
 Delegado: <@ejb-*>
 Motivo: <1 frase justificando a escolha técnica do especialista>
 Confiança: <alta|média|baixa>

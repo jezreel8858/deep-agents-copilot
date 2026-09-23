@@ -22,7 +22,6 @@
     "documentation-writing-patterns"
   ],
   "tools": [
-    "read_file",
     "grep_search",
     "file_search",
     "list_dir",
@@ -30,7 +29,9 @@
     "run_subagent",
     "context-mode/ctx_search",
     "context-mode/ctx_execute",
-    "context-mode/ctx_batch_execute"
+    "context-mode/ctx_batch_execute",
+    "context-mode/ctx_execute_file",
+    "context-mode/ctx_index"
   ],
   "security_profile": {
     "tool_zones": [

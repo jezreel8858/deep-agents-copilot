@@ -1011,6 +1011,23 @@ regressao:
     critico: true
     threshold: 0.90
 
+  - id: "canon-048"
+    descricao: "Análise semântica de aderência e paridade entre modelos, persistência e métodos de Store Angular roteada para angular-router (arch-advisor)"
+    input:
+      solicitacao: "Analisar simultaneamente os modelos, métodos de persistência e métodos do store da feature de escala no meu-app-angular. Listar se os métodos do store cobrem todos os campos do modelo com resumo comparativo direto."
+    expected:
+      agent_route: "angular-router"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.85
+      output_contains:
+        - "Agente Ativo: angular-router"
+        - "angular-arch-advisor"
+      nao_deve:
+        comportamento: "rotear para code-knowledge-graph para checagem semântica de cobertura de campos de modelo"
+    critico: true
+    threshold: 0.90
+
   - id: "regr-020"
     descricao: "REGRESSÃO: governance-factory NUNCA deve criar novo agent, prompt ou skill diretamente sem antes delegar pesquisa prévia de diretrizes e skills ao deep-search"
     input:

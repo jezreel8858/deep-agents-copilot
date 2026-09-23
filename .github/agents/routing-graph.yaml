@@ -373,8 +373,10 @@ workflows:
         agent: "tech-solution-architect"
         checkpoint_humano: "ask_questions (aprovacao_blueprint)"
         particionamento_escopo: ["frontend_only", "backend_only", "fullstack", "database_only"]
-        sub_rotinas_permitidas: ["database-specialist"]
+        sub_rotinas_permitidas: ["database-specialist", "feature-planner"]
         tasks_backend_tag_obrigatoria: "stack (spring-boot|spring-reactive|ejb|python|struts) por item, nunca lista plana"
+        obrigatorio_para: "features com novo schema de persistencia, maquina de estados (3+ transicoes), transacoes atomicas ou plugins de infra/push (R-058)"
+        proibir_bypass_direto_para_implementador: true
       - etapa: 4
         nome: "test_strategy_and_risk_matrix"
         agent: "test-strategy"
@@ -870,6 +872,7 @@ arestas:
         - "revisar/corrigir código"                # → bug-triage/code-review/refactor-planner
         - "implementação/feature de componente"    # → angular-engineer / spring-boot-engineer
         - "acoplamento arquitetural entre sistemas" # → tech-solution-architect (cross-sistema/contratos)
+        - "análise semântica de paridade/cobertura de atributos entre modelo, persistência e store" # → domain-router (ex.: angular-router / angular-arch-advisor) ou business-rules-extractor
 
   # Delegação interna: qualquer agent downstream pode invocar code-knowledge-graph sob demanda (RF-002)
   - de: "*downstream"
@@ -1109,7 +1112,12 @@ arestas:
         - "karma angular"
         - "angular e2e"
         - "playwright angular"
-      sinal_r006: "É qualquer solicitação do ecossistema Angular? (despacha para o catálogo de 8 especialistas de frontend em .github/agents/frontend/angular/angular-catalog.yaml)"
+        - "paridade modelo store"
+        - "cobertura campos modelo store"
+        - "fluxo de escala"
+        - "métodos do store cobrem campos do modelo"
+        - "análise de aderência de store"
+      sinal_r006: "É qualquer solicitação do ecossistema Angular ou análise semântica de modelos/stores/services Angular? (despacha para o catálogo de 8 especialistas de frontend em .github/agents/frontend/angular/angular-catalog.yaml)"
 
   # Supervisor e roteador de domínio Spring Boot (Hierarchical Sub-Router)
   - de: agent-router

@@ -6,9 +6,76 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.33.1] — 2026-09-23
+
+### Corrigido (Auto-Auditoria Pos-Implementacao de R-060)
+- **Propagacao Sistemica de R-060 para 100% dos Agentes Executores (Gap Critico Corrigido)**:
+  - **Gap Identificado**: A regra R-060 havia sido formalizada apenas em CLAUDE.md, copilot-instructions.md, agent-template.md e no agent code-knowledge-graph.agent.md, mas NAO havia sido propagada para os demais 76 agentes executores nao-roteadores, violando o requisito de solucao geral para todos os agents do projeto.
+  - **Correcao Aplicada**: Propagacao em lote unico via ctx_batch_execute do bloco de Teto Rigido de Tool Turns (<= 5) e Warm Start Compulsorio no <execution_protocol> de 100% dos 77 agentes executores nao-roteadores (confirmado via teste determinístico test_all_non_router_agents_declare_r060_turn_budget).
+- **Correcao de Corrupcao de Caracteres de Controle (BELL/BACKSPACE/FORMFEED) em Arquivos de Governanca**:
+  - **Causa Raiz**: Sequencias de escape Python (\a, \b, \f) presentes em palavras como ask_questions, build-if-missing, batch_query e find_cycles foram interpretadas como caracteres de controle (BEL/BS/FF) pela camada de shell do sandbox durante a escrita em lote, corrompendo 7 arquivos normativos e reincidindo apos a propagacao em lote para os 76 agentes.
+  - **Correcao Aplicada**: Substituicao sistematica dos caracteres de controle pelos textos originais em todos os arquivos afetados (CLAUDE.md, copilot-instructions.md, agent-template.md, code-knowledge-graph.agent.md, codegraph-optave-usage/SKILL.md, efficient-batch-code-modification/SKILL.md, CHANGELOG.md e nos 76 agentes executores), incluindo normalizacao de notacao matematica quebrada (O(N^2)) e remocao de blocos LaTeX brutos substituidos por notacao textual simples.
+  - **Guardrail de Regressao**: Novo teste test_no_control_character_corruption_in_governance_files em tests/governance_audit/test_turn_budget_and_warm_start_governance.py varre 100% dos arquivos de governanca versionados contra reincidencia de corrupcao.
+- **Quality Gate**: 165/165 testes deterministicos aprovados (tests/governance_audit/ + tests/routing_gate/), incluindo os 2 novos testes de guardrail (propagacao R-060 e anti-corrupcao).
+
+## [2.33.0] — 2026-09-24
+
+### Adicionado & Formalizado
+- **Teto Rígido de Tool Turns (≤ 5), Warm Start Compulsório e Consolidação de Queries em Lote (R-060 / Anti-Token Debt)**:
+  - **Mitigação da Dívida de Tokens Quadrática O(N^2)**: Introduzida a regra normativa **R-060** para eliminar sessões infladas por encadeamento de dezenas de turnos de ferramentas onde todo o histórico é reenviado recursivamente.
+  - **Teto de 5 Tool Turns & Circuit Breaker no 4º Turno**: Limite rígido de 5 turnos de ferramentas para qualquer agente executor, com interrupção e condensação mandatória no 4º turno para prevenir loops investigativos redundantes.
+  - **Warm Start Compulsório (Build-if-Missing)**: Obrigatoriedade de ferramentas e subsistemas locais baseados em índices (como .codegraph/graph.db) construírem ou validarem suas bases silenciosamente no comando inicial, vedando quebras por cold start que consumiam turnos de depuração do LLM.
+  - **Consolidação de Queries & Edge Truncation**: Exigência de que consultas a múltiplos nós/símbolos sejam feitas via chamadas em lote (batch_query, ctx_batch_execute ou script SQLite em sandbox) com destilação semântica e truncamento na borda.
+- **Atualização Sistêmica de Artefatos**:
+  - CLAUDE.md: Adição de R-060 e atualização do índice normativo para R-001..R-060.
+  - .github/copilot-instructions.md: Inclusão de R-059 e R-060 no corpo de regras e detalhamento de turn budgeting e warm start na Seção 2.1.
+  - .github/agents/templates/agent-template.md: Incorporação do Teto Rígido de 5 turnos e Warm Start no bloco <execution_protocol>.
+  - .github/skills/codegraph-optave-usage/SKILL.md: Formalização de Warm Start (build-if-missing), Batch Querying e Turn Budget ≤ 3 para o @code-knowledge-graph.
+  - .github/skills/efficient-batch-code-modification/SKILL.md: Nova Seção 6 detalhando a matemática da dívida de tokens, destilação na borda e Circuit Breaker.
+  - .github/agents/code-knowledge-graph.agent.md: Incorporação de salvaguardas de Warm Start e teto de turnos.
+
+## [2.32.0] — 2026-09-24
+
+### Adicionado & Formalizado
+- **Universalização do Protocolo Plan-Then-Batch (Smell 2.26 / Smell 2.13 / R-059) em 100% dos Agentes Não-Routers**:
+  - **Extensão Holística do Escopo**: Ampliação do protocolo para todos os 27 agentes analíticos, advisory, arquitetos, auditores, reviewers e especialistas restantes (totalizando 78 agentes não-routers no ecossistema).
+  - **Saneamento Total de Editor Tools (R-056 / Smell 2.24)**: Remoção integral de `read_file`, `create_file`, `insert_edit_into_file` e `replace_string_in_file` de todos os frontmatters `tools:` e sub-catálogos de domínio.
+  - **Conjunto Completo de Context-Mode Mandatório**: Inclusão garantida das 5 ferramentas context-mode (`context-mode/ctx_batch_execute`, `context-mode/ctx_execute`, `context-mode/ctx_execute_file`, `context-mode/ctx_index`, `context-mode/ctx_search`) em todos os agentes não-routers com escopo de arquivos.
+  - **Salvaguarda Especializada para `@code-knowledge-graph`**: Exigência expressa de que qualquer inspeção multi-arquivo para extração ou análise comparativa DEVE compulsoriamente utilizar `ctx_batch_execute` ou script iterativo consolidado em sandbox antes de queries de grafo, eliminando chamadas sequenciais unitárias de `ctx_execute`.
+- **Blindagem do Router contra Discovery de Modelos em Tempo de Execução (R-054 / Zero Discovery)**:
+  - **Eliminação de Runtime Discovery**: Formalizada a proibição inegociável de o `@agent-router` e domain routers chamarem ferramentas de busca/leitura (`read_file`, `grep_search`, `file_search`, `list_dir`) em tempo de execução para inspecionar `catalog.yaml` ou `*.agent.md` em busca de modelos de subagentes delegados.
+  - **Resolução Estática / Melhor Esforço**: Mapeamento modelo ↔ agent estabelecido como estático ou convencional (zero tool calls em runtime).
+  - **Limpeza do Formato de Saída**: Remoção da menção `(.github/agents/catalog.yaml)` na linha informativa `[Model] Delegando para...` de todos os routers centrais, supervisores de domínio e templates para prevenir alucinações de busca pelo modelo.
+- **Sincronização Atômica de Catálogos (R-015 / R-040)**:
+  - Atualização com paridade estrita em `.github/agents/catalog.yaml` e nos 7 sub-catálogos hierárquicos de domínio (`backend/database`, `backend/ejb`, `backend/python`, `backend/spring-boot`, `backend/spring-reactive`, `backend/struts`, `frontend/angular`).
+- **Quality Gates Determinísticos no Pytest (`tests/governance_audit/`)**:
+  - Atualização e expansão de `test_context_mode_precedence_governance.py` com novas asserções cobrindo 100% dos 78 agentes não-routers quanto à ausência de editor tools, presença de todas as ferramentas context-mode, obrigatoriedade do bloco `<execution_protocol>`, salvaguarda específica do `@code-knowledge-graph` e salvaguarda do `@agent-router` contra discovery de modelos em runtime.
+
+---
+
+## [2.31.0] — 2026-09-24
+
+### Adicionado & Formalizado
+- **Instituição da Regra R-059, Regra do Limiar >= 2 e Protocolo Plan-Then-Batch (Smell 2.26 / Smell 2.13)**:
+  - **Diagnóstico e Causa-Raiz**: Identificado que agents executores mantinham chamadas unitárias sequenciais de `ctx_execute` por alvo no chat (MCP Tool Chaining / Smell 2.26) em tarefas multi-arquivo ou regrediam para ferramentas nativas de editor (`read_file`, `create_file`, `insert_edit_into_file`) em prompts curtos do usuário ("prosseguir", "continue").
+  - **Regra do Limiar >= 2 (inegociável)**: Se a tarefa exigir inspecionar, ler, comparar, editar ou executar >= 2 arquivos/comandos/alvos, é terminantemente proibido disparar `ctx_execute` isolado por alvo em turnos sucessivos; exige compulsoriamente `ctx_batch_execute(commands, queries)` OU script iterativo consolidado em `ctx_execute`.
+  - **Protocolo Plan-Then-Batch**: Protocolo em 4 etapas (1. ENUMERAR, 2. CONSOLIDAR, 3. DESPACHAR, 4. Comandos curtos não suspendem a regra) formalizado globalmente em `CLAUDE.md` (R-059), `.github/copilot-instructions.md` § 2.1, `context-mode/SKILL.md` e `efficient-batch-code-modification/SKILL.md`.
+  - **Saneamento de Frontmatter dos Agentes Executores (50 Agentes)**: Removidas as affordances de editor (`read_file`, `create_file`, `insert_edit_into_file`, `replace_string_in_file`) de 100% dos 50 agentes executores mutativos, assegurando a presença das 5 ferramentas context-mode (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_index`, `ctx_search`).
+  - **Bloco `<execution_protocol>` Canônico**: Inserido bloco estruturado `<execution_protocol>` em 100% dos 50 agentes executores e nos templates operacionais (`operational-agent.md`, `agent-template.md`), tornando o protocolo Plan-Then-Batch contratual em cada especialista.
+  - **Sincronização Atômica de Catálogos (R-015/R-040)**: `catalog.yaml` e todos os 7 sub-catálogos de domínio atualizados com paridade estrita nas ferramentas dos agentes executores.
+  - **Quality Gate Determinístico Expandido**: `tests/governance_audit/test_context_mode_precedence_governance.py` expandido para validar a presença da Regra do Limiar >= 2, o protocolo Plan-Then-Batch, a ausência de ferramentas nativas de editor nos 50 executores e a presença do bloco `<execution_protocol>`.
+
+---
+
 ## [2.30.0] — 2026-09-23
 
 ### Adicionado & Formalizado
+- **Instituição da Regra R-058 e Invariante 20: Blueprint Técnico e Decomposição Obrigatórios em Features Complexas (Anti-Premature Implementation Bypass & Anti-Gap Dumping / Smell 2.27)**:
+  - **Diagnóstico e Causa Raiz**: Identificado que o `@agent-router`, ao despachar novas funcionalidades de stack única (ex.: frontend com BaaS/Firestore) que envolviam novos schemas de persistência, máquinas de estados (3+ transições), concorrência e push notifications, bypassava prematuramente o `@tech-solution-architect` e o `@feature-planner`, despejando lacunas de arquitetura no handoff para o implementador de código resolver no improviso.
+  - **Regra Normativa R-058**: Features que tocam novo schema de persistência, máquina de estados (3+ transições), transações/concorrência ou infra/push NUNCA podem ser despachadas diretamente para domain routers ou implementadores de código; exigem passagem compulsória pelo Estado 3 de `WORKFLOW-FEATURE-DEVELOPMENT` (`@tech-solution-architect`) com aprovação no Checkpoint 3b (`ask_questions`).
+  - **Decomposição em Subtasks (`@feature-planner`)**: Features com 3 ou mais frentes interdependentes exigem decomposição formal em subtasks sequenciais `[S]` e paralelas `[P]` com Definition of Done granular, evitando improviso na ordem de execução.
+  - **Proibição de Gap Dumping e Smell 2.27**: Veda expressamente ao roteador listar lacunas conceituais de schema/permissão em "Lacunas para handoff" para o desenvolvedor improvisar durante a codificação; havendo lacunas de arquitetura, o roteamento mandatório é para `@tech-solution-architect`.
+  - **Quality Gate e Testes Determinísticos**: Criada a suíte `tests/governance_audit/test_architectural_blueprint_gate_governance.py` com 7 testes automatizados validando a conformidade em `CLAUDE.md`, `copilot-instructions.md`, `agent-router.agent.md`, `router-agent.md`, `workflows.md`, `routing-graph.yaml` e `governance-audit-patterns/SKILL.md`.
 - **Instituição do 9º Workflow Canônico: `WORKFLOW-PROMPT-SYNTHESIS` e Comando Operacional `/craft-prompt` (R-050, R-041)**:
   - **Propósito**: Conduzir o refinamento estrutural de solicitações, mineração determinística de contexto no codebase e síntese de prompts canônicos encapsulados em blocos Markdown (`.md`) prontos para sessões limpas com Prompt Caching otimizado.
   - **Máquina de Estados de 5 Etapas**:
