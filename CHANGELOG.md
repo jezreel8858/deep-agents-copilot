@@ -6,6 +6,13 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.34.1] — 2026-09-23
+
+### Refatorado & Otimizado
+- **Desduplicação e Redução de Instruction Bloat em `.github/copilot-instructions.md`**:
+  - **Consolidação de SSOT e Remoção de Redundâncias**: Redução das seções de Think-in-Code (R-008), Single-Turn Batching (R-046), precedência de context-mode (R-056), Protocolo Plan-Then-Batch e Teto de Tool Turns (R-060) para formulações concisas com ponteiros diretos para `CLAUDE.md` e skills canônicas (`context-mode`, `efficient-batch-code-modification`, `terminal-governance`).
+  - **Otimização de Janela de Contexto**: Economia líquida de 51 linhas no system prompt base, diminuindo a pegada de tokens e eliminando duplicações sem relaxar nenhum guardrail mandatório.
+
 ## [2.34.0] — 2026-09-23
 
 ### Padronizado & Refatorado
