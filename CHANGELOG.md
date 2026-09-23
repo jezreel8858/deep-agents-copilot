@@ -16,6 +16,20 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
   - **Guardrail Determinístico de Testes**: Implementada a suíte `tests/governance_audit/test_agent_headings_standardization.py` parametrizada sobre os 86 agents e 4 templates, garantindo que o H1 seja único, obrigatório e estritamente padronizado.
   - **Quality Gate**: 248/248 testes aprovados no pytest com 100% de sucesso.
 
+## [2.33.3] — 2026-09-23
+
+### Adicionado (Fonte Unica para execution_protocol — Fim da Duplicacao Manual de R-059/R-060)
+- **Diagnostico**: o bloco `<execution_protocol>` (Protocolo Plan-Then-Batch R-059 + Teto de Tool Turns/Warm Start R-060) estava duplicado manualmente em 77 dos 86 agents (~159 KB de texto redundante, 3 variantes quase identicas), com guardrail de teste fraco (checagem de substring "R-060", nao de fidelidade). Isso causou reincidencia de corrupcao de caracteres de controle durante propagacoes manuais em lote.
+- **Solucao**: replicado o padrao ja usado por `tools/agentcard_exporter` (fonte unica -> artefatos derivados) para o execution_protocol:
+  - Nova fonte canonica `tools/agent_protocol_sync/_execution-protocol-fragment.md` com 2 blocos nomeados (MUTATING / READONLY).
+  - Novo mapa de papeis `tools/agent_protocol_sync/protocol_roles.json` (77 agents classificados).
+  - Novo script `tools/agent_protocol_sync/sync_execution_protocol.py` (--check para CI, --apply para corrigir drift).
+  - Agent `code-knowledge-graph` mantido como excecao pinada (CUSTOM) com validacao minima de presenca de R-060.
+- **Guardrail Fortalecido**: novo teste `test_execution_protocol_sync_tool_reports_zero_drift` substitui a checagem fraca de substring por comparacao byte-a-byte via o proprio script de sync; novo teste `test_protocol_roles_map_covers_all_non_router_agents` garante que agents futuros nao fiquem fora do mecanismo.
+- **Estado Validado**: 0 drift detectado nos 77 agents na execucao inicial do script (textos ja estavam consistentes; ferramenta agora formaliza e protege essa consistencia).
+- **Racional de Design**: o protocolo permanece INLINE em cada agent (nao virou referencia/pointer) para preservar o viés de proximidade/recência do LLM e evitar leitura extra de arquivo em runtime — a mudanca ataca o custo de MANUTENCAO (77 edicoes manuais -> 1 edicao na fonte + 1 execucao do script), nao o custo de execucao.
+- **Quality Gate**: 258/258 testes deterministicos aprovados (`tests/governance_audit/` + `tests/routing_gate/`).
+
 ## [2.33.2] — 2026-09-23
 
 ### Alterado (Consolidacao de Model Routing por Perfil de Agent)
