@@ -16,6 +16,23 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
   - **Guardrail Determinístico de Testes**: Implementada a suíte `tests/governance_audit/test_agent_headings_standardization.py` parametrizada sobre os 86 agents e 4 templates, garantindo que o H1 seja único, obrigatório e estritamente padronizado.
   - **Quality Gate**: 248/248 testes aprovados no pytest com 100% de sucesso.
 
+## [2.33.2] — 2026-09-23
+
+### Alterado (Consolidacao de Model Routing por Perfil de Agent)
+- **Correcao de Drift de Deteccao (Transparencia)**: Auditoria inicial reportou 21 agents "sem modelo declarado" devido a regex sensivel a quebra de linha CRLF que falhou ao ler o frontmatter de `.agent.md`. Revalidacao confirmou que **100% dos 86 agents ja possuiam `model` declarado no proprio frontmatter** (fonte autoritativa); a tabela real de mudancas necessarias foi reduzida de 24 para **13 upgrades genuinos**.
+- **Upgrade Gemini 3.8 Flash -> Claude Sonnet 5 (13 agents)**: Aplicado a agents cujo perfil exige julgamento de alto risco ou raciocinio multi-arquivo profundo, com evidencia de sessao real onde a versao economica nao capturou gaps criticos:
+  - `agent-auditor` (auditoria meta-nivel do proprio catalogo de governanca).
+  - `governance-factory` (design de novos artefatos de governanca, nao e batch mecanico).
+  - `database-specialist` (migracoes/queries genericas de schema - mesmo risco de DDL dos especialistas Oracle/Informix).
+  - `security-reviewer`, `compliance-guardrails`, `code-review`, `devops-engineer` (julgamento de severidade/risco).
+  - `requirements-analyst` ja estava correto em Sonnet (nao alterado).
+  - `debugger`, `business-rules-extractor`, `feature-planner`, `performance-agent` (raciocinio de causa raiz, nuance semantica e planejamento critico).
+  - `oracle-migration-dev`, `informix-migration-dev` (correcao de drift: `catalog.yaml` ja indicava Claude Sonnet 5, mas o frontmatter `.agent.md` real estava em Gemini 3.8 Flash).
+- **Sincronizacao Multi-Fonte**: Atualizados em lote via `ctx_execute` (all-or-nothing): 13 arquivos `.agent.md`, 3 entradas em `.github/agents/catalog.yaml` (`agent-auditor`, `database-specialist`, `governance-factory`), e 5 `.a2a/agentcards/*.json` correspondentes (`model_preferences.recommended_model`).
+- **Estado Final do Ecossistema**: 30 agents em `Claude Sonnet 5` (antes: 17) / 56 agents em `Gemini 3.8 Flash` (antes: 69) - 100% sem drift entre `catalog.yaml` e `.agent.md`.
+- **Gap Identificado (fora de escopo desta entrega)**: 21 agents (incluindo os 7 routers de dominio e agents mais recentes como `security-reviewer`, `debugger`, `feature-planner`) nao possuem entrada em `.a2a/agentcards/` nem em `catalog.yaml` - modelo e definido exclusivamente no frontmatter do proprio `.agent.md`. Recomenda-se rodar `agentcard_exporter` para fechar essa lacuna de sincronizacao em entrega futura.
+- **Quality Gate**: 256/256 testes deterministicos aprovados (`tests/governance_audit/` + `tests/routing_gate/`).
+
 ## [2.33.1] — 2026-09-23
 
 ### Corrigido (Auto-Auditoria Pos-Implementacao de R-060)

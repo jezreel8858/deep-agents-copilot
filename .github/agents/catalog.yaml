@@ -402,7 +402,7 @@ agents:
 
   agent-auditor:
     id: "agent-auditor"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     priority: 8.4
     version: "1.0.0"
     domain: "Auditoria semantica de governanca do catalogo (meta-nivel, read-only)"
@@ -457,7 +457,7 @@ agents:
 
   governance-factory:
     id: "governance-factory"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     priority: 9
     version: "1.2.0"
     domain: "Governanca e autoria de artefatos e stacks (agent/skill/prompt/stack)"
@@ -669,7 +669,7 @@ agents:
 
   database-specialist:
     id: "database-specialist"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     priority: 5.5
     version: "1.0.0"
     domain: "Migracoes de schema, otimizacao de query e integridade referencial"
