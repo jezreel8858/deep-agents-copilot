@@ -3,7 +3,7 @@ description: >
   Grafo de roteamento declarado — fonte de verdade estrutural para o agent-router.
   Nós = agents disponíveis; arestas = condições de roteamento (keywords, sinais R-006, score threshold).
   A Decision Tree em agent-router.agent.md é documentação derivada deste arquivo.
-last_updated: "2026-09-15 (v9 — WORKFLOW-FRAMEWORK-MIGRATION: adicionado colaboracao_dual_stack e co_agentes de domain-router-origem/destino em todas as etapas, corrigindo omissao do router legado em migracoes cross-stack)"
+last_updated: "2026-09-22 (v10 — WORKFLOW-PROMPT-SYNTHESIS: inclusão do workflow de síntese e refino de prompts para novo chat via /craft-prompt)"
 
 # ─────────────────────────────────────────────
 # NÓS — agents disponíveis no catálogo
@@ -562,6 +562,41 @@ workflows:
         agent: "code-review"
         checkpoint_final: "ask_questions (aprovacao_go_no_go_deploy)"
 
+  - id: WORKFLOW-PROMPT-SYNTHESIS
+    nome: "Síntese e Refino de Prompts para Sessões Limpas"
+    regra: "R-050"
+    fast_path: true
+    gatilhos:
+      - "refinar prompt"
+      - "sintetizar prompt"
+      - "craft prompt"
+      - "gerar prompt perfeito"
+      - "preparar prompt novo chat"
+      - "/craft-prompt"
+    estados:
+      - etapa: 1
+        nome: "elicitation_and_problem_space"
+        agent: "requirements-analyst | prompt-structuring"
+        co_agentes: ["requirements-analyst", "prompt-structuring"]
+        invariantes: ["ask_questions_obrigatorio_em_ambiguidade", "proibicao_alucinacao_regras", "delimitar_problem_space"]
+      - etapa: 2
+        nome: "codebase_context_grounding"
+        agent: "code-knowledge-graph"
+        sub_rotinas_permitidas: ["deep-search"]
+        mineracoes: ["caminhos_reais_arquivos", "interfaces_dto", "irmaos_canonicos"]
+      - etapa: 3
+        nome: "constraint_and_boundary_mapping"
+        agent: "prompt-structuring"
+        injecoes: ["batching_r046", "nao_escopo", "convencoes_stack"]
+      - etapa: 4
+        nome: "structured_prompt_synthesis"
+        agent: "prompt-structuring"
+        otimizacoes: ["xml_semantico", "prompt_caching_alignment"]
+      - etapa: 5
+        nome: "quality_gate_and_emission"
+        agent: "prompt-structuring"
+        formato_entrega: "markdown_code_block"
+
 # ─────────────────────────────────────────────
 # ARESTAS — condições de roteamento
 # Cada aresta define: origem, destino, sinais de ativação e threshold mínimo
@@ -595,6 +630,7 @@ arestas:
         - "WORKFLOW-GOVERNANCE-MAINTENANCE (auditoria e higiene)"
         - "WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION (CVEs, alertas SCA e bumps de dependência)"
         - "WORKFLOW-RELEASE-READINESS (pre-flight de deploy, auditoria de release e DDL)"
+        - "WORKFLOW-PROMPT-SYNTHESIS (síntese e refino de prompt para novo chat via /craft-prompt)"
       loop_maximo: 5
       retorno_obrigatorio: agent-router
 
