@@ -376,13 +376,24 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 | Severidade | **Bloqueador** (desperdício exponencial de créditos e tokens LLM, latência excessiva por roundtrips desnecessários e risco de exaustão da janela de contexto) |
 | Remediação | (a) Declarar compulsoriamente `'context-mode/ctx_batch_execute'` no frontmatter `tools:` de todos os agentes que operam com context-mode; (b) Injetar a cláusula de proibição de MCP Tool Chaining sequencial no bloco CRÍTICO/Diretrizes do agente e templates; (c) Consolidar inspeções múltiplas em `ctx_batch_execute` (com comandos e queries unificadas) ou em script síncrono único em `ctx_execute` |
 
+---
+### 2.27 — Desvio Prematuro para Implementação e Despejo de Lacunas Arquiteturais (Premature Implementation Bypass & Gap Dumping / R-058)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | O `@agent-router` (ou router de domínio), ao classificar uma nova funcionalidade, identifica lacunas conceituais e arquiteturais críticas (matriz de permissões/papéis, evolução de schema de persistência/banco, transações atômicas/concorrência, plugins de push notifications/infraestrutura), mas em vez de despachar compulsoriamente para o `@tech-solution-architect` (Estado 3 do `WORKFLOW-FEATURE-DEVELOPMENT`) para elaborar o Technical Blueprint e resolver os contratos no checkpoint humano 3b, desvia prematuramente o fluxo direto para o executor de código (`@<stack>-router` ou `@<stack>-feature-developer`), listando as lacunas no bloco "Lacunas para handoff" para que o desenvolvedor resolva no improviso durante a codificação |
+| Como detectar | (a) Resposta do router despachando feature nova que cita lacunas de schema de banco, modelo de permissão ou infraestrutura no handoff diretamente para especialista/router de código sem passar por `@tech-solution-architect`; (b) Router gerando cronogramas ou listas arbitrárias de sub-etapas de implementação linear no chat em vez de despachar para `@feature-planner`; (c) Ausência da regra R-058 no bloco CRÍTICO de routers ou templates |
+| Origem (TrustAgent) | Intrínseco — miopia de stack e pressa de entrega, onde o roteador constata que todos os arquivos grounded estão no frontend e assume erroneamente que uma feature com persistência e concorrência dispensa arquitetura prévia |
+| Severidade | **Bloqueador** (gera código no escuro, risco severo de corrupção de dados ou regras de segurança falhas, e quebra do checkpoint humano 3b) |
+| Remediação | (a) Injeção de R-058 em `CLAUDE.md`, `copilot-instructions.md`, `agent-router.agent.md` e `router-agent.md`; (b) Roteamento compulsório de features com persistência/máquina de estados/push para `@tech-solution-architect` (WF4 Estado 3); (c) Decomposição em subtasks `[S]`/`[P]` com `@feature-planner` para demandas multi-task; (d) Teste determinístico no pytest (`test_architectural_blueprint_gate_governance.py`) |
+
 ## 3) Severidade — Reaproveitamento da Taxonomia Existente
 
 Esta skill **reaproveita** (não recria) a taxonomia de `code-review-patterns`:
 
 | Severidade | Critério Objetivo de Enquadramento |
 |---|---|
-| **Bloqueador** | Gap que impede o funcionamento técnico ou a governança do artefato: falta de `run_subagent` (R-042); `model:` inválido ou desconhecido (`Unknown model`); tool de escrita em agent read-only; uso de terminal sem `terminal-governance`; vazamento de evidência real de projeto (R-044); dessincronização crítica no catálogo (R-015); terceirização manual ao usuário por agent analítico (R-057 / Smell 2.25); ou MCP tool chaining sequencial no chat / omissão de ctx_batch_execute (Smell 2.26). |
+| **Bloqueador** | Gap que impede o funcionamento técnico ou a governança do artefato: falta de `run_subagent` (R-042); `model:` inválido ou desconhecido (`Unknown model`); tool de escrita em agent read-only; uso de terminal sem `terminal-governance`; vazamento de evidência real de projeto (R-044); dessincronização crítica no catálogo (R-015); terceirização manual ao usuário por agent analítico (R-057 / Smell 2.25); MCP tool chaining sequencial no chat / omissão de ctx_batch_execute (Smell 2.26); ou desvio prematuro para implementação e despejo de lacunas arquiteturais em executores de código (R-058 / Smell 2.27). |
 | **Alto** | Gap que gera desperdício severo de tokens/créditos, duplicação de manutenção ou risco de drift: violação de batching (R-046); divergência de templates canônicos (ausência de escopo ✅/❌ ou workflow); falta de variáveis nativas em prompts; código inline > 8 linhas em skills (R-026); ou sobreposição funcional ativa entre 2 agents. |
 | **Sugestão** | Melhoria técnica não urgente ou cosmética: refinamento de `argument-hint`; ajuste fino de `description` dentro do limite; ou gap taxonômico de categoria intencionalmente não coberta. |
 
@@ -397,7 +408,7 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 
 | Smell | Local(is) afetado(s) | Severidade | Remediação sugerida | Agent a acionar |
 |---|---|---|---|---|
-| <2.1..2.26> | <arquivo(s)> | Bloqueador/Alto/Sugestão | <ação objetiva> | <@governance-factory/@docs-engineer/@governance-maintainer> |
+| <2.1..2.27> | <arquivo(s)> | Bloqueador/Alto/Sugestão | <ação objetiva> | <@governance-factory/@docs-engineer/@governance-maintainer> |
 
 ## Resumo por Severidade
 - Bloqueador: N

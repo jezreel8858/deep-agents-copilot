@@ -115,7 +115,6 @@ agents:
       - "code-knowledge-graph"
       - "refactor-planner"
     tools:
-      - "read_file"
       - "grep_search"
       - "file_search"
       - "list_dir"
@@ -174,7 +173,6 @@ agents:
       - "tech-solution-architect"
       - "docs-engineer"
     tools:
-      - "read_file"
       - "grep_search"
       - "file_search"
       - "list_dir"
@@ -230,7 +228,6 @@ agents:
       - "code-knowledge-graph"
       - "test-strategy"
     tools:
-      - "read_file"
       - "grep_search"
       - "file_search"
       - "list_dir"
@@ -290,7 +287,6 @@ agents:
       - "tech-solution-architect"
       - "governance-factory"
     tools:
-      - "read_file"
       - "grep_search"
       - "file_search"
       - "list_dir"
@@ -366,7 +362,6 @@ agents:
       - "test-strategy"
       - "feature-planner"
     tools:
-      - "read_file"
       - "grep_search"
       - "file_search"
       - "list_dir"
@@ -432,13 +427,15 @@ agents:
       - "docs-engineer"
       - "tech-solution-architect"
     tools:
-      - "read_file"
       - "grep_search"
       - "file_search"
       - "list_dir"
       - "run_subagent"
       - "context-mode/ctx_search"
       - "context-mode/ctx_batch_execute"
+      - "context-mode/ctx_execute"
+      - "context-mode/ctx_execute_file"
+      - "context-mode/ctx_index"
     related_skills:
       - "governance-audit-patterns"
       - "agent-contracts"
@@ -489,9 +486,6 @@ agents:
       - "agent-router"
       - "docs-engineer"
     tools:
-      - "read_file"
-      - "insert_edit_into_file"
-      - "create_file"
       - "grep_search"
       - "file_search"
       - "list_dir"
@@ -548,9 +542,6 @@ agents:
       - "agent-auditor"
       - "docs-engineer"
     tools:
-      - "read_file"
-      - "insert_edit_into_file"
-      - "create_file"
       - "grep_search"
       - "file_search"
       - "list_dir"
@@ -603,7 +594,6 @@ agents:
       - "test-strategy"
       - "devops-engineer"
     tools:
-      - "read_file"
       - "list_dir"
       - "grep_search"
       - "file_search"
@@ -611,6 +601,9 @@ agents:
       - "run_subagent"
       - "context-mode/ctx_batch_execute"
       - "context-mode/ctx_execute"
+      - "context-mode/ctx_execute_file"
+      - "context-mode/ctx_index"
+      - "context-mode/ctx_search"
     related_skills:
       - "terminal-governance"
       - "agent-contracts"
@@ -649,8 +642,6 @@ agents:
       - "agent-router"
       - "code-review"
     tools:
-      - "read_file"
-      - "insert_edit_into_file"
       - "grep_search"
       - "file_search"
       - "list_dir"
@@ -660,6 +651,8 @@ agents:
       - "ask_questions"
       - "run_subagent"
       - "context-mode/ctx_search"
+      - "context-mode/ctx_execute_file"
+      - "context-mode/ctx_index"
     related_skills:
       - "git-governance"
       - "agent-contracts"
@@ -702,9 +695,6 @@ agents:
       - "spring-boot-engineer"
       - "tech-solution-architect"
     tools:
-      - "read_file"
-      - "insert_edit_into_file"
-      - "create_file"
       - "grep_search"
       - "file_search"
       - "list_dir"
@@ -762,7 +752,6 @@ agents:
       - "refactor-planner"
       - "business-rules-extractor"
     tools:
-      - "read_file"
       - "grep_search"
       - "file_search"
       - "list_dir"
@@ -772,6 +761,7 @@ agents:
       - "context-mode/ctx_index"
       - "context-mode/ctx_execute"
       - "context-mode/ctx_batch_execute"
+      - "context-mode/ctx_execute_file"
     related_skills:
       - "context-mode"
       - "agent-contracts"
@@ -814,7 +804,6 @@ agents:
       - "code-knowledge-graph"
       - "business-rules-extractor"
     tools:
-      - "read_file"
       - "grep_search"
       - "file_search"
       - "list_dir"
@@ -823,6 +812,8 @@ agents:
       - "context-mode/ctx_search"
       - "context-mode/ctx_execute"
       - "context-mode/ctx_batch_execute"
+      - "context-mode/ctx_execute_file"
+      - "context-mode/ctx_index"
     related_skills:
       - "context-mode"
       - "agent-contracts"
@@ -868,7 +859,6 @@ agents:
       - "runtime-verifier"
       - "agent-auditor"
     tools:
-      - "read_file"
       - "grep_search"
       - "file_search"
       - "list_dir"
@@ -877,6 +867,8 @@ agents:
       - "context-mode/ctx_search"
       - "context-mode/ctx_execute"
       - "context-mode/ctx_batch_execute"
+      - "context-mode/ctx_execute_file"
+      - "context-mode/ctx_index"
     related_skills:
       - "agent-contracts"
       - "handoff-governance"

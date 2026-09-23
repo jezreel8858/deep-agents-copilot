@@ -23,7 +23,6 @@
     "test-implementation-frontend"
   ],
   "tools": [
-    "read_file",
     "grep_search",
     "file_search",
     "list_dir",

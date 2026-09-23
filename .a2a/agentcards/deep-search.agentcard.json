@@ -26,7 +26,6 @@
     "confidence-fallback-policy"
   ],
   "tools": [
-    "read_file",
     "grep_search",
     "file_search",
     "list_dir",

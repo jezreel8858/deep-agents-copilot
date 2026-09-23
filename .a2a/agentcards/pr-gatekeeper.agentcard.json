@@ -20,8 +20,6 @@
     "terminal-governance"
   ],
   "tools": [
-    "read_file",
-    "insert_edit_into_file",
     "grep_search",
     "file_search",
     "list_dir",
@@ -30,12 +28,13 @@
     "context-mode/ctx_execute",
     "ask_questions",
     "run_subagent",
-    "context-mode/ctx_search"
+    "context-mode/ctx_search",
+    "context-mode/ctx_execute_file",
+    "context-mode/ctx_index"
   ],
   "security_profile": {
     "tool_zones": [
       "read-only",
-      "mutating",
       "execution"
     ],
     "least_privilege_level": "elevated",

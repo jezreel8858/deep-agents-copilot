@@ -54,6 +54,25 @@ Skill genérica para operar `@optave/codegraph` (repo `optave/ops-codegraph-tool
 
 Rebuild completo: apagar `.codegraph/` e repetir `build`. Uso normal é incremental (não precisa rebuild manual a cada mudança se `watch` estiver ativo).
 
+## 3.1) Warm Start Compulsório & Batch Querying (R-060 / Anti-Token Debt)
+
+Para prevenir a explosão de consumo de créditos e a dívida de tokens cumulativa O(N^2) em análises de grafo:
+
+1. **Warm Start Silencioso (Build-if-Missing)**:
+   - Toda consulta ou execução de grafo DEVE verificar preliminarmente se o arquivo .codegraph/graph.db existe no projeto alvo.
+   - **Proibição de Quebra por Cold Start**: Se a base não existir, o agente NÃO deve disparar uma tool de query isolada que falhará em erro e obrigará o LLM a consumir turnos extras de raciocínio. O agente DEVE executar codegraph build . imediatamente no mesmo lote ou comando preliminar (build-if-missing).
+2. **Consolidação de Queries (Batch Querying)**:
+   - Para mapear dependências, chamadas ou blast radius de múltiplos símbolos ou módulos, é TERMINANTEMENTE PROIBIDO invocar ferramentas atômicas sequenciais (query, fn_impact, etc.) em turnos separados no chat.
+   - O agente deve:
+     - Utilizar ferramentas de lote (batch_query) quando disponíveis; OU
+     - Executar um script sandbox único via ctx_execute realizando queries SQL diretamente no banco SQLite .codegraph/graph.db.
+3. **Destilação na Borda (Edge Truncation)**:
+   - A saída bruta do grafo deve ser filtrada e agregada dentro do runtime/sandbox. Apenas o resumo executivo, nós centrais e inversões reais de dependência entram na resposta final ao chat (*Think-in-Code*).
+4. **Teto Rígido de Turnos (≤ 3 turnos para análise de grafo)**:
+   - Turno 1: Warm Start + Batch Gather.
+   - Turno 2: Query agregada / Análise SQL em sandbox.
+   - Turno 3: Síntese conclusiva e entrega.
+
 ## 4) Comandos CLI mais usados
 
 | Comando | Uso |

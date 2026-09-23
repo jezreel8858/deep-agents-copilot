@@ -165,35 +165,80 @@ def test_governance_maintainer_and_peer_agents_align_with_context_mode_precedenc
         assert "fallback exclusivo" in c, f"[{pf.name}] DEVE citar fallback exclusivo de editor"
 
 
+EXECUTOR_AGENT_NAMES = {
+    "adapter-generator.agent.md",
+    "angular-bug-fixer.agent.md",
+    "angular-component-test-writer.agent.md",
+    "angular-e2e-writer.agent.md",
+    "angular-feature-developer.agent.md",
+    "angular-test-fixer.agent.md",
+    "angular-ui-stylist.agent.md",
+    "angular-unit-test-writer.agent.md",
+    "binding-initializer.agent.md",
+    "business-rules-extractor.agent.md",
+    "database-specialist.agent.md",
+    "docs-engineer.agent.md",
+    "ejb-bug-fixer.agent.md",
+    "ejb-feature-developer.agent.md",
+    "ejb-integration-test-writer.agent.md",
+    "ejb-perf-tuner.agent.md",
+    "ejb-test-fixer.agent.md",
+    "ejb-unit-test-writer.agent.md",
+    "governance-factory.agent.md",
+    "governance-maintainer.agent.md",
+    "informix-migration-dev.agent.md",
+    "informix-spl-expert.agent.md",
+    "oracle-migration-dev.agent.md",
+    "oracle-plsql-expert.agent.md",
+    "pr-gatekeeper.agent.md",
+    "python-bug-fixer.agent.md",
+    "python-feature-developer.agent.md",
+    "python-integration-test-writer.agent.md",
+    "python-perf-tuner.agent.md",
+    "python-test-fixer.agent.md",
+    "python-unit-test-writer.agent.md",
+    "requirements-analyst.agent.md",
+    "spring-boot-bug-fixer.agent.md",
+    "spring-boot-feature-developer.agent.md",
+    "spring-boot-integration-test-writer.agent.md",
+    "spring-boot-perf-tuner.agent.md",
+    "spring-boot-test-fixer.agent.md",
+    "spring-boot-unit-test-writer.agent.md",
+    "spring-reactive-bug-fixer.agent.md",
+    "spring-reactive-feature-developer.agent.md",
+    "spring-reactive-integration-test-writer.agent.md",
+    "spring-reactive-resilience-tuner.agent.md",
+    "spring-reactive-test-fixer.agent.md",
+    "spring-reactive-unit-test-writer.agent.md",
+    "struts-bug-fixer.agent.md",
+    "struts-feature-developer.agent.md",
+    "struts-integration-test-writer.agent.md",
+    "struts-perf-tuner.agent.md",
+    "struts-test-fixer.agent.md",
+    "struts-unit-test-writer.agent.md",
+}
+
+
 def test_all_mutating_agents_declare_r056_and_explicit_prohibition():
     """
     Varredura dinâmica e assertiva (R-056 / Smell 2.24):
-    Todo .agent.md no repositório que declare insert_edit_into_file ou create_file em tools:
+    Todo .agent.md no repositório com perfil executor mutativo
     DEVE conter a regra R-056 e a proibição explícita no seu texto.
     """
-    import re
-
     agent_files = [
         p for p in AGENTS_DIR.glob("**/*.agent.md")
         if "templates" not in p.parts
     ]
     assert len(agent_files) >= 40, "Deve haver ao menos 40 agents no catálogo"
 
-    mutating_agents = []
-    for af in agent_files:
-        content = af.read_text(encoding="utf-8")
-        fm_match = re.match(r"^---\s*\n(.*?)\n---", content, re.DOTALL)
-        if not fm_match:
-            continue
-        fm_text = fm_match.group(1)
-        tools_match = re.search(r"tools:\s*(\[[^\]]*\])", fm_text)
-        if not tools_match:
-            continue
-        tools_str = tools_match.group(1)
-        if "insert_edit_into_file" in tools_str or "create_file" in tools_str:
-            mutating_agents.append(af)
+    mutating_agents = [
+        af for af in agent_files
+        if af.name in EXECUTOR_AGENT_NAMES
+    ]
 
-    assert len(mutating_agents) >= 45, f"Esperado ao menos 45 agentes mutadores, encontrados {len(mutating_agents)}"
+    assert len(mutating_agents) == len(EXECUTOR_AGENT_NAMES), (
+        f"Esperados {len(EXECUTOR_AGENT_NAMES)} agentes executores, encontrados {len(mutating_agents)}"
+    )
 
     violations = []
     for ma in mutating_agents:
@@ -441,4 +486,301 @@ def test_all_non_router_agents_prohibit_mcp_tool_chaining():
     assert not violations, (
         f"Violação de Smell 2.26 (MCP Tool Chaining) em {len(violations)} agentes:\n"
         + "\n".join(violations)
+    )
+
+
+def test_threshold_ge_2_and_plan_then_batch_declared_in_normative_docs():
+    """
+    Valida se CLAUDE.md, copilot-instructions.md, efficient-batch e context-mode
+    formalizam deterministicamente a 'Regra do Limiar >= 2' e o 'Protocolo Plan-Then-Batch' (R-059 / Smell 2.26).
+    """
+    claude_file = REPO_ROOT / "CLAUDE.md"
+    ci_file = REPO_ROOT / ".github" / "copilot-instructions.md"
+    eff_file = SKILLS_DIR / "efficient-batch-code-modification" / "SKILL.md"
+    ctx_file = SKILLS_DIR / "context-mode" / "SKILL.md"
+
+    for path_obj, name in [
+        (claude_file, "CLAUDE.md"),
+        (ci_file, "copilot-instructions.md"),
+        (eff_file, "efficient-batch-code-modification/SKILL.md"),
+        (ctx_file, "context-mode/SKILL.md"),
+    ]:
+        assert path_obj.exists(), f"{name} deve existir"
+        c = path_obj.read_text(encoding="utf-8")
+        assert "Limiar >= 2" in c, f"[{name}] DEVE formalizar a Regra do Limiar >= 2"
+        assert "Plan-Then-Batch" in c, f"[{name}] DEVE formalizar o Protocolo Plan-Then-Batch"
+        assert "ENUMERAR" in c, f"[{name}] DEVE conter a etapa ENUMERAR do protocolo"
+        assert "prosseguir" in c.lower(), f"[{name}] DEVE declarar que comandos curtos ('prosseguir') mantêm o rigor"
+
+
+def test_all_executor_agents_absence_of_native_editor_tools():
+    """
+    Valida que 100% dos 50 agentes executores mutativos possuem AUSÊNCIA TOTAL
+    de ferramentas nativas de editor (read_file, create_file, insert_edit_into_file, replace_string_in_file)
+    no frontmatter YAML tools: (Smell 2.24 / Smell 2.26).
+    """
+    import re
+
+    forbidden_tools = {"read_file", "create_file", "insert_edit_into_file", "replace_string_in_file"}
+    agent_files = [
+        p for p in AGENTS_DIR.glob("**/*.agent.md")
+        if p.name in EXECUTOR_AGENT_NAMES
+    ]
+    assert len(agent_files) == len(EXECUTOR_AGENT_NAMES)
+
+    violations = []
+    for af in agent_files:
+        c = af.read_text(encoding="utf-8")
+        fm_match = re.match(r"^---\s*\n(.*?)\n---", c, re.DOTALL)
+        if not fm_match:
+            violations.append(f"[{af.name}] ausência de frontmatter")
+            continue
+        tools_match = re.search(r"tools:\s*(\[[^\]]*\])", fm_match.group(1))
+        if not tools_match:
+            violations.append(f"[{af.name}] ausência de tools: no frontmatter")
+            continue
+        tools_str = tools_match.group(1)
+        present_forbidden = [t for t in forbidden_tools if f"'{t}'" in tools_str or f'"{t}"' in tools_str]
+        if present_forbidden:
+            violations.append(f"[{af.name}] ferramentas nativas de editor proibidas presentes: {present_forbidden}")
+
+    assert not violations, (
+        f"Violação de menor privilégio / Smell 2.24 em {len(violations)} agentes executores:\n"
+        + "\n".join(violations)
+    )
+
+
+def test_all_executor_agents_declare_all_ctx_tools():
+    """
+    Valida que 100% dos 50 agentes executores declaram compulsoriamente todas as 5 ferramentas
+    context-mode (ctx_execute, ctx_execute_file, ctx_batch_execute, ctx_index, ctx_search) em tools:.
+    """
+    import re
+
+    required_ctx = [
+        "context-mode/ctx_execute",
+        "context-mode/ctx_execute_file",
+        "context-mode/ctx_batch_execute",
+        "context-mode/ctx_index",
+        "context-mode/ctx_search",
+    ]
+    agent_files = [
+        p for p in AGENTS_DIR.glob("**/*.agent.md")
+        if p.name in EXECUTOR_AGENT_NAMES
+    ]
+    assert len(agent_files) == len(EXECUTOR_AGENT_NAMES)
+
+    violations = []
+    for af in agent_files:
+        c = af.read_text(encoding="utf-8")
+        fm_match = re.match(r"^---\s*\n(.*?)\n---", c, re.DOTALL)
+        if not fm_match:
+            continue
+        tools_match = re.search(r"tools:\s*(\[[^\]]*\])", fm_match.group(1))
+        if not tools_match:
+            continue
+        tools_str = tools_match.group(1)
+        missing = [t for t in required_ctx if t not in tools_str]
+        if missing:
+            violations.append(f"[{af.name}] ferramentas context-mode ausentes: {missing}")
+
+    assert not violations, (
+        f"Agentes executores sem o conjunto completo de context-mode ({len(violations)}):\n"
+        + "\n".join(violations)
+    )
+
+
+def test_all_executor_agents_contain_execution_protocol_block():
+    """
+    Valida que 100% dos 50 agentes executores contêm o bloco canônico <execution_protocol>
+    referenciando o Protocolo Plan-Then-Batch e a Regra do Limiar >= 2 (Smell 2.26 / Smell 2.13 / R-059).
+    """
+    agent_files = [
+        p for p in AGENTS_DIR.glob("**/*.agent.md")
+        if p.name in EXECUTOR_AGENT_NAMES
+    ]
+    assert len(agent_files) == len(EXECUTOR_AGENT_NAMES)
+
+    violations = []
+    for af in agent_files:
+        c = af.read_text(encoding="utf-8")
+        if "<execution_protocol>" not in c or "</execution_protocol>" not in c:
+            violations.append(f"[{af.name}] ausência do bloco <execution_protocol>")
+            continue
+        if "Plan-Then-Batch" not in c:
+            violations.append(f"[{af.name}] <execution_protocol> não referencia 'Plan-Then-Batch'")
+        if "Limiar >= 2" not in c:
+            violations.append(f"[{af.name}] <execution_protocol> não referencia 'Limiar >= 2'")
+        if "ENUMERAR" not in c:
+            violations.append(f"[{af.name}] <execution_protocol> não detalha a etapa 'ENUMERAR'")
+
+    assert not violations, (
+        f"Agentes executores sem bloco <execution_protocol> válido ({len(violations)}):\n"
+        + "\n".join(violations)
+    )
+
+
+def test_all_non_router_agents_absence_of_native_editor_tools():
+    """
+    Valida que 100% dos 78 agentes nao-roteadores (incluindo prompt-structuring) possuem
+    AUSENCIA TOTAL de ferramentas nativas de editor (read_file, create_file, insert_edit_into_file, replace_string_in_file)
+    no frontmatter YAML tools: (Smell 2.24 / Smell 2.26 / R-056 / R-059).
+    """
+    import re
+
+    forbidden_tools = {"read_file", "create_file", "insert_edit_into_file", "replace_string_in_file"}
+    all_agents = [
+        p for p in AGENTS_DIR.glob("**/*.agent.md")
+        if "templates" not in p.parts
+    ]
+    non_routers = [
+        p for p in all_agents
+        if not p.name.endswith("-router.agent.md") and p.name != "agent-router.agent.md"
+    ]
+    assert len(non_routers) >= 78, f"Esperado ao menos 78 agentes nao-roteadores, encontrados {len(non_routers)}"
+
+    violations = []
+    for af in non_routers:
+        c = af.read_text(encoding="utf-8")
+        fm_match = re.match(r"^---\s*\n(.*?)\n---", c, re.DOTALL)
+        if not fm_match:
+            violations.append(f"[{af.name}] ausencia de frontmatter")
+            continue
+        tools_match = re.search(r"tools:\s*(\[[^\]]*\])", fm_match.group(1))
+        if not tools_match:
+            violations.append(f"[{af.name}] ausencia de tools: no frontmatter")
+            continue
+        tools_str = tools_match.group(1)
+        present_forbidden = [t for t in forbidden_tools if f"'{t}'" in tools_str or f'"{t}"' in tools_str]
+        if present_forbidden:
+            violations.append(f"[{af.name}] ferramentas nativas de editor proibidas presentes: {present_forbidden}")
+
+    assert not violations, (
+        f"Violacao de menor privilegio / Smell 2.24 em {len(violations)} agentes nao-roteadores:\n"
+        + "\n".join(violations)
+    )
+
+
+def test_all_non_router_agents_declare_all_ctx_tools():
+    """
+    Valida que 100% de todos os agentes nao-roteadores (exceto prompt-structuring) declaram
+    compulsoriamente todas as 5 ferramentas context-mode (ctx_execute, ctx_execute_file, ctx_batch_execute, ctx_index, ctx_search) em tools:.
+    """
+    import re
+
+    required_ctx = [
+        "context-mode/ctx_execute",
+        "context-mode/ctx_execute_file",
+        "context-mode/ctx_batch_execute",
+        "context-mode/ctx_index",
+        "context-mode/ctx_search",
+    ]
+    all_agents = [
+        p for p in AGENTS_DIR.glob("**/*.agent.md")
+        if "templates" not in p.parts
+    ]
+    non_routers = [
+        p for p in all_agents
+        if not p.name.endswith("-router.agent.md") and p.name != "agent-router.agent.md" and p.name != "prompt-structuring.agent.md"
+    ]
+    assert len(non_routers) >= 77
+
+    violations = []
+    for af in non_routers:
+        c = af.read_text(encoding="utf-8")
+        fm_match = re.match(r"^---\s*\n(.*?)\n---", c, re.DOTALL)
+        if not fm_match:
+            continue
+        tools_match = re.search(r"tools:\s*(\[[^\]]*\])", fm_match.group(1))
+        if not tools_match:
+            continue
+        tools_str = tools_match.group(1)
+        missing = [t for t in required_ctx if t not in tools_str]
+        if missing:
+            violations.append(f"[{af.name}] ferramentas context-mode ausentes: {missing}")
+
+    assert not violations, (
+        f"Agentes nao-roteadores sem o conjunto completo de context-mode ({len(violations)}):\n"
+        + "\n".join(violations)
+    )
+
+
+def test_all_non_router_agents_contain_execution_protocol_block():
+    """
+    Valida que 100% de todos os agentes nao-roteadores (exceto prompt-structuring) contem o bloco canonico <execution_protocol>
+    referenciando o Protocolo Plan-Then-Batch e a Regra do Limiar >= 2 (Smell 2.26 / Smell 2.13 / R-059).
+    """
+    all_agents = [
+        p for p in AGENTS_DIR.glob("**/*.agent.md")
+        if "templates" not in p.parts
+    ]
+    non_routers = [
+        p for p in all_agents
+        if not p.name.endswith("-router.agent.md") and p.name != "agent-router.agent.md" and p.name != "prompt-structuring.agent.md"
+    ]
+    assert len(non_routers) >= 77
+
+    violations = []
+    for af in non_routers:
+        c = af.read_text(encoding="utf-8")
+        if "<execution_protocol>" not in c or "</execution_protocol>" not in c:
+            violations.append(f"[{af.name}] ausencia do bloco <execution_protocol>")
+            continue
+        if "Plan-Then-Batch" not in c:
+            violations.append(f"[{af.name}] <execution_protocol> nao referencia 'Plan-Then-Batch'")
+        if "Limiar >= 2" not in c:
+            violations.append(f"[{af.name}] <execution_protocol> nao referencia 'Limiar >= 2'")
+        if "ENUMERAR" not in c:
+            violations.append(f"[{af.name}] <execution_protocol> nao detalha a etapa 'ENUMERAR'")
+
+    assert not violations, (
+        f"Agentes nao-roteadores sem bloco <execution_protocol> valido ({len(violations)}):\n"
+        + "\n".join(violations)
+    )
+
+
+def test_code_knowledge_graph_specific_plan_then_batch_safeguard():
+    """
+    Valida se code-knowledge-graph.agent.md contem salvaguarda especifica exigindo ctx_batch_execute
+    ou script de leitura em lote consolidado antes de queries de grafo, proibindo N chamadas de ctx_execute (Smell 2.26 / R-059).
+    """
+    ckg_file = AGENTS_DIR / "code-knowledge-graph.agent.md"
+    assert ckg_file.exists()
+    content = ckg_file.read_text(encoding="utf-8")
+
+    assert "ctx_batch_execute" in content, "code-knowledge-graph deve referenciar ctx_batch_execute"
+    assert "<execution_protocol>" in content, "code-knowledge-graph deve conter <execution_protocol>"
+    assert "N chamadas" in content or "chamadas sequenciais unitárias" in content, (
+        "code-knowledge-graph deve proibir explicitamente N chamadas unitarias de ctx_execute"
+    )
+    assert "inspeção de múltiplos arquivos" in content or "inspeções multi-arquivo" in content, (
+        "code-knowledge-graph deve conter regra especifica para inspecao multi-arquivo em lote"
+    )
+
+
+def test_agent_router_safeguard_against_model_discovery_r054():
+    """
+    Valida se agent-router.agent.md e copilot-instructions.md formalizam a salvaguarda estrita contra
+    discovery de catalog.yaml ou *.agent.md em tempo de execucao para descoberta de modelos (R-054 / Zero Discovery).
+    """
+    router_file = AGENTS_DIR / "agent-router.agent.md"
+    ci_file = REPO_ROOT / ".github" / "copilot-instructions.md"
+
+    r_content = router_file.read_text(encoding="utf-8")
+    ci_content = ci_file.read_text(encoding="utf-8")
+
+    # In router
+    assert "Zero Discovery de Modelos" in r_content or "ZERO DISCOVERY DE MODELOS" in r_content or "RESOLUÇÃO ESTÁTICA / ZERO DISCOVERY EM RUNTIME" in r_content, (
+        "agent-router.agent.md deve conter clausula formal de Zero Discovery de Modelos"
+    )
+    assert "É TERMINANTEMENTE PROIBIDO ao `agent-router` chamar ferramentas de busca ou leitura" in r_content or "É TERMINANTEMENTE PROIBIDO ao `agent-router`" in r_content, (
+        "agent-router.agent.md deve proibir ferramentas de busca/leitura para catalog.yaml"
+    )
+
+    # In copilot-instructions
+    assert "Blindagem contra Discovery de Modelos (R-054)" in ci_content, (
+        "copilot-instructions.md deve formalizar a Blindagem contra Discovery de Modelos (R-054)"
+    )
+    assert "Zero Discovery é absoluto e inegociável" in ci_content, (
+        "copilot-instructions.md deve declarar que Zero Discovery e absoluto e inegociavel"
     )

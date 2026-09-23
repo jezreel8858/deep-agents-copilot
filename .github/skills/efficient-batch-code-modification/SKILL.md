@@ -132,6 +132,19 @@ Toda inspeção, análise, validação ou modificação envolvendo múltiplos al
    ```
 3. **Proibição Absoluta**: É terminantemente proibido disparar turnos separados no chat chamando `ctx_execute` para cada arquivo/comando individualmente.
 
+#### Regra do Limiar >= 2 (Anti Tool Chaining — Smell 2.26 / R-059)
+
+> **Regra do Limiar >= 2 (inegociável):** SE o escopo da tarefa exigir inspecionar, ler, comparar, editar ou executar 2 (DOIS) OU MAIS arquivos/comandos/alvos, é TERMINANTEMENTE PROIBIDO disparar `ctx_execute` isolado por alvo em chamadas/turnos sucessivos. É OBRIGATÓRIO: (a) `ctx_batch_execute(commands, queries)` com todos os alvos rotulados em uma única chamada, OU (b) um único script iterativo em `ctx_execute` que processe todos os alvos em loop interno e imprima o resumo consolidado de uma só vez. Antes de disparar a primeira chamada de ferramenta, o agente DEVE enumerar mentalmente TODOS os alvos necessários para completar a tarefa (Plan-Then-Batch, ver abaixo) — nunca descobrir o próximo alvo reativamente turno-a-turno.
+
+#### Protocolo Plan-Then-Batch (Anti Miopia Reativa — Smell 2.13 / R-059)
+
+> 1. **ENUMERAR**: antes de qualquer tool call, liste internamente todos os arquivos/comandos que compõem a tarefa completa (não apenas o próximo passo aparente).
+> 2. **CONSOLIDAR**: se a lista tiver >= 2 itens, agrupe tudo em uma única payload (`commands[]` em `ctx_batch_execute` ou loop único em `ctx_execute`).
+> 3. **DESPACHAR**: dispare apenas 1 chamada de ferramenta de leitura/processamento por fase da tarefa — nunca N chamadas sequenciais para N alvos previsíveis.
+> 4. **Comandos curtos não suspendem a regra**: prompts do usuário como "prosseguir", "continue", "pode seguir" NÃO isentam o agente da obrigatoriedade de context-mode nem do limiar >= 2 — a obrigação é da TAREFA em andamento, não do tamanho do prompt do turno atual.
+>
+> *(SSOT Normativa: `.github/copilot-instructions.md` § 2.1; alinhamento operacional em `.github/skills/context-mode/SKILL.md`)*.
+
 ---
 
 ## 3. Matriz Comparativa: Execução Ingênua vs. Batch de Editor vs. Context-Mode Script
@@ -197,4 +210,30 @@ Regras inegociáveis para edição segura:
   - [ ] **Não** → `replace_string_in_file` permitido, mas ainda verificando unicidade de âncora e seguindo 5.2.
 - [ ] Contei ocorrências da âncora em memória e confirmei que `count === 1` antes de substituir?
 - [ ] Após escrever, reli o arquivo (ou rodei validação de sintaxe/integridade de seções) para confirmar o resultado real?
+
+## 6. Teto Rígido de Tool Turns (≤ 5) e Prevenção de Dívida de Tokens O(N^2) (R-060)
+
+### 6.1. A Dinâmica do Custo Quadrático de Contexto
+
+Em arquiteturas agentic baseadas em tool-calling, o LLM reenvia todo o histórico cumulativo a cada novo turno:
+
+Total Tokens approx Sum(k=1..N) [Prompt Base + Sum(i=1..k) Tool Output_i]
+
+Uma sessão ingênua com 20 tool turns pode inflar o volume de tokens processados de 10.000 para mais de 350.000 tokens de entrada, elevando os custos de créditos em até 10x-50x.
+
+### 6.2. Estratégia de Warm Start e Destilação na Borda (Edge Truncation)
+
+1. **Warm Start Compulsório**: Recursos locais (caches, grafos, compilações) nunca devem falhar no primeiro turno exigindo auto-recuperação reativa. Devem ser inicializados silenciosamente em lote (*build-if-missing*).
+2. **Batch Querying**: Agrupar todas as interrogações em uma única chamada agregada (ctx_batch_execute, batch_query ou script iterativo em sandbox).
+3. **Edge Truncation (Destilação Semântica)**: Truncar e filtrar dados volumosos *dentro da ferramenta/sandbox*. O chat recebe apenas métricas, anomalias e achados conclusivos.
+
+### 6.3. Protocolo de Circuit Breaker no 4º Turno
+
+- **Turno 1**: Levantamento consolidado (Batch Gather) + Warm Start.
+- **Turno 2**: Execução/processamento unificado em lote (All-or-Nothing / Batch Processing).
+- **Turno 3**: Validação consolidada (Quality Gate).
+- **Turno 4 (Threshold)**: Se a tarefa não convergir, acionar compulsoriamente o **Circuit Breaker**:
+  - Salvar evidências parciais em ctx_index;
+  - Emitir parecer técnico com o estado alcançado;
+  - Delegar ao próximo agente via handoff ou acionar intervenção humana via ask_questions.
 

@@ -6,7 +6,7 @@ description: >-
   (gitignored, R-043) via scanner read-only de stack e arquitetura. Opera em
   modos scan, generate-one e batch, integrando-se a `/add-project-context`.
 model: "Gemini 3.8 Flash"
-tools: ['read_file', 'create_file', 'file_search', 'list_dir', 'get_errors', 'grep_search', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
+tools: ['file_search', 'list_dir', 'get_errors', 'grep_search', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
@@ -374,6 +374,16 @@ Confiança: Baixa — aguardando correção manual
 - `./.github/instructions/README.md` — adapters genéricos/compartilhados (nunca projetos).
 - `./.github/projects.local.yaml` — descobre projetos + paths externos (gitignored, só lido em `modo=batch`).
 - `.github/instructions/README.md` — atualizar com novos arquivos criados.
+
+<execution_protocol>
+**Protocolo Plan-Then-Batch (Smell 2.26 / Smell 2.13 / R-059):**
+1. **ENUMERAR**: Antes de qualquer ação de modificação ou inspeção, liste internamente todos os arquivos e comandos necessários para a demanda completa (não apenas o próximo passo aparente).
+2. **CONSOLIDAR (Limiar >= 2)**: Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de `ctx_execute` por alvo no chat. Use compulsoriamente `ctx_batch_execute(commands, queries)` OU script iterativo consolidado em `ctx_execute`.
+3. **DESPACHAR & VALIDAR**: Aplique todas as mutações em processo único no sandbox (all-or-nothing verificado, R-051) e execute `get_errors` agrupado uma única vez ao final com a lista completa de arquivos alterados.
+4. **Comandos curtos não suspendem a regra**: Prompts curtos ("prosseguir", "continue", "pode seguir") NÃO isentam o agente do limiar >= 2 nem do context-mode em lote — a regra vincula-se ao escopo da tarefa, nunca ao tamanho do prompt.
+5. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions, vedando loops investigativos de dívida de tokens O(N²).
+6. **Warm Start Compulsório & Batch Querying (R-060)**: Ferramentas locais que dependem de índices ou bases pré-computadas devem verificar e inicializar a base silenciosamente no primeiro comando (build-if-missing). É proibido disparar consultas granulares individuais para múltiplos nós — agrupe todas as pesquisas via chamadas em lote (batch_query, ctx_batch_execute, script iterativo) com destilação semântica e truncamento na borda (Edge Truncation).
+</execution_protocol>
 
 ## Retorno ao Router (R-042 — Anti Sticky-Session)
 
