@@ -10,12 +10,14 @@ Motivacao (ver docs/plan/... ou CHANGELOG [2.33.3]):
     canonica unica gera/valida os artefatos derivados.
 
 Fonte canonica:
-    .github/agents/templates/_execution-protocol-fragment.md
-    (contem os blocos MUTATING e READONLY delimitados por marcadores HTML)
+    tools/agent_protocol_sync/_execution-protocol-fragment.md
+    (contem o bloco STANDARD delimitado por marcadores HTML; unificado em
+    2026-09-23 apos constatar que a antiga divisao MUTATING/READONLY diferia
+    em apenas 3 palavras cosmeticas no item 3 - ver CHANGELOG [2.33.4])
 
 Mapa de papeis:
     tools/agent_protocol_sync/protocol_roles.json
-    { "<agent-id>": "MUTATING" | "READONLY" | "CUSTOM" }
+    { "<agent-id>": "STANDARD" | "CUSTOM" }
 
 Uso:
     python tools/agent_protocol_sync/sync_execution_protocol.py            # dry-run (mostra diffs)
@@ -40,10 +42,10 @@ BLOCK_RE = re.compile(r"<execution_protocol>([\s\S]*?)</execution_protocol>")
 
 
 def load_canonical_blocks() -> dict[str, str]:
-    """Extrai os blocos MUTATING/READONLY do arquivo de fragmento canonico."""
+    """Extrai o bloco STANDARD do arquivo de fragmento canonico."""
     text = FRAGMENT_PATH.read_text(encoding="utf-8")
     blocks: dict[str, str] = {}
-    for role in ("MUTATING", "READONLY"):
+    for role in ("STANDARD",):
         pattern = re.compile(
             rf"<!-- BEGIN:{role} -->\s*\n([\s\S]*?)\n<!-- END:{role} -->"
         )

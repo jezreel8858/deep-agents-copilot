@@ -114,13 +114,15 @@ def test_execution_protocol_sync_tool_reports_zero_drift():
     Guardrail de FIDELIDADE EXATA (substitui a checagem fraca de substring
     'R-060' in text): invoca tools/agent_protocol_sync/sync_execution_protocol.py
     --check, que compara byte-a-byte o bloco <execution_protocol> de cada um
-    dos 77 agentes executores contra a fonte canonica unica em
-    .github/agents/templates/_execution-protocol-fragment.md (papel MUTATING
-    ou READONLY conforme tools/agent_protocol_sync/protocol_roles.json).
+    dos 77 agentes executores contra a fonte canonica unica (bloco STANDARD)
+    em tools/agent_protocol_sync/_execution-protocol-fragment.md, conforme
+    tools/agent_protocol_sync/protocol_roles.json.
 
     Previne a reincidencia de drift silencioso: um agente pode conter a
     substring "R-060" e ainda assim divergir do texto canonico em qualquer
-    outro trecho (ex.: item 1-4 do Protocolo Plan-Then-Batch).
+    outro trecho (ex.: item 1-4 do Protocolo Plan-Then-Batch). Tambem previne
+    a reincidencia da antiga divisao MUTATING/READONLY (unificada em 2026-09-23
+    apos constatar que as 2 variantes diferiam em apenas 3 palavras cosmeticas).
     """
     assert PROTOCOL_FRAGMENT.exists(), f"Fonte canonica ausente: {PROTOCOL_FRAGMENT}"
     assert PROTOCOL_ROLES.exists(), f"Mapa de papeis ausente: {PROTOCOL_ROLES}"

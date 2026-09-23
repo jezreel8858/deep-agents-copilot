@@ -16,6 +16,15 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
   - **Guardrail Determinístico de Testes**: Implementada a suíte `tests/governance_audit/test_agent_headings_standardization.py` parametrizada sobre os 86 agents e 4 templates, garantindo que o H1 seja único, obrigatório e estritamente padronizado.
   - **Quality Gate**: 248/248 testes aprovados no pytest com 100% de sucesso.
 
+## [2.33.4] — 2026-09-23
+
+### Corrigido (Unificacao MUTATING/READONLY em execution_protocol)
+- **Gap identificado**: a fonte canonica introduzida em [2.33.3] mantinha 2 blocos quase identicos (MUTATING/READONLY), diferindo apenas em 3 palavras cosmeticas no item 3 ("mutacoes" vs "mutacoes ou leituras... quando aplicavel") - a redacao READONLY ja era universalmente compativel com ambos os perfis.
+- **Correcao**: unificado em um unico bloco canonico `STANDARD` em `tools/agent_protocol_sync/_execution-protocol-fragment.md`. Papel `CUSTOM` (`code-knowledge-graph`) mantido como excecao pinada.
+- **Sincronizacao Aplicada**: `protocol_roles.json` convertido (50 MUTATING + 26 READONLY -> 76 STANDARD); `sync_execution_protocol.py --apply` corrigiu automaticamente os 50 agents que ainda tinham a redacao antiga (sem "ou leituras"/"quando aplicavel").
+- **Estado Final**: 0 drift confirmado via `--check` nos 77 agents; suite de testes atualizada (comentarios de `test_execution_protocol_sync_tool_reports_zero_drift` refletem o modelo STANDARD/CUSTOM).
+- **Quality Gate**: 258/258 testes deterministicos aprovados.
+
 ## [2.33.3] — 2026-09-23
 
 ### Adicionado (Fonte Unica para execution_protocol — Fim da Duplicacao Manual de R-059/R-060)
