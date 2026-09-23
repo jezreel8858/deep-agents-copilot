@@ -996,6 +996,21 @@ regressao:
     critico: true
     threshold: 0.85
 
+  - id: "canon-047"
+    descricao: "Invocação de síntese de prompt para novo chat (/craft-prompt -> WORKFLOW-PROMPT-SYNTHESIS -> prompt-structuring)"
+    input:
+      solicitacao: "/craft-prompt criar listagem reativa de itens com state store para novo chat"
+    expected:
+      agent_route: "prompt-structuring"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.90
+      output_contains:
+        - "Agente Ativo: prompt-structuring"
+        - "WORKFLOW-PROMPT-SYNTHESIS"
+    critico: true
+    threshold: 0.90
+
   - id: "regr-020"
     descricao: "REGRESSÃO: governance-factory NUNCA deve criar novo agent, prompt ou skill diretamente sem antes delegar pesquisa prévia de diretrizes e skills ao deep-search"
     input:

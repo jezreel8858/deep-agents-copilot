@@ -28,7 +28,9 @@
     "list_dir",
     "ask_questions",
     "run_subagent",
-    "context-mode/ctx_search"
+    "context-mode/ctx_search",
+    "context-mode/ctx_execute",
+    "context-mode/ctx_batch_execute"
   ],
   "security_profile": {
     "tool_zones": [

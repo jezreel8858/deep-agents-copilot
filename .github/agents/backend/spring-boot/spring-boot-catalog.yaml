@@ -46,6 +46,8 @@ agents:
       - "ask_questions"
       - "run_subagent"
       - "context-mode/ctx_search"
+      - "context-mode/ctx_execute"
+      - "context-mode/ctx_batch_execute"
     skills:
       - "spring-boot-backend-patterns"
       - "java-jdk-backend-governance"

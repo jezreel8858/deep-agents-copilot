@@ -212,3 +212,42 @@ def test_generic_placeholders_in_workflow_and_router():
     assert handoff_skill.exists()
     content_handoff = handoff_skill.read_text(encoding="utf-8")
     assert "[PROJETO-ALVO]" in content_handoff, "handoff-governance/SKILL.md deve usar o placeholder genérico [PROJETO-ALVO]"
+
+
+# ─────────────────────────────────────────────────────────────
+# 6. Proibição de Caminhos Concretos de Projetos Locais em Governança (R-038 & R-044)
+# ─────────────────────────────────────────────────────────────
+
+def test_no_concrete_local_project_file_paths_in_governance_files():
+    """Valida R-038 e R-044: workflows.md, prompts e suítes de teste de governança nunca devem
+    conter caminhos reais de código ou features de projetos locais privados."""
+    targets_to_check = [
+        REPO_ROOT / ".github" / "agents" / "workflows.md",
+        REPO_ROOT / ".github" / "prompts" / "craft-prompt.prompt.md",
+        REPO_ROOT / ".github" / "agents" / "evals" / "casos-roteamento.yaml",
+        REPO_ROOT / "tests" / "operational_flow" / "casos-workflows.yaml",
+    ]
+
+    # Snippets e caminhos característicos de projetos locais que devem ser genéricos
+    forbidden_snippets = [
+        "src/app/features/escala",
+        "src/app/models/escala",
+        "src/app/features/admin-global",
+        "escala-list.component",
+        "admin-global.component",
+    ]
+
+    leaks: list[str] = []
+    for target in targets_to_check:
+        if not target.exists():
+            continue
+        content = target.read_text(encoding="utf-8")
+        rel_path = target.relative_to(REPO_ROOT)
+        for snippet in forbidden_snippets:
+            if snippet in content:
+                leaks.append(f"[{rel_path}] contém caminho/termo de projeto local proibido: '{snippet}'")
+
+    assert not leaks, (
+        f"Foram detectados {len(leaks)} vazamentos de caminhos de projetos locais em artefatos de governança (violação R-038/R-044):\n"
+        + "\n".join(f"  - {leak}" for leak in leaks)
+    )

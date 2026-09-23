@@ -501,3 +501,67 @@ cenarios:
         preservar_state_bag: true
         bypass_triagem_inicial: true
         direcionar_para_etapa: 1
+
+  # ─────────────────────────────────────────────────────────────
+  # WORKFLOW 9 — PROMPT SYNTHESIS
+  # ─────────────────────────────────────────────────────────────
+  - id: "WF-PROMPT-001"
+    nome: "Síntese e Refino de Prompt Canônico para Novo Chat"
+    workflow: "WORKFLOW-PROMPT-SYNTHESIS"
+    tipo: "fast_path"
+    projeto_alvo: "[PROJETO-ALVO]"
+    input_inicial: "/craft-prompt criar tela de listagem reativa de itens com state store e testes unitarios"
+    trajetoria:
+      - etapa: 1
+        nome_etapa: "Elicitação & Problem Space"
+        agente: "requirements-analyst"
+        co_agentes: ["prompt-structuring"]
+        invariantes:
+          proibir_mutacao: false
+          exigir_banner: "Agente Ativo: requirements-analyst"
+          ask_questions_obrigatorio: true
+        output_esperado:
+          - "Problem Space"
+          - "Critérios de Aceitação"
+        proximos_permitidos: ["code-knowledge-graph"]
+      - etapa: 2
+        nome_etapa: "Context Grounding & AST Mining"
+        agente: "code-knowledge-graph"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: code-knowledge-graph"
+        output_esperado:
+          - "grounded_files"
+          - "irmaos_canonicos"
+        proximos_permitidos: ["prompt-structuring"]
+      - etapa: 3
+        nome_etapa: "Mapeamento de Restrições & Não-Escopo"
+        agente: "prompt-structuring"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: prompt-structuring"
+        output_esperado:
+          - "constraints"
+          - "R-046"
+        proximos_permitidos: ["prompt-structuring"]
+      - etapa: 4
+        nome_etapa: "Síntese Estruturada & Otimização de Caching"
+        agente: "prompt-structuring"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: prompt-structuring"
+        output_esperado:
+          - "<role>"
+          - "<project_context>"
+          - "<task>"
+        proximos_permitidos: ["prompt-structuring"]
+      - etapa: 5
+        nome_etapa: "Quality Gate & Emissão do Bloco Markdown"
+        agente: "prompt-structuring"
+        invariantes:
+          proibir_mutacao: true
+          exigir_banner: "Agente Ativo: prompt-structuring"
+        output_esperado:
+          - "bloco_md_gerado"
+          - "```markdown"
+        proximos_permitidos: []

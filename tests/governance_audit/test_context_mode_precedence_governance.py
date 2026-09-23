@@ -161,7 +161,7 @@ def test_governance_maintainer_and_peer_agents_align_with_context_mode_precedenc
     for pf in peer_files:
         assert pf.exists(), f"Peer agent {pf.name} deve existir"
         c = pf.read_text(encoding="utf-8")
-        assert "100% obrigatório" in c, f"[{pf.name}] DEVE declarar context-mode 100% obrigatório"
+        assert "100% OBRIGATÓRIO" in c or "100% obrigatório" in c, f"[{pf.name}] DEVE declarar context-mode 100% obrigatório"
         assert "fallback exclusivo" in c, f"[{pf.name}] DEVE citar fallback exclusivo de editor"
 
 
@@ -321,4 +321,124 @@ def test_catalog_yaml_declares_ctx_batch_execute_for_all_ctx_execute_agents():
 
     assert not missing_in_cat, (
         f"catalog.yaml possui agentes com ctx_execute sem ctx_batch_execute: {missing_in_cat}"
+    )
+
+
+def test_all_non_router_agents_declare_ctx_batch_execute_and_ctx_execute():
+    """
+    Valida que 100% dos agentes não-roteadores (exceto prompt-structuring, que não possui tools de arquivo)
+    declaram compulsoriamente 'context-mode/ctx_batch_execute' e 'context-mode/ctx_execute' em tools:.
+    """
+    import re
+
+    all_agents = [
+        p for p in AGENTS_DIR.glob("**/*.agent.md")
+        if "templates" not in p.parts
+    ]
+    
+    non_routers = [
+        p for p in all_agents
+        if not p.name.endswith("-router.agent.md") and p.name != "agent-router.agent.md" and p.name != "prompt-structuring.agent.md"
+    ]
+    assert len(non_routers) >= 75, f"Esperado ao menos 75 agentes não-roteadores, encontrados {len(non_routers)}"
+
+    missing_batch = []
+    missing_exec = []
+    for af in non_routers:
+        c = af.read_text(encoding="utf-8")
+        fm_match = re.match(r"^---\s*\n(.*?)\n---", c, re.DOTALL)
+        if not fm_match:
+            continue
+        fm_text = fm_match.group(1)
+        tools_match = re.search(r"tools:\s*(\[[^\]]*\])", fm_text)
+        if not tools_match:
+            continue
+        tools_str = tools_match.group(1)
+        rel = str(af.relative_to(REPO_ROOT))
+        if "context-mode/ctx_batch_execute" not in tools_str:
+            missing_batch.append(rel)
+        if "context-mode/ctx_execute" not in tools_str:
+            missing_exec.append(rel)
+
+    assert not missing_batch, (
+        f"100% dos agentes não-roteadores DEVEM possuir ctx_batch_execute. Faltam ({len(missing_batch)}):\n"
+        + "\n".join(missing_batch)
+    )
+    assert not missing_exec, (
+        f"100% dos agentes não-roteadores DEVEM possuir ctx_execute. Faltam ({len(missing_exec)}):\n"
+        + "\n".join(missing_exec)
+    )
+
+
+def test_all_non_router_agents_declare_r056_and_prohibition():
+    """
+    Valida que 100% dos agentes não-roteadores declaram compulsoriamente a proibição
+    de ferramentas manuais de editor e o uso 100% obrigatório de context-mode (R-008 / R-056 / Smell 2.24).
+    """
+    all_agents = [
+        p for p in AGENTS_DIR.glob("**/*.agent.md")
+        if "templates" not in p.parts
+    ]
+    non_routers = [
+        p for p in all_agents
+        if not p.name.endswith("-router.agent.md") and p.name != "agent-router.agent.md" and p.name != "prompt-structuring.agent.md"
+    ]
+
+    violations = []
+    for af in non_routers:
+        rel = str(af.relative_to(REPO_ROOT))
+        text = af.read_text(encoding="utf-8")
+        if "NÃO usar ferramentas nativas de editor" not in text:
+            violations.append(f"[{rel}] ausência de proibição de editor tools")
+        if "100% OBRIGATÓRIO" not in text and "100% obrigatório" not in text:
+            violations.append(f"[{rel}] ausência de '100% OBRIGATÓRIO'")
+        if "fallback exclusivo" not in text.lower():
+            violations.append(f"[{rel}] ausência de 'fallback exclusivo'")
+
+    assert not violations, (
+        f"Violação de R-056 em {len(violations)} agentes não-roteadores:\n"
+        + "\n".join(violations)
+    )
+
+
+def test_prompts_declare_context_mode_precedence_and_batching():
+    """Valida que prompts de execução declaram context-mode e batching mandatórios."""
+    prompts_dir = REPO_ROOT / ".github" / "prompts"
+    commit_p = prompts_dir / "commit.prompt.md"
+    review_p = prompts_dir / "review.prompt.md"
+    tpl_p = prompts_dir / "templates" / "prompt-template.md"
+
+    for p, name in [(commit_p, "commit.prompt.md"), (review_p, "review.prompt.md"), (tpl_p, "prompt-template.md")]:
+        assert p.exists()
+        c = p.read_text(encoding="utf-8")
+        assert "ctx_batch_execute" in c, f"[{name}] DEVE declarar ctx_batch_execute"
+        assert "100% OBRIGATÓRIO" in c or "100% obrigatório" in c, f"[{name}] DEVE declarar context-mode 100% obrigatório"
+
+
+def test_all_non_router_agents_prohibit_mcp_tool_chaining():
+    """
+    Valida que 100% dos agentes não-roteadores contêm a proibição explícita
+    contra MCP Tool Chaining sequencial no chat (Smell 2.26).
+    """
+    all_agents = [
+        p for p in AGENTS_DIR.glob("**/*.agent.md")
+        if "templates" not in p.parts
+    ]
+    non_routers = [
+        p for p in all_agents
+        if not p.name.endswith("-router.agent.md") and p.name != "agent-router.agent.md" and p.name != "prompt-structuring.agent.md"
+    ]
+
+    violations = []
+    for af in non_routers:
+        rel = str(af.relative_to(REPO_ROOT))
+        content = af.read_text(encoding="utf-8")
+        if "NÃO encadear chamadas unitárias sequenciais de `ctx_execute`" not in content and "NÃO encadear chamadas unitárias sequenciais de ctx_execute" not in content:
+            violations.append(f"[{rel}] ausência de proibição de MCP Tool Chaining sequencial")
+        if "Regra de Ouro do Single-Turn MCP" not in content:
+            violations.append(f"[{rel}] ausência da Regra de Ouro do Single-Turn MCP")
+
+    assert not violations, (
+        f"Violação de Smell 2.26 (MCP Tool Chaining) em {len(violations)} agentes:\n"
+        + "\n".join(violations)
     )

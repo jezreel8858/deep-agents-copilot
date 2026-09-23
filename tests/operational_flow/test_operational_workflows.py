@@ -529,3 +529,30 @@ def test_workflow_release_readiness_edge_scenarios_and_state_bag(routing_graph):
     assert "database-specialist" in etapa2.get("agent", "")
     etapa4 = next((e for e in estados if e["etapa"] == 4), {})
     assert "pr-gatekeeper" in etapa4.get("agent", "")
+
+
+def test_workflow_prompt_synthesis_edge_scenarios_and_state_bag(routing_graph):
+    """Valida que WORKFLOW-PROMPT-SYNTHESIS cobre elicitação no problem space, grounding AST,
+    restrições e não-escopo, otimização para prompt caching, emissão em bloco markdown e State Bag."""
+    content_wf = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    assert "WORKFLOW-PROMPT-SYNTHESIS" in content_wf
+    assert "Elicitação & Problem Space" in content_wf or "Elicitação & Intake" in content_wf
+    assert "Context Grounding & AST Mining" in content_wf
+    assert "prompt_alvo:" in content_wf, "workflows.md deve definir Typed State Bag do Workflow 9"
+
+    wf9 = next((wf for wf in routing_graph.get("workflows", []) if wf["id"] == "WORKFLOW-PROMPT-SYNTHESIS"), None)
+    assert wf9 is not None, "WORKFLOW-PROMPT-SYNTHESIS deve existir no routing-graph.yaml"
+    estados = wf9.get("estados", [])
+    etapa1 = next((e for e in estados if e["etapa"] == 1), {})
+    assert "requirements-analyst" in etapa1.get("agent", "") or "requirements-analyst" in str(etapa1.get("co_agentes", []))
+    assert "prompt-structuring" in etapa1.get("agent", "") or "prompt-structuring" in str(etapa1.get("co_agentes", []))
+    etapa2 = next((e for e in estados if e["etapa"] == 2), {})
+    assert "code-knowledge-graph" in etapa2.get("agent", "")
+    etapa4 = next((e for e in estados if e["etapa"] == 4), {})
+    assert "prompt-structuring" in etapa4.get("agent", "")
+    etapa5 = next((e for e in estados if e["etapa"] == 5), {})
+    assert etapa5.get("formato_entrega") == "markdown_code_block"
+    assert "Invariante de Visibilidade Progressiva" in content_wf, "workflows.md deve exigir visibilidade progressiva no Workflow 9"
+    assert "Painel de Evidências" in content_wf, "workflows.md deve exigir Painel de Evidências no Workflow 9"
+    assert "Invariante de Invocação Compulsória do Motor de Grafo" in content_wf, "workflows.md deve exigir invocação compulsória de @code-knowledge-graph na Etapa 2"
+    assert "Invariante de Interrupção Compulsória por Ambiguidade" in content_wf, "workflows.md deve exigir Invariante 19 de interrupção compulsória"

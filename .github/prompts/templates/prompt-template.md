@@ -3,8 +3,9 @@ name: '<verbo>-<objeto>'
 description: '<Ação imperativa em 1 linha — ex.: Analisa e refatora o arquivo ativo aplicando padrões de Clean Architecture>'
 agent: 'agent'
 model: "Gemini 3.8 Flash"
-tools: ['read_file', 'get_errors']
+tools: ['read_file', 'get_errors', 'context-mode/ctx_execute', 'context-mode/ctx_batch_execute', 'context-mode/ctx_search']
 # Se run_in_terminal for declarado em tools, é OBRIGATÓRIO incluir .github/skills/terminal-governance/SKILL.md em source_docs (R-049).
+# O uso de context-mode (ctx_execute, ctx_batch_execute, ctx_search) é 100% OBRIGATÓRIO para leituras e escritas quando disponível, aplicando compulsoriamente Single-Turn MCP Batching (R-008, R-046, R-056, Smell 2.24, Smell 2.26).
 argument-hint: '[caminho-do-arquivo | contexto-opcional]'
 # SSOT de Dependências de Prompt (VS Code Copilot Prompt Files Spec):
 # 100% das dependências documentais e skills do prompt DEVEM residir exclusivamente em source_docs: no frontmatter.

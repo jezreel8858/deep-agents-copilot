@@ -345,7 +345,7 @@ flowchart TB
 
 ---
 
-## Status Atual (2026-09-21 — Versão 2.26.0)
+## Status Atual (2026-09-21 — Versão 2.29.0)
 
 ### Governança Global & Blindagem Sistêmica
 - ✅ **Regras normativas consolidadas** (`CLAUDE.md` — Regras R-001 a R-057).
@@ -360,7 +360,7 @@ flowchart TB
   - **`WORKFLOW-REFACTORING`**: **Contract Testing** formal (**Pact-style / consumer-driven** contract tests ou OpenAPI / JSON Schema Diff) no gate de contratos (Estado 2a) para proteção de APIs públicas e contratos entre múltiplos módulos; **Camada de Redundância Proporcional ao Blast Radius** no Estado 5 para blast radius moderado ou alto, composta por: (1) Auditoria Reversa de Símbolos (`reverse_symbol_audit` via grafo determinístico), (2) Mini Mutation Gate (`mini_mutation_gate` na Golden Master) e (3) Differential Replay Leve (`differential_replay_leve` comparando snapshots de entrada e saída pré/pós refatoração); e governança de Rollback fortalecida no Estado 5b com cálculo, registro e reporte quantitativo do **`blast_radius_revertido`** (nós Mikado revertidos, arquivos e callers restaurados) no `workflow_state`.
 - ✅ **Migração Determinística com Tríplice Redundância Pós-Migração**: Elevação do `WORKFLOW-FRAMEWORK-MIGRATION` para 6 etapas canônicas com Symbol Exhaustion Gate, Anti-Omission AST Validator, Reverse Orphan Audit, Mutation Parity e Differential Shadow Replay.
 - ✅ **Portal Unificado de Documentação & Framework Diátaxis**: Centralização em [`docs/README.md`](docs/README.md) e formalização do [`AI_GOVERNANCE_DOCUMENTATION_GUIDE.md`](docs/architecture/AI_GOVERNANCE_DOCUMENTATION_GUIDE.md) alinhado a NIST AI RMF, ISO 42001 e OWASP Agentic AI.
-- ✅ **Suíte de Testes Automatizados**: **179 testes determinísticos 100% passando** no pytest.
+- ✅ **Suíte de Testes Automatizados**: **193 testes determinísticos 100% passando** no pytest.
 
 ### Adapters de Stack
 - ✅ `spring-boot-backend.instructions.md` — Java/Spring Boot
