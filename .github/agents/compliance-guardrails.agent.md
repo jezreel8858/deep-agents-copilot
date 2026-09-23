@@ -6,7 +6,7 @@ description: >-
   HIPAA, ISO 27001) — audit trails, least privilege, retenção de dados
   pessoais. Distinto de agent-safety-guardrails (segurança do próprio agent
   de IA). Nunca corrige, apenas analisa e reporta. Read-only.
-model: "Gemini 3.8 Flash"
+model: "Claude Sonnet 5"
 tools: ['list_dir', 'grep_search', 'file_search', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_execute', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index']
 source_docs:
   - CLAUDE.md

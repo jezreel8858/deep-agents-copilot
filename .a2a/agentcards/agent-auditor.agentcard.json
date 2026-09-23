@@ -42,7 +42,7 @@
     "data_sensitivity": "internal"
   },
   "model_preferences": {
-    "recommended_model": "Gemini 3.8 Flash",
+    "recommended_model": "Claude Sonnet 5",
     "cost_tier": "1x"
   },
   "input_contract": {

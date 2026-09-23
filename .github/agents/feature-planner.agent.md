@@ -7,7 +7,7 @@ description: >-
   Nunca implementa código; retorna plano estruturado para delegação a agents
   especializados. Distinto de refactor-planner (foco em risco/rollback de
   código existente).
-model: "Gemini 3.8 Flash"
+model: "Claude Sonnet 5"
 tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_execute', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index']
 source_docs:
   - CLAUDE.md

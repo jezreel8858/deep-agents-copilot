@@ -6,7 +6,7 @@ description: >-
   ASVS 5.0, CVE em dependências, secrets expostos). Nunca corrige, apenas
   analisa e reporta; complementa code-review (dimensão genérica) com
   profundidade de security specialist. Read-only.
-model: "Gemini 3.8 Flash"
+model: "Claude Sonnet 5"
 tools: ['list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_execute_file', 'context-mode/ctx_index']
 source_docs:
   - CLAUDE.md

@@ -6,7 +6,7 @@ description: >-
   log ou sintoma reportado — navegação de call graph, hipótese de causa raiz
   e reprodução mínima. Não corrige o código (isso é do agent especializado
   por stack); complementa bug-triage com investigação mais profunda.
-model: "Gemini 3.8 Flash"
+model: "Claude Sonnet 5"
 tools: ['list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_execute_file', 'context-mode/ctx_index']
 source_docs:
   - CLAUDE.md

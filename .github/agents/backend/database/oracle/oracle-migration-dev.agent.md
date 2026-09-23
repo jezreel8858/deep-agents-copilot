@@ -4,7 +4,7 @@ version: "2.0.0"
 description: >-
   Especialista em migrações DDL de schema para Oracle Database — Flyway (V__ e R__), sequences,
   tablespaces, particionamento, constraints e scripts de rollback idempotentes sob R-046.
-model: "Gemini 3.8 Flash"
+model: "Claude Sonnet 5"
 tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_execute_file']
 source_docs:
   - CLAUDE.md
