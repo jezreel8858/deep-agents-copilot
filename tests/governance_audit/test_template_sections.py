@@ -143,33 +143,33 @@ def test_polymorphic_disjunction_rule_logic(tmp_path: Path):
 
     # Template A: Perfil Operacional (Escopo, Workflow, Contrato)
     (tpl_dir / "operational-tpl.md").write_text(
-        "---\nname: op-tpl\n---\n# Template Op\n## 🛑 CRÍTICO: ESCOPO\n## 📋 Processo Passo a Passo\n## 🤝 Contrato Operacional\n",
+        "---\nname: op-tpl\n---\n# Perfil Operacional\n## 🛑 CRÍTICO: ESCOPO\n## 📋 Processo Passo a Passo\n## 🤝 Contrato Operacional\n",
         encoding="utf-8"
     )
 
     # Template B: Perfil Analítico (Escopo, Checklist, Retorno ao Router)
     (tpl_dir / "research-tpl.md").write_text(
-        "---\nname: res-tpl\n---\n# Template Res\n## 🛑 CRÍTICO: ESCOPO\n## ✅ Checklist de Análise\n## 🔄 Retorno ao Router\n",
+        "---\nname: res-tpl\n---\n# Perfil Operacional\n## 🛑 CRÍTICO: ESCOPO\n## ✅ Checklist de Análise\n## 🔄 Retorno ao Router\n",
         encoding="utf-8"
     )
 
     # Caso 1: Artefato operacional (tem Escopo, Workflow, Contrato)
     art_op = tmp_path / "my-operational.md"
-    art_op.write_text("# Agente Op\n## 🛑 CRÍTICO: ESCOPO CIRÚRGICO\n## 📋 Workflow Numerado\n## 🤝 Contrato Operacional\n", encoding="utf-8")
+    art_op.write_text("# Perfil Operacional\n## 🛑 CRÍTICO: ESCOPO CIRÚRGICO\n## 📋 Workflow Numerado\n## 🤝 Contrato Operacional\n", encoding="utf-8")
     valid_op, matched_tpl, _ = validate_artifact_sections_against_templates(art_op, tpl_dir)
     assert valid_op is True
     assert matched_tpl == "operational-tpl.md"
 
     # Caso 2: Artefato analítico (tem Escopo, Checklist, Retorno ao Router)
     art_res = tmp_path / "my-research.md"
-    art_res.write_text("# Agente Res\n## 🛑 CRÍTICO: ESCOPO READ-ONLY\n## ✅ Checklist Antes de Concluir\n## 🔄 Retorno ao Router\n", encoding="utf-8")
+    art_res.write_text("# Perfil Operacional\n## 🛑 CRÍTICO: ESCOPO READ-ONLY\n## ✅ Checklist Antes de Concluir\n## 🔄 Retorno ao Router\n", encoding="utf-8")
     valid_res, matched_tpl, _ = validate_artifact_sections_against_templates(art_res, tpl_dir)
     assert valid_res is True
     assert matched_tpl == "research-tpl.md"
 
     # Caso 3: Artefato incompleto (tem apenas Escopo)
     art_bad = tmp_path / "my-incomplete.md"
-    art_bad.write_text("# Agente Incompleto\n## 🛑 CRÍTICO: ESCOPO\n", encoding="utf-8")
+    art_bad.write_text("# Perfil Operacional\n## 🛑 CRÍTICO: ESCOPO\n", encoding="utf-8")
     valid_bad, matched_tpl, failures = validate_artifact_sections_against_templates(art_bad, tpl_dir)
     assert valid_bad is False
     assert matched_tpl == ""
@@ -421,7 +421,7 @@ def test_homologation_gate_blocks_unhomologated_injections(tmp_path: Path):
     """
     dummy_agent = tmp_path / "dummy.agent.md"
     dummy_agent.write_text(
-        "---\nname: dummy\n---\n# Dummy Agent\n## 🛑 CRÍTICO: ESCOPO\n## 📌 Docs Sempre Anexadas (pre-fetch obrigatório)\n",
+        "---\nname: dummy\n---\n# Perfil Operacional\n## 🛑 CRÍTICO: ESCOPO\n## 📌 Docs Sempre Anexadas (pre-fetch obrigatório)\n",
         encoding="utf-8"
     )
 

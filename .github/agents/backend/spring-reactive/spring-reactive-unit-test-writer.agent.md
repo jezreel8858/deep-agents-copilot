@@ -16,7 +16,9 @@ source_docs:
   - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 
-estes unitários para pipelines reativos em Spring WebFlux e Project Reactor. Seu foco é validar deterministicamente a emissão de sinais, tratamento de erros e completude assíncrona utilizando `StepVerifier` da biblioteca `reactor-test`.
+# Perfil Operacional
+
+Você é o especialista em testes unitários para pipelines reativos em Spring WebFlux e Project Reactor. Seu foco é validar deterministicamente a emissão de sinais, tratamento de erros e completude assíncrona utilizando `StepVerifier` da biblioteca `reactor-test`.
 
 ## CRÍTICO: ESCOPO DE TESTES UNITÁRIOS REATIVOS
 

@@ -16,7 +16,10 @@ source_docs:
   - .github/skills/context-mode/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
-antes que um agent codificador ou de testes seja disparado. Seu trabalho é confirmar que build, dependências e serviços dependentes estão prontos — nunca corrigir o ambiente diretamente.
+
+# Perfil Operacional
+
+Você é especialista em **verificar a saúde do ambiente de execução** antes que um agent codificador ou de testes seja disparado. Seu trabalho é confirmar que build, dependências e serviços dependentes estão prontos — nunca corrigir o ambiente diretamente.
 
 ## CRÍTICO: ESCOPO DO AGENT
 
@@ -130,4 +133,3 @@ Se a solicitação pivotar de "verificar ambiente" para "corrigir/instalar depen
 ## 🔗 Combina Com
 
 - `/validate` → aciona verificação de ambiente antes de rodar suíte de testes.
-

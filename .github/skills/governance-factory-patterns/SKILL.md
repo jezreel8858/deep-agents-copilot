@@ -96,6 +96,7 @@ Reportar no Formato de Saída (§4 desta skill)
 - [ ] Se CRIAÇÃO: pesquisa prévia de melhores diretrizes e skills delegada ao `@deep-search` (web/local) e síntese incorporada ao design do artefato/ecossistema.
 - [ ] Catálogo/índice atualizado **na mesma entrega** (R-015 — nunca "depois").
 - [ ] README correspondente atualizado **na mesma entrega**.
+- [ ] Se `agent`: H1 padronizado exclusivamente para `# Perfil Operacional`, sem identificador nominal no título (o nome reside exclusivamente no frontmatter `name:`).
 - [ ] Se `agent`: `run_subagent` presente no frontmatter `tools:` (bloqueante — R-042); seção "Retorno ao Router" declarada; banner "Agente Ativo" presente no Formato de Saída.
 - [ ] Se `agent`/`prompt`: `source_docs` presente no frontmatter apontando para as skills/regras que são DEPENDÊNCIA FUNCIONAL REAL do agent (não apenas afinidade temática) — reutilizar o Gate de Autocrítica §3.1 para validar isso.
 - [ ] Se `run_in_terminal` for declarado em `tools:` (agent, prompt ou especialista de stack): inclusão COMPULSÓRIA de `.github/skills/terminal-governance/SKILL.md` em `source_docs:` (ou na seção `skills:` do sub-catálogo local da stack) para assegurar governança de terminal (R-049).

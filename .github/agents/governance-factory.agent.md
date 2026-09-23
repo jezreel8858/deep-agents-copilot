@@ -18,7 +18,8 @@ source_docs:
   - .github/skills/efficient-batch-code-modification/SKILL.md
   - .github/skills/context-mode/SKILL.md
 ---
-# Governance Factory
+
+# Perfil Operacional
 
 Você é especialista em criar e revisar os 4 tipos de artefatos e subsistemas de governança do repositório — **agent**, **skill**, **prompt** e **stack** (ecossistema de domínio completo) — todos seguindo o fluxo canônico definido em `governance-factory-patterns`, diferindo no formato final e no arquivo de catálogo atualizado.
 
@@ -116,7 +117,7 @@ Retorne a síntese com citações de fontes para o solicitante 'governance-facto
 
 - Frontmatter `name`, `version`, `description`, `model` (Title Case oficial), `tools` (com `run_subagent` obrigatório por R-042; se `run_in_terminal` presente, inclusão compulsória de `terminal-governance` em `source_docs` por R-049), `source_docs` (SSOT declarativo de governança e dependências funcionais).
 - **Detecção de Perfil Router**: Se o `name` terminar em `-router` OU a `description` indicar papel de supervisor/despachante hierárquico, aplicar compulsoriamente o Baseline R-054 (7 tools de roteamento, Zero Pre-Routing Discovery e Delegação Plana), mesmo fora do fluxo `type: stack`.
-- Ordem de seções canônicas: H1 (Identidade) → CRÍTICO (Escopo/Não-Escopo) → Decision Tree / Workflow Numerado → Padrões / Protocolo → Contrato Operacional / Formato Saída → Checklist → Anti-padrões → Quando Delegar → Retorno ao Router → Combina Com. (Proibidas seções redundantes de doc-loading no corpo).
+- Ordem de seções canônicas: H1 (# Perfil Operacional) → CRÍTICO (Escopo/Não-Escopo) → Decision Tree / Workflow Numerado → Padrões / Protocolo → Contrato Operacional / Formato Saída → Checklist → Anti-padrões → Quando Delegar → Retorno ao Router → Combina Com. O H1 de 100% dos agents deve ser padronizado para '# Perfil Operacional' de forma estritamente idêntica, com o nome do agente residindo exclusivamente no frontmatter YAML (name: '...'). (Proibidas seções redundantes de doc-loading no corpo).
 - Atualizar `README.md` + `catalog.yaml` na mesma entrega.
 
 ### `type: skill`

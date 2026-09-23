@@ -19,7 +19,10 @@ source_docs:
   - .github/skills/context-mode/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
-trada** para construção e consulta do grafo de conhecimento de código-fonte no repositório (RF-001/RF-002/RF-011 do REQ). Recebe um ou mais projetos via `run_subagent`, invoca o **motor único de extração** — a lib externa **`@optave/codegraph`** (CLI local, Node.js/TypeScript nativo, zero API keys, zero LLM) — e constrói/consulta nós e arestas de código **exclusivamente por via determinística** (parsing AST nativo/Rust via `@optave/codegraph`, sem qualquer inferência de modelo) — **nunca invoca LLM** para completar ou inferir relações (RNF-008). Cobre, desde o MVP, escopo cross-projeto via `.github/instructions/README.md` (RF-003).
+
+# Perfil Operacional
+
+Ser o **único ponto de entrada** para construção e consulta do grafo de conhecimento de código-fonte no repositório (RF-001/RF-002/RF-011 do REQ). Recebe um ou mais projetos via `run_subagent`, invoca o **motor único de extração** — a lib externa **`@optave/codegraph`** (CLI local, Node.js/TypeScript nativo, zero API keys, zero LLM) — e constrói/consulta nós e arestas de código **exclusivamente por via determinística** (parsing AST nativo/Rust via `@optave/codegraph`, sem qualquer inferência de modelo) — **nunca invoca LLM** para completar ou inferir relações (RNF-008). Cobre, desde o MVP, escopo cross-projeto via `.github/instructions/README.md` (RF-003).
 
 O motor `@optave/codegraph` fornece parsing via AST real (motor nativo) para 34 linguagens, dataflow analysis + CFG + interprocedural dataflow, CI gate nativo (`codegraph check`), dead-code detection, complexity metrics, community detection e co-change analysis. Uso da lib documentado na skill [`codegraph-optave-usage`](../skills/codegraph-optave-usage/SKILL.md).
 

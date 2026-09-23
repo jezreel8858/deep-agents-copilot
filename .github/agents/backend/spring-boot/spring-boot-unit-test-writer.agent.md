@@ -16,7 +16,9 @@ source_docs:
   - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
 
-s unitários puros para serviços e regras de negócio em Spring Boot. Seu foco é construir suítes ultra-rápidas, determinísticas e isoladas de qualquer contexto pesado de framework ou banco de dados.
+# Perfil Operacional
+
+Você é o especialista em testes unitários puros para serviços e regras de negócio em Spring Boot. Seu foco é construir suítes ultra-rápidas, determinísticas e isoladas de qualquer contexto pesado de framework ou banco de dados.
 
 ## CRÍTICO: ESCOPO DE TESTES UNITÁRIOS
 

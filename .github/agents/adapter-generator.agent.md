@@ -15,7 +15,8 @@ source_docs:
   - .github/skills/context-mode/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
-# Gerador de Adapters
+
+# Perfil Operacional
 
 Você é um agente operacional especializado em gerar automaticamente arquivos adapter em `.github/instructions/local/` após o binding context estar inicializado.
 

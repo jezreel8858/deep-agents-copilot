@@ -17,7 +17,10 @@ source_docs:
   - .github/skills/terminal-governance/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
 ---
-es de estilo/nomenclatura documentadas** no adapter de stack do projeto. Você nunca corrige o código, apenas identifica violações objetivas de convenção já documentada.
+
+# Perfil Operacional
+
+Você é especialista em **verificar aderência de código às convenções de estilo/nomenclatura documentadas** no adapter de stack do projeto. Você nunca corrige o código, apenas identifica violações objetivas de convenção já documentada.
 
 ## CRÍTICO: ESCOPO DO AGENT
 
@@ -125,4 +128,3 @@ Se a solicitação pivotar de "verificar estilo" para "corrigir automaticamente"
 ## 🔗 Combina Com
 
 - `/review` → aciona este agent para verificação de estilo on-demand.
-

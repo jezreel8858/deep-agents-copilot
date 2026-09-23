@@ -6,6 +6,16 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.34.0] — 2026-09-23
+
+### Padronizado & Refatorado
+- **Padronização Universal do Cabeçalho H1 (`# Perfil Operacional`) em 100% dos Agentes e Templates**:
+  - **Eliminação de Inconsistência Estrutural e Duplicação de Nomes**: Unificação do H1 de todos os 86 arquivos de agents (`.github/agents/**/*.agent.md`) e dos 4 templates canônicos (`.github/agents/templates/*.md`) para a linha exata `# Perfil Operacional`.
+  - **Single Source of Truth (SSOT) para Identificadores de Agentes**: O nome e identificador do agente reside agora EXCLUSIVAMENTE no campo `name: '...'` do frontmatter YAML, eliminando a duplicação nominal no corpo textual.
+  - **Governança da Fábrica (R-055 Systemic Reuse Gate)**: Atualização de `.github/agents/governance-factory.agent.md` e `.github/skills/governance-factory-patterns/SKILL.md` estipulando `# Perfil Operacional` como regra inegociável na criaç��o e revisão de agentes.
+  - **Guardrail Determinístico de Testes**: Implementada a suíte `tests/governance_audit/test_agent_headings_standardization.py` parametrizada sobre os 86 agents e 4 templates, garantindo que o H1 seja único, obrigatório e estritamente padronizado.
+  - **Quality Gate**: 248/248 testes aprovados no pytest com 100% de sucesso.
+
 ## [2.33.1] — 2026-09-23
 
 ### Corrigido (Auto-Auditoria Pos-Implementacao de R-060)
