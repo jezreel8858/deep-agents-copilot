@@ -6,6 +6,27 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.39.0] — 2026-09-24
+
+### Adicionado (Governança de Batching Context-Mode, Fan-Out Signal & Quality Review Loop)
+- **Context-Mode Circuit Breaker & Few-Shot (§ 4.1 a 4.3 em context-mode/SKILL.md)**:
+  - Seção 4.1: Circuit Breaker de Tool-Chaining Sequencial (Regra dos 3 Tool Turns — Smell 2.26) para barrar loops degradantes de MCP tools.
+  - Seção 4.2: Mitigação de cwd explícito no `ctx_batch_execute`, prevenindo falhas de resolução do diretório raiz em sandboxes temporários.
+  - Seção 4.3: Exemplo concreto Few-Shot de Anti-Padrão (chamadas sequenciais) vs Padrão Correto (script consolidado em lote).
+  - Remissão de reforço na skill `efficient-batch-code-modification/SKILL.md`.
+- **R-021.1 (Model Routing Signal por Volume de Alvos / Fan-Out)**:
+  - Formalização no SSOT `CLAUDE.md` e na tabela de sinais de `.github/copilot-instructions.md` recomendando escalonamento pontual para modelo 1× ou superior em tarefas com ≥ 10 alvos/arquivos homogêneos.
+- **Sincronização de Templates Canônicos**:
+  - Atualização dos templates `agent-template.md` e `operational-agent.md` com parâmetro `cwd` explícito em `ctx_batch_execute`.
+- **Loop de Revisão de Qualidade (R-050.4 e § 1.5 de workflows.md)**:
+  - Formalização do padrão Evaluator-Optimizer com teto rígido de 3 iterações para achados não-bloqueantes nos 6 workflows operacionais.
+  - Atualização dos diagramas e fluxos em `docs/architecture/ARCHITECTURE_AND_GOVERNANCE_GUIDE.md`.
+- **Quality Gate Determinístico**:
+  - Testes `test_context_mode_circuit_breaker_and_explicit_cwd_governance()` e `test_context_mode_few_shot_batching_and_model_routing_fan_out_signal()` em `test_context_mode_precedence_governance.py`.
+  - Teste `test_workflows_support_quality_review_loop_r050_4()` em `test_operational_workflows.py`.
+
+---
+
 ## [2.38.0] — 2026-09-24
 
 ### Adicionado (Governança Anti Root-Agent-Impersonation & Anti Silent Bypass: R-062 e R-063)
