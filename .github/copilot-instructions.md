@@ -45,6 +45,7 @@
 │   ❌ Pular router e ir direto para agent específico    │
 │   ❌ Chamar múltiplos agents sem triagem               │
 │   ❌ Implementar sem passar por roteamento             │
+│   ❌ Ler .agent.md de agent p/ simular papel (R-062)   │
 │                                                         │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -57,7 +58,7 @@ Solicitação (turno N)
 @agent-router (triagem inicial & Health Check R-034)
     ↓
 Agent ativo de turno anterior? (R-042)
-    ├─ Não -> triagem normal
+    ├─ Não -> triagem normal (OBRIGATÓRIO invocar @agent-router via run_subagent antes de qualquer tool — R-063; "ausência de agent ativo" NUNCA autoriza execução direta)
     └─ Sim -> checar deriva de intenção antes de responder
               ├─ Sem deriva -> devolve ao agent ativo (sem re-rotear)
               └─ Deriva -> handoff (motivo: "deriva_de_intencao") -> triagem completa
@@ -122,6 +123,8 @@ Esta matriz é **responsabilidade do roteador** — não é regra global.
 - **Blueprint Técnico e Decomposição Obrigatórios em Features Complexas (R-058 — Anti-Premature Implementation Bypass & Anti-Gap Dumping)**: Toda solicitação de nova feature que envolva criação/evolução de schema de banco (mesmo BaaS/Firestore), máquina de estados (3+ transições), concorrência/transações atômicas ou infraestrutura (push notifications, plugins nativos) NUNCA deve ser despachada diretamente para domain routers ou especialistas de código. O router DEVE encaminhar obrigatoriamente para `@tech-solution-architect` (WF4 Estado 3) para emissão de Technical Blueprint e aprovação no Checkpoint 3b. Se houver 3+ frentes de trabalho interdependentes, a decomposição em subtasks `[S]`/`[P]` cabe compulsoriamente ao `@feature-planner`. É terminantemente proibido ao router listar lacunas de arquitetura/schema em "Lacunas para handoff" transferindo a resolução ao especialista de implementação no improviso (Smell 2.27).
 - **Regra do Limiar >= 2 e Protocolo Plan-Then-Batch Global (R-059 — Anti-MCP Tool Chaining & Anti-Miopia Reativa)**: Em 2 ou mais alvos/comandos, aplique Plan-Then-Batch (ENUMERAR -> CONSOLIDAR -> DESPACHAR) via `ctx_batch_execute` ou script iterativo único em `ctx_execute`; proibido tool chaining sequencial, e comandos curtos como "prosseguir" mantêm o rigor (ver `CLAUDE.md` § R-059 e `.github/skills/efficient-batch-code-modification/SKILL.md`).
 - **Teto Rígido de Tool Turns (≤ 5) e Warm Start Compulsório (R-060 — Anti-Token Debt & Anti-Turn Chaining)**: Limite estrito de ≤ 5 tool turns por ciclo; aplique Warm Start silencioso (build-if-missing), batch querying, Edge Truncation / Destilação semântica e Circuit Breaker no 4º turno para conter dívida de tokens O(N²) (ver `CLAUDE.md` § R-060 e `.github/skills/terminal-governance/SKILL.md`).
+- **Zero Impersonation pelo Orquestrador Raiz (R-062 — Anti Root-Agent-Impersonation)**: É terminantemente proibido ao modelo do turno raiz ler, abrir, resumir ou parafrasear o conteúdo de qualquer arquivo `.github/agents/**/*.agent.md` (fora de `agent-router.agent.md`, `catalog.yaml` e `routing-graph.yaml`, consultáveis exclusivamente para fins de roteamento) com o intuito de simular aquele papel diretamente no chat raiz sem invocação real via `run_subagent`. Comandos citando `@nome-do-agent` ou pedidos curtos NÃO isentam da passagem obrigatória pelo `@agent-router` primeiro nem autorizam impersonação — regra agnóstica de modelo (ver `CLAUDE.md` § R-062).
+- **Zero Execução Direta pelo Orquestrador Raiz sem Router (R-063 — Anti Silent Bypass)**: É terminantemente proibido ao modelo do turno raiz executar diretamente qualquer tool genérica (terminal, leitura/busca, edição ou listagem de arquivos) em resposta a um pedido do usuário sem antes invocar compulsoriamente o `@agent-router` via `run_subagent`. A ausência de agent ativo residente (ex.: após workflow concluído, R-052) NUNCA autoriza execução direta — é precisamente o gatilho que exige triagem normal completa (R-037/R-042). Pedidos informais ("revise isso", "dá uma olhada") sujeitam-se integralmente a esta regra — regra agnóstica de modelo (ver `CLAUDE.md` § R-063).
 - **Fluxo contínuo sem becos sem saída (`R-047`)**: nenhum agent do catálogo pode encerrar resposta apenas com texto descritivo sugerindo "próximo passo"; deve obrigatoriamente acionar `run_subagent` (handoff a outro agent) OU `ask_questions` (decisão/aprovação humana), salvo resposta 100% conclusiva sem pendências. **Exceção de Routers / Delegação Plana**: O `@agent-router` (e supervisores hierárquicos) encerra sua resposta com o bloco canônico de decisão de roteamento (`Agente Ativo`, `Delegado: @<agent>`, `Pipeline de Execução`) — isso NÃO constitui beco sem saída. É **terminantemente proibido ao `@agent-router` invocar subagentes executores downstream via `run_subagent`** (aninhamento `root -> agent-router -> downstream`), pois causa duplicação de execução e desperdício de créditos. O despacho downstream é executado pelo Orquestrador Raiz em nível plano (Flat Delegation).
 - **Plano Auto-Implementável (R-031)**: plano aprovado → execução integral sem interrupção. Pré-voo: escopo + contingências inline `[fallback: X]` + critério de falha tolerável. Parada permitida APENAS por: commit autônomo, credencial exposta, ou estado irrecuperável. Relatório final substitui checkpoints intermediários.
 - **Estrutura de Resposta (R-028)**: toda implementação abre com resumo em 5 seções (Abordagem · Componentes · Código · Passos Cruciais · Impacto).
@@ -303,6 +306,7 @@ Projetos e adapters por-projeto NUNCA são commitados no repositório compartilh
 - `context-compact` -> compactação pós-leitura e geração de resumos executáveis.
 - `refactoring-planning-patterns` -> planejamento de refatoração estrutural (Mikado, Branch by Abstraction, Strangler Fig, safety net).
 - `efficient-batch-code-modification` -> edição em lote, dry-run e diffs cirúrgicos para economia de tokens e créditos Copilot.
+- `harness-engineering-patterns` -> diretrizes de harness engineering, diagnóstico harness vs modelo, heurística da zona inteligente (~100k tokens), poda de contexto e Ralph Loop.
 
 **Pesquisa e Documentação:**
 - `tavily` -> pesquisa externa e documentação atualizada.

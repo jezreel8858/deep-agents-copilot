@@ -62,6 +62,22 @@ Nem toda pergunta é bloqueante. Classificar cada campo do intake em:
 
 **Anti-padrão:** perguntar tudo como bloqueante (fadiga de intake) ou nada como bloqueante (viola R-027).
 
+## 2.1) Protocolo de Grilling Cético ("Grill Me" / Matt Pocock)
+
+Inspirado nas práticas de AI Hero / `mattpocock/skills`, o agente não assume uma postura passiva de mero executor de ordens ou aceitador cego de premissas. Ele deve **interrogar ativamente o desenvolvedor/arquiteto** sobre premissas implícitas, casos de borda e modos de falha antes de qualquer geração de código ou alteração estrutural.
+
+#### Dinâmica de Interrogação
+O agente formula indagações cirúrgicas via `ask_questions`:
+- *"O que acontece se o serviço/dependência X falhar ou retornar timeout?"*
+- *"Qual é o comportamento esperado sob concorrência e condições de corrida?"*
+- *"Qual trade-off arquitetural foi considerado para esta abordagem (ex.: latência vs. consistência)?"*
+- *"Por que não adotar a alternativa Y (solução mais simples ou padrão existente no repositório)?"*
+- *"Quais invariantes de negócio não podem ser violados em hipótese alguma?"*
+
+#### Regra de Ouro da Responsabilidade
+- **Humanos mantêm 100% da responsabilidade** pelas decisões de produto, requisitos e arquitetura final.
+- **O agente expõe as ramificações, premissas implícitas e decisões ocultas** antes da codificação, forçando clareza e prevenindo retrabalho catastrófico.
+
 ## 3) Template de Consolidação
 
 Após a coleta, todo agent que usa este padrão deve produzir um bloco de consolidação antes de agir, nomeado por domínio (ex.: `## PRÉ-CONTEXTO VALIDADO`, `## PROTOCOLO DE DETECÇÃO CONCLUÍDO`, `## CONTEXTO DE COLETA`):

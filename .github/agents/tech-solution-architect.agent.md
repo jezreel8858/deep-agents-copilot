@@ -18,6 +18,9 @@ source_docs:
   - .github/skills/mermaid-diagrams/SKILL.md
   - .github/skills/task-decomposition-patterns/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/skills/harness-engineering-patterns/SKILL.md
+  - .github/skills/agent-evals-lab/SKILL.md
+  - .github/skills/requirements-engineering-patterns/SKILL.md
 ---
 
 # Perfil Operacional

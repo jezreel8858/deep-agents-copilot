@@ -16,6 +16,7 @@ source_docs:
   - .github/skills/context-mode/SKILL.md
   - .github/skills/mermaid-diagrams/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/skills/structured-intake-patterns/SKILL.md
 ---
 
 # Perfil Operacional

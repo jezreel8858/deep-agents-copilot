@@ -94,6 +94,14 @@ A regra **R-048** estabelece critérios objetivos para evitar o tráfego desnece
 - **`read_file(offset, limit)` (Leitura Pontual/Pequena)**: Utilize quando o objetivo for inspecionar ou preparar uma edição localizada após encontrar a linha via `grep_search`. A janela útil recomendada é de 60 a 80 linhas. Nunca leia o arquivo integralmente (>100 linhas) apenas para editar uma função ou método isolado.
 - **`ctx_execute_file` (Agregação/Processamento de Arquivo Grande)**: Utilize quando o arquivo for extenso (>300 linhas ou logs) e o objetivo for sumarizar, extrair métricas, filtrar padrões ou responder perguntas analíticas sem necessidade de edição direta no editor. O arquivo é processado dentro do sandbox e apenas o resultado sintetizado retorna ao chat.
 
+
+## 3.3) Padrão `CONTEXT.md` (Glossário de Domínio Compartilhado para Compressão Semântica)
+
+Recomenda-se manter um arquivo `CONTEXT.md` na raiz ou em `docs/` (baseado no template canônico `docs/agent-context/templates/CONTEXT.template.md`) em projetos gerenciados:
+- **Objetivo**: Fixar termos canônicos, acrônimos, anti-termos e invariantes de negócio não-negociáveis.
+- **Benefício**: Proporciona "compressão semântica de tokens", evitando que humanos precisem re-explicar conceitos de domínio complexos a cada sessão conversacional.
+- **Uso com context-mode**: O arquivo deve ser indexado sob `source: "domain:context-glossary"` para que o agente utilize `ctx_search` para desambiguação rápida e instantânea de regras e terminologias de domínio antes de propor soluções ou blueprints.
+
 ## 4) Guardrails de economia (token budget)
 
 - **Single-Turn MCP Batching Compulsório (Smell 2.26)**: É terminantemente proibido encadear múltiplas chamadas unitárias de `ctx_execute` no chat para analisar múltiplos alvos; usar compulsoriamente `ctx_batch_execute(commands, queries)` em rodada única OU um script síncrono consolidado em `ctx_execute`.

@@ -10,6 +10,7 @@ import re
 from pathlib import Path
 import pytest
 import yaml
+from tests.governance_audit._helpers import remediation
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 AGENTS_DIR = REPO_ROOT / ".github" / "agents"
@@ -60,23 +61,38 @@ def get_all_catalog_files() -> list[Path]:
 def test_smell_2_2_all_agents_have_mandatory_frontmatter():
     """Valida se todo agent possui frontmatter com name, description, tools e run_subagent (R-042)"""
     agent_files = get_all_agent_files()
-    assert len(agent_files) >= 15, "Deve existir ao menos 15 agents no catálogo"
+    assert len(agent_files) >= 15, remediation(
+        "Deve existir ao menos 15 agents no catálogo",
+        fix_hint="Verifique se .github/agents/**/*.agent.md não foi movido/deletado por engano.",
+    )
 
     for agent_file in agent_files:
         content = agent_file.read_text(encoding="utf-8")
         fm = parse_frontmatter(content)
         rel_path = agent_file.relative_to(REPO_ROOT)
 
-        assert "name" in fm, f"[{rel_path}] Ausência do campo 'name' no frontmatter"
-        assert "description" in fm, f"[{rel_path}] Ausência do campo 'description' no frontmatter"
+        assert "name" in fm, remediation(
+            f"[{rel_path}] Ausência do campo 'name' no frontmatter",
+            fix_hint=f"Adicione 'name: <slug-do-agent>' ao frontmatter YAML de {rel_path}.",
+        )
+        assert "description" in fm, remediation(
+            f"[{rel_path}] Ausência do campo 'description' no frontmatter",
+            fix_hint=f"Adicione 'description: >-' com 1-3 frases objetivas ao frontmatter de {rel_path}.",
+        )
 
         # Teto de caracteres de description (§10 governance-factory-patterns)
         desc = fm.get("description", "")
-        assert len(desc.strip()) <= 600, f"[{rel_path}] description excede limite ({len(desc)} chars)"
+        assert len(desc.strip()) <= 600, remediation(
+            f"[{rel_path}] description excede limite ({len(desc)} chars)",
+            fix_hint="Reduza a description para <= 600 caracteres, movendo detalhe extra para o corpo do agent.",
+        )
 
         # run_subagent é OBRIGATÓRIO E BLOQUEANTE em 100% dos agents (R-042)
         tools = fm.get("tools", [])
-        assert "run_subagent" in tools, f"[{rel_path}] Tool mandatória 'run_subagent' (R-042) ausente em tools:"
+        assert "run_subagent" in tools, remediation(
+            f"[{rel_path}] Tool mandatória 'run_subagent' (R-042) ausente em tools:",
+            fix_hint=f"Adicione 'run_subagent' à lista 'tools:' do frontmatter de {rel_path} (R-042).",
+        )
 
 
 def test_smell_2_2_all_agents_have_active_agent_banner():
@@ -84,7 +100,10 @@ def test_smell_2_2_all_agents_have_active_agent_banner():
     for agent_file in get_all_agent_files():
         content = agent_file.read_text(encoding="utf-8")
         rel_path = agent_file.relative_to(REPO_ROOT)
-        assert "Agente Ativo:" in content, f"[{rel_path}] Ausência da cláusula obrigatória 'Agente Ativo:' no formato"
+        assert "Agente Ativo:" in content, remediation(
+            f"[{rel_path}] Ausência da cláusula obrigatória 'Agente Ativo:' no formato",
+            fix_hint=f"Inclua a linha 'Agente Ativo: <@agent>' no bloco 'Formato de Saída' de {rel_path}.",
+        )
 
 
 # ─────────────────────────────────────────────────────────────
@@ -109,7 +128,10 @@ def test_smell_2_6_no_absolute_paths_in_governance_files():
             if "grep_search" in linha or "Regex" in linha or "padrao" in linha or "padroes" in linha:
                 continue
             match = abs_path_pattern.search(linha)
-            assert not match, f"[{rel_path}:{idx}] Vazamento de caminho local absoluto (violação R-044): '{linha.strip()}'"
+            assert not match, remediation(
+                f"[{rel_path}:{idx}] Vazamento de caminho local absoluto (violação R-044): '{linha.strip()}'",
+                fix_hint="Substitua o caminho absoluto real por um placeholder genérico (ex.: '[PROJETO-ALVO]') ou caminho relativo ao repo (R-044).",
+            )
 
 
 # ─────────────────────────────────────────────────────────────
@@ -131,7 +153,10 @@ def test_smell_2_7_readonly_agents_cannot_have_mutation_tools():
             tools = set(fm.get("tools", []))
             proibidas = tools.intersection(mutation_tools)
             rel_path = agent_file.relative_to(REPO_ROOT)
-            assert not proibidas, f"[{rel_path}] Agent Read-Only possui tools mutativas proibidas: {proibidas}"
+            assert not proibidas, remediation(
+                f"[{rel_path}] Agent Read-Only possui tools mutativas proibidas: {proibidas}",
+                fix_hint=f"Remova {sorted(proibidas)} da lista 'tools:' de {rel_path} — agents read-only/advisory nunca mutam arquivos (§2.7.1).",
+            )
 
 
 def test_smell_2_7_terminal_tool_requires_terminal_governance_skill():
@@ -152,8 +177,9 @@ def test_smell_2_7_terminal_tool_requires_terminal_governance_skill():
             if isinstance(source_docs, str):
                 source_docs = [source_docs]
             has_term_gov = any(target_skill in str(doc) for doc in source_docs)
-            assert has_term_gov, (
-                f"[{rel_path}] Declara tool 'run_in_terminal' mas não referencia a skill obrigatória 'terminal-governance' em source_docs (R-049)"
+            assert has_term_gov, remediation(
+                f"[{rel_path}] Declara tool 'run_in_terminal' mas não referencia a skill obrigatória 'terminal-governance' em source_docs (R-049)",
+                fix_hint=f"Adicione '.github/skills/terminal-governance/SKILL.md' à lista 'source_docs:' de {rel_path}.",
             )
 
     # 2. Prompts (*.prompt.md)
@@ -170,8 +196,9 @@ def test_smell_2_7_terminal_tool_requires_terminal_governance_skill():
             if isinstance(source_docs, str):
                 source_docs = [source_docs]
             has_term_gov = any(target_skill in str(doc) for doc in source_docs)
-            assert has_term_gov, (
-                f"[{rel_path}] Prompt declara tool 'run_in_terminal' mas não referencia 'terminal-governance' em source_docs (R-049)"
+            assert has_term_gov, remediation(
+                f"[{rel_path}] Prompt declara tool 'run_in_terminal' mas não referencia 'terminal-governance' em source_docs (R-049)",
+                fix_hint=f"Adicione '.github/skills/terminal-governance/SKILL.md' à lista 'source_docs:' de {rel_path}.",
             )
 
     # 3. Catálogos (*catalog*.yaml)
@@ -193,8 +220,9 @@ def test_smell_2_7_terminal_tool_requires_terminal_governance_skill():
                         agent_fm = parse_frontmatter(agent_matches[0].read_text(encoding="utf-8"))
                         agent_docs = agent_fm.get("source_docs", []) or []
                         has_term_gov = any(target_skill in str(d) for d in agent_docs)
-                assert has_term_gov, (
-                    f"[{rel_path}#{agent_id}] Declara tool 'run_in_terminal' mas não referencia 'terminal-governance' em source_docs ou skills (R-049)"
+                assert has_term_gov, remediation(
+                    f"[{rel_path}#{agent_id}] Declara tool 'run_in_terminal' mas não referencia 'terminal-governance' em source_docs ou skills (R-049)",
+                    fix_hint=f"Adicione 'terminal-governance' em 'source_docs:' ou 'skills:' da entrada '{agent_id}' em {rel_path}.",
                 )
 
 
@@ -208,8 +236,9 @@ def test_smell_2_7_context_mode_tool_requires_context_mode_skill():
         has_ctx_tool = any("context-mode" in t or t.startswith("ctx_") for t in tools)
         if has_ctx_tool:
             rel_path = agent_file.relative_to(REPO_ROOT)
-            assert "context-mode" in content, (
-                f"[{rel_path}] Declara tools context-mode mas não referencia a skill obrigatória 'context-mode'"
+            assert "context-mode" in content, remediation(
+                f"[{rel_path}] Declara tools context-mode mas não referencia a skill obrigatória 'context-mode'",
+                fix_hint=f"Adicione '.github/skills/context-mode/SKILL.md' à lista 'source_docs:' de {rel_path} (R-008/R-056).",
             )
 
 
@@ -227,8 +256,9 @@ def test_smell_2_8_mutating_agents_reference_batching_protocol():
             content = agent_file.read_text(encoding="utf-8")
             rel_path = agent_file.relative_to(REPO_ROOT)
             has_batching_ref = "R-046" in content or "batch" in content.lower() or "efficient-batch" in content
-            assert has_batching_ref, (
-                f"[{rel_path}] Agent executor com capacidade mutativa não referencia o protocolo R-046 / Batching"
+            assert has_batching_ref, remediation(
+                f"[{rel_path}] Agent executor com capacidade mutativa não referencia o protocolo R-046 / Batching",
+                fix_hint=f"Adicione '.github/skills/efficient-batch-code-modification/SKILL.md' em 'source_docs:' de {rel_path} e cite R-046 no corpo.",
             )
 
 
@@ -258,8 +288,9 @@ def test_smell_2_11_skills_code_block_limits():
             if lang in executable_langs:
                 # Skills de template de teste possuem estruturas completas describe/it
                 max_lines = 45 if "test-implementation" in skill_file.parent.name else 25
-                assert len(lines) <= max_lines, (
-                    f"[{rel_path}] Bloco de código ({lang}) com {len(lines)} linhas excede o teto recomendado de snippets ({max_lines})"
+                assert len(lines) <= max_lines, remediation(
+                    f"[{rel_path}] Bloco de código ({lang}) com {len(lines)} linhas excede o teto recomendado de snippets ({max_lines})",
+                    fix_hint=f"Mova a implementação completa para 'snippets/' ou 'templates/' e referencie o caminho em {rel_path} (R-026).",
                 )
 
 # ─────────────────────────────────────────────────────────────
@@ -269,51 +300,72 @@ def test_smell_2_11_skills_code_block_limits():
 def test_smell_2_9_all_agents_have_mandatory_source_docs():
     """Valida se 100% dos agents possuem a chave obrigatória 'source_docs:' com ao menos 1 documento"""
     agent_files = get_all_agent_files()
-    assert len(agent_files) >= 15, "Deve existir ao menos 15 agents no catálogo"
+    assert len(agent_files) >= 15, remediation(
+        "Deve existir ao menos 15 agents no catálogo",
+        fix_hint="Verifique se .github/agents/**/*.agent.md não foi movido/deletado por engano.",
+    )
 
     for agent_file in agent_files:
         content = agent_file.read_text(encoding="utf-8")
         fm = parse_frontmatter(content)
         rel_path = agent_file.relative_to(REPO_ROOT)
 
-        assert "source_docs" in fm, f"[{rel_path}] Ausência do campo obrigatório 'source_docs:' no frontmatter"
+        assert "source_docs" in fm, remediation(
+            f"[{rel_path}] Ausência do campo obrigatório 'source_docs:' no frontmatter",
+            fix_hint=f"Adicione 'source_docs:' com ao menos CLAUDE.md e o(s) skill(s) usados por {rel_path}.",
+        )
         docs = fm.get("source_docs")
-        assert isinstance(docs, list) and len(docs) >= 1, (
-            f"[{rel_path}] 'source_docs' deve ser uma lista não vazia de documentos (atual: {docs})"
+        assert isinstance(docs, list) and len(docs) >= 1, remediation(
+            f"[{rel_path}] 'source_docs' deve ser uma lista não vazia de documentos (atual: {docs})",
+            fix_hint=f"Converta 'source_docs:' em {rel_path} para uma lista YAML ('- caminho/arquivo.md') com >= 1 item.",
         )
 
 
 def test_smell_2_9_all_prompts_have_mandatory_source_docs():
     """Valida se 100% dos prompts possuem a chave obrigatória 'source_docs:' com ao menos 1 documento"""
     prompt_files = get_all_prompt_files()
-    assert len(prompt_files) >= 5, "Deve existir ao menos 5 prompts no repositório"
+    assert len(prompt_files) >= 5, remediation(
+        "Deve existir ao menos 5 prompts no repositório",
+        fix_hint="Verifique se .github/prompts/*.prompt.md não foi movido/deletado por engano.",
+    )
 
     for prompt_file in prompt_files:
         content = prompt_file.read_text(encoding="utf-8")
         fm = parse_frontmatter(content)
         rel_path = prompt_file.relative_to(REPO_ROOT)
 
-        assert "source_docs" in fm, f"[{rel_path}] Ausência do campo obrigatório 'source_docs:' no frontmatter"
+        assert "source_docs" in fm, remediation(
+            f"[{rel_path}] Ausência do campo obrigatório 'source_docs:' no frontmatter",
+            fix_hint=f"Adicione 'source_docs:' com ao menos 1 documento normativo a {rel_path}.",
+        )
         docs = fm.get("source_docs")
-        assert isinstance(docs, list) and len(docs) >= 1, (
-            f"[{rel_path}] 'source_docs' deve ser uma lista não vazia de documentos (atual: {docs})"
+        assert isinstance(docs, list) and len(docs) >= 1, remediation(
+            f"[{rel_path}] 'source_docs' deve ser uma lista não vazia de documentos (atual: {docs})",
+            fix_hint=f"Converta 'source_docs:' em {rel_path} para uma lista YAML ('- caminho/arquivo.md') com >= 1 item.",
         )
 
 
 def test_smell_2_9_all_skills_have_mandatory_source_docs():
     """Valida se 100% das skills possuem a chave obrigatória 'source_docs:' com ao menos 1 documento"""
     skill_files = get_all_skill_files()
-    assert len(skill_files) >= 10, "Deve existir ao menos 10 skills no repositório"
+    assert len(skill_files) >= 10, remediation(
+        "Deve existir ao menos 10 skills no repositório",
+        fix_hint="Verifique se .github/skills/**/SKILL.md não foi movido/deletado por engano.",
+    )
 
     for skill_file in skill_files:
         content = skill_file.read_text(encoding="utf-8")
         fm = parse_frontmatter(content)
         rel_path = skill_file.relative_to(REPO_ROOT)
 
-        assert "source_docs" in fm, f"[{rel_path}] Ausência do campo obrigatório 'source_docs:' no frontmatter"
+        assert "source_docs" in fm, remediation(
+            f"[{rel_path}] Ausência do campo obrigatório 'source_docs:' no frontmatter",
+            fix_hint=f"Adicione 'source_docs:' com ao menos 1 documento normativo a {rel_path}.",
+        )
         docs = fm.get("source_docs")
-        assert isinstance(docs, list) and len(docs) >= 1, (
-            f"[{rel_path}] 'source_docs' deve ser uma lista não vazia de documentos (atual: {docs})"
+        assert isinstance(docs, list) and len(docs) >= 1, remediation(
+            f"[{rel_path}] 'source_docs' deve ser uma lista não vazia de documentos (atual: {docs})",
+            fix_hint=f"Converta 'source_docs:' em {rel_path} para uma lista YAML ('- caminho/arquivo.md') com >= 1 item.",
         )
 
 
@@ -343,9 +395,10 @@ def test_smell_2_9_source_docs_referential_integrity():
             if not target_repo.exists() and not target_local.exists():
                 broken_links.append((rel_file, str(doc)))
 
-    assert not broken_links, (
+    assert not broken_links, remediation(
         f"Foram encontrados {len(broken_links)} links quebrados em source_docs:\n"
-        + "\n".join(f"  - Em [{origem}]: {destino}" for origem, destino in broken_links)
+        + "\n".join(f"  - Em [{origem}]: {destino}" for origem, destino in broken_links),
+        fix_hint="Corrija o caminho relativo/absoluto em 'source_docs:' de cada arquivo listado ou crie o documento referenciado.",
     )
 
 
@@ -357,7 +410,10 @@ def _get_latest_normative_rule_number() -> int:
     """Extrai o maior número de regra R-0XX declarado em CLAUDE.md § 3 (dinâmico, nunca hardcoded)."""
     content = CLAUDE_MD.read_text(encoding="utf-8")
     rule_numbers = [int(n) for n in re.findall(r"\*\*R-(\d{3})", content)]
-    assert rule_numbers, "Nenhuma regra R-0XX encontrada em CLAUDE.md"
+    assert rule_numbers, remediation(
+        "Nenhuma regra R-0XX encontrada em CLAUDE.md",
+        fix_hint="Verifique se CLAUDE.md § 3 ainda declara as regras normativas no formato '**R-0XX**'.",
+    )
     return max(rule_numbers)
 
 
@@ -379,14 +435,16 @@ def test_smell_2_15_no_hardcoded_normative_rule_range():
         if match:
             hardcoded.append((agent_file.relative_to(REPO_ROOT), match.group(0)))
 
-    assert not missing_claude_ref, (
+    assert not missing_claude_ref, remediation(
         f"Smell 2.15: {len(missing_claude_ref)} agent(s) com 'Regras Herdadas' não referenciam CLAUDE.md:\n"
-        + "\n".join(f"  - {path}" for path in missing_claude_ref)
+        + "\n".join(f"  - {path}" for path in missing_claude_ref),
+        fix_hint="Adicione a menção explícita a 'CLAUDE.md' na seção 'Regras Herdadas' de cada agent listado.",
     )
-    assert not hardcoded, (
+    assert not hardcoded, remediation(
         f"Smell 2.15 (Acoplamento Rígido de Range): {len(hardcoded)} agent(s) contêm range numérico hardcoded "
         f"(deve usar herança aberta 'regras normativas globais em CLAUDE.md'):\n"
-        + "\n".join(f"  - {path}: {val}" for path, val in hardcoded)
+        + "\n".join(f"  - {path}: {val}" for path, val in hardcoded),
+        fix_hint="Substitua o range hardcoded (ex.: 'R-001..R-051') pela frase aberta 'regras normativas globais em CLAUDE.md'.",
     )
 
 
@@ -413,10 +471,11 @@ def test_smell_2_16_mutating_agents_reference_safe_editing_skill():
         if skill_ref not in content:
             gaps.append(agent_file.relative_to(REPO_ROOT))
 
-    assert not gaps, (
+    assert not gaps, remediation(
         f"Smell 2.16: {len(gaps)} agent(s) com tools mutativas nao referenciam "
         f"'{skill_ref}' em source_docs/skills:\n"
-        + "\n".join(f"  - {p}" for p in gaps)
+        + "\n".join(f"  - {p}" for p in gaps),
+        fix_hint=f"Adicione '.github/skills/{skill_ref}/SKILL.md' à lista 'source_docs:' de cada agent listado (R-051).",
     )
 
 
@@ -455,10 +514,11 @@ def test_smell_2_17_no_bare_git_pager_commands_in_prompts_and_governance():
                 if not any(flag in line for flag in safe_flags):
                     violations.append((tg_file.relative_to(REPO_ROOT), line_no, line.strip()))
 
-    assert not violations, (
+    assert not violations, remediation(
         f"Smell 2.17: {len(violations)} comando(s) git desprovido(s) de desativação de pager "
         f"encontrado(s) em prompts/governança (R-035):\n"
-        + "\n".join(f"  - {path}:{num} -> {cmd}" for path, num, cmd in violations)
+        + "\n".join(f"  - {path}:{num} -> {cmd}" for path, num, cmd in violations),
+        fix_hint="Adicione '--no-pager' logo após 'git' no comando (ex.: 'git --no-pager diff') ou finalize com '| cat'.",
     )
 
 
@@ -471,29 +531,38 @@ def test_smell_2_20_router_flat_delegation_rule():
     sendo proibido de invocar subagentes executores downstream via run_subagent
     para evitar execução duplicada pelo orquestrador raiz (R-047 / R-037)."""
     router_file = AGENTS_DIR / "agent-router.agent.md"
-    assert router_file.exists(), "agent-router.agent.md deve existir"
+    assert router_file.exists(), remediation(
+        "agent-router.agent.md deve existir",
+        fix_hint="Restaure .github/agents/agent-router.agent.md — é o ponto de entrada obrigatório (R-037).",
+    )
     router_content = router_file.read_text(encoding="utf-8")
 
     # Verifica declaração de Delegação Plana no router
-    assert "Flat Delegation" in router_content or "Delegação Plana" in router_content, (
-        "agent-router.agent.md DEVE declarar regra de Delegação Plana (Flat Delegation)"
+    assert "Flat Delegation" in router_content or "Delegação Plana" in router_content, remediation(
+        "agent-router.agent.md DEVE declarar regra de Delegação Plana (Flat Delegation)",
+        fix_hint="Adicione a expressão 'Delegação Plana (Flat Delegation)' ao bloco CRÍTICO de agent-router.agent.md.",
     )
 
     # Verifica proibição explícita de subagente executor downstream
-    assert "NÃO invocar subagente executor downstream" in router_content or "proibido aninhamento" in router_content, (
-        "agent-router.agent.md DEVE proibir invocação de executores downstream via run_subagent"
+    assert "NÃO invocar subagente executor downstream" in router_content or "proibido aninhamento" in router_content, remediation(
+        "agent-router.agent.md DEVE proibir invocação de executores downstream via run_subagent",
+        fix_hint="Adicione a cláusula '❌ NÃO invocar subagente executor downstream' ao bloco CRÍTICO de agent-router.agent.md.",
     )
 
     # Verifica exceção no CLAUDE.md (R-047)
     claude_content = CLAUDE_MD.read_text(encoding="utf-8")
-    assert "Delegação Plana" in claude_content, (
-        "CLAUDE.md (R-047) DEVE prever a exceção de Delegação Plana para routers"
+    assert "Delegação Plana" in claude_content, remediation(
+        "CLAUDE.md (R-047) DEVE prever a exceção de Delegação Plana para routers",
+        fix_hint="Adicione a frase 'Delegação Plana' à regra R-047 em CLAUDE.md.",
     )
 
     # Verifica documentação do Smell 2.20 na skill
     gap_skill = SKILLS_DIR / "governance-audit-patterns" / "SKILL.md"
     gap_content = gap_skill.read_text(encoding="utf-8")
-    assert "2.20" in gap_content, "governance-audit-patterns/SKILL.md DEVE documentar o Smell 2.20"
+    assert "2.20" in gap_content, remediation(
+        "governance-audit-patterns/SKILL.md DEVE documentar o Smell 2.20",
+        fix_hint="Adicione a seção '### 2.20 — ...' em governance-audit-patterns/SKILL.md.",
+    )
 
 # ─────────────────────────────────────────────────────────────
 # SMELL 2.1 — Referência Órfã / Agentes Descomissionados em Documentação Viva
@@ -521,15 +590,17 @@ def test_smell_2_1_no_deprecated_agents_in_live_readmes():
     readme_content = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
     for dep in deprecated_agents:
         pattern = rf"(?<![a-zA-Z0-9_-]){re.escape(dep)}(?![a-zA-Z0-9_-])"
-        assert not re.search(pattern, readme_content), (
-            f"README.md cita agent descontinuado '{dep}' fora de changelog histórico"
+        assert not re.search(pattern, readme_content), remediation(
+            f"README.md cita agent descontinuado '{dep}' fora de changelog histórico",
+            fix_hint=f"Remova ou substitua a referência a '{dep}' em README.md pelo agent atual equivalente do catálogo.",
         )
     # 2. .github/skills/README.md
     skills_readme = (SKILLS_DIR / "README.md").read_text(encoding="utf-8")
     for dep in deprecated_agents:
         pattern = rf"(?<![a-zA-Z0-9_-]){re.escape(dep)}(?![a-zA-Z0-9_-])"
-        assert not re.search(pattern, skills_readme), (
-            f".github/skills/README.md cita agent descontinuado '{dep}'"
+        assert not re.search(pattern, skills_readme), remediation(
+            f".github/skills/README.md cita agent descontinuado '{dep}'",
+            fix_hint=f"Remova ou substitua a referência a '{dep}' em .github/skills/README.md pelo agent atual equivalente.",
         )
 
 # ─────────────────────────────────────────────────────────────
@@ -540,21 +611,36 @@ def test_smell_2_21_visual_blindness_and_ui_contracts_documented():
     (Cegueira Visual e Suposição de Contratos de UI), e os agentes de frontend
     devem prever o protocolo 'Canonical Sibling First' e contratos de shared components."""
     gap_file = SKILLS_DIR / "governance-audit-patterns" / "SKILL.md"
-    assert gap_file.exists(), "governance-audit-patterns/SKILL.md deve existir"
+    assert gap_file.exists(), remediation(
+        "governance-audit-patterns/SKILL.md deve existir",
+        fix_hint="Restaure .github/skills/governance-audit-patterns/SKILL.md.",
+    )
     gap_content = gap_file.read_text(encoding="utf-8")
-    assert "2.21" in gap_content, "governance-audit-patterns/SKILL.md DEVE documentar o Smell 2.21"
-    assert "Cegueira Visual" in gap_content, "Smell 2.21 deve abordar Cegueira Visual"
+    assert "2.21" in gap_content, remediation(
+        "governance-audit-patterns/SKILL.md DEVE documentar o Smell 2.21",
+        fix_hint="Adicione a seção '### 2.21 — ...' em governance-audit-patterns/SKILL.md.",
+    )
+    assert "Cegueira Visual" in gap_content, remediation(
+        "Smell 2.21 deve abordar Cegueira Visual",
+        fix_hint="Inclua o termo 'Cegueira Visual' na descrição do Smell 2.21 em governance-audit-patterns/SKILL.md.",
+    )
 
     # Valida presença do protocolo Canonical Sibling First no angular-feature-developer e angular-ui-stylist
     afd_file = AGENTS_DIR / "frontend" / "angular" / "angular-feature-developer.agent.md"
     assert afd_file.exists()
     afd_content = afd_file.read_text(encoding="utf-8")
-    assert "Canonical Sibling" in afd_content, "angular-feature-developer deve adotar Canonical Sibling First"
+    assert "Canonical Sibling" in afd_content, remediation(
+        "angular-feature-developer deve adotar Canonical Sibling First",
+        fix_hint="Adicione a menção ao protocolo 'Canonical Sibling First' em angular-feature-developer.agent.md.",
+    )
 
     aus_file = AGENTS_DIR / "frontend" / "angular" / "angular-ui-stylist.agent.md"
     assert aus_file.exists()
     aus_content = aus_file.read_text(encoding="utf-8")
-    assert "Canonical Sibling" in aus_content, "angular-ui-stylist deve adotar Canonical Sibling First"
+    assert "Canonical Sibling" in aus_content, remediation(
+        "angular-ui-stylist deve adotar Canonical Sibling First",
+        fix_hint="Adicione a menção ao protocolo 'Canonical Sibling First' em angular-ui-stylist.agent.md.",
+    )
 
 # ─────────────────────────────────────────────────────────────
 # SMELL 2.22 — Sticky Agent e Falha de Reset de Workflow (R-042 / R-052)
@@ -565,17 +651,26 @@ def test_smell_2_22_workflow_reset_and_anti_sticky_agent_rule():
     e a obrigatoriedade de reset pós-conclusão de workflow (R-052 / R-042)."""
     # 1. Verifica no CLAUDE.md
     claude_content = CLAUDE_MD.read_text(encoding="utf-8")
-    assert "R-052" in claude_content, "CLAUDE.md DEVE declarar a regra R-052"
+    assert "R-052" in claude_content, remediation(
+        "CLAUDE.md DEVE declarar a regra R-052",
+        fix_hint="Adicione a regra '**R-052**' em CLAUDE.md § 3 com o texto de Reset Mandatório pós-Conclusão de Workflow.",
+    )
     assert "Anti Sticky-Agent" in claude_content or "conclusao_de_workflow_anterior" in claude_content
 
     # 2. Verifica no copilot-instructions.md
     copilot_file = REPO_ROOT / ".github" / "copilot-instructions.md"
     assert copilot_file.exists()
     copilot_content = copilot_file.read_text(encoding="utf-8")
-    assert "R-052" in copilot_content, "copilot-instructions.md DEVE declarar R-052"
+    assert "R-052" in copilot_content, remediation(
+        "copilot-instructions.md DEVE declarar R-052",
+        fix_hint="Adicione a referência a 'R-052' em .github/copilot-instructions.md § 2.",
+    )
 
     # 3. Verifica em governance-audit-patterns/SKILL.md
     gap_file = SKILLS_DIR / "governance-audit-patterns" / "SKILL.md"
     gap_content = gap_file.read_text(encoding="utf-8")
-    assert "2.22" in gap_content, "governance-audit-patterns/SKILL.md DEVE documentar o Smell 2.22"
+    assert "2.22" in gap_content, remediation(
+        "governance-audit-patterns/SKILL.md DEVE documentar o Smell 2.22",
+        fix_hint="Adicione a seção '### 2.22 — ...' em governance-audit-patterns/SKILL.md.",
+    )
     assert "Sticky Agent" in gap_content

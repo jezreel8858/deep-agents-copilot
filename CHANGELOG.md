@@ -6,6 +6,82 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.38.0] — 2026-09-24
+
+### Adicionado (Governança Anti Root-Agent-Impersonation & Anti Silent Bypass: R-062 e R-063)
+- **R-062 (Zero Impersonation pelo Orquestrador Raiz — Anti Root-Agent-Impersonation) e Smell 2.29**:
+  - Proibição terminante do modelo raiz ler, resumir ou parafrasear arquivos `.agent.md` para usurpar o papel de subagentes especializados sem dispatch real via `run_subagent`.
+  - Propagação normativa no SSOT `CLAUDE.md`, `.github/copilot-instructions.md`, `agent-router.agent.md`, `templates/router-agent.md`, 7 domain routers (`engineering-router`, `architecture-router`, `quality-router`, `security-governance-router`, `data-router`, `devops-router`, `research-router`) e na skill `governance-audit-patterns/SKILL.md`.
+  - Implementação de suíte de testes determinísticos em `tests/governance_audit/test_root_agent_impersonation_governance.py`.
+- **R-063 (Zero Execução Direta pelo Orquestrador Raiz sem Router — Anti Silent Bypass) e Smell 2.30**:
+  - Proibição terminante do modelo raiz executar ferramentas genéricas nativas (terminal, read_file, grep, edit) sem triagem prévia obrigatória via `@agent-router` (inclusive em turnos subsequentes, após encerramento de workflow ou em resposta a prompts curtos/informais).
+  - Complemento formal da regra R-042 em `CLAUDE.md` e ajuste do diagrama de fluxo no prompt de sistema `.github/copilot-instructions.md`.
+  - Propagação de blindagem nos 7 domain routers e no template de router (`templates/router-agent.md`).
+  - Implementação de suíte de testes determinísticos em `tests/governance_audit/test_root_orchestrator_silent_execution_governance.py`.
+
+---
+
+## [2.37.0] — 2026-09-24
+
+### Adicionado (Wiring Sistêmico de Harness/Prompt/Context Engineering & Anti-Silo Fix)
+- **Fechamento de Gaps de Wiring (Plano de Ação do @agent-auditor pós-2.36.0)**:
+  - **Wiring 1 (`harness-engineering-patterns/SKILL.md`)**: formalizada dependência operacional em `source_docs:` para agentes chave de orquestração, auditoria e arquitetura (`@agent-router`, `@agent-auditor`, `@governance-maintainer`, `@tech-solution-architect`).
+  - **Wiring 2 (`agent-evals-lab/SKILL.md`)**: referenciada em `source_docs:` de agentes que elaboram ou avaliam arquiteturas e fábricas de governança (`@governance-factory`, `@tech-solution-architect`, `@agent-router`).
+  - **Wiring 3 (`prompt-engineering-patterns/SKILL.md`)**: vinculada ao `source_docs:` de agentes criadores de diretrizes e roteamento (`@governance-factory`, `@agent-router`).
+  - **Wiring 4 (`structured-intake-patterns/SKILL.md`)**: adicionada ao `source_docs:` de `@test-strategy` e consolidação formal de SSOT de frontmatter em `@business-rules-extractor` e `@requirements-analyst`.
+  - **Wiring 5 (`requirements-engineering-patterns/SKILL.md`)**: adicionada ao `source_docs:` de `@tech-solution-architect` para suporte a elicitação e refinamento não-funcional.
+  - **Wiring 6 (`docs/agent-context/templates/CONTEXT.template.md`)**: vinculado formalmente em `source_docs:` de `@docs-engineer` e `@adapter-generator`, com orientações nos corpos de `/add-project-context` (proposição de criação de `CONTEXT.md` ao gerar adapter) e `/init-context` (opção de bootstrap de glossário de domínio).
+- **Quality Gate Determinístico**:
+  - Novo teste restrito `test_wiring_of_new_skills_in_consumer_agents()` em `tests/governance_audit/test_harness_engineering_governance.py` validando deterministamente a presença de todos os 6 wirings nos frontmatters dos agentes consumidores.
+- **Governança & Portão de Reúso Sistêmico (R-055 / Q1)**:
+  - Registrada recomendação (não implementada nesta release para evitar quebras em wirings pré-existentes não relacionados) para futura auditoria sistêmica global automatizada `.index.json` × `source_docs:` em todo o catálogo de agentes.
+
+---
+
+## [2.36.0] — 2026-09-23
+
+### Adicionado (Harness Engineering Patterns & Sincronização Normativa R-061)
+- **Pesquisa de Mercado 2026**: consolidação de práticas de Harness Engineering a partir de referências públicas de mercado (Matt Pocock / AI Hero — *Harness Engineering & Ralph Loop*, HumanLayer — *Context Engineering & Agent Tooling*, Martin Fowler / Anthropic / OpenAI):
+  - Diagnóstico sistemático de causa-raiz: segregação entre falhas de infraestrutura do agente (harness) e limitações cognitivas da LLM (modelo).
+  - Heurística da "zona inteligente" (~100k tokens) e descarte profilático de sessões com handoffs portáteis (*Write/Select/Compress/Isolate*).
+  - Poda contínua de instrução via "delete e observe" e progressive disclosure em arquivos de diretrizes persistentes (`AGENTS.md` / `CLAUDE.md`).
+  - Modo de execução autônoma tipo "Ralph Loop" documentado estritamente como técnica de execução contínua em workflows existentes (sem criação de workflow anômalo, respeitando R-050).
+- **Governança & Cascata Normativa (R-015 / R-046 / R-055 / R-061)**:
+  - `CLAUDE.md`: formalização da regra normativa **R-061** (Diagnóstico de Harness-vs-Modelo e Poda Anti-Bloat de Instrução).
+  - Nova skill canônica `.github/skills/harness-engineering-patterns/SKILL.md` (Tier 1, category `process`).
+  - Atualização atômica de catálogo em `.github/skills/README.md` e `.github/skills/.index.json`.
+  - Atualização cruzada em `.github/skills/agent-evals-lab/SKILL.md` (seção 2.4 — Métricas de Qualidade do Harness vs. Métricas do Modelo).
+  - Atualização cruzada em `.github/skills/prompt-engineering-patterns/SKILL.md` (Escrever para Agentes vs. Prompts de Tarefa efêmeros).
+  - Alinhamento de governança de handoffs em `.github/skills/handoff-governance/SKILL.md` (§ 2.5).
+  - Atualização do catálogo rápido em `.github/copilot-instructions.md`.
+  - Suíte de testes determinística `tests/governance_audit/test_harness_engineering_governance.py` com remediações acionáveis (`remediation()`).
+  - **Padrões Complementares de Context Engineering & AI Hero (Matt Pocock)**:
+    - **Protocolo de Grilling Cético ("Grill Me")**: formalizado em `.github/skills/structured-intake-patterns/SKILL.md` (§ 2.1) estabelecendo que o agente interroga ativamente premissas, falhas e trade-offs (mantendo humanos como responsáveis finais), com nota cruzada em `.github/skills/requirements-engineering-patterns/SKILL.md` (§ 6).
+    - **Padrão `CONTEXT.md` (Glossário de Domínio Compartilhado para Compressão Semântica)**: criação do template canônico `docs/agent-context/templates/CONTEXT.template.md` (termos canônicos, invariantes não-negociáveis, siglas e anti-termos) e recomendação de consumo em `.github/skills/context-mode/SKILL.md` (§ 3.3) via `ctx_search`.
+    - **Estratégia Tracer Bullets (Vertical Slicing)**: formalizada em `.github/skills/task-decomposition-patterns/SKILL.md` (§ 1) instruindo fatiamento vertical ponta a ponta (UI → API → Banco com teste funcional na primeira subtask) para validação precoce de arquitetura.
+    - **Quality Gate determinístico**: 3 novos testes em `tests/governance_audit/test_harness_engineering_governance.py` garantindo a integridade dos 3 novos padrões com remediações determinísticas (`remediation()`).
+- **Correção Pós-Cascata (Integridade Estrutural de Catálogo, R-051)**: a primeira aplicação da cascata pelo `governance-maintainer` converteu inadvertidamente a chave `skills` de `.github/skills/.index.json` de **array** (schema canônico usado por todo o catálogo) para **objeto/dict** com chaves numéricas — regressão estrutural silenciosa que teria quebrado qualquer consumidor externo do índice. Corrigido reconstruindo `skills` como array, com a nova entrada `harness-engineering-patterns` reposicionada em ordem alfabética (entre `handoff-governance` e `integration-contract-analysis`); o teste determinístico correspondente foi ajustado para validar o schema de array (não dict). Suíte completa revalidada: 317/317 testes aprovados.
+
+
+## [2.35.0] — 2026-09-23
+
+### Adicionado (Harness Engineering — Sensores, Padrão Gerador–Avaliador Cético & Garbage Collection Contínuo)
+- **Pesquisa de base**: síntese das descobertas de mercado 2026 sobre Engenharia de Harness (Anthropic — *Harness design for long-running application development*; OpenAI — *Harness engineering: leveraging Codex in an agent-first world*; Martin Fowler/Thoughtworks — *Harness engineering for coding agent users*) aplicadas ao ecossistema `deep-agents-copilot`.
+- **[PROPOSTA-1] Positive Prompt Injection em Sensores Computacionais**:
+  - Novo helper `tests/governance_audit/_helpers.py` (`remediation(message, fix_hint=...)`) formatando mensagens de `assert` com bloco `REMEDIATION:` acionável, fechando o ciclo de auto-correção sem exigir raciocínio inferencial extra.
+  - Refatoração completa de `tests/governance_audit/test_governance_smells.py` (todas as asserções) para usar o novo helper.
+  - Novo **Smell 2.28** (Mensagem de Sensor Sem Remediação Acionável) documentado em `governance-audit-patterns/SKILL.md`, com atualização de contadores (26→28 categorias) e checklist de conformidade.
+  - `tests/README.md` atualizado com a convenção obrigatória para novos asserts em `tests/governance_audit/`.
+- **[PROPOSTA-2] Padrão Gerador–Avaliador Cético (Generator-Evaluator Skeptical Pattern)**:
+  - Nova seção `§ 1.4` em `.github/agents/workflows.md` formalizando o padrão (Sprint Contract pré-negociado, rubrica de corte objetiva, independência de avaliação).
+  - Aplicado a `WORKFLOW-BUG-FIX` (Estado 2 = Gerador do Red Test; Estado 5 = Avaliador Cético) e `WORKFLOW-FEATURE-DEVELOPMENT` (Estado 2 = negociação do contrato; Estado 6 = Avaliador Cético), incluindo novos campos `sprint_contract` e `avaliacao_cetica` nos respectivos Typed State Bags.
+- **[PROPOSTA-3] Continuous Garbage Collection & Drift Detection**:
+  - Nova skill `.github/skills/continuous-garbage-collection-patterns/SKILL.md` cobrindo 5 categorias de drift (documental, referência órfã, duplicação não consolidada, sincronização de catálogo R-015, skill órfã) e o protocolo de execução de varredura periódica ("Janitor Run").
+  - Registrada em `.github/skills/.index.json` (61 skills) e `.github/skills/README.md`; referenciada em `source_docs:` de `repo-hygiene-auditor.agent.md` e `governance-maintainer.agent.md`.
+- **Quality Gate**: 313/313 testes determinísticos aprovados (pytest).
+
+---
+
 ## [2.34.1] — 2026-09-23
 
 ### Refatorado & Otimizado

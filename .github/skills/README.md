@@ -26,6 +26,7 @@ Toda skill deve declarar no topo:
 | Skill | Tier sugerido | Quando usar |
 |---|---|---|
 | **`prompt-engineering-patterns`** | 🧠 **Tier 2** | Técnicas consolidadas (APE/OPRO/DSPy/Anthropic/OpenAI) para estruturar prompts em `<task>/<context>/<constraints>/<output_format>`, detectar ambiguidade objetivamente e aplicar self-critique — base do agent `prompt-structuring` |
+| `harness-engineering-patterns` | Tier 1 | ⭐ (NEW) Fornece diretrizes e heurísticas de Harness Engineering: diagnóstico harness vs modelo, heurística da zona inteligente (~100k tokens), poda anti-bloat e execução autônoma Ralph Loop |
 | `context-mode` | Tier 1 | Roteamento ctx-first, coleta em batch, busca indexada e processamento em sandbox com economia de tokens/créditos |
 | `sonarqube-governance` | Tier 2 | Monitorar métricas de qualidade, cobertura e segurança via SonarQube |
 | `tavily` | Tier 2 | Pesquisar documentação externa, changelog, versões e referências de terceiros |
@@ -77,6 +78,7 @@ Toda skill deve declarar no topo:
 | **`governance-audit-patterns`** | 🕵️ **Tier 1** | Catálogo dos 16 agent/governance smells (anti-padrão estrutural, gap de perfil, desalinhamento contratual perfil ↔ tools ↔ skills ↔ catálogo, R-046, R-044, R-051 e drift normativo R-0XX) com sintoma, detecção estática Tier 1, severidade e remediação — base do agent `agent-auditor` |
 | **`reflection-self-critique-patterns`** | 🪞 **Tier 2** | Padrão generate→critique→revise (Reflection) de baixo custo — self-reflection 1 round grounded para agents Executores reexaminarem o próprio artefato antes de reportar sucesso — base de `docs-engineer`, `test-strategy` |
 | **`repository-hygiene-patterns`** | 🧹 **Tier 2** | Diretrizes e matriz canônica para auditoria e garantia de higiene de repositório, documentação essencial (README, CONTRIBUTING, LICENSE), segurança de versionamento (.gitignore) e práticas de CI/CD — base do agent `repo-hygiene-auditor` |
+| **`continuous-garbage-collection-patterns`** | 🧽 **Tier 2** | ⭐ ***(NEW)*** Varreduras periódicas de baixo custo (Janitor Tasks) para drift documental, referências órfãs, duplicação não consolidada e desalinhamento de catálogo — modo contínuo complementar de `repo-hygiene-auditor` e `governance-maintainer` |
 | **`security-review-patterns`** | 🔒 **Tier 2** | ⭐ ***(NEW)*** OWASP Top 10:2025, ASVS 5.0, OWASP LLM/Agentic AI, SCA (CVE/CVSS), detecção de secrets e rubrica de triagem — base do agent `security-reviewer` |
 | **`performance-engineering-patterns`** | ⚡ **Tier 2** | ⭐ ***(NEW)*** Core Web Vitals (LCP/INP/CLS), N+1 queries, profiling de latência e otimização de query — base do agent `performance-agent` |
 | **`compliance-governance-patterns`** | 🛡️ **Tier 2** | ⭐ ***(NEW)*** SOC 2/GDPR/LGPD/HIPAA/ISO 27001, audit trails, least privilege e retenção de dado pessoal — base do agent `compliance-guardrails` |

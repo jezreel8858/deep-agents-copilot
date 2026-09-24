@@ -387,6 +387,41 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 | Severidade | **Bloqueador** (gera código no escuro, risco severo de corrupção de dados ou regras de segurança falhas, e quebra do checkpoint humano 3b) |
 | Remediação | (a) Injeção de R-058 em `CLAUDE.md`, `copilot-instructions.md`, `agent-router.agent.md` e `router-agent.md`; (b) Roteamento compulsório de features com persistência/máquina de estados/push para `@tech-solution-architect` (WF4 Estado 3); (c) Decomposição em subtasks `[S]`/`[P]` com `@feature-planner` para demandas multi-task; (d) Teste determinístico no pytest (`test_architectural_blueprint_gate_governance.py`) |
 
+---
+### 2.28 — Mensagem de Sensor Sem Remediação Acionável (Non-Actionable Assertion Message / Anti Positive Prompt Injection)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Um teste determinístico (sensor computacional em `tests/governance_audit/` ou equivalente) falha emitindo apenas a descrição do sintoma (ex.: `"[agent.md] Ausência do campo 'source_docs'"`), sem indicar a ação corretiva exata. Isso força uma segunda rodada de raciocínio inferencial (LLM) só para descobrir "o que fazer a seguir", desperdiçando tokens e quebrando o ciclo cibernético de auto-correção descrito em *Harness Engineering for Coding Agent Users* (Böckeler/Fowler, Thoughtworks, 2026) |
+| Como detectar | (a) Mensagens de `assert` que terminam sem instrução imperativa de correção (sem verbo de ação como "adicione", "remova", "substitua"); (b) Ausência do helper padronizado de remediação (`remediation()` ou equivalente) em testes novos de `tests/governance_audit/`; (c) Sensores customizados (linters, scripts de auditoria) que retornam apenas código de erro sem contexto de arquivo/campo/valor esperado |
+| Origem (TrustAgent) | Intrínseco — o autor do teste otimiza para "detectar a violação" mas não para "fechar o loop de autocorreção do agente consumidor", tratando o sensor como gate humano em vez de sensor agent-first |
+| Severidade | **Alto** (não bloqueia a execução do teste, mas degrada significativamente a eficiência de autocorreção e aumenta o custo de tokens do ciclo feedback → correção) |
+| Remediação | (a) Todo `assert` novo em `tests/governance_audit/` DEVE usar o helper `remediation(message, fix_hint=...)` de `tests/governance_audit/_helpers.py`, retornando mensagem multilinha com bloco `REMEDIATION:` explícito; (b) `fix_hint` deve ser imperativo, específico e citar o arquivo/campo/valor esperado — nunca genérico ("corrija o problema"); (c) Sensores fora do pytest (linters JS/Python customizados) devem seguir o mesmo princípio de "Positive Prompt Injection": a mensagem de erro já contém a instrução de correção |
+
+### 2.29 — Root Orchestrator Agent Impersonation (R-062)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | O modelo do turno raiz (Orquestrador Raiz), dependendo do prompt/modelo (ex.: Claude Sonnet 5), lê diretamente o conteúdo de arquivos `.github/agents/**/*.agent.md` de agents específicos e passa a "atuar como" aquele agent diretamente no próprio chat, sem invocá-lo de fato via `run_subagent` a partir do `@agent-router` — bypassando R-037/R-042/R-050/R-054 |
+| Como detectar | (a) Resposta do turno raiz reproduz estrutura, tom ou persona de um agent específico (ex.: banner "Agente Ativo: X") sem que tenha havido chamada de `run_subagent` correspondente no histórico de tool calls; (b) Menção ou paráfrase do conteúdo de um `.agent.md` específico no chat sem invocação real; (c) Ausência da cláusula R-062 em `CLAUDE.md`, `copilot-instructions.md` e `agent-router.agent.md` |
+| Origem (TrustAgent) | Intrínseco — modelos de turno raiz com acesso a ferramentas de leitura de arquivo podem "atalhar" o custo de invocação de subagente lendo e simulando o papel do especialista diretamente, especialmente sob prompts curtos citando `@nome-do-agent` |
+| Severidade | **Bloqueador** (bypass estrutural de toda a governança agent-first: roteamento, re-triagem, least privilege de router e delegação plana) |
+| Remediação | (a) Declarar R-062 (Zero Impersonation pelo Orquestrador Raiz) em `CLAUDE.md` § 3; (b) Propagar cláusula redundante em `.github/copilot-instructions.md` §1.1 (bloco "Proibido:") e §2 ("✅ Sempre"); (c) Reforçar `agent-router.agent.md` deixando explícito que a proibição de Zero Discovery/Zero Impersonation é responsabilidade do Orquestrador Raiz mesmo antes de invocar o router; (d) Adicionar seção "Zero Impersonation pelo Orquestrador Raiz" ao template canônico `templates/router-agent.md`; (e) Validar via `tests/governance_audit/test_root_agent_impersonation_governance.py` |
+
+---
+
+### 2.30 — Silent Root Tool Execution / Zero-Agent Router Bypass (R-063)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | O modelo do turno raiz (Orquestrador Raiz) invoca diretamente uma tool nativa genérica (terminal, leitura de arquivo, grep, busca, edição) em resposta a um NOVO pedido do usuário sem que tenha havido invocação prévia de `run_subagent(agentName: 'agent-router', ...)` neste mesmo turno — independentemente de o usuário citar nome de agent, de o Orquestrador Raiz ter lido algum `.agent.md`, ou de haver agent ativo residente de turno anterior |
+| Como detectar | (a) Histórico de tool calls do turno mostra chamada de `read_file`, `grep_search`, `run_in_terminal`, `insert_edit_into_file` (ou equivalente) ANTES de qualquer `run_subagent(agent-router)` no mesmo turno; (b) Resposta do turno raiz produz resultado técnico (diagnóstico, edição, saída de comando) sem banner `Agente Ativo: <agent>` precedente; (c) Ausência da cláusula R-063 em `CLAUDE.md`, `copilot-instructions.md`, `agent-router.agent.md` e `templates/router-agent.md` |
+| Origem (TrustAgent) | Intrínseco — modelos de turno raiz com acesso direto a ferramentas nativas podem atalhar o custo de roteamento executando a tool solicitada de forma literal e imediata, sem produzir qualquer simulação de persona de agent específico (o que distingue este smell do Smell 2.29, que exige leitura/paráfrase de um `.agent.md` e simulação de papel) |
+| Severidade | **Bloqueador** (bypass estrutural do roteamento obrigatório, mesmo sem impersonation de agent específico) |
+| Remediação | (a) Declarar R-063 (Zero Execução Direta pelo Orquestrador Raiz sem Router / Anti Silent Bypass) em `CLAUDE.md` § 3, complementando R-042; (b) Propagar cláusula em `.github/copilot-instructions.md` §1.1 (diagrama, ramo Não → triagem normal) e §2 (bullet "Sempre"); (c) Adicionar subseção "Zero Execução Direta pelo Orquestrador Raiz (R-063)" em `agent-router.agent.md` e no template canônico `templates/router-agent.md`, propagada aos 7 domain routers; (d) Validar via `tests/governance_audit/test_root_orchestrator_silent_execution_governance.py` e `tests/governance_audit/test_router_agents.py` |
+
+---
+
 ## 3) Severidade — Reaproveitamento da Taxonomia Existente
 
 Esta skill **reaproveita** (não recria) a taxonomia de `code-review-patterns`:
@@ -394,7 +429,7 @@ Esta skill **reaproveita** (não recria) a taxonomia de `code-review-patterns`:
 | Severidade | Critério Objetivo de Enquadramento |
 |---|---|
 | **Bloqueador** | Gap que impede o funcionamento técnico ou a governança do artefato: falta de `run_subagent` (R-042); `model:` inválido ou desconhecido (`Unknown model`); tool de escrita em agent read-only; uso de terminal sem `terminal-governance`; vazamento de evidência real de projeto (R-044); dessincronização crítica no catálogo (R-015); terceirização manual ao usuário por agent analítico (R-057 / Smell 2.25); MCP tool chaining sequencial no chat / omissão de ctx_batch_execute (Smell 2.26); ou desvio prematuro para implementação e despejo de lacunas arquiteturais em executores de código (R-058 / Smell 2.27). |
-| **Alto** | Gap que gera desperdício severo de tokens/créditos, duplicação de manutenção ou risco de drift: violação de batching (R-046); divergência de templates canônicos (ausência de escopo ✅/❌ ou workflow); falta de variáveis nativas em prompts; código inline > 8 linhas em skills (R-026); ou sobreposição funcional ativa entre 2 agents. |
+| **Alto** | Gap que gera desperdício severo de tokens/créditos, duplicação de manutenção ou risco de drift: violação de batching (R-046); divergência de templates canônicos (ausência de escopo ✅/❌ ou workflow); falta de variáveis nativas em prompts; código inline > 8 linhas em skills (R-026); sobreposição funcional ativa entre 2 agents; ou mensagem de sensor sem remediação acionável (Smell 2.28). |
 | **Sugestão** | Melhoria técnica não urgente ou cosmética: refinamento de `argument-hint`; ajuste fino de `description` dentro do limite; ou gap taxonômico de categoria intencionalmente não coberta. |
 
 ## 4) Cross-check de Segurança (Referência, Não Duplicação)
@@ -408,7 +443,7 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 
 | Smell | Local(is) afetado(s) | Severidade | Remediação sugerida | Agent a acionar |
 |---|---|---|---|---|
-| <2.1..2.27> | <arquivo(s)> | Bloqueador/Alto/Sugestão | <ação objetiva> | <@governance-factory/@docs-engineer/@governance-maintainer> |
+| <2.1..2.28> | <arquivo(s)> | Bloqueador/Alto/Sugestão | <ação objetiva> | <@governance-factory/@docs-engineer/@governance-maintainer> |
 
 ## Resumo por Severidade
 - Bloqueador: N
@@ -421,7 +456,7 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 
 ## 6) Checklist de Conformidade da Auditoria
 
-- [ ] Todo achado classificado estritamente em uma das 26 categorias de smell (2.1..2.26).
+- [ ] Todo achado classificado estritamente em uma das 28 categorias de smell (2.1..2.28).
 - [ ] Severidade reaproveitada de `code-review-patterns` (Bloqueador/Alto/Sugestão).
 - [ ] Origem classificada como intrínseca ou extrínseca (TrustAgent) quando relevante.
 - [ ] Remediação aponta agent executor real do catálogo (nunca "corrigir diretamente" — agent de auditoria é estritamente read-only).
@@ -432,11 +467,12 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 - [ ] Conflito de responsabilidade cross-artefato (agents vs prompts vs skills) verificado — fronteira decisão/conhecimento/atalho respeitada (§2.12).
 - [ ] Hipertrofia instrucional e redundância de saída em runtime verificada — sem banners multicamada, overhead cosmético ou mismatch de perfil vs `agent-contracts` §8 (§2.13).
 - [ ] Casos de teste minerados da telemetria sanitizados conforme R-044 antes de persistência em `casos-roteamento.yaml` (§2.14).
+- [ ] Mensagens de `assert` de sensores computacionais novos usam o helper `remediation()` com `fix_hint` acionável (§2.28).
 
 ## 7) Anti-padrões
 
 - ❌ Agent de auditoria aplicar a correção diretamente (deve ser read-only — só análise e recomendação).
-- ❌ Inventar categoria de smell fora das 26 catalogadas nesta skill.
+- ❌ Inventar categoria de smell fora das 28 catalogadas nesta skill.
 - ❌ Duplicar taxonomia de severidade ou checklist de segurança já existentes em outras skills.
 - ❌ Reportar achado sem apontar agent executor de remediação (relatório inacionável).
 - ❌ Classificar achados como Bloqueadores sem critério estrutural comprovado.

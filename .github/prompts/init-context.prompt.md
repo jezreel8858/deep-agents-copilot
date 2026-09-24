@@ -387,6 +387,7 @@ Sintetiza em bullets objetivos apenas as pendências reais detectadas nos Passos
 - **[Model]** *(se recomendável)*: Ajuste o modelo da sessão conforme a complexidade da tarefa (R-021).
 - **[Binding]** *(se incompleto)*: Execute `binding-initializer` — instructions/README.md ou projects.local.yaml.example ausentes (R-034).
 - **[Extends]** *(se houver projeto sem extends)*: Configure herança em `<n>` projeto(s) pendente(s) — PASSO 6.
+- **[Domínio / Glossário]** *(opcional)*: Para projetos com termos de negócio e regras densas, referencie o template canônico `docs/agent-context/templates/CONTEXT.template.md` como opção de bootstrap de glossário de domínio (`CONTEXT.md`).
 - **[Drift/Instruções]** *(se houver projeto com deriva)*: Atualize o adapter local de `<projeto>` via `adapter-generator` ou re-sincronização — detectada evolução de stack (ex.: framework ou runner de testes atualizados) — PASSO 7.
 - **[Cache]** *(se houver projeto sem grafo)*: Considere `@code-knowledge-graph` para `<projeto(s)>` antes de análises profundas.
 - **[Sessão]** *(se Context Mode inativo)*: Rode `/ctx-start` — Total calls = 0, dashboard não vai rastrear.

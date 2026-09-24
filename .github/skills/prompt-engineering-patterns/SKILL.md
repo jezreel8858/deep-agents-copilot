@@ -77,6 +77,19 @@ Considerar o prompt **completo** (sair do loop) quando os 4 campos canônicos (`
 - [ ] Ambiguidade avaliada pelas heurísticas acima — não por julgamento subjetivo.
 - [ ] Self-critique executado antes de encerrar a iteração.
 
+## Escrever para Agentes (Writing-for-Agents vs. Task Prompts)
+
+Ao redigir instruções persistentes para agentes (como arquivos de instrução de agentes, `.prompt.md` e `SKILL.md`), os princípios divergem dos prompts de tarefa efêmeros:
+
+1. **Triggers Claros e Unívocos**: Agentes de roteamento e LLMs ativam skills baseando-se em gatilhos léxicos e semânticos. Evite termos genéricos que colidam com outras especialidades (ex.: use "migração de branch por abstração" em vez de "refatorar código").
+2. **Steering Declarativo e Restrições Negativas**: Modelos agentic respondem melhor a limites explícitos de não-escopo (o que NÃO fazer) e contratos de entrada/saída padronizados do que a descrições prolixas de comportamento.
+3. **Poda e Progressive Disclosure**: Documentos de instrução persistente devem ser compactos e orientados a índices/ponteiros. Conteúdo volumoso deve ser adiado para carregamento sob demanda (`context-mode`).
+4. **Fronteira Arquitetural**:
+   - **Prompt de Tarefa (Task Prompt)**: Escopo local, efêmero, focado na intenção do usuário corrente e na cadeia de raciocínio imediata (governado por esta skill `prompt-engineering-patterns`).
+   - **Instrução de Harness (Persistent Instruction)**: Escopo global, duradouro, focado nas capacidades, ferramentas, permissões e boundaries do agente no ciclo de vida (governado por `harness-engineering-patterns`).
+
+---
+
 ## Referências
 
 - Zhou et al., "Large Language Models Are Human-Level Prompt Engineers" (APE), arXiv:2211.01910, ICLR 2022 — https://arxiv.org/abs/2211.01910

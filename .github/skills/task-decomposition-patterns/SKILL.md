@@ -42,6 +42,10 @@ tools: []
 | **Paralela** | Subtasks genuinamente independentes | Frontend + Backend + Docs simultâneos |
 | **Híbrida** | Combinação — grupos paralelos com barreira de sincronização | Implementação paralela → Convergência em Review |
 
+
+> **Tracer Bullets (Vertical Slicing / Matt Pocock):**
+> Em vez de decompor horizontalmente em camadas isoladas (construir todo o schema, depois toda a service, depois toda a controller, depois toda a UI — postergando a integração para o final), fatiar verticalmente de ponta a ponta. A primeira subtask implementa e testa um caminho feliz mínimo atravessando todas as camadas (UI → API → Banco) com um teste funcional executável. Valida contratos e arquitetura imediatamente, eliminando o risco de incompatibilidades tardias.
+
 ## 2) Granularidade Ideal
 
 > Regra prática de mercado (2026): **2-3 níveis de decomposição** para a maioria das tarefas.

@@ -17,6 +17,7 @@ source_docs:
   - .github/skills/efficient-batch-code-modification/SKILL.md
   - .github/skills/context-mode/SKILL.md
   - .github/skills/reflection-self-critique-patterns/SKILL.md
+  - docs/agent-context/templates/CONTEXT.template.md
 ---
 
 # Perfil Operacional

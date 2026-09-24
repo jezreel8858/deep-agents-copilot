@@ -38,6 +38,17 @@ Para permanecer agnóstico de stack (R-038), este documento referencia os execut
 3. **Banco de dados é exceção nomeada**: sub-rotinas de schema/DDL nunca usam papel genérico — referenciam sempre `@database-specialist` (agente único, cross-stack) por nome literal.
 4. **Stack não identificada**: se o `@bug-triage`/`@refactor-planner` não conseguir inferir a stack (nenhum domain router aplicável), o estado correspondente aciona `ask_questions` para confirmar a stack antes de resolver o papel genérico — nunca infere silenciosamente.
 
+### 1.4 Padrão Gerador–Avaliador Cético (Generator-Evaluator Skeptical Pattern)
+
+**Fundamentação de mercado**: Anthropic (*Harness design for long-running application development*, Mar/2026) demonstrou que agentes avaliando o próprio trabalho tendem à complacência ("self-grading leniency") — mesmo diante de resultados objetivamente medíocres. A separação estrutural entre quem **gera** o artefato e quem o **avalia** — com o avaliador operando sob rubrica cética e independente — eleva substancialmente a taxa de detecção de defeitos sem depender de troca de modelo.
+
+**Aplicação nos Workflows Canônicos**: Este padrão já está estruturalmente presente em `WORKFLOW-BUG-FIX` (Estado 2 = Gerador do Red Test; Estado 5 = Avaliador Cético via Quality Gate) e `WORKFLOW-FEATURE-DEVELOPMENT` (Estado 2 = negociação do contrato de aceitação; Estado 5 = Gerador da implementação; Estado 6 = Avaliador Cético via Gates de Segurança/UI/Code Review). Para tornar essa separação explícita e auditável:
+
+1. **Mini-Contrato de Aceitação Pré-Negociado (Sprint Contract)**: Antes de o Gerador produzir o artefato final, ele propõe por escrito os critérios objetivos de "concluído" (comportamento esperado, casos de borda cobertos, forma de verificação). O Avaliador revisa e aprova esse contrato **antes** da implementação — evitando que a definição de sucesso seja inventada retroativamente pelo próprio Gerador.
+2. **Rubrica de Corte Objetiva do Avaliador**: O Avaliador Cético (`runtime-verifier`, `code-review`, `security-reviewer`, `angular-ui-stylist` conforme o gate) julga contra critérios explícitos com limiar de corte (`threshold`), não contra impressão subjetiva. Qualquer critério abaixo do limiar reprova o artefato inteiro, mesmo que os demais critérios estejam excelentes (nenhuma média compensatória).
+3. **Independência de Avaliação**: O Avaliador nunca é a mesma invocação/contexto que gerou o artefato — mesmo quando o mesmo agent desempenha os dois papéis em momentos distintos do workflow (ex.: `specialist-feature-developer` gera; `@code-review` avalia), a avaliação ocorre em uma etapa e contexto discretos, com acesso às evidências de execução real (testes rodados, logs, diffs) e não apenas ao código-fonte estático.
+4. **Registro no `workflow_state`**: Todo workflow que aplica este padrão declara os campos `sprint_contract` (critérios negociados) e `avaliacao_cetica` (rubrica aplicada, nota por critério, veredito) — ver Typed State Bags de `WORKFLOW-BUG-FIX` § 3.1 e `WORKFLOW-FEATURE-DEVELOPMENT` § 3.4.
+
 ---
 
 ## 2. Matriz Geral de Roteamento de Workflows
@@ -136,7 +147,8 @@ flowchart TD
    - *Sub-rotina 1a (Diagnóstico Profundo)*: Se envolver call graph multi-camada complexo, invoca `@debugger` com `call_type: "subroutine"`.
    - *Sub-rotina 1b (Repro Gate)*: Se o bug for intermitente ou faltar evidência mínima, o `@bug-triage` NÃO avança cegamente para o Estado 2. Ele aciona o `@debugger` com logpoint/tracepoint (`logExpression` com `suspendPolicy=NONE`) ou dispara `ask_questions` (R-027) com 1 pergunta solicitando o payload/passos mínimos.
    - *Sub-rotina 1c (Circuit Breaker de Reprodução)*: O Repro Gate tem **teto de 2 tentativas**. Se após 2 rodadas a reprodução determinística ainda falhar, o `@bug-triage` PARA de repetir o ciclo e aciona `ask_questions` com 3 opções objetivas: **(A)** prosseguir para o Estado 2 com a hipótese de maior confiança disponível, registrando o risco assumido no `workflow_state`; **(B)** pausar o workflow aguardando evidência adicional (log/observabilidade) do solicitante; **(C)** encerrar a triagem classificando `status_reproducao: "nao_reproduzivel"` e registrar achados parciais para backlog. Este é um estado terminal distinto (🟡 Pausado), não um retorno silencioso ao loop.
-2. **Estado 2 — Caracterização e Reprodução Automatizada**:
+2. **Estado 2 — Caracterização e Reprodução Automatizada (Papel: Gerador do Red Test — § 1.4)**:
+   - *Sprint Contract*: Antes de escrever o teste, o especialista declara por escrito o comportamento esperado pós-fix e os casos de borda que o Red Test deve cobrir (`sprint_contract` no `workflow_state`) — este mini-contrato é o que o Avaliador Cético (Estado 5) usará como rubrica de corte, evitando que o critério de "concluído" seja inventado retroativamente.
    - *Cenário A (Lógica / Runtime / Regra, sem dependência de contexto de framework)*: `specialist-unit-test-writer` cria teste automatizado isolado que falha comprovando o defeito. Antes disso, um pré-voo de baseline confirma que o ambiente de teste executa limpo nos testes vizinhos para evitar falsos positivos de flaky tests pré-existentes.
    - *Cenário B (Runtime que só reproduz com contexto de framework)*: Quando o bug exige DOM real (`specialist-component-test-writer`, Angular) ou contexto de aplicação (`specialist-integration-test-writer` com `@SpringBootTest`/`@WebMvcTest`/`@DataJpaTest`/Testcontainers/R2DBC em backend, reactive ou EJB) para reproduzir — ex.: `LazyInitializationException`, rollback transacional incorreto, falha de filtro de segurança — o teste de regressão DEVE usar o contexto de framework em vez de um mock isolado que mascararia o sintoma real. Ver § 1.3 para a tabela completa de resolução por stack.
    - *Cenário C (Layout / CSS / Estilo / Responsividade / Smell 2.21)*: `specialist-ui-stylist` e `specialist-component-test-writer` mapeiam a falha visual através do ciclo VFL (`frontend-visual-feedback-loop`), identificando quebras de hierarquia em relação ao componente irmão canônico, ausência de classes utilitárias de diálogo (`.app-dialog-content`, `.form-grid`), textos literais de ícones vazando e cores hexadecimais arbitrárias. Geram teste de componente com asserção estrita de DOM/AOM ou especificação de layout multi-viewport (375px/768px/1440px).
@@ -154,8 +166,9 @@ flowchart TD
    - *Verificação Estrita para Bugs de Layout*: Para defeitos visuais, a validação do Estado 4 exige aprovação dupla: testes de componente verdes E re-inspeção visual/AOM (`frontend-visual-feedback-loop`), confirmando eliminação de texto literal de ícones, preservação de dimensões elásticas e ausência de hex inline antes de liberar para o Quality Gate. Se quebrar, aciona `specialist-test-fixer` ou `specialist-ui-stylist` (máx. 3 iterações).
    - **Nota de precedência**: quando `specialist-test-fixer` esgota seu próprio teto interno, o escalonamento genérico do sub-catálogo ("retornar ao `@agent-router`") é **substituído**, dentro de um `WORKFLOW-BUG-FIX` ativo, pelo protocolo formal do Estado 4b abaixo — a regra de workflow tem precedência sobre o comportamento default do catálogo de domínio (R-050 > comportamento genérico).
    - *Estado 4b — Circuit Breaker & Rollback (contrato corrigido)*: Se após 3 tentativas os testes não passarem, o `runtime-verifier` — **estritamente read-only, nunca executa mutação** — apenas DECLARA o veredito de bloqueio (`PRONTO | BLOQUEADO` conforme seu próprio contrato) e aciona via `run_subagent` o `specialist-bug-fixer`/`specialist-test-fixer` ativo para executar a reversão atômica estritamente orientada ao `rollback_plan` previamente declarado (`git checkout -- <arquivos>` / `git restore`). **Jamais o `runtime-verifier` reverte diretamente** — isso violaria seu próprio contrato read-only (mesma classe de agent validada em `test_readonly_advisory_agents_do_not_contain_mutation_tools`). Após confirmação da reversão, o especialista escala para intervenção humana via `ask_questions`.
-5. **Estado 5 — Quality Gate, Autorreflexão & Observação Pós-Fix / Canary (`@code-review` / `@pr-gatekeeper`)**:
+5. **Estado 5 — Quality Gate, Autorreflexão & Observação Pós-Fix / Canary (`@code-review` / `@pr-gatekeeper` — Papel: Avaliador Cético — § 1.4)**:
    - *Entrada*: Diff final e evidências de teste.
+   - *Rubrica de Corte contra o Sprint Contract*: O `@code-review` avalia o diff estritamente contra o `sprint_contract` declarado no Estado 2 (não contra impressão subjetiva de qualidade). Cada critério do contrato recebe veredito objetivo (`atendido | nao_atendido`); qualquer critério `nao_atendido` reprova a entrega inteira, mesmo que os demais estejam excelentes (registrado em `avaliacao_cetica` no `workflow_state`).
    - *Observação Pós-Fix / Canary Gate (para Bugs Críticos)*: Se o defeito for de severidade crítica/alta (P0/P1, falha de autenticação/sessão, corrupção ou perda de dados, indisponibilidade ou memory leak), o Quality Gate exige compulsoriamente a declaração formal de critérios de **observação pós-fix / canary**: janela de monitoramento pós-deploy (ex.: 15m a 30m), verificação de ausência de novos erros 5xx/APM e estabilização de latência antes do encerramento definitivo do incidente.
    - *Autorreflexão Documental pós-Correção (R-033)*: O agente avalia autonomamente se a resolução do bug revelou regra de negócio oculta, contrato divergente ou padrão de layout (ex.: Smell 2.21). Se sim, atualiza a documentação viva de padrões (`docs/*padrao*`, `docs/componentes-shared.md` ou adapter local) para blindar o ecossistema contra reincidência, sem esperar ordem manual.
    - *Saída*: Resumo estruturado em 5 seções (R-028) ou preparação de PR via `@pr-gatekeeper`.
@@ -174,6 +187,15 @@ workflow_state:
     evidencia_confirmada: true  # 'evidence before hypothesis' exige min. 2 fontes independentes
     causa_raiz_identificada: "<classe.metodo:linha e mecanismo causal primário>"
   causa_raiz: "<classe.metodo:linha e mecanismo da falha>"
+  sprint_contract:  # negociado no Estado 2 (Gerador), avaliado no Estado 5 (Avaliador Cético — § 1.4)
+    criterios_aceite:
+      - "<comportamento esperado pós-fix ou caso de borda coberto>"
+    forma_verificacao: "<comando de teste ou passo manual>"
+  avaliacao_cetica:  # preenchido pelo Avaliador no Estado 5
+    criterios_avaliados:
+      - criterio: "<mesmo criterio do sprint_contract>"
+        veredito: "atendido | nao_atendido"
+    veredito_final: "aprovado | reprovado"
   blast_radius_estimado:
     callers_diretos: 2
     modulos_afetados:
@@ -444,7 +466,7 @@ flowchart TD
 
 #### Cadeia Sequencial e Papéis:
 1. **Estado 1 — Estruturação de Prompt (`@prompt-structuring`)**: Transforma pedidos abertos no formato canônico `<task>/<context>/<constraints>/<output_format>`.
-2. **Estado 2 — Elicitação de Requisitos (`@requirements-analyst` / `@feature-planner`)**: Detalha regras funcionais (BDD/EARS) e não-funcionais com critérios de aceitação objetivos, prevenindo *solution-jumping* e persistindo a especificação oficial em `docs/requirements/REQ-<modulo>.md` (perfil Híbrido Documental sob R-056).
+2. **Estado 2 — Elicitação de Requisitos (`@requirements-analyst` / `@feature-planner` — negociação do Sprint Contract — § 1.4)**: Detalha regras funcionais (BDD/EARS) e não-funcionais com critérios de aceitação objetivos, prevenindo *solution-jumping* e persistindo a especificação oficial em `docs/requirements/REQ-<modulo>.md` (perfil Híbrido Documental sob R-056). Os critérios de aceitação aqui definidos constituem o `sprint_contract` que o Avaliador Cético do Estado 6 usará como rubrica de corte objetiva — nenhum critério pode ser adicionado ou reinterpretado retroativamente pelo Gerador (Estado 5) sem nova negociação explícita.
 3. **Estado 3 — Technical Blueprint & Contratos (`@tech-solution-architect`)**:
    - Modela contratos de integração (OpenAPI v3), esquema de banco de dados (relacional ou NoSQL/Firestore/BaaS), máquina de estados e mitigação de concorrência.
    - Particionamento de escopo: isola se a demanda é **Fullstack**, **Backend-Only**, **Frontend-Only** ou **Database-Only**.
@@ -458,9 +480,10 @@ flowchart TD
    - **Frontend (Modelo Test-Last com Verification Gate)**: Para eliminar gargalos de runners repetitivos e mocks prematuros de DOM, a stack frontend adota **Implementation-First / Test-Last**:
      - *Estado 5a (Lógica, Store & Services)*: O `@angular-feature-developer` constrói componentes standalone, gerência de estado reativo (Signals/NgRx) e serviços primeiro, validando compilação limpa com `get_errors`. A criação dos testes unitários/componentes de regressão é executada ao final (`Test-Last`) pelo `@angular-unit-test-writer` ou `@angular-component-test-writer`.
      - *Estado 5b (Handoff Mandatório de Apresentação & Paridade de UI)*: Handoff obrigatório para o `@angular-ui-stylist` para validação do protocolo "Canonical Sibling First" (inspeção prévia de componente irmão canônico homologado), auditoria de design tokens (zero hex inline), classes utilitárias de layout/scroll para diálogos e verificação estrita dos inputs de componentes compartilhados em seus arquivos `.ts` (Smell 2.21). **Agentes e tarefas de UI pura/estilização são formalmente ISENTOS de criar ou rodar testes unitários de lógica** (validação é visual via Visual Feedback Loop e compilação limpa).
-6. **Estado 6 — Duplo Quality Gate, Segurança & PR (`@security-reviewer`, `@angular-ui-stylist`, `@code-review` e `@pr-gatekeeper`)**:
+6. **Estado 6 — Duplo Quality Gate, Segurança & PR (`@security-reviewer`, `@angular-ui-stylist`, `@code-review` e `@pr-gatekeeper` — Papel: Avaliador Cético — § 1.4)**:
    - *Sub-rotina 6a — Gate 1: Security Review (OWASP), Lógica & Contratos*: O `@security-reviewer` audita novos endpoints contra OWASP Top 10 (SQL Injection, IDOR, Broken Authentication, sanitização); validação de testes verdes e compilação limpa (`get_errors`).
    - *Gate 2 (Design System & Paridade de UI)*: Auditoria visual estrita — proibição absoluta de cores hexadecimais inline em SCSS de feature, conferência de propriedades tipadas de componentes `shared/` contra o TypeScript real (prevenindo que atributos não mapeados passem silenciosamente), alinhamento estrutural de diálogos/seções e execução de linters/scripts de auditoria visual do projeto (ex.: `npm run material:auditar`).
+   - *Rubrica de Corte contra o Sprint Contract*: O `@code-review` avalia a implementação estritamente contra os critérios de aceitação (`sprint_contract`) negociados no Estado 2, registrando veredito objetivo por critério em `avaliacao_cetica` no `workflow_state` — qualquer critério `nao_atendido` reprova a entrega, sem média compensatória com os demais critérios.
    - O `@code-review` realiza a revisão holística de conformidade, boas práticas e **conformidade documental viva** (verificando se o diff possui impacto em `docs/`, schemas ou READMEs).
    - **Autorreflexão Documental de DoD (R-033)**: Antes de finalizar a entrega, o pipeline avalia autonomamente se a nova funcionalidade introduziu rotas, modelos de dados, componentes compartilhados ou regras de negócio, atualizando de forma automática e atômica a documentação viva do projeto (`docs/`, `README.md`, catálogo de componentes ou ADRs) sem exigir lembrete do usuário.
    - O `@pr-gatekeeper` gera a mensagem de commit semântico, descrição estruturada de PR e atualiza o CHANGELOG.md (sem push autônomo — R-031).
@@ -488,6 +511,15 @@ workflow_state:
     backend_concluido: true
     frontend_concluido: true
   security_gate_status: "aprovado | vulnerabilidade_detectada"
+  sprint_contract:  # negociado no Estado 2 (Gerador), avaliado no Estado 6 (Avaliador Cético — § 1.4)
+    criterios_aceite:
+      - "<criterio de aceitacao funcional ou nao-funcional>"
+    forma_verificacao: "<teste automatizado, checklist visual ou script de auditoria>"
+  avaliacao_cetica:  # preenchido pelo Avaliador (@code-review) no Estado 6
+    criterios_avaliados:
+      - criterio: "<mesmo criterio do sprint_contract>"
+        veredito: "atendido | nao_atendido"
+    veredito_final: "aprovado | reprovado"
 ```
 
 ---

@@ -14,6 +14,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/repository-hygiene-patterns/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/skills/continuous-garbage-collection-patterns/SKILL.md
 ---
 
 # Perfil Operacional

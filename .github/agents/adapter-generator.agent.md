@@ -14,6 +14,7 @@ source_docs:
   - .github/skills/handoff-governance/SKILL.md
   - .github/skills/context-mode/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
+  - docs/agent-context/templates/CONTEXT.template.md
 ---
 
 # Perfil Operacional
