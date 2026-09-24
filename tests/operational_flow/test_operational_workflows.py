@@ -277,6 +277,24 @@ def test_workflows_support_fast_chaining_circuit_breaker_and_multi_project():
     assert "carry_over_state" in content, "workflows.md deve especificar a transferência de estado no chaining"
 
 
+
+def test_workflows_support_quality_review_loop_r050_4():
+    """Valida que workflows.md documenta o Loop de Revisão de Qualidade (§ 1.5, R-050.4)
+    e que os 6 workflows aplicáveis possuem a referência cruzada com teto de 3 iterações."""
+    content = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    assert "### 1.5 Loop de Revisão de Qualidade (Quality Review Loop)" in content
+    assert "Evaluator-Optimizer" in content
+    assert "quality_review_loop:" in content
+    assert "max_iteracoes: 3" in content
+    
+    # Valida presença da referência cruzada nos 6 workflows aplicáveis
+    assert content.count("Loop de Revisão de Qualidade (§ 1.5)") >= 6
+    
+    # Valida presença da regra normativa em CLAUDE.md
+    claude_content = (REPO_ROOT / "CLAUDE.md").read_text(encoding="utf-8")
+    assert "R-050.4" in claude_content
+    assert "Loop de Revisão de Qualidade" in claude_content
+
 def test_handoff_governance_v13_schema():
     """Valida que handoff-governance/SKILL.md formaliza a v1.3 com projeto_alvo e chaining."""
     content = HANDOFF_SKILL_PATH.read_text(encoding="utf-8")

@@ -118,6 +118,39 @@ Recomenda-se manter um arquivo `CONTEXT.md` na raiz ou em `docs/` (baseado no te
 - Não imprimir JSON bruto no stdout; imprimir resumo, contagem, IDs e evidência objetiva.
 - Persistir saída extensa em arquivo e retornar somente caminho + 1 linha de descrição.
 
+### 4.1) Circuit Breaker de Tool-Chaining Sequencial (Anti-Loop de `ctx_execute` no Chat)
+
+Para conter a degradação de contexto e a queima descontrolada de créditos provocadas por tool-chaining sequencial (Smell 2.26 / incidente docs-engineer), todo agente que utilize o context-mode DEVE observar o seguinte mecanismo comportamental de corte:
+
+- **Regra Objetiva de Corte**: Se o agente detectar em seu histórico de chamadas do turno/ciclo que já executou **2 (duas) chamadas consecutivas de `ctx_execute` ou `ctx_execute_file`** sem uma chamada interposta de `ctx_batch_execute`, o Circuit Breaker é compulsoriamente acionado (`state: OPEN`).
+- **Ação Imediata (Interrupção & Consolidação)**: O agente DEVE interromper imediatamente a próxima chamada isolada e reconsolidar TODOS os alvos e comandos restantes em uma única chamada de `ctx_batch_execute(commands, queries)` (ou script unificado no sandbox) antes de prosseguir.
+- **Transição de Estados**:
+  - `CLOSED` (Operação Normal): Uso de `ctx_batch_execute` ou até 1 chamada exploratória pontual isolada.
+  - `OPEN` (Disparado): 2 chamadas consecutivas de `ctx_execute`/`ctx_execute_file` sem lote interposto. É **terminantemente proibido** disparar a 3ª chamada unitária no chat. O agente deve reagrupar os alvos pendentes em lote ou emitir síntese conclusiva com o que foi coletado até então.
+- **Declaração de Limitação Conhecida (Mitigação Comportamental)**: Este Circuit Breaker opera no nível de *prompt engineering* e governança comportamental do modelo; não constitui trava mecânica em nível de protocolo/infraestrutura (uma vez que o runtime MCP atual não dispõe de hooks automáticos de contagem e bloqueio). Portanto, modelos compactos ou rápidos exigem atenção redobrada a esta diretriz estática.
+- **Precedente Arquitetural**: Alinhado ao padrão de Circuit Breaker Stateful de subagentes formalizado em `.github/skills/handoff-governance/SKILL.md` § 2.4.
+
+### 4.2) Mitigação Mandatória de Diretório de Execução (`cwd` Explícito no Sandbox)
+
+- **Declaração Obrigatória de `cwd`**: Ao invocar `ctx_batch_execute`, `ctx_execute` ou `ctx_execute_file` fora do diretório padrão do host (IDE), declare **sempre** o parâmetro `cwd` apontando explicitamente para a raiz do repositório-alvo (ex.: via `git rev-parse --show-toplevel` ou caminho absoluto conhecido).
+- **Risco Mitigado (Anti-PathNotFound / Anti-Fallback)**: A omissão de `cwd` no payload pode fazer com que o sandbox resolva o comando relativo a partir do diretório de instalação do IDE (ex.: diretório de binários do editor no host) em vez da raiz do repositório de trabalho. Isso gera erros em cascata (`PathNotFound` / código de saída de falha), os quais induzem o agente erroneamente a assumir falha estrutural do comando em lote e incorrer em fallback indevido para chamadas sequenciais fragmentadas. Este padrão de falha foi reproduzido e comprovado em auditoria de governança sistêmica.
+
+### 4.3) Few-Shot: Anti-Padrão vs Padrão Correto de Batching
+
+Regra textual abstrata sozinha é insuficiente para modelos de menor capacidade de raciocínio composicional (Gemini Flash e equivalentes) em cenários de alto fan-out. Use o exemplo concreto abaixo como âncora mental antes de despachar qualquer tarefa com N ≥ 2 alvos/arquivos.
+
+**Cenário:** tarefa pede para atualizar um trecho repetido em 6 arquivos de documentação.
+
+❌ **Anti-padrão (proibido — MCP Tool Chaining Sequencial, Smell 2.26):**
+> `ctx_execute(arquivo-1.md)` → aguarda → `ctx_execute(arquivo-2.md)` → aguarda → `ctx_execute(arquivo-3.md)` → ... (6 chamadas isoladas em turnos sucessivos, cada uma reenviando o histórico acumulado do chat)
+
+✅ **Padrão correto (obrigatório — Plan-Then-Batch, R-059):**
+> 1. ENUMERAR mentalmente os 6 alvos antes de qualquer tool call.
+> 2. Emitir **UMA única chamada**: `ctx_batch_execute(commands: [{label:"arquivo-1",...}, {label:"arquivo-2",...}, ..., {label:"arquivo-6",...}], queries: [...])`.
+> 3. Processar os 6 resultados retornados na mesma resposta, sem nova rodada de tool calls por arquivo.
+
+**Regra de decisão rápida**: se ao planejar a tarefa você identificar mentalmente a palavra "próximo arquivo" ou "e depois o outro", pare — isso é o sinal de que a tarefa exige `ctx_batch_execute` com todos os alvos enumerados no mesmo payload, não uma sequência de chamadas unitárias.
+
 ## 5) Terminal e fallback
 
 - Terminal só para: `git`, `mkdir`, `rm`, `mv`, `cd`, `ls`, `npm install`, `pip install`.
@@ -149,7 +182,8 @@ ctx_search({
 ctx_batch_execute({
   commands: [{ label: "service", command: "rg -n \"class .*Service\" src" }],
   queries: ["serviços críticos", "pontos de risco"],
-  query_scope: "batch"
+  query_scope: "batch",
+  cwd: "/caminho/raiz/do/repositorio"
 })
 ```
 

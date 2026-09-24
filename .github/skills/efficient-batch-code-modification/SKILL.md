@@ -144,6 +144,8 @@ Toda inspeção, análise, validação ou modificação envolvendo múltiplos al
 > 4. **Comandos curtos não suspendem a regra**: prompts do usuário como "prosseguir", "continue", "pode seguir" NÃO isentam o agente da obrigatoriedade de context-mode nem do limiar >= 2 — a obrigação é da TAREFA em andamento, não do tamanho do prompt do turno atual.
 >
 > *(SSOT Normativa: `.github/copilot-instructions.md` § 2.1; alinhamento operacional em `.github/skills/context-mode/SKILL.md`)*.
+>
+> - Ver exemplo few-shot Anti-Padrão vs Padrão Correto de batching em `.github/skills/context-mode/SKILL.md § 4.3`.
 
 ---
 
@@ -237,3 +239,8 @@ Uma sessão ingênua com 20 tool turns pode inflar o volume de tokens processado
   - Emitir parecer técnico com o estado alcançado;
   - Delegar ao próximo agente via handoff ou acionar intervenção humana via ask_questions.
 
+---
+
+## 7. Referências Cruzadas
+
+- Ver exemplo few-shot Anti-Padrão vs Padrão Correto de batching em `.github/skills/context-mode/SKILL.md § 4.3`.

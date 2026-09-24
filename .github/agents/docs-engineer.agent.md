@@ -130,4 +130,3 @@ Se a solicitação pivotar para "implementar aplicação", retornar para `@agent
 - `/plan` → definir tipo de documento e estrutura.
 - `/implement` → gerar/atualizar o(s) `.md`.
 - `/validate` → checklist de estrutura, nomenclatura e veracidade.
-- `/documentar-regras` → quando o alvo for regra de negócio.
