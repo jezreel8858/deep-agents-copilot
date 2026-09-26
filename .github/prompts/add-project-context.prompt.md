@@ -252,7 +252,6 @@ O Copilot aplica mudanças **atomicamente por plano validado** (sem depender de 
    - [CREATE-SE-AUSENTE] `.github/projects.local.yaml` ← copiar de `projects.local.yaml.example` se ainda não existir
    - [UPDATE] `.github/projects.local.yaml` ← NESTE repo, gitignored (NUNCA `catalog.yaml`) — próprio prompt, não o agent
    - [UPDATE] `.github/instructions/README.md` ← NESTE repo (referência, sem dado de projeto real)
-   - [UPDATE] `.github/instructions/README.md` ← NESTE repo (referência, sem dado de projeto real)
    - ❌ Nenhuma operação no projeto externo
    - ❌ Nenhuma operação em `.github/instructions/README.md` (compartilhado/commitado)
 5. **Validar pós**: YAML válido, entrada presente em `projects.local.yaml`; arquivo do adapter (se aplicável) existe em `.github/instructions/local/`

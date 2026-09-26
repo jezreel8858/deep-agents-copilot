@@ -603,6 +603,45 @@ def test_smell_2_1_no_deprecated_agents_in_live_readmes():
             fix_hint=f"Remova ou substitua a referência a '{dep}' em .github/skills/README.md pelo agent atual equivalente.",
         )
 
+
+def test_smell_2_1_no_verbatim_consecutive_duplicate_lines():
+    """Smell 2.1: Garante que nenhum arquivo de governança (.agent.md, SKILL.md, .prompt.md)
+    contenha linhas longas (>= 80 caracteres) duplicadas consecutivamente ou near-adjacent (separadas por até 1 linha)."""
+    all_files = get_all_agent_files() + get_all_skill_files() + get_all_prompt_files()
+    violations: list[str] = []
+
+    for file_path in all_files:
+        content = file_path.read_text(encoding="utf-8")
+        lines = content.splitlines()
+        for i in range(len(lines)):
+            line_a = lines[i].strip()
+            if len(line_a) < 80:
+                continue
+            # Consecutiva (i + 1)
+            if i + 1 < len(lines):
+                line_b = lines[i + 1].strip()
+                if line_a == line_b:
+                    violations.append(
+                        f"{file_path.relative_to(REPO_ROOT)}: L{i+1} e L{i+2}: '{line_a[:60]}...'"
+                    )
+                    continue
+            # Near-adjacent (separadas por até 1 linha intermediária: i e i+2)
+            if i + 2 < len(lines):
+                line_c = lines[i + 2].strip()
+                if line_a == line_c:
+                    violations.append(
+                        f"{file_path.relative_to(REPO_ROOT)}: L{i+1} e L{i+3}: '{line_a[:60]}...'"
+                    )
+
+    assert not violations, remediation(
+        f"Encontrada(s) {len(violations)} ocorrência(s) de linhas longas duplicadas consecutivas/near-adjacent:\n"
+        + "\n".join(f"  - {v}" for v in violations[:15])
+        + (f"\n  ... e mais {len(violations) - 15}" if len(violations) > 15 else ""),
+        fix_hint="Remova as linhas duplicadas nos arquivos de governança apontados.",
+    )
+
+
+
 # ─────────────────────────────────────────────────────────────
 # SMELL 2.21 — Cegueira Visual e Suposição de Contratos de UI
 # ─────────────────────────────────────────────────────────────

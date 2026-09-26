@@ -6,6 +6,19 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.41.1] — 2026-09-26
+
+### Adicionado
+- **Auditoria de Linhas Duplicadas (Smell 2.1)**:
+  - Teste determinístico `test_smell_2_1_no_verbatim_consecutive_duplicate_lines` em `tests/governance_audit/test_governance_smells.py` para prevenir regressões de linhas duplicadas consecutivas em `.agent.md` e `.prompt.md`.
+
+### Modificado
+- **Higiene e Deduplicação de Prompts de Governança**:
+  - Remoção em lote de linha duplicada de diretriz do `context-mode` (Single-Turn MCP / Smell 2.26) em 33 agentes (`.github/agents/**/*.agent.md`) e no prompt `.github/prompts/add-project-context.prompt.md`.
+  - Sincronização do modelo recomendado em `.a2a/agentcards/bug-triage.agentcard.json` para `"Claude Sonnet 5"`, mantendo paridade com o catálogo e o frontmatter do agente.
+
+---
+
 ## [2.41.0] — 2026-09-26
 
 ### Adicionado (Telemetria Zero-Footprint, SDK Langfuse, MCP Proxy & Framework de Evals)

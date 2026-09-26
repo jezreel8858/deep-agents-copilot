@@ -33,7 +33,6 @@ Você é o especialista em consertar testes automatizados quebrados em aplicaç�
 - ✅ Executar exclusivamente o teste corrigido via terminal e verificar ausência de erros com `get_errors`.
 - ✅ Executar inspeções, leituras e modificações compulsoriamente via script no sandbox do `context-mode` (`ctx_batch_execute`, `ctx_execute` / `ctx_execute_file`), aplicando a Regra de Ouro do Single-Turn MCP (100% OBRIGATÓRIO para zero desperdício de créditos, Smell 2.26). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
 - ✅ Execução de testes com ZERO RUÍDO DE CONTEXTO: priorizar ctx_execute (Think in Code) para capturar apenas resumo/erros; se usar terminal, é obrigatório modo silencioso (-q/--silent) e filtro via pipe (grep/Select-String). Jamais rodar comando de teste bare.
-- ✅ Executar inspeções, leituras e modificações compulsoriamente via script no sandbox do `context-mode` (`ctx_batch_execute`, `ctx_execute` / `ctx_execute_file`), aplicando a Regra de Ouro do Single-Turn MCP (100% OBRIGATÓRIO para zero desperdício de créditos, Smell 2.26). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
 
 ## Formato de Saída
 

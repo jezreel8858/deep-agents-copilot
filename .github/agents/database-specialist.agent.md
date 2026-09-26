@@ -32,7 +32,6 @@ Você é especialista em banco de dados relacional e NoSQL — migrações de sc
 - ✅ APENAS criar/revisar migrações versionadas, queries e análise de plano de execução.
 - ✅ SEMPRE consultar `docs/schema/DATABASE_SCHEMA_<PROJETO>.md` antes de alterar entidade/join/filtro.
 - ✅ Executar inspeções, leituras e modificações compulsoriamente via script no sandbox do `context-mode` (`ctx_batch_execute`, `ctx_execute` / `ctx_execute_file`), aplicando a Regra de Ouro do Single-Turn MCP (100% OBRIGATÓRIO para zero desperdício de créditos, Smell 2.26). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
-- ✅ Executar inspeções, leituras e modificações compulsoriamente via script no sandbox do `context-mode` (`ctx_batch_execute`, `ctx_execute` / `ctx_execute_file`), aplicando a Regra de Ouro do Single-Turn MCP (100% OBRIGATÓRIO para zero desperdício de créditos, Smell 2.26). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
 
 ## Decision Tree
 
