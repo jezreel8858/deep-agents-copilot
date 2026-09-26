@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "code-knowledge-graph",
+  "name": "Code Knowledge Graph",
+  "version": "4.1.1",
+  "description": "Constrói e consulta o grafo de conhecimento de código-fonte (imports, chamadas, blast radius, dataflow/CFG, ciclos, dead code), cross-projeto e puramente determinístico — nunca invoca LLM. Motor único: lib externa `@optave/codegraph` via MCP Server enxuto (Least-Tools) para consultas e CLI local para build/indexação.",
+  "domain": "Grafo de conhecimento de codigo-fonte (imports, chamadas, blast radius, dataflow/CFG, ciclos, dead code), motor unico via lib externa @optave/codegraph (CLI local, zero API keys, Node.js/TypeScript nativo)",
+  "role": "specialist",
+  "capabilities": [
+    "specialist",
+    "code knowledge graph"
+  ],
+  "skills": [
+    "codegraph-optave-usage",
+    "context-mode",
+    "terminal-governance",
+    "agent-contracts",
+    "handoff-governance"
+  ],
+  "tools": [
+    "run_subagent",
+    "run_in_terminal",
+    "context-mode/ctx_execute",
+    "context-mode/ctx_execute_file",
+    "context-mode/ctx_batch_execute",
+    "context-mode/ctx_index",
+    "context-mode/ctx_search",
+    "codegraph/query",
+    "codegraph/module_map",
+    "codegraph/fn_impact",
+    "codegraph/find_cycles",
+    "codegraph/context"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only",
+      "execution"
+    ],
+    "least_privilege_level": "elevated",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Gemini 3.8 Flash",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/catalog.yaml",
+    "priority": 4.95,
+    "estimated_time_minutes": 30
+  }
+}

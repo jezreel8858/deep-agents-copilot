@@ -1,33 +1,33 @@
 {
   "schemaVersion": "1.0.0",
   "protocol": "A2A/1.0.0",
-  "id": "pr-gatekeeper",
-  "name": "Pr Gatekeeper",
-  "version": "1.2.0",
-  "description": "Prepara submissao de PR pos-aprovacao do quality gate — sintetiza diff, aplica guardrail de segredos e template semantico SSOT (/commit), gera titulo e descricao de PR com matriz de risco e atualiza CHANGELOG.md. Nunca executa git add/commit/push (R-031).",
-  "domain": "Preparacao de entrega (PR/commit/changelog)",
-  "role": "gatekeeper",
+  "id": "debugger",
+  "name": "Debugger",
+  "version": "1.0.0",
+  "description": "Investiga causa raiz de comportamento inesperado a partir de stack trace, log ou sintoma reportado — navegação de call graph, hipótese de causa raiz e reprodução mínima. Não corrige o código (isso é do agent especializado por stack); complementa bug-triage com investigação mais profunda.",
+  "domain": "Investigacao de causa raiz a partir de sintoma/stack trace",
+  "role": "specialist",
   "capabilities": [
-    "pull request",
-    "commit semantico",
-    "changelog",
-    "matriz de risco",
-    "git hygiene"
+    "investigar bug",
+    "stack trace",
+    "call graph",
+    "causa raiz",
+    "root cause",
+    "debug"
   ],
   "skills": [
-    "git-governance",
-    "agent-contracts",
+    "code-tracing",
     "terminal-governance",
-    "git-conflict-resolution-patterns"
+    "agent-contracts",
+    "context-mode"
   ],
   "tools": [
+    "list_dir",
     "grep_search",
     "file_search",
-    "list_dir",
     "run_in_terminal",
     "context-mode/ctx_batch_execute",
     "context-mode/ctx_execute",
-    "ask_questions",
     "run_subagent",
     "context-mode/ctx_search",
     "context-mode/ctx_execute_file",
@@ -42,7 +42,7 @@
     "data_sensitivity": "internal"
   },
   "model_preferences": {
-    "recommended_model": "Gemini 3.8 Flash",
+    "recommended_model": "Claude Sonnet 5",
     "cost_tier": "1x"
   },
   "input_contract": {
@@ -60,7 +60,7 @@
   },
   "metadata": {
     "catalog_source": ".github/agents/catalog.yaml",
-    "priority": 4.5,
-    "estimated_time_minutes": 15
+    "priority": 2.1,
+    "estimated_time_minutes": 30
   }
 }

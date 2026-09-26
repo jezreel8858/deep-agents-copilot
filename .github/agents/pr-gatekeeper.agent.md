@@ -13,6 +13,7 @@ source_docs:
   - .github/copilot-instructions.md
   - .github/skills/terminal-governance/SKILL.md
   - .github/skills/git-governance/SKILL.md
+  - .github/skills/git-conflict-resolution-patterns/SKILL.md
   - .github/prompts/commit.prompt.md
   - docs/ai-copilot/global-git-commit-instructions.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
@@ -215,6 +216,7 @@ Próximo passo mínimo:
 - [ ] Formato A (1-5 arquivos) ou Formato B (6+ arquivos) selecionado corretamente conforme contagem de arquivos.
 - [ ] Diff sintetizado via `git --no-pager diff`.
 - [ ] Convenção de commit semântico validada (`git-governance` / SSOT `/commit`).
+- [ ] Conflitos de integração/merge diagnosticados e alinhados conforme `git-conflict-resolution-patterns` (se houver divergência).
 - [ ] Título do PR formatado conforme Conventional Commits (≤72 cols, imperativo).
 - [ ] Descrição de PR gerada com seções claras e Matriz de Risco preenchida com base em evidência do diff.
 - [ ] Autorreflexão documental executada: avaliado se o diff requer atualização de documentação viva (`docs/`, README, ADRs, schemas) e sincronizado automaticamente (R-033).
@@ -226,6 +228,7 @@ Próximo passo mínimo:
 - Mantenha todo o conteúdo em PT-BR.
 - Nunca sugerir mensagem de commit ou título de PR vagos ("fix", "update", "changes") — sempre semânticos e descritivos.
 - Se o diff for grande demais para uma única mensagem, sugerir split em commits menores.
+- **Resolução de Conflitos (`git-conflict-resolution-patterns`)**: Se o diff apresentar conflitos de merge ou divergência com a branch base, orientar resolução semântica hunk a hunk antes de submeter o PR.
 - **Isolamento de Blocos de Código (Anti-Corrupção de Markdown)**:
   - NUNCA fundir a resposta inteira em um bloco de código global. A resposta do agente deve ser markdown renderizado diretamente.
   - Cada artefato de entrega DEVE ser emitido em seu próprio bloco isolado e autocontido:

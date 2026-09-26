@@ -17,6 +17,8 @@ source_docs:
   - .github/skills/agent-contracts/SKILL.md
   - .github/skills/context-mode/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/skills/socratic-grilling-patterns/SKILL.md
+  - docs/agent-context/templates/stakeholder-questionnaire.md
 ---
 
 # Perfil Operacional

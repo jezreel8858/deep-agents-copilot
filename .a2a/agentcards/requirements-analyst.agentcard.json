@@ -1,48 +1,42 @@
 {
   "schemaVersion": "1.0.0",
   "protocol": "A2A/1.0.0",
-  "id": "refactor-planner",
-  "name": "Refactor Planner",
-  "version": "2.0.0",
-  "description": "Planejar e decompor refatorações estruturais em DAG de etapas atômicas (Mikado, Branch by Abstraction, Strangler Fig) com safety net e rollback multicamada",
-  "domain": "Planejamento e decomposição macro de refatoração",
-  "role": "planner",
+  "id": "requirements-analyst",
+  "name": "Requirements Analyst",
+  "version": "2.1.0",
+  "description": "Especialista em elicitação, refinamento e estruturação de requisitos de negócio e técnicos a partir de pedidos ambíguos. Converte intenção em especificações precisas com critérios de aceitação e regras de negócio antes do planejamento técnico, materializando-as em docs/requirements/REQ-<modulo>.md como ground truth.",
+  "domain": "Elicitacao e estruturacao de requisitos (prospectivo, pre-tecnico)",
+  "role": "specialist",
   "capabilities": [
-    "refactor",
-    "planejamento",
-    "rollback",
-    "riscos",
-    "decomposição",
-    "mikado",
-    "strangler fig"
+    "levantar requisitos",
+    "requisito ambiguo",
+    "elicitacao de requisitos",
+    "user story",
+    "criterio de aceite",
+    "requisito funcional",
+    "requisito nao funcional"
   ],
   "skills": [
-    "refactoring-planning-patterns",
-    "context-mode",
+    "requirements-engineering-patterns",
+    "structured-intake-patterns",
+    "documentation-writing-patterns",
     "agent-contracts",
-    "confidence-fallback-policy",
-    "code-tracing",
-    "business-rules-governance",
-    "integration-contract-analysis",
+    "context-mode",
+    "efficient-batch-code-modification",
     "socratic-grilling-patterns"
   ],
   "tools": [
     "grep_search",
     "file_search",
     "list_dir",
+    "get_errors",
     "ask_questions",
     "run_subagent",
     "context-mode/ctx_execute",
     "context-mode/ctx_execute_file",
     "context-mode/ctx_index",
     "context-mode/ctx_search",
-    "context-mode/ctx_fetch_and_index",
-    "context-mode/ctx_batch_execute",
-    "context-mode/ctx_stats",
-    "context-mode/ctx_doctor",
-    "context-mode/ctx_upgrade",
-    "context-mode/ctx_purge",
-    "context-mode/ctx_insight"
+    "context-mode/ctx_batch_execute"
   ],
   "security_profile": {
     "tool_zones": [
@@ -70,7 +64,7 @@
   },
   "metadata": {
     "catalog_source": ".github/agents/catalog.yaml",
-    "priority": 4,
-    "estimated_time_minutes": 30
+    "priority": 4.8,
+    "estimated_time_minutes": 25
   }
 }

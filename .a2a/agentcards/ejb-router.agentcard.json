@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "ejb-router",
+  "name": "Ejb Router",
+  "version": "2.0.0",
+  "description": "Roteador de domínio Java Legado EJB e supervisor hierárquico — recebe solicitações de backend EJB legado (EJB 2.x/3.x, JTA, MDB, EAR/WAR/JAR) do agent-router central e despacha para os 7 especialistas do catálogo EJB (arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer e test-fixer).",
+  "domain": "Supervisor hierarquico e roteador do dominio Java Legado EJB",
+  "role": "router",
+  "capabilities": [
+    "ejb",
+    "ejb router",
+    "backend ejb",
+    "java legado",
+    "stateless",
+    "stateful",
+    "mdb",
+    "jta",
+    "cmt",
+    "ear"
+  ],
+  "skills": [
+    "agent-contracts",
+    "handoff-governance",
+    "context-mode"
+  ],
+  "tools": [
+    "read_file",
+    "file_search",
+    "grep_search",
+    "list_dir",
+    "ask_questions",
+    "run_subagent",
+    "context-mode/ctx_search"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only"
+    ],
+    "least_privilege_level": "standard",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Gemini 3.8 Flash",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/catalog.yaml",
+    "priority": 8.9,
+    "estimated_time_minutes": 15
+  }
+}

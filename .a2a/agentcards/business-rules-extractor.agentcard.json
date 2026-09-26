@@ -1,48 +1,41 @@
 {
   "schemaVersion": "1.0.0",
   "protocol": "A2A/1.0.0",
-  "id": "refactor-planner",
-  "name": "Refactor Planner",
-  "version": "2.0.0",
-  "description": "Planejar e decompor refatorações estruturais em DAG de etapas atômicas (Mikado, Branch by Abstraction, Strangler Fig) com safety net e rollback multicamada",
-  "domain": "Planejamento e decomposição macro de refatoração",
-  "role": "planner",
+  "id": "business-rules-extractor",
+  "name": "Business Rules Extractor",
+  "version": "1.1.0",
+  "description": "Extrair regras de negócio de qualquer código-fonte e documentá-las em arquivos .md estruturados — servindo como ground truth para validar que refatorações não quebram comportamento existente. Opera em dois modos: Extract (gerar documentação) e Validate (verificar código refatorado contra regras documentadas).",
+  "domain": "Extracao e validacao de regras de negocio",
+  "role": "specialist",
   "capabilities": [
-    "refactor",
-    "planejamento",
-    "rollback",
-    "riscos",
-    "decomposição",
-    "mikado",
-    "strangler fig"
+    "business rule",
+    "regra de negocio",
+    "extrair regra",
+    "documentar codigo",
+    "validar refatoracao",
+    "rule violation",
+    "living documentation",
+    "ground truth",
+    "breaking change"
   ],
   "skills": [
-    "refactoring-planning-patterns",
-    "context-mode",
-    "agent-contracts",
-    "confidence-fallback-policy",
-    "code-tracing",
     "business-rules-governance",
-    "integration-contract-analysis",
-    "socratic-grilling-patterns"
+    "code-tracing",
+    "mermaid-diagrams",
+    "context-mode"
   ],
   "tools": [
     "grep_search",
     "file_search",
     "list_dir",
+    "get_errors",
     "ask_questions",
     "run_subagent",
     "context-mode/ctx_execute",
     "context-mode/ctx_execute_file",
     "context-mode/ctx_index",
     "context-mode/ctx_search",
-    "context-mode/ctx_fetch_and_index",
-    "context-mode/ctx_batch_execute",
-    "context-mode/ctx_stats",
-    "context-mode/ctx_doctor",
-    "context-mode/ctx_upgrade",
-    "context-mode/ctx_purge",
-    "context-mode/ctx_insight"
+    "context-mode/ctx_batch_execute"
   ],
   "security_profile": {
     "tool_zones": [
@@ -70,7 +63,7 @@
   },
   "metadata": {
     "catalog_source": ".github/agents/catalog.yaml",
-    "priority": 4,
-    "estimated_time_minutes": 30
+    "priority": 5,
+    "estimated_time_minutes": 60
   }
 }

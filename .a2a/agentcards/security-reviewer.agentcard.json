@@ -1,33 +1,38 @@
 {
   "schemaVersion": "1.0.0",
   "protocol": "A2A/1.0.0",
-  "id": "pr-gatekeeper",
-  "name": "Pr Gatekeeper",
-  "version": "1.2.0",
-  "description": "Prepara submissao de PR pos-aprovacao do quality gate — sintetiza diff, aplica guardrail de segredos e template semantico SSOT (/commit), gera titulo e descricao de PR com matriz de risco e atualiza CHANGELOG.md. Nunca executa git add/commit/push (R-031).",
-  "domain": "Preparacao de entrega (PR/commit/changelog)",
-  "role": "gatekeeper",
+  "id": "security-reviewer",
+  "name": "Security Reviewer",
+  "version": "1.0.0",
+  "description": "Revisa código de aplicação por segurança especializada (OWASP Top 10:2025, ASVS 5.0, CVE em dependências, secrets expostos). Nunca corrige, apenas analisa e reporta; complementa code-review (dimensão genérica) com profundidade de security specialist. Read-only.",
+  "domain": "Revisao especializada de seguranca de aplicacao (read-only)",
+  "role": "specialist",
   "capabilities": [
-    "pull request",
-    "commit semantico",
-    "changelog",
-    "matriz de risco",
-    "git hygiene"
+    "revisao de seguranca",
+    "security review",
+    "owasp",
+    "cve",
+    "vulnerabilidade",
+    "secrets no codigo",
+    "sast",
+    "sca"
   ],
   "skills": [
-    "git-governance",
+    "security-review-patterns",
+    "code-review-patterns",
     "agent-contracts",
+    "handoff-governance",
+    "confidence-fallback-policy",
     "terminal-governance",
-    "git-conflict-resolution-patterns"
+    "context-mode"
   ],
   "tools": [
+    "list_dir",
     "grep_search",
     "file_search",
-    "list_dir",
     "run_in_terminal",
     "context-mode/ctx_batch_execute",
     "context-mode/ctx_execute",
-    "ask_questions",
     "run_subagent",
     "context-mode/ctx_search",
     "context-mode/ctx_execute_file",
@@ -42,7 +47,7 @@
     "data_sensitivity": "internal"
   },
   "model_preferences": {
-    "recommended_model": "Gemini 3.8 Flash",
+    "recommended_model": "Claude Sonnet 5",
     "cost_tier": "1x"
   },
   "input_contract": {
@@ -60,7 +65,7 @@
   },
   "metadata": {
     "catalog_source": ".github/agents/catalog.yaml",
-    "priority": 4.5,
-    "estimated_time_minutes": 15
+    "priority": 4.55,
+    "estimated_time_minutes": 25
   }
 }

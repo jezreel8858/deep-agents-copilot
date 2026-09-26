@@ -1,44 +1,42 @@
 {
   "schemaVersion": "1.0.0",
   "protocol": "A2A/1.0.0",
-  "id": "pr-gatekeeper",
-  "name": "Pr Gatekeeper",
-  "version": "1.2.0",
-  "description": "Prepara submissao de PR pos-aprovacao do quality gate — sintetiza diff, aplica guardrail de segredos e template semantico SSOT (/commit), gera titulo e descricao de PR com matriz de risco e atualiza CHANGELOG.md. Nunca executa git add/commit/push (R-031).",
-  "domain": "Preparacao de entrega (PR/commit/changelog)",
-  "role": "gatekeeper",
+  "id": "binding-initializer",
+  "name": "Binding Initializer",
+  "version": "1.0.0",
+  "description": "Agente operacional de inicialização de binding context. Detecta ausência de `catalog.yaml` e `binding.md` via Health Check (R-034), coleta o nome do ecossistema via `ask_questions` (1 pergunta) e gera o esqueleto dos artefatos. Projetos são adicionados depois via `/add-project-context`.",
+  "domain": "Inicializacao de binding context",
+  "role": "specialist",
   "capabilities": [
-    "pull request",
-    "commit semantico",
-    "changelog",
-    "matriz de risco",
-    "git hygiene"
+    "binding",
+    "catalog",
+    "health check",
+    "inicializar",
+    "contexto binding",
+    "esqueleto"
   ],
   "skills": [
-    "git-governance",
+    "context-mode",
     "agent-contracts",
-    "terminal-governance",
-    "git-conflict-resolution-patterns"
+    "project-scanner"
   ],
   "tools": [
+    "ask_questions",
+    "context-mode/ctx_execute",
     "grep_search",
     "file_search",
     "list_dir",
-    "run_in_terminal",
-    "context-mode/ctx_batch_execute",
-    "context-mode/ctx_execute",
-    "ask_questions",
     "run_subagent",
     "context-mode/ctx_search",
+    "context-mode/ctx_batch_execute",
     "context-mode/ctx_execute_file",
     "context-mode/ctx_index"
   ],
   "security_profile": {
     "tool_zones": [
-      "read-only",
-      "execution"
+      "read-only"
     ],
-    "least_privilege_level": "elevated",
+    "least_privilege_level": "standard",
     "data_sensitivity": "internal"
   },
   "model_preferences": {
@@ -60,7 +58,7 @@
   },
   "metadata": {
     "catalog_source": ".github/agents/catalog.yaml",
-    "priority": 4.5,
-    "estimated_time_minutes": 15
+    "priority": 10.5,
+    "estimated_time_minutes": 10
   }
 }

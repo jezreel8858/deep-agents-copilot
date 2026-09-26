@@ -37,7 +37,8 @@
     "integration-contract-analysis",
     "task-decomposition-patterns",
     "mermaid-diagrams",
-    "code-tracing"
+    "code-tracing",
+    "socratic-grilling-patterns"
   ],
   "tools": [
     "grep_search",

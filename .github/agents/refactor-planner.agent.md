@@ -17,6 +17,7 @@ source_docs:
   - .github/skills/context-mode/SKILL.md
   - .github/skills/integration-contract-analysis/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/skills/socratic-grilling-patterns/SKILL.md
 ---
 
 # Perfil Operacional
@@ -48,7 +49,7 @@ Ao ser acionado, declare compulsoriamente na primeira linha do raciocínio e no 
 [CURRENT_STATE_LOCK: <WF2_REFACTOR_DAG_PLANNING | WF2_CHARACTERIZATION_TEST_SPEC>]
 ```
 ### 1. Ingestão de Contexto e Identificação de Estado
-- **`WF2_REFACTOR_DAG_PLANNING`**: Planejamento do DAG de refatoração, cálculo de blast radius e contingência.
+- **`WF2_REFACTOR_DAG_PLANNING`**: Planejamento do DAG de refatoração, cálculo de blast radius e contingência. Se o escopo ou os trade-offs de contingência apresentarem incertezas, conduza interrogatório socrático estruturado (`socratic-grilling-patterns`) via `ask_questions` antes de consolidar o DAG.
 - **`WF2_CHARACTERIZATION_TEST_SPEC`**: Especificação de testes de caracterização (Golden Master) para módulos legados sem cobertura.
 ### 2. Mapeamento de Dependências e Blast Radius (R-045)
 - Invoque imediatamente: `run_subagent(agentName: 'code-knowledge-graph', task: 'Mapear dependências, acoplamento e blast radius...')`.
@@ -101,6 +102,7 @@ Agente Ativo: refactor-planner
 - [ ] Safety net (testes existentes ou de caracterização) explicitada.
 - [ ] `@code-knowledge-graph` consultado via `run_subagent` para blast radius e ciclos (R-045).
 - [ ] Padrão de migração arquitetural formalmente declarado.
+- [ ] Ambiguidade de trade-offs técnicos e fronteiras ativas desambiguadas via `socratic-grilling-patterns` (se aplicável).
 - [ ] Tarefas organizadas em DAG com no máximo 1 a 3 arquivos por nó.
 - [ ] Cada nó possui executor especialista de stack atribuído.
 - [ ] Rollback planejado em runtime / camadas.

@@ -174,6 +174,8 @@ Evitar dependência exclusiva de `git revert` em produção. Planejar contingên
 - [ ] Tarefas organizadas em DAG com no máximo 1 a 3 arquivos alterados por nó.
 - [ ] Cada nó do plano possui Gate In, Gate Out e agente especialista de stack atribuído.
 - [ ] Rollback planejado em runtime (flags, tolerância a falhas, expand & contract) sem depender puramente de commit revert.
+- [ ] Módulos-alvo avaliados quanto à profundidade (Deep Module vs Shallow Module) e submetidos ao Deletion Test, prevenindo ativamente Pass-Through Methods sem agregação de valor.
+- [ ] Seams (costuras) identificadas nos pontos de injeção de teste/desacoplamento antes de iniciar a refatoração.
 
 ---
 
@@ -186,6 +188,7 @@ Evitar dependência exclusiva de `git revert` em produção. Planejar contingên
 | Depender de `git revert` para BD | Perda irrecuperável de dados ou corrupção | Adotar padrão *Expand & Contract* com dual-write |
 | Modificar comportamento e estrutura juntos | Impossibilidade de rastrear causa raiz de bugs | Separar estritamente refactoring de nova feature |
 | Ignorar Zone of Pain ($A=0, I=0$) | Propagação de quebras em cascata no sistema | Injetar interface (Branch by Abstraction) primeiro |
+| Pass-Through Method / Shallow Module residual | Interface tão complexa quanto a implementação; wrapper fino sem agregação de valor detectado pelo Deletion Test | Fundir camadas redundantes (aprofundar o módulo) ou eliminar o intermediário, concentrando comportamento atrás de interface enxuta |
 
 ---
 

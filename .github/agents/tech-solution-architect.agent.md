@@ -21,6 +21,7 @@ source_docs:
   - .github/skills/harness-engineering-patterns/SKILL.md
   - .github/skills/agent-evals-lab/SKILL.md
   - .github/skills/requirements-engineering-patterns/SKILL.md
+  - .github/skills/socratic-grilling-patterns/SKILL.md
 ---
 
 # Perfil Operacional
@@ -88,6 +89,7 @@ Identifique o workflow ativo e o estado específico de invocação. Declare comp
 
 ### 3. Execução Técnica Deliberativa
 - Consulte `@code-knowledge-graph` para quaisquer dependências estruturais ou de blast radius.
+- Conduza interrogatório socrático estruturado (`socratic-grilling-patterns`) via `ask_questions` caso requisitos, fronteiras de contexto ou trade-offs técnicos permaneçam ambíguos.
 - Formule as especificações declarativas estritamente necessárias ao estado ativo.
 - Mantenha conformidade com os princípios Spec-First e Context Firewall.
 
@@ -194,6 +196,7 @@ Para garantir que o modelo Claude Sonnet 5 não tome iniciativas espúrias ou at
 - [ ] `@code-knowledge-graph` consultado via `run_subagent` para dependências e acoplamento (R-045).
 - [ ] Zero varredura manual realizada caso o grafo tenha falhado (Invariante 10).
 - [ ] Zero código executável de domínio gerado (apenas contratos declarativos OpenAPI/DDL).
+- [ ] Interrogatório socrático (`socratic-grilling-patterns`) aplicado via `ask_questions` quando identificada ambiguidade técnica ou trade-off crítico.
 - [ ] Formato de saída adequado ao estado ativo (Formato A, B ou C).
 - [ ] Context Firewall aplicado separando `[BACKEND_TASKS]` e `[FRONTEND_TASKS]` (se Formato B).
 - [ ] Toda nova rota listada em `[FRONTEND_TASKS]` inclui integração de navegação ao shell.
