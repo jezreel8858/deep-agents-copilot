@@ -66,8 +66,8 @@
     "data_sensitivity": "internal"
   },
   "model_preferences": {
-    "recommended_model": "Claude Sonnet 5",
-    "cost_tier": "1x"
+    "recommended_model": "Claude Opus 5.5",
+    "cost_tier": "3x"
   },
   "input_contract": {
     "accepts_payload": "yaml / markdown",

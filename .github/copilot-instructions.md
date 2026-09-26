@@ -206,7 +206,7 @@ Avalie o tipo da tarefa e emita o sinal abaixo quando exigir modelo **1× ou sup
 | Exploração · contexto · Q&A · confirmação · MCP fetch | **Claude Haiku** | **0×** |
 | Edições pequenas · respostas rápidas | Claude Haiku | 0.33× |
 | Implementação padrão · refactor | Claude Sonnet / GPT-5 | 1× |
-| Arquitetura complexa · debug crítico · decisão crítica | Claude Opus | 3× |
+| Arquitetura complexa · debug crítico · decisão crítica | Claude Opus 5.5 | 3× |
 | Tarefa multi-arquivo/alto fan-out (≥ 10 alvos/arquivos/operações homogêneas) (R-021.1) | Claude Sonnet / GPT-5 / Gemini Pro | 1× (mesmo com modelo mais leve configurado no catálogo) |
 
 **Nota (R-021.1 — Fan-Out)**: modelos de menor capacidade (ex.: Gemini Flash) tendem a degradar em decisões condicionais compostas de alto fan-out, executando `ctx_execute` sequencial em vez de `ctx_batch_execute` (ver Circuit Breaker em `context-mode/SKILL.md § 4.1`). O sinal de fan-out é uma **recomendação de escalonamento pontual para aquele despacho específico**, não uma alteração permanente do `model:` do agent no catálogo.

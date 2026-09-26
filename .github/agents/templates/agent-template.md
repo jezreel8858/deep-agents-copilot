@@ -5,6 +5,7 @@ description: >-
 # Seleção de Modelo (governance-factory-patterns/SKILL.md §9):
 # - "Gemini 3.8 Flash" -> Perfil Procedural / Operacional / SLM de alta velocidade (padrão para executores, fixers, test-writers)
 # - "Claude Sonnet 5"  -> Perfil Decompositivo / Deliberativo / Raciocínio Guiado (arquitetura, planejamento, routers centrais)
+# - "Claude Opus 5.5"  -> Perfil Raciocínio Crítico Avançado / Arquitetura Complexa / Debug Profundo (tech-solution-architect, debugger)
 model: "Gemini 3.8 Flash"
 # Tools: Princípio de menor privilégio. run_subagent é OBRIGATÓRIO por R-042.
 # Se run_in_terminal for declarado em tools, é OBRIGATÓRIO incluir .github/skills/terminal-governance/SKILL.md em source_docs (R-049).

@@ -323,7 +323,7 @@ agents:
     estimated_time_minutes: 25
   tech-solution-architect:
     id: tech-solution-architect
-    model: Claude Sonnet 5
+    model: Claude Opus 5.5
     priority: 8
     version: 2.2.0
     domain: Arquitetura técnica, blueprint, contratos de integração e divisão por
@@ -1245,7 +1245,7 @@ agents:
     estimated_time_minutes: 30
   debugger:
     id: debugger
-    model: Claude Sonnet 5
+    model: Claude Opus 5.5
     priority: 2.1
     version: 1.0.0
     domain: Investigacao de causa raiz a partir de sintoma/stack trace

@@ -5,7 +5,7 @@ description: >-
   Arquiteto de solução técnica: viabilidade, blueprint técnico, contratos de
   API (OpenAPI/AsyncAPI/gRPC), modelo de dados e divisão macro do trabalho em
   seções isoladas ([BACKEND_TASKS], [FRONTEND_TASKS]) com metodologia B1/B2/B3.
-model: "Claude Sonnet 5"
+model: "Claude Opus 5.5"
 tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_fetch_and_index', 'context-mode/ctx_batch_execute', 'context-mode/ctx_stats', 'context-mode/ctx_doctor', 'context-mode/ctx_upgrade', 'context-mode/ctx_purge', 'context-mode/ctx_insight', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file']
 source_docs:
   - CLAUDE.md
