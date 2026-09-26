@@ -41,6 +41,31 @@ Estratégias consolidadas para navegar um codebase a partir de um sintoma — lo
 
 ---
 
+## 0.1) Fase "Feedback Loop First" — Construir Reprodução Antes de Hipótese
+
+Inspirado na metodologia de `mattpocock/skills/diagnosing-bugs`, **nunca inicie uma investigação navegando cegamente pelo código ou disparando buscas globais (`grep_search`) sem antes estabelecer um feedback loop executável**.
+
+### A Disciplina "Feedback Loop First"
+Antes de formular qualquer hipótese, abrir múltiplos arquivos ou tentar alterações ad-hoc:
+1. **Construa um gatilho de reprodução determinístico**:
+   - Um **teste automatizado mínimo que falha** (unitário ou de integração com asserção do comportamento anômalo).
+   - Um **comando CLI direto** ou script isolado que dispara o caminho de erro em poucos segundos.
+   - Uma **chamada HTTP / curl** com payload e cabeçalhos representativos que reproduz o código de status inesperado.
+2. **Tempo de ciclo veloz (< 5 segundos)**: O feedback loop DEVE responder com rapidez extrema. Se a suíte demorar minutos, isole o teste unitário específico com flags cirúrgicas (ex.: `pytest -k test_falha_reproduzida` ou `npx vitest run path/to/spec`).
+3. **Sem reprodução = Risco de Alucinação**: Se você não consegue ver a falha acontecer deterministicamente sob demanda, você não poderá comprovar que a causa raiz foi eliminada nem prevenir regressões.
+
+### Política de Redação de Segredos em Artefatos Capturados (Security Redaction)
+Ao capturar logs de reprodução, traces de rede, variáveis de ambiente ou payloads para compor o caso de teste:
+- **Sanitização Compulsória (R-010)**: Redija imediatamente credenciais, tokens JWT, API keys, senhas de banco e dados pessoais identificáveis (PII).
+- **Substituição Canônica**:
+  - `Bearer eyJ...` → `Bearer <REDACTED_JWT_TOKEN>`
+  - `password: "secret123"` → `password: "<REDACTED_SECRET>"`
+  - `api_key: "sk_live_..."` → `api_key: "<REDACTED_API_KEY>"`
+  - `cpf / cnpj / email real` → dados sintéticos / fictícios (ex.: `usuario.teste@example.com`).
+- **Verificação Pré-Indexação**: Nunca anexe traces brutos contendo segredos em issues, PRs ou no banco de conhecimento do projeto.
+
+---
+
 ## 1) Pipeline de Investigação: Do Sintoma à Causa Raiz
 
 ```
@@ -315,6 +340,7 @@ Após o rastreio, classificar a confiança da hipótese de causa raiz:
 
 ## 11) Referências
 
+- Matt Pocock / AI Hero: *diagnosing-bugs skill* (https://github.com/mattpocock/skills)
 - CodeQL Call Graph: https://codeql.github.com/docs/codeql-language-guides/navigating-the-call-graph
 - Semantic Code Search vs Grep: https://particula.tech/blog/semantic-code-search-vs-grep-coding-agents
 - LLM-Guided Code Navigation: https://arxiv.org/html/2506.18191v1

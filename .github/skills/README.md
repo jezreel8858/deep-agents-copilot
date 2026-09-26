@@ -25,6 +25,8 @@ Toda skill deve declarar no topo:
 
 | Skill | Tier sugerido | Quando usar |
 |---|---|---|
+| `prototype-patterns` | Tier 2 | Prototipagem rápida e descartável para responder perguntas de design, viabilidade de UI e validação de modelos de estado |
+| `interactive-wizard-patterns` | Tier 2 | Criação de scripts interativos e assistentes passo a passo (wizards) para procedimentos HITL, credenciais e migrações |
 | **`prompt-engineering-patterns`** | 🧠 **Tier 2** | Técnicas consolidadas (APE/OPRO/DSPy/Anthropic/OpenAI) para estruturar prompts em `<task>/<context>/<constraints>/<output_format>`, detectar ambiguidade objetivamente e aplicar self-critique — base do agent `prompt-structuring` |
 | `harness-engineering-patterns` | Tier 1 | ⭐ (NEW) Fornece diretrizes e heurísticas de Harness Engineering: diagnóstico harness vs modelo, heurística da zona inteligente (~100k tokens), poda anti-bloat e execução autônoma Ralph Loop |
 | `context-mode` | Tier 1 | Roteamento ctx-first, coleta em batch, busca indexada e processamento em sandbox com economia de tokens/créditos |
@@ -45,21 +47,21 @@ Toda skill deve declarar no topo:
 | **`test-implementation-angular-jasmine`** | ⭐ **Tier 2** | Padrões **específicos** Jasmine/Karma + Playwright para Angular 21 (legado/migração) |
 | **`test-implementation-angular-vitest`** | ⭐ **Tier 2** | Padrões **específicos** Vitest 3+ + @angular/build:unit-test para Angular 20/21+ (oficial/novo padrão) |
 | **`test-implementation-python`** | ⭐ **Tier 2** | Padrões **específicos** pytest + coverage.py para Python |
-| `test-coverage-governance` | Tier 2 | Estratégia agnóstica de cobertura, métricas e priorização por risco |
+| **`test-coverage-governance`** | 🧪 **Tier 2** | Estratégia agnóstica de cobertura por risco, seams pré-acordados (testing-first + refactor fora do loop) e relatórios consolidados |
 | `project-scanner` | Tier 2 | Scanner automático de projetos para detecção de stack e convenções |
-| `project-context-builder` | Tier 2 | Preparar, condensar e persistir contexto técnico multi-projeto |
+| **`project-context-builder`** | 🏗️ **Tier 2** | Scanner automático de projetos, scaffolding guiado e suporte a Bounded Contexts (`CONTEXT-MAP.md`) |
 | `git-governance` | Tier 2 | Convenções de git workflow, branch naming, commit standards e PR guidelines |
 | **`git-worktree-governance`** | 🌲 **Tier 2** | ⭐ ***(NEW)*** Diretrizes de ciclo de vida e isolamento para execução de agentes paralelos e explorações especulativas via Git Worktrees |
 | **`terminal-governance`** | 🔧 **Tier 1** | Boas práticas obrigatórias para uso de `run_in_terminal` — prevenção de poluição de contexto, truncamento de saída, não-interativo, lote e padrões proibidos |
 | **`code-tracing`** | 🔧 **Tier 1** | Rastrear código do sintoma à causa raiz — grep vs semântico, stack trace parsing, call graph, rastreio de API/método, coleta mínima de evidências |
-| **`business-rules-governance`** | 📋 **Tier 1** | Taxonomia, templates e protocolos para extrair, documentar e validar regras de negócio em markdown — ground truth para validação de refatorações |
+| **`business-rules-governance`** | 📋 **Tier 1** | Taxonomia, templates, extração/validação de regras em markdown e documentação de Bounded Contexts (`CONTEXT-MAP.md`) |
 | **`integration-contract-analysis`** | 🔗 **Tier 2** | Análise de contratos de integração (OpenAPI, AsyncAPI, gRPC, GraphQL): detecção de **breaking changes**, classificação BREAKING/COMPATIBLE/DEPRECIAÇÃO, consumidores afetados |
 | **`agent-memory-policy`** | 🧠 **Tier 3** | Política de memória long-term para agents: tipos episódico, semântico e procedimental. Foco em memória procedimental (agents auto-adaptativos) com guardrails e aprovação humana obrigatória |
 | **`frontend-componentization-patterns`** | 🧩 **Tier 2** | Padrões genéricos de componentização frontend (responsabilidade única, composição, contrato de componente, fronteiras de estado) |
 | **`angular-frontend-patterns`** | 🅰️ **Tier 2** | Boas práticas/patterns de codificação Angular (standalone, template/binding, Signals+RxJS, segurança e consistência) |
 | **`angular-performance-patterns`** | 🅰️⚡ **Tier 2** | ⭐ ***(NEW)*** Engenharia de performance Angular: Zoneless, Signals fine-grained, @defer, incremental hydration, Core Web Vitals e memory leaks — base dos especialistas do ecossistema `angular-router` |
 | **`angular-responsive-ui-patterns`** | 📱 **Tier 2** | Responsividade Angular (mobile-first, breakpoints, container queries, layout fluido, imagens responsivas e validação multi-viewport) |
-| **frontend-visual-feedback-loop** | 👁️ **Tier 2** | ⭐ ***(NEW)*** Visual Feedback Loop (VFL) agnóstico (Angular, React, Vue, Svelte): renderização isolada (Storybook/dev-server), inspeção multimodal (viewports 375/768/1440px), Árvore de Acessibilidade (AOM) e asserções visuais Playwright |
+| **`frontend-visual-feedback-loop`** | 👁️ **Tier 2** | ⭐ ***(NEW)*** Visual Feedback Loop (VFL) agnóstico (Angular, React, Vue, Svelte): renderização isolada (Storybook/dev-server), inspeção multimodal (viewports 375/768/1440px), Árvore de Acessibilidade (AOM) e asserções visuais Playwright |
 | **`design-system-component-contracts`** | 🧱 **Tier 2** | Governança de contratos de componente para design system: tokens, variantes/estados, Inputs/Outputs, semver, depreciação, breaking change e acessibilidade |
 | **`spring-boot-backend-patterns`** | ☕ **Tier 2** | Baseline enterprise para análise/recomendação Spring Boot (arquitetura, observabilidade, segurança, performance e migração) |
 | **`spring-boot-performance-patterns`** | ☕⚡ **Tier 2** | ⭐ ***(NEW)*** Engenharia de performance Spring Boot: Virtual Threads, pinning, HikariCP, N+1/EntityGraph, Caffeine+Redis, ZGC e AppCDS — base dos especialistas do ecossistema `spring-boot-router` |
@@ -87,6 +89,10 @@ Toda skill deve declarar no topo:
 | **`devops-agent-patterns`** | 🐳 **Tier 2** | ⭐ ***(NEW)*** Checklists de revisão Dockerfile/Kubernetes/CI-CD/IaC e estratégias de deployment — base do agent `devops-engineer` |
 | **`codegraph-optave-usage`** | 🕸️ **Tier 2** | ⭐ ***(NEW)*** Uso da lib externa `@optave/codegraph` (CLI local e MCP Server enxuto, zero API keys) como motor único de build/consulta de grafo de código — query, blast radius, ciclos, dead code, dataflow e CI gate. Base do agent `code-knowledge-graph` |
 | **`efficient-batch-code-modification`** | ⚡ **Tier 1** | ⭐ ***(NEW)*** Edição em lote otimizada para economia de tokens e créditos Copilot — análise prévia (dry-run), tool calls agrupadas na mesma rodada, minimal diffs cirúrgicos e proteção anti-corrupção em arquivo único grande/estruturado via padrão verificado (R-051) |
+
+> 💡 **Cross-Reference & Guias Especializados**:
+> - Veja também: `prototype-patterns` para prototipagem rápida e validação de viabilidade de UI/estado.
+> - Veja também: `interactive-wizard-patterns` para setup interativo e assistentes passo a passo (HITL).
 
 ## 4) Instructions associadas
 

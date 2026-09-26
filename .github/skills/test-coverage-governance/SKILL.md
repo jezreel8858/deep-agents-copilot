@@ -35,7 +35,27 @@ Cobertura de testes não é um fim em si mesmo — é uma métrica de risco. Est
 > - Frontend Angular → **Istanbul/Karma** (ver `test-implementation-angular-jasmine`)
 > - Python → **coverage.py** (ver `test-implementation-python`)
 
-## 1) Matriz de Cobertura por Risco
+## 1) Quando Usar
+
+- Avaliar e estabelecer metas mínimas de cobertura de testes por criticidade de negócio e superfície de ataque.
+- Priorizar cenários de teste antes de refatorações de código legado, upgrades de dependências ou releases críticas.
+- Auditar e interpretar relatórios consolidados em pipelines de CI/CD (JaCoCo, Istanbul/Karma/Vitest, coverage.py).
+- Orientar o fluxo de testes unitários prevenindo acoplamento indevido ou refatorações estruturais prematuras.
+
+## 1.1) Regra de Seams Pré-Acordados: Testing-First + Refactor Fora do Loop
+
+- **Princípio**: O ciclo de TDD red-green (ciclo curto de feedback) **NUNCA** inclui refatorações estruturais de outros módulos. Testes e refatorações estruturais pertencem a etapas distintas e separadas.
+- **Seams Pré-Acordados**: Antes de escrever o primeiro teste unitário, **acordar explicitamente com o usuário onde os mocks/fakes serão colocados** (ponto de injeção de dependência, fronteira de adapter, contrato de repositório, etc.).
+- **Regra de Sequenciamento**: O refactoring pertence à etapa POSTERIOR de `code-review` ou refatoração planejada, apenas após a suíte de testes estar completamente verde (`green`).
+- **Exemplo Prático**: Testes de `OrderProcessor` devem mockar `TaxCalculator` no seam previamente acordado; qualquer refatoração interna em `TaxCalculator` só ocorre após a suíte de `OrderProcessor` estar verde e validada.
+- **Checklist de Validação**:
+  - [ ] Antes de escrever qualquer teste, você respondeu: *"Onde colocar os mocks/fakes?"*
+  - [ ] *O usuário está explicitamente de acordo com as fronteiras de isolamento (seams) escolhidas?*
+  - [ ] O refatoramento estrutural foi postergado para fora do loop red-green?
+
+*(Referência: mattpocock/skills/tdd)*
+
+## 1.2) Matriz de Cobertura por Risco
 
 | Tipo de Código | Relevância | Cobertura Mínima | Prioritário? |
 |---|---|---|---|

@@ -52,6 +52,96 @@ source_docs:
 | **Manutenibilidade** | Complexidade ciclomática alta, duplicação, nomes obscuros |
 | **UX/Design System & Navegabilidade** | Nova rota frontend possui entrada correspondente em componente de navegação do projeto (menu/sidenav/tabs — Smell 2.18); componentes de UI novos reaproveitam `shared/`/design system do projeto em vez de HTML/CSS customizado duplicado (Smell 2.19) |
 | **Conformidade Documental (Living Docs)** | Mudanças estruturais, rotas, entidades, contratos ou padrões de UI estão refletidos na documentação do projeto (`docs/`, ADRs, schemas, README) de forma auto-sincronizada (R-033) |
+---
+
+## 3.1) Taxonomia de Code Smells Clássicos
+
+Inspirada no catálogo clássico de Martin Fowler (*Refactoring*) e no padrão `mattpocock/skills/code-review`, esta taxonomia estabelece o vocabulário compartilhado para achados de manutenibilidade e design em code reviews automatizados por IA.
+
+### 1. Data Clumps
+- **Definição**: Grupos de variáveis ou campos que aparecem repetidamente juntos em parâmetros de funções, classes ou retornos.
+- **Quando detectar**: O diff adiciona funções com 3+ parâmetros correlatos (ex.: `rua`, `cidade`, `cep`, `numero` ou `startDate`, `endDate`, `timezone`) repetidos em múltiplos métodos.
+- **Exemplo de achado em diff**:
+```diff
+- function createOrder(userId: string, street: string, city: string, zip: string, country: string) {
++ interface ShippingAddress { street: string; city: string; zip: string; country: string; }
++ function createOrder(userId: string, address: ShippingAddress) {
+```
+
+### 2. Primitive Obsession
+- **Definição**: Uso excessivo de tipos primitivos (`string`, `number`, `boolean`) para modelar conceitos de domínio que possuem invariantes, validações ou comportamentos específicos.
+- **Quando detectar**: O diff manipula strings brutas para entidades como `Email`, `CPF`, `Money`, `OrderId` ou `CurrencyCode`, espalhando validações manuais via `regex` ou `if`.
+- **Exemplo de achado em diff**:
+```diff
+- function sendInvoice(recipientEmail: string, amount: number) {
++ function sendInvoice(recipientEmail: EmailAddress, amount: Money) {
+```
+
+### 3. Repeated Switches
+- **Definição**: Estruturas condicionais (`switch` ou cadeias `if/else if`) sobre o mesmo discriminante (tipo, status, role) repetidas em diferentes módulos da aplicação.
+- **Quando detectar**: O diff adiciona mais um `case` em um `switch (user.role)` ou `switch (payment.type)` que já existe em 3 ou mais lugares no código.
+- **Exemplo de achado em diff**:
+```diff
+- switch (notification.type) { case 'SMS': sendSms(); break; case 'EMAIL': sendEmail(); break; }
++ // Preferir Strategy Pattern ou Record de Handlers polimórficos:
++ const handler = notificationHandlers[notification.type];
++ handler.dispatch(notification);
+```
+
+### 4. Shotgun Surgery
+- **Definição**: Sintoma onde uma única alteração conceitual de negócio exige dezenas de pequenas modificações espalhadas em arquivos, camadas ou repositórios diferentes.
+- **Quando detectar**: O PR toca 15+ arquivos com diffs de 1-3 linhas apenas para adicionar um novo status ou campo a uma entidade central.
+- **Exemplo de achado em diff**:
+```diff
+- // Adicionar 'isVIP: boolean' exige alterar 12 arquivos: Model, DTO, Repository, Mapper, Controller...
++ // Centralizar comportamento ou delegar para objeto de valor / extensão modular
+```
+
+### 5. Divergent Change
+- **Definição**: Uma única classe, módulo ou arquivo que é frequentemente modificado por razões completamente distintas (violação direta do Princípio de Responsabilidade Única - SRP).
+- **Quando detectar**: O diff mistura alteração de persistência/SQL, formatação de UI e regra de negócio no mesmo arquivo (ex.: `UserService.ts` alterado tanto para suporte a OAuth quanto para relatório em PDF).
+- **Exemplo de achado em diff**:
+```diff
+- class OrderManager { saveToDb() { ... } generateInvoicePdf() { ... } notifySlack() { ... } }
++ // Separar em OrderRepository, InvoicePdfGenerator e SlackNotifier
+```
+
+### 6. Feature Envy
+- **Definição**: Um método em uma classe que acessa dados, getters e lógica de outro objeto com mais frequência do que os dados de sua própria classe.
+- **Quando detectar**: O diff introduz um método que invoca 4+ getters encadeados de outra classe para realizar um cálculo ou decisão que pertence logicamente à classe dona dos dados.
+- **Exemplo de achado em diff**:
+```diff
+- function calculateDiscount(customer: Customer) {
+-   return customer.getOrders().getTotal() * customer.getTier().getFactor();
+- }
++ // Mover o cálculo para a própria entidade dona dos dados:
++ const discount = customer.calculateDiscount();
+```
+
+### 7. Mysterious Name
+- **Definição**: Nomes de variáveis, funções, classes ou módulos enigmáticos, abreviados ou genéricos que ocultam a verdadeira intenção do código.
+- **Quando detectar**: O diff introduz identificadores como `d`, `tmp`, `data2`, `res`, `processData()`, `handleStuff()` ou abreviações não-padrão (`usrMgrFn`).
+- **Exemplo de achado em diff**:
+```diff
+- const fn = (d: number, m: boolean) => m ? d * 1.1 : d;
++ const applyTaxAdjustment = (baseAmount: number, isTaxExempt: boolean) =>
++   isTaxExempt ? baseAmount : baseAmount * 1.1;
+```
+
+### 8. Duplicated Code
+- **Definição**: Estruturas de código, algoritmos ou blocos idênticos ou quase idênticos duplicados em múltiplos pontos, gerando dívida técnica e risco de correções divergentes.
+- **Quando detectar**: O diff copia e cola blocos de cálculo de frete, parsing de datas ou tratamento de erros em um novo controller em vez de extrair utilitário ou hook compartilhado.
+- **Exemplo de achado em diff**:
+```diff
+- // No Controller A e no Controller B:
+- const token = req.headers.authorization?.split(' ')[1];
+- if (!token) throw new UnauthorizedError();
++ // Extrair middleware ou helper compartilhado:
++ const token = extractBearerToken(req);
+```
+
+---
+
 ## 3) Critérios de Bloqueio de Merge
 Bloquear (🔴) **somente** quando:
 - Segurança crítica (secret exposto, injeção, bypass de autenticação/autorização).
@@ -97,6 +187,8 @@ Demais achados → alertar (🟠/🟡), nunca bloquear por preferência de estil
 
 ## Referências
 
+- Fowler, Martin. *Refactoring: Improving the Design of Existing Code*.
+- Matt Pocock / AI Hero: *code-review skill* (https://github.com/mattpocock/skills).
 - Google Engineering Practices — Code Review Guide: https://google.github.io/eng-practices/review/
 - OWASP Top 10: https://owasp.org/www-project-top-ten/
 - Padrões observados em ferramentas de mercado (CodeRabbit, Qodo/PR-Agent, Sourcery, DeepSource, SonarQube AI CodeFix) — revisão diff-only, severidade blocker/major/minor, complemento a SAST/lint.

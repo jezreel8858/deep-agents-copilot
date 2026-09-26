@@ -168,9 +168,70 @@ fix(entity): corrige NPE em PecaEntity ao buscar por ID nulo
 
 ---
 
-## 6) Referências
+## 6) Resolução de Merge/Rebase Conflict
+
+Inspirado no procedimento de resolução de conflitos de `mattpocock/skills/resolving-merge-conflicts`, o tratamento de divergências entre branches segue uma disciplina analítica estrita: conflitos representam decisões concorrentes e devem ser compreendidos antes de qualquer unificação.
+
+### Regra de Ouro: NUNCA Usar `--abort` como Fuga
+- **Proibição de Abandono Cego**: É terminantemente proibido executar `git merge --abort` ou `git rebase --abort` para fugir de conflitos sem antes diagnosticar os hunks divergentes.
+- **Exceção Válida**: O cancelamento (`--abort`) só é admitido quando se constata que a branch base incorreta foi selecionada para o rebase/merge ou por solicitação explícita do desenvolvedor humano.
+
+### Procedimento Determinístico Hunk-a-Hunk
+
+```
+1. Auditar Conflitos (git status)
+         ↓
+2. Rastrear Intent Original (ours vs theirs via git log/PR/issue)
+         ↓
+3. Resolver Hunk a Hunk (<<<<<<< / ======= / >>>>>>>)
+         ↓
+4. Executar Checks Automatizados (testes determinísticos / linters)
+         ↓
+5. Concluir & Avançar (git add + git rebase --continue)
+```
+
+1. **Auditar o Estado de Conflito**:
+   - Execute `git status` para listar todos os arquivos marcados como `both modified` ou `unmerged`.
+   - Isole os arquivos prioritários de configuração/contrato antes dos arquivos de implementação.
+
+2. **Rastrear o Intent Original de Ambos os Lados**:
+   - **Lado Local (`ours` / HEAD)**: Verifique o commit local que gerou a alteração para relembrar o propósito específico da sua branch.
+   - **Lado Entrante (`theirs` / upstream / branch base)**: Rastreie a intenção examinando os commits correspondentes:
+     ```sh
+     git log --oneline -5 --stat MERGE_HEAD
+     ```
+   - Consulte o PR ou Issue associada quando a intenção do código entrante não estiver clara no diff.
+
+3. **Resolver Hunk por Hunk com Foco Cirúrgico**:
+   - Abra cada arquivo conflitante e examine cada bloco de conflito:
+     ```text
+     <<<<<<< HEAD (suas alterações na branch atual)
+     const apiTimeout = 5000;
+     =======
+     const apiTimeout = 8000; // Ajustado para resiliência no upstream
+     >>>>>>> main
+     ```
+   - Preserve a intenção de ambos os lados sempre que viável (geralmente gerando um superset coerente).
+   - **Regra de Não-Contaminação**: NUNCA aproveite a resolução de conflito para introduzir refatorações acessórias, renomeações aleatórias ou estilizações estéticas fora de escopo.
+
+4. **Rodar Checks Automatizados Imediatamente**:
+   - Antes de dar continuidade, execute a suíte de testes determinísticos e os checks de tipo/linter para garantir que a resolução não introduziu quebras sutis:
+     ```sh
+     npm test || pytest || cargo test
+     ```
+   - Em caso de falha de teste ou compilação, ajuste a resolução antes de avançar.
+
+5. **Concluir a Etapa de Integração**:
+   - Adicione os arquivos resolvidos: `git add <caminho-do-arquivo>`.
+   - Prossiga com o fluxo: `git rebase --continue` (ou `git commit` no caso de merge workflow).
+   - Nenhuma execução autônoma de push forçado (`git push --force`) é permitida para agentes de IA (R-031).
+
+---
+
+## 7) Referências
 
 - Conventional Commits: https://www.conventionalcommits.org/
 - `/commit` prompt: `.github/prompts/commit.prompt.md`
 - Regras de segurança: `CLAUDE.md` R-010
+- Matt Pocock / AI Hero: *resolving-merge-conflicts skill* (https://github.com/mattpocock/skills)
 

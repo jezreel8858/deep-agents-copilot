@@ -1,9 +1,9 @@
 {
   "version": "1.0",
   "domain": "governanca-ai-generica",
-  "generated_at": "2026-08-30T16:00:00Z",
+  "generated_at": "2026-09-26",
   "summary": {
-    "total_skills": 62
+    "total_skills": 64
   },
   "skills": [
     {
@@ -133,7 +133,7 @@
       "tier": 1,
       "category": "documentation",
       "path": ".github/skills/business-rules-governance/SKILL.md",
-      "description": "Taxonomia, templates e protocolos para extrair, documentar e validar regras de negócio de código-fonte em qualquer linguagem. Formato markdown canônico para ground truth de refatorações.",
+      "description": "Taxonomia, templates e protocolos para extrair, documentar e validar regras de negócio em markdown e mapear Bounded Contexts (CONTEXT-MAP.md) como ground truth de refatorações.",
       "tools": [
         "read_file",
         "grep_search",
@@ -146,6 +146,34 @@
         "@refactor-planner",
         "@docs-engineer",
         "@tech-solution-architect"
+      ],
+      "triggers": [
+        "extrair regras de negócio",
+        "documentar regra",
+        "business rule",
+        "regra de negócio",
+        "validar refatoração",
+        "documentar lógica",
+        "catalogar regras",
+        "rule violation",
+        "breaking change",
+        "regra quebrada",
+        "documentação de código"
+      ],
+      "source_docs": [
+        "CLAUDE.md",
+        ".github/copilot-instructions.md"
+      ],
+      "related_skills": [
+        "project-context-builder",
+        "refactoring-planning-patterns",
+        "test-coverage-governance"
+      ],
+      "depends_on": [],
+      "related_to": [
+        "project-context-builder",
+        "refactoring-planning-patterns",
+        "test-coverage-governance"
       ]
     },
     {
@@ -479,7 +507,41 @@
       "path": ".github/skills/project-context-builder/SKILL.md",
       "related_agents": [
         "@context-builder",
-        "@tech-solution-architect"
+        "@tech-solution-architect",
+        "@adapter-generator"
+      ],
+      "description": "Scanner automático de projetos + Copilot Chat. Detecta stack, padrões, convenções e Bounded Contexts (CONTEXT-MAP.md), gerando artefatos de contexto e adapters sem chamadas externas.",
+      "triggers": [
+        "/add-project-context",
+        "novo projeto",
+        "adicionar projeto ao binding",
+        "scaffolding automático",
+        "escanear projeto"
+      ],
+      "source_docs": [
+        ".github/prompts/add-project-context.prompt.md",
+        ".github/agents/adapter-generator.agent.md",
+        ".github/instructions/README.md",
+        ".github/skills/business-rules-governance/SKILL.md"
+      ],
+      "tools": [
+        "read_file",
+        "create_file",
+        "list_dir",
+        "grep_search",
+        "file_search"
+      ],
+      "related_skills": [
+        "business-rules-governance",
+        "interactive-wizard-patterns",
+        "project-scanner"
+      ],
+      "depends_on": [
+        "project-scanner"
+      ],
+      "related_to": [
+        "business-rules-governance",
+        "interactive-wizard-patterns"
       ]
     },
     {
@@ -512,6 +574,36 @@
         "@refactor-planner",
         "@tech-solution-architect",
         "@code-knowledge-graph"
+      ],
+      "description": "Diretrizes consolidadas para planejamento e decomposição macro de refatorações estruturais: Mikado Method, Strangler Fig, Branch by Abstraction, Characterization Tests, vocabulário de Deep Module e rollback multicamada.",
+      "triggers": [
+        "planejamento de refatoração",
+        "refactor planning",
+        "mikado method",
+        "strangler fig",
+        "branch by abstraction",
+        "golden master",
+        "characterization tests",
+        "blast radius refactor",
+        "decomposição de refatoração",
+        "rollback de refatoração"
+      ],
+      "source_docs": [
+        "CLAUDE.md",
+        ".github/copilot-instructions.md",
+        ".github/agents/refactor-planner.agent.md"
+      ],
+      "tools": [],
+      "related_skills": [
+        "test-coverage-governance",
+        "business-rules-governance",
+        "prototype-patterns"
+      ],
+      "depends_on": [],
+      "related_to": [
+        "prototype-patterns",
+        "test-coverage-governance",
+        "business-rules-governance"
       ]
     },
     {
@@ -700,10 +792,44 @@
       "name": "test-coverage-governance",
       "tier": 2,
       "category": "testing",
-      "description": "Estratégia agnóstica de cobertura, métricas por risco, interpretação de reports",
+      "description": "Governança de cobertura de testes, métricas por risco, seams pré-acordados (testing-first + refactor fora do loop) e interpretação de reports de qualidade agnóstica de stack.",
       "path": ".github/skills/test-coverage-governance/SKILL.md",
       "related_agents": [
-        "@test-strategy"
+        "@test-strategy",
+        "@code-review"
+      ],
+      "triggers": [
+        "test coverage",
+        "cobertura de testes",
+        "cálculo de cobertura",
+        "métricas de qualidade",
+        "code coverage report",
+        "jacoco",
+        "istanbul"
+      ],
+      "source_docs": [
+        "CLAUDE.md",
+        ".github/copilot-instructions.md",
+        ".github/skills/test-implementation-backend/SKILL.md",
+        ".github/skills/test-implementation-spring-boot/SKILL.md",
+        ".github/skills/test-implementation-angular-jasmine/SKILL.md",
+        ".github/skills/test-implementation-angular-vitest/SKILL.md",
+        ".github/skills/test-implementation-python/SKILL.md"
+      ],
+      "tools": [],
+      "related_skills": [
+        "test-implementation-backend",
+        "test-implementation-spring-boot",
+        "test-implementation-angular-vitest",
+        "test-implementation-python",
+        "business-rules-governance"
+      ],
+      "depends_on": [
+        "test-implementation-backend"
+      ],
+      "related_to": [
+        "business-rules-governance",
+        "refactoring-planning-patterns"
       ]
     },
     {
@@ -794,6 +920,88 @@
         "@agent-router",
         "@tech-solution-architect",
         "@deep-search"
+      ]
+    },
+    {
+      "name": "prototype-patterns",
+      "tier": 2,
+      "category": "process",
+      "path": ".github/skills/prototype-patterns/SKILL.md",
+      "tools": [
+        "context-mode"
+      ],
+      "related_agents": [
+        "@refactor-planner",
+        "@tech-solutions-architect",
+        "@frontend-developer",
+        "@backend-developer"
+      ],
+      "description": "Padrão formalizado de prototipagem descartável para responder perguntas de design, validar modelos de estado e testar viabilidade de UI/API antes de implementar em produção.",
+      "triggers": [
+        "protótipo",
+        "prototipagem",
+        "spike",
+        "proof of concept",
+        "POC",
+        "descartável",
+        "HITL rápido"
+      ],
+      "source_docs": [
+        "CLAUDE.md",
+        ".github/copilot-instructions.md",
+        ".github/skills/prompt-engineering-patterns/SKILL.md"
+      ],
+      "related_skills": [
+        "interactive-wizard-patterns",
+        "prompt-engineering-patterns",
+        "refactoring-planning-patterns"
+      ],
+      "depends_on": [
+        "prompt-engineering-patterns"
+      ],
+      "related_to": [
+        "interactive-wizard-patterns",
+        "refactoring-planning-patterns"
+      ]
+    },
+    {
+      "name": "interactive-wizard-patterns",
+      "tier": 2,
+      "category": "process",
+      "path": ".github/skills/interactive-wizard-patterns/SKILL.md",
+      "tools": [
+        "context-mode"
+      ],
+      "related_agents": [
+        "@devops-engineer",
+        "@governance-maintainer",
+        "@tech-solutions-architect"
+      ],
+      "description": "Padrões para criação de scripts interativos e wizards passo a passo para operações que exigem intervenção humana (HITL), configuração de infraestrutura, credenciais, segredos de CI e migrações manuais de cutover.",
+      "triggers": [
+        "wizard",
+        "setup interativo",
+        "passo a passo manual",
+        "inicialização guiada",
+        "scaffolding",
+        "HITL interativo"
+      ],
+      "source_docs": [
+        "CLAUDE.md",
+        ".github/copilot-instructions.md",
+        ".github/skills/terminal-governance/SKILL.md"
+      ],
+      "related_skills": [
+        "terminal-governance",
+        "structured-intake-patterns",
+        "prototype-patterns"
+      ],
+      "depends_on": [
+        "terminal-governance"
+      ],
+      "related_to": [
+        "prototype-patterns",
+        "structured-intake-patterns"
       ]
     }
   ],

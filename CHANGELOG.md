@@ -6,6 +6,26 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.40.0] — 2026-09-24
+
+### Adicionado (Incorporação de Patterns do mattpocock/skills — Fases 1, 2 e 3)
+- **Fase 1 — Novas Skills Autônomas**:
+  - `interactive-wizard-patterns` (Tier 2): Padrões para criação de scripts interativos e wizards passo a passo para operações que exigem intervenção humana (HITL), configuração de infraestrutura, credenciais, segredos de CI e migrações manuais de cutover.
+  - `prototype-patterns` (Tier 2): Padrão formalizado de prototipagem descartável para responder perguntas de design, validar modelos de estado e testar viabilidade de UI/API antes de implementar em produção (spikes, POCs rápidos e alinhamento HITL).
+- **Fase 2 — Reforços em Skills Core Existentes**:
+  - `code-review-patterns` (§ 3.1): Taxonomia de Code Smells Clássicos (Data Clumps, Primitive Obsession, Feature Envy, Long Parameter List, Divergent Change, Shotgun Surgery).
+  - `git-governance` (§ 6): Procedimento determinístico de resolução de conflitos de merge/rebase (regra de ouro anti-abort, auditoria hunk-a-hunk e reconciliação semântica).
+  - `structured-intake-patterns` (§ 2.2): State machine de triagem formal orientada a rótulos (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`).
+  - `task-decomposition-patterns` (§ 3.1): Padrão Tracer-Bullet (fatias verticais ponta a ponta), arestas de bloqueio (*blocking edges*) e estratégia Expand-Migrate-Contract para refatorações amplas.
+  - `refactoring-planning-patterns` (§ 1.1): Vocabulário arquitetural de Deep Module (Ousterhout), Seams (Feathers), Adapters e Leverage Points para refatorações estruturadas.
+  - `code-tracing` (§ 0.1): Metodologia Feedback Loop First (construir reprodução determinística com tempo de ciclo < 5s antes de formular hipóteses) e política de Security Redaction em artefatos de depuração.
+- **Fase 3 — Reforços Finais em Skills & Integrações Transversais**:
+  - `test-coverage-governance` (§ 1 e 1.1): Diretrizes de uso e Regra de Seams Pré-Acordados (Testing-First + Refactor Fora do Loop), desacoplando testes unitários de refatorações de dependências.
+  - `business-rules-governance` (§ 4.2) & `project-context-builder`: Mapeamento canônico de Bounded Contexts (`CONTEXT-MAP.md`), relações upstream/downstream (ACL, Shared Kernel, Published Language) e capability `generate_context_map`.
+  - `README.md` & `.index.json`: Atualização do catálogo oficial de 64 skills e sincronização de metadados expandidos (`triggers`, `source_docs`, `related_skills`).
+
+---
+
 ## [2.39.0] — 2026-09-24
 
 ### Adicionado (Governança de Batching Context-Mode, Fan-Out Signal & Quality Review Loop)
