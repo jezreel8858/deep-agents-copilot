@@ -10,6 +10,10 @@ tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 
 # Supervisores hierárquicos possuem estrutura contratual fechada para roteamento determinístico.
 # As 4 seções canônicas são: CRÍTICO: ESCOPO DE ROTEAMENTO, Decision Tree, Formato de Saída e Retorno ao Router.
 # Toda dependência documental e de skills reside exclusivamente no frontmatter 'source_docs:' (SSOT).
+# Checklist de Governança (Q2 / R-055 - Portão de Reúso Sistêmico):
+# Todo novo domain router DEVE ser integrado às enumerações de .github/agents/workflows.md
+# (ex.: § 1.3, § 3.3, § 5, § 8) bem como em catalog.yaml, routing-graph.yaml, agent-router.agent.md
+# e nos casos de teste de roteamento (evals/casos-roteamento.yaml - R-015 / R-040).
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
