@@ -151,7 +151,7 @@ agents:
     estimated_time_minutes: 25
   test-strategy:
     id: test-strategy
-    model: Gemini 3.8 Flash
+    model: Claude Sonnet 5
     priority: 3
     domain: Estrategia de testes
     description: Planejar cobertura, cenarios e criterios de aceitacao por risco
@@ -822,7 +822,7 @@ agents:
     estimated_time_minutes: 20
   repo-hygiene-auditor:
     id: repo-hygiene-auditor
-    model: Gemini 3.8 Flash
+    model: Claude Sonnet 5
     priority: 4.8
     version: 1.0.0
     domain: Auditoria de higiene estrutural, documentação essencial e padrões de repositório

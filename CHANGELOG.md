@@ -6,6 +6,25 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.41.2] — 2026-09-26
+
+### Adicionado
+- **Auditoria de Contradição de Tools e Paridade de Modelos (Smell 2.7 & R-015)**:
+  - Teste determinístico `test_smell_2_7_no_internal_tool_contradiction_in_body` para garantir que nenhum agente negue no corpo possuir ferramentas ativas no frontmatter.
+  - Teste determinístico `test_r015_catalog_and_agent_model_parity` garantindo paridade estrita de modelo (`model:`) entre `catalog.yaml` e as definições dos agentes.
+- **Hermeticidade de Testes de Observabilidade**:
+  - Fixture `isolate_env` em `tests/otel_langfuse/conftest.py` para isolamento e hermeticidade contra variáveis OTLP/Langfuse nos testes unitários.
+
+### Modificado
+- **Alinhamento de Modelos Recomendados (Claude Sonnet 5)**:
+  - Atualização do modelo para `Claude Sonnet 5` em `test-strategy.agent.md`, `repo-hygiene-auditor.agent.md`, `catalog.yaml` e cards A2A correspondentes (`.a2a/agentcards/`).
+- **Resolução de Contradição de Tools (Smell 2.7)**:
+  - Ajuste de redação em `refactor-planner.agent.md` e `test-strategy.agent.md` esclarecendo operação analítica/read-only sem negação contraditória do catálogo de ferramentas.
+- **Configuração de Autenticação OTLP/Langfuse**:
+  - Em `tools/otel-langfuse/otel_langfuse/config.py`, geração consistente e sobrescrita de `langfuse_otlp_auth` em base64 a partir de chaves pública e secreta.
+
+---
+
 ## [2.41.1] — 2026-09-26
 
 ### Adicionado

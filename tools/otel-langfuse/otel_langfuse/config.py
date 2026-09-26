@@ -39,11 +39,10 @@ class TraceConfig(BaseModel):
     @model_validator(mode="after")
     def compute_auth_and_enabled(self) -> TraceConfig:
         """Calcula o token basic auth e define se o cliente está ativo."""
-        # Se temos public e secret key mas não temos otlp_auth, gera em base64
+        # Se temos public e secret key, sempre gera em base64 e sobrescreve otlp_auth
         if self.langfuse_public_key and self.langfuse_secret_key:
-            if not self.langfuse_otlp_auth:
-                raw_token = f"{self.langfuse_public_key}:{self.langfuse_secret_key}"
-                self.langfuse_otlp_auth = base64.b64encode(raw_token.encode("utf-8")).decode("utf-8")
+            raw_token = f"{self.langfuse_public_key}:{self.langfuse_secret_key}"
+            self.langfuse_otlp_auth = base64.b64encode(raw_token.encode("utf-8")).decode("utf-8")
             self.is_enabled = True
         elif self.langfuse_otlp_auth or self.otlp_endpoint:
             self.is_enabled = True

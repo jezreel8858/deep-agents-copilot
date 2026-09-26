@@ -713,3 +713,79 @@ def test_smell_2_22_workflow_reset_and_anti_sticky_agent_rule():
         fix_hint="Adicione a seção '### 2.22 — ...' em governance-audit-patterns/SKILL.md.",
     )
     assert "Sticky Agent" in gap_content
+
+
+# ─────────────────────────────────────────────────────────────
+# PREVENÇÃO CONTRA CONTRADIÇÃO DE TOOLS (SMELL 2.7) E PARIDADE R-015
+# ─────────────────────────────────────────────────────────────
+
+def test_smell_2_7_no_internal_tool_contradiction_in_body():
+    """Smell 2.7: Garante que nenhum .agent.md nega no corpo ter tools que estão
+    ativamente declaradas no seu frontmatter 'tools:' (prevenção de contradição interna)."""
+    negation_regex = re.compile(
+        r'n[aã]o\s+possui\s+ferramentas?\s+de\s+[^(\n]*\(([^)]+)\)',
+        re.IGNORECASE
+    )
+
+    for agent_file in get_all_agent_files():
+        content = agent_file.read_text(encoding="utf-8")
+        parts = content.split("---", 2)
+        if len(parts) < 3:
+            continue
+        fm = yaml.safe_load(parts[1]) or {}
+        raw_tools = fm.get("tools", [])
+        if isinstance(raw_tools, str):
+            raw_tools = [raw_tools]
+
+        declared_tools = set()
+        for t in raw_tools:
+            declared_tools.add(t)
+            if "/" in t:
+                declared_tools.add(t.split("/", 1)[1])
+
+        body = parts[2]
+        rel_path = agent_file.relative_to(REPO_ROOT)
+        for line in body.splitlines():
+            match = negation_regex.search(line)
+            if match:
+                raw_extracted = match.group(1)
+                tokens = [t.strip().strip("`'\"") for t in raw_extracted.split(",")]
+                contradictions = [t for t in tokens if t in declared_tools]
+                assert not contradictions, remediation(
+                    f"[{rel_path}] Contradição interna de governança (Smell 2.7): corpo afirma que o agent NÃO possui {contradictions}, "
+                    f"mas as tools estão ativamente declaradas em 'tools:' no frontmatter.",
+                    fix_hint=f"Alinhe a descrição no corpo de {rel_path} para esclarecer o modo de operação (ex: modo analítico/read-only) em vez de negar falsamente a posse de tools ativas.",
+                )
+
+
+def test_r015_catalog_and_agent_model_parity():
+    """R-015: Valida a paridade de 'model:' entre cada .agent.md e o catalog.yaml raiz
+    para todos os agents registrados no catálogo."""
+    catalog_path = AGENTS_DIR / "catalog.yaml"
+    assert catalog_path.exists(), remediation("catalog.yaml não encontrado em .github/agents/")
+    cat = yaml.safe_load(catalog_path.read_text(encoding="utf-8")) or {}
+    catalog_agents = cat.get("agents", {})
+    assert catalog_agents, remediation("Nenhum agent encontrado em catalog.yaml")
+
+    agent_files_by_id = {}
+    for agent_file in get_all_agent_files():
+        agent_id = agent_file.name.replace(".agent.md", "")
+        agent_files_by_id[agent_id] = agent_file
+
+    mismatches = []
+    for agent_id, data in catalog_agents.items():
+        cat_model = data.get("model")
+        agent_file = agent_files_by_id.get(agent_id)
+        assert agent_file is not None, remediation(
+            f"Agent '{agent_id}' está registrado em catalog.yaml mas seu arquivo {agent_id}.agent.md não foi encontrado.",
+            fix_hint=f"Crie .github/agents/{agent_id}.agent.md ou remova-o de catalog.yaml.",
+        )
+        fm = parse_frontmatter(agent_file.read_text(encoding="utf-8"))
+        md_model = fm.get("model")
+        if cat_model != md_model:
+            mismatches.append(f"[{agent_id}] catalog.yaml='{cat_model}' vs .agent.md='{md_model}'")
+
+    assert not mismatches, remediation(
+        f"Violação de paridade de modelo R-015 detectada em {len(mismatches)} agent(s):\n" + "\n".join(mismatches),
+        fix_hint="Sincronize o campo 'model:' entre catalog.yaml e o frontmatter do respectivo .agent.md.",
+    )
