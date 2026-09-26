@@ -91,7 +91,7 @@ agents:
     estimated_time_minutes: 5
   bug-triage:
     id: bug-triage
-    model: Gemini 3.8 Flash
+    model: Claude Sonnet 5
     priority: 2
     domain: Triagem de bugs e regressao
     description: Classificar bugs, reproduzir erro, analisar blast radius e propor
@@ -893,8 +893,8 @@ agents:
     - CLAUDE.md
     - .github/copilot-instructions.md
     - .github/agents/README.md
-    - docs/ai-context/catalog.yaml
-    - docs/ai-context/binding.md
+    - .github/agents/catalog.yaml
+    - .github/instructions/README.md
     related_agents:
     - agent-router
     - docs-engineer
@@ -918,8 +918,8 @@ agents:
     - .github/copilot-instructions.md
     - .github/agents/adapter-generator.agent.md
     - .github/skills/project-scanner/SKILL.md
-    - docs/ai-context/catalog.yaml
-    - docs/ai-context/binding.md
+    - .github/agents/catalog.yaml
+    - .github/instructions/README.md
     estimated_time_minutes: 20
     version: 1.0.0
   binding-initializer:
@@ -942,8 +942,8 @@ agents:
     - CLAUDE.md
     - .github/copilot-instructions.md
     - .github/agents/README.md
-    - docs/ai-context/catalog.yaml
-    - docs/ai-context/binding.md
+    - .github/agents/catalog.yaml
+    - .github/instructions/README.md
     related_agents:
     - adapter-generator
     - agent-router
@@ -968,8 +968,8 @@ agents:
     - .github/copilot-instructions.md
     - .github/agents/binding-initializer.agent.md
     - .github/skills/project-scanner/SKILL.md
-    - docs/ai-context/catalog.yaml
-    - docs/ai-context/binding.md
+    - .github/agents/catalog.yaml
+    - .github/instructions/README.md
     estimated_time_minutes: 10
     version: 1.0.0
   business-rules-extractor:
@@ -1139,7 +1139,7 @@ agents:
     - .github/skills/code-review-patterns/SKILL.md
     - .github/skills/terminal-governance/SKILL.md
     - .github/skills/context-mode/SKILL.md
-    - docs/ai-context/catalog.yaml
+    - .github/agents/catalog.yaml
     estimated_time_minutes: 20
     version: 1.0.0
   code-style-enforcer:
@@ -1165,7 +1165,7 @@ agents:
     - .github/copilot-instructions.md
     - .github/agents/README.md
     - .github/agents/catalog.yaml
-    - docs/ai-context/catalog.yaml
+    - .github/agents/catalog.yaml
     related_agents:
     - agent-router
     - code-review
@@ -1189,7 +1189,7 @@ agents:
     - .github/copilot-instructions.md
     - .github/agents/code-style-enforcer.agent.md
     - .github/skills/terminal-governance/SKILL.md
-    - docs/ai-context/catalog.yaml
+    - .github/agents/catalog.yaml
     estimated_time_minutes: 15
   compliance-guardrails:
     id: compliance-guardrails

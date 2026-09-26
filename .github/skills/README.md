@@ -39,6 +39,7 @@ Toda skill deve declarar no topo:
 | `confidence-fallback-policy` | Tier 1 | Definir score de confiança e regras de fallback/escalonamento |
 | `agent-safety-guardrails` | Tier 1 | Aplicar guardrails de segurança e compliance em respostas de agents |
 | `agent-observability-otel` | Tier 2 | Padronizar telemetria e rastreabilidade de execução de agents |
+| `langfuse-observability` | Tier 2 | Especialização Langfuse (tracing, prompt management, evals/datasets) — complementa `agent-observability-otel` |
 | `agent-evals-lab` | Tier 2 | Definir suíte de avaliação contínua e regressão de agents |
 | `yaml-governance` | Tier 2 | Manipular, validar e governar arquivos YAML/YML com segurança, tipagem e schema |
 | **`test-implementation-backend`** | ⭐ **Tier 2** | Padrões **genéricos** de testes backend (agnóstico de framework — pirâmide, AAA, mocks) |

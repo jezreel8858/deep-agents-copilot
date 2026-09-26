@@ -6,6 +6,42 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.41.0] — 2026-09-26
+
+### Adicionado (Telemetria Zero-Footprint, SDK Langfuse, MCP Proxy & Framework de Evals)
+- **Topologia de Telemetria OTel Proxy para Langfuse Cloud**:
+  - Arquitetura de observabilidade leve (~45MB RAM, zero banco local) despachando para Langfuse Cloud via HTTPS OTLP com Basic Auth.
+  - Guia de configuração e diagnóstico de limitação conhecida no IntelliJ IDEA em `docs/context/setup-telemetry-copilot.md`.
+  - Processadores de mascaramento de credenciais (`transform/redact-secrets`) e conformidade Semconv v1.41+ em `tools/otel-langfuse/otel-collector-config.yaml`.
+  - Scripts de teste sintético de traces e métricas GenAI (`test-trace.js` e `test_trace.py`).
+- **SDK Python de Observabilidade e Sanitização (`tools/otel-langfuse/otel_langfuse`)**:
+  - Cliente OTel/Langfuse assíncrono com ciclo de vida de traces, spans, validação Pydantic e retry exponencial com backoff.
+  - Sanitizador de payloads e mascaramento automático de credenciais (GitHub tokens, Langfuse keys, OpenAI/Anthropic keys, AWS IAM keys e Bearer tokens).
+  - Cobertura de testes unitários em `tests/otel_langfuse/` (`test_client.py`, `test_models.py`, `test_sanitizer.py`).
+- **Proxy MCP Instrumentado com OpenTelemetry (`tools/mcp-otel-proxy`)**:
+  - Interceptor stdio para servidores MCP com injeção automática de contexto de trace W3C e exportação OTLP.
+  - Redação de dados sensíveis em chamadas de ferramentas e telemetria de latência/erros.
+- **Framework e Estratégia de Avaliações (Evals)**:
+  - Documentação arquitetural: `docs/architecture/BLUEPRINT_AGENT_OBSERVABILITY.md` e `docs/architecture/EVALS_TEST_STRATEGY.md`.
+  - Suíte de evals em `tests/evals/` cobrindo acurácia de roteamento de agentes (`test_routing_accuracy_evals.py`), seleção de ferramentas (`test_tool_selection_evals.py`) e integridade de telemetria (`test_telemetry_integrity.py`).
+- **Nova Skill e Governança de Observabilidade**:
+  - `langfuse-observability` (Tier 2): Especialização Langfuse cobrindo tracing, prompt management, evals/datasets e integração com coding assistants.
+  - Atualização de `agent-observability-otel` para GenAI Semconv v1.41+ com migração de `gen_ai.system` para `gen_ai.provider.name`.
+
+### Modificado
+- **Sanitização e Segurança de Variáveis de Ambiente**:
+  - Sanitização de `tools/otel-langfuse/.env.example` com placeholders genéricos (`pk-lf-seu-public-key-aqui`, `sk-lf-seu-secret-key-aqui`) e token Base64 demonstrativo.
+  - Documentação atualizada em `tools/otel-langfuse/README.md` refletindo o pipeline SaaS gerenciado.
+- **Configuração de Execução de Testes e Catálogo de Agentes**:
+  - Ajuste de `pythonpath` em `pytest.ini` para incluir `tools/otel-langfuse` resolvendo importações de módulo sem colisões de namespace.
+  - Atualização de `source_docs` no `.github/agents/catalog.yaml` para alinhamento com os novos blueprints de arquitetura e observabilidade.
+
+### Removido
+- `tools/otel-langfuse/docker-compose.yml`: Remoção do stack monolítico pesado local (PostgreSQL, ClickHouse, MinIO, Redis) em favor do Langfuse Cloud SaaS.
+- Remoção de arquivo colidente `tests/otel_langfuse/__init__.py` para evitar conflito de importação do pacote `otel_langfuse`.
+
+---
+
 ## [2.40.0] — 2026-09-24
 
 ### Adicionado (Incorporação de Patterns do mattpocock/skills — Fases 1, 2 e 3)

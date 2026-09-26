@@ -117,7 +117,7 @@ deep-agents-copilot/
 │   ├── incident_recorder/                       # ⭐ Motor de persistência de incidentes e aprendizado (SQLite + Supabase)
 │   ├── codegraph-visualizer/                    # Visualizador de grafos de código
 │   ├── context-insight-visualizer/              # Visualizador de insights de contexto
-│   └── otel-langfuse/                           # Coletor OpenTelemetry para Langfuse
+│   └── otel-langfuse/                           # Coletor OpenTelemetry proxy para Langfuse Cloud (ver docs/context/setup-telemetry-copilot.md)
 │
 └── tests/                                       # Suíte de Testes Automatizados (pytest)
     ├── governance_audit/                        # Auditoria de regras e smells de governança

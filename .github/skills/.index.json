@@ -3,7 +3,7 @@
   "domain": "governanca-ai-generica",
   "generated_at": "2026-09-26",
   "summary": {
-    "total_skills": 66
+    "total_skills": 67
   },
   "skills": [
     {
@@ -66,6 +66,22 @@
         "@agent-router",
         "@tech-solution-architect",
         "@context-builder"
+      ]
+    },
+    {
+      "name": "langfuse-observability",
+      "tier": 2,
+      "category": "observability",
+      "path": ".github/skills/langfuse-observability/SKILL.md",
+      "description": "Especialização Langfuse para observabilidade de LLMs/Agents: modelo de dados trace→observations, prompt management versionado, evaluations/datasets/scores e integração com coding assistants via CLI/SDK/MCP.",
+      "tools": [
+        "context-mode"
+      ],
+      "related_agents": [
+        "@tech-solution-architect",
+        "@context-builder",
+        "@test-strategy",
+        "@agent-router"
       ]
     },
     {
