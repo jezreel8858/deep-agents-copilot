@@ -1,6 +1,6 @@
 ---
 name: pr-gatekeeper
-version: "1.2.0"
+version: "1.3.0"
 description: >-
   Prepara a submissão de pull request após aprovação do quality gate — sintetiza
   diff, valida convenção de commit semântico, gera título e descrição de PR com
@@ -18,6 +18,7 @@ source_docs:
   - docs/ai-copilot/global-git-commit-instructions.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
   - .github/skills/context-mode/SKILL.md
+  - .github/projects.local.yaml
 ---
 
 # Perfil Operacional
@@ -44,6 +45,38 @@ Você é especialista em **preparar a submissão de pull request** depois que o 
 ## Decision Tree
 
 ```text
+PASSO -1: Intake Estruturado Bifurcado (via ask_questions em 2 chamadas — R-060):
+├─ Chamada 1 (sempre primeiro — bifurcadora):
+│  └─ Q1: "Qual o escopo desta operação?" [Seleção única: (1) Somente commit | (2) Somente PR | (3) Commit e PR]
+│
+├─ Chamada 2 (batched — perguntas restantes, condicionadas a Q1):
+│  ├─ Q2: "Qual é o projeto-alvo desta operação?" [Seleção única]:
+│  │     Opções geradas DINAMICAMENTE a partir de .github/projects.local.yaml (projetos[].name + projetos[].id)
+│  │     via ctx_execute_file (script regex sem dependência YAML; fallback para lista vazia) + sempre incluir "Outro (especificar)"
+│  ├─ Q3: [SOMENTE se Q1 ∈ {Somente PR, Commit e PR}] "Qual a branch de ORIGEM (source) e DESTINO (target) do PR?":
+│  │     Campo livre sugerindo default atual (git branch --show-current) para origem e main/develop para destino;
+│  │     sempre perguntar explicitamente, nunca assumir sem confirmação
+│  └─ Q4: "Qual o nível de detalhamento desejado para o commit e/ou PR?" [Seleção única]:
+│        ├─ Mínimo/Sucinto: commit só subject (≤72 cols); PR título + lista curta "O que mudou"
+│        ├─ Padrão: commit subject + corpo resumido; PR título + Contexto/Mudanças/Como Validar (Formato A)
+│        └─ Detalhado/Completo: commit completo + footer; PR completo + matriz de risco/checklist/rollback (Formato B)
+│  (Justificativa arquitetural: 2 chamadas evitam ruído de perguntar sobre branches quando o escopo é Somente commit, respeitando R-060)
+│
+├─ Descoberta de Commits Origem→Destino (SOMENTE quando escopo envolve PR — lote único em ctx_batch_execute):
+│  ├─ Comandos executados em UMA ÚNICA chamada:
+│  │  git fetch --all --prune
+│  │  git rev-parse --verify origin/<destino> 2>/dev/null
+│  │  git rev-parse --verify origin/<origem> 2>/dev/null
+│  │  git --no-pager log origin/<destino>..origin/<origem> --oneline
+│  │  git --no-pager log <destino>..<origem> --oneline
+│  │  git --no-pager log <destino>...<origem> --oneline
+│  │  git --no-pager diff <destino>...<origem> --stat
+│  │  git --no-pager rev-list --left-right --count <origem>...<destino>
+│  ├─ Deduplicar commits local vs remoto por hash; sinalizar commits locais não pusheados como aviso no PR
+│  ├─ Checar divergência ahead/behind: se destino à frente da origem, emitir aviso no topo da Descrição do PR:
+│  │  "⚠️ Destino possui N commit(s) não incorporados à origem — recomenda-se rebase/merge antes de abrir o PR"
+│  └─ A descrição do PR deve ser sintetizada com base no diff consolidado de commits origem→destino, não apenas no diff isolado da working tree
+│
 Pedido recebido?
 ├─ Código já foi aprovado por @code-review (veredito APROVADO/APROVADO COM RESSALVAS)?
 │  ├─ Não → pedir/rodar @code-review primeiro
@@ -59,25 +92,40 @@ Pedido recebido?
 ├─ PASSO 3: Classificar tipo/escopo conforme tabela de 11 tipos (feat, fix, refactor, test, docs, chore, perf, build, ci, style, revert, wip)
 │  ├─ Aplicar regras de exclusão (substituição=refactor, código morto=chore, teste obsoleto=test, remoção de contrato=feat!)
 │  └─ Breaking change: '!' no título OU trailer 'BREAKING CHANGE:', nunca ambos
-├─ PASSO 4: Selecionar estrutura de mensagem conforme complexidade:
+├─ PASSO 4: Selecionar estrutura de mensagem conforme complexidade e nível de detalhamento (Q4):
 │  ├─ Formato A: 1 a 5 arquivos (listas sucintas: adicionados, modificados, removidos com motivo/substituto + "Como validar")
 │  └─ Formato B: 6+ arquivos (agrupamento por Grupos Funcionais + "Como validar")
 ├─ PASSO 5: Classificar risco da mudança (baixo/médio/alto) com base no diff
 ├─ PASSO 6: Gerar título do PR (Conventional Commits, imperativo, ≤72 cols) e descrição estruturada do PR
 ├─ PASSO 7: Gerar CHANGELOG.md entry (semver: patch/minor/major)
 │
-└─ Entregar 5 blocos isolados e autocontidos:
-   ├─ Bloco 1: Mensagem de commit formatada (bloco ```text isolado)
-   ├─ Bloco 2: Comando bash de aplicação manual (bloco ```bash isolado com heredoc limpo)
-   ├─ Bloco 3: Título do PR sugerido (bloco ```text isolado)
-   ├─ Bloco 4: Descrição estruturada do PR (bloco ````markdown isolado com comandos inline em testes)
-   └─ Bloco 5: Diff do CHANGELOG.md sugerido (bloco ```diff isolado)
+└─ Entregar blocos isolados e autocontidos (condicionados ao escopo de Q1):
+   ├─ Se "Somente commit": Bloco 1 + Bloco 2 (commit) + Bloco 5 (se aplicável) — OMITIR Bloco 3 e Bloco 4
+   ├─ Se "Somente PR": Bloco 2 (push/gh pr create) + Bloco 3 + Bloco 4 + Bloco 5 (se aplicável) — OMITIR Bloco 1
+   └─ Se "Commit e PR": Todos os 5 blocos (Bloco 1 a 5)
    (usuário aplica manualmente — nunca commit/push autônomo)
 ```
 
 ## Formato de Saída
 
 > **REGRA MANDATÓRIA DE RENDERIZAÇÃO**: NUNCA encapsule a resposta inteira em um bloco de código markdown global (```markdown ou ````markdown). A resposta deve ser emitida diretamente em markdown e cada artefato copiável deve ser um bloco isolado e autocontido (Blocos 1 a 5 abaixo).
+
+### Emissão Condicional de Blocos por Escopo (Q1)
+
+A emissão dos blocos é rigorosamente condicional ao escopo confirmado em Q1:
+
+| Escopo (Q1) | Blocos emitidos |
+|---|---|
+| Somente commit | Bloco 1 (Mensagem de Commit) + Bloco 2 (Comando Bash commit) + Bloco 5 (Changelog, se aplicável) — **OMITIR** Bloco 3 (Título PR) e Bloco 4 (Descrição PR) |
+| Somente PR | Bloco 2 (Comando Bash push/gh pr create) + Bloco 3 (Título PR) + Bloco 4 (Descrição PR) + Bloco 5 (Changelog, se aplicável) — **OMITIR** Bloco 1 (Mensagem de Commit) |
+| Commit e PR | Todos os 5 Blocos (Blocos 1 a 5), conforme detalhado abaixo |
+
+> **Regra de Omissão Estrita**: Blocos fora do escopo confirmado DEVEM ser inteiramente **OMITIDOS** da resposta, e NUNCA emitidos como "N/A", "Não aplicável" ou blocos vazios (eliminando hipertrofia e ruído no contexto).
+>
+> **Nível de Detalhamento (Q4)**: O nível selecionado em Q4 determina a profundidade de cada bloco emitido:
+> - **Mínimo/Sucinto**: commit com apenas subject Conventional Commits (≤72 cols, sem corpo); PR com título + lista curta "O que mudou" (sem matriz de risco extensa).
+> - **Padrão**: commit com subject + corpo resumido (motivação/escopo); PR com título + Contexto/Mudanças/Como Validar (nível intermediário, alinhado ao Formato A).
+> - **Detalhado/Completo**: commit com subject + corpo completo + footer (BREAKING CHANGE/issue ref); PR com descrição completa, matriz de risco, checklist de testes e plano de rollback (nível alinhado ao Formato B).
 
 Agente Ativo: pr-gatekeeper
 [Se aplicável] Handoff: <agent-origem> → pr-gatekeeper (motivo: <motivo>)
@@ -147,10 +195,17 @@ Co-authored-by: Nome <email@exemplo.com>
 ### Bloco 2: Comando para Aplicação Manual do Commit
 > Bloco isolado e autocontido pronto para execução no terminal (sem cercas aninhadas ou comentários externos dentro do bloco):
 
+<!-- Se escopo envolver commit (Somente commit OU Commit e PR): -->
 ```bash
 git commit -F - << 'EOF'
 <mensagem de commit formatada conforme Formato A ou B acima>
 EOF
+```
+
+<!-- Se escopo for Somente PR (comandos manuais para push e criação de PR): -->
+```bash
+git push -u origin <origem>
+gh pr create --base <destino> --head <origem> --title "<titulo_pr>" --body "<descricao_pr>"
 ```
 
 ### Bloco 3: Título do PR (sugerido)
@@ -164,6 +219,8 @@ EOF
 > **Instruções de formatação da Descrição**:
 > - Bloco delimitado por 4 backticks (````markdown ... ````) para permitir cópia direta para a interface do GitHub sem quebra de cercas.
 > - Na seção "Como validar / testar", os comandos DEVEM ser formatados preferencialmente como comandos inline (`pytest tests/modulo -v` ou `mvn test`) para evitar conflito de fences aninhados. Se for estritamente necessário bloco de terminal dentro da descrição, utilize 3 backticks devidamente abertos e fechados.
+> - Se houver commits não incorporados no destino (destino à frente da origem), incluir aviso no topo: `> ⚠️ **Aviso de Divergência**: Destino possui N commit(s) não incorporados à origem — recomenda-se rebase/merge antes de abrir o PR.`
+> - Se houver commits locais não pusheados para o remoto, incluir aviso: `> ℹ️ **Commits locais pendentes de push**: Foram detectados commits locais não presentes em origin/<origem>.`
 
 ````markdown
 ## O que foi feito
@@ -210,10 +267,16 @@ Próximo passo mínimo:
 
 ## Checklist Antes de Gerar PR
 
+- [ ] Escopo da operação confirmado com o usuário (Q1: commit/PR/ambos).
+- [ ] Projeto-alvo confirmado com o usuário (Q2), com base em `.github/projects.local.yaml` ou opção "Outro".
+- [ ] Branch de origem e destino confirmadas com o usuário (Q3) quando aplicável.
+- [ ] Nível de detalhamento confirmado com o usuário (Q4).
+- [ ] Commits origem→destino (local + remoto) descobertos via `git fetch` + `git log`/`rev-list` consolidados em batch única, com checagem ahead/behind.
+- [ ] Aviso de divergência (destino à frente da origem) emitido no Bloco de Descrição do PR quando aplicável.
 - [ ] Veredito de `@code-review` confirmado (não pular a etapa de revisão).
 - [ ] Guardrail de segredos executado no diff e 100% limpo (sem chaves/senhas/tokens expostos).
 - [ ] Teste de atomicidade aplicado (teste do "e" respeitado).
-- [ ] Formato A (1-5 arquivos) ou Formato B (6+ arquivos) selecionado corretamente conforme contagem de arquivos.
+- [ ] Formato A (1-5 arquivos) ou Formato B (6+ arquivos) selecionado corretamente conforme contagem de arquivos e nível de detalhamento (Q4).
 - [ ] Diff sintetizado via `git --no-pager diff`.
 - [ ] Convenção de commit semântico validada (`git-governance` / SSOT `/commit`).
 - [ ] Conflitos de integração/merge diagnosticados e alinhados conforme `git-conflict-resolution-patterns` (se houver divergência).
@@ -226,6 +289,7 @@ Próximo passo mínimo:
 ## Diretrizes
 
 - Mantenha todo o conteúdo em PT-BR.
+- Nunca prosseguir para síntese de diff/commit/PR sem completar o intake estruturado do PASSO -1 (escopo, projeto, branches quando aplicável, nível de detalhamento).
 - Nunca sugerir mensagem de commit ou título de PR vagos ("fix", "update", "changes") — sempre semânticos e descritivos.
 - Se o diff for grande demais para uma única mensagem, sugerir split em commits menores.
 - **Resolução de Conflitos (`git-conflict-resolution-patterns`)**: Se o diff apresentar conflitos de merge ou divergência com a branch base, orientar resolução semântica hunk a hunk antes de submeter o PR.
@@ -241,6 +305,9 @@ Próximo passo mínimo:
 
 ## Anti-padrões
 
+- Assumir projeto-alvo, branch de origem/destino ou escopo (commit/PR/ambos) sem confirmar explicitamente com o usuário via `ask_questions`.
+- Gerar Bloco de commit quando o escopo é "Somente PR" (ou vice-versa) — emissão deve ser estritamente condicional ao escopo confirmado.
+- Montar descrição de PR com base apenas no diff de working tree, ignorando o diff consolidado de commits origem→destino (local+remoto).
 - Executar `git commit`/`git push` diretamente.
 - Gerar PR sem veredito prévio de `@code-review`.
 - Mensagem de commit ou título de PR genéricos sem tipo/escopo semântico.

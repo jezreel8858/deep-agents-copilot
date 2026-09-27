@@ -615,7 +615,7 @@ agents:
     id: pr-gatekeeper
     model: Gemini 3.8 Flash
     priority: 4.5
-    version: 1.2.0
+    version: 1.3.0
     domain: Preparacao de entrega (PR/commit/changelog)
     description: Prepara submissao de PR pos-aprovacao do quality gate — sintetiza
       diff, aplica guardrail de segredos e template semantico SSOT (/commit), gera
@@ -630,10 +630,14 @@ agents:
     prerequisite_docs:
     - CLAUDE.md
     - .github/copilot-instructions.md
-    - .github/agents/README.md
+    - .github/skills/terminal-governance/SKILL.md
     - .github/skills/git-governance/SKILL.md
+    - .github/skills/git-conflict-resolution-patterns/SKILL.md
     - .github/prompts/commit.prompt.md
     - docs/ai-copilot/global-git-commit-instructions.md
+    - .github/skills/efficient-batch-code-modification/SKILL.md
+    - .github/skills/context-mode/SKILL.md
+    - .github/projects.local.yaml
     related_agents:
     - agent-router
     - code-review
