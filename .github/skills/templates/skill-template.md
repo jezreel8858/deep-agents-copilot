@@ -13,7 +13,6 @@ triggers:
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/skills/<nome-kebab-case>/SKILL.md
 ---
 
 # <Nome Humano da Skill>

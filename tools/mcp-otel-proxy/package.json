@@ -1,0 +1,22 @@
+{
+  "name": "mcp-otel-proxy",
+  "version": "1.0.0",
+  "description": "Zero-overhead stdio proxy for MCP servers emitting OpenTelemetry GenAI v1.41+ spans to OTLP collector",
+  "main": "bin/mcp-otel-proxy.js",
+  "bin": {
+    "mcp-otel-proxy": "./bin/mcp-otel-proxy.js"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [
+    "mcp",
+    "opentelemetry",
+    "langfuse",
+    "proxy",
+    "genai",
+    "observability"
+  ],
+  "author": "Deep Agents",
+  "license": "Apache-2.0"
+}

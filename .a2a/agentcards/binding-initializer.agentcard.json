@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "binding-initializer",
+  "name": "Binding Initializer",
+  "version": "1.0.0",
+  "description": "Agente operacional de inicialização de binding context. Detecta ausência de `catalog.yaml` e `binding.md` via Health Check (R-034), coleta o nome do ecossistema via `ask_questions` (1 pergunta) e gera o esqueleto dos artefatos. Projetos são adicionados depois via `/add-project-context`.",
+  "domain": "Inicializacao de binding context",
+  "role": "specialist",
+  "capabilities": [
+    "binding",
+    "catalog",
+    "health check",
+    "inicializar",
+    "contexto binding",
+    "esqueleto"
+  ],
+  "skills": [
+    "context-mode",
+    "agent-contracts",
+    "project-scanner"
+  ],
+  "tools": [
+    "ask_questions",
+    "context-mode/ctx_execute",
+    "grep_search",
+    "file_search",
+    "list_dir",
+    "run_subagent",
+    "context-mode/ctx_search",
+    "context-mode/ctx_batch_execute",
+    "context-mode/ctx_execute_file",
+    "context-mode/ctx_index"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only"
+    ],
+    "least_privilege_level": "standard",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Gemini 3.8 Flash",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/catalog.yaml",
+    "priority": 10.5,
+    "estimated_time_minutes": 10
+  }
+}

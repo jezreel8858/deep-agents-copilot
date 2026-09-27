@@ -297,6 +297,8 @@ O aumento da complexidade de workflows multi-agente exige a transição formal d
     ```
 - **Consumo pelo Receptor**: O agente receptor inspeciona o `resumo_executivo` e, se e somente se necessitar dos detalhes brutos do artefato, realiza a consulta cirúrgica do `artifact_ref` via `read_file` pontual ou `ctx_search(source: ...)` com escopo delimitado.
 
+> **Alinhamento com Harness Engineering (2026)**: O padrão *Write, Select, Compress, Isolate* implementado acima materializa na prática a recomendação de mercado de handoffs sucintos e portáteis. Conforme detalhado em `harness-engineering-patterns` (§ 2.2 — Zona Inteligente de Tokens e Sessões Descartáveis), ao aproximar-se do limiar prático de degradação (~100k tokens na janela ativa), o agente deve consolidar o estado essencial em um handoff portátil e disparar um reset de sessão, mantendo a inferência sempre na zona de alta fidelidade cognitiva.
+
 ---
 
 ## 3) Fluxos de Delegação Comuns

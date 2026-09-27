@@ -17,6 +17,8 @@ source_docs:
   - .github/skills/agent-contracts/SKILL.md
   - .github/skills/context-mode/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/skills/socratic-grilling-patterns/SKILL.md
+  - docs/agent-context/templates/stakeholder-questionnaire.md
 ---
 
 # Perfil Operacional
@@ -52,6 +54,7 @@ Ao ser acionado, declare compulsoriamente na primeira linha do raciocínio e no 
 ### 2. Validação ISO 29148 e Resolução de Ambiguidade
 - Avalie se o requisito possui clareza, viabilidade e testabilidade.
 - Se houver ambiguidade, formule perguntas objetivas usando o padrão `structured-intake-patterns` via `ask_questions`.
+- **Elicitação Aprofundada no WORKFLOW-PROMPT-SYNTHESIS (Estado 1)**: Quando atuando na Etapa 1 do `WORKFLOW-PROMPT-SYNTHESIS`, conduz um ciclo estruturado de 5 a 10 rodadas de `ask_questions` (com opções claras + campo livre, sem checklist fixo, adaptativo ao domínio do usuário) para desambiguação exaustiva de regras de negócio. Caso atinja a 10ª rodada com indefinições remanescentes, aplica a cláusula de teto (Invariante 19): declara formalmente as lacunas residuais no State Bag e na seção de restrições e avança para a Etapa 2 sem loops infinitos.
 ### 3. Estruturação em Padrões Canônicos
 - Formate requisitos funcionais com EARS e critérios de aceite em Gherkin (`Dado/Quando/Então`).
 - Categorize requisitos não-funcionais no modelo FURPS+ (Functionality, Usability, Reliability, Performance, Supportability).

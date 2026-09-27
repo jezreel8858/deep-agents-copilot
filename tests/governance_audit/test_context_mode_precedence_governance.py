@@ -784,3 +784,84 @@ def test_agent_router_safeguard_against_model_discovery_r054():
     assert "Zero Discovery é absoluto e inegociável" in ci_content, (
         "copilot-instructions.md deve declarar que Zero Discovery e absoluto e inegociavel"
     )
+
+
+def test_context_mode_sequential_tool_chaining_circuit_breaker_and_explicit_cwd():
+    """
+    Valida se context-mode/SKILL.md formaliza o Circuit Breaker de Tool-Chaining Sequencial
+    (limite de 2 chamadas consecutivas de ctx_execute/ctx_execute_file), a mitigação de cwd explícito
+    (anti-PathNotFound / anti-fallback), e se CLAUDE.md referencia o mecanismo sob R-059.
+    """
+    skill_file = SKILLS_DIR / "context-mode" / "SKILL.md"
+    claude_file = REPO_ROOT / "CLAUDE.md"
+
+    assert skill_file.exists(), "context-mode/SKILL.md deve existir"
+    assert claude_file.exists(), "CLAUDE.md deve existir"
+
+    s_content = skill_file.read_text(encoding="utf-8")
+    c_content = claude_file.read_text(encoding="utf-8")
+
+    # Circuit Breaker de Tool-Chaining Sequencial
+    assert "Circuit Breaker de Tool-Chaining Sequencial" in s_content, (
+        "context-mode/SKILL.md deve conter secao do Circuit Breaker de Tool-Chaining Sequencial"
+    )
+    assert "2 (duas) chamadas consecutivas" in s_content or "2 chamadas consecutivas" in s_content, (
+        "context-mode/SKILL.md deve definir o limiar de 2 chamadas consecutivas para o Circuit Breaker"
+    )
+    assert "handoff-governance" in s_content and "2.4" in s_content, (
+        "context-mode/SKILL.md deve referenciar o precedente de handoff-governance/SKILL.md 2.4"
+    )
+    assert "limitação conhecida" in s_content.lower() or "mitigação comportamental" in s_content.lower(), (
+        "context-mode/SKILL.md deve explicitar a limitacao comportamental/prompt engineering do circuit breaker"
+    )
+
+    # Mitigação de cwd explícito
+    assert "cwd" in s_content, "context-mode/SKILL.md deve mencionar parametro cwd"
+    assert "PathNotFound" in s_content, "context-mode/SKILL.md deve advertir sobre PathNotFound por omissao de cwd"
+    assert "raiz do repositório" in s_content or "raiz do repositório-alvo" in s_content, (
+        "context-mode/SKILL.md deve orientar a apontar cwd para a raiz do repositorio"
+    )
+
+    # Remissão em CLAUDE.md R-059
+    assert "Circuit Breaker de Tool-Chaining Sequencial" in c_content, (
+        "CLAUDE.md deve referenciar o Circuit Breaker de Tool-Chaining Sequencial sob R-059"
+    )
+
+def test_context_mode_few_shot_batching_and_model_routing_fan_out_signal():
+    """
+    Valida se context-mode/SKILL.md formaliza o exemplo Few-Shot (4.3) de Anti-Padrão vs Padrão Correto,
+    se CLAUDE.md e copilot-instructions.md declaram R-021.1 (Model Routing por Fan-Out),
+    e se a skill efficient-batch-code-modification referencia a subseção 4.3.
+    """
+    ctx_skill_file = SKILLS_DIR / "context-mode" / "SKILL.md"
+    eff_skill_file = SKILLS_DIR / "efficient-batch-code-modification" / "SKILL.md"
+    claude_file = REPO_ROOT / "CLAUDE.md"
+    copilot_file = REPO_ROOT / ".github" / "copilot-instructions.md"
+
+    assert ctx_skill_file.exists(), "context-mode/SKILL.md deve existir"
+    assert eff_skill_file.exists(), "efficient-batch-code-modification/SKILL.md deve existir"
+    assert claude_file.exists(), "CLAUDE.md deve existir"
+    assert copilot_file.exists(), "copilot-instructions.md deve existir"
+
+    ctx_content = ctx_skill_file.read_text(encoding="utf-8")
+    eff_content = eff_skill_file.read_text(encoding="utf-8")
+    claude_content = claude_file.read_text(encoding="utf-8")
+    copilot_content = copilot_file.read_text(encoding="utf-8")
+
+    # Bloco 1: Subseção 4.3 em context-mode/SKILL.md
+    assert "4.3" in ctx_content and "Few-Shot: Anti-Padrão vs Padrão Correto de Batching" in ctx_content, (
+        "context-mode/SKILL.md deve conter subseção 4.3 com o cabeçalho Few-Shot: Anti-Padrão vs Padrão Correto de Batching"
+    )
+
+    # Bloco 2: Remissão em efficient-batch-code-modification/SKILL.md
+    assert "context-mode/SKILL.md § 4.3" in eff_content, (
+        "efficient-batch-code-modification/SKILL.md deve conter remissão para context-mode/SKILL.md § 4.3"
+    )
+
+    # Bloco 3 & 4: R-021.1 em CLAUDE.md e copilot-instructions.md
+    assert "R-021.1" in claude_content, "CLAUDE.md deve declarar a regra R-021.1 (Model Routing por Fan-Out)"
+    assert "R-021.1" in copilot_content, "copilot-instructions.md deve declarar a regra R-021.1 (Model Routing por Fan-Out)"
+    assert "≥ 10 alvos/arquivos/operações homogêneas" in copilot_content, (
+        "copilot-instructions.md deve declarar o limiar de fan-out (>= 10 alvos/arquivos/operações)"
+    )
+

@@ -17,7 +17,8 @@
   "skills": [
     "git-governance",
     "agent-contracts",
-    "terminal-governance"
+    "terminal-governance",
+    "git-conflict-resolution-patterns"
   ],
   "tools": [
     "grep_search",

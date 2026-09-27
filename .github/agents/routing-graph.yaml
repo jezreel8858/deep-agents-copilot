@@ -17,7 +17,7 @@ nos:
     tipo: mandatory_pre_step
     descricao: >
       Passo mandatório pós-health-check (R-041): refina o prompt em loop
-      controlado (máx. 5 iterações) no formato <task>/<context>/<constraints>/
+      controlado (máx. 5 iterações) no formato canônico Markdown (Tarefa/Contexto/Restrições/Formato)
       <output_format> e SEMPRE retorna ao agent-router. Nunca é destino final.
 
   - id: bug-triage
@@ -593,7 +593,7 @@ workflows:
       - etapa: 4
         nome: "structured_prompt_synthesis"
         agent: "prompt-structuring"
-        otimizacoes: ["xml_semantico", "prompt_caching_alignment"]
+        otimizacoes: ["markdown_estruturado", "prompt_caching_alignment"]
       - etapa: 5
         nome: "quality_gate_and_emission"
         agent: "prompt-structuring"

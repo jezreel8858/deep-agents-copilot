@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "debugger",
+  "name": "Debugger",
+  "version": "1.0.0",
+  "description": "Investiga causa raiz de comportamento inesperado a partir de stack trace, log ou sintoma reportado — navegação de call graph, hipótese de causa raiz e reprodução mínima. Não corrige o código (isso é do agent especializado por stack); complementa bug-triage com investigação mais profunda.",
+  "domain": "Investigacao de causa raiz a partir de sintoma/stack trace",
+  "role": "specialist",
+  "capabilities": [
+    "investigar bug",
+    "stack trace",
+    "call graph",
+    "causa raiz",
+    "root cause",
+    "debug"
+  ],
+  "skills": [
+    "code-tracing",
+    "terminal-governance",
+    "agent-contracts",
+    "context-mode"
+  ],
+  "tools": [
+    "list_dir",
+    "grep_search",
+    "file_search",
+    "run_in_terminal",
+    "context-mode/ctx_batch_execute",
+    "context-mode/ctx_execute",
+    "run_subagent",
+    "context-mode/ctx_search",
+    "context-mode/ctx_execute_file",
+    "context-mode/ctx_index"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only",
+      "execution"
+    ],
+    "least_privilege_level": "elevated",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Claude Opus 5.5",
+    "cost_tier": "3x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/catalog.yaml",
+    "priority": 2.1,
+    "estimated_time_minutes": 30
+  }
+}

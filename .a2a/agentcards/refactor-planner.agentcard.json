@@ -23,7 +23,8 @@
     "confidence-fallback-policy",
     "code-tracing",
     "business-rules-governance",
-    "integration-contract-analysis"
+    "integration-contract-analysis",
+    "socratic-grilling-patterns"
   ],
   "tools": [
     "grep_search",

@@ -42,6 +42,10 @@ tools: []
 | **Paralela** | Subtasks genuinamente independentes | Frontend + Backend + Docs simultâneos |
 | **Híbrida** | Combinação — grupos paralelos com barreira de sincronização | Implementação paralela → Convergência em Review |
 
+
+> **Tracer Bullets (Vertical Slicing / Matt Pocock):**
+> Em vez de decompor horizontalmente em camadas isoladas (construir todo o schema, depois toda a service, depois toda a controller, depois toda a UI — postergando a integração para o final), fatiar verticalmente de ponta a ponta. A primeira subtask implementa e testa um caminho feliz mínimo atravessando todas as camadas (UI → API → Banco) com um teste funcional executável. Valida contratos e arquitetura imediatamente, eliminando o risco de incompatibilidades tardias.
+
 ## 2) Granularidade Ideal
 
 > Regra prática de mercado (2026): **2-3 níveis de decomposição** para a maioria das tarefas.
@@ -64,6 +68,30 @@ tools: []
 5. Validar dependências antes de iniciar execução
 6. Atribuir subtask a agent especializado por domínio
 ```
+
+
+## 3.1) Padrão Tracer-Bullet + Blocking Edges + Expand-Migrate-Contract
+
+> **Origem / Inspiração**: Metodologia de quebra de tarefas e tickets em fatias verticais inspirada em *The Pragmatic Programmer* e consolidada em `mattpocock/skills/to-tickets`.
+> **Objetivo**: Garantir que as subtasks entreguem incrementos funcionais completos de ponta a ponta (*tracer-bullets*), mapeiem explicitamente suas dependências críticas (*blocking edges*) e estruturem refatorações amplas sem quebrar o build contínuo (*expand-migrate-contract*).
+
+### Conceitos Centrais
+
+1. **Tracer-Bullet (Vertical Slice)**: Uma fatia mínima, estreita mas COMPLETA, que atravessa todas as camadas do sistema (banco de dados/schema, regras de negócio/API, interface/consumidor e testes automatizados). Diferente de uma fatia horizontal (ex.: "criar todos os schemas hoje"), o tracer-bullet é executável, verificável e demonstrável de forma independente ao final da subtask.
+2. **Blocking Edges (Arestas de Bloqueio)**: Declaração explícita no grafo de dependências de quais subtasks travam a execução de outras. Uma subtask com zero arestas de bloqueio está na "fronteira ativa" e pode ser executada imediatamente em paralelo.
+3. **Expand-Migrate-Contract (Para Wide Refactors)**: Exceção deliberada ao fatiamento vertical. Aplica-se a mudanças mecânicas amplas (ex.: renomear campo central, alterar assinatura de método usado em 200 locais) cujo *blast radius* atinge o sistema todo. A estratégia desdobra-se em 3 fases estruturadas:
+
+| Fase | Descrição | Quando Aplicar | Exemplo |
+|---|---|---|---|
+| **Expand** | Adiciona a nova estrutura, método ou campo ao lado do legado, sem remover o anterior. Zero quebras de consumidores. | Início de refatorações com alto blast radius; permite que o CI permaneça verde. | Criar novo método `findActiveUsers()` no repositório mantendo `getUsers(status=1)` funcionando. |
+| **Migrate** | Migra os pontos de chamada em lotes atômicos e progressivos (por módulo, pasta ou serviço), cada lote como subtask isolada. | Após a conclusão do Expand, permitindo entregas parciais e reversíveis em PRs menores. | Atualizar primeiro os controladores de checkout para chamar o novo método, depois os de relatórios. |
+| **Contract** | Remove a estrutura legada depreciada e limpa referências antigas após garantir que 100% dos consumidores migraram. | Última fase, bloqueada por todas as subtasks de Migrate concluídas com sucesso. | Deletar `getUsers(status=1)` e remover a coluna legada do banco de dados via migration final. |
+
+### Regras para Criação de Subtasks Tracer-Bullet
+
+- **Autossuficiência**: Cada subtask tracer-bullet deve caber confortavelmente em uma janela de contexto limpa e ter critérios de aceite executáveis (`[ ] Critério 1`).
+- **Respeito à Fronteira**: Sempre priorizar o avanço das tarefas da fronteira ativa (aquelas com todas as arestas bloqueantes já resolvidas).
+- **Sem Snippets Instáveis**: Evitar colar blocos grandes de código efêmero nas descrições de subtasks; focar no comportamento observável e decisões de design consolidadas.
 
 ## 4) Validação de Dependências (Antes de Executar)
 

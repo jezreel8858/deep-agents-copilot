@@ -177,6 +177,29 @@ grep_search "MAX_\|MIN_\|LIMIT_"                        # CSTR
 
 ---
 
+## 4.2) Documentação de Bounded Contexts: CONTEXT-MAP.md
+
+Quando múltiplos Bounded Contexts coexistem no codebase (ex.: Order Context, Shipping Context, Payment Context), a fronteira entre modelos de domínio deve ser explicitamente mapeada para evitar contaminação semântica e acoplamento desordenado.
+
+### Estrutura Canônica de `CONTEXT-MAP.md` (Raiz do Projeto)
+
+- **[Context A]**: Definição do escopo, entidades centrais, invariantes de domínio e termos da linguagem ubíqua.
+- **[Context B]**: Definição do escopo, entidades centrais e invariantes de domínio.
+- **Relacionamentos (Relationships)**: Mapeamento de dependência upstream/downstream entre contextos:
+  - *Anti-Corruption Layer (ACL)*: Camada de tradução que protege o modelo downstream de vazamentos do modelo upstream.
+  - *Shared Kernel*: Subconjunto de domínio compartilhado sob estrito contrato mútuo e validação contínua.
+  - *Published Language / Open-Host Service*: Protocolo ou esquema padronizado de intercâmbio entre múltiplos contextos.
+- **Fronteiras Invertidas e God Classes**: Identificação precoce de smells onde uma única entidade/classe transgride múltiplos contextos (ex.: classe `User` acumulando autenticação, faturamento e entrega), sinalizando oportunidade de segregação.
+
+### Checklist de Fronteiras de Domínio
+- [ ] Refatorações que cruzam fronteiras de contexto possuem validação prévia em `CONTEXT-MAP.md`.
+- [ ] Módulos downstream não consomem entidades internas puras de módulos upstream sem ACL.
+- [ ] Invariantes de cada bounded context estão documentadas e isoladas em suas regras (`BR-XXX`).
+
+*(Referência: mattpocock/skills/domain-modeling)*
+
+---
+
 ## 5) Protocolo de Validação (Modo Validate)
 
 Quando usado para validar código novo/refatorado contra regras documentadas:

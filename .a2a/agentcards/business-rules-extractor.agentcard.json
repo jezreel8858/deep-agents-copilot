@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "business-rules-extractor",
+  "name": "Business Rules Extractor",
+  "version": "1.1.0",
+  "description": "Extrair regras de negócio de qualquer código-fonte e documentá-las em arquivos .md estruturados — servindo como ground truth para validar que refatorações não quebram comportamento existente. Opera em dois modos: Extract (gerar documentação) e Validate (verificar código refatorado contra regras documentadas).",
+  "domain": "Extracao e validacao de regras de negocio",
+  "role": "specialist",
+  "capabilities": [
+    "business rule",
+    "regra de negocio",
+    "extrair regra",
+    "documentar codigo",
+    "validar refatoracao",
+    "rule violation",
+    "living documentation",
+    "ground truth",
+    "breaking change"
+  ],
+  "skills": [
+    "business-rules-governance",
+    "code-tracing",
+    "mermaid-diagrams",
+    "context-mode"
+  ],
+  "tools": [
+    "grep_search",
+    "file_search",
+    "list_dir",
+    "get_errors",
+    "ask_questions",
+    "run_subagent",
+    "context-mode/ctx_execute",
+    "context-mode/ctx_execute_file",
+    "context-mode/ctx_index",
+    "context-mode/ctx_search",
+    "context-mode/ctx_batch_execute"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only"
+    ],
+    "least_privilege_level": "standard",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Claude Sonnet 5",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/catalog.yaml",
+    "priority": 5,
+    "estimated_time_minutes": 60
+  }
+}

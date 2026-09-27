@@ -1,6 +1,6 @@
 {
   "protocol": "A2A/1.0.0",
-  "total_agentcards": 65,
+  "total_agentcards": 86,
   "agents": {
     "agent-router": {
       "name": "Agent Router",
@@ -97,6 +97,132 @@
       "role": "auditor",
       "domain": "Auditoria de higiene estrutural, documentação essencial e padrões de repositório",
       "version": "1.0.0"
+    },
+    "adapter-generator": {
+      "name": "Adapter Generator",
+      "role": "specialist",
+      "domain": "Geracao automatica de adapters",
+      "version": "1.0.0"
+    },
+    "binding-initializer": {
+      "name": "Binding Initializer",
+      "role": "specialist",
+      "domain": "Inicializacao de binding context",
+      "version": "1.0.0"
+    },
+    "business-rules-extractor": {
+      "name": "Business Rules Extractor",
+      "role": "specialist",
+      "domain": "Extracao e validacao de regras de negocio",
+      "version": "1.1.0"
+    },
+    "code-knowledge-graph": {
+      "name": "Code Knowledge Graph",
+      "role": "specialist",
+      "domain": "Grafo de conhecimento de codigo-fonte (imports, chamadas, blast radius, dataflow/CFG, ciclos, dead code), motor unico via lib externa @optave/codegraph (CLI local, zero API keys, Node.js/TypeScript nativo)",
+      "version": "4.1.1"
+    },
+    "code-review": {
+      "name": "Code Review",
+      "role": "specialist",
+      "domain": "Revisao de codigo antes do merge (read-only, severidade)",
+      "version": "1.0.0"
+    },
+    "code-style-enforcer": {
+      "name": "Code Style Enforcer",
+      "role": "specialist",
+      "domain": "Verificacao de aderencia a convencoes de estilo (read-only)",
+      "version": "1.0.0"
+    },
+    "compliance-guardrails": {
+      "name": "Compliance Guardrails",
+      "role": "specialist",
+      "domain": "Avaliacao de conformidade regulatoria de aplicacao (read-only)",
+      "version": "1.0.0"
+    },
+    "debugger": {
+      "name": "Debugger",
+      "role": "specialist",
+      "domain": "Investigacao de causa raiz a partir de sintoma/stack trace",
+      "version": "1.0.0"
+    },
+    "devops-engineer": {
+      "name": "Devops Engineer",
+      "role": "specialist",
+      "domain": "Revisao de artefatos DevOps (read-only)",
+      "version": "1.0.0"
+    },
+    "docs-engineer": {
+      "name": "Docs Engineer",
+      "role": "specialist",
+      "domain": "Ciclo de vida de documentacao tecnica (autoria + curadoria)",
+      "version": "1.0.0"
+    },
+    "feature-planner": {
+      "name": "Feature Planner",
+      "role": "planner",
+      "domain": "Decomposicao de feature nova em subtasks executaveis",
+      "version": "2.0.0"
+    },
+    "performance-agent": {
+      "name": "Performance Agent",
+      "role": "specialist",
+      "domain": "Revisao especializada de performance (read-only)",
+      "version": "1.0.0"
+    },
+    "requirements-analyst": {
+      "name": "Requirements Analyst",
+      "role": "specialist",
+      "domain": "Elicitacao e estruturacao de requisitos (prospectivo, pre-tecnico)",
+      "version": "2.1.0"
+    },
+    "security-reviewer": {
+      "name": "Security Reviewer",
+      "role": "specialist",
+      "domain": "Revisao especializada de seguranca de aplicacao (read-only)",
+      "version": "1.0.0"
+    },
+    "angular-router": {
+      "name": "Angular Router",
+      "role": "router",
+      "domain": "Supervisor hierarquico e roteador do dominio Angular",
+      "version": "2.0.0"
+    },
+    "database-router": {
+      "name": "Database Router",
+      "role": "router",
+      "domain": "Supervisor hierarquico e roteador do dominio Banco de Dados",
+      "version": "2.0.0"
+    },
+    "ejb-router": {
+      "name": "Ejb Router",
+      "role": "router",
+      "domain": "Supervisor hierarquico e roteador do dominio Java Legado EJB",
+      "version": "2.0.0"
+    },
+    "python-router": {
+      "name": "Python Router",
+      "role": "router",
+      "domain": "Supervisor hierarquico e roteador do dominio Python Backend",
+      "version": "2.0.0"
+    },
+    "spring-boot-router": {
+      "name": "Spring Boot Router",
+      "role": "router",
+      "domain": "Supervisor hierarquico e roteador do dominio Spring Boot",
+      "version": "2.0.0"
+    },
+    "spring-reactive-router": {
+      "name": "Spring Reactive Router",
+      "role": "router",
+      "domain": "Supervisor hierarquico e roteador do dominio Spring Reactive",
+      "version": "2.0.0"
+    },
+    "struts-router": {
+      "name": "Struts Router",
+      "role": "router",
+      "domain": "Supervisor hierarquico e roteador do dominio Java Legado Struts",
+      "version": "2.0.0"
     },
     "oracle-migration-dev": {
       "name": "Oracle Migration Dev",

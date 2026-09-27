@@ -78,6 +78,17 @@ Mudança de prompt / modelo / tool
 | **Toxicity** | Conteúdo prejudicial no output |
 | **Excessive Agency** | Agent realizou ações não solicitadas |
 
+### 2.4) Métricas de Qualidade do Harness vs. Métricas do Modelo
+
+Na engenharia de agentes contemporânea (2026), é imperativo desacoplar falhas do *modelo* (inferência pura) de falhas do *harness* (infraestrutura, ferramentas, system prompt e injeção de contexto), conforme preconizado em `harness-engineering-patterns`:
+
+| Dimensão | O que avalia | Métricas típicas | Skill canônica de referência |
+|---|---|---|---|
+| **Qualidade do Modelo** | Capacidade de raciocínio, alucinação, consistência semântica e fidelidade das respostas | Faithfulness, Answer Relevancy, Hallucination, Correctness | `agent-evals-lab` (§ 2.1) |
+| **Qualidade do Harness** | Precisão de tool definitions, schema de retorno, tamanho de janela útil, taxa de overhead de tokens e clareza de system prompt | Tool Calling Accuracy, Schema Adherence, Context Window Saturation, Tool Latency/Failures | `harness-engineering-patterns` |
+
+> **Diagnóstico Cruzado**: Antes de culpar a capacidade de raciocínio do modelo por uma falha de agente, audite o harness: schemas de ferramentas ambíguos, instruções contraditórias em arquivos de prompt e saturação da janela útil (> 100k tokens) degradam drasticamente o desempenho mesmo dos modelos mais avançados.
+
 ---
 
 ## 3) Estrutura de Caso de Teste

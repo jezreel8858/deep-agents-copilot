@@ -76,6 +76,11 @@ Quando a solicitação for vinculada a um dos **5 Workflows Canônicos** (`WORKF
 - `[▶]` **Em Andamento**: Etapa sendo executada pelo agente ativo no turno atual.
 - `[⏳]` **Pendente**: Etapa futura a ser acionada na sequência.
 
+### 0.2) Gatilho `wait-what` — Re-Pitching Obrigatório (R-029)
+
+Quando o usuário expressar desorientação explícita ("wait what", "peraí", "não entendi", "como assim"), o agent ativo DEVE interromper imediatamente qualquer aprofundamento técnico adicional e executar um **re-pitching conciso** (máx. 3-5 frases) em Simplified Technical English / linguagem ubíqua de negócio — sem jargão de implementação — recontextualizando o objetivo de negócio e o próximo passo antes de retomar. Nunca redobrar a densidade técnica como resposta à confusão do usuário (ver `CLAUDE.md` § R-029(d)).
+
+
 ### Checklist de Conformidade
 
 - [ ] Toda resposta abre com `Agente Ativo: <name>` — sem exceção, mesmo sem handoff.

@@ -6,6 +6,210 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.43.0] — 2026-09-27
+
+### Modificado / Manutenção de Governança
+- **Migração Global XML → Markdown e Redesenho do `WORKFLOW-PROMPT-SYNTHESIS` (R-055 / R-064)**:
+  - Substituição global do formato de tags XML (`<task>/<context>/<constraints>/<output_format>`) pelo template Markdown estruturado (`## Tarefa`, `## Contexto`, `## Restrições e Não-Escopo`, `## Formato de Saída Esperado`) em todo o catálogo (`prompt-structuring.agent.md`, `prompt-engineering-patterns/SKILL.md`, `harness-engineering-patterns/SKILL.md`, `catalog.yaml`, `routing-graph.yaml`, `CLAUDE.md` § R-041).
+  - Redesenho do `WORKFLOW-PROMPT-SYNTHESIS` e comando `/craft-prompt`: criação do template canônico reutilizável `templates/prompt-synthesis-output.md`.
+  - Quality Gate ativo com Red-Teaming analítico de Solution Space baseado em 4 critérios de corte excludentes no Estado 5 e Invariante 17(c) desdobrado com cláusula impeditiva de bloqueio.
+  - Finalidade explícita de consumo exclusivo downstream por outros agents e workflows canônicos em novas sessões limpas, vedada a apresentação como entrega final de negócio direta ao usuário.
+  - Elicitação ampliada no Estado 1 e Invariante 19 para ciclo aprofundado de 5 a 10 rodadas estruturadas de `ask_questions` com cláusula de teto na 10ª rodada (declaração de lacunas residuais em `## Restrições e Não-Escopo`).
+  - Typed State Bag atualizado com paridade total: `rodadas_elicitacao_realizadas`, `lacunas_residuais_declaradas`, `red_teaming_solution_space`, `consumo_exclusivo_agents: true` e `formato_saida: "markdown_code_block"`.
+  - Nova suíte de testes determinísticos de governança: `tests/governance_audit/test_prompt_synthesis_output_format_governance.py`.
+
+## [2.42.0] — 2026-09-27
+
+### Adicionado
+- **R-064 (Duplo Gate Documental de Planejamento e Implementação)**: Norma que estabelece a obrigatoriedade de versionamento e aprovação humana prévia de dois planos em workflows de código: Plano de Planejamento (`docs/plans/`) e Plano de Implementação (`docs/implementation-plans/`), autorados por especialistas analíticos e `<stack>-arch-advisor`. Diretórios de convenção criados com READMEs explicativos.
+- **Mapa do Repositório Canônico (`docs/repo-map.md`)**: Atualização e consolidação da infraestrutura determinística de arquivos (Zero Blind Searches), incorporando as novas pastas de planos (`docs/plans/` e `docs/implementation-plans/`) e sincronizando `README.md` e `docs/README.md` (R-015).
+
+
+## [2.41.2] — 2026-09-26
+
+### Adicionado
+- **Auditoria de Contradição de Tools e Paridade de Modelos (Smell 2.7 & R-015)**:
+  - Teste determinístico `test_smell_2_7_no_internal_tool_contradiction_in_body` para garantir que nenhum agente negue no corpo possuir ferramentas ativas no frontmatter.
+  - Teste determinístico `test_r015_catalog_and_agent_model_parity` garantindo paridade estrita de modelo (`model:`) entre `catalog.yaml` e as definições dos agentes.
+- **Hermeticidade de Testes de Observabilidade**:
+  - Fixture `isolate_env` em `tests/otel_langfuse/conftest.py` para isolamento e hermeticidade contra variáveis OTLP/Langfuse nos testes unitários.
+
+### Modificado
+- **Alinhamento de Modelos Recomendados (Claude Sonnet 5)**:
+  - Atualização do modelo para `Claude Sonnet 5` em `test-strategy.agent.md`, `repo-hygiene-auditor.agent.md`, `catalog.yaml` e cards A2A correspondentes (`.a2a/agentcards/`).
+- **Resolução de Contradição de Tools (Smell 2.7)**:
+  - Ajuste de redação em `refactor-planner.agent.md` e `test-strategy.agent.md` esclarecendo operação analítica/read-only sem negação contraditória do catálogo de ferramentas.
+- **Configuração de Autenticação OTLP/Langfuse**:
+  - Em `tools/otel-langfuse/otel_langfuse/config.py`, geração consistente e sobrescrita de `langfuse_otlp_auth` em base64 a partir de chaves pública e secreta.
+
+---
+
+## [2.41.1] — 2026-09-26
+
+### Adicionado
+- **Auditoria de Linhas Duplicadas (Smell 2.1)**:
+  - Teste determinístico `test_smell_2_1_no_verbatim_consecutive_duplicate_lines` em `tests/governance_audit/test_governance_smells.py` para prevenir regressões de linhas duplicadas consecutivas em `.agent.md` e `.prompt.md`.
+
+### Modificado
+- **Higiene e Deduplicação de Prompts de Governança**:
+  - Remoção em lote de linha duplicada de diretriz do `context-mode` (Single-Turn MCP / Smell 2.26) em 33 agentes (`.github/agents/**/*.agent.md`) e no prompt `.github/prompts/add-project-context.prompt.md`.
+  - Sincronização do modelo recomendado em `.a2a/agentcards/bug-triage.agentcard.json` para `"Claude Sonnet 5"`, mantendo paridade com o catálogo e o frontmatter do agente.
+
+---
+
+## [2.41.0] — 2026-09-26
+
+### Adicionado (Telemetria Zero-Footprint, SDK Langfuse, MCP Proxy & Framework de Evals)
+- **Topologia de Telemetria OTel Proxy para Langfuse Cloud**:
+  - Arquitetura de observabilidade leve (~45MB RAM, zero banco local) despachando para Langfuse Cloud via HTTPS OTLP com Basic Auth.
+  - Guia de configuração e diagnóstico de limitação conhecida no IntelliJ IDEA em `docs/context/setup-telemetry-copilot.md`.
+  - Processadores de mascaramento de credenciais (`transform/redact-secrets`) e conformidade Semconv v1.41+ em `tools/otel-langfuse/otel-collector-config.yaml`.
+  - Scripts de teste sintético de traces e métricas GenAI (`test-trace.js` e `test_trace.py`).
+- **SDK Python de Observabilidade e Sanitização (`tools/otel-langfuse/otel_langfuse`)**:
+  - Cliente OTel/Langfuse assíncrono com ciclo de vida de traces, spans, validação Pydantic e retry exponencial com backoff.
+  - Sanitizador de payloads e mascaramento automático de credenciais (GitHub tokens, Langfuse keys, OpenAI/Anthropic keys, AWS IAM keys e Bearer tokens).
+  - Cobertura de testes unitários em `tests/otel_langfuse/` (`test_client.py`, `test_models.py`, `test_sanitizer.py`).
+- **Proxy MCP Instrumentado com OpenTelemetry (`tools/mcp-otel-proxy`)**:
+  - Interceptor stdio para servidores MCP com injeção automática de contexto de trace W3C e exportação OTLP.
+  - Redação de dados sensíveis em chamadas de ferramentas e telemetria de latência/erros.
+- **Framework e Estratégia de Avaliações (Evals)**:
+  - Documentação arquitetural: `docs/architecture/BLUEPRINT_AGENT_OBSERVABILITY.md` e `docs/architecture/EVALS_TEST_STRATEGY.md`.
+  - Suíte de evals em `tests/evals/` cobrindo acurácia de roteamento de agentes (`test_routing_accuracy_evals.py`), seleção de ferramentas (`test_tool_selection_evals.py`) e integridade de telemetria (`test_telemetry_integrity.py`).
+- **Nova Skill e Governança de Observabilidade**:
+  - `langfuse-observability` (Tier 2): Especialização Langfuse cobrindo tracing, prompt management, evals/datasets e integração com coding assistants.
+  - Atualização de `agent-observability-otel` para GenAI Semconv v1.41+ com migração de `gen_ai.system` para `gen_ai.provider.name`.
+
+### Modificado
+- **Sanitização e Segurança de Variáveis de Ambiente**:
+  - Sanitização de `tools/otel-langfuse/.env.example` com placeholders genéricos (`pk-lf-seu-public-key-aqui`, `sk-lf-seu-secret-key-aqui`) e token Base64 demonstrativo.
+  - Documentação atualizada em `tools/otel-langfuse/README.md` refletindo o pipeline SaaS gerenciado.
+- **Configuração de Execução de Testes e Catálogo de Agentes**:
+  - Ajuste de `pythonpath` em `pytest.ini` para incluir `tools/otel-langfuse` resolvendo importações de módulo sem colisões de namespace.
+  - Atualização de `source_docs` no `.github/agents/catalog.yaml` para alinhamento com os novos blueprints de arquitetura e observabilidade.
+
+### Removido
+- `tools/otel-langfuse/docker-compose.yml`: Remoção do stack monolítico pesado local (PostgreSQL, ClickHouse, MinIO, Redis) em favor do Langfuse Cloud SaaS.
+- Remoção de arquivo colidente `tests/otel_langfuse/__init__.py` para evitar conflito de importação do pacote `otel_langfuse`.
+
+---
+
+## [2.40.0] — 2026-09-24
+
+### Adicionado (Incorporação de Patterns do mattpocock/skills — Fases 1, 2 e 3)
+- **Fase 1 — Novas Skills Autônomas**:
+  - `interactive-wizard-patterns` (Tier 2): Padrões para criação de scripts interativos e wizards passo a passo para operações que exigem intervenção humana (HITL), configuração de infraestrutura, credenciais, segredos de CI e migrações manuais de cutover.
+  - `prototype-patterns` (Tier 2): Padrão formalizado de prototipagem descartável para responder perguntas de design, validar modelos de estado e testar viabilidade de UI/API antes de implementar em produção (spikes, POCs rápidos e alinhamento HITL).
+- **Fase 2 — Reforços em Skills Core Existentes**:
+  - `code-review-patterns` (§ 3.1): Taxonomia de Code Smells Clássicos (Data Clumps, Primitive Obsession, Feature Envy, Long Parameter List, Divergent Change, Shotgun Surgery).
+  - `git-governance` (§ 6): Procedimento determinístico de resolução de conflitos de merge/rebase (regra de ouro anti-abort, auditoria hunk-a-hunk e reconciliação semântica).
+  - `structured-intake-patterns` (§ 2.2): State machine de triagem formal orientada a rótulos (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`).
+  - `task-decomposition-patterns` (§ 3.1): Padrão Tracer-Bullet (fatias verticais ponta a ponta), arestas de bloqueio (*blocking edges*) e estratégia Expand-Migrate-Contract para refatorações amplas.
+  - `refactoring-planning-patterns` (§ 1.1): Vocabulário arquitetural de Deep Module (Ousterhout), Seams (Feathers), Adapters e Leverage Points para refatorações estruturadas.
+  - `code-tracing` (§ 0.1): Metodologia Feedback Loop First (construir reprodução determinística com tempo de ciclo < 5s antes de formular hipóteses) e política de Security Redaction em artefatos de depuração.
+- **Fase 3 — Reforços Finais em Skills & Integrações Transversais**:
+  - `test-coverage-governance` (§ 1 e 1.1): Diretrizes de uso e Regra de Seams Pré-Acordados (Testing-First + Refactor Fora do Loop), desacoplando testes unitários de refatorações de dependências.
+  - `business-rules-governance` (§ 4.2) & `project-context-builder`: Mapeamento canônico de Bounded Contexts (`CONTEXT-MAP.md`), relações upstream/downstream (ACL, Shared Kernel, Published Language) e capability `generate_context_map`.
+  - `README.md` & `.index.json`: Atualização do catálogo oficial de 64 skills e sincronização de metadados expandidos (`triggers`, `source_docs`, `related_skills`).
+
+---
+
+## [2.39.0] — 2026-09-24
+
+### Adicionado (Governança de Batching Context-Mode, Fan-Out Signal & Quality Review Loop)
+- **Context-Mode Circuit Breaker & Few-Shot (§ 4.1 a 4.3 em context-mode/SKILL.md)**:
+  - Seção 4.1: Circuit Breaker de Tool-Chaining Sequencial (Regra dos 3 Tool Turns — Smell 2.26) para barrar loops degradantes de MCP tools.
+  - Seção 4.2: Mitigação de cwd explícito no `ctx_batch_execute`, prevenindo falhas de resolução do diretório raiz em sandboxes temporários.
+  - Seção 4.3: Exemplo concreto Few-Shot de Anti-Padrão (chamadas sequenciais) vs Padrão Correto (script consolidado em lote).
+  - Remissão de reforço na skill `efficient-batch-code-modification/SKILL.md`.
+- **R-021.1 (Model Routing Signal por Volume de Alvos / Fan-Out)**:
+  - Formalização no SSOT `CLAUDE.md` e na tabela de sinais de `.github/copilot-instructions.md` recomendando escalonamento pontual para modelo 1× ou superior em tarefas com ≥ 10 alvos/arquivos homogêneos.
+- **Sincronização de Templates Canônicos**:
+  - Atualização dos templates `agent-template.md` e `operational-agent.md` com parâmetro `cwd` explícito em `ctx_batch_execute`.
+- **Loop de Revisão de Qualidade (R-050.4 e § 1.5 de workflows.md)**:
+  - Formalização do padrão Evaluator-Optimizer com teto rígido de 3 iterações para achados não-bloqueantes nos 6 workflows operacionais.
+  - Atualização dos diagramas e fluxos em `docs/architecture/ARCHITECTURE_AND_GOVERNANCE_GUIDE.md`.
+- **Quality Gate Determinístico**:
+  - Testes `test_context_mode_circuit_breaker_and_explicit_cwd_governance()` e `test_context_mode_few_shot_batching_and_model_routing_fan_out_signal()` em `test_context_mode_precedence_governance.py`.
+  - Teste `test_workflows_support_quality_review_loop_r050_4()` em `test_operational_workflows.py`.
+
+---
+
+## [2.38.0] — 2026-09-24
+
+### Adicionado (Governança Anti Root-Agent-Impersonation & Anti Silent Bypass: R-062 e R-063)
+- **R-062 (Zero Impersonation pelo Orquestrador Raiz — Anti Root-Agent-Impersonation) e Smell 2.29**:
+  - Proibição terminante do modelo raiz ler, resumir ou parafrasear arquivos `.agent.md` para usurpar o papel de subagentes especializados sem dispatch real via `run_subagent`.
+  - Propagação normativa no SSOT `CLAUDE.md`, `.github/copilot-instructions.md`, `agent-router.agent.md`, `templates/router-agent.md`, 7 domain routers (`engineering-router`, `architecture-router`, `quality-router`, `security-governance-router`, `data-router`, `devops-router`, `research-router`) e na skill `governance-audit-patterns/SKILL.md`.
+  - Implementação de suíte de testes determinísticos em `tests/governance_audit/test_root_agent_impersonation_governance.py`.
+- **R-063 (Zero Execução Direta pelo Orquestrador Raiz sem Router — Anti Silent Bypass) e Smell 2.30**:
+  - Proibição terminante do modelo raiz executar ferramentas genéricas nativas (terminal, read_file, grep, edit) sem triagem prévia obrigatória via `@agent-router` (inclusive em turnos subsequentes, após encerramento de workflow ou em resposta a prompts curtos/informais).
+  - Complemento formal da regra R-042 em `CLAUDE.md` e ajuste do diagrama de fluxo no prompt de sistema `.github/copilot-instructions.md`.
+  - Propagação de blindagem nos 7 domain routers e no template de router (`templates/router-agent.md`).
+  - Implementação de suíte de testes determinísticos em `tests/governance_audit/test_root_orchestrator_silent_execution_governance.py`.
+
+---
+
+## [2.37.0] — 2026-09-24
+
+### Adicionado (Wiring Sistêmico de Harness/Prompt/Context Engineering & Anti-Silo Fix)
+- **Fechamento de Gaps de Wiring (Plano de Ação do @agent-auditor pós-2.36.0)**:
+  - **Wiring 1 (`harness-engineering-patterns/SKILL.md`)**: formalizada dependência operacional em `source_docs:` para agentes chave de orquestração, auditoria e arquitetura (`@agent-router`, `@agent-auditor`, `@governance-maintainer`, `@tech-solution-architect`).
+  - **Wiring 2 (`agent-evals-lab/SKILL.md`)**: referenciada em `source_docs:` de agentes que elaboram ou avaliam arquiteturas e fábricas de governança (`@governance-factory`, `@tech-solution-architect`, `@agent-router`).
+  - **Wiring 3 (`prompt-engineering-patterns/SKILL.md`)**: vinculada ao `source_docs:` de agentes criadores de diretrizes e roteamento (`@governance-factory`, `@agent-router`).
+  - **Wiring 4 (`structured-intake-patterns/SKILL.md`)**: adicionada ao `source_docs:` de `@test-strategy` e consolidação formal de SSOT de frontmatter em `@business-rules-extractor` e `@requirements-analyst`.
+  - **Wiring 5 (`requirements-engineering-patterns/SKILL.md`)**: adicionada ao `source_docs:` de `@tech-solution-architect` para suporte a elicitação e refinamento não-funcional.
+  - **Wiring 6 (`docs/agent-context/templates/CONTEXT.template.md`)**: vinculado formalmente em `source_docs:` de `@docs-engineer` e `@adapter-generator`, com orientações nos corpos de `/add-project-context` (proposição de criação de `CONTEXT.md` ao gerar adapter) e `/init-context` (opção de bootstrap de glossário de domínio).
+- **Quality Gate Determinístico**:
+  - Novo teste restrito `test_wiring_of_new_skills_in_consumer_agents()` em `tests/governance_audit/test_harness_engineering_governance.py` validando deterministamente a presença de todos os 6 wirings nos frontmatters dos agentes consumidores.
+- **Governança & Portão de Reúso Sistêmico (R-055 / Q1)**:
+  - Registrada recomendação (não implementada nesta release para evitar quebras em wirings pré-existentes não relacionados) para futura auditoria sistêmica global automatizada `.index.json` × `source_docs:` em todo o catálogo de agentes.
+
+---
+
+## [2.36.0] — 2026-09-23
+
+### Adicionado (Harness Engineering Patterns & Sincronização Normativa R-061)
+- **Pesquisa de Mercado 2026**: consolidação de práticas de Harness Engineering a partir de referências públicas de mercado (Matt Pocock / AI Hero — *Harness Engineering & Ralph Loop*, HumanLayer — *Context Engineering & Agent Tooling*, Martin Fowler / Anthropic / OpenAI):
+  - Diagnóstico sistemático de causa-raiz: segregação entre falhas de infraestrutura do agente (harness) e limitações cognitivas da LLM (modelo).
+  - Heurística da "zona inteligente" (~100k tokens) e descarte profilático de sessões com handoffs portáteis (*Write/Select/Compress/Isolate*).
+  - Poda contínua de instrução via "delete e observe" e progressive disclosure em arquivos de diretrizes persistentes (`AGENTS.md` / `CLAUDE.md`).
+  - Modo de execução autônoma tipo "Ralph Loop" documentado estritamente como técnica de execução contínua em workflows existentes (sem criação de workflow anômalo, respeitando R-050).
+- **Governança & Cascata Normativa (R-015 / R-046 / R-055 / R-061)**:
+  - `CLAUDE.md`: formalização da regra normativa **R-061** (Diagnóstico de Harness-vs-Modelo e Poda Anti-Bloat de Instrução).
+  - Nova skill canônica `.github/skills/harness-engineering-patterns/SKILL.md` (Tier 1, category `process`).
+  - Atualização atômica de catálogo em `.github/skills/README.md` e `.github/skills/.index.json`.
+  - Atualização cruzada em `.github/skills/agent-evals-lab/SKILL.md` (seção 2.4 — Métricas de Qualidade do Harness vs. Métricas do Modelo).
+  - Atualização cruzada em `.github/skills/prompt-engineering-patterns/SKILL.md` (Escrever para Agentes vs. Prompts de Tarefa efêmeros).
+  - Alinhamento de governança de handoffs em `.github/skills/handoff-governance/SKILL.md` (§ 2.5).
+  - Atualização do catálogo rápido em `.github/copilot-instructions.md`.
+  - Suíte de testes determinística `tests/governance_audit/test_harness_engineering_governance.py` com remediações acionáveis (`remediation()`).
+  - **Padrões Complementares de Context Engineering & AI Hero (Matt Pocock)**:
+    - **Protocolo de Grilling Cético ("Grill Me")**: formalizado em `.github/skills/structured-intake-patterns/SKILL.md` (§ 2.1) estabelecendo que o agente interroga ativamente premissas, falhas e trade-offs (mantendo humanos como responsáveis finais), com nota cruzada em `.github/skills/requirements-engineering-patterns/SKILL.md` (§ 6).
+    - **Padrão `CONTEXT.md` (Glossário de Domínio Compartilhado para Compressão Semântica)**: criação do template canônico `docs/agent-context/templates/CONTEXT.template.md` (termos canônicos, invariantes não-negociáveis, siglas e anti-termos) e recomendação de consumo em `.github/skills/context-mode/SKILL.md` (§ 3.3) via `ctx_search`.
+    - **Estratégia Tracer Bullets (Vertical Slicing)**: formalizada em `.github/skills/task-decomposition-patterns/SKILL.md` (§ 1) instruindo fatiamento vertical ponta a ponta (UI → API → Banco com teste funcional na primeira subtask) para validação precoce de arquitetura.
+    - **Quality Gate determinístico**: 3 novos testes em `tests/governance_audit/test_harness_engineering_governance.py` garantindo a integridade dos 3 novos padrões com remediações determinísticas (`remediation()`).
+- **Correção Pós-Cascata (Integridade Estrutural de Catálogo, R-051)**: a primeira aplicação da cascata pelo `governance-maintainer` converteu inadvertidamente a chave `skills` de `.github/skills/.index.json` de **array** (schema canônico usado por todo o catálogo) para **objeto/dict** com chaves numéricas — regressão estrutural silenciosa que teria quebrado qualquer consumidor externo do índice. Corrigido reconstruindo `skills` como array, com a nova entrada `harness-engineering-patterns` reposicionada em ordem alfabética (entre `handoff-governance` e `integration-contract-analysis`); o teste determinístico correspondente foi ajustado para validar o schema de array (não dict). Suíte completa revalidada: 317/317 testes aprovados.
+
+
+## [2.35.0] — 2026-09-23
+
+### Adicionado (Harness Engineering — Sensores, Padrão Gerador–Avaliador Cético & Garbage Collection Contínuo)
+- **Pesquisa de base**: síntese das descobertas de mercado 2026 sobre Engenharia de Harness (Anthropic — *Harness design for long-running application development*; OpenAI — *Harness engineering: leveraging Codex in an agent-first world*; Martin Fowler/Thoughtworks — *Harness engineering for coding agent users*) aplicadas ao ecossistema `deep-agents-copilot`.
+- **[PROPOSTA-1] Positive Prompt Injection em Sensores Computacionais**:
+  - Novo helper `tests/governance_audit/_helpers.py` (`remediation(message, fix_hint=...)`) formatando mensagens de `assert` com bloco `REMEDIATION:` acionável, fechando o ciclo de auto-correção sem exigir raciocínio inferencial extra.
+  - Refatoração completa de `tests/governance_audit/test_governance_smells.py` (todas as asserções) para usar o novo helper.
+  - Novo **Smell 2.28** (Mensagem de Sensor Sem Remediação Acionável) documentado em `governance-audit-patterns/SKILL.md`, com atualização de contadores (26→28 categorias) e checklist de conformidade.
+  - `tests/README.md` atualizado com a convenção obrigatória para novos asserts em `tests/governance_audit/`.
+- **[PROPOSTA-2] Padrão Gerador–Avaliador Cético (Generator-Evaluator Skeptical Pattern)**:
+  - Nova seção `§ 1.4` em `.github/agents/workflows.md` formalizando o padrão (Sprint Contract pré-negociado, rubrica de corte objetiva, independência de avaliação).
+  - Aplicado a `WORKFLOW-BUG-FIX` (Estado 2 = Gerador do Red Test; Estado 5 = Avaliador Cético) e `WORKFLOW-FEATURE-DEVELOPMENT` (Estado 2 = negociação do contrato; Estado 6 = Avaliador Cético), incluindo novos campos `sprint_contract` e `avaliacao_cetica` nos respectivos Typed State Bags.
+- **[PROPOSTA-3] Continuous Garbage Collection & Drift Detection**:
+  - Nova skill `.github/skills/continuous-garbage-collection-patterns/SKILL.md` cobrindo 5 categorias de drift (documental, referência órfã, duplicação não consolidada, sincronização de catálogo R-015, skill órfã) e o protocolo de execução de varredura periódica ("Janitor Run").
+  - Registrada em `.github/skills/.index.json` (61 skills) e `.github/skills/README.md`; referenciada em `source_docs:` de `repo-hygiene-auditor.agent.md` e `governance-maintainer.agent.md`.
+- **Quality Gate**: 313/313 testes determinísticos aprovados (pytest).
+
+---
+
 ## [2.34.1] — 2026-09-23
 
 ### Refatorado & Otimizado

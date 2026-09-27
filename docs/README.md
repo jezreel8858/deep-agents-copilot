@@ -42,6 +42,9 @@ APRENDIZADO ────────────────────┼─�
 
 - **Como Rodar Workflows Canônicos**:
   - [Workflows Operacionais Determinísticos](../.github/agents/workflows.md): Especificação dos 8 workflows canônicos, com endurecimento determinístico e paridade de rigor entre Migração (6 etapas, Symbol Exhaustion e Tríplice Redundância), Bug-Fix (RCA estruturado 5 Whys/Fishbone com dupla evidência observável, classificação flaky vs regressão real, pré-declaração de blast radius e rollback plan, mini mutation-check anti falso-verde e observação pós-fix/canary) e Refatoração (Contract Testing Pact-style / consumer-driven, camada de redundância proporcional com auditoria reversa de símbolos, mini mutation gate e differential replay leve, e rollback com registro de blast_radius_revertido).
+- **Como Elaborar Planos de Workflow (R-064)**:
+  - [Planos de Planejamento](plans/README.md): Convenção e elaboração do Plano de Planejamento funcional (`docs/plans/`).
+  - [Planos de Implementação](implementation-plans/README.md): Convenção e elaboração do Plano de Implementação técnica (`docs/implementation-plans/`).
 - **Como Adicionar Contexto de Novo Projeto**:
   - [Project Context Builder](../.github/skills/project-context-builder/SKILL.md): Como executar `/add-project-context` para gerar adapters em `local/` sem vazar dados para o repositório público (R-043/R-044).
 - **Como Operar em Modo Context Mode**:
@@ -55,8 +58,9 @@ APRENDIZADO ────────────────────┼─�
 *Especificações formais, catálogos estruturados, schemas de validação e regras normativas para consulta rápida e auditoria automatizada.*
 
 - **Regras Normativas de Governança (Ground Truth)**:
-  - [CLAUDE.md](../CLAUDE.md): Fonte de verdade operacional global (Regras R-001 a R-056).
+  - [CLAUDE.md](../CLAUDE.md): Fonte de verdade operacional global (Regras R-001 a R-064).
   - [Instruções Copilot](../.github/copilot-instructions.md): Diretrizes operacionais e fast-paths do GitHub Copilot.
+  - [Mapa do Repositório (Repo Map)](repo-map.md): Fonte de verdade para navegação determinística de arquivos (Zero Blind Searches).
 - **Catálogos Estruturados de Agentes e Skills**:
   - [Catálogo Central de Agents](../.github/agents/catalog.yaml): Metadados, modelos, ferramentas e restrições dos 36 agentes.
   - [Grafo de Roteamento Estrutural](../.github/agents/routing-graph.yaml): Grafo declarativo de nós, arestas e regras de transição (R-040).

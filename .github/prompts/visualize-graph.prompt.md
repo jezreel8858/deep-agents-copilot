@@ -34,8 +34,6 @@ source_docs:
 
 ---
 
----
-
 ## 🎯 Uso
 
 ```bash

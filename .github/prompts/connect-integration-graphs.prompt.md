@@ -7,7 +7,7 @@ description:
   faltam em `.codegraphrc.json` até fechar todo gap identificado. Requer projetos já
   registrados via `/add-project-context`; nunca escreve em `catalog.yaml` (compartilhado).
 agent: 'agent'
-model: "Gemini 3.8 Flash"
+model: "Claude Sonnet 5"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'ask_questions', 'context-mode/ctx_search', 'context-mode/ctx_execute', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index']
 argument-hint: '[repositório-alvo]'
 source_docs:
@@ -19,6 +19,8 @@ source_docs:
   - .github/agents/code-knowledge-graph.agent.md
   - .github/skills/integration-contract-analysis/SKILL.md
   - .github/skills/codegraph-optave-usage/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/skills/handoff-governance/SKILL.md
 ---
 
 # `/connect-integration-graphs`
@@ -39,12 +41,14 @@ source_docs:
 
 ## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
 
-- ✅ **APENAS** mapear fronteiras de integração multi-repo (`manifesto.boundaries`) em `.codegraphrc.json`.
+- ✅ **APENAS** mapear fronteiras de integração multi-repo (`manifesto.boundaries`) em `.codegraphrc.json`, consultando contratos/endpoints/grafo existentes e propondo/aplicando as fronteiras que fecham gaps reais.
 - ✅ **SEMPRE** preservar isolamento local e respeitar o grafo construído pelo `@code-knowledge-graph`.
-- ❌ **NÃO** implementar código ou alterar endpoints em serviços da aplicação.
-- ❌ **NÃO** escrever em `.github/instructions/README.md` (compartilhado, R-043).
-
----
+- ✅ **SEMPRE** delegar levantamento de contrato/integração a `@tech-solution-architect` e consulta/validação de grafo a `@code-knowledge-graph` via `run_subagent` — nunca duplicar a lógica desses agents aqui (R-003).
+- ❌ **NÃO** implementar ou corrigir código nem alterar endpoints em serviços da aplicação nos projetos analisados.
+- ❌ **NÃO** escrever em `.github/instructions/README.md` nem em `catalog.yaml` (compartilhados, R-043) — projetos vivem em `projects.local.yaml`; leitura apenas.
+- ❌ **NÃO** reconstruir grafo do zero se já existir cache válido — sempre checar `code-graph:*` antes via `@code-knowledge-graph` (RNF-002).
+- ❌ **NÃO** editar ou aplicar `.codegraphrc.json` de nenhum projeto sem confirmação explícita via `ask_questions` (R-009) — é mudança estrutural em projeto(s) externo(s).
+- ❌ **NÃO** afirmar que uma integração existe sem evidência dupla: (a) declarada no levantamento de contrato (FASE 1) **e** (b) confirmada pela aresta real no grafo (FASE 2) — divergência é gap de evidência, não integração fechada.
 
 ---
 
@@ -54,18 +58,6 @@ source_docs:
 /connect-integration-graphs                            → varre todos os projetos registrados (catalog.yaml + projects.local.yaml)
 /connect-integration-graphs <projeto-A> <projeto-B>     → escopo restrito a um par/subconjunto de projetos
 ```
-
----
-
-## CRÍTICO
-
-- ❌ NÃO implementar/corrigir código de aplicação nos projetos analisados.
-- ❌ NÃO escrever em `.github/instructions/README.md` (compartilhado) — projetos vivem em `projects.local.yaml` (R-043); esta é leitura apenas.
-- ❌ NÃO reconstruir grafo do zero se já existir cache válido — sempre delegar a `@code-knowledge-graph`, que verifica hash/cache antes de reprocessar (RNF-002).
-- ❌ NÃO editar `.codegraphrc.json` de nenhum projeto sem confirmação explícita via `ask_questions` (R-009) — é mudança estrutural em projeto(s) externo(s).
-- ❌ NÃO afirmar que uma integração existe sem evidência dupla: (a) declarada no levantamento de contrato (FASE 1) **e** (b) confirmada pela aresta real no grafo (FASE 2) — divergência é gap de evidência, não integração fechada.
-- ✅ APENAS consultar contratos/endpoints/grafo existentes e propor/aplicar as fronteiras que fecham gaps reais.
-- ✅ SEMPRE delegar levantamento de contrato/integração a `@tech-solution-architect` e consulta/validação de grafo a `@code-knowledge-graph` via `run_subagent` — nunca duplicar a lógica desses agents aqui (R-003).
 
 ---
 
@@ -112,6 +104,8 @@ run_subagent(
 ### FASE 3 — Fechar as Pontes Faltantes (`manifesto.boundaries`)
 
 1. Cruzar a matriz confirmada (FASE 1 + FASE 2) com o estado atual de `.codegraphrc.json` de cada projeto envolvido (`read_file` se o arquivo existir).
+   - **Padrão de Edição Segura Verificada (R-051)**: a edição de `.codegraphrc.json` (arquivo JSON, sintaxe sensível a indentação) deve seguir o padrão R-051, verificando unicidade da âncora antes de escrever e revalidando a sintaxe após a escrita.
+   - **Lote Consolidado (R-046)**: se houver 2+ projetos com gap de fronteira pendente, consolidar todas as edições em uma única chamada de lote via `ctx_execute`/`ctx_batch_execute` (R-046) — nunca projeto por projeto sequencialmente no chat.
 2. Para cada par de projetos com integração confirmada e **sem** `manifesto.boundaries` correspondente em `.codegraphrc.json` → é um gap de fronteira.
 3. Apresentar via `ask_questions` a lista de gaps encontrados, com a opção de aplicar automaticamente cada ponte (`modules` + `rules`) — mesma estrutura de `.codegraphrc.json` já usada em `/add-project-context` FASE 4.1:
 
@@ -189,13 +183,7 @@ Resultado final: <N> gaps fechados / <N> gaps remanescentes (com próximo passo 
 
 ---
 
-## 🚨 Regras de Autonomia
-
-- ❌ **NUNCA** aplicar `.codegraphrc.json` sem confirmação explícita via `ask_questions` — mudança estrutural em projeto(s) externo(s).
-- ❌ **NUNCA** reconstruir grafo já cacheado — sempre checar `code-graph:*` antes (delegado a `@code-knowledge-graph`).
-- ❌ **NUNCA** escrever em `catalog.yaml` compartilhado (R-043) — apenas leitura.
-- ❌ **NUNCA** declarar integração "confirmada" apoiado só na FASE 1 (contrato) sem a confirmação estrutural da FASE 2 (grafo).
-- ✅ **APENAS** reportar e aplicar pontes após aprovação explícita do usuário.
+> Regras de autonomia consolidadas no bloco 🛑 CRÍTICO no topo deste arquivo.
 
 ---
 
@@ -217,6 +205,12 @@ Resultado final: <N> gaps fechados / <N> gaps remanescentes (com próximo passo 
 > especializados nesses dois domínios, evitando duplicação (R-003). Projetos sem `path_externo`
 > acessível no momento da execução são reportados como gap remanescente, nunca ignorados
 > silenciosamente.
+>
+> **Escalonamento de modelo (R-021.1)**: este prompt é fixado em `Claude Sonnet 5` devido ao
+> fan-out não limitado a priori sobre todos os projetos registrados no ecossistema e à
+> necessidade de reconciliação analítica estrita entre duas fontes de evidência independentes
+> (contratos/código via FASE 1 e arestas reais do grafo via FASE 2) antes de declarar qualquer
+> integração fechada.
 
 *v1.0 — connect-integration-graphs prompt — 2026-09-04*
 

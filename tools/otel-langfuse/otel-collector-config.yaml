@@ -10,27 +10,78 @@ receivers:
         endpoint: 0.0.0.0:4318
         cors:
           allowed_origins:
-            - "http://*"
-            - "https://*"
+            - "http://localhost:*"
+            - "http://127.0.0.1:*"
 
 processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 512
+    spike_limit_mib: 128
+
+  resource/defaults:
+    attributes:
+      - key: service.namespace
+        value: deep-agents
+        action: upsert
+      - key: deployment.environment
+        value: local
+        action: insert
+
+  transform/semconv:
+    trace_statements:
+      - context: span
+        statements:
+          - set(attributes["gen_ai.provider.name"], attributes["gen_ai.system"]) where attributes["gen_ai.provider.name"] == nil and attributes["gen_ai.system"] != nil
+          - delete_key(attributes, "gen_ai.system")
+          - set(attributes["gen_ai.conversation.id"], attributes["agent.conversation.id"]) where attributes["gen_ai.conversation.id"] == nil and attributes["agent.conversation.id"] != nil
+          - set(attributes["langfuse.session.id"], attributes["gen_ai.conversation.id"]) where attributes["gen_ai.conversation.id"] != nil
+          - set(attributes["gen_ai.tool.type"], "mcp") where attributes["mcp.method.name"] != nil
+
+  transform/redact-secrets:
+    trace_statements:
+      - context: span
+        statements:
+          - replace_all_patterns(attributes, "value", "(ghp_|gho_|github_pat_)[A-Za-z0-9_]+", "***REDACTED_GH***")
+          - replace_all_patterns(attributes, "value", "(sk|pk)-lf-[A-Za-z0-9-]+", "***REDACTED_LF***")
+          - replace_all_patterns(attributes, "value", "sk-[A-Za-z0-9]{20,}", "***REDACTED_KEY***")
+          - replace_all_patterns(attributes, "value", "Bearer\\s+[A-Za-z0-9._~+/=-]+", "Bearer ***REDACTED***")
+          - replace_all_patterns(attributes, "value", "AKIA[0-9A-Z]{16}", "***REDACTED_AWS***")
+
   batch:
     timeout: 1s
     send_batch_size: 64
 
-exporters:
-  # Exportador OTLP HTTP para o Langfuse v3
-  # Header calculado a partir de Basic base64(pk-lf-deep-agents-local-001:sk-lf-deep-agents-local-001)
-  otlp_http/langfuse:
-    endpoint: "http://langfuse-server:3000/api/public/otel"
-    headers:
-      Authorization: "Basic cGstbGYtZGVlcC1hZ2VudHMtbG9jYWwtMDAxOnNrLWxmLWRlZXAtYWdlbnRzLWxvY2FsLTAwMQ=="
+connectors:
+  spanmetrics:
+    histogram:
+      unit: ms
+    dimensions:
+      - name: gen_ai.operation.name
+      - name: gen_ai.tool.name
+      - name: gen_ai.tool.type
+      - name: tool.execution.status
+      - name: gen_ai.agent.name
 
-  # Exportador em arquivo local (JSON estruturado) para auditoria e integração com Context Insight Visualizer
+exporters:
+  otlp_http/langfuse:
+    # Langfuse Cloud SaaS endpoint (EU: https://cloud.langfuse.com/api/public/otel | US: https://us.cloud.langfuse.com/api/public/otel)
+    endpoint: "https://us.cloud.langfuse.com/api/public/otel"
+    headers:
+      Authorization: "Basic ${env:LANGFUSE_OTLP_AUTH}"
+
   file/traces:
     path: /var/log/otel/traces.json
+    rotation:
+      max_megabytes: 100
+      max_backups: 5
 
-  # Log no stdout do container para depuração
+  file/metrics:
+    path: /var/log/otel/metrics.json
+    rotation:
+      max_megabytes: 50
+      max_backups: 3
+
   debug:
     verbosity: basic
 
@@ -38,13 +89,13 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [batch]
-      exporters: [otlp_http/langfuse, file/traces, debug]
+      processors: [memory_limiter, resource/defaults, transform/semconv, transform/redact-secrets, batch]
+      exporters: [otlp_http/langfuse, spanmetrics, debug]
     metrics:
-      receivers: [otlp]
-      processors: [batch]
+      receivers: [otlp, spanmetrics]
+      processors: [memory_limiter, resource/defaults, batch]
       exporters: [debug]
     logs:
       receivers: [otlp]
-      processors: [batch]
+      processors: [memory_limiter, resource/defaults, transform/redact-secrets, batch]
       exporters: [debug]

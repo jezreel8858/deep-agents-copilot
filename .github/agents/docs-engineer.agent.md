@@ -17,6 +17,7 @@ source_docs:
   - .github/skills/efficient-batch-code-modification/SKILL.md
   - .github/skills/context-mode/SKILL.md
   - .github/skills/reflection-self-critique-patterns/SKILL.md
+  - docs/agent-context/templates/CONTEXT.template.md
 ---
 
 # Perfil Operacional
@@ -129,4 +130,3 @@ Se a solicitação pivotar para "implementar aplicação", retornar para `@agent
 - `/plan` → definir tipo de documento e estrutura.
 - `/implement` → gerar/atualizar o(s) `.md`.
 - `/validate` → checklist de estrutura, nomenclatura e veracidade.
-- `/documentar-regras` → quando o alvo for regra de negócio.

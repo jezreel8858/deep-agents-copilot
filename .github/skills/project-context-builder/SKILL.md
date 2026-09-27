@@ -21,6 +21,7 @@ source_docs:
   - ".github/prompts/add-project-context.prompt.md"
   - ".github/agents/adapter-generator.agent.md"
   - ".github/instructions/README.md"
+  - ".github/skills/business-rules-governance/SKILL.md"
 
 capabilities:
   - name: "scan_project_structure"
@@ -126,6 +127,8 @@ Copilot pergunta:
 ```
 
 ### Stage 4: Copilot Chat Generation (Seu Modelo, Sem APIs)
+
+> **Suporte a Bounded Contexts**: Quando o scan detectar múltiplos módulos ou subdomínios independentes, Copilot Chat gera opcionalmente um `CONTEXT-MAP.md` canônico na raiz do projeto conforme a skill `business-rules-governance`.
 
 ```
 Copilot Chat recebe o contexto:

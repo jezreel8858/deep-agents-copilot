@@ -10,6 +10,10 @@ tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 
 # Supervisores hierárquicos possuem estrutura contratual fechada para roteamento determinístico.
 # As 4 seções canônicas são: CRÍTICO: ESCOPO DE ROTEAMENTO, Decision Tree, Formato de Saída e Retorno ao Router.
 # Toda dependência documental e de skills reside exclusivamente no frontmatter 'source_docs:' (SSOT).
+# Checklist de Governança (Q2 / R-055 - Portão de Reúso Sistêmico):
+# Todo novo domain router DEVE ser integrado às enumerações de .github/agents/workflows.md
+# (ex.: § 1.3, § 3.3, § 5, § 8) bem como em catalog.yaml, routing-graph.yaml, agent-router.agent.md
+# e nos casos de teste de roteamento (evals/casos-roteamento.yaml - R-015 / R-040).
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
@@ -76,3 +80,11 @@ Próximo passo mínimo:
 
 **Banner obrigatório**: toda resposta abre com `Agente Ativo: <dominio>-router`.  
 Se a demanda for fora deste domínio, delegar para `@agent-router` via `run_subagent(agentName: 'agent-router', ...)`.
+
+## Zero Impersonation pelo Orquestrador Raiz (R-062)
+
+É TERMINANTEMENTE PROIBIDO ao modelo do turno raiz (antes de qualquer `run_subagent`) ler, abrir, resumir ou parafrasear o conteúdo de qualquer arquivo `.github/agents/**/*.agent.md` (de qualquer agent que não seja este próprio router) com o intuito de executar aquele papel diretamente no chat raiz. Exceção explícita: o arquivo deste router, `catalog.yaml` e `routing-graph.yaml` podem ser consultados exclusivamente para fins de roteamento/despacho, nunca para "aprender" e simular o comportamento de um agent específico. A única forma válida de "agir como" qualquer agent do catálogo é invocá-lo de fato via `run_subagent`. Comandos citando `@nome-do-agent` ou pedidos curtos NÃO isentam da passagem obrigatória pelo router primeiro. Regra agnóstica de modelo (Claude, GPT, Gemini etc.).
+
+## Zero Execução Direta pelo Orquestrador Raiz (R-063)
+
+É TERMINANTEMENTE PROIBIDO ao modelo do turno raiz (Orquestrador Raiz) executar qualquer tool nativa genérica (terminal, leitura de arquivo, busca, grep, edição) em resposta a um NOVO pedido do usuário sem antes invocar `run_subagent(agentName: 'agent-router', ...)` neste mesmo turno — mesmo quando não há agent ativo residente na conversa, mesmo quando o usuário não cita nome de agent algum, e mesmo para pedidos aparentemente triviais ou de baixo risco. A obrigação de passar pelo `@agent-router` primeiro é absoluta, complementa R-062 e independe de contexto residual de sessão: ausência de agent ativo residente NUNCA suspende a passagem obrigatória pelo router. Regra agnóstica de modelo (Claude, GPT, Gemini etc.).

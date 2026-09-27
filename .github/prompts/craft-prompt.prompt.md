@@ -1,6 +1,6 @@
 ---
 name: 'craft-prompt'
-description: 'Aciona o WORKFLOW-PROMPT-SYNTHESIS para refinar, enriquecer com contexto determinístico e gerar o prompt perfeito em bloco de código Markdown para um novo chat'
+description: 'Aciona o WORKFLOW-PROMPT-SYNTHESIS para refinar, enriquecer com contexto determinístico e gerar o prompt perfeito em template Markdown para um novo chat'
 agent: 'agent'
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'get_errors', 'ask_questions', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch_execute', 'context-mode/ctx_search']
@@ -16,7 +16,7 @@ source_docs:
 
 # `/craft-prompt`
 
-> **Propósito**: Acionar o `WORKFLOW-PROMPT-SYNTHESIS` para conduzir o refinamento estrutural de prompt, minerar contexto e dependências no codebase e sintetizar o prompt canônico perfeito em bloco de código Markdown pronto para inicializar um novo chat.
+> **Propósito**: Acionar o `WORKFLOW-PROMPT-SYNTHESIS` para conduzir o refinamento estrutural de prompt, minerar contexto e dependências no codebase e sintetizar o prompt canônico perfeito em template Markdown pronto para inicializar um novo chat conduzido por agents ou workflows especialistas (consumo exclusivo downstream).
 > **Arquivo Ativo**: `${file}`
 > **Workspace**: `${workspaceFolder}`
 
@@ -45,19 +45,21 @@ Este prompt utiliza as variáveis de contexto nativas do VS Code / JetBrains Cop
 ## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
 
 - ✅ **APENAS** refinar requisitos, minerar contexto determinístico no codebase e sintetizar o prompt canônico final em bloco de código Markdown (`.md`).
+- ✅ **SEMPRE** tratar o prompt sintetizado como de **consumo exclusivo downstream** por outros agents e workflows em uma nova sessão limpa, nunca como resposta ou solução final direta ao usuário.
 - ✅ **SEMPRE** avaliar a natureza da solicitação no Passo 1: se envolver nova feature, regras de negócio ou demanda aberta, assumir compulsoriamente a postura de `@requirements-analyst` e disparar `ask_questions` para validar decisões e regras de domínio com o usuário antes de avançar (R-027 / Invariante 19).
 - ✅ **SEMPRE** invocar compulsoriamente o subagente `@code-knowledge-graph` via `run_subagent` no Passo 2 para grounding determinístico de arquivos e dependências (R-045 / Invariante 18).
 - ✅ **SEMPRE** garantir **Visibilidade Progressiva (Anti-Blackbox Execution)**: detalhar obrigatoriamente no chat os achados e decisões de cada uma das 5 etapas antes de emitir o prompt final.
 - ✅ **SEMPRE** operar no **Problem Space** durante o refino, formalizando Critérios de Aceitação (DoD) e Não-Escopo antes da síntese.
-- ✅ **SEMPRE** identificar e injetar caminhos reais de arquivos (`<grounded_files>`) e componentes irmãos canônicos homologados.
+- ✅ **SEMPRE** identificar e injetar caminhos reais de arquivos (seção `## Arquivos e Referências Grounded`) e componentes irmãos canônicos homologados.
 - ❌ **NÃO** deduzir, supor ou inventar regras de negócio, telas, permissões ou fluxos de aprovação sem confirmação humana direta (proibição expressa de alucinação de requisitos).
 - ❌ **NÃO** tratar checkpoints de validação humana como opcionais em demandas com ambiguidade de domínio ou múltiplos caminhos de negócio viáveis.
 - ❌ **NÃO** realizar varredura manual de pastas, scripts exploratórios de diretório com `fs` no sandbox via `ctx_execute` ou MCP Tool Chaining sequencial (violação gravíssima de R-045 / RNF-004 e Smell 2.26). Toda análise estrutural pertence com exclusividade ao `@code-knowledge-graph`.
 - ❌ **NÃO** simular ou fingir a chamada de `@code-knowledge-graph` no checklist sem tê-lo invocado de fato via `run_subagent`.
 - ❌ **NÃO** executar o workflow em silêncio (blackbox) emitindo apenas checkboxes [✅] sem o Painel de Evidências das etapas.
 - ❌ **NÃO** implementar código de aplicação, alterar arquivos de domínio ou executar correções de funcionalidade (responsabilidade do novo chat).
-- ❌ **NÃO** fazer perguntas abertas ou excessivas — aplicar o modelo de Autonomia Delimitada (`ask_questions` estruturado com opções + campo livre).
-- ❌ **NÃO** gerar texto de prompt solto sem tags XML canônicas ou fora de bloco de código copiável.
+- ❌ **NÃO** fazer perguntas abertas ou desestruturadas — aplicar elicitação de 5 a 10 rodadas estruturadas de desambiguação via `ask_questions` com opções + campo livre (R-027 / Invariante 19), com teto estrito na 10ª rodada.
+- ❌ **NÃO** gerar texto de prompt solto sem estrutura Markdown canônica ou fora de bloco de código copiável.
+- ❌ **NÃO** apresentar o prompt como solução técnica implementada ou resposta final ao usuário (consumo estrito downstream).
 
 ---
 
@@ -70,8 +72,8 @@ O processamento segue rigorosamente as 5 etapas do **`WORKFLOW-PROMPT-SYNTHESIS`
 - **Via Funcional (Feature / Regras de Negócio / Demanda Aberta)**:
   - Assuma compulsoriamente a postura investigativa de `@requirements-analyst`.
   - Aplique *Five Whys* caso a solicitação venha com solução técnica prematura (*solution-jumping*).
-  - Isole as ambiguidades fundamentais de negócio e formule de 1 a 3 perguntas estruturadas com opções claras (padrão `structured-intake-patterns`) via `ask_questions`.
-  - 🛑 **PARADA OBRIGATÓRIA**: Aguarde a resposta do usuário antes de avançar! É terminantemente proibido avançar para o Passo 2 ou alucinar regras de negócio sem confirmação do solicitante (R-027 / Invariante 19).
+  - Isole as ambiguidades fundamentais de negócio e formule de 5 a 10 rodadas estruturadas de desambiguação via `ask_questions` com opções claras + campo livre (padrão `structured-intake-patterns` e Invariante 19).
+  - 🛑 **PARADA OBRIGATÓRIA**: Aguarde a resposta do usuário em cada rodada antes de avançar! É terminantemente proibido avançar para o Passo 2 ou alucinar regras de negócio sem confirmação do solicitante (R-027 / Invariante 19). Caso atinja a 10ª rodada com pontos ainda em aberto, aplique a cláusula de teto: declare as lacunas residuais formalmente na seção de restrições e prossiga.
   - Converta as definições validadas pelo usuário em Critérios de Aceitação (DoD em formato INVEST/Gherkin).
 - **Via Técnica (Refactor / Bugfix / Tarefa Direta com Alvo Claro)**:
   - Conduza com `@prompt-structuring` diretamente no Problem Space técnico, delimitando o escopo sem inventar regras de negócio.
@@ -92,19 +94,25 @@ O processamento segue rigorosamente as 5 etapas do **`WORKFLOW-PROMPT-SYNTHESIS`
 - Registre as restrições na seção `### 🛑 Etapa 3: Mapeamento de Restrições e Não-Escopo`.
 
 ### Passo 4 — Síntese Estruturada & Otimização de Caching (`@prompt-structuring`)
-- Monte o prompt canônico final estruturado com tags XML semânticas estritas:
-  - `<role>`: Especialista sênior na stack detectada.
-  - `<project_context>`: Dados estáticos da aplicação e convenções para alinhamento e Prompt Caching.
-  - `<grounded_files>`: Caminhos reais dos arquivos alvo, interfaces e referências.
-  - `<task>`: Descrição clara e concisa do objetivo.
-  - `<acceptance_criteria>`: Checklist de aceitação objetivo.
-  - `<constraints>`: Restrições negativas e diretrizes inegociáveis.
-  - `<execution_protocol>`: Passos operacionais recomendados para o agente executor.
-  - `<output_format>`: Formato conciso e sem narrativa ociosa.
+- Monte o prompt canônico final estruturado no template Markdown canônico (`templates/prompt-synthesis-output.md`):
+  - `# [Papel Especialista / Stack Detectada]`
+  - `## Contexto do Projeto`: Dados estáticos da aplicação e convenções para alinhamento e Prompt Caching.
+  - `## Arquivos e Referências Grounded`: Caminhos reais dos arquivos alvo, interfaces e referências verificados.
+  - `## Tarefa`: Descrição clara e concisa do objetivo.
+  - `## Critérios de Aceitação`: Checklist de aceitação objetivo em formato INVEST/Gherkin.
+  - `## Restrições e Não-Escopo`: Restrições negativas, diretrizes inegociáveis (R-046 / Single-Turn Batching) e eventuais lacunas residuais declaradas.
+  - `## Protocolo de Execução Recomendado`: Passos operacionais recomendados para o agente executor na nova sessão.
+  - `## Formato de Saída Esperado`: Formato conciso de entrega sem narrativa ociosa.
 - Registre a estratégia de alinhamento para Prompt Caching na seção `### ⚡ Etapa 4: Síntese Estruturada & Caching`.
 
 ### Passo 5 — Quality Gate & Emissão do Bloco Markdown (`@prompt-structuring`)
-- Execute um red-teaming analítico: confirme zero ambiguidades, zero contradições, zero alucinações de caminhos de arquivo e eliminação de over-prompting.
+- Execute um red-teaming analítico ativo contra o Solution Space avaliando os 4 critérios de corte excludentes:
+  1. Classes ou métodos internos não solicitados;
+  2. Bibliotecas, frameworks ou algoritmos não pedidos expressamente;
+  3. Arquitetura interna ou design patterns prescritos no lugar de preservar a autonomia do especialista;
+  4. Tecnologias não mencionadas na demanda original.
+- Confirme ainda: zero alucinações de caminhos de arquivos (100% verificados via `@code-knowledge-graph`), zero ambiguidades nos critérios de aceite, eliminação de over-prompting prejudicial a modelos de raciocínio frontier e garantia de consumo exclusivo downstream por agents/workflows.
+- Cláusula de bloqueio: qualquer violação reprova a emissão e força re-síntese cirúrgica no Passo 4.
 - Registre o checklist de verificação na seção `### 🛡️ Etapa 5: Quality Gate & Validação Final`.
 - Emita o bloco de código Markdown (`.md`) completo e autocontido, pronto para ser copiado e colado na primeira mensagem de uma sessão limpa.
 
@@ -116,9 +124,11 @@ O processamento segue rigorosamente as 5 etapas do **`WORKFLOW-PROMPT-SYNTHESIS`
 - [ ] Subagente `@code-knowledge-graph` invocado formalmente via `run_subagent` na Etapa 2 (zero scripts manuais no sandbox).
 - [ ] Pipeline visual `### 🗺️ Pipeline de Execução: WORKFLOW-PROMPT-SYNTHESIS (5 etapas)` exibido no topo.
 - [ ] Painel de Evidências com relatório individual de cada uma das 5 etapas renderizado no chat.
-- [ ] Arquivos e referências mapeados com caminhos reais existentes no repositório (`<grounded_files>`).
-- [ ] Critérios de aceitação objetivos formulados em formato de checklist (`<acceptance_criteria>`).
-- [ ] Restrições negativas e não-escopo explicitados (`<constraints>`).
+- [ ] Arquivos e referências mapeados com caminhos reais existentes no repositório (`## Arquivos e Referências Grounded`).
+- [ ] Critérios de aceitação objetivos formulados em formato de checklist (`## Critérios de Aceitação`).
+- [ ] Restrições negativas, governança de lote e eventuais lacunas residuais explicitadas (`## Restrições e Não-Escopo`).
+- [ ] Red-teaming de Solution Space aprovado nos 4 critérios de corte.
+- [ ] Finalidade de consumo exclusivo downstream garantida (não entregue como resposta final ao usuário).
 - [ ] Bloco Markdown final renderizado em cerca de código pronta para cópia.
 - [ ] Nenhuma alteração indevida realizada no codebase da aplicação.
 
@@ -155,13 +165,15 @@ O processamento segue rigorosamente as 5 etapas do **`WORKFLOW-PROMPT-SYNTHESIS`
 - **Convenções Obrigatórias Injetadas**: <R-046, Single-Turn Batching, regras inegociáveis da stack>
 
 #### ⚡ Etapa 4: Síntese Estruturada & Caching
-- **Segmentação XML**: Tags semânticas canônicas (`<role>`, `<project_context>`, `<grounded_files>`, etc.).
+- **Segmentação Markdown**: Seções canônicas estruturadas (`## Contexto do Projeto`, `## Arquivos e Referências Grounded`, `## Tarefa`, `## Critérios de Aceitação`, `## Restrições e Não-Escopo`, `## Protocolo de Execução Recomendado`, `## Formato de Saída Esperado`).
 - **Prompt Caching Alignment**: Instruções estáticas e regras posicionadas no topo; dados variáveis da task na cauda.
 
 #### 🛡️ Etapa 5: Quality Gate & Validação Final
+- [x] Zero invasão de Solution Space (red-teaming de 4 critérios aprovado).
 - [x] Zero alucinações de caminhos de arquivos (100% verificados contra o workspace).
 - [x] Zero ambiguidades nos critérios de aceite.
 - [x] Zero over-prompting prejudicial a modelos com raciocínio nativo.
+- [x] Consumo exclusivo downstream assegurado (destinado a inicializar novo chat com agent/workflow).
 - [x] Bloco Markdown completo e autocontido.
 
 ---
@@ -170,37 +182,39 @@ O processamento segue rigorosamente as 5 etapas do **`WORKFLOW-PROMPT-SYNTHESIS`
 Copie o bloco de código abaixo e cole na mensagem inicial da sua nova sessão:
 
 ````markdown
-<role>
-...
-</role>
+# [Papel Especialista / Stack Detectada]
 
-<project_context>
+## Contexto do Projeto
+<!-- Dados estáticos da aplicação e convenções para alinhamento e Prompt Caching -->
 ...
-</project_context>
 
-<grounded_files>
-...
-</grounded_files>
+## Arquivos e Referências Grounded
+<!-- Caminhos reais no repositório verificados via @code-knowledge-graph e componentes irmãos canônicos -->
+- `caminho/do/arquivo_1`
+- `caminho/do/arquivo_2`
 
-<task>
+## Tarefa
+<!-- Descrição clara e concisa do objetivo a ser executado no novo chat -->
 ...
-</task>
 
-<acceptance_criteria>
-...
-</acceptance_criteria>
+## Critérios de Aceitação
+<!-- Checklist objetivo em formato INVEST/Gherkin -->
+- [ ] Critério 1
+- [ ] Critério 2
 
-<constraints>
-...
-</constraints>
+## Restrições e Não-Escopo
+<!-- Restrições negativas, diretrizes inegociáveis (R-046 / Single-Turn Batching) e eventuais lacunas residuais -->
+- **Não-Escopo Negativo**: ...
+- **Governança de Lote**: R-046 aplicado
+- **Lacunas Residuais**: ...
 
-<execution_protocol>
-...
-</execution_protocol>
+## Protocolo de Execução Recomendado
+<!-- Passos operacionais recomendados para o agente executor na nova sessão -->
+1. Inspecionar arquivos grounded em memória...
 
-<output_format>
+## Formato de Saída Esperado
+<!-- Formato conciso de entrega sem narrativa ociosa -->
 ...
-</output_format>
 ````
 ```
 
@@ -210,6 +224,7 @@ Copie o bloco de código abaixo e cole na mensagem inicial da sua nova sessão:
 
 - ❌ **NUNCA** contornar a invocação do subagente `@code-knowledge-graph` utilizando scripts manuais `fs` em `ctx_execute` (violação estrita de R-045 / RNF-004 e Smell 2.26).
 - ❌ **NUNCA** modificar arquivos de aplicação durante a execução deste prompt — sua saída exclusiva é a especificação e o prompt sintetizado.
+- ❌ **NUNCA** apresentar o prompt sintetizado como solução final ao usuário — o artefato é de consumo exclusivo downstream para inicialização de uma nova sessão limpa.
 - ❌ **NUNCA** emitir uma resposta "caixa-preta" ocultando o Painel de Evidências por Etapa.
 - ❌ **NÃO** inferir intenções de negócio ou requisitos técnicos não fundamentados.
 - ✅ **SEMPRE** priorizar caminhos de arquivos canônicos e contratos documentados.

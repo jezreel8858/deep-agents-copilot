@@ -222,6 +222,8 @@ Não reexecutar o scanner — usar diretamente o `project_profile` já obtido vi
 >     via `adapter-generator` (modo `generate-one`) — nunca via `create_file` direto do Copilot.
 >     Nenhum arquivo é criado no projeto externo (`<caminho-externo>`).
 >     Nenhum artefato deste passo toca `catalog.yaml` ou a raiz de `.github/instructions/` (compartilhados).
+>
+> 💡 **Glossário de Domínio Opcional (`CONTEXT.md`)**: Ao gerar o adapter do projeto, caso o projeto possua termos de negócio ou regras recorrentes com jargão específico, o fluxo pode propor a criação de um `CONTEXT.md` a partir do template canônico (`docs/agent-context/templates/CONTEXT.template.md`) para alimentar a compressão semântica via `ctx_search`.
 
 #### 2.5 Preview + Confirmação
 - Mostrar YAML gerado
@@ -249,7 +251,6 @@ O Copilot aplica mudanças **atomicamente por plano validado** (sem depender de 
    - Backup automático de arquivos
    - [CREATE-SE-AUSENTE] `.github/projects.local.yaml` ← copiar de `projects.local.yaml.example` se ainda não existir
    - [UPDATE] `.github/projects.local.yaml` ← NESTE repo, gitignored (NUNCA `catalog.yaml`) — próprio prompt, não o agent
-   - [UPDATE] `.github/instructions/README.md` ← NESTE repo (referência, sem dado de projeto real)
    - [UPDATE] `.github/instructions/README.md` ← NESTE repo (referência, sem dado de projeto real)
    - ❌ Nenhuma operação no projeto externo
    - ❌ Nenhuma operação em `.github/instructions/README.md` (compartilhado/commitado)

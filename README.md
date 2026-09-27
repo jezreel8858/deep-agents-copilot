@@ -107,6 +107,10 @@ deep-agents-copilot/
 │       └── local/                               # Adapters locais de projetos (gitignored, R-043)
 │
 ├── docs/                                        # Documentação de Produto, Arquitetura e Planos
+│   ├── README.md                                # Central unificada de documentação (Diátaxis)
+│   ├── repo-map.md                              # ⭐ Mapa do repositório para navegação determinística
+│   ├── plans/                                   # ⭐ Planos de Planejamento por workflow (R-064)
+│   ├── implementation-plans/                    # ⭐ Planos de Implementação técnica por workflow (R-064)
 │   ├── agent-context/                           # Guias de uso de ferramentas
 │   ├── plan/                                    # Planos arquiteturais
 │   │   └── agent-profiles-taxonomy.md           # Taxonomia consolidada de agents de mercado
@@ -117,7 +121,7 @@ deep-agents-copilot/
 │   ├── incident_recorder/                       # ⭐ Motor de persistência de incidentes e aprendizado (SQLite + Supabase)
 │   ├── codegraph-visualizer/                    # Visualizador de grafos de código
 │   ├── context-insight-visualizer/              # Visualizador de insights de contexto
-│   └── otel-langfuse/                           # Coletor OpenTelemetry para Langfuse
+│   └── otel-langfuse/                           # Coletor OpenTelemetry proxy para Langfuse Cloud (ver docs/context/setup-telemetry-copilot.md)
 │
 └── tests/                                       # Suíte de Testes Automatizados (pytest)
     ├── governance_audit/                        # Auditoria de regras e smells de governança

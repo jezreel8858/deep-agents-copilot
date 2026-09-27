@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "adapter-generator",
+  "name": "Adapter Generator",
+  "version": "1.0.0",
+  "description": "Gera automaticamente adapters por-projeto em `.github/instructions/local/` (gitignored, R-043) via scanner read-only de stack e arquitetura. Opera em modos scan, generate-one e batch, integrando-se a `/add-project-context`.",
+  "domain": "Geracao automatica de adapters",
+  "role": "specialist",
+  "capabilities": [
+    "adapter",
+    "convencoes",
+    "instrucoes",
+    "gerar adapters",
+    ".instructions.md",
+    "scanner",
+    "detectar stack"
+  ],
+  "skills": [
+    "context-mode",
+    "agent-contracts",
+    "project-scanner"
+  ],
+  "tools": [
+    "file_search",
+    "list_dir",
+    "get_errors",
+    "grep_search",
+    "run_subagent",
+    "context-mode/ctx_execute",
+    "context-mode/ctx_execute_file",
+    "context-mode/ctx_index",
+    "context-mode/ctx_search",
+    "context-mode/ctx_batch_execute"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only"
+    ],
+    "least_privilege_level": "standard",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Gemini 3.8 Flash",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/catalog.yaml",
+    "priority": 10.7,
+    "estimated_time_minutes": 20
+  }
+}

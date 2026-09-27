@@ -37,6 +37,34 @@ tools: []
 
 ---
 
+
+## 1.1) Vocabulário de Deep Module (Codebase Design)
+
+> **Origem / Inspiração**: Princípios de arquitetura e design de software de John Ousterhout (*A Philosophy of Software Design*) consolidados em `mattpocock/skills/codebase-design`.
+> **Objetivo em Refatoração**: Projetar **módulos profundos** (*deep modules*), onde uma alta densidade de comportamento e complexidade reside atrás de uma interface enxuta e estável, posicionada em uma costura (*seam*) limpa e testável.
+
+### Conceitos Fundamentais
+
+| Termo | Definição | Objetivo em Refatoração | Exemplo Concreto |
+|---|---|---|---|
+| **Deep Module** | Módulo cuja interface expõe pouca complexidade (poucos métodos/parâmetros), mas cuja implementação interna encapsula alto comportamento e regras de negócio. | Maximizar a alavancagem dos chamadores e isolar mudanças internas sem quebrar consumidores. | Um serviço `OrderProcessor.process(orderId)` que internamente orquestra estoque, pagamento, antifraude e mensageria sem expor 15 métodos intermediários. |
+| **Shallow Module** | Módulo cuja interface é quase tão complexa quanto sua implementação interna (pass-through ou wrapper fino sem agregação de valor). | Eliminar ou aprofundar durante o refactoring, fundindo camadas redundantes ou ocultando detalhes internos. | Um `UserService` anêmico que apenas repassa chamadas idênticas para `UserRepository.findById` sem validação, transformação ou política adicional. |
+| **Seam (Costura)** | Ponto de junção onde é possível alterar o comportamento do sistema sem editar o código naquele ponto exato (Michael Feathers). | Estabelecer limites desacoplados onde módulos legados e novos possam coexistir ou ser interceptados por testes/mocks. | Injeção de dependência via interface `PaymentGateway` permitindo alternar entre implementação real (Stripe) e fake em memória nos testes. |
+| **Adapter Pattern** | Estrutura concreta que preenche um slot em uma costura (*seam*), adaptando uma interface externa ou legado ao contrato exigido pelo módulo. | Permitir que o novo design avance com vocabulário de domínio limpo, isolando peculiaridades de clientes ou sistemas externos. | `LegacyCustomerSoapAdapter` implementando a nova interface `CustomerDomainService` enquanto consome chamadas SOAP de um ERP legado. |
+| **Leverage Points** | Pontos de alta alavancagem onde uma pequena alteração ou abstração na interface beneficia N pontos de chamada e M testes. | Concentrar o esforço de refatoração nos componentes que maximizam a redução de complexidade em toda a base de código. | Centralizar a política de validação de tokens em um interceptor/middleware único, removendo parsing manual de 40 endpoints. |
+| **Locality** | Propriedade de concentração de contexto, conhecimento, bugs e verificação em um único ponto, evitando dispersão sistêmica. | Garantir que correções ou alterações de regras ocorram em um único local (*fix once, fixed everywhere*), eliminando *shotgun surgery*. | Centralizar regras fiscais de cálculo de tributos em `TaxCalculator` em vez de espalhá-las nas camadas de checkout, fatura e relatório. |
+| **Deletion Test** | Teste de validação conceitual: imaginar a exclusão do módulo do sistema para auditar se ele realmente justifica sua existência. | Validar se o módulo é um intermediário dispensável ou se concentra complexidade real que reapareceria nos consumidores caso removido. | Se deletar `OrderValidationHelper` faz a complexidade desaparecer, ele era ruído; se espalha validações em 10 controladores, era legítimo. |
+
+### Diretrizes de Design para Refatoração
+
+1. **Profundidade é propriedade da interface, não do tamanho do código**: Um módulo profundo pode ser internamente composto por partes menores e intercambiáveis (costuras internas), mas sua superfície externa permanece pequena e coesa.
+2. **A interface é a superfície de teste**: Testes e chamadores cruzam a mesma costura (*seam*). Se for necessário inspecionar detalhes privados além da interface para testar, o módulo provavelmente está com o formato incorreto.
+3. **Uma costura sem variação é custo**: Uma única implementação concreta indica uma costura hipotética; duas ou mais indicam uma costura real necessária. Evitar criar abstrações ou interfaces prematuras quando não há variabilidade real.
+4. **Preferir dependências recebidas a criadas**: Receber dependências via construtor ou parâmetro em vez de instanciar internamente (`new ConcreteGateway()`), garantindo testabilidade limpa na costura.
+5. **Retornar resultados em vez de produzir efeitos colaterais ocultos**: Favorecer métodos que retornam estruturas imutáveis e resultados explícitos, facilitando testes e reduzindo acoplamento temporal.
+
+---
+
 ## 1) Metodologias e Padrões de Refatoração Estrutural
 
 ```text
@@ -146,6 +174,8 @@ Evitar dependência exclusiva de `git revert` em produção. Planejar contingên
 - [ ] Tarefas organizadas em DAG com no máximo 1 a 3 arquivos alterados por nó.
 - [ ] Cada nó do plano possui Gate In, Gate Out e agente especialista de stack atribuído.
 - [ ] Rollback planejado em runtime (flags, tolerância a falhas, expand & contract) sem depender puramente de commit revert.
+- [ ] Módulos-alvo avaliados quanto à profundidade (Deep Module vs Shallow Module) e submetidos ao Deletion Test, prevenindo ativamente Pass-Through Methods sem agregação de valor.
+- [ ] Seams (costuras) identificadas nos pontos de injeção de teste/desacoplamento antes de iniciar a refatoração.
 
 ---
 
@@ -158,6 +188,7 @@ Evitar dependência exclusiva de `git revert` em produção. Planejar contingên
 | Depender de `git revert` para BD | Perda irrecuperável de dados ou corrupção | Adotar padrão *Expand & Contract* com dual-write |
 | Modificar comportamento e estrutura juntos | Impossibilidade de rastrear causa raiz de bugs | Separar estritamente refactoring de nova feature |
 | Ignorar Zone of Pain ($A=0, I=0$) | Propagação de quebras em cascata no sistema | Injetar interface (Branch by Abstraction) primeiro |
+| Pass-Through Method / Shallow Module residual | Interface tão complexa quanto a implementação; wrapper fino sem agregação de valor detectado pelo Deletion Test | Fundir camadas redundantes (aprofundar o módulo) ou eliminar o intermediário, concentrando comportamento atrás de interface enxuta |
 
 ---
 

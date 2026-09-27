@@ -62,6 +62,52 @@ Nem toda pergunta é bloqueante. Classificar cada campo do intake em:
 
 **Anti-padrão:** perguntar tudo como bloqueante (fadiga de intake) ou nada como bloqueante (viola R-027).
 
+## 2.1) Protocolo de Grilling Cético ("Grill Me" / Matt Pocock)
+
+Inspirado nas práticas de AI Hero / `mattpocock/skills`, o agente não assume uma postura passiva de mero executor de ordens ou aceitador cego de premissas. Ele deve **interrogar ativamente o desenvolvedor/arquiteto** sobre premissas implícitas, casos de borda e modos de falha antes de qualquer geração de código ou alteração estrutural.
+
+#### Dinâmica de Interrogação
+O agente formula indagações cirúrgicas via `ask_questions`:
+- *"O que acontece se o serviço/dependência X falhar ou retornar timeout?"*
+- *"Qual é o comportamento esperado sob concorrência e condições de corrida?"*
+- *"Qual trade-off arquitetural foi considerado para esta abordagem (ex.: latência vs. consistência)?"*
+- *"Por que não adotar a alternativa Y (solução mais simples ou padrão existente no repositório)?"*
+- *"Quais invariantes de negócio não podem ser violados em hipótese alguma?"*
+
+#### Regra de Ouro da Responsabilidade
+- **Humanos mantêm 100% da responsabilidade** pelas decisões de produto, requisitos e arquitetura final.
+- **O agente expõe as ramificações, premissas implícitas e decisões ocultas** antes da codificação, forçando clareza e prevenindo retrabalho catastrófico.
+
+---
+
+## 2.2) State Machine de Triagem Formal (Issue Labels)
+
+Inspirada no modelo de governança de `mattpocock/skills/triage`, a triagem formal opera como uma máquina de estados determinística orientada a rótulos (*labels* de issue/ticket). Ela assegura que nenhuma tarefa seja executada sem especificação suficiente e que agentes autônomos só atuem quando todas as ambiguidades tiverem sido eliminadas.
+
+### Estados Canônicos de Triagem
+- `needs-triage`: Estado inicial obrigatório para qualquer nova issue ou solicitação inbound. Nenhuma intervenção de código é permitida.
+- `needs-info`: A solicitação carece de reprodução, logs, escopo ou parâmetros essenciais. Aguarda esclarecimento do autor.
+- `ready-for-agent`: A demanda possui especificações completas, critérios de aceite claros, zero ambiguidade arquitetural e pode ser executada por agente de IA com guardrails.
+- `ready-for-human`: A demanda envolve julgamento de produto, design sensível, decisões estratégicas de arquitetura, alto risco regulatório ou aprovação orçamentária.
+- `wontfix`: Solicitação rejeitada por estar fora de escopo, duplicada, tecnicamente inviável ou refutada durante o grilling.
+
+### Tabela de Transições da State Machine
+
+| Estado Atual | Evento / Condição | Próximo Estado | Ação Automática Executada |
+|---|---|---|---|
+| *(Nova issue)* | Criação do ticket sem análise prévia | `needs-triage` | Aplicar label `needs-triage`; acionar `@agent-router` ou triagem inicial. |
+| `needs-triage` | Dados incompletos, sem passos de reprodução ou sem critérios | `needs-info` | Aplicar `needs-info`; emitir perguntas cirúrgicas via `ask_questions` / template de intake. |
+| `needs-info` | Autor responde com todos os dados e critérios validados | `needs-triage` | Remover `needs-info`; reavaliar elegibilidade de execução. |
+| `needs-info` | Inatividade prolongada sem resposta (> 14 dias) | `wontfix` | Fechar issue com mensagem explicativa de expiração de contexto. |
+| `needs-triage` | Escopo delimitado, reproduzível, puramente técnico e sem risco estrutural | `ready-for-agent` | Aplicar `ready-for-agent`; despachar para o especialista correspondente no grafo. |
+| `needs-triage` | Envolve trade-off crítico de negócio, arquitetura core ou UX subjetiva | `ready-for-human` | Aplicar `ready-for-human`; notificar mantenedores humanos no PR/issue. |
+| `needs-triage` | Fora de escopo, duplicada ou refutada no grilling cético | `wontfix` | Aplicar `wontfix`; registrar justificativa técnica e fechar ticket. |
+
+### Regras de Automação e Governança de Labels
+1. **SSOT da Triagem**: Apenas um label de estado (`needs-*` ou `ready-*`) deve estar ativo por vez no artefato.
+2. **Portão de Entrada do Agente**: Agentes executores (`refactor-planner`, `backend-developer`, `test-engineer`, etc.) DEVEM recusar execução imediata se a issue estiver com label `needs-triage` ou `needs-info`.
+3. **Escalonamento Transparente**: Se durante a execução um agente detectar complexidade imprevista que rompe o contrato inicial, ele deve transicionar o estado de `ready-for-agent` para `ready-for-human` e suspender a automação.
+
 ## 3) Template de Consolidação
 
 Após a coleta, todo agent que usa este padrão deve produzir um bloco de consolidação antes de agir, nomeado por domínio (ex.: `## PRÉ-CONTEXTO VALIDADO`, `## PROTOCOLO DE DETECÇÃO CONCLUÍDO`, `## CONTEXTO DE COLETA`):
@@ -120,6 +166,7 @@ Quando não há relatório/fonte externa disponível (ex.: `test-engineer` sem r
 
 ## 9) Referências
 
+- Matt Pocock / AI Hero: *triage skill* (https://github.com/mattpocock/skills)
 - `CLAUDE.md` — R-027 (Clarificação Obrigatória).
 - `.github/copilot-instructions.md` — R-027, formato de `ask_questions`.
 - `.github/skills/context-mode/SKILL.md` — playbook de coleta ativa em lote antes de perguntar.

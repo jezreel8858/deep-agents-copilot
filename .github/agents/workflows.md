@@ -19,7 +19,7 @@ Conforme documentado no framework *Building Effective Agents* (Anthropic) e nas 
 
 ### 1.3 Convenção de Nomenclatura: Resolução de Papéis Genéricos (`specialist-<papel>`)
 
-Para permanecer agnóstico de stack (R-038), este documento referencia os executores táticos através de **papéis genéricos** (`specialist-bug-fixer`, `specialist-ui-stylist`, `specialist-unit-test-writer`, `specialist-component-test-writer`, `specialist-integration-test-writer`, `specialist-test-fixer`, `specialist-feature-developer`, `specialist-arch-advisor`). **Nenhum desses nomes existe literalmente no catálogo** — são aliases resolvidos em tempo de roteamento pelo *domain router* ativo (`@angular-router`, `@spring-boot-router`, `@spring-reactive-router`, `@ejb-router`) para o agente concreto do seu sub-catálogo (`*-catalog.yaml`) que declara a tag `role:` correspondente.
+Para permanecer agnóstico de stack (R-038), este documento referencia os executores táticos através de **papéis genéricos** (`specialist-bug-fixer`, `specialist-ui-stylist`, `specialist-unit-test-writer`, `specialist-component-test-writer`, `specialist-integration-test-writer`, `specialist-test-fixer`, `specialist-feature-developer`, `specialist-arch-advisor`). **Nenhum desses nomes existe literalmente no catálogo** — são aliases resolvidos em tempo de roteamento pelo *domain router* ativo (`@angular-router`, `@spring-boot-router`, `@spring-reactive-router`, `@ejb-router`, `@struts-router`, `@database-router`, `@python-router`) para o agente concreto do seu sub-catálogo (`*-catalog.yaml`) que declara a tag `role:` correspondente.
 
 | Papel Genérico | Tag `role:` | Angular | Spring Boot | Spring Reactive | EJB |
 |---|---|---|---|---|---|
@@ -38,7 +38,74 @@ Para permanecer agnóstico de stack (R-038), este documento referencia os execut
 3. **Banco de dados é exceção nomeada**: sub-rotinas de schema/DDL nunca usam papel genérico — referenciam sempre `@database-specialist` (agente único, cross-stack) por nome literal.
 4. **Stack não identificada**: se o `@bug-triage`/`@refactor-planner` não conseguir inferir a stack (nenhum domain router aplicável), o estado correspondente aciona `ask_questions` para confirmar a stack antes de resolver o papel genérico — nunca infere silenciosamente.
 
+### 1.4 Padrão Gerador–Avaliador Cético (Generator-Evaluator Skeptical Pattern)
+
+**Fundamentação de mercado**: Anthropic (*Harness design for long-running application development*, Mar/2026) demonstrou que agentes avaliando o próprio trabalho tendem à complacência ("self-grading leniency") — mesmo diante de resultados objetivamente medíocres. A separação estrutural entre quem **gera** o artefato e quem o **avalia** — com o avaliador operando sob rubrica cética e independente — eleva substancialmente a taxa de detecção de defeitos sem depender de troca de modelo.
+
+**Aplicação nos Workflows Canônicos**: Este padrão já está estruturalmente presente em `WORKFLOW-BUG-FIX` (Estado 2 = Gerador do Red Test; Estado 5 = Avaliador Cético via Quality Gate) e `WORKFLOW-FEATURE-DEVELOPMENT` (Estado 2 = negociação do contrato de aceitação; Estado 5 = Gerador da implementação; Estado 6 = Avaliador Cético via Gates de Segurança/UI/Code Review). Para tornar essa separação explícita e auditável:
+
+1. **Mini-Contrato de Aceitação Pré-Negociado (Sprint Contract)**: Antes de o Gerador produzir o artefato final, ele propõe por escrito os critérios objetivos de "concluído" (comportamento esperado, casos de borda cobertos, forma de verificação). O Avaliador revisa e aprova esse contrato **antes** da implementação — evitando que a definição de sucesso seja inventada retroativamente pelo próprio Gerador.
+2. **Rubrica de Corte Objetiva do Avaliador**: O Avaliador Cético (`runtime-verifier`, `code-review`, `security-reviewer`, `angular-ui-stylist` conforme o gate) julga contra critérios explícitos com limiar de corte (`threshold`), não contra impressão subjetiva. Qualquer critério abaixo do limiar reprova o artefato inteiro, mesmo que os demais critérios estejam excelentes (nenhuma média compensatória).
+3. **Independência de Avaliação**: O Avaliador nunca é a mesma invocação/contexto que gerou o artefato — mesmo quando o mesmo agent desempenha os dois papéis em momentos distintos do workflow (ex.: `specialist-feature-developer` gera; `@code-review` avalia), a avaliação ocorre em uma etapa e contexto discretos, com acesso às evidências de execução real (testes rodados, logs, diffs) e não apenas ao código-fonte estático.
+4. **Registro no `workflow_state`**: Todo workflow que aplica este padrão declara os campos `sprint_contract` (critérios negociados) e `avaliacao_cetica` (rubrica aplicada, nota por critério, veredito) — ver Typed State Bags de `WORKFLOW-BUG-FIX` § 3.1 e `WORKFLOW-FEATURE-DEVELOPMENT` § 3.4.
+
+### 1.5 Loop de Revisão de Qualidade (Quality Review Loop)
+
+**Fundamentação de mercado**: Este padrão implementa formalmente o fluxo **Evaluator-Optimizer** (Anthropic, *Building Effective Agents*, 2024), complementado pelas evidências empíricas de **Self-Refine** (Madaan et al., 2023) e **Reflexion** (Shinn et al., 2023). Pesquisas demonstram que loops de refinamento com feedback externo atingem retornos decrescentes expressivos após aproximadamente 3 iterações — além desse ponto, o modelo tende a oscilar entre soluções sem ganho real de qualidade. Consistente com esse consenso, o próprio **GitHub Copilot coding agent** limita seu ciclo autônomo de auto-revisão a 2–3 rodadas antes de consolidar o Pull Request e documentar achados residuais para o desenvolvedor humano.
+
+**Distinção entre os Mecanismos de Controle**:
+Para evitar sobreposição e ambiguidade operacional, o ecossistema distingue rigidamente três mecanismos complementares:
+
+| Mecanismo | Escopo / Problema Resolvido | Ator Responsável | Ação ao Atingir Limite |
+| :--- | :--- | :--- | :--- |
+| **§ 1.4 Gerador–Avaliador Cético** | **Quem avalia**: separação estrita de papéis para eliminar auto-complacência (*self-grading leniency*). | Avaliador Cético independente (`@code-review`, `@security-reviewer`, etc.). | Reprovação objetiva via rubrica com limiar de corte (*threshold*). |
+| **§ 8 / R-050.2 Circuit Breaker** | **Falha funcional/teste**: quebra de build, testes vermelhos ou violação de regras invariantes. | `specialist-test-fixer` / Especialista de Stack. | Reversão do workspace (Rollback State) e escalonamento humano via `ask_questions`. |
+| **§ 1.5 Loop de Revisão de Qualidade** | **Qualidade e estilo pós-avaliação**: refinamento de achados NÃO-bloqueantes (nomenclatura, edge cases, legibilidade, linting). | Gerador revisa; mesmo Avaliador Cético reavalia. | Parada no teto de 3 iterações e escalonamento via `ask_questions` com achados residuais. |
+
+```mermaid
+flowchart TD
+    Gen["<b>1. Gerador Original</b><br/>(specialist-dev, planner, maintainer, etc.)<br/>Submete artefato gerado/alterado"] --> Eval["<b>2. Avaliador Cético Independente (§ 1.4)</b><br/>(@code-review, @security-reviewer, etc.)<br/>Avaliação objetiva via rubrica com threshold"]
+
+    Eval --> CheckVerdict{"Veredito da<br/>Rubrica"}
+
+    CheckVerdict -- "Aprovado<br/>(Score >= Threshold)" --> Approved(["✅ Aprovado — Avança para Próxima Etapa / Conclusão"])
+
+    CheckVerdict -- "Reprovado por Falha Funcional / Teste Quebrado" --> CircuitBreaker["<b>Circuit Breaker (§ 8 / R-050.2)</b><br/>Reversão do workspace e escalonamento"]
+
+    CheckVerdict -- "Reprovado por Achados de Qualidade NÃO-Bloqueantes<br/>(legibilidade, convenções, edge cases, docs)" --> CheckIter{"Iteração Atual<br/>&lt; Teto de 3?"}
+
+    CheckIter -- "Sim (Iteração 1 ou 2)" --> IncIter["<b>Incrementa Iteração (N + 1)</b><br/>Atualiza quality_review_loop no State Bag"]
+    IncIter --> Refine["<b>Refinamento pelo Gerador Original</b><br/>Aplica correções cirúrgicas baseadas no feedback"]
+    Refine --> Resubmit["<b>Reenvio Obrigatório ao MESMO Avaliador Cético</b><br/>Preserva histórico da rubrica e consistência"]
+    Resubmit --> Eval
+
+    CheckIter -- "Não (3ª iteração esgotada)" --> Escalate["<b>Escalonamento Humano Compulsório</b><br/>Aciona ask_questions com achados residuais consolidados"]
+    Escalate --> HumanDecision{"Decisão<br/>Humana"}
+    HumanDecision -- "(a) Aprovar com ressalva" --> ApprovedCaveat(["🟡 Aprovado com Ressalva Registrada"])
+    HumanDecision -- "(b) Ajustar critério/rubrica" --> AdjustRubric["Ajusta rubrica e reavalia"] --> Eval
+    HumanDecision -- "(c) Cancelar / Reverter" --> Rollback["Reversão do diff / Rollback"] --> EndCancel(["🛑 Fluxo Interrompido"])
+```
+
+**Regras Normativas do Mecanismo**:
+
+1. **Gatilho**: O Avaliador Cético (§ 1.4) reprova o artefato por achados de qualidade **não-bloqueantes** (ex.: legibilidade, convenções de estilo, cobertura de casos de borda adicionais, documentação interna ou modularização). Achados bloqueantes de segurança (OWASP Top 10, CVEs críticas) ou violações funcionais de regra de negócio NÃO entram neste loop — seguem imediatamente os fluxos de rollback (§ 8) ou interrupção.
+2. **Ciclo de Refinamento com Mesmo Avaliador**: O Gerador original recebe o feedback estruturado do Avaliador Cético, aplica as correções cirúrgicas e submete o artefato revisado compulsoriamente para o **mesmo Avaliador** que emitiu o parecer (preservando o histórico da rubrica e evitando discrepâncias entre avaliadores distintos).
+3. **Teto Rígido de 3 Iterações (R-055 / Anti-Silo Reuse)**: O loop é estritamente limitado ao teto de **3 iterações** (idêntico ao limiar do Circuit Breaker R-050.2, reaproveitado deliberadamente para coerência e integridade da governança). É vedado qualquer loop aberto ou indeterminado.
+4. **Critério de Corte Objetivo**: A reavaliação utiliza a mesma rubrica com limiar de corte (`threshold`) pré-estabelecida no Estado de avaliação (§ 1.4) — qualquer critério abaixo do corte mantém a reprovação, sendo terminantemente proibida média compensatória.
+5. **Escalonamento Humano Obrigatório ao Esgotar**: Se a 3ª iteração for concluída sem aprovação integral, o Avaliador Cético interrompe o ciclo e aciona compulsoriamente `ask_questions`, apresentando ao usuário o relatório consolidado de achados residuais com as 3 opções canônicas: *(a)* Aprovar com ressalva registrada; *(b)* Ajustar o critério da rubrica; ou *(c)* Cancelar a entrega e reverter o diff. Nunca aprova silenciosamente nem continua iterando.
+6. **Rastreamento no `workflow_state`**: Todo workflow que executa este loop declara e atualiza o bloco estruturado no State Bag:
+```yaml
+quality_review_loop:
+  iteracao_atual: 1  # 1 a 3
+  max_iteracoes: 3
+  achados_pendentes:
+    - "achado de qualidade ou estilo"
+  veredito: "em_andamento | aprovado | escalado_para_humano"
+```
+7. **Aplicabilidade Restrita**: Mecanismo opt-in por workflow, com aplicação formalizada nos seguintes Estados: `WORKFLOW-BUG-FIX` (Estado 5), `WORKFLOW-REFACTORING` (Estado 5), `WORKFLOW-FEATURE-DEVELOPMENT` (Estado 6), `WORKFLOW-GOVERNANCE-MAINTENANCE` (Estado 4), `WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION` (Estado 5) e `WORKFLOW-FRAMEWORK-MIGRATION` (Estado 6).
+
 ---
+
 
 ## 2. Matriz Geral de Roteamento de Workflows
 
@@ -61,9 +128,26 @@ flowchart TD
     RouterRet --> WF4["🚀 WORKFLOW-FEATURE-DEVELOPMENT\nPipeline Completo E2E"]
 ```
 
+### 2.1 Resumo dos Pipelines Determinísticos & Quality Gates
+
+| Workflow | Fast-Path | Pipeline Canônico & Quality Gate |
+| :--- | :--- | :--- |
+| `WORKFLOW-BUG-FIX` | `⚡ Sim` | `1. Triagem (RCA 2 fontes) -> 2. Red Test -> 3. Fix Cirúrgico -> 4. Green Test -> [5. Quality Gate & Quality Review Loop (§ 1.5)]` |
+| `WORKFLOW-REFACTORING` | `⚡ Sim` | `1. Ground Truth -> 2. Blast Radius & Contratos -> 3. Plano Mikado -> 4. Execução em Lote -> [5. Validação & Quality Review Loop (§ 1.5)]` |
+| `WORKFLOW-TECHNICAL-ANALYSIS` | `⚡ Sim` | `1. Despacho Especialista -> 2. Coleta Read-Only -> 3. Síntese Técnica & Propostas` |
+| `WORKFLOW-FEATURE-DEVELOPMENT` | `❌ Não (R-041)` | `1. Prompt Structuring -> 2. Requisitos -> 3. Blueprint -> 4. Estratégia Testes -> 5. TDD -> [6. Duplo Gate & Quality Review Loop (§ 1.5)]` |
+| `WORKFLOW-GOVERNANCE-MAINTENANCE` | `⚡ Sim` | `1. Diagnóstico/Pesquisa -> 2. Checkpoint Humano -> 3. Execução em Lote -> [4. Quality Gate & Quality Review Loop (§ 1.5)]` |
+| `WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION` | `⚡ Sim` | `1. Triagem SCA -> 2. Blast Radius -> 3. Bump & Lockfile -> 4. Adaptação Breaking -> [5. Quality Gate SCA & Quality Review Loop (§ 1.5)]` |
+| `WORKFLOW-FRAMEWORK-MIGRATION` | `⚡ Sim` | `1. 5D & Símbolos -> 2. Blueprint & De-Para -> 3. Codemod Lote -> 4. Paridade Dual -> 5. Baseline Gate -> [6. Redundancy Gate & Quality Review Loop (§ 1.5)]` |
+| `WORKFLOW-RELEASE-READINESS` | `⚡ Sim` | `1. Contratos OpenAPI -> 2. Rollout DDL -> 3. Segredos & Higiene -> 4. Changelog & SemVer -> 5. Veredito Go/No-Go` |
+| `WORKFLOW-PROMPT-SYNTHESIS` | `⚡ Sim` | `1. Elicitação -> 2. Context Grounding -> 3. Restrições -> 4. Síntese Estruturada -> 5. Quality Gate (.md)` |
+
 ---
 
 ## 3. Especificação dos Workflows Canônicos e de Ciclo de Vida (9 Workflows Determinísticos)
+
+> **Nota de Exceção Explícita de Governança — Agentes de Bootstrap e Onboarding (R-050)**:
+> Os agentes `@binding-initializer` e `@adapter-generator` são categorizados formalmente como agentes de bootstrap técnico e verificação estrutural (`tipo: health_check` / onboarding de tooling local). Por sua natureza de ciclo de vida prévio (execução isolada sob demanda para inicialização de bindings e geração de adapters), eles operam intencionalmente fora dos 9 workflows operacionais canônicos aqui especificados, estando catalogados em `catalog.yaml` para suporte operacional e diagnóstico de ambiente.
 
 ---
 
@@ -119,7 +203,7 @@ flowchart TD
     Fix --> GreenTest["<b>4. Green Test, Linter & Mini Mutation-Check</b><br/>Agente: runtime-verifier / test-fixer<br/>Ação: Suíte verde + mini mutation-check proporcional ao risco"]
 
     GreenTest --> CheckPass{"Testes passaram<br/>e mutantes eliminados (máx 3x)?"}
-    CheckPass -- "Sim" --> QualityGate["<b>5. Quality Gate & Observação Pós-Fix</b><br/>Agente: @code-review / @pr-gatekeeper<br/>Ação: Validação de segurança/diff, autorreflexão e canary para bugs críticos"]
+    CheckPass -- "Sim" --> QualityGate["<b>5. Quality Gate & Observação Pós-Fix</b><br/>Agente: @code-review + @code-style-enforcer / @pr-gatekeeper<br/>Ação: Validação de segurança/diff, estilo/lint, autorreflexão e canary para bugs críticos"]
     CheckPass -- "Não (Falha Persistente)" --> CircuitBreaker["<b>4b. Circuit Breaker & Rollback</b><br/>Agente: runtime-verifier (DECLARA veredito, read-only)<br/>Ação: Aciona specialist-bug-fixer/test-fixer para reversão atômica via rollback_plan + Escalation (ask_questions)"]
 
     QualityGate --> EndBug(["✅ Concluído com Sucesso"])
@@ -136,7 +220,8 @@ flowchart TD
    - *Sub-rotina 1a (Diagnóstico Profundo)*: Se envolver call graph multi-camada complexo, invoca `@debugger` com `call_type: "subroutine"`.
    - *Sub-rotina 1b (Repro Gate)*: Se o bug for intermitente ou faltar evidência mínima, o `@bug-triage` NÃO avança cegamente para o Estado 2. Ele aciona o `@debugger` com logpoint/tracepoint (`logExpression` com `suspendPolicy=NONE`) ou dispara `ask_questions` (R-027) com 1 pergunta solicitando o payload/passos mínimos.
    - *Sub-rotina 1c (Circuit Breaker de Reprodução)*: O Repro Gate tem **teto de 2 tentativas**. Se após 2 rodadas a reprodução determinística ainda falhar, o `@bug-triage` PARA de repetir o ciclo e aciona `ask_questions` com 3 opções objetivas: **(A)** prosseguir para o Estado 2 com a hipótese de maior confiança disponível, registrando o risco assumido no `workflow_state`; **(B)** pausar o workflow aguardando evidência adicional (log/observabilidade) do solicitante; **(C)** encerrar a triagem classificando `status_reproducao: "nao_reproduzivel"` e registrar achados parciais para backlog. Este é um estado terminal distinto (🟡 Pausado), não um retorno silencioso ao loop.
-2. **Estado 2 — Caracterização e Reprodução Automatizada**:
+2. **Estado 2 — Caracterização e Reprodução Automatizada (Papel: Gerador do Red Test — § 1.4)**:
+   - *Sprint Contract*: Antes de escrever o teste, o especialista declara por escrito o comportamento esperado pós-fix e os casos de borda que o Red Test deve cobrir (`sprint_contract` no `workflow_state`) — este mini-contrato é o que o Avaliador Cético (Estado 5) usará como rubrica de corte, evitando que o critério de "concluído" seja inventado retroativamente.
    - *Cenário A (Lógica / Runtime / Regra, sem dependência de contexto de framework)*: `specialist-unit-test-writer` cria teste automatizado isolado que falha comprovando o defeito. Antes disso, um pré-voo de baseline confirma que o ambiente de teste executa limpo nos testes vizinhos para evitar falsos positivos de flaky tests pré-existentes.
    - *Cenário B (Runtime que só reproduz com contexto de framework)*: Quando o bug exige DOM real (`specialist-component-test-writer`, Angular) ou contexto de aplicação (`specialist-integration-test-writer` com `@SpringBootTest`/`@WebMvcTest`/`@DataJpaTest`/Testcontainers/R2DBC em backend, reactive ou EJB) para reproduzir — ex.: `LazyInitializationException`, rollback transacional incorreto, falha de filtro de segurança — o teste de regressão DEVE usar o contexto de framework em vez de um mock isolado que mascararia o sintoma real. Ver § 1.3 para a tabela completa de resolução por stack.
    - *Cenário C (Layout / CSS / Estilo / Responsividade / Smell 2.21)*: `specialist-ui-stylist` e `specialist-component-test-writer` mapeiam a falha visual através do ciclo VFL (`frontend-visual-feedback-loop`), identificando quebras de hierarquia em relação ao componente irmão canônico, ausência de classes utilitárias de diálogo (`.app-dialog-content`, `.form-grid`), textos literais de ícones vazando e cores hexadecimais arbitrárias. Geram teste de componente com asserção estrita de DOM/AOM ou especificação de layout multi-viewport (375px/768px/1440px).
@@ -154,8 +239,11 @@ flowchart TD
    - *Verificação Estrita para Bugs de Layout*: Para defeitos visuais, a validação do Estado 4 exige aprovação dupla: testes de componente verdes E re-inspeção visual/AOM (`frontend-visual-feedback-loop`), confirmando eliminação de texto literal de ícones, preservação de dimensões elásticas e ausência de hex inline antes de liberar para o Quality Gate. Se quebrar, aciona `specialist-test-fixer` ou `specialist-ui-stylist` (máx. 3 iterações).
    - **Nota de precedência**: quando `specialist-test-fixer` esgota seu próprio teto interno, o escalonamento genérico do sub-catálogo ("retornar ao `@agent-router`") é **substituído**, dentro de um `WORKFLOW-BUG-FIX` ativo, pelo protocolo formal do Estado 4b abaixo — a regra de workflow tem precedência sobre o comportamento default do catálogo de domínio (R-050 > comportamento genérico).
    - *Estado 4b — Circuit Breaker & Rollback (contrato corrigido)*: Se após 3 tentativas os testes não passarem, o `runtime-verifier` — **estritamente read-only, nunca executa mutação** — apenas DECLARA o veredito de bloqueio (`PRONTO | BLOQUEADO` conforme seu próprio contrato) e aciona via `run_subagent` o `specialist-bug-fixer`/`specialist-test-fixer` ativo para executar a reversão atômica estritamente orientada ao `rollback_plan` previamente declarado (`git checkout -- <arquivos>` / `git restore`). **Jamais o `runtime-verifier` reverte diretamente** — isso violaria seu próprio contrato read-only (mesma classe de agent validada em `test_readonly_advisory_agents_do_not_contain_mutation_tools`). Após confirmação da reversão, o especialista escala para intervenção humana via `ask_questions`.
-5. **Estado 5 — Quality Gate, Autorreflexão & Observação Pós-Fix / Canary (`@code-review` / `@pr-gatekeeper`)**:
+5. **Estado 5 — Quality Gate, Autorreflexão & Observação Pós-Fix / Canary (`@code-review` + `@code-style-enforcer` / `@pr-gatekeeper` — Papel: Avaliador Cético — § 1.4)**:
    - *Entrada*: Diff final e evidências de teste.
+   - *Co-Verificação Analítica de Estilo*: O `@code-style-enforcer` atua ao lado do `@code-review` como co-verificador analítico de qualidade estática (aderência estrita a guias de estilo, convenções idiomáticas e higiene de linter), garantindo que a correção cirúrgica não introduza regressão de formatação nem dívida cosmética.
+   - *Rubrica de Corte contra o Sprint Contract*: O `@code-review` avalia o diff estritamente contra o `sprint_contract` declarado no Estado 2 (não contra impressão subjetiva de qualidade). Cada critério do contrato recebe veredito objetivo (`atendido | nao_atendido`); qualquer critério `nao_atendido` reprova a entrega inteira, mesmo que os demais estejam excelentes (registrado em `avaliacao_cetica` no `workflow_state`).
+   - *Loop de Revisão de Qualidade*: Se o Avaliador Cético reprovar por achados de qualidade não-bloqueantes, aplica-se o Loop de Revisão de Qualidade (§ 1.5), teto de 3 iterações.
    - *Observação Pós-Fix / Canary Gate (para Bugs Críticos)*: Se o defeito for de severidade crítica/alta (P0/P1, falha de autenticação/sessão, corrupção ou perda de dados, indisponibilidade ou memory leak), o Quality Gate exige compulsoriamente a declaração formal de critérios de **observação pós-fix / canary**: janela de monitoramento pós-deploy (ex.: 15m a 30m), verificação de ausência de novos erros 5xx/APM e estabilização de latência antes do encerramento definitivo do incidente.
    - *Autorreflexão Documental pós-Correção (R-033)*: O agente avalia autonomamente se a resolução do bug revelou regra de negócio oculta, contrato divergente ou padrão de layout (ex.: Smell 2.21). Se sim, atualiza a documentação viva de padrões (`docs/*padrao*`, `docs/componentes-shared.md` ou adapter local) para blindar o ecossistema contra reincidência, sem esperar ordem manual.
    - *Saída*: Resumo estruturado em 5 seções (R-028) ou preparação de PR via `@pr-gatekeeper`.
@@ -174,6 +262,15 @@ workflow_state:
     evidencia_confirmada: true  # 'evidence before hypothesis' exige min. 2 fontes independentes
     causa_raiz_identificada: "<classe.metodo:linha e mecanismo causal primário>"
   causa_raiz: "<classe.metodo:linha e mecanismo da falha>"
+  sprint_contract:  # negociado no Estado 2 (Gerador), avaliado no Estado 5 (Avaliador Cético — § 1.4)
+    criterios_aceite:
+      - "<comportamento esperado pós-fix ou caso de borda coberto>"
+    forma_verificacao: "<comando de teste ou passo manual>"
+  avaliacao_cetica:  # preenchido pelo Avaliador no Estado 5
+    criterios_avaliados:
+      - criterio: "<mesmo criterio do sprint_contract>"
+        veredito: "atendido | nao_atendido"
+    veredito_final: "aprovado | reprovado"
   blast_radius_estimado:
     callers_diretos: 2
     modulos_afetados:
@@ -247,7 +344,7 @@ flowchart TD
     CheckRiskGate -- "Não (escopo local claro)" --> Execution["<b>4. Execução Incremental em Lote</b><br/>Agente: Domain Router / Specialist Developer<br/>Ação: Execução em micro-lotes com diffs cirúrgicos (R-046)"]
     PlanGate --> Execution
 
-    Execution --> Validation["<b>5. Validação de Ground Truth & Redundância Proporcional</b><br/>Agente: @business-rules-extractor (Validate) + @code-review<br/>Ação: Ground Truth 100% + Reverse Symbol Audit + Mini Mutation Gate + Differential Replay"]
+    Execution --> Validation["<b>5. Validação de Ground Truth & Redundância Proporcional</b><br/>Agente: @business-rules-extractor (Validate) + @code-review + @code-style-enforcer<br/>Ação: Ground Truth 100% + Reverse Symbol Audit + Mini Mutation Gate + Differential Replay"]
 
     Validation --> CheckRefactor{"Regras, testes e<br/>redundância 100% aprovados?"}
     CheckRefactor -- "Sim" --> EndRefactor(["✅ Concluído com Sucesso"])
@@ -266,12 +363,14 @@ flowchart TD
    - *Sub-rotina 3c (Checkpoint de Aprovação do Plano)*: Se a refatoração envolver **breaking change de contrato**, **schema de banco** ou **blast radius grande** (muitos callers/callees no Estado 2), o `@refactor-planner` apresenta o DAG completo e aciona `ask_questions` para aprovação humana explícita **antes** de iniciar o Estado 4 — mesmo padrão de checkpoint usado em `WORKFLOW-FEATURE-DEVELOPMENT` (Estado 3b) e `WORKFLOW-GOVERNANCE-MAINTENANCE` (Estado 2b). Para refatorações de escopo local claro e baixo risco, a aprovação pode ser contextual/implícita (R-031).
    - *Limite de Escala do DAG*: cada nó já é limitado a 1-3 arquivos (contrato do `@refactor-planner`); se o DAG total ultrapassar **15 nós**, o plano DEVE ser fatiado em fases entregáveis independentes (múltiplas sessões/PRs), cada uma terminando em estado *always deployable* — nunca um plano monolítico de execução única inviável.
 4. **Estado 4 — Execução Incremental em Lote (`domain router / specialists`)**: Aplica as alterações respeitando o protocolo R-046 (Single-Turn Batching / context-mode para 5+ arquivos) em micro-lotes. Cada nó do DAG tem seu próprio Gate Out (compilação limpa, testes 100% verdes, diff mínimo — conforme o template de saída do `@refactor-planner`), validando incrementalmente contra a suíte de caracterização a cada micro-lote, não apenas ao final.
-5. **Estado 5 — Validação de Não-Regressão, Redundância Proporcional e Compliance (`@business-rules-extractor` + `@code-review`)**:
+5. **Estado 5 — Validação de Não-Regressão, Redundância Proporcional e Compliance (`@business-rules-extractor` + `@code-review` + `@code-style-enforcer`)**:
    - O `@business-rules-extractor` executa o modo Validate comparando o código final com as regras documentadas no Estado 1.
+   - *Co-Verificação Analítica de Estilo*: O `@code-style-enforcer` atua em conjunto com o `@code-review` validando a conformidade estrutural com convenções de lint, formatação e pureza idiomática da base refatorada.
    - *Redundância Proporcional ao Blast Radius*: Quando o blast radius for médio ou alto (múltiplos callers, componentes estruturais ou extração de interfaces), a validação incorpora compulsoriamente a tríade de redundância:
      1. **Auditoria Reversa de Símbolos (`reverse_symbol_audit`)**: O `@code-knowledge-graph` compara o inventário de símbolos, métodos públicos e interfaces pré-refatoração contra o código final para assegurar que nenhum símbolo público ou contrato foi acidentalmente omitido, descontinuado ou tornado privado sem aprovação.
      2. **Mini Mutation Gate (`mini_mutation_gate`)**: Injeção controlada de mutantes sintéticos nas áreas refatoradas para comprovar que a suíte de caracterização / Golden Master é resiliente e acurada (eliminando falsos-verdes).
      3. **Differential Replay Leve (`differential_replay_leve`, quando aplicável)**: Para rotinas determinísticas de transformação de dados, parsers, cálculo ou regras de negócio, replay comparativo de fixtures de entrada e saída capturadas no Estado 1/2 antes da mutação, comprovando equivalência de comportamento com zero drift.
+   - *Loop de Revisão de Qualidade*: Se o Avaliador Cético reprovar por achados de qualidade não-bloqueantes, aplica-se o Loop de Revisão de Qualidade (§ 1.5), teto de 3 iterações.
    - *Estado 5b — Rollback Decidido pelo Planner, Executado pelo Especialista com `blast_radius_revertido` (contrato corrigido)*: Se qualquer regra de negócio for violada, o gate de contratos falhar ou os testes de caracterização quebrarem, o `@refactor-planner` — **que não possui nenhuma ferramenta de edição ou terminal** — apenas DECIDE o escopo do rollback (quais nós do DAG revertem, com base na árvore de dependências do Estado 3; preferencialmente incremental, não o plano inteiro) e aciona via `run_subagent` o(s) domain router(s)/specialist(s) que executaram cada nó afetado para reverter fisicamente seus próprios arquivos. **Jamais o `@refactor-planner` executa a reversão diretamente** (ver § 5, invariante 6). A reversão calcula e registra quantitativamente o **`blast_radius_revertido`** (inventário de nós revertidos, arquivos restaurados e callers preservados) no `workflow_state` e escala para decisão humana via `ask_questions`.
 
 #### Typed State Bag (`workflow_state`):
@@ -338,7 +437,7 @@ flowchart TD
     CatGlobal -- "Segurança & Compliance" --> A2["@security-reviewer / @compliance-guardrails"]
     CatGlobal -- "Performance & Otimização" --> A3["@performance-agent / @oracle-query-tuner / @informix-query-tuner"]
     CatGlobal -- "Arquitetura de Tela / Frontend" --> A4["@angular-router → @angular-arch-advisor (Read-Only)"]
-    CatGlobal -- "Arquitetura de Serviço / Backend" --> A5["@spring-boot-router / @spring-reactive-router / @ejb-router (Advisors)"]
+    CatGlobal -- "Arquitetura de Serviço / Backend" --> A5["@spring-boot-router / @spring-reactive-router / @ejb-router / @struts-router / @database-router / @python-router (Advisors)"]
     CatGlobal -- "Solução Cross-Stack / Contratos" --> A6["@tech-solution-architect"]
     CatGlobal -- "Infraestrutura / DevOps / CI-CD" --> A7["@devops-engineer (Read-Only)"]
     CatGlobal -- "Múltiplas Dimensões Independentes [P]" --> FanOut["<b>1d. Fan-out Multidimensional</b><br/>Fan-out/Fan-in (handoff-governance § 5.1)<br/>Ação: Dispara N especialistas em paralelo"]
@@ -443,8 +542,8 @@ flowchart TD
 ```
 
 #### Cadeia Sequencial e Papéis:
-1. **Estado 1 — Estruturação de Prompt (`@prompt-structuring`)**: Transforma pedidos abertos no formato canônico `<task>/<context>/<constraints>/<output_format>`.
-2. **Estado 2 — Elicitação de Requisitos (`@requirements-analyst` / `@feature-planner`)**: Detalha regras funcionais (BDD/EARS) e não-funcionais com critérios de aceitação objetivos, prevenindo *solution-jumping* e persistindo a especificação oficial em `docs/requirements/REQ-<modulo>.md` (perfil Híbrido Documental sob R-056).
+1. **Estado 1 — Estruturação de Prompt (`@prompt-structuring`)**: Transforma pedidos abertos no formato canônico Markdown (`## Tarefa`, `## Contexto`, `## Restrições e Não-Escopo`, `## Formato de Saída Esperado`).
+2. **Estado 2 — Elicitação de Requisitos (`@requirements-analyst` / `@feature-planner` — negociação do Sprint Contract — § 1.4)**: Detalha regras funcionais (BDD/EARS) e não-funcionais com critérios de aceitação objetivos, prevenindo *solution-jumping* e persistindo a especificação oficial em `docs/requirements/REQ-<modulo>.md` (perfil Híbrido Documental sob R-056). Os critérios de aceitação aqui definidos constituem o `sprint_contract` que o Avaliador Cético do Estado 6 usará como rubrica de corte objetiva — nenhum critério pode ser adicionado ou reinterpretado retroativamente pelo Gerador (Estado 5) sem nova negociação explícita.
 3. **Estado 3 — Technical Blueprint & Contratos (`@tech-solution-architect`)**:
    - Modela contratos de integração (OpenAPI v3), esquema de banco de dados (relacional ou NoSQL/Firestore/BaaS), máquina de estados e mitigação de concorrência.
    - Particionamento de escopo: isola se a demanda é **Fullstack**, **Backend-Only**, **Frontend-Only** ou **Database-Only**.
@@ -458,9 +557,11 @@ flowchart TD
    - **Frontend (Modelo Test-Last com Verification Gate)**: Para eliminar gargalos de runners repetitivos e mocks prematuros de DOM, a stack frontend adota **Implementation-First / Test-Last**:
      - *Estado 5a (Lógica, Store & Services)*: O `@angular-feature-developer` constrói componentes standalone, gerência de estado reativo (Signals/NgRx) e serviços primeiro, validando compilação limpa com `get_errors`. A criação dos testes unitários/componentes de regressão é executada ao final (`Test-Last`) pelo `@angular-unit-test-writer` ou `@angular-component-test-writer`.
      - *Estado 5b (Handoff Mandatório de Apresentação & Paridade de UI)*: Handoff obrigatório para o `@angular-ui-stylist` para validação do protocolo "Canonical Sibling First" (inspeção prévia de componente irmão canônico homologado), auditoria de design tokens (zero hex inline), classes utilitárias de layout/scroll para diálogos e verificação estrita dos inputs de componentes compartilhados em seus arquivos `.ts` (Smell 2.21). **Agentes e tarefas de UI pura/estilização são formalmente ISENTOS de criar ou rodar testes unitários de lógica** (validação é visual via Visual Feedback Loop e compilação limpa).
-6. **Estado 6 — Duplo Quality Gate, Segurança & PR (`@security-reviewer`, `@angular-ui-stylist`, `@code-review` e `@pr-gatekeeper`)**:
+6. **Estado 6 — Duplo Quality Gate, Segurança & PR (`@security-reviewer`, `@angular-ui-stylist`, `@code-review` e `@pr-gatekeeper` — Papel: Avaliador Cético — § 1.4)**:
    - *Sub-rotina 6a — Gate 1: Security Review (OWASP), Lógica & Contratos*: O `@security-reviewer` audita novos endpoints contra OWASP Top 10 (SQL Injection, IDOR, Broken Authentication, sanitização); validação de testes verdes e compilação limpa (`get_errors`).
    - *Gate 2 (Design System & Paridade de UI)*: Auditoria visual estrita — proibição absoluta de cores hexadecimais inline em SCSS de feature, conferência de propriedades tipadas de componentes `shared/` contra o TypeScript real (prevenindo que atributos não mapeados passem silenciosamente), alinhamento estrutural de diálogos/seções e execução de linters/scripts de auditoria visual do projeto (ex.: `npm run material:auditar`).
+   - *Rubrica de Corte contra o Sprint Contract*: O `@code-review` avalia a implementação estritamente contra os critérios de aceitação (`sprint_contract`) negociados no Estado 2, registrando veredito objetivo por critério em `avaliacao_cetica` no `workflow_state` — qualquer critério `nao_atendido` reprova a entrega, sem média compensatória com os demais critérios.
+   - *Loop de Revisão de Qualidade*: Se o Avaliador Cético reprovar por achados de qualidade não-bloqueantes, aplica-se o Loop de Revisão de Qualidade (§ 1.5), teto de 3 iterações.
    - O `@code-review` realiza a revisão holística de conformidade, boas práticas e **conformidade documental viva** (verificando se o diff possui impacto em `docs/`, schemas ou READMEs).
    - **Autorreflexão Documental de DoD (R-033)**: Antes de finalizar a entrega, o pipeline avalia autonomamente se a nova funcionalidade introduziu rotas, modelos de dados, componentes compartilhados ou regras de negócio, atualizando de forma automática e atômica a documentação viva do projeto (`docs/`, `README.md`, catálogo de componentes ou ADRs) sem exigir lembrete do usuário.
    - O `@pr-gatekeeper` gera a mensagem de commit semântico, descrição estruturada de PR e atualiza o CHANGELOG.md (sem push autônomo — R-031).
@@ -488,6 +589,15 @@ workflow_state:
     backend_concluido: true
     frontend_concluido: true
   security_gate_status: "aprovado | vulnerabilidade_detectada"
+  sprint_contract:  # negociado no Estado 2 (Gerador), avaliado no Estado 6 (Avaliador Cético — § 1.4)
+    criterios_aceite:
+      - "<criterio de aceitacao funcional ou nao-funcional>"
+    forma_verificacao: "<teste automatizado, checklist visual ou script de auditoria>"
+  avaliacao_cetica:  # preenchido pelo Avaliador (@code-review) no Estado 6
+    criterios_avaliados:
+      - criterio: "<mesmo criterio do sprint_contract>"
+        veredito: "atendido | nao_atendido"
+    veredito_final: "aprovado | reprovado"
 ```
 
 ---
@@ -505,7 +615,7 @@ flowchart TD
     RouterGov --> GovCheck{"Tipo de Operação"}
 
     GovCheck -- "Diagnóstico de Smells / Gaps" --> Auditor["<b>1a. Auditoria de Smells (Tier 2)</b><br/>Agente: @agent-auditor (Read-Only)<br/>Ação: Análise de conformidade e R-046"]
-    GovCheck -- "Higiene / CI-CD / Licença" --> Hygiene["<b>1b. Auditoria de Higiene</b><br/>Agente: @repo-hygiene-auditor (Read-Only)<br/>Ação: README, CONTRIBUTING, .gitignore"]
+    GovCheck -- "Higiene / CI-CD / Licença / Docs" --> Hygiene["<b>1b. Auditoria de Higiene & Docs</b><br/>Agente: @repo-hygiene-auditor / @docs-engineer (Read-Only)<br/>Ação: README, CONTRIBUTING, .gitignore e documentação"]
     GovCheck -- "Criação de Novo Artefato / Stack" --> PreSearch["<b>1c. Pesquisa Prévia de Mercado</b><br/>Agente: @deep-search (sub-rotina)<br/>Ação: Sintetiza padrões consolidados de mercado"]
 
     PreSearch --> Factory["<b>2a. Modelagem de Artefato / Stack</b><br/>Agente: @governance-factory<br/>Ação: Geração com templates canônicos (R-015)"]
@@ -514,7 +624,7 @@ flowchart TD
 
     PlanReport --> HumanGate{"<b>2b. Checkpoint de Aprovação</b><br/>Humana via ask_questions"}
 
-    HumanGate -- "Aprovado" --> Maintainer["<b>3. Execução em Lote no Sandbox</b><br/>Agente: @governance-maintainer<br/>Ação: Batching atômico via context-mode (R-046)"]
+    HumanGate -- "Aprovado" --> Maintainer["<b>3. Execução em Lote no Sandbox</b><br/>Agente: @governance-maintainer / @docs-engineer<br/>Ação: Batching atômico via context-mode (R-046)"]
     HumanGate -- "Rejeitado" --> EndCancel(["🛑 Ajuste de Escopo / Cancelado"])
 
     Factory --> MaintainerSync["<b>3b. Sincronização Quádrupla SSOT</b><br/>Atualização atômica de catálogos e grafos (R-015)"]
@@ -536,13 +646,13 @@ flowchart TD
   - **Q3 (Blindagem por Teste / Quality Gate)**: *A suíte determinística em `tests/governance_audit/` já valida essa regra?* Se não, uma asserção ou teste específico no pytest DEVE ser criado ou expandido para garantir não-regressão contínua.
 1. **Estado 1 — Diagnóstico Read-Only ou Pesquisa Prévia**:
    - *Diagnóstico de Smells & Reúso*: O `@agent-auditor` executa auditoria estática e comportamental contra os smells canônicos de governança e avalia compulsoriamente Q1, Q2 e Q3.
-   - *Auditoria de Higiene*: O `@repo-hygiene-auditor` audita a saúde do repositório, licença e segurança de versionamento.
+   - *Auditoria de Higiene & Documentação*: O `@repo-hygiene-auditor` audita a saúde do repositório, licença e segurança de versionamento; o `@docs-engineer` mapeia a integridade documental, alinhamento técnico de manuais e conformidade de guias de governança.
    - *Pesquisa Prévia Compulsória (Criação de Artefatos / Stack)*: O `@governance-factory` delega compulsoriamente ao `@deep-search` a investigação de mercado antes de escrever novos prompts, skills ou agents.
 2. **Estado 2 — Modelagem e Checkpoint de Aprovação Humana**:
    - Apresentação objetiva dos achados ou especificações do novo artefato, incluindo a matriz de generalização sistêmica (artefatos alvo + peers + templates + testes).
    - *Estado 2b (Checkpoint Humano)*: Toda manutenção estrutural ou criação de stack exige autorização explícita via `ask_questions` antes de qualquer alteração física nos catálogos.
 3. **Estado 3 — Execução e Sincronização em Lote por Tipo de Artefato (R-015 / R-046)**:
-   - O `@governance-maintainer` aplica as alterações em lote único (*Single-Turn Batching*) utilizando o `context-mode` MCP no sandbox para zero desperdício de tokens.
+   - O `@governance-maintainer` aplica as alterações em lote único (*Single-Turn Batching*) utilizando o `context-mode` MCP no sandbox para zero desperdício de tokens, atuando em conjunto com o `@docs-engineer` para atualização e consolidação formal de documentação técnica, manuais e guias de governança.
    - **Sincronização Atômica por Tipo (R-015 — gap corrigido)**: o conjunto de arquivos sincronizados depende do tipo de artefato, nunca uma lista fixa de 4 arquivos:
      - **Novo Agent**: `catalog.yaml` + `routing-graph.yaml` (nós/arestas) + **novo caso em `.github/agents/evals/casos-roteamento.yaml`** (exigência formal de R-040, antes omitida desta lista) + `agent-router.agent.md` (Decision Tree derivada) + `.github/agents/README.md`.
      - **Nova Skill**: `.github/skills/.index.json` + `.github/skills/README.md` + `source_docs:` dos agents consumidores.
@@ -555,6 +665,7 @@ flowchart TD
      - `test_routing_quality_gate.py` (integridade do grafo e alcançabilidade).
    - **Suíte de Evals Comportamental**: para nova rota/agent, valida adicionalmente contra os 60 casos de `.github/agents/evals/casos-roteamento.yaml` (`agent-evals-lab`) — regressão estrutural (pytest) não substitui regressão comportamental de roteamento.
    - **Circuit Breaker (Estado 4b)**: teto de **3 tentativas** de autocorreção. Havendo regressão, o `@governance-maintainer` executa autocorreção cirúrgica; se a 3ª tentativa ainda falhar, escala via `ask_questions` para revisão manual do diff — nunca autocorreção indefinida.
+   - *Loop de Revisão de Qualidade*: Se o Avaliador Cético reprovar por achados de qualidade não-bloqueantes, aplica-se o Loop de Revisão de Qualidade (§ 1.5), teto de 3 iterações.
 
 #### Typed State Bag (`workflow_state`):
 ```yaml
@@ -631,6 +742,7 @@ flowchart TD
 5. **Estado 5 — Verificação de Regressão & Quality Gate SCA (`runtime-verifier` + `@code-review` + `@security-reviewer`)**:
    - *Entrada*: Build completo e suíte de testes.
    - *Saída*: Validação de que 100% dos testes passam, linter limpo, nova varredura SCA sem CVEs e preparação de PR via `@pr-gatekeeper`.
+   - *Loop de Revisão de Qualidade*: Se o Avaliador Cético reprovar por achados de qualidade não-bloqueantes, aplica-se o Loop de Revisão de Qualidade (§ 1.5), teto de 3 iterações.
 
 #### Typed State Bag (`workflow_state`):
 ```yaml
@@ -791,6 +903,7 @@ Documentada em `docs/migrations/matriz-de-para-<alvo>.md` (ou incorporada ao blu
      - **Sub-rotina 6a: Reverse Orphan Audit (Auditoria Reversa de Órfãos)**: O `@code-review` em conjunto com o `@code-knowledge-graph` varre todo o código-fonte legado contra o código moderno e a Matriz De-Para. Se existir qualquer método legado, endpoint, query nativa, arquivo de configuração XML/properties ou entidade que não possua mapeamento ativo (`[✅ MIGRADO]` ou `[ℹ️ DESACOPLADO]` / `[🚫 OBSOLETO]`), o gate gera um `GAP-REVERSO` imediato e força o retorno à Etapa 3.
      - **Sub-rotina 6b: Mutation Parity Resilience (Testes de Mutação de Paridade)**: O `@test-strategy` orienta a injeção de mutantes sintéticos controlados no código moderno (inversão de operadores booleanos, omissão proposital de escrita em tabelas secundárias de auditoria/histórico, alteração de status codes). A suíte de testes Golden Master DEVE obrigatoriamente quebrar com 100% dos mutantes eliminados. Se qualquer teste continuar verde na presença de uma mutação de regra de negócio, o teste é classificado como falso-positivo / frágil e a aprovação é bloqueada até o reforço das asserções.
      - **Sub-rotina 6c: Differential Shadow Replay & Invariant Comparator**: Execução em paralelo das fixtures canônicas Golden Master nas duas aplicações (legada e moderna), comparando semanticamente via comparador normalizado: *(1)* payload e status de resposta; *(2)* estado final do banco de dados (todas as tabelas filhas, registros de rateio e histórico); *(3)* mensagens disparadas para mensageria. Qualquer discrepância de negócio emite relatório de discrepância de paridade.
+   - *Loop de Revisão de Qualidade*: Se o Avaliador Cético reprovar por achados de qualidade não-bloqueantes, aplica-se o Loop de Revisão de Qualidade (§ 1.5), teto de 3 iterações.
    - *Certificado de Paridade Total & Cutover Autorizado*: Emissão do artefato formal de encerramento em `docs/migrations/certificado-paridade-<alvo>.md`, com atesto unânime e autorização definitiva de deploy/cutover.
 
 #### Typed State Bag (`workflow_state`):
@@ -869,13 +982,13 @@ flowchart TD
 
     DBRollout --> CheckDB{"DDL idempotente<br/>e reversível?"}
     CheckDB -- "Não" --> BlockDB["🛑 Bloqueio: Script DDL não possui rollback idempotente"]
-    CheckDB -- "Sim" --> SecScan["<b>3. Security, Secrets & Hygiene Scan</b><br/>Agente: @security-reviewer + @repo-hygiene-auditor<br/>Ação: Varredura de credenciais expostas, .env commitado e licenças"]
+    CheckDB -- "Sim" --> SecScan["<b>3. Security, Secrets, Style & Hygiene Scan</b><br/>Agente: @security-reviewer + @repo-hygiene-auditor + @code-style-enforcer<br/>Ação: Varredura de credenciais expostas, .env commitado, conformidade de estilo e licenças"]
 
     SecScan --> CheckSec{"Segredos ou CVEs<br/>detectados?"}
     CheckSec -- "Sim" --> BlockSec["🛑 Bloqueio: Segredos expostos ou CVE crítica não tratada"]
-    CheckSec -- "Não" --> Packaging["<b>4. Changelog, SemVer & Release Packaging</b><br/>Agente: @pr-gatekeeper<br/>Ação: Validação SemVer, compilação de changelog e draft de release"]
+    CheckSec -- "Não" --> Packaging["<b>4. Changelog, SemVer, Docs & Release Packaging</b><br/>Agente: @pr-gatekeeper + @docs-engineer<br/>Ação: Validação SemVer, documentação técnica, compilação de changelog e draft de release"]
 
-    Packaging --> VerdictGate{"<b>5. Release Verdict & Executive Summary</b><br/>Agente: @code-review + ask_questions<br/>Ação: Matriz de risco consolidada e decisão Go / No-Go"}
+    Packaging --> VerdictGate{"<b>5. Release Verdict & Executive Summary</b><br/>Agente: @code-review + @code-style-enforcer + ask_questions<br/>Ação: Matriz de risco consolidada e decisão Go / No-Go"}
 
     VerdictGate -- "Go (Aprovado)" --> EndGo(["🚀 Release Aprovada para Deploy"])
     VerdictGate -- "No-Go" --> EndNoGo(["🟡 Release Pausada — Pendências Críticas"])
@@ -886,12 +999,12 @@ flowchart TD
    - *Ação*: Validação de diffs de especificação OpenAPI v3 / contratos de integração entre a versão atual e a release pretendida. Verificação estrita de *breaking changes* não versionadas contra clientes consumidores.
 2. **Estado 2 — Database Rollout Pre-Flight & Rollback Check (`@database-specialist`)**:
    - *Ação*: Auditoria de scripts Flyway/DDL pendentes: confirmação de idempotência, ausência de `DROP` destrutivo sem fase de deprecação e existência de scripts de reversão (rollback) testados.
-3. **Estado 3 — Security, Secrets & Repository Hygiene Scan (`@security-reviewer` + `@repo-hygiene-auditor`)**:
-   - *Ação*: Varredura de diffs contra credenciais vazadas, variáveis `.env` expostas, pacotes de licença incompatível e conformidade de arquivos essenciais (`README`, `CHANGELOG`, `.gitignore`).
-4. **Estado 4 — Changelog, SemVer & Release Packaging (`@pr-gatekeeper`)**:
-   - *Ação*: Compilação das alterações agrupadas por convenção Conventional Commits (`feat`, `fix`, `refactor`, `perf`), validação do bump SemVer (`major`, `minor`, `patch`) e atualização formal do `CHANGELOG.md`.
-5. **Estado 5 — Release Verdict & Executive Summary (`@code-review` + `ask_questions`)**:
-   - *Ação*: Emissão da Matriz de Risco Executiva de Release e checkpoint formal de decisão humana (Go / No-Go / Contingência) via `ask_questions`.
+3. **Estado 3 — Security, Secrets & Repository Hygiene Scan (`@security-reviewer` + `@repo-hygiene-auditor` + `@code-style-enforcer`)**:
+   - *Ação*: Varredura de diffs contra credenciais vazadas, variáveis `.env` expostas, pacotes de licença incompatível, conformidade de lint/estilo via `@code-style-enforcer` e conformidade de arquivos essenciais (`README`, `CHANGELOG`, `.gitignore`).
+4. **Estado 4 — Changelog, SemVer, Docs & Release Packaging (`@pr-gatekeeper` + `@docs-engineer`)**:
+   - *Ação*: Compilação das alterações agrupadas por convenção Conventional Commits (`feat`, `fix`, `refactor`, `perf`), validação do bump SemVer (`major`, `minor`, `patch`), geração de release notes e sincronização de documentação técnica via `@docs-engineer`, e atualização formal do `CHANGELOG.md`.
+5. **Estado 5 — Release Verdict & Executive Summary (`@code-review` + `@code-style-enforcer` + `ask_questions`)**:
+   - *Ação*: Emissão da Matriz de Risco Executiva de Release (com co-verificação analítica do `@code-review` e `@code-style-enforcer`) e checkpoint formal de decisão humana (Go / No-Go / Contingência) via `ask_questions`.
 
 #### Typed State Bag (`workflow_state`):
 ```yaml
@@ -910,7 +1023,7 @@ workflow_state:
 
 ### 3.9 WORKFLOW 9: `WORKFLOW-PROMPT-SYNTHESIS` (Síntese e Refino de Prompts para Sessões Limpas)
 
-> **Objetivo**: Conduzir o refinamento estrutural de prompt, enriquecer com mineração determinística de contexto no codebase e sintetizar o prompt perfeito com tags XML em bloco de código Markdown pronto para inicializar uma nova sessão limpa.
+> **Objetivo**: Conduzir o refinamento estrutural de prompt, enriquecer com mineração determinística de contexto no codebase e sintetizar o prompt canônico perfeito em template Markdown estruturado em bloco de código pronto para inicializar uma nova sessão limpa conduzida por agents ou workflows especialistas (consumo exclusivo downstream).
 > **Gatilho de Entrada**: Invocação via `/craft-prompt`, intenção explícita do usuário de sintetizar ou refinar prompt para um novo chat, ou comando de preparação de contexto pré-execução.
 > **Fast-Path**: Sim (dispensa Fast-Chaining prévio; ingressa diretamente no Estado 1).
 
@@ -918,7 +1031,7 @@ workflow_state:
 flowchart TD
     Start(["Entrada do Usuário:<br/>Objetivo / Ideia Inicial"]) --> CheckType{"Tipo de Demanda"}
 
-    CheckType -- "Feature Nova / Regras de Negócio<br/>(Demanda Aberta / Ambígua)" --> S1_Req["<b>1. Elicitação & Intake com Usuário</b><br/>Agente: @requirements-analyst<br/>🛑 <b>ask_questions OBRIGATÓRIO</b><br/>Ação: Desambiguação de premissas, trade-offs e regras de negócio com o usuário"]
+    CheckType -- "Feature Nova / Regras de Negócio<br/>(Demanda Aberta / Ambígua)" --> S1_Req["<b>1. Elicitação & Intake com Usuário</b><br/>Agente: @requirements-analyst<br/>🛑 <b>ask_questions OBRIGATÓRIO (5 a 10 rodadas)</b><br/>Ação: Desambiguação aprofundada de premissas, trade-offs e regras de negócio com o usuário"]
 
     CheckType -- "Tarefa Técnica Direta / Bugfix<br/>(Alvo claro, sem novas regras)" --> S1_Tech["<b>1. Delimitação Técnica</b><br/>Agente: @prompt-structuring<br/>Ação: Delimitação técnica do Problem Space e critérios"]
 
@@ -929,25 +1042,32 @@ flowchart TD
 
     S2 --> S3["<b>3. Mapeamento de Restrições & Não-Escopo</b><br/>Agente: @prompt-structuring<br/>Ação: Injeção de R-046 (batching), anti-padrões e limites estritos da stack"]
 
-    S3 --> S4["<b>4. Síntese Estruturada & Otimização de Caching</b><br/>Agente: @prompt-structuring<br/>Ação: Composição do XML canônico ordenado estaticamente para Prompt Caching"]
+    S3 --> S4["<b>4. Síntese Estruturada & Otimização de Caching</b><br/>Agente: @prompt-structuring<br/>Ação: Composição do template Markdown canônico ordenado estaticamente para Prompt Caching"]
 
-    S4 --> S5{"<b>5. Quality Gate & Emissão do Bloco .md</b><br/>Agente: @prompt-structuring<br/>Ação: Red-teaming de ambiguidade e emissão do bloco Markdown final"}
+    S4 --> S5{"<b>5. Quality Gate & Emissão do Bloco .md</b><br/>Agente: @prompt-structuring<br/>Ação: Red-teaming de Solution Space, ambiguidade e emissão do bloco Markdown final"}
 
     S5 --> End(["📋 Prompt Perfeito Pronto para Novo Chat"])
 ```
 
 #### Cadeia Sequencial e Papéis:
 1. **Estado 1 — Elicitação & Intake com Usuário (`@requirements-analyst` para Negócio / `@prompt-structuring` para Técnico)**:
-   - *Via Funcional (Feature / Negócio / Demanda Aberta)*: O `@requirements-analyst` é o agente condutor desta etapa. Aplica *Five Whys* se houver *solution-jumping* precoce e aciona compulsoriamente `ask_questions` (1 a 3 perguntas estruturadas com opções + campo livre) para desambiguar regras de negócio, fluxos de aprovação, permissões e critérios com o usuário (R-027 / Invariante 19). É terminantemente proibido deduzir premissas ou alucinar requisitos de negócio sem confirmação humana.
+   - *Via Funcional (Feature / Negócio / Demanda Aberta)*: O `@requirements-analyst` é o agente condutor desta etapa. Aplica *Five Whys* se houver *solution-jumping* precoce e aciona compulsoriamente `ask_questions` em um ciclo aprofundado de 5 a 10 rodadas estruturadas de desambiguação (com opções + campo livre, sem checklist fixo, adaptativo ao domínio) para desambiguar regras de negócio, fluxos de aprovação, permissões e critérios com o usuário (R-027 / Invariante 19). É terminantemente proibido deduzir premissas ou alucinar requisitos de negócio sem confirmação humana. Cláusula de teto: atingida a 10ª rodada de `ask_questions`, eventuais ambiguidades ou lacunas residuais ainda não sanadas devem ser registradas expressamente em `## Restrições e Não-Escopo` como dívida técnica delimitada, autorizando o avanço para o Estado 2 sem loops infinitos.
    - *Via Técnica (Refactor / Bugfix / Tarefa Direta)*: Se a tarefa já possuir alvo e escopo técnicos claros sem novas regras de domínio, o `@prompt-structuring` atua diretamente na delimitação do Problem Space técnico, critérios e não-escopo preliminares.
 2. **Estado 2 — Context Grounding & AST Mining (`@code-knowledge-graph` + `@deep-search`)**:
-   - *Ação*: O `@code-knowledge-graph` é o agente executor OBRIGATÓRIO desta etapa (R-045 / Invariante 18). Ele DEVE ser invocado formalmente via `run_subagent(agentName: 'code-knowledge-graph', ...)` para extrair deterministamente os caminhos reais de arquivos (`<grounded_files>`), interfaces compartilhadas, contratos de DTOs e identificação de componentes irmãos canônicos homologados (protocolo *Canonical Sibling First*). É terminantemente proibido substituir a invocação do subagente por scripts manuais de varredura `fs` no sandbox via `ctx_execute` (Smell 2.26). Se houver novas dependências de biblioteca externa, o `@deep-search` é acionado via `run_subagent` para obter documentação oficial, versões e contratos reais.
+   - *Ação*: O `@code-knowledge-graph` é o agente executor OBRIGATÓRIO desta etapa (R-045 / Invariante 18). Ele DEVE ser invocado formalmente via `run_subagent(agentName: 'code-knowledge-graph', ...)` para extrair deterministamente os caminhos reais de arquivos (seção `## Arquivos e Referências Grounded`), interfaces compartilhadas, contratos de DTOs e identificação de componentes irmãos canônicos homologados (protocolo *Canonical Sibling First*). É terminantemente proibido substituir a invocação do subagente por scripts manuais de varredura `fs` no sandbox via `ctx_execute` (Smell 2.26). Se houver novas dependências de biblioteca externa, o `@deep-search` é acionado via `run_subagent` para obter documentação oficial, versões e contratos reais.
 3. **Estado 3 — Mapeamento de Restrições & Não-Escopo (`@prompt-structuring`)**:
    - *Ação*: Definição do Não-Escopo explícito (o que o agente executor NÃO deve alterar, bibliotecas proibidas, garantias de compatibilidade reversa). Injeção compulsória de governança de lote (*Single-Turn Batching* / R-046) e regras inegociáveis da stack do projeto alvo (ex.: convenções de modernização, injeções padronizadas, reatividade estrita, zero estilos inline arbitrários).
 4. **Estado 4 — Síntese Estruturada & Otimização de Caching (`@prompt-structuring`)**:
-   - *Ação*: Montagem do prompt canônico final utilizando tags XML semânticas (`<role>`, `<project_context>`, `<grounded_files>`, `<task>`, `<acceptance_criteria>`, `<constraints>`, `<execution_protocol>`, `<output_format>`). Otimização de ordem dos tokens para alinhamento com Prompt Caching (conteúdo estático e de convenções no topo; especificidades variáveis da task na cauda).
+   - *Ação*: Montagem do prompt canônico final utilizando o template Markdown canônico (`templates/prompt-synthesis-output.md`), estruturado nas seções: `# [Papel Especialista / Stack Detectada]`, `## Contexto do Projeto`, `## Arquivos e Referências Grounded`, `## Tarefa`, `## Critérios de Aceitação`, `## Restrições e Não-Escopo`, `## Protocolo de Execução Recomendado` e `## Formato de Saída Esperado`. Otimização de ordem dos tokens para alinhamento com Prompt Caching (conteúdo estático e de convenções no topo; especificidades variáveis da task na cauda).
 5. **Estado 5 — Quality Gate & Emissão do Bloco .md (`@prompt-structuring`)**:
-   - *Ação*: Avaliação crítica de fechamento (Red-Teaming analítico): verificação de contradições, remoção de instruções de sobre-verificação que degradam modelos de raciocínio frontier e validação do template. Emissão do prompt final encapsulado em bloco de código Markdown (`.md`), pronto para ser colado em um novo chat.
+   - *Ação*: Avaliação crítica de fechamento com Quality Gate ativo e Red-Teaming analítico contra o Solution Space antes da emissão. O `@prompt-structuring` submete o rascunho do prompt a um checklist de corte com 4 critérios excludentes:
+     1. **Classes/métodos internos**: o prompt não pode ditar classes internas, métodos ou assinaturas de código não solicitados pelo usuário;
+     2. **Bibliotecas/frameworks/algoritmos não pedidos**: não pode introduzir bibliotecas, frameworks auxiliares ou algoritmos específicos que o usuário não demandou expressamente;
+     3. **Arquitetura/design patterns prescritos**: não pode impor design patterns ou decisões de arquitetura interna, preservando a autonomia técnica do agente especialista do novo chat;
+     4. **Tecnologias não mencionadas**: não pode injetar tecnologias, ferramentas ou runtimes não citados na solicitação original.
+   - *Cláusula de Bloqueio*: Qualquer violação a um dos 4 critérios reprova imediatamente o prompt, forçando re-síntese cirúrgica no Estado 4 antes da liberação.
+   - *Finalidade de Consumo Exclusivo*: O prompt emitido destina-se estritamente ao consumo por outros agents ou workflows em uma nova sessão limpa (consumo exclusivo downstream), sendo expressamente vedada sua apresentação como solução final direta de negócio ao usuário.
+   - *Emissão*: Emissão do prompt final aprovado encapsulado em bloco de código Markdown (`.md`), pronto para ser colado em um novo chat.
 
 #### Typed State Bag (`workflow_state`):
 ```yaml
@@ -957,6 +1077,8 @@ workflow_state:
   prompt_alvo:
     intencao_original: "<descricao-ou-objetivo-inicial-da-tarefa>"
     stack_detectada: "<stack-alvo-detectada | ex: angular | spring-boot | python>"
+    rodadas_elicitacao_realizadas: 5  # 5..10 (Invariante 19)
+    lacunas_residuais_declaradas: []  # itens não resolvidos até a 10ª rodada
     arquivos_grounded:
       - "<caminho/relativo/arquivo-alvo-1.ext>"
       - "<caminho/relativo/modelo-ou-contrato.ext>"
@@ -967,7 +1089,11 @@ workflow_state:
     restricoes_nao_escopo:
       - "<restricao-negativa-ou-nao-escopo-1>"
       - "<convencao-obrigatoria-ou-anti-padrao-2>"
+    red_teaming_solution_space:
+      aprovado: true
+      violacoes_detectadas: []
     formato_saida: "markdown_code_block"
+    consumo_exclusivo_agents: true
     bloco_md_gerado: true
 ```
 
@@ -1045,10 +1171,11 @@ handoff_payload:
 
 16. **Invariante de Proibição Estrita de Terceirização ao Usuário em Etapas Analíticas e Diagnósticas (R-057 / Smell 2.25)**: É expressamente vedado a qualquer agente participante de etapas analíticas, diagnósticas, de auditoria ou triagem (ex.: Etapa 1 de `WORKFLOW-BUG-FIX` com `@bug-triage`, Etapa 1 de `WORKFLOW-GOVERNANCE-MAINTENANCE` com `@agent-auditor`, Etapa 1 de `WORKFLOW-TECHNICAL-ANALYSIS`, etc.), ao constatar falta de ferramentas de escrita ou identificar a necessidade de alterações de código ou governança, encerrar seu turno emitindo instruções para que o usuário execute edições manuais. O agente analítico DEVE compulsoriamente avançar para o checkpoint de aprovação ou transferir deterministamente o controle para o agente executor competente (ex.: `@governance-maintainer`, `@bug-fixer`, `@feature-developer`).
 
-17. **Invariante de Visibilidade Progressiva e Painel de Evidências em Síntese de Prompt (WORKFLOW-PROMPT-SYNTHESIS)**: É terminantemente proibido:
+17. **Invariante de Visibilidade Progressiva, Red-Teaming de Solution Space e Painel de Evidências em Síntese de Prompt (WORKFLOW-PROMPT-SYNTHESIS)**: É terminantemente proibido:
     **(a) Execução Blackbox**: Emitir o prompt final diretamente ou apenas a listagem de checkboxes [✅] sem apresentar o Painel de Evidências por Etapa com o detalhamento de cada uma das 5 etapas (Elicitação no Problem Space, Grounding de Arquivos Reais, Mapeamento de Não-Escopo, Síntese de Caching e Quality Gate).
-    **(b) Alucinação de caminhos**: Listar arquivos em `<grounded_files>` sem verificação determinística de existência real no workspace via `@code-knowledge-graph` ou inspeção de contexto.
-    **(c) Invasão de Solution Space**: Ditar classes internas, algoritmos ou implementações técnicas detalhadas dentro do Problem Space, retirando a autonomia técnica do agente especialista que atuará no novo chat.
+    **(b) Alucinação de caminhos**: Listar arquivos em referências grounded sem verificação determinística de existência real no workspace via `@code-knowledge-graph` ou inspeção de contexto.
+    **(c) Invasão de Solution Space (Red-Teaming Ativo Compulsório)**: Emitir prompt que viole qualquer um dos 4 critérios excludentes do checklist de corte de Solution Space: (1) classes ou métodos internos não solicitados; (2) bibliotecas, frameworks ou algoritmos não pedidos expressamente; (3) arquitetura interna ou design patterns prescritos no lugar de preservar a autonomia do especialista executor; (4) tecnologias não mencionadas na demanda original. Qualquer violação constitui bloqueio impeditivo no Estado 5, exigindo re-síntese cirúrgica no Estado 4.
+    **(d) Desvirtuamento de Consumo (Não-Entrega Direta ao Usuário)**: Apresentar o prompt sintetizado como se fosse o código implementado ou a solução final de negócio para o usuário. O prompt gerado possui a finalidade declarada e restrita de consumo exclusivo downstream por outros agents e workflows canônicos na inicialização de uma nova sessão limpa.
 
 ---
 
@@ -1059,15 +1186,15 @@ handoff_payload:
 
 ---
 
-19. **Invariante de Interrupção Compulsória por Ambiguidade e Proibição de Alucinação de Requisitos (WORKFLOW-PROMPT-SYNTHESIS / R-027)**: É terminantemente proibido:
+19. **Invariante de Interrupção Compulsória por Ambiguidade, Elicitação Aprofundada e Proibição de Alucinação de Requisitos (WORKFLOW-PROMPT-SYNTHESIS / R-027)**: É terminantemente proibido:
     **(a) Inferência e Alucinação de Regras de Negócio**: Em solicitações que envolvam novas funcionalidades, telas ou regras de negócio abertas, o agente participante não pode deduzir, supor ou alucinar fluxos funcionais, critérios de aceitação, regras de aprovação ou entidades sem validação explícita do usuário.
-    **(b) Bypass do Checkpoint Humano em Ambiguidade**: A interação com o usuário na Etapa 1 via `ask_questions` é OBRIGATÓRIA e BLOQUEANTE quando a demanda possuir ambiguidade de domínio ou múltiplos caminhos de negócio viáveis (R-027). A palavra "Opcional" é expressamente proibida para este checkpoint. O workflow não pode avançar para a Etapa 2 sem as respostas do solicitante.
+    **(b) Bypass do Checkpoint Humano em Ambiguidade & Elicitação em 5 a 10 Rodadas**: A interação com o usuário na Etapa 1 via `ask_questions` é OBRIGATÓRIA e BLOQUEANTE quando a demanda possuir ambiguidade de domínio ou múltiplos caminhos de negócio viáveis (R-027). A palavra "Opcional" é expressamente proibida para este checkpoint. Em demandas funcionais do `WORKFLOW-PROMPT-SYNTHESIS`, a elicitação deve conduzir um processo iterativo aprofundado de no mínimo 5 e no máximo 10 rodadas estruturadas de `ask_questions` (sem checklist fixo, adaptativo ao domínio do usuário). Cláusula de Teto: caso o diálogo atinja a 10ª rodada e ainda restem indefinições residuais, o agente DEVE compulsoriamente interromper as perguntas, declarar as lacunas em aberto formalmente na seção `## Restrições e Não-Escopo` do prompt e prosseguir para a Etapa 2, impedindo loops infinitos.
     **(c) Invasão de Papel**: A elicitação, desambiguação e estruturação de requisitos de negócio e critérios de aceitação em demandas funcionais cabe com exclusividade ao `@requirements-analyst`, cabendo ao `@prompt-structuring` atuar na Etapa 1 apenas para tarefas estritamente técnicas ou após a elicitação de negócio, conduzindo as Etapas 3 a 5 (mapeamento de não-escopo, Prompt Caching, injeção de governança e emissão do bloco `.md`).
 
 ---
 
 20. **Invariante de Blueprint Técnico e Decomposição Obrigatórios em Features Complexas (WORKFLOW-FEATURE-DEVELOPMENT / R-058 / Smell 2.27)**: É terminantemente proibido:
-    **(a) Bypass Prematuro para Implementadores de Código**: Despachar solicitações de novas funcionalidades que envolvam novo schema de persistência (mesmo Firestore/BaaS), máquina de estados finita com 3+ transições, concorrência/transações atômicas ou integração de infraestrutura (plugins nativos, push notifications) diretamente para domain routers (`@angular-router`, `@spring-boot-router`, etc.) ou executores de código sem a passagem compulsória pelo Estado 3 (`@tech-solution-architect`) para elaboração de Technical Blueprint e aprovação no Checkpoint 3b (`ask_questions`).
+    **(a) Bypass Prematuro para Implementadores de Código**: Despachar solicitações de novas funcionalidades que envolvam novo schema de persistência (mesmo Firestore/BaaS), máquina de estados finita com 3+ transições, concorrência/transações atômicas ou integração de infraestrutura (plugins nativos, push notifications) diretamente para domain routers (`@angular-router`, `@spring-boot-router`, `@python-router`, etc.) ou executores de código sem a passagem compulsória pelo Estado 3 (`@tech-solution-architect`) para elaboração de Technical Blueprint e aprovação no Checkpoint 3b (`ask_questions`).
     **(b) Despejo de Lacunas Arquiteturais (Anti-Gap Dumping)**: O `@agent-router` identificar lacunas arquiteturais conceituais (ex.: matriz de papéis/permissões, formato de payload/coleções de banco, escopo de tokens de push notification) e despejá-las no bloco de "Lacunas para handoff" para que o especialista de implementação resolva no improviso durante a codificação.
     **(c) Omissão do `@feature-planner` em Demandas Multi-Task**: Omitir a decomposição formal de subtasks atômicas `[S]` e `[P]` quando a feature contiver 3 ou mais frentes de trabalho ou tarefas interdependentes, deixando a ordem de implementação a critério arbitrário do executor tático.
 
@@ -1092,7 +1219,7 @@ Para que o usuário nunca fique no escuro quanto ao fluxo em andamento, o `@agen
 - [⏳] **Etapa 2: Red Test de Caracterização & Baseline** → `specialist-unit-test-writer` *(Pendente: teste automatizado que falha comprovando o bug)*
 - [⏳] **Etapa 3: Correção Cirúrgica Mínima** → `specialist-bug-fixer` *(Pendente: blast radius estimado & rollback plan declarados, diff cirúrgico R-002/R-046)*
 - [⏳] **Etapa 4: Validação Green Test & Mini Mutation-Check** → `runtime-verifier` *(Pendente: 100% testes passando, linter limpo e mini mutation anti falso-verde)*
-- [⏳] **Etapa 5: Quality Gate & Observação Pós-Fix / Canary** → `@code-review` / `@pr-gatekeeper` *(Pendente: revisão final, autorreflexão R-033 e canary para bugs críticos)*
+- [⏳] **Etapa 5: Quality Gate, Observação Pós-Fix / Canary & Quality Review Loop (§ 1.5)** → `@code-review` / `@pr-gatekeeper` *(Pendente: revisão final, autorreflexão R-033, loop de qualidade até 3x se achados não-bloqueantes e canary para bugs críticos)*
 ```
 
 #### WORKFLOW 2: `WORKFLOW-REFACTORING` (5 etapas)
@@ -1102,7 +1229,7 @@ Para que o usuário nunca fique no escuro quanto ao fluxo em andamento, o `@agen
 - [⏳] **Etapa 2: Blast Radius & Contract Testing** → `@code-knowledge-graph` + `@tech-solution-architect` *(Pendente: grafo determinístico via @optave/codegraph e Contract Testing Pact-style)*
 - [⏳] **Etapa 3: Plano Macro Mikado & Safety Net** → `@refactor-planner` + `@test-strategy` *(Pendente: árvore Mikado, threshold de caracterização e rollback planejado)*
 - [⏳] **Etapa 4: Execução Incremental em Lote** → `Domain Router / Specialists` *(Pendente: micro-lotes com Gate Out por nó R-046)*
-- [⏳] **Etapa 5: Validação de Regras & Redundância Proporcional** → `@business-rules-extractor` + `@code-review` *(Pendente: ground truth 100% + auditoria reversa de símbolos + mini mutation gate + blast radius revertido se falha)*
+- [⏳] **Etapa 5: Validação de Regras, Redundância Proporcional & Quality Review Loop (§ 1.5)** → `@business-rules-extractor` + `@code-review` *(Pendente: ground truth 100% + auditoria reversa de símbolos + mini mutation gate + loop de qualidade até 3x + blast radius revertido se falha)*
 ```
 
 #### WORKFLOW 3: `WORKFLOW-TECHNICAL-ANALYSIS` (3 etapas)
@@ -1116,20 +1243,31 @@ Para que o usuário nunca fique no escuro quanto ao fluxo em andamento, o `@agen
 #### WORKFLOW 4: `WORKFLOW-FEATURE-DEVELOPMENT` (6 etapas)
 ```markdown
 ### 🗺️ Pipeline de Execução: WORKFLOW-FEATURE-DEVELOPMENT (6 etapas)
-- [▶] **Etapa 1: Prompt Structuring** → `@prompt-structuring` *(Em Andamento: refinamento <task>/<context>/<constraints>)*
+- [▶] **Etapa 1: Prompt Structuring** → `@prompt-structuring` *(Em Andamento: refinamento Markdown Tarefa/Contexto/Restrições/Formato)*
 - [⏳] **Etapa 2: Elicitação de Requisitos** → `@requirements-analyst` / `@feature-planner` *(Pendente: critérios de aceitação BDD/EARS)*
 - [⏳] **Etapa 3: Technical Blueprint & Contratos** → `@tech-solution-architect` *(Pendente: OpenAPI, modelo de dados e divisão por stack)*
 - [⏳] **Etapa 4: Estratégia de Testes (TDD)** → `@test-strategy` *(Pendente: matriz de riscos e casos de borda)*
 - [⏳] **Etapa 5: Implementação Domain TDD & Paridade UI** → `Domain Routers & Specialists` *(Pendente: Red-Green-Refactor + Handoff UI 5a->5b)*
-- [⏳] **Etapa 6: Duplo Quality Gate & PR Preparation** → `Gate 1 (Lógica/Sec) + Gate 2 (UI Parity) → @pr-gatekeeper` *(Pendente: validação dupla e PR)*
+- [⏳] **Etapa 6: Duplo Quality Gate, Quality Review Loop (§ 1.5) & PR Preparation** → `Gate 1 (Lógica/Sec) + Gate 2 (UI Parity) → @pr-gatekeeper` *(Pendente: validação dupla, loop de qualidade até 3x se achados não-bloqueantes e PR)*
 ```
 
-#### WORKFLOW 5: `WORKFLOW-GOVERNANCE-MAINTENANCE` (3 etapas)
+#### WORKFLOW 5: `WORKFLOW-GOVERNANCE-MAINTENANCE` (4 etapas)
 ```markdown
-### 🗺️ Pipeline de Execução: WORKFLOW-GOVERNANCE-MAINTENANCE (3 etapas)
-- [▶] **Etapa 1: Diagnóstico Read-Only** → `@agent-auditor` / `@repo-hygiene-auditor` *(Em Andamento: auditoria estrutural)*
+### 🗺️ Pipeline de Execução: WORKFLOW-GOVERNANCE-MAINTENANCE (4 etapas)
+- [▶] **Etapa 1: Diagnóstico Read-Only ou Pesquisa Prévia** → `@agent-auditor` / `@repo-hygiene-auditor` / `@docs-engineer` / `@deep-search` *(Em Andamento: auditoria estrutural, documental e pesquisa prévia)*
 - [⏳] **Etapa 2: Checkpoint de Aprovação Humana** → `ask_questions` *(Pendente: aprovação explícita do plano)*
-- [⏳] **Etapa 3: Execução Governada em Lote** → `@governance-maintainer` / `@governance-factory` *(Pendente: sincronização em lote R-046)*
+- [⏳] **Etapa 3: Execução Governada em Lote** → `@governance-maintainer` / `@governance-factory` / `@docs-engineer` *(Pendente: sincronização atômica SSOT R-015/R-046 e documentação técnica)*
+- [⏳] **Etapa 4: Quality Gate de Governança & Quality Review Loop (§ 1.5)** → `pytest (Tier 1)` / `@agent-auditor` *(Pendente: validação determinística de smells, routing, isolamento e loop de qualidade até 3x)*
+```
+
+#### WORKFLOW 6: `WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION` (5 etapas)
+```markdown
+### 🗺️ Pipeline de Execução: WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION (5 etapas)
+- [▶] **Etapa 1: Triagem de Vulnerabilidade & Advisory** → `@security-reviewer` *(Em Andamento: análise de CVE, CVSS e changelog)*
+- [⏳] **Etapa 2: Mapeamento de Blast Radius da Dependência** → `@code-knowledge-graph` *(Pendente: mapa de impacto e consumidores R-045)*
+- [⏳] **Etapa 3: Bump de Manifesto & Sincronização de Lockfile** → `specialist-developer` *(Pendente: atualização de dependências e lockfile)*
+- [⏳] **Etapa 4: Adaptação de Breaking Changes & Compilação** → `specialist-bug-fixer` / `specialist-test-fixer` *(Pendente: compatibilização de APIs e compilação limpa)*
+- [⏳] **Etapa 5: Verificação de Regressão, SCA & Quality Review Loop (§ 1.5)** → `runtime-verifier` + `@code-review` + `@security-reviewer` *(Pendente: 100% testes verdes, scan SCA limpo e loop de qualidade até 3x)*
 ```
 
 #### WORKFLOW 7: `WORKFLOW-FRAMEWORK-MIGRATION` (6 etapas — Cross-Stack exige Router Origem + Destino + Grafo)
@@ -1140,7 +1278,17 @@ Para que o usuário nunca fique no escuro quanto ao fluxo em andamento, o `@agen
 - [⏳] **Etapa 3: Codemod & Transformação em Lote com Anti-Omission** → `@domain-router-DESTINO` (executor) + `@domain-router-ORIGEM` (oráculo consultivo contínuo) + `@code-knowledge-graph` (obrigatório, blast radius por lote) *(Pendente: codemods no sandbox R-046 + validação anti-omissão AST)*
 - [⏳] **Etapa 4: Refinamento & Paridade Funcional (Dual-Verification Expandido)** → `@domain-router-DESTINO` + `@domain-router-ORIGEM` + `@business-rules-extractor` + `@code-knowledge-graph` (obrigatório, find_cycles/dead-code) *(Pendente: Golden Master + 100% regras de negócio cobertas + zero ciclos/dead-code novos)*
 - [⏳] **Etapa 5: Baseline & Quality Gate de Migração** → `runtime-verifier` + `@code-review` + sign-off de `@domain-router-ORIGEM` + sign-off de `@code-knowledge-graph` *(Pendente: build limpo, testes verdes e PR preliminar)*
-- [⏳] **Etapa 6: Post-Migration Verification & Redundancy Gate** → `@code-review` + `@test-strategy` + `@business-rules-extractor` + `@runtime-verifier` *(Pendente: tríplice auditoria: reverse orphan audit + mutation parity resilience + differential shadow replay)*
+- [⏳] **Etapa 6: Post-Migration Verification, Redundancy Gate & Quality Review Loop (§ 1.5)** → `@code-review` + `@test-strategy` + `@business-rules-extractor` + `@runtime-verifier` *(Pendente: tríplice auditoria: reverse orphan audit + mutation parity resilience + differential shadow replay e loop de qualidade até 3x)*
+```
+
+#### WORKFLOW 8: `WORKFLOW-RELEASE-READINESS` (5 etapas)
+```markdown
+### 🗺️ Pipeline de Execução: WORKFLOW-RELEASE-READINESS (5 etapas)
+- [▶] **Etapa 1: Contract & API Compatibility Audit** → `@tech-solution-architect` *(Em Andamento: diff OpenAPI v3 contra breaking changes)*
+- [⏳] **Etapa 2: Database Rollout Pre-Flight** → `@database-specialist` *(Pendente: DDL idempotente e scripts de rollback testados)*
+- [⏳] **Etapa 3: Security, Secrets & Repository Hygiene Scan** → `@security-reviewer` + `@repo-hygiene-auditor` + `@code-style-enforcer` *(Pendente: varredura de credenciais, .env, conformidade de estilo e licenças)*
+- [⏳] **Etapa 4: Changelog, SemVer, Docs & Release Packaging** → `@pr-gatekeeper` + `@docs-engineer` *(Pendente: validação SemVer, documentação, compilação de changelog e draft de release)*
+- [⏳] **Etapa 5: Release Verdict & Executive Summary** → `@code-review` + `@code-style-enforcer` + `ask_questions` *(Pendente: matriz de risco consolidada e decisão Go/No-Go)*
 ```
 **Nota obrigatória (Invariantes 8 e 9, § 5)**: se a migração for cross-stack, `@domain-router-ORIGEM` NUNCA é omitido do bloco acima após a Etapa 1 — ele permanece listado até a Etapa 5. `@code-knowledge-graph` é co-agente obrigatório (R-045) nas Etapas 1, 3, 4 e 5 — nunca apenas sub-rotina opcional.
 
@@ -1173,13 +1321,15 @@ Para que o usuário nunca fique no escuro quanto ao fluxo em andamento, o `@agen
 - **Convenções Obrigatórias Injetadas**: <R-046, regras de stack>
 
 #### ⚡ Etapa 4: Síntese Estruturada & Caching
-- **Segmentação XML**: Tags semânticas canônicas.
+- **Segmentação Markdown**: Seções canônicas estruturadas.
 - **Prompt Caching Alignment**: Regras no topo; dados variáveis da task na cauda.
 
 #### 🛡️ Etapa 5: Quality Gate & Validação Final
+- [x] Zero invasão de Solution Space (red-teaming contra 4 critérios aprovado).
 - [x] Zero alucinações de caminhos de arquivos (100% verificados).
 - [x] Zero ambiguidades nos critérios de aceite.
 - [x] Zero over-prompting prejudicial a reasoning models.
+- [x] Consumo exclusivo downstream assegurado.
 - [x] Bloco Markdown completo e autocontido.
 
 ---
@@ -1227,7 +1377,7 @@ Nenhum workflow mutativo pode deixar o repositório em estado quebrado, sujo ou 
    - Se os testes não passarem na 3ª tentativa, o fluxo **NÃO** prossegue para o Quality Gate nem continua tentando cegamente.
 2. **Ativação Compulsória do Estado de Rollback (Estado 4b) — Separação Declarador/Executor**:
    - **2a. `WORKFLOW-BUG-FIX` (contrato corrigido)**: o `runtime-verifier` (agente estritamente read-only, sem ferramentas de mutação) apenas DETECTA o esgotamento do teto e DECLARA o veredito de bloqueio. A reversão física dos diffs (`git checkout -- <arquivos>`) é sempre EXECUTADA pelo `specialist-bug-fixer`/`specialist-test-fixer` ativo (que possuem `run_in_terminal` + `insert_edit_into_file`) via `run_subagent` acionado pelo `runtime-verifier`, estritamente amparado pelo `rollback_plan` previamente declarado no Estado 3. **Um agente read-only nunca executa a mutação de rollback diretamente** — essa separação declarador/executor é invariante de arquitetura (ver Seção 5, item 6).
-   - **2b. `WORKFLOW-REFACTORING` (Estado 5b — contrato corrigido)**: o `@refactor-planner` não possui **nenhuma** ferramenta de edição ou terminal em seu frontmatter (nem `run_in_terminal`) — é ainda mais estritamente read-only que o `runtime-verifier`. Ele DETECTA a violação (via relatório `@business-rules-extractor` modo Validate) e DECIDE o escopo do rollback (quais nós do DAG Mikado precisam reverter, com base na árvore de dependências que ele mesmo desenhou no Estado 3 — pode ser rollback parcial dos últimos micro-lotes, não necessariamente do plano inteiro). A EXECUÇÃO física da reversão é sempre delegada, nó a nó, ao domain router/specialist que aplicou aquele nó especificamente (`@angular-router`, `@spring-boot-router`, `@spring-reactive-router`, `@database-router` — cada um reverte apenas os arquivos que executou), registrando compulsoriamente o `blast_radius_revertido` no `workflow_state`.
+   - **2b. `WORKFLOW-REFACTORING` (Estado 5b — contrato corrigido)**: o `@refactor-planner` não possui **nenhuma** ferramenta de edição ou terminal em seu frontmatter (nem `run_in_terminal`) — é ainda mais estritamente read-only que o `runtime-verifier`. Ele DETECTA a violação (via relatório `@business-rules-extractor` modo Validate) e DECIDE o escopo do rollback (quais nós do DAG Mikado precisam reverter, com base na árvore de dependências que ele mesmo desenhou no Estado 3 — pode ser rollback parcial dos últimos micro-lotes, não necessariamente do plano inteiro). A EXECUÇÃO física da reversão é sempre delegada, nó a nó, ao domain router/specialist que aplicou aquele nó especificamente (`@angular-router`, `@spring-boot-router`, `@spring-reactive-router`, `@database-router`, `@python-router`, `@struts-router` — cada um reverte apenas os arquivos que executou), registrando compulsoriamente o `blast_radius_revertido` no `workflow_state`.
    - Em ambos os casos, o agente responsável gera um relatório compacto de falha (3 linhas: Causa, Local, Ação sugerida) e aciona `ask_questions` para decisão humana:
      - *Opção A: Ajustar a estratégia de teste manualmente.*
      - *Opção B: Revisar hipótese de causa raiz.*
@@ -1269,3 +1419,52 @@ workflow_tracking:
       diagnostico_previo: "3 memory leaks detectados em subscriptions manuais sem takeUntil"
 ```
 Com esse bloco, qualquer especialista na cadeia sequencial sabe exatamente onde ler, onde testar e quais convenções de stack aplicar, sem ambiguidades.
+
+---
+
+## 10. R-064 — Duplo Gate Documental de Planejamento e Implementação
+
+> **Fonte de verdade normativa:** [`CLAUDE.md`](../../CLAUDE.md) § R-064 e [`.github/copilot-instructions.md`](../copilot-instructions.md) § 1.1 e § 2.  
+> **Diretórios canônicos:** [`docs/plans/`](../../docs/plans/README.md) e [`docs/implementation-plans/`](../../docs/implementation-plans/README.md).
+
+### 10.1 Princípio Operacional e Estrutura dos Gates
+
+Todo workflow canônico que envolva mutação de código (`WORKFLOW-BUG-FIX`, `WORKFLOW-REFACTORING`, `WORKFLOW-FEATURE-DEVELOPMENT`, `WORKFLOW-GOVERNANCE-MAINTENANCE`, `WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION`, `WORKFLOW-FRAMEWORK-MIGRATION`) opera compulsoriamente sob dois portões documentais versionados prévios à execução:
+
+```text
+Etapa Inicial (Elicitação / RCA / Escopo)
+                   │
+                   ▼
+  [ GATE 1: PLANO DE PLANEJAMENTO ]
+  ├─ Arquivo: docs/plans/<AAAAMMDD>-<workflow>-<identificador-curto>.md
+  ├─ Autoria: Especialista analítico/triagem dono da Etapa 1/2
+  ├─ Materialização: Orquestrador Raiz (Flat Delegation R-037/R-042)
+  └─ Checkpoint: ask_questions obrigatório (Aprovar / Solicitar Ajustes)
+                   │ (Aprovado pelo Usuário)
+                   ▼
+  [ GATE 2: PLANO DE IMPLEMENTAÇÃO TÉCNICA ]
+  ├─ Arquivo: docs/implementation-plans/<AAAAMMDD>-<workflow>-<identificador-curto>.md
+  ├─ Autoria: <stack>-arch-advisor (domínio específico) ou especialista técnico do workflow
+  ├─ Materialização: Orquestrador Raiz
+  └─ Checkpoint: ask_questions obrigatório (Aprovar / Solicitar Ajustes)
+                   │ (Aprovado pelo Usuário)
+                   ▼
+Etapa de Execução / Mutação de Código (Batch Execution R-046 / R-059)
+```
+
+### 10.2 Matriz de Responsabilidade de Autoria por Workflow
+
+| Workflow Canônico | Gate 1: Plano de Planejamento (`docs/plans/`) | Gate 2: Plano de Implementação (`docs/implementation-plans/`) |
+|---|---|---|
+| **WORKFLOW-BUG-FIX** | `@bug-triage` (RCA, evidências e escopo) | `<stack>-arch-advisor` (ou analítico da stack) |
+| **WORKFLOW-REFACTORING** | `@refactor-planner` (diagnóstico e Mikado DAG) | `<stack>-arch-advisor` (detalhamento técnico de blast radius) |
+| **WORKFLOW-FEATURE-DEVELOPMENT** | `@requirements-analyst` / `@tech-solution-architect` | `<stack>-arch-advisor` (arquitetura e etapas técnicas) |
+| **WORKFLOW-GOVERNANCE-MAINTENANCE** | `@agent-auditor` / `@repo-hygiene-auditor` | Especialista analítico do lote (`@governance-maintainer`) |
+| **WORKFLOW-DEPENDENCY-VULNERABILITY** | Especialista de segurança / scan | Especialista analítico de dependências / `<stack>-arch-advisor` |
+| **WORKFLOW-FRAMEWORK-MIGRATION** | `@tech-solution-architect` (5D Assessment e De-Para) | `<stack>-arch-advisor` (estratégia técnica de paridade e codemod) |
+
+### 10.3 Isenções e Regras de Exceção
+
+1. **Fast-Path Determinístico (R-041, Tier 1)**: Para correções pontuais, refatorações com alvo definido e análises diretas, o Plano de Planejamento (`docs/plans/`) pode ser dispensado, mas o **Plano de Implementação (`docs/implementation-plans/`) permanece 100% obrigatório** antes de tocar em código.
+2. **Workflows Read-Only**: `WORKFLOW-TECHNICAL-ANALYSIS`, `WORKFLOW-RELEASE-READINESS` e `WORKFLOW-PROMPT-SYNTHESIS` são isentos do Plano de Implementação (não realizam mutação de código na aplicação), podendo produzir apenas o Plano de Planejamento quando a profundidade analítica demandar alinhamento prévio.
+3. **Zero Discovery pelo Router (R-054)**: O `@agent-router` não gera, não persiste e não inspeciona planos; a materialização física dos arquivos gerados pelos agentes Read-Only é executada pelo Orquestrador Raiz.

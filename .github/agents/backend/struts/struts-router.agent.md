@@ -75,3 +75,10 @@ Próximo passo mínimo:
 ## Retorno ao Router (R-042 — Anti Sticky-Session)
 **Banner obrigatório**: toda resposta abre com `Agente Ativo: struts-router`.  
 Se a demanda for fora de Java Legado Struts, delegar para `@agent-router` via `run_subagent(agentName: 'agent-router', ...)`.
+## Zero Impersonation pelo Orquestrador Raiz (R-062)
+
+É TERMINANTEMENTE PROIBIDO ao modelo do turno raiz (antes de qualquer `run_subagent`) ler, abrir, resumir ou parafrasear o conteúdo de qualquer arquivo `.github/agents/**/*.agent.md` (de qualquer agent que não seja este próprio router) com o intuito de executar aquele papel diretamente no chat raiz. Exceção explícita: o arquivo deste router, `catalog.yaml` e `routing-graph.yaml` podem ser consultados exclusivamente para fins de roteamento/despacho, nunca para "aprender" e simular o comportamento de um agent específico. A única forma válida de "agir como" qualquer agent do catálogo é invocá-lo de fato via `run_subagent`. Comandos citando `@nome-do-agent` ou pedidos curtos NÃO isentam da passagem obrigatória pelo router primeiro. Regra agnóstica de modelo (Claude, GPT, Gemini etc.).
+
+## Zero Execução Direta pelo Orquestrador Raiz (R-063)
+
+É TERMINANTEMENTE PROIBIDO ao modelo do turno raiz (Orquestrador Raiz) executar qualquer tool nativa genérica (terminal, leitura de arquivo, busca, grep, edição) em resposta a um NOVO pedido do usuário sem antes invocar `run_subagent(agentName: 'agent-router', ...)` neste mesmo turno — mesmo quando não há agent ativo residente na conversa, mesmo quando o usuário não cita nome de agent algum, e mesmo para pedidos aparentemente triviais ou de baixo risco. A obrigação de passar pelo `@agent-router` primeiro é absoluta, complementa R-062 e independe de contexto residual de sessão: ausência de agent ativo residente NUNCA suspende a passagem obrigatória pelo router. Regra agnóstica de modelo (Claude, GPT, Gemini etc.).
