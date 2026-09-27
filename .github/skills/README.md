@@ -27,7 +27,7 @@ Toda skill deve declarar no topo:
 |---|---|---|
 | `prototype-patterns` | Tier 2 | Prototipagem rápida e descartável para responder perguntas de design, viabilidade de UI e validação de modelos de estado |
 | `interactive-wizard-patterns` | Tier 2 | Criação de scripts interativos e assistentes passo a passo (wizards) para procedimentos HITL, credenciais e migrações |
-| **`prompt-engineering-patterns`** | 🧠 **Tier 2** | Técnicas consolidadas (APE/OPRO/DSPy/Anthropic/OpenAI) para estruturar prompts em `<task>/<context>/<constraints>/<output_format>`, detectar ambiguidade objetivamente e aplicar self-critique — base do agent `prompt-structuring` |
+| **`prompt-engineering-patterns`** | 🧠 **Tier 2** | Técnicas consolidadas (APE/OPRO/DSPy/Anthropic/OpenAI) para estruturar prompts em seções canônicas Markdown (## Tarefa, ## Contexto, ## Restrições e Não-Escopo, ## Formato de Saída Esperado), detectar ambiguidade objetivamente e aplicar self-critique — base do agent `prompt-structuring` |
 | `harness-engineering-patterns` | Tier 1 | ⭐ (NEW) Fornece diretrizes e heurísticas de Harness Engineering: diagnóstico harness vs modelo, heurística da zona inteligente (~100k tokens), poda anti-bloat e execução autônoma Ralph Loop |
 | `context-mode` | Tier 1 | Roteamento ctx-first, coleta em batch, busca indexada e processamento em sandbox com economia de tokens/créditos |
 | `sonarqube-governance` | Tier 2 | Monitorar métricas de qualidade, cobertura e segurança via SonarQube |

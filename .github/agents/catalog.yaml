@@ -55,7 +55,7 @@ agents:
     version: 2.0.0
     domain: Refinamento estrutural de prompt (passo mandatorio)
     description: 'Refinamento estrutural de prompt sob autonomia delimitada (3 Tiers,
-      R-041): transforma a solicitacao no formato canonico <task>/<context>/<constraints>/<output_format>
+      R-041): transforma a solicitacao no formato canonico Markdown (## Tarefa, ## Contexto, ## Restrições e Não-Escopo, ## Formato de Saída Esperado)
       com Gate Pattern de 1-clique (Tier 2) ou loop interativo (Tier 3 — max. 5 iteracoes)
       estritamente no Problem Space sem invadir o Solution Space dos especialistas.'
     keywords:

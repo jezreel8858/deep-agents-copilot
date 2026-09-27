@@ -542,7 +542,7 @@ flowchart TD
 ```
 
 #### Cadeia Sequencial e Papéis:
-1. **Estado 1 — Estruturação de Prompt (`@prompt-structuring`)**: Transforma pedidos abertos no formato canônico `<task>/<context>/<constraints>/<output_format>`.
+1. **Estado 1 — Estruturação de Prompt (`@prompt-structuring`)**: Transforma pedidos abertos no formato canônico Markdown (`## Tarefa`, `## Contexto`, `## Restrições e Não-Escopo`, `## Formato de Saída Esperado`).
 2. **Estado 2 — Elicitação de Requisitos (`@requirements-analyst` / `@feature-planner` — negociação do Sprint Contract — § 1.4)**: Detalha regras funcionais (BDD/EARS) e não-funcionais com critérios de aceitação objetivos, prevenindo *solution-jumping* e persistindo a especificação oficial em `docs/requirements/REQ-<modulo>.md` (perfil Híbrido Documental sob R-056). Os critérios de aceitação aqui definidos constituem o `sprint_contract` que o Avaliador Cético do Estado 6 usará como rubrica de corte objetiva — nenhum critério pode ser adicionado ou reinterpretado retroativamente pelo Gerador (Estado 5) sem nova negociação explícita.
 3. **Estado 3 — Technical Blueprint & Contratos (`@tech-solution-architect`)**:
    - Modela contratos de integração (OpenAPI v3), esquema de banco de dados (relacional ou NoSQL/Firestore/BaaS), máquina de estados e mitigação de concorrência.
@@ -1023,7 +1023,7 @@ workflow_state:
 
 ### 3.9 WORKFLOW 9: `WORKFLOW-PROMPT-SYNTHESIS` (Síntese e Refino de Prompts para Sessões Limpas)
 
-> **Objetivo**: Conduzir o refinamento estrutural de prompt, enriquecer com mineração determinística de contexto no codebase e sintetizar o prompt perfeito com tags XML em bloco de código Markdown pronto para inicializar uma nova sessão limpa.
+> **Objetivo**: Conduzir o refinamento estrutural de prompt, enriquecer com mineração determinística de contexto no codebase e sintetizar o prompt canônico perfeito em template Markdown estruturado em bloco de código pronto para inicializar uma nova sessão limpa conduzida por agents ou workflows especialistas (consumo exclusivo downstream).
 > **Gatilho de Entrada**: Invocação via `/craft-prompt`, intenção explícita do usuário de sintetizar ou refinar prompt para um novo chat, ou comando de preparação de contexto pré-execução.
 > **Fast-Path**: Sim (dispensa Fast-Chaining prévio; ingressa diretamente no Estado 1).
 
@@ -1031,7 +1031,7 @@ workflow_state:
 flowchart TD
     Start(["Entrada do Usuário:<br/>Objetivo / Ideia Inicial"]) --> CheckType{"Tipo de Demanda"}
 
-    CheckType -- "Feature Nova / Regras de Negócio<br/>(Demanda Aberta / Ambígua)" --> S1_Req["<b>1. Elicitação & Intake com Usuário</b><br/>Agente: @requirements-analyst<br/>🛑 <b>ask_questions OBRIGATÓRIO</b><br/>Ação: Desambiguação de premissas, trade-offs e regras de negócio com o usuário"]
+    CheckType -- "Feature Nova / Regras de Negócio<br/>(Demanda Aberta / Ambígua)" --> S1_Req["<b>1. Elicitação & Intake com Usuário</b><br/>Agente: @requirements-analyst<br/>🛑 <b>ask_questions OBRIGATÓRIO (5 a 10 rodadas)</b><br/>Ação: Desambiguação aprofundada de premissas, trade-offs e regras de negócio com o usuário"]
 
     CheckType -- "Tarefa Técnica Direta / Bugfix<br/>(Alvo claro, sem novas regras)" --> S1_Tech["<b>1. Delimitação Técnica</b><br/>Agente: @prompt-structuring<br/>Ação: Delimitação técnica do Problem Space e critérios"]
 
@@ -1042,25 +1042,32 @@ flowchart TD
 
     S2 --> S3["<b>3. Mapeamento de Restrições & Não-Escopo</b><br/>Agente: @prompt-structuring<br/>Ação: Injeção de R-046 (batching), anti-padrões e limites estritos da stack"]
 
-    S3 --> S4["<b>4. Síntese Estruturada & Otimização de Caching</b><br/>Agente: @prompt-structuring<br/>Ação: Composição do XML canônico ordenado estaticamente para Prompt Caching"]
+    S3 --> S4["<b>4. Síntese Estruturada & Otimização de Caching</b><br/>Agente: @prompt-structuring<br/>Ação: Composição do template Markdown canônico ordenado estaticamente para Prompt Caching"]
 
-    S4 --> S5{"<b>5. Quality Gate & Emissão do Bloco .md</b><br/>Agente: @prompt-structuring<br/>Ação: Red-teaming de ambiguidade e emissão do bloco Markdown final"}
+    S4 --> S5{"<b>5. Quality Gate & Emissão do Bloco .md</b><br/>Agente: @prompt-structuring<br/>Ação: Red-teaming de Solution Space, ambiguidade e emissão do bloco Markdown final"}
 
     S5 --> End(["📋 Prompt Perfeito Pronto para Novo Chat"])
 ```
 
 #### Cadeia Sequencial e Papéis:
 1. **Estado 1 — Elicitação & Intake com Usuário (`@requirements-analyst` para Negócio / `@prompt-structuring` para Técnico)**:
-   - *Via Funcional (Feature / Negócio / Demanda Aberta)*: O `@requirements-analyst` é o agente condutor desta etapa. Aplica *Five Whys* se houver *solution-jumping* precoce e aciona compulsoriamente `ask_questions` (1 a 3 perguntas estruturadas com opções + campo livre) para desambiguar regras de negócio, fluxos de aprovação, permissões e critérios com o usuário (R-027 / Invariante 19). É terminantemente proibido deduzir premissas ou alucinar requisitos de negócio sem confirmação humana.
+   - *Via Funcional (Feature / Negócio / Demanda Aberta)*: O `@requirements-analyst` é o agente condutor desta etapa. Aplica *Five Whys* se houver *solution-jumping* precoce e aciona compulsoriamente `ask_questions` em um ciclo aprofundado de 5 a 10 rodadas estruturadas de desambiguação (com opções + campo livre, sem checklist fixo, adaptativo ao domínio) para desambiguar regras de negócio, fluxos de aprovação, permissões e critérios com o usuário (R-027 / Invariante 19). É terminantemente proibido deduzir premissas ou alucinar requisitos de negócio sem confirmação humana. Cláusula de teto: atingida a 10ª rodada de `ask_questions`, eventuais ambiguidades ou lacunas residuais ainda não sanadas devem ser registradas expressamente em `## Restrições e Não-Escopo` como dívida técnica delimitada, autorizando o avanço para o Estado 2 sem loops infinitos.
    - *Via Técnica (Refactor / Bugfix / Tarefa Direta)*: Se a tarefa já possuir alvo e escopo técnicos claros sem novas regras de domínio, o `@prompt-structuring` atua diretamente na delimitação do Problem Space técnico, critérios e não-escopo preliminares.
 2. **Estado 2 — Context Grounding & AST Mining (`@code-knowledge-graph` + `@deep-search`)**:
-   - *Ação*: O `@code-knowledge-graph` é o agente executor OBRIGATÓRIO desta etapa (R-045 / Invariante 18). Ele DEVE ser invocado formalmente via `run_subagent(agentName: 'code-knowledge-graph', ...)` para extrair deterministamente os caminhos reais de arquivos (`<grounded_files>`), interfaces compartilhadas, contratos de DTOs e identificação de componentes irmãos canônicos homologados (protocolo *Canonical Sibling First*). É terminantemente proibido substituir a invocação do subagente por scripts manuais de varredura `fs` no sandbox via `ctx_execute` (Smell 2.26). Se houver novas dependências de biblioteca externa, o `@deep-search` é acionado via `run_subagent` para obter documentação oficial, versões e contratos reais.
+   - *Ação*: O `@code-knowledge-graph` é o agente executor OBRIGATÓRIO desta etapa (R-045 / Invariante 18). Ele DEVE ser invocado formalmente via `run_subagent(agentName: 'code-knowledge-graph', ...)` para extrair deterministamente os caminhos reais de arquivos (seção `## Arquivos e Referências Grounded`), interfaces compartilhadas, contratos de DTOs e identificação de componentes irmãos canônicos homologados (protocolo *Canonical Sibling First*). É terminantemente proibido substituir a invocação do subagente por scripts manuais de varredura `fs` no sandbox via `ctx_execute` (Smell 2.26). Se houver novas dependências de biblioteca externa, o `@deep-search` é acionado via `run_subagent` para obter documentação oficial, versões e contratos reais.
 3. **Estado 3 — Mapeamento de Restrições & Não-Escopo (`@prompt-structuring`)**:
    - *Ação*: Definição do Não-Escopo explícito (o que o agente executor NÃO deve alterar, bibliotecas proibidas, garantias de compatibilidade reversa). Injeção compulsória de governança de lote (*Single-Turn Batching* / R-046) e regras inegociáveis da stack do projeto alvo (ex.: convenções de modernização, injeções padronizadas, reatividade estrita, zero estilos inline arbitrários).
 4. **Estado 4 — Síntese Estruturada & Otimização de Caching (`@prompt-structuring`)**:
-   - *Ação*: Montagem do prompt canônico final utilizando tags XML semânticas (`<role>`, `<project_context>`, `<grounded_files>`, `<task>`, `<acceptance_criteria>`, `<constraints>`, `<execution_protocol>`, `<output_format>`). Otimização de ordem dos tokens para alinhamento com Prompt Caching (conteúdo estático e de convenções no topo; especificidades variáveis da task na cauda).
+   - *Ação*: Montagem do prompt canônico final utilizando o template Markdown canônico (`templates/prompt-synthesis-output.md`), estruturado nas seções: `# [Papel Especialista / Stack Detectada]`, `## Contexto do Projeto`, `## Arquivos e Referências Grounded`, `## Tarefa`, `## Critérios de Aceitação`, `## Restrições e Não-Escopo`, `## Protocolo de Execução Recomendado` e `## Formato de Saída Esperado`. Otimização de ordem dos tokens para alinhamento com Prompt Caching (conteúdo estático e de convenções no topo; especificidades variáveis da task na cauda).
 5. **Estado 5 — Quality Gate & Emissão do Bloco .md (`@prompt-structuring`)**:
-   - *Ação*: Avaliação crítica de fechamento (Red-Teaming analítico): verificação de contradições, remoção de instruções de sobre-verificação que degradam modelos de raciocínio frontier e validação do template. Emissão do prompt final encapsulado em bloco de código Markdown (`.md`), pronto para ser colado em um novo chat.
+   - *Ação*: Avaliação crítica de fechamento com Quality Gate ativo e Red-Teaming analítico contra o Solution Space antes da emissão. O `@prompt-structuring` submete o rascunho do prompt a um checklist de corte com 4 critérios excludentes:
+     1. **Classes/métodos internos**: o prompt não pode ditar classes internas, métodos ou assinaturas de código não solicitados pelo usuário;
+     2. **Bibliotecas/frameworks/algoritmos não pedidos**: não pode introduzir bibliotecas, frameworks auxiliares ou algoritmos específicos que o usuário não demandou expressamente;
+     3. **Arquitetura/design patterns prescritos**: não pode impor design patterns ou decisões de arquitetura interna, preservando a autonomia técnica do agente especialista do novo chat;
+     4. **Tecnologias não mencionadas**: não pode injetar tecnologias, ferramentas ou runtimes não citados na solicitação original.
+   - *Cláusula de Bloqueio*: Qualquer violação a um dos 4 critérios reprova imediatamente o prompt, forçando re-síntese cirúrgica no Estado 4 antes da liberação.
+   - *Finalidade de Consumo Exclusivo*: O prompt emitido destina-se estritamente ao consumo por outros agents ou workflows em uma nova sessão limpa (consumo exclusivo downstream), sendo expressamente vedada sua apresentação como solução final direta de negócio ao usuário.
+   - *Emissão*: Emissão do prompt final aprovado encapsulado em bloco de código Markdown (`.md`), pronto para ser colado em um novo chat.
 
 #### Typed State Bag (`workflow_state`):
 ```yaml
@@ -1070,6 +1077,8 @@ workflow_state:
   prompt_alvo:
     intencao_original: "<descricao-ou-objetivo-inicial-da-tarefa>"
     stack_detectada: "<stack-alvo-detectada | ex: angular | spring-boot | python>"
+    rodadas_elicitacao_realizadas: 5  # 5..10 (Invariante 19)
+    lacunas_residuais_declaradas: []  # itens não resolvidos até a 10ª rodada
     arquivos_grounded:
       - "<caminho/relativo/arquivo-alvo-1.ext>"
       - "<caminho/relativo/modelo-ou-contrato.ext>"
@@ -1080,7 +1089,11 @@ workflow_state:
     restricoes_nao_escopo:
       - "<restricao-negativa-ou-nao-escopo-1>"
       - "<convencao-obrigatoria-ou-anti-padrao-2>"
+    red_teaming_solution_space:
+      aprovado: true
+      violacoes_detectadas: []
     formato_saida: "markdown_code_block"
+    consumo_exclusivo_agents: true
     bloco_md_gerado: true
 ```
 
@@ -1158,10 +1171,11 @@ handoff_payload:
 
 16. **Invariante de Proibição Estrita de Terceirização ao Usuário em Etapas Analíticas e Diagnósticas (R-057 / Smell 2.25)**: É expressamente vedado a qualquer agente participante de etapas analíticas, diagnósticas, de auditoria ou triagem (ex.: Etapa 1 de `WORKFLOW-BUG-FIX` com `@bug-triage`, Etapa 1 de `WORKFLOW-GOVERNANCE-MAINTENANCE` com `@agent-auditor`, Etapa 1 de `WORKFLOW-TECHNICAL-ANALYSIS`, etc.), ao constatar falta de ferramentas de escrita ou identificar a necessidade de alterações de código ou governança, encerrar seu turno emitindo instruções para que o usuário execute edições manuais. O agente analítico DEVE compulsoriamente avançar para o checkpoint de aprovação ou transferir deterministamente o controle para o agente executor competente (ex.: `@governance-maintainer`, `@bug-fixer`, `@feature-developer`).
 
-17. **Invariante de Visibilidade Progressiva e Painel de Evidências em Síntese de Prompt (WORKFLOW-PROMPT-SYNTHESIS)**: É terminantemente proibido:
+17. **Invariante de Visibilidade Progressiva, Red-Teaming de Solution Space e Painel de Evidências em Síntese de Prompt (WORKFLOW-PROMPT-SYNTHESIS)**: É terminantemente proibido:
     **(a) Execução Blackbox**: Emitir o prompt final diretamente ou apenas a listagem de checkboxes [✅] sem apresentar o Painel de Evidências por Etapa com o detalhamento de cada uma das 5 etapas (Elicitação no Problem Space, Grounding de Arquivos Reais, Mapeamento de Não-Escopo, Síntese de Caching e Quality Gate).
-    **(b) Alucinação de caminhos**: Listar arquivos em `<grounded_files>` sem verificação determinística de existência real no workspace via `@code-knowledge-graph` ou inspeção de contexto.
-    **(c) Invasão de Solution Space**: Ditar classes internas, algoritmos ou implementações técnicas detalhadas dentro do Problem Space, retirando a autonomia técnica do agente especialista que atuará no novo chat.
+    **(b) Alucinação de caminhos**: Listar arquivos em referências grounded sem verificação determinística de existência real no workspace via `@code-knowledge-graph` ou inspeção de contexto.
+    **(c) Invasão de Solution Space (Red-Teaming Ativo Compulsório)**: Emitir prompt que viole qualquer um dos 4 critérios excludentes do checklist de corte de Solution Space: (1) classes ou métodos internos não solicitados; (2) bibliotecas, frameworks ou algoritmos não pedidos expressamente; (3) arquitetura interna ou design patterns prescritos no lugar de preservar a autonomia do especialista executor; (4) tecnologias não mencionadas na demanda original. Qualquer violação constitui bloqueio impeditivo no Estado 5, exigindo re-síntese cirúrgica no Estado 4.
+    **(d) Desvirtuamento de Consumo (Não-Entrega Direta ao Usuário)**: Apresentar o prompt sintetizado como se fosse o código implementado ou a solução final de negócio para o usuário. O prompt gerado possui a finalidade declarada e restrita de consumo exclusivo downstream por outros agents e workflows canônicos na inicialização de uma nova sessão limpa.
 
 ---
 
@@ -1172,9 +1186,9 @@ handoff_payload:
 
 ---
 
-19. **Invariante de Interrupção Compulsória por Ambiguidade e Proibição de Alucinação de Requisitos (WORKFLOW-PROMPT-SYNTHESIS / R-027)**: É terminantemente proibido:
+19. **Invariante de Interrupção Compulsória por Ambiguidade, Elicitação Aprofundada e Proibição de Alucinação de Requisitos (WORKFLOW-PROMPT-SYNTHESIS / R-027)**: É terminantemente proibido:
     **(a) Inferência e Alucinação de Regras de Negócio**: Em solicitações que envolvam novas funcionalidades, telas ou regras de negócio abertas, o agente participante não pode deduzir, supor ou alucinar fluxos funcionais, critérios de aceitação, regras de aprovação ou entidades sem validação explícita do usuário.
-    **(b) Bypass do Checkpoint Humano em Ambiguidade**: A interação com o usuário na Etapa 1 via `ask_questions` é OBRIGATÓRIA e BLOQUEANTE quando a demanda possuir ambiguidade de domínio ou múltiplos caminhos de negócio viáveis (R-027). A palavra "Opcional" é expressamente proibida para este checkpoint. O workflow não pode avançar para a Etapa 2 sem as respostas do solicitante.
+    **(b) Bypass do Checkpoint Humano em Ambiguidade & Elicitação em 5 a 10 Rodadas**: A interação com o usuário na Etapa 1 via `ask_questions` é OBRIGATÓRIA e BLOQUEANTE quando a demanda possuir ambiguidade de domínio ou múltiplos caminhos de negócio viáveis (R-027). A palavra "Opcional" é expressamente proibida para este checkpoint. Em demandas funcionais do `WORKFLOW-PROMPT-SYNTHESIS`, a elicitação deve conduzir um processo iterativo aprofundado de no mínimo 5 e no máximo 10 rodadas estruturadas de `ask_questions` (sem checklist fixo, adaptativo ao domínio do usuário). Cláusula de Teto: caso o diálogo atinja a 10ª rodada e ainda restem indefinições residuais, o agente DEVE compulsoriamente interromper as perguntas, declarar as lacunas em aberto formalmente na seção `## Restrições e Não-Escopo` do prompt e prosseguir para a Etapa 2, impedindo loops infinitos.
     **(c) Invasão de Papel**: A elicitação, desambiguação e estruturação de requisitos de negócio e critérios de aceitação em demandas funcionais cabe com exclusividade ao `@requirements-analyst`, cabendo ao `@prompt-structuring` atuar na Etapa 1 apenas para tarefas estritamente técnicas ou após a elicitação de negócio, conduzindo as Etapas 3 a 5 (mapeamento de não-escopo, Prompt Caching, injeção de governança e emissão do bloco `.md`).
 
 ---
@@ -1229,7 +1243,7 @@ Para que o usuário nunca fique no escuro quanto ao fluxo em andamento, o `@agen
 #### WORKFLOW 4: `WORKFLOW-FEATURE-DEVELOPMENT` (6 etapas)
 ```markdown
 ### 🗺️ Pipeline de Execução: WORKFLOW-FEATURE-DEVELOPMENT (6 etapas)
-- [▶] **Etapa 1: Prompt Structuring** → `@prompt-structuring` *(Em Andamento: refinamento <task>/<context>/<constraints>)*
+- [▶] **Etapa 1: Prompt Structuring** → `@prompt-structuring` *(Em Andamento: refinamento Markdown Tarefa/Contexto/Restrições/Formato)*
 - [⏳] **Etapa 2: Elicitação de Requisitos** → `@requirements-analyst` / `@feature-planner` *(Pendente: critérios de aceitação BDD/EARS)*
 - [⏳] **Etapa 3: Technical Blueprint & Contratos** → `@tech-solution-architect` *(Pendente: OpenAPI, modelo de dados e divisão por stack)*
 - [⏳] **Etapa 4: Estratégia de Testes (TDD)** → `@test-strategy` *(Pendente: matriz de riscos e casos de borda)*
@@ -1307,13 +1321,15 @@ Para que o usuário nunca fique no escuro quanto ao fluxo em andamento, o `@agen
 - **Convenções Obrigatórias Injetadas**: <R-046, regras de stack>
 
 #### ⚡ Etapa 4: Síntese Estruturada & Caching
-- **Segmentação XML**: Tags semânticas canônicas.
+- **Segmentação Markdown**: Seções canônicas estruturadas.
 - **Prompt Caching Alignment**: Regras no topo; dados variáveis da task na cauda.
 
 #### 🛡️ Etapa 5: Quality Gate & Validação Final
+- [x] Zero invasão de Solution Space (red-teaming contra 4 critérios aprovado).
 - [x] Zero alucinações de caminhos de arquivos (100% verificados).
 - [x] Zero ambiguidades nos critérios de aceite.
 - [x] Zero over-prompting prejudicial a reasoning models.
+- [x] Consumo exclusivo downstream assegurado.
 - [x] Bloco Markdown completo e autocontido.
 
 ---
@@ -1403,3 +1419,52 @@ workflow_tracking:
       diagnostico_previo: "3 memory leaks detectados em subscriptions manuais sem takeUntil"
 ```
 Com esse bloco, qualquer especialista na cadeia sequencial sabe exatamente onde ler, onde testar e quais convenções de stack aplicar, sem ambiguidades.
+
+---
+
+## 10. R-064 — Duplo Gate Documental de Planejamento e Implementação
+
+> **Fonte de verdade normativa:** [`CLAUDE.md`](../../CLAUDE.md) § R-064 e [`.github/copilot-instructions.md`](../copilot-instructions.md) § 1.1 e § 2.  
+> **Diretórios canônicos:** [`docs/plans/`](../../docs/plans/README.md) e [`docs/implementation-plans/`](../../docs/implementation-plans/README.md).
+
+### 10.1 Princípio Operacional e Estrutura dos Gates
+
+Todo workflow canônico que envolva mutação de código (`WORKFLOW-BUG-FIX`, `WORKFLOW-REFACTORING`, `WORKFLOW-FEATURE-DEVELOPMENT`, `WORKFLOW-GOVERNANCE-MAINTENANCE`, `WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION`, `WORKFLOW-FRAMEWORK-MIGRATION`) opera compulsoriamente sob dois portões documentais versionados prévios à execução:
+
+```text
+Etapa Inicial (Elicitação / RCA / Escopo)
+                   │
+                   ▼
+  [ GATE 1: PLANO DE PLANEJAMENTO ]
+  ├─ Arquivo: docs/plans/<AAAAMMDD>-<workflow>-<identificador-curto>.md
+  ├─ Autoria: Especialista analítico/triagem dono da Etapa 1/2
+  ├─ Materialização: Orquestrador Raiz (Flat Delegation R-037/R-042)
+  └─ Checkpoint: ask_questions obrigatório (Aprovar / Solicitar Ajustes)
+                   │ (Aprovado pelo Usuário)
+                   ▼
+  [ GATE 2: PLANO DE IMPLEMENTAÇÃO TÉCNICA ]
+  ├─ Arquivo: docs/implementation-plans/<AAAAMMDD>-<workflow>-<identificador-curto>.md
+  ├─ Autoria: <stack>-arch-advisor (domínio específico) ou especialista técnico do workflow
+  ├─ Materialização: Orquestrador Raiz
+  └─ Checkpoint: ask_questions obrigatório (Aprovar / Solicitar Ajustes)
+                   │ (Aprovado pelo Usuário)
+                   ▼
+Etapa de Execução / Mutação de Código (Batch Execution R-046 / R-059)
+```
+
+### 10.2 Matriz de Responsabilidade de Autoria por Workflow
+
+| Workflow Canônico | Gate 1: Plano de Planejamento (`docs/plans/`) | Gate 2: Plano de Implementação (`docs/implementation-plans/`) |
+|---|---|---|
+| **WORKFLOW-BUG-FIX** | `@bug-triage` (RCA, evidências e escopo) | `<stack>-arch-advisor` (ou analítico da stack) |
+| **WORKFLOW-REFACTORING** | `@refactor-planner` (diagnóstico e Mikado DAG) | `<stack>-arch-advisor` (detalhamento técnico de blast radius) |
+| **WORKFLOW-FEATURE-DEVELOPMENT** | `@requirements-analyst` / `@tech-solution-architect` | `<stack>-arch-advisor` (arquitetura e etapas técnicas) |
+| **WORKFLOW-GOVERNANCE-MAINTENANCE** | `@agent-auditor` / `@repo-hygiene-auditor` | Especialista analítico do lote (`@governance-maintainer`) |
+| **WORKFLOW-DEPENDENCY-VULNERABILITY** | Especialista de segurança / scan | Especialista analítico de dependências / `<stack>-arch-advisor` |
+| **WORKFLOW-FRAMEWORK-MIGRATION** | `@tech-solution-architect` (5D Assessment e De-Para) | `<stack>-arch-advisor` (estratégia técnica de paridade e codemod) |
+
+### 10.3 Isenções e Regras de Exceção
+
+1. **Fast-Path Determinístico (R-041, Tier 1)**: Para correções pontuais, refatorações com alvo definido e análises diretas, o Plano de Planejamento (`docs/plans/`) pode ser dispensado, mas o **Plano de Implementação (`docs/implementation-plans/`) permanece 100% obrigatório** antes de tocar em código.
+2. **Workflows Read-Only**: `WORKFLOW-TECHNICAL-ANALYSIS`, `WORKFLOW-RELEASE-READINESS` e `WORKFLOW-PROMPT-SYNTHESIS` são isentos do Plano de Implementação (não realizam mutação de código na aplicação), podendo produzir apenas o Plano de Planejamento quando a profundidade analítica demandar alinhamento prévio.
+3. **Zero Discovery pelo Router (R-054)**: O `@agent-router` não gera, não persiste e não inspeciona planos; a materialização física dos arquivos gerados pelos agentes Read-Only é executada pelo Orquestrador Raiz.

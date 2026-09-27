@@ -27,7 +27,7 @@ tools: []
 
 ## Quando Usar
 
-- Ao estruturar um prompt recebido no formato canônico `<task>/<context>/<constraints>/<output_format>`.
+- Ao estruturar um prompt recebido no formato canônico Markdown (## Tarefa, ## Contexto, ## Restrições e Não-Escopo, ## Formato de Saída Esperado).
 - Ao decidir se um prompt está ambíguo o suficiente para justificar 1 pergunta de clarificação.
 - Ao revisar (self-critique) um prompt já estruturado antes de retornar ao `agent-router`.
 
@@ -52,7 +52,7 @@ Estruturar/refinar o prompt antes da execução **eleva a qualidade do output** 
 | Role/persona framing | Domínio da tarefa exige enquadramento de especialidade |
 | Chain-of-thought elicitation | Tarefas multi-etapas ou que exigem raciocínio explícito |
 | Few-shot exemplar (1-3) | Formato de saída ambíguo ou pouco usual |
-| Output format specification | Sempre — nunca deixar `<output_format>` vazio |
+| Output format specification | Sempre — nunca deixar `Formato de Saída Esperado` vazio |
 | Constraint extraction (não-escopo) | Sempre — extrair explicitamente o que NÃO deve ser feito |
 | Task decomposition | Pedido com 2+ intenções simultâneas (ex.: "teste e refatore") |
 | Self-critique final | Antes de encerrar qualquer iteração do loop |
@@ -62,18 +62,18 @@ Estruturar/refinar o prompt antes da execução **eleva a qualidade do output** 
 
 Considerar o prompt **incompleto** (justifica 1 pergunta) quando:
 - [ ] Falta entidade/arquivo/módulo-alvo identificável.
-- [ ] Falta critério de sucesso ou `output_format`.
+- [ ] Falta critério de sucesso ou formato de saída esperado.
 - [ ] Duas ou mais intenções concorrentes sem ordem definida.
 - [ ] Constraints conflitantes (ex.: "rápido" + "cobertura 100%") sem prioridade declarada.
 
-Considerar o prompt **completo** (sair do loop) quando os 4 campos canônicos (`task`, `context`, `constraints`, `output_format`) puderem ser preenchidos sem inferência especulativa.
+Considerar o prompt **completo** (sair do loop) quando os 4 campos canônicos estruturados (`Tarefa`, `Contexto`, `Restrições e Não-Escopo`, `Formato de Saída Esperado`) puderem ser preenchidos sem inferência especulativa.
 
 ## Checklist
 
-- [ ] `<task>` é uma frase objetiva e verificável.
-- [ ] `<context>` cita artefatos/projeto ou declara "nenhum necessário".
-- [ ] `<constraints>` inclui não-escopo explícito.
-- [ ] `<output_format>` nunca fica implícito.
+- [ ] `## Tarefa` é uma frase objetiva e verificável.
+- [ ] `## Contexto` cita artefatos/projeto ou declara "nenhum necessário".
+- [ ] `## Restrições e Não-Escopo` inclui não-escopo explícito.
+- [ ] `## Formato de Saída Esperado` nunca fica implícito.
 - [ ] Ambiguidade avaliada pelas heurísticas acima — não por julgamento subjetivo.
 - [ ] Self-critique executado antes de encerrar a iteração.
 

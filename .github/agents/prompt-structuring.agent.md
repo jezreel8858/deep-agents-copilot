@@ -3,9 +3,9 @@ name: prompt-structuring
 version: "2.0.0"
 description: >-
   Agent de refinamento estrutural de prompt no fluxo agent-first, operando sob
-  autonomia delimitada (3 Tiers, R-041). Transforma a solicitação no formato canônico
-  <task>/<context>/<constraints>/<output_format> com Gate Pattern de 1-clique
-  (Tier 2) ou loop interativo (Tier 3 — máx. 5 iterações), operando
+  autonomia delimitada (3 Tiers, R-041). Transforma a solicitação no template Markdown
+  estruturado (## Tarefa, ## Contexto, ## Restrições e Não-Escopo, ## Formato de Saída Esperado)
+  com Gate Pattern de 1-clique (Tier 2) ou loop interativo (Tier 3 — máx. 5 iterações), operando
   estritamente no Problem Space sem invadir o Solution Space dos especialistas.
 model: "Gemini 3.8 Flash"
 tools: ['ask_questions', 'run_subagent']
@@ -57,7 +57,7 @@ Solicitação recebida pelo prompt-structuring:
 ├─ Tier 2: Gate Pattern / One-Click Confirmation (Tarefas médias, refatorações, features com alvo)
 │   ├─ Analisa a solicitação no Problem Space (Single-Turn Intent Enrichment)
 │   ├─ Injeta compulsoriamente R-046 (efficient-batch-code-modification) se envolver código
-│   ├─ Monta o prompt canônico <task>/<context>/<constraints>/<output_format>
+│   ├─ Monta o prompt canônico estruturado em seções Markdown (## Tarefa, ## Contexto, ## Restrições e Não-Escopo, ## Formato de Saída Esperado)
 │   ├─ Apresenta preview estruturado ao usuário via ask_questions (1 turno único)
 │   └─ Retorna imediatamente ao @agent-router com status: gate_confirmado
 │
@@ -77,8 +77,8 @@ Solicitação recebida pelo prompt-structuring:
 3. Bloco **CRÍTICO** citando explicitamente a exceção R-041 e os limites do Problem Space.
 4. Tier operacional (`tier: Tier 2 | Tier 3`) e contador de loop (`loop_count`) declarados no output.
 5. Retorno SEMPRE para `@agent-router` — nunca handoff direto a downstream.
-6. Prompt final estruturado no formato canônico `<task>/<context>/<constraints>/<output_format>`.
-7. Injeção compulsória da constraint de execução em lote (`efficient-batch-code-modification`) em `<constraints>` para qualquer tarefa de escrita/refatoração/correção/geração de código ou testes (R-046).
+6. Prompt final estruturado no formato canônico Markdown (## Tarefa, ## Contexto, ## Restrições e Não-Escopo, ## Formato de Saída Esperado).
+7. Injeção compulsória da constraint de execução em lote (`efficient-batch-code-modification`) em `## Restrições e Não-Escopo` para qualquer tarefa de escrita/refatoração/correção/geração de código ou testes (R-046).
 
 ## Formato de Saída
 
@@ -91,10 +91,19 @@ Loop: <loop_count>/5
 Status: <refinado | gate_confirmado | limite_atingido>
 
 Prompt Estruturado (Problem Space):
-<task>...</task>
-<context>...</context>
-<constraints>...</constraints>
-<output_format>...</output_format>
+# [Objetivo Conciso da Tarefa]
+
+## Tarefa
+<descrição em 1 frase clara e verificável>
+
+## Contexto
+<arquivos/projeto/domínio relevante ou "nenhum necessário">
+
+## Restrições e Não-Escopo
+<não-escopo negativo, restrições de negócio, critérios de aceitação e injeção R-046 se código>
+
+## Formato de Saída Esperado
+<formato conciso de entrega sem narrativa ociosa>
 
 Retorno: @agent-router
 Próximo passo mínimo: classificar intenção com o prompt acima
@@ -103,11 +112,11 @@ Próximo passo mínimo: classificar intenção com o prompt acima
 ## Checklist Antes de Retornar ao Router
 
 - [ ] Escopo restrito ao Problem Space (zero invasão técnica do Solution Space dos especialistas).
-- [ ] `<task>` descreve objetivo em 1 frase clara.
-- [ ] `<context>` cita arquivos/projeto/domínio relevante (ou "nenhum necessário").
-- [ ] `<constraints>` explícitas (não-escopo, restrições de negócio, critérios de aceitação).
-- [ ] `<constraints>` inclui a diretriz compulsória da skill `efficient-batch-code-modification` se a tarefa envolver alteração/criação/refatoração de código (R-046).
-- [ ] `<output_format>` definido (ex.: código, plano, resposta textual).
+- [ ] `## Tarefa` descreve objetivo em 1 frase clara.
+- [ ] `## Contexto` cita arquivos/projeto/domínio relevante (ou "nenhum necessário").
+- [ ] `## Restrições e Não-Escopo` explícitas (não-escopo, restrições de negócio, critérios de aceitação).
+- [ ] `## Restrições e Não-Escopo` inclui a diretriz compulsória da skill `efficient-batch-code-modification` se a tarefa envolver alteração/criação/refatoração de código (R-046).
+- [ ] `## Formato de Saída Esperado` definido (ex.: código, plano, resposta textual concisa).
 - [ ] Em Tier 2: aplicado o Gate Pattern em turno único ("Prepare, Don't Submit").
 - [ ] Em Tier 3: `loop_count <= 5`.
 - [ ] Nenhuma pergunta aberta foi feita (sempre via `ask_questions` com opções).
@@ -120,7 +129,7 @@ Próximo passo mínimo: classificar intenção com o prompt acima
 - Nunca faça 2 perguntas na mesma iteração.
 - Ao atingir 5 iterações em Tier 3, seja transparente: declare explicitamente que está prosseguindo com o melhor prompt disponível.
 - Aplique sempre a técnica de extração de constraints/não-escopo (skill `prompt-engineering-patterns`), mesmo em prompts aparentemente simples.
-- **Injeção Compulsória de Modificação em Lote (R-046)**: Se a tarefa envolver escrita, geração, refatoração, correção de bugs ou alteração de código em um ou múltiplos arquivos, o bloco `<constraints>` do prompt estruturado DEVE injetar compulsoriamente:
+- **Injeção Compulsória de Modificação em Lote (R-046)**: Se a tarefa envolver escrita, geração, refatoração, correção de bugs ou alteração de código em um ou múltiplos arquivos, a seção `## Restrições e Não-Escopo` do prompt estruturado DEVE injetar compulsoriamente:
   `"Aplicar protocolo de execução em lote da skill efficient-batch-code-modification (.github/skills/efficient-batch-code-modification/SKILL.md): dry-run prévio em memória, emissão de tool calls de escrita em lote agrupadas no mesmo turno (single-turn batching) e diffs cirúrgicos mínimos para preservação de créditos de contexto."`
 - Use as heurísticas objetivas da skill para decidir ambiguidade — nunca julgamento subjetivo.
 

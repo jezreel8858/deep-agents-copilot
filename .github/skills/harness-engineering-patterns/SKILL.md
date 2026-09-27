@@ -59,7 +59,7 @@ Esta skill consolida heurísticas de mercado (2026) — práticas de Matt Pocock
 
 ### ❌ Quando NÃO Usar
 - Para avaliar se a **resposta do modelo** está correta/factual — isso é `agent-evals-lab` (métricas de faithfulness, hallucination, tool correctness).
-- Para estruturar o prompt de uma tarefa específica no formato `<task>/<context>/<constraints>/<output_format>` — isso é `prompt-engineering-patterns`.
+- Para estruturar o prompt de uma tarefa específica no formato canônico Markdown (## Tarefa, ## Contexto, ## Restrições e Não-Escopo, ## Formato de Saída Esperado) — isso é `prompt-engineering-patterns`.
 - Para o payload/portabilidade de handoff entre agents — isso é `handoff-governance`.
 
 ---

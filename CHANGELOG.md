@@ -6,6 +6,25 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.43.0] — 2026-09-27
+
+### Modificado / Manutenção de Governança
+- **Migração Global XML → Markdown e Redesenho do `WORKFLOW-PROMPT-SYNTHESIS` (R-055 / R-064)**:
+  - Substituição global do formato de tags XML (`<task>/<context>/<constraints>/<output_format>`) pelo template Markdown estruturado (`## Tarefa`, `## Contexto`, `## Restrições e Não-Escopo`, `## Formato de Saída Esperado`) em todo o catálogo (`prompt-structuring.agent.md`, `prompt-engineering-patterns/SKILL.md`, `harness-engineering-patterns/SKILL.md`, `catalog.yaml`, `routing-graph.yaml`, `CLAUDE.md` § R-041).
+  - Redesenho do `WORKFLOW-PROMPT-SYNTHESIS` e comando `/craft-prompt`: criação do template canônico reutilizável `templates/prompt-synthesis-output.md`.
+  - Quality Gate ativo com Red-Teaming analítico de Solution Space baseado em 4 critérios de corte excludentes no Estado 5 e Invariante 17(c) desdobrado com cláusula impeditiva de bloqueio.
+  - Finalidade explícita de consumo exclusivo downstream por outros agents e workflows canônicos em novas sessões limpas, vedada a apresentação como entrega final de negócio direta ao usuário.
+  - Elicitação ampliada no Estado 1 e Invariante 19 para ciclo aprofundado de 5 a 10 rodadas estruturadas de `ask_questions` com cláusula de teto na 10ª rodada (declaração de lacunas residuais em `## Restrições e Não-Escopo`).
+  - Typed State Bag atualizado com paridade total: `rodadas_elicitacao_realizadas`, `lacunas_residuais_declaradas`, `red_teaming_solution_space`, `consumo_exclusivo_agents: true` e `formato_saida: "markdown_code_block"`.
+  - Nova suíte de testes determinísticos de governança: `tests/governance_audit/test_prompt_synthesis_output_format_governance.py`.
+
+## [2.42.0] — 2026-09-27
+
+### Adicionado
+- **R-064 (Duplo Gate Documental de Planejamento e Implementação)**: Norma que estabelece a obrigatoriedade de versionamento e aprovação humana prévia de dois planos em workflows de código: Plano de Planejamento (`docs/plans/`) e Plano de Implementação (`docs/implementation-plans/`), autorados por especialistas analíticos e `<stack>-arch-advisor`. Diretórios de convenção criados com READMEs explicativos.
+- **Mapa do Repositório Canônico (`docs/repo-map.md`)**: Atualização e consolidação da infraestrutura determinística de arquivos (Zero Blind Searches), incorporando as novas pastas de planos (`docs/plans/` e `docs/implementation-plans/`) e sincronizando `README.md` e `docs/README.md` (R-015).
+
+
 ## [2.41.2] — 2026-09-26
 
 ### Adicionado

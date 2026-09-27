@@ -756,7 +756,7 @@ regressao:
     descricao: "REGRESSÃO: prompt-structuring NUNCA deve exceder 5 iterações de loop (R-041)"
     input:
       solicitacao: "Solicitação extremamente vaga que nunca atinge completude"
-      contexto_simulado: "loop_count chegando a 5 sem <task>/<context>/<constraints>/<output_format> completos"
+      contexto_simulado: "loop_count chegando a 5 sem seções Markdown (Tarefa/Contexto/Restrições/Formato) completas"
     expected:
       comportamento: "loop interrompido compulsoriamente em loop_count = 5, retorno forçado ao agent-router com sinalização de limitação"
     nao_deve:
