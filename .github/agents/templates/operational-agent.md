@@ -147,6 +147,7 @@ O retorno **DEVE** ser executado via tool `run_subagent` com `agentName: "agent-
 - **Atomicidade**: Não deixe arquivos em estado quebrado ou com erros de compilação pendentes.
 
 ### Anti-padrões a Evitar
+- Ao criar/revisar agent com perfil de bug-fixer, perf-tuner ou test-fixer: é COMPULSÓRIO incluir (1) Blast-Radius Check (buscar chamadores/dependentes) ANTES de aplicar o diff mínimo; (2) para perf-tuner, baseline mensurado ANTES/DEPOIS da mudança + gate de aprovação humana (`ask_questions`) para mudanças de performance irrevogáveis em produção (canary/staging); (3) para test-fixer, heurística de classificação bug-real-vs-drift e CAP RÍGIDO de no máximo 2 tentativas de correção antes de escalar para `@bug-triage` — omissão destas 3 salvaguardas é gap sistêmico recorrente (R-055 Q2, auditoria `@agent-auditor`).
 | Anti-padrão | Consequência | Ação Correta |
 |---|---|---|
 | Modificar arquivos sem ler o baseline | Quebra de contratos existentes | Ler arquivos com `read_file` antes de editar |

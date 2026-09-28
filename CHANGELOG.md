@@ -6,6 +6,23 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.49.0] — 2026-09-28
+
+### Adicionado — Salvaguardas de Mercado 2025/2026, Model Tiering e Blindagem por Testes
+
+- **R-064 Gate & Model Tiering em Domain Routers**: adicionada etapa obrigatória `implementation_plan_authoring` para `<stack>-arch-advisor` antes de codemod em `WORKFLOW-FRAMEWORK-MIGRATION` (`routing-graph.yaml`). Elevação do `model` para `Claude Sonnet 5` nos 6 domain routers (`ejb`, `spring-boot`, `spring-reactive`, `python`, `struts`, `angular`) por alinhamento à orquestração de fan-out (R-021.1).
+- **Fronteiras de Autoria de Testes & Paridade Test-Last**: barreira explícita proibindo autoria de testes por `*-feature-developer` em todas as 6 stacks com handoff obrigatório para test-writers. Preservação formal e blindada por teste do desvio `Test-Last` do ecossistema Angular (`excecao_dominio_frontend`). Inclusão da etapa `e2e_journey_validation` em `WORKFLOW-FEATURE-DEVELOPMENT`.
+- **Salvaguardas Operacionais 2025/2026**:
+  - `*-bug-fixer` (6 stacks): verificação obrigatória de blast radius antes do diff cirúrgico.
+  - `*-perf-tuner` (5 stacks backend): medição de baseline antes/depois e safety gate proibindo push direto sem canary/staging e aprovação humana.
+  - `*-test-fixer` (6 stacks): heurística binária (defeito real vs flakiness/drift) com cap rígido de 2 tentativas antes de escalar para o bug-fixer.
+  - `*-test-writer` (12 especialistas): mutation testing awareness e foco em boundary values / edge cases.
+  - `angular-e2e-writer`: cap de 2 tentativas de self-healing.
+- **Consolidação do Domínio Spring Reactive**: remoção do agente fora de padrão `spring-reactive-resilience-tuner`, absorvendo escopo (Resilience4j / Circuit Breaker) em `spring-reactive-perf-tuner` e restaurando a topologia canônica de 7 especialistas por stack backend (86 agentes ativos no total).
+- **Blindagem por Testes de Governança**: 10 novas suítes de testes determinísticos em `tests/governance_audit/` cobrindo todas as novas regras e topologias (suíte completa: 373 passed, 1 skipped).
+
+---
+
 ## [2.48.0] — 2026-09-28
 
 ### Adicionado / Resolvido — Fechamento das Pendências Não-Bloqueantes da Fase PoC (Runner Headless)

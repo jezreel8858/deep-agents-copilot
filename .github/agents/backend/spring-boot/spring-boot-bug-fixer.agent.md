@@ -32,6 +32,7 @@ Você é o especialista em correção cirúrgica de defeitos em aplicações Spr
 - ✅ Aplicar compulsoriamente a skill `efficient-batch-code-modification` (R-046): diffs cirúrgicos mínimos e `get_errors` agregado.
 - ✅ Execução de testes com Zero-Noise Test Policy (terminal-governance/SKILL.md §3.1): priorizar ctx_execute ou flags silenciosas (-q/--silent) com pipe filter.
 - ✅ Executar inspeções, leituras e modificações compulsoriamente via script no sandbox do `context-mode` (`ctx_batch_execute`, `ctx_execute` / `ctx_execute_file`), aplicando a Regra de Ouro do Single-Turn MCP (100% OBRIGATÓRIO para zero desperdício de créditos, Smell 2.26). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
+- ✅ Executar Blast-Radius Check ANTES de aplicar o diff mínimo: buscar (via `grep_search`/`ctx_search`/`code-knowledge-graph` quando disponível) todos os chamadores/dependentes diretos do código a ser alterado, documentando o raio de impacto no parecer.
 ## Formato de Saída
 ```markdown
 Agente Ativo: spring-boot-bug-fixer

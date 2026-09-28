@@ -383,11 +383,24 @@ workflows:
         threshold_cobertura_por_risco: "test-coverage-governance/SKILL.md § 1 (90 critico | 80 integracao | 70 controller)"
         casos_borda_seguranca_obrigatorios: true
       - etapa: 5
-        nome: "tdd_domain_implementation"
-        agent: "domain-router | specialists"
+        nome: "red_test_authoring"
+        agent: "specialist-unit-test-writer"
         padrao: "contract_first_tdd"
         protocolo: "efficient-batch-code-modification"
+        excecao_dominio_frontend: "Quando domain-router = angular-router, esta etapa (red) e a etapa 6 (green) sao COMPULSORIAMENTE invertidas por desenho: Angular adota Implementation-First/Test-Last (ver angular-feature-developer.agent.md / angular-router.agent.md). Nao e bug, e desvio intencional documentado (R-050)."
       - etapa: 6
+        nome: "green_implementation"
+        agent: "specialist-feature-developer"
+        padrao: "contract_first_tdd"
+        protocolo: "efficient-batch-code-modification"
+        excecao_dominio_frontend: "Quando domain-router = angular-router, esta etapa executa PRIMEIRO (Implementation-First via @angular-feature-developer) e a etapa 5 (red/testes) ocorre a posteriori via handoff para @angular-unit-test-writer/@angular-component-test-writer. Ver nota na etapa 5 (R-050)."
+      - etapa: 7
+        nome: "e2e_journey_validation"
+        agent: "specialist-e2e-writer"
+        aplicavel_quando: "domain-router = angular-router"
+        condicional: true
+        nota: "Etapa opcional/condicional — aplicavel somente em stacks com especialista E2E dedicado no catalogo local (ex.: @angular-e2e-writer). Stacks sem E2E writer dedicado pulam esta etapa sem bloqueio."
+      - etapa: 8
         nome: "quality_gate_and_pr_preparation"
         agent: "code-review | pr-gatekeeper"
         sub_rotinas_permitidas: ["security-reviewer"]
@@ -516,17 +529,25 @@ workflows:
         checkpoint_humano: "ask_questions (aprovacao_fases_migracao)"
         nota: "blueprint gera a Matriz De-Para bidirecional canonica (docs/migrations/matriz-de-para-<alvo>.md) vinculando 100% dos elementos legados a componentes destino e fases B1/B2/B3 com dashboard de visibilidade humana; declara papeis de origem (oraculo) e destino (executor)"
       - etapa: 3
+        nome: "implementation_plan_authoring"
+        agent: "specialist-arch-advisor"
+        resolvido_por: "domain-router-stack-destino"
+        regra: "R-064"
+        entregavel: "docs/implementation-plans/<AAAAMMDD>-<wf>-<id>.md"
+        bloqueia_proxima_etapa: true
+        descricao: "Autoria do Plano de Implementacao pelo <stack>-arch-advisor antes de qualquer codemod (R-064)"
+      - etapa: 4
         nome: "codemod_and_batch_rewrite"
         agent: "domain-router-stack-destino | specialist-feature-developer"
         co_agentes: ["domain-router-stack-origem (consultivo, obrigatorio se cross-stack)", "code-knowledge-graph (obrigatorio, R-045 - blast radius por lote antes de cada micro-batch)"]
         protocolo: "efficient-batch-code-modification"
         nota: "execucao dos codemods estritamente orientada aos IDs da Matriz De-Para da fase ativa; domain-router-stack-origem permanece ativo validando paridade; code-knowledge-graph recalcula blast radius"
-      - etapa: 4
+      - etapa: 5
         nome: "refinement_and_parity_testing"
         agent: "domain-router-stack-destino | specialist-unit-test-writer | specialist-component-test-writer"
         co_agentes: ["domain-router-stack-origem (dual_verification)", "business-rules-extractor (modo validate)", "code-knowledge-graph (obrigatorio, R-045 - find_cycles e dead-code pos-codemod)"]
         gate: "dual_verification_gate (golden_master_100 + matriz_de_para_100_resolvida + regras_de_negocio_100_cobertas + zero_ciclos_dead_code_novos, ver workflows.md § 3.7.1)"
-      - etapa: 5
+      - etapa: 6
         nome: "baseline_and_quality_gate"
         agent: "runtime-verifier | code-review"
         co_agentes: ["domain-router-stack-origem (sign-off final de paridade e fechamento de 100% da Matriz De-Para, obrigatorio se cross-stack)", "code-knowledge-graph (obrigatorio, R-045 - verificacao final de zero ciclos novos e zero dead-code introduzido)"]
