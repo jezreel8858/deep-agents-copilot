@@ -15,7 +15,7 @@ permissions:
   contents: read
   pull-requests: write
   checks: write
-  copilot-requests: write-all
+  copilot-requests: write
 
 concurrency:
   group: agent-audit-${{ github.event.pull_request.number }}
