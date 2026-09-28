@@ -6,6 +6,18 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.48.0] — 2026-09-28
+
+### Adicionado / Resolvido — Fechamento das Pendências Não-Bloqueantes da Fase PoC (Runner Headless)
+
+- **Wiring completo dos reporters (`cli.py::main()`)**: o canal `--report checks,pr-comment` agora efetivamente publica o resultado da auditoria via Checks API (`reporters/checks.py`) e comentário sticky de PR (`reporters/pr_comment.py`), antes apenas impresso em stdout. Publicação é **fail-open**: falha em qualquer canal de reporting emite aviso em stderr mas nunca altera o exit code da auditoria (a auditoria read-only permanece sempre concluída).
+- **Novos argumentos do CLI**: `--repo` (default `$GITHUB_REPOSITORY`), `--sha` (default `$GITHUB_SHA`), `--pr-number` — necessários para os reporters identificarem onde publicar.
+- **Escopo de execução restrito por custo/credits (`governance-agent-audit.yml`)**: o workflow agora dispara **exclusivamente** em Pull Requests de `develop` para `main` (filtro duplo: `branches: [main]` no gatilho + `head.ref == 'develop'` na condição do job) — nunca mais em PRs de feature branch para `develop`.
+- **Feature-flag de ativação sem editar o workflow**: variável de repositório `vars.GOVERNANCE_AGENT_AUDIT_ENABLED` controla se o job roda. Default (variável ausente) é **desativado** — modelo opt-in seguro que garante zero consumo de premium requests até ativação explícita via Settings > Actions > Variables, sem exigir novo commit para ligar/desligar.
+- **Pendência remanescente (não bloqueante)**: confirmação manual do painel de billing/quota da conta associada ao PAT — ação humana fora do escopo de automação.
+
+---
+
 ## [2.47.0] — 2026-09-28
 
 ### Resolvido — Q-01 Validado Empiricamente em CI Real + Correções de Integração do Runner Headless

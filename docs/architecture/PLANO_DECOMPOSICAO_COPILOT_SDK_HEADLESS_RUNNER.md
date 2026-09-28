@@ -71,7 +71,7 @@ Objetivo: Validar isoladamente o motor de roteamento (`routing/`), cobrir exaust
 
 | # | Subtask / Marco | P/S | Responsável | Depende de | Definition of Done (DoD) |
 |---|-----------------|:---:|-------------|------------|--------------------------|
-| 27 | **Gate de Qualidade PoC → Piloto** | [S] | requester + QA governança | 18, 20-24, 26 | `tests/routing_unit/` 100% verde · 13 TC + 2 extras aprovados · Q-01 resolvida e comprovada em CI real · zero flakiness em 10 execuções. | ✅ **APROVADO** (2026-09-28) — 161 testes verdes, 0 flakiness, 0 erros estáticos (`mypy --strict`), Q-01 validado empiricamente em CI real (subtask 26). Pendências não bloqueantes carregadas para a fase Piloto: (a) confirmação manual do painel de billing/quota; (b) wiring de `--report checks,pr-comment` em `cli.py::main()` (reporters existem mas não são invocados). |
+| 27 | **Gate de Qualidade PoC → Piloto** | [S] | requester + QA governança | 18, 20-24, 26 | `tests/routing_unit/` 100% verde · 13 TC + 2 extras aprovados · Q-01 resolvida e comprovada em CI real · zero flakiness em 10 execuções. | ✅ **APROVADO** (2026-09-28) — 161 testes verdes, 0 flakiness, 0 erros estáticos (`mypy --strict`), Q-01 validado empiricamente em CI real (subtask 26). Pendências fechadas na mesma sessão: (a) wiring de `--report checks,pr-comment` em `cli.py::main()` implementado (canais fail-open, nunca alteram o exit code da auditoria); (b) gatilho do workflow restrito a PR `develop→main` com feature-flag opt-in via `vars.GOVERNANCE_AGENT_AUDIT_ENABLED` (custo/credits sob controle explícito). Única pendência remanescente, não bloqueante: confirmação manual do painel de billing/quota da conta (ação humana fora do IDE). |
 
 ---
 
