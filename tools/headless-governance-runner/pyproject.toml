@@ -15,8 +15,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Extra "sdk": dependências do Copilot SDK / execução do runner headless (subtasks futuras, Bloco C+).
-sdk = []
+# Extra "sdk": pacote real do Copilot SDK (confirmado via @deep-search —
+# github/copilot-sdk, PyPI `github-copilot-sdk`, modulo importavel `copilot`).
+# Requer runtime baixado apos a instalacao: `python -m copilot download-runtime`.
+sdk = ["github-copilot-sdk>=1.0.0"]
 # Extra "otel": instrumentação de telemetria OTel GenAI do runner (subtasks futuras, Bloco C+).
 otel = []
 dev = [

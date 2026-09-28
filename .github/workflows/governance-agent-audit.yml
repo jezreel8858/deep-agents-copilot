@@ -48,6 +48,11 @@ jobs:
       - name: Instalar governance-runner
         run: pip install -e "tools/headless-governance-runner[sdk,otel,dev]"
 
+      - name: Baixar runtime do Copilot SDK
+        # Wheels publicadas do github-copilot-sdk incluem versao de runtime
+        # pinada, mas o binario e baixado separadamente (README oficial).
+        run: python -m copilot download-runtime
+
       - name: Gate mecânico — suíte determinística de roteamento
         # Nenhum premium request é gasto se o motor de roteamento estiver quebrado.
         run: pytest tools/headless-governance-runner -q
