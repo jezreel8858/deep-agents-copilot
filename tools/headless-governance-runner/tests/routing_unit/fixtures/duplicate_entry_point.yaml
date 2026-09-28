@@ -1,0 +1,10 @@
+version: "1.0"
+nos:
+  - id: agent-router
+    tipo: entry_point
+    descricao: "Entry point 1"
+  - id: agent-router-2
+    tipo: entry_point
+    descricao: "Entry point 2 (duplicado)"
+workflows: []
+arestas: []

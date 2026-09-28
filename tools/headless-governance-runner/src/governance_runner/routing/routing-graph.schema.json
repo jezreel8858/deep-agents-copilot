@@ -1,0 +1,228 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://deep-agents-copilot/schemas/routing-graph.schema.json",
+  "title": "routing-graph.yaml",
+  "description": "Schema estrutural do grafo de roteamento declarado (.github/agents/routing-graph.yaml). Valida somente a forma (chaves obrigatorias, tipos, enums, faixas numericas) - nao resolve aliases nem valida contra catalog.yaml (RG-05).",
+  "type": "object",
+  "required": [
+    "version",
+    "nos",
+    "workflows",
+    "arestas"
+  ],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "last_updated": {
+      "type": "string"
+    },
+    "convencao_papeis_genericos": {
+      "type": "object",
+      "properties": {
+        "descricao": {
+          "type": "string"
+        },
+        "excecao": {
+          "type": "string"
+        }
+      }
+    },
+    "politica_cascata": {
+      "type": "object"
+    },
+    "nos": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "tipo"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "tipo": {
+            "type": "string",
+            "enum": [
+              "entry_point",
+              "health_check",
+              "mandatory_pre_step",
+              "domain_router",
+              "downstream",
+              "fallback"
+            ]
+          },
+          "descricao": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "arestas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "de",
+          "para"
+        ],
+        "properties": {
+          "de": {
+            "type": "string",
+            "minLength": 1
+          },
+          "para": {
+            "type": "string",
+            "minLength": 1
+          },
+          "prioridade": {
+            "type": "number"
+          },
+          "threshold_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "nivel_routing": {
+            "type": "string"
+          },
+          "condicoes": {
+            "type": "object",
+            "properties": {
+              "tipo": {
+                "type": "string"
+              },
+              "regra": {
+                "type": "string"
+              },
+              "gatilho": {
+                "type": "string"
+              },
+              "keywords": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "sinal": {
+                "type": "string"
+              },
+              "sinal_r006": {
+                "type": "string"
+              },
+              "nao_confundir_com": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "fast_path_bypass": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "loop_maximo": {
+                "type": "integer"
+              },
+              "retorno_obrigatorio": {
+                "type": "string"
+              },
+              "proibido": {
+                "type": "string"
+              },
+              "aplica_a": {
+                "type": "string"
+              },
+              "acao": {
+                "type": "string"
+              },
+              "politica_desvio": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "workflows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "estados"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "regra": {
+            "type": "string"
+          },
+          "fast_path": {
+            "type": "boolean"
+          },
+          "gatilhos": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "estados": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "etapa",
+                "nome"
+              ],
+              "properties": {
+                "etapa": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "nome": {
+                  "type": "string"
+                },
+                "agent": {
+                  "type": "string"
+                },
+                "agents_permitidos": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "sub_rotinas_permitidas": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "checkpoint_humano": {}
+              },
+              "additionalProperties": true
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

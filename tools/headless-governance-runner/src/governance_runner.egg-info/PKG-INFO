@@ -1,0 +1,55 @@
+Metadata-Version: 2.4
+Name: governance-runner
+Version: 0.1.0
+Summary: Motor determinístico de roteamento/governança (routing/) e runner headless (CI) do Copilot SDK. Ver docs/architecture/BLUEPRINT_COPILOT_SDK_HEADLESS_RUNNER.md.
+License: Proprietary
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: PyYAML>=6.0
+Requires-Dist: jsonschema>=4.20.0
+Provides-Extra: sdk
+Provides-Extra: otel
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0; extra == "dev"
+Requires-Dist: mypy>=1.8; extra == "dev"
+
+# headless-governance-runner
+
+Pacote Python `governance_runner` — motor determinístico de roteamento/governança
+(`routing/`) e runner headless de auditoria/governança para GitHub Actions
+(`runner/`, `reporters/`, `telemetry/`).
+
+> **Escopo e contratos completos**: ver
+> [`docs/architecture/BLUEPRINT_COPILOT_SDK_HEADLESS_RUNNER.md`](../../docs/architecture/BLUEPRINT_COPILOT_SDK_HEADLESS_RUNNER.md)
+> (arquitetura, §5.2 estrutura de diretórios, §6 contratos de classes/funções, §7 testes determinísticos).
+>
+> **Plano de execução e status das subtasks**: ver
+> [`docs/architecture/PLANO_DECOMPOSICAO_COPILOT_SDK_HEADLESS_RUNNER.md`](../../docs/architecture/PLANO_DECOMPOSICAO_COPILOT_SDK_HEADLESS_RUNNER.md)
+> (Bloco A — Eixo 2 `routing/`, Bloco B — Eixo 3 `tests/routing_unit/`).
+
+## Status atual (Subtask 1 — Scaffolding)
+
+Estrutura de pastas criada; módulos de `routing/` contêm apenas assinaturas e
+contratos (docstrings Google-style PT-BR + type hints PEP 484), com
+`NotImplementedError` explícito. Implementação real ocorre nas subtasks 2 a 6
+do plano de decomposição.
+
+```text
+src/governance_runner/
+├── routing/            # PURO — sem import de SDK nem rede (Bloco A)
+│   ├── model.py        # Enums Workflow, Fase, TipoNo, NivelRouting; dataclasses frozen
+│   ├── graph_loader.py # subtask 2
+│   ├── state_machine.py# subtask 3
+│   ├── drift.py        # subtask 4
+│   ├── router.py       # subtask 5
+│   └── handoff.py      # subtask 6
+├── runner/             # subtasks futuras (Bloco C+)
+├── reporters/          # subtasks futuras (Bloco C+)
+└── telemetry/          # subtasks futuras (Bloco C+)
+```
+
+## Instalação (modo editável, para testes locais)
+
+```shell
+python -m pip install -e tools/headless-governance-runner[dev]
+```

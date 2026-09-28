@@ -1,0 +1,81 @@
+version: "1.0"
+description: "Fixture reduzida para testes unitários de router.py (subtask 5)."
+last_updated: "2026-01-01"
+
+nos:
+  - id: agent-router
+    tipo: entry_point
+    descricao: "Entry point único"
+  - id: bug-triage
+    tipo: downstream
+    descricao: "Triagem de bugs"
+  - id: code-review
+    tipo: downstream
+    descricao: "Revisão de código"
+  - id: security-review
+    tipo: downstream
+    descricao: "Revisão de segurança"
+  - id: deep-search
+    tipo: fallback
+    descricao: "Fallback primário"
+  - id: tech-solution-architect
+    tipo: fallback
+    descricao: "Fallback secundário"
+
+workflows:
+  - id: WORKFLOW-BUG-FIX
+    nome: "Resolução de Bugs"
+    estados:
+      - etapa: 1
+        nome: "triage_and_root_cause"
+        agent: "bug-triage"
+      - etapa: 2
+        nome: "implementation"
+        agent: "domain-router | specialist-bug-fixer"
+
+arestas:
+  - de: agent-router
+    para: bug-triage
+    prioridade: 1
+    threshold_score: 0.9
+    nivel_routing: rule-based
+    condicoes:
+      keywords: ["bug", "erro"]
+  - de: agent-router
+    para: code-review
+    prioridade: 1.0
+    threshold_score: 0.75
+    nivel_routing: semantic
+    condicoes:
+      keywords: ["revisar codigo", "pull request", "diff", "merge"]
+  - de: agent-router
+    para: security-review
+    prioridade: 2.0
+    threshold_score: 0.70
+    nivel_routing: semantic
+    condicoes:
+      keywords:
+        - "revisar seguranca"
+        - "vulnerabilidade"
+        - "autenticacao"
+        - "token"
+        - "senha"
+        - "vazamento"
+        - "exploit"
+        - "injecao"
+        - "xss"
+        - "csrf"
+  - de: agent-router
+    para: deep-search
+    prioridade: 9
+    threshold_score: 0.70
+    nivel_routing: semantic
+    condicoes:
+      sinal: "Duvida tecnica geral, pesquisa interna/externa"
+  - de: agent-router
+    para: tech-solution-architect
+    prioridade: 8
+    threshold_score: 0.70
+    nivel_routing: semantic
+    condicoes:
+      sinal: "Analise tecnica generica cross-sistema"
