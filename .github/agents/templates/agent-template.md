@@ -147,6 +147,7 @@ Retorne IMEDIATAMENTE para `@agent-router` caso a solicitação fuja do escopo d
 - Evitar mutações em arquivos compartilhados sem necessidade comprovada.
 
 ### Anti-padrões a Evitar
+- Ao criar/revisar agent com perfil de bug-fixer, perf-tuner ou test-fixer: é COMPULSÓRIO incluir (1) Blast-Radius Check (buscar chamadores/dependentes) ANTES de aplicar o diff mínimo; (2) para perf-tuner, baseline mensurado ANTES/DEPOIS da mudança + gate de aprovação humana (`ask_questions`) para mudanças de performance irrevogáveis em produção (canary/staging); (3) para test-fixer, heurística de classificação bug-real-vs-drift e CAP RÍGIDO de no máximo 2 tentativas de correção antes de escalar para `@bug-triage` — omissão destas 3 salvaguardas é gap sistêmico recorrente (R-055 Q2, auditoria `@agent-auditor`).
 | Anti-padrão | Impacto | Prática Correta |
 |---|---|---|
 | Assumir requisitos ocultos | Retrabalho e quebra de contratos | Solicitar clarificação ou ater-se ao explícito |

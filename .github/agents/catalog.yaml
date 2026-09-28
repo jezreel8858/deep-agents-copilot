@@ -1624,7 +1624,7 @@ agents:
     estimated_time_minutes: 25
   angular-router:
     id: angular-router
-    model: Gemini 3.8 Flash
+    model: Claude Sonnet 5
     priority: 8.5
     version: 2.0.0
     domain: Supervisor hierarquico e roteador do dominio Angular
@@ -1719,7 +1719,7 @@ agents:
     estimated_time_minutes: 15
   ejb-router:
     id: ejb-router
-    model: Gemini 3.8 Flash
+    model: Claude Sonnet 5
     priority: 8.9
     version: 2.0.0
     domain: Supervisor hierarquico e roteador do dominio Java Legado EJB
@@ -1769,7 +1769,7 @@ agents:
     estimated_time_minutes: 15
   python-router:
     id: python-router
-    model: Gemini 3.8 Flash
+    model: Claude Sonnet 5
     priority: 8.92
     version: 2.0.0
     domain: Supervisor hierarquico e roteador do dominio Python Backend
@@ -1820,7 +1820,7 @@ agents:
     estimated_time_minutes: 15
   spring-boot-router:
     id: spring-boot-router
-    model: Gemini 3.8 Flash
+    model: Claude Sonnet 5
     priority: 8.7
     version: 2.0.0
     domain: Supervisor hierarquico e roteador do dominio Spring Boot
@@ -1867,14 +1867,14 @@ agents:
     estimated_time_minutes: 15
   spring-reactive-router:
     id: spring-reactive-router
-    model: Gemini 3.8 Flash
+    model: Claude Sonnet 5
     priority: 8.8
     version: 2.0.0
     domain: Supervisor hierarquico e roteador do dominio Spring Reactive
     description: Roteador de domínio Spring Reactive e supervisor hierárquico — recebe
       solicitações de backend reativo (WebFlux/Reactor/R2DBC) do agent-router central
       e despacha para os 7 especialistas reativos (arch-advisor, feature-developer,
-      bug-fixer, resilience-tuner, unit-test-writer, integration-test-writer e test-fixer).
+      bug-fixer, perf-tuner, unit-test-writer, integration-test-writer, test-fixer).
     keywords:
     - spring webflux
     - spring reactive router
@@ -1891,7 +1891,7 @@ agents:
     - spring-reactive-arch-advisor
     - spring-reactive-feature-developer
     - spring-reactive-bug-fixer
-    - spring-reactive-resilience-tuner
+    - spring-reactive-perf-tuner
     - spring-reactive-unit-test-writer
     - spring-reactive-integration-test-writer
     - spring-reactive-test-fixer
@@ -1914,7 +1914,7 @@ agents:
   struts-router:
     id: struts-router
     version: 2.0.0
-    model: Gemini 3.8 Flash
+    model: Claude Sonnet 5
     description: Roteador de domínio Java Legado Struts e supervisor hierárquico —
       recebe solicitações de backend Struts legado (Struts 1.x/2.x, Actions, FormBeans,
       ActionServlet, Tiles) do agent-router central e despacha para os 7 especialistas

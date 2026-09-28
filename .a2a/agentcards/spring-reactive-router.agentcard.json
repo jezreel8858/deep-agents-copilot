@@ -4,7 +4,7 @@
   "id": "spring-reactive-router",
   "name": "Spring Reactive Router",
   "version": "2.0.0",
-  "description": "Roteador de domínio Spring Reactive e supervisor hierárquico — recebe solicitações de backend reativo (WebFlux/Reactor/R2DBC) do agent-router central e despacha para os 7 especialistas reativos (arch-advisor, feature-developer, bug-fixer, resilience-tuner, unit-test-writer, integration-test-writer e test-fixer).",
+  "description": "Roteador de domínio Spring Reactive e supervisor hierárquico — recebe solicitações de backend reativo (WebFlux/Reactor/R2DBC) do agent-router central e despacha para os 7 especialistas reativos (arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer, test-fixer).",
   "domain": "Supervisor hierarquico e roteador do dominio Spring Reactive",
   "role": "router",
   "capabilities": [
@@ -37,7 +37,7 @@
     "data_sensitivity": "internal"
   },
   "model_preferences": {
-    "recommended_model": "Gemini 3.8 Flash",
+    "recommended_model": "Claude Sonnet 5",
     "cost_tier": "1x"
   },
   "input_contract": {

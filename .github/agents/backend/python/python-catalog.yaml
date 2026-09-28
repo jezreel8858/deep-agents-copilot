@@ -38,16 +38,16 @@ agents:
       - "mypy strict"
       - "design api python"
     tools:
-      - "file_search"
-      - "grep_search"
-      - "list_dir"
-      - "ask_questions"
-      - "run_subagent"
-      - "context-mode/ctx_search"
-      - "context-mode/ctx_execute"
-      - "context-mode/ctx_batch_execute"
-      - "context-mode/ctx_execute_file"
-      - "context-mode/ctx_index"
+    - file_search
+    - grep_search
+    - list_dir
+    - ask_questions
+    - run_subagent
+    - context-mode/ctx_search
+    - context-mode/ctx_execute
+    - context-mode/ctx_batch_execute
+    - context-mode/ctx_execute_file
+    - context-mode/ctx_index
     skills:
       - "test-implementation-python"
       - "specialist-hybrid-advisory-implementation-patterns"
@@ -70,18 +70,18 @@ agents:
       - "tdd python"
       - "api python"
     tools:
-      - "file_search"
-      - "grep_search"
-      - "list_dir"
-      - "ask_questions"
-      - "run_subagent"
-      - "get_errors"
-      - "run_in_terminal"
-      - "context-mode/ctx_execute"
-      - "context-mode/ctx_search"
-      - "context-mode/ctx_batch_execute"
-      - "context-mode/ctx_index"
-      - "context-mode/ctx_execute_file"
+    - file_search
+    - grep_search
+    - list_dir
+    - ask_questions
+    - run_subagent
+    - get_errors
+    - run_in_terminal
+    - context-mode/ctx_execute
+    - context-mode/ctx_search
+    - context-mode/ctx_batch_execute
+    - context-mode/ctx_index
+    - context-mode/ctx_execute_file
     skills:
       - "test-implementation-python"
       - "terminal-governance"

@@ -207,7 +207,7 @@ EXECUTOR_AGENT_NAMES = {
     "spring-reactive-bug-fixer.agent.md",
     "spring-reactive-feature-developer.agent.md",
     "spring-reactive-integration-test-writer.agent.md",
-    "spring-reactive-resilience-tuner.agent.md",
+    "spring-reactive-perf-tuner.agent.md",
     "spring-reactive-test-fixer.agent.md",
     "spring-reactive-unit-test-writer.agent.md",
     "struts-bug-fixer.agent.md",

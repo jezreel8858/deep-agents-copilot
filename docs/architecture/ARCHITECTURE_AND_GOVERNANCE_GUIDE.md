@@ -156,7 +156,7 @@ graph TD
 | **Roteamento Central** | `@agent-router` | Triagem universal, Health Check (R-034), Fast-Path (R-041/R-050) |
 | **Frontend** | `@angular-router` | arch-advisor, feature-developer, bug-fixer, ui-stylist, unit-test-writer, component-test-writer, test-fixer, e2e-writer |
 | **Backend Spring Boot** | `@spring-boot-router` | arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer, test-fixer |
-| **Backend Reativo** | `@spring-reactive-router` | arch-advisor, feature-developer, bug-fixer, resilience-tuner, unit-test-writer, integration-test-writer, test-fixer |
+| **Backend Reativo** | `@spring-reactive-router` | arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer, test-fixer |
 | **Backend Legado Java** | `@ejb-router` / `@struts-router` | Especialistas canônicos para EJB (2.x/3.x, CMT/JTA) e Struts (1.x/2.x, Actions, FormBeans) |
 | **Backend Python** | `@python-router` | arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer, test-fixer |
 | **Banco de Dados** | `@database-router` | oracle-migration-dev, oracle-plsql-expert, oracle-query-tuner, informix-migration-dev, informix-spl-expert, informix-query-tuner |

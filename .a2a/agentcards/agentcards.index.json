@@ -404,10 +404,10 @@
       "domain": "Correções cirúrgicas de bloqueios acidentais em Event Loop, vazamentos de Subscription e falhas de fluxo reativo",
       "version": "1.0.0"
     },
-    "spring-reactive-resilience-tuner": {
-      "name": "Spring Reactive Resilience Tuner",
+    "spring-reactive-perf-tuner": {
+      "name": "Spring Reactive Perf Tuner",
       "role": "specialist",
-      "domain": "Ajuste de resiliência, backpressure, circuit breakers (Resilience4j), connection pool R2DBC e dimensionamento Netty",
+      "domain": "Profiling e tuning de backpressure, schedulers, pipelines Mono/Flux e detecção de bloqueio de event-loop Netty",
       "version": "1.0.0"
     },
     "spring-reactive-unit-test-writer": {
