@@ -6,6 +6,33 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.46.0] — 2026-09-28
+
+### Adicionado — Runner Headless Copilot SDK e Roteamento Determinístico em Código
+
+- **Motor Determinístico de Roteamento (`governance_runner.routing`)**:
+  - Implementação em código puro Python da máquina de estados finita e guard clauses das regras normativas R-037 (agent-router first), R-042 (detecção de deriva de intenção com short-circuit de continuidade), R-050 (9 workflows canônicos e avanço sequencial estrito), R-052 (reset mandatório pós-conclusão) e R-064 (checkpoint humano).
+  - Parser e validador de `routing-graph.yaml` contra JSON Schema Draft-07 (`graph_loader.py`), com compilação imutável para `TabelaTransicao` e resolução resiliente dos gaps RG-01 a RG-04.
+  - Algoritmo de scoring rule-based determinístico (`router.py`) com política de cascata de 4 níveis (0.9 / 0.7 / 0.5 / 0.0) e desempate por prioridade na zona de ambiguidade ($\Delta \le 0.05$).
+  - Validador estrito de payload de handoff v1.3 (`handoff.py`) conforme `handoff-governance/SKILL.md`, com verificação fail-closed contra vazamento de segredos e credenciais (PX-08).
+- **Runner Headless para CI/CD (`governance_runner.runner`)**:
+  - Protocol abstrato `CopilotSDKClient` desacoplado da dependência direta de runtime, com Permission Handler restrito a operações read-only para o caso de uso `agent-audit`.
+  - Controle orçamentário de execução (`budget.py`) com teto configurável de requisições premium (`GOV_MAX_PREMIUM_REQUESTS`) e teto rígido de 5 turnos (R-060), retornando conclusão `neutral` com motivo `budget_exhausted` sem quebrar o processo.
+  - Reporters para GitHub Checks API e comentários estruturados em PR (`reporters/`).
+  - Observabilidade OpenTelemetry com política fail-open (`telemetry/otel.py`).
+  - Entrypoint CLI `governance-runner` para automação headless via terminal e CI.
+- **Suíte Canônica de Testes de Roteamento (`tests/routing_unit/` e `tests/runner_unit/`)**:
+  - 161 testes unitários e de integração (110 em `routing_unit` cobrindo TC01 a TC08, integridade referencial cruzada e idempotência; 51 em `runner_unit` cobrindo TC09 a TC13 e smoke tests E2E).
+  - Verificação de zero flakiness com 10 execuções consecutivas 100% verdes e conformidade estrita de tipagem (`mypy --strict`).
+- **Pipeline de Auditoria Automatizada em CI**:
+  - Workflow `.github/workflows/governance-agent-audit.yml` disparado em PRs que tocam `.github/{agents,skills,prompts}/**`, executando gate mecânico prévio via `pytest` e conclusão `neutral` na fase PoC.
+- **Documentação Técnica e Governança**:
+  - Blueprint Técnico C4 e Matriz de Requisitos: `docs/architecture/BLUEPRINT_COPILOT_SDK_HEADLESS_RUNNER.md`.
+  - Plano de Decomposição em 46 Subtasks: `docs/architecture/PLANO_DECOMPOSICAO_COPILOT_SDK_HEADLESS_RUNNER.md`.
+  - Runbook Operacional para Validação de Autenticação/Billing Q-01 em CI Real: `docs/architecture/RUNBOOK_VALIDACAO_Q01_COPILOT_SDK_CI.md`.
+
+---
+
 ## [2.45.0] — 2026-09-27
 
 ### Adicionado / Modificado — Roteamento Híbrido de Modelo e Política Zero-Noise de Testes

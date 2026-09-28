@@ -123,6 +123,7 @@ deep-agents-copilot/
 │   │   ├── AI_GOVERNANCE_DOCUMENTATION_GUIDE.md # Alinhamento NIST AI RMF e ISO 42001
 │   │   ├── APPLICATION_SECURITY_GUIDE.md        # Matriz AppSec e OWASP Top 10
 │   │   ├── BLUEPRINT_AGENT_OBSERVABILITY.md     # Arquitetura de observabilidade e tracing
+│   │   ├── BLUEPRINT_COPILOT_SDK_HEADLESS_RUNNER.md # Blueprint do runner headless de governança CI/CD
 │   │   └── EVALS_TEST_STRATEGY.md               # Estratégia de testes para evals de IA
 │   │
 │   ├── plan/                                    # Blueprints de Arquitetura e Pesquisas
