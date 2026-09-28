@@ -29,7 +29,9 @@ COPILOT_SDK_TOKEN_ENV = "COPILOT_SDK_TOKEN"
 _USE_CASES_SUPORTADOS = ("agent-audit",)
 
 _SCHEMA_PADRAO = Path(__file__).parent / "routing" / "routing-graph.schema.json"
-_GRAFO_PADRAO = Path(__file__).parents[3] / ".github" / "agents" / "routing-graph.yaml"
+# __file__ = <repo>/tools/headless-governance-runner/src/governance_runner/cli.py
+# parents[0]=governance_runner, [1]=src, [2]=headless-governance-runner, [3]=tools, [4]=<repo>
+_GRAFO_PADRAO = Path(__file__).parents[4] / ".github" / "agents" / "routing-graph.yaml"
 
 
 def construir_parser() -> argparse.ArgumentParser:
