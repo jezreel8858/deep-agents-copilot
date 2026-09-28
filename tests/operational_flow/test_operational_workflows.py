@@ -438,8 +438,8 @@ def test_workflow_feature_development_edge_scenarios_and_state_bag(routing_graph
     assert "aprovacao_blueprint" in str(etapa3.get("checkpoint_humano", "")), "Workflow 4 deve ter checkpoint_humano na etapa 3"
     assert "fullstack" in str(etapa3.get("particionamento_escopo", [])), "Workflow 4 deve suportar particionamento de escopo"
 
-    etapa6 = next((e for e in estados if e["etapa"] == 6), {})
-    assert "security-reviewer" in str(etapa6.get("sub_rotinas_permitidas", [])), "Workflow 4 deve ter security-reviewer no gate"
+    etapa_gate = next((e for e in estados if e.get("nome") == "quality_gate_and_pr_preparation"), {})
+    assert "security-reviewer" in str(etapa_gate.get("sub_rotinas_permitidas", [])), "Workflow 4 deve ter security-reviewer no gate"
 
 def test_workflow_governance_maintenance_edge_scenarios_and_state_bag(routing_graph):
     """Valida que WORKFLOW-GOVERNANCE-MAINTENANCE cobre pesquisa prévia de mercado via deep-search,
@@ -525,8 +525,8 @@ def test_workflow_framework_migration_depara_matrix_and_brownfield_reconciliatio
     assert wf7["matriz_de_para_obrigatoria"]["taxonomia_status"] == ["MIGRADO", "PENDENTE", "DIVERGENTE", "DESACOPLADO", "OBSOLETO"]
     
     estados = wf7.get("estados", [])
-    etapa4 = next((e for e in estados if e["etapa"] == 4), {})
-    assert "matriz_de_para_100_resolvida" in etapa4.get("gate", "")
+    etapa_gate = next((e for e in estados if e.get("nome") == "refinement_and_parity_testing"), {})
+    assert "matriz_de_para_100_resolvida" in etapa_gate.get("gate", "")
 
 
 def test_workflow_release_readiness_edge_scenarios_and_state_bag(routing_graph):
