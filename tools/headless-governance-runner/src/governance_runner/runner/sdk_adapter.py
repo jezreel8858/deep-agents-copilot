@@ -16,6 +16,8 @@ leitura de arquivos dentro do escopo do diff auditado e a tool customizada
 
 from __future__ import annotations
 
+import asyncio
+import json
 from dataclasses import dataclass
 from typing import Any, Callable, Mapping, Protocol, Sequence
 
@@ -34,6 +36,31 @@ __all__ = [
     "construir_permission_handler_read_only",
     "criar_cliente_sdk_real",
 ]
+
+# Timeout de segurança para uma sessão do Copilot SDK real (evita hang
+# indefinido em CI caso o evento `SessionIdleData` nunca seja emitido —
+# API confirmada via @deep-search, mas sem SLA documentado de latência).
+_TIMEOUT_SESSAO_SEGUNDOS = 120.0
+
+# Marcadores textuais de falha de autenticação (401/403/token invalido).
+# Fallback pragmático: a API real ainda não expõe (confirmado via
+# @deep-search) uma classe de exceção dedicada para 401/403 no SDK Python.
+_MARCADORES_ERRO_AUTENTICACAO: tuple[str, ...] = (
+    "401",
+    "403",
+    "unauthorized",
+    "forbidden",
+    "invalid token",
+    "invalid_token",
+    "authentication",
+    "expired",
+)
+
+
+def _parece_erro_autenticacao(exc: BaseException) -> bool:
+    """Heurística textual para classificar uma exceção do SDK como falha de autenticação."""
+    texto = str(exc).lower()
+    return any(marcador in texto for marcador in _MARCADORES_ERRO_AUTENTICACAO)
 
 
 class SDKAuthenticationError(Exception):
@@ -199,6 +226,11 @@ def construir_permission_handler_read_only(
 def criar_cliente_sdk_real(token: str, *, modelo: str | None = None) -> CopilotSDKClient:
     """Cria o cliente real do Copilot SDK (import tardio, RK-01/RK-06).
 
+    API confirmada via @deep-search (github/copilot-sdk, pacote PyPI
+    `github-copilot-sdk`, módulo importável `copilot`) nesta sessão —
+    ver BLUEPRINT_COPILOT_SDK_HEADLESS_RUNNER.md, nota de pendencia de
+    verificacao externa (agora resolvida).
+
     Args:
         token: Token de autenticação (`COPILOT_SDK_TOKEN`).
         modelo: Override opcional de modelo (menor multiplicador de custo).
@@ -208,7 +240,7 @@ def criar_cliente_sdk_real(token: str, *, modelo: str | None = None) -> CopilotS
             `[sdk]` (mensagem descritiva, nunca falha silenciosa).
     """
     try:
-        import copilot_sdk  # type: ignore[import-not-found]  # noqa: F401  (import tardio proposital)
+        import copilot  # type: ignore[import-not-found]  # noqa: F401  (import tardio proposital)
     except ImportError as exc:  # pragma: no cover - depende de dependencia externa opcional
         raise RuntimeError(
             "Pacote do Copilot SDK nao instalado. Instale o extra "
@@ -216,7 +248,107 @@ def criar_cliente_sdk_real(token: str, *, modelo: str | None = None) -> CopilotS
             "CopilotSDKClient para testes locais."
         ) from exc
 
-    raise NotImplementedError(
-        "Integracao com o Copilot SDK real pendente de confirmacao de API via @deep-search "
-        "(BLUEPRINT_COPILOT_SDK_HEADLESS_RUNNER.md, nota de pendencia de verificacao externa)."
-    )
+    return _ClienteSDKReal(token=token, modelo=modelo)
+
+
+class _ClienteSDKReal:
+    """Ponte síncrona (`CopilotSDKClient.invoke`) sobre a API assíncrona nativa
+    do pacote `github-copilot-sdk` (`copilot.CopilotClient`).
+
+    Escopo PoC (subtask 26): 1 sessão descartável por chamada `invoke()`,
+    sem streaming, com timeout de segurança `_TIMEOUT_SESSAO_SEGUNDOS`.
+    `premium_requests_consumidos` é aproximado como `1` por turno nesta
+    fase — a API do SDK ainda não expõe (confirmado via @deep-search) um
+    contador de uso/billing granular por resposta.
+    """
+
+    def __init__(self, token: str, *, modelo: str | None = None) -> None:
+        self._token = token
+        self._modelo = modelo
+
+    def invoke(self, request: SDKRequest) -> SDKResponse:
+        try:
+            return asyncio.run(self._invoke_async(request))
+        except SDKAuthenticationError:
+            raise
+        except Exception as exc:  # noqa: BLE001 - reclassifica ou repropaga
+            if _parece_erro_autenticacao(exc):
+                raise SDKAuthenticationError(str(exc)) from exc
+            raise
+
+    async def _invoke_async(self, request: SDKRequest) -> SDKResponse:
+        import copilot
+        from copilot.session_events import AssistantMessageData, SessionIdleData  # type: ignore[import-not-found]
+
+        def _bridge_permissao(perm_request: Any, invocation: Mapping[str, Any]) -> dict[str, str]:
+            tool_name = str(
+                getattr(perm_request, "tool_name", None)
+                or invocation.get("toolName")
+                or invocation.get("tool_name")
+                or ""
+            )
+            decisao = request.permission_handler(tool_name, dict(invocation))
+            return {"permissionDecision": "allow" if decisao.permitido else "deny"}
+
+        fragmentos_resposta: list[str] = []
+        concluido = asyncio.Event()
+
+        def _on_event(event: Any) -> None:
+            dado = getattr(event, "data", None)
+            if isinstance(dado, AssistantMessageData):
+                fragmentos_resposta.append(str(dado.content))
+            elif isinstance(dado, SessionIdleData):
+                concluido.set()
+
+        async with copilot.CopilotClient(github_token=self._token) as client:
+            async with await client.create_session(
+                on_permission_request=_bridge_permissao,
+                model=request.modelo or self._modelo,
+            ) as session:
+                session.on(_on_event)
+                await session.send(request.prompt)
+                try:
+                    await asyncio.wait_for(concluido.wait(), timeout=_TIMEOUT_SESSAO_SEGUNDOS)
+                except asyncio.TimeoutError as exc:
+                    raise RuntimeError(
+                        f"Sessao do Copilot SDK nao concluiu em {_TIMEOUT_SESSAO_SEGUNDOS}s "
+                        "(timeout de seguranca — possivel travamento de rede/runtime)."
+                    ) from exc
+
+        return SDKResponse(
+            achados=_parsear_achados("\n".join(fragmentos_resposta)),
+            premium_requests_consumidos=1,
+            turnos_consumidos=1,
+        )
+
+
+def _parsear_achados(resposta_bruta: str) -> tuple[dict[str, Any], ...]:
+    """Extrai achados estruturados da resposta textual do SDK (best-effort).
+
+    Contrato esperado (BLUEPRINT §5.4): lista JSON de objetos
+    `{arquivo, linha, regra, severidade, mensagem}`. Se a resposta não for
+    JSON válido (agente não seguiu o formato solicitado no prompt), retorna
+    um único achado informativo envolvendo o texto bruto — nunca lança
+    exceção nem descarta silenciosamente o conteúdo da resposta.
+    """
+    texto = resposta_bruta.strip()
+    if not texto:
+        return ()
+    try:
+        dados = json.loads(texto)
+    except (json.JSONDecodeError, ValueError):
+        return (
+            {
+                "arquivo": "",
+                "linha": None,
+                "regra": "RESPOSTA_NAO_ESTRUTURADA",
+                "severidade": "info",
+                "mensagem": texto[:2000],
+            },
+        )
+    if isinstance(dados, dict):
+        dados = [dados]
+    if not isinstance(dados, list):
+        return ()
+    return tuple(item for item in dados if isinstance(item, dict))
+
