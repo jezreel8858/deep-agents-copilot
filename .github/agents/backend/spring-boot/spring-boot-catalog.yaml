@@ -58,7 +58,7 @@ agents:
 
   spring-boot-feature-developer:
     id: "spring-boot-feature-developer"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "implementer"
     domain: "Desenvolvimento de endpoints REST, services transacionais, DTOs Records e repositories JPA via TDD estrito"
     description: "Desenvolvedor de features: cria controllers REST (/v1/), services transacionais, entidades Jakarta Persistence e DTOs Records sob TDD."
@@ -91,7 +91,7 @@ agents:
 
   spring-boot-bug-fixer:
     id: "spring-boot-bug-fixer"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "fixer"
     domain: "Correções cirúrgicas de exceptions de runtime, transações e bugs em produção"
     description: "Especialista em resolução rápida de bugs: corrige BusinessException, LazyInitializationException, rollbacks incorretos e deadlocks com diff mínimo e teste de regressão."
@@ -221,7 +221,7 @@ agents:
 
   spring-boot-test-fixer:
     id: "spring-boot-test-fixer"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "fixer"
     domain: "Diagnóstico e autocorreção de logs de falha de testes em Maven/Gradle"
     description: "Analisa relatórios de falhas de suítes de teste Java, corrige falhas de Mockito, quebras de contexto Spring e fixtures desatualizadas."

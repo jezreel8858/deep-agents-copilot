@@ -57,7 +57,7 @@ agents:
 
   python-feature-developer:
     id: "python-feature-developer"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "implementer"
     domain: "Desenvolvimento de features Python backend com FastAPI, Flask, Django, SQLAlchemy, Pydantic e async/await sob TDD estrito"
     description: "Desenvolvedor de features Python: constrói endpoints REST, schemas Pydantic, repositórios SQLAlchemy/ORM, services desacoplados sob TDD com pytest."
@@ -90,7 +90,7 @@ agents:
 
   python-bug-fixer:
     id: "python-bug-fixer"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "fixer"
     domain: "Correção cirúrgica de runtime errors em Python (TypeError, AttributeError, asyncio deadlocks, conexões ORM, unhandled exceptions)"
     description: "Especialista em resolução rápida de bugs Python: corrige falhas assíncronas, problemas de tipagem runtime, vazamentos de conexão e exceptions de validação Pydantic com diff mínimo."
@@ -223,7 +223,7 @@ agents:
 
   python-test-fixer:
     id: "python-test-fixer"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "fixer"
     domain: "Diagnóstico e reparo de testes quebrados no pytest, asserções desatualizadas e quebras de fixtures"
     description: "Diagnostica e corrige falhas em suítes pytest: desvios de fixtures, problemas de event loop em pytest-asyncio, mocks incorretos e regressões com diff cirúrgico."

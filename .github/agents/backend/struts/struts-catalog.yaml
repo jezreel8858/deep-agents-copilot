@@ -58,7 +58,7 @@ agents:
 
   struts-feature-developer:
     id: "struts-feature-developer"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "implementer"
     domain: "Desenvolvimento de features em Java Legado Struts: Actions, ActionMapping, ActionForm, DynaActionForm, JSP Taglibs sob TDD estrito"
     description: "Desenvolvedor de features Struts: implementa Actions, DispatchActions, FormBeans, mapeamentos XML e integrações de serviço sob TDD com JUnit 4/5 e Mockito."
@@ -92,7 +92,7 @@ agents:
 
   struts-bug-fixer:
     id: "struts-bug-fixer"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "fixer"
     domain: "Correções cirúrgicas de falhas em Struts: ClassCastException em form-beans, forwards nulos, thread-safety em Actions, vazamentos de sessão"
     description: "Especialista em resolução rápida de bugs Struts: corrige falhas de ActionForward, ClassCastException em ActionForm, loops de redirecionamento e concorrência com diff mínimo."
@@ -222,7 +222,7 @@ agents:
 
   struts-test-fixer:
     id: "struts-test-fixer"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "fixer"
     domain: "Diagnóstico e reparo de suítes de teste Struts quebradas em builds legados Ant/Maven Surefire"
     description: "Diagnostica e corrige falhas em testes de Struts legados: ActionForward inválido em assert, falhas de MockStrutsTestCase, classpath XML e regressões de build Ant/Maven."

@@ -59,7 +59,7 @@ agents:
 
   angular-feature-developer:
     id: "angular-feature-developer"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "implementer"
     domain: "Desenvolvimento de features novas, componentes standalone e gerenciamento de estado reativo"
     description: "Desenvolvedor de features: cria componentes standalone, NgRx Signal Stores, services e diretivas sob workflow Test-Last (Implementation-First com testes posteriores)."
@@ -94,7 +94,7 @@ agents:
 
   angular-bug-fixer:
     id: "angular-bug-fixer"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "fixer"
     domain: "Correções cirúrgicas de bugs e runtime errors em produção"
     description: "Especialista em resolução rápida de bugs: corrige runtime errors, ExpressionChanged..., memory leaks e falhas de reatividade com diff mínimo."
@@ -228,7 +228,7 @@ agents:
 
   angular-test-fixer:
     id: "angular-test-fixer"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "fixer"
     domain: "Diagnóstico e autocorreção de logs de falha de runners (Vitest, Karma, Jest)"
     description: "Diagnostica e corrige testes quebrados por timing assíncrono, zoneless, flushEffects(), erros de mocks desatualizados ou dependências de TestBed."

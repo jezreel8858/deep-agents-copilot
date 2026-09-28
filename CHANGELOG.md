@@ -6,6 +6,26 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.45.0] — 2026-09-27
+
+### Adicionado / Modificado — Roteamento Híbrido de Modelo e Política Zero-Noise de Testes
+
+- **Roteamento Híbrido de Modelo (18 Agents Promovidos)**: Promoção dos executores centrais de desenvolvimento e reparo (`*-feature-developer`, `*-bug-fixer`, `*-test-fixer`) nas stacks Angular, Spring Boot, Spring Reactive, EJB, Python e Struts de "Gemini 3.8 Flash" para "Claude Sonnet 5" em seus frontmatters e catálogos de stack (`*-catalog.yaml`), mantendo os 12 `*-test-writer` em "Gemini 3.8 Flash".
+- **Nova Regra Normativa R-021.2 (Retry-Rate Model Escalation)**: Formalizada em `.github/copilot-instructions.md` (§3) a exigência de escalonamento pontual para modelo superior (🧠) quando o mesmo teste ou ciclo TDD falhar 2 vezes consecutivas na sessão, evitando queima agregada de retries em modelos de menor capacidade.
+- **Reforço Textual da Zero-Noise Test Policy**: Padronização literal da menção a `Zero-Noise Test Policy (terminal-governance/SKILL.md §3.1)` em todos os 30 agents executores e nos templates canônicos (`agent-template.md` e `operational-agent.md`), garantindo execução filtrada sem poluição de contexto.
+- **Quality Gate Determinístico de Roteamento de Modelo**: Novo teste de auditoria estática em `tests/governance_audit/test_hybrid_model_routing_and_zero_noise_governance.py` garantindo que desvios de modelo em executores, ausência de `terminal-governance` ou omissões textuais de Zero-Noise causem falha imediata no CI.
+
+## [2.44.0] — 2026-09-27
+
+### Adicionado / Modificado — Persistência de Estado de Sessão e Recuperação de Crash (Terminal Hang)
+
+- **Watchdog de Comando Bloqueante (`terminal-governance/SKILL.md` § 5.2)**: nova seção normativa exigindo wrapper `timeout -k <graça> <limite> <cmd>` (Linux/WSL/Git Bash) ou `Start-Job`+`Wait-Job -Timeout`+`Stop-Job` (PowerShell) para qualquer script/processo sem timeout nativo; correção do antipadrão anterior ("aguardar output completo do comando anterior") que causava hang indefinido de `run_in_terminal` no client JetBrains — agora exige `isBackground:true` + redirect a arquivo + leitura via `read_file`/`ctx_execute_file`.
+- **Checkpoint Automático Pré-Risco (`agent-memory-policy/SKILL.md` § 3.2)**: formalização de checkpoint via `ctx_index` (formato híbrido reaproveitado de `/ctx-checkpoint`) obrigatório antes de qualquer comando classificado como risco; documentada a limitação do schema de `.github/hooks/context-mode.json` (sem matcher condicional por conteúdo de tool) — disparo permanece responsabilidade do agent.
+- **Fallback de Retomada Sem Checkpoint (`ctx-resume.prompt.md`)**: novo protocolo de reconstrução best-effort via `git --no-pager status`/`git --no-pager diff --stat` + inspeção de arquivos modificados para cenário de crash/trava sem checkpoint prévio salvo.
+- **Nota de Reúso Sistêmico (R-055)**: a correção em `terminal-governance/SKILL.md` é referenciada (não duplicada) pelos ~61 agents que declaram `run_in_terminal` em seu frontmatter — propagação automática via skill compartilhada, sem necessidade de edição individual por agent.
+- Pendente para Etapa 4 (`@governance-maintainer`): criação de teste determinístico em `tests/governance_audit/` validando presença dos termos normativos `timeout -k` / `isBackground` em `terminal-governance/SKILL.md`.
+
+
 ## [2.43.0] — 2026-09-27
 
 ### Modificado / Manutenção de Governança

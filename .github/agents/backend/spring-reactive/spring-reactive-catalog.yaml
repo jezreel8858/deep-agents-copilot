@@ -57,7 +57,7 @@ agents:
 
   spring-reactive-feature-developer:
     id: "spring-reactive-feature-developer"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "implementer"
     domain: "Desenvolvimento de endpoints reativos, pipelines funcionais WebFlux, R2DBC e DTOs Records via TDD"
     description: "Desenvolvedor de features: cria RouterFunctions/Controllers reativos, pipelines não-bloqueantes com Mono/Flux, R2DBC e Records sob TDD."
@@ -90,7 +90,7 @@ agents:
 
   spring-reactive-bug-fixer:
     id: "spring-reactive-bug-fixer"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "fixer"
     domain: "Correções cirúrgicas de bloqueios acidentais em Event Loop, vazamentos de Subscription e falhas de fluxo reativo"
     description: "Especialista em resolução rápida de bugs reativos: detecta e remove bloqueios acidentais no Netty, corrige onErrorResume e memory leaks de buffer com diff mínimo."
@@ -220,7 +220,7 @@ agents:
 
   spring-reactive-test-fixer:
     id: "spring-reactive-test-fixer"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "fixer"
     domain: "Diagnóstico e resolução de suítes de teste reativas quebradas por timeouts, sinais inesperados ou race conditions"
     description: "Analisa relatórios de falha de StepVerifier, corrige asserções fora de ordem, cancelamentos prematuros de subscription e timeouts em testes assíncronos."

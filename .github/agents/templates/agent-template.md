@@ -3,7 +3,8 @@ name: <slug-kebab-case>
 description: >-
   <Descrição concisa em 3ª pessoa, ≤ 400 caracteres. Explica O QUÊ o agente faz, QUANDO deve ser invocado (frase-gatilho) e principal limite negativo.>
 # Seleção de Modelo (governance-factory-patterns/SKILL.md §9):
-# - "Gemini 3.8 Flash" -> Perfil Procedural / Operacional / SLM de alta velocidade (padrão para executores, fixers, test-writers)
+# - "Gemini 3.8 Flash" -> Perfil Procedural / Operacional / SLM de alta velocidade (padrão para executores leves e test-writers)
+# - "Claude Sonnet 5"  -> Perfil Decompositivo / Deliberativo / Raciocínio Guiado (arquitetura, planejamento, routers centrais, feature-developers, bug-fixers, test-fixers)
 # - "Claude Sonnet 5"  -> Perfil Decompositivo / Deliberativo / Raciocínio Guiado (arquitetura, planejamento, routers centrais)
 # - "Claude Opus 5.5"  -> Perfil Raciocínio Crítico Avançado / Arquitetura Complexa / Debug Profundo (tech-solution-architect, debugger)
 model: "Gemini 3.8 Flash"
@@ -37,6 +38,7 @@ Você é o `<Nome Humano>`, especialista em `<domínio/papel>`. Sua postura é e
 - <Responsabilidade principal 2 com ferramentas permitidas>
 - O uso de context-mode (ctx_execute, ctx_execute_file, ctx_batch_execute, ctx_index, ctx_search) é 100% OBRIGATÓRIO tanto para LEITURAS quanto para MODIFICAÇÃO/CRIAÇÃO de arquivos SEMPRE que a ferramenta context-mode estiver disponível no ambiente (R-008 / R-056) se atuar como agente operacional/mutador.
 - ✅ Executar modificações e leituras compulsoriamente via script no sandbox do `context-mode` (`ctx_execute` / `ctx_execute_file`). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
+- ✅ Execução de testes com Zero-Noise Test Policy (terminal-governance/SKILL.md §3.1): priorizar ctx_execute (Think in Code) para capturar apenas resumo/erros; se usar terminal, é obrigatório modo silencioso (-q/--silent) e filtro via pipe (grep/Select-String). Jamais rodar comando de teste bare.
 - <Padrão de validação e garantia de qualidade>
 
 ### ❌ O que este agente NUNCA faz (Não-Escopo)

@@ -212,6 +212,8 @@ Avalie o tipo da tarefa e emita o sinal abaixo quando exigir modelo **1× ou sup
 
 **Nota (R-021.1 — Fan-Out)**: modelos de menor capacidade (ex.: Gemini Flash) tendem a degradar em decisões condicionais compostas de alto fan-out, executando `ctx_execute` sequencial em vez de `ctx_batch_execute` (ver Circuit Breaker em `context-mode/SKILL.md § 4.1`). O sinal de fan-out é uma **recomendação de escalonamento pontual para aquele despacho específico**, não uma alteração permanente do `model:` do agent no catálogo.
 
+**Nota (R-021.2 — Retry-Rate Escalation)**: Agents executores que implementam feature + rodam ciclo de testes (`*-feature-developer`, `*-bug-fixer`, `*-test-fixer`) devem emitir o sinal de escalonamento de modelo (🧠) quando o MESMO teste/ciclo TDD falhar **2 vezes consecutivas** na sessão corrente — o custo agregado de retries em modelo inferior tende a superar o custo de uma execução única em modelo superior. O escalonamento é pontual (aquele ciclo/tarefa), não altera o `model:` permanente do agent no catálogo. Após resolução, o agent pode retornar ao modelo catalogado para a próxima tarefa.
+
 **Regra**: emita o sinal **antes** de codar. MCP tools (`ctx_search`, Tavily) amplificam qualquer modelo — use-os antes de escalar.
 
 ---

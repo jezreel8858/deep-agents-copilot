@@ -26,6 +26,8 @@ source_docs:
   - .github/skills/context-mode/SKILL.md
   - .github/skills/agent-safety-guardrails/SKILL.md
   - .github/skills/agent-observability-otel/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
+  - .github/prompts/ctx-checkpoint.prompt.md
 tools: []
 ---
 
@@ -120,6 +122,23 @@ Para evitar que decisões de design críticas sejam descartadas pelo TTL de 7 di
        - Rationale: <por-que-foi-escolhido>
        - AprovadoEm: <ISO-8601>
    ```
+
+---
+
+### 3.2) Checkpoint Automático Pré-Risco (Session Persistence)
+
+Antes de qualquer operação classificada como **risco** — execução de script (Python/Node ad-hoc), comando de terminal sem timeout nativo, ou comando de duração desconhecida (ver `terminal-governance/SKILL.md` § 5.2) — o agent DEVE gravar um checkpoint via `ctx_index` **antes** de disparar o comando, reaproveitando o formato híbrido já definido em `/ctx-checkpoint` (`.github/prompts/ctx-checkpoint.prompt.md`).
+
+- **Gatilho**: qualquer comando classificado como potencialmente bloqueante por `terminal-governance/SKILL.md` § 5.2 (watchdog obrigatório).
+- **Conteúdo mínimo**: plano ativo, arquivos em edição, último passo concluído, decisões pendentes — os mesmos campos de `/ctx-checkpoint` (`lastStep`, `nextStep`, `completedActions`, `decisions`, `files`).
+- **Namespace**: `checkpoint::<task-slug>::pre-risco::<YYYY-MM-DD-HHmm>` — distinto de checkpoints manuais, para diferenciação em `ctx_search`.
+- **Granularidade recomendada**: 1 checkpoint imediatamente antes de cada comando de risco é suficiente — sem periodicidade adicional. O objetivo é garantir recuperação pós-crash, não auditoria contínua; indexação por tempo fixo geraria overhead sem ganho, alinhado ao princípio de snapshot por unidade atômica de trabalho (não por tempo).
+- **Limitação conhecida do hook automático**: o schema de `.github/hooks/context-mode.json` (eventos `PreToolUse`/`preToolUse`) não suporta matcher condicional por conteúdo/argumento da tool invocada — apenas por nome de evento de ciclo de vida, sem diferenciação por comando de risco. Portanto, o disparo do checkpoint pré-risco é **responsabilidade do agent** (via esta política), não um mecanismo automático do hook.
+
+**Checklist adicional (soma-se ao Checklist geral desta skill):**
+- [ ] Comando classificado como risco segundo `terminal-governance/SKILL.md` § 5.2 antes de executar
+- [ ] Checkpoint gravado via `ctx_index` com `source: "checkpoint::<task-slug>::pre-risco::<data>"` ANTES do comando
+- [ ] Watchdog aplicado (`timeout -k` ou `Start-Job`/`Wait-Job`) + `isBackground:true` + redirect a arquivo
 
 ---
 
