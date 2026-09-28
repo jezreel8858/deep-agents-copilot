@@ -46,7 +46,7 @@ jobs:
           cache: pip
 
       - name: Instalar governance-runner
-        run: pip install -e "tools/headless-governance-runner[sdk,otel]"
+        run: pip install -e "tools/headless-governance-runner[sdk,otel,dev]"
 
       - name: Gate mecânico — suíte determinística de roteamento
         # Nenhum premium request é gasto se o motor de roteamento estiver quebrado.
