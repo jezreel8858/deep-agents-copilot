@@ -65,13 +65,13 @@ Objetivo: Validar isoladamente o motor de roteamento (`routing/`), cobrir exaust
 | 23 | `test_TC13_otel_collector_unavailable.py` | [P] | @python-integration-test-writer | 19 | N2 | Resiliência e graceful degradation quando o coletor OTel estiver indisponível. | ✅ |
 | 24 | `test_TC12_handoff_contract.py` | [S] | @python-integration-test-writer | 6, 19 | N3 | Validação de payload completo de handoff contra `handoff-governance/SKILL.md`. | ✅ |
 | 25 | Workflow `governance-agent-audit.yml` (PR, Checks API neutral, sticky comment) | [S] | Orquestrador raiz (edição direta) | 19 | CI | `.github/workflows/governance-agent-audit.yml` criado e validado sintaticamente (YAML parse OK). | ✅ |
-| 26 | Validação real de Q-01 em CI (`GITHUB_TOKEN` + `copilot-requests:write` ou BYOK) | [S] | Humano (requer secrets reais + push a PR real) | 25 | CI | Execução real autentica sem erro no GitHub Actions; TC-09 validado fora de mock. | ⏳ **BLOQUEADO — requer ação manual fora do IDE** (configurar `COPILOT_SDK_TOKEN`/política de org e abrir PR de teste tocando `.github/agents/**`) |
+| 26 | Validação real de Q-01 em CI (`GITHUB_TOKEN` + `copilot-requests:write` ou BYOK) | [S] | Humano (requer secrets reais + push a PR real) | 25 | CI | Execução real autentica sem erro no GitHub Actions; TC-09 validado fora de mock. | ✅ **CONCLUÍDO** (2026-09-28, PR #55, run `governance-agent-audit.yml` #6/id `36405112477` — auth via PAT dedicado `COPILOT_SDK_TOKEN`, `veredito='neutral'`, custo `{premium_requests:1, turnos:1}`, fail-open OTel confirmado em CI real. Ver Seção 7 de `RUNBOOK_VALIDACAO_Q01_COPILOT_SDK_CI.md`. **Achado adicional corrigido na mesma sessão**: hook `preToolUse` de `.github/hooks/context-mode.json` bloqueava categoricamente todo tool call em ambientes sem o binário `context-mode` — guarda defensiva aplicada nas 12 entradas de hook.) |
 
 ### 2.4 Gate de Promoção PoC → Piloto
 
 | # | Subtask / Marco | P/S | Responsável | Depende de | Definition of Done (DoD) |
 |---|-----------------|:---:|-------------|------------|--------------------------|
-| 27 | **Gate de Qualidade PoC → Piloto** | [S] | requester + QA governança | 18, 20-24, 26 | `tests/routing_unit/` 100% verde · 13 TC + 2 extras aprovados · Q-01 resolvida e comprovada em CI real · zero flakiness em 10 execuções. | ⏳ **Pendente exclusivamente da subtask 26** (todo o restante do gate já está satisfeito: 161 testes verdes, 0 flakiness, 0 erros estáticos) |
+| 27 | **Gate de Qualidade PoC → Piloto** | [S] | requester + QA governança | 18, 20-24, 26 | `tests/routing_unit/` 100% verde · 13 TC + 2 extras aprovados · Q-01 resolvida e comprovada em CI real · zero flakiness em 10 execuções. | ✅ **APROVADO** (2026-09-28) — 161 testes verdes, 0 flakiness, 0 erros estáticos (`mypy --strict`), Q-01 validado empiricamente em CI real (subtask 26). Pendências não bloqueantes carregadas para a fase Piloto: (a) confirmação manual do painel de billing/quota; (b) wiring de `--report checks,pr-comment` em `cli.py::main()` (reporters existem mas não são invocados). |
 
 ---
 

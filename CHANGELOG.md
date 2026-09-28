@@ -6,6 +6,21 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.47.0] — 2026-09-28
+
+### Resolvido — Q-01 Validado Empiricamente em CI Real + Correções de Integração do Runner Headless
+
+- **Gate PoC → Piloto (subtask 26/27) APROVADO**: primeira execução real e autenticada do `governance-agent-audit.yml` contra o Copilot SDK verdadeiro em GitHub Actions (PR #55, run #6) — autenticação bem-sucedida via PAT dedicado (`COPILOT_SDK_TOKEN`, escopo "Copilot Requests: Read-only"), `veredito='neutral'`, custo `{premium_requests:1, turnos:1}` (dentro do teto `GOV_MAX_PREMIUM_REQUESTS=15`), fail-open do OTel Collector confirmado em produção (não apenas em mock).
+- **Correção de path de resolução do grafo (`cli.py`)**: `_GRAFO_PADRAO` usava `Path(__file__).parents[3]` (resolvia para `tools/`); corrigido para `parents[4]` (raiz do repositório).
+- **Integração real com o Copilot SDK implementada (`sdk_adapter.py`)**: substituída a implementação-placeholder (`NotImplementedError` pendente de confirmação de API) por uma ponte síncrona real (`_ClienteSDKReal`) sobre a API assíncrona confirmada via pesquisa externa (pacote PyPI `github-copilot-sdk`, módulo importável `copilot`, `CopilotClient(github_token=...)`, eventos `AssistantMessageData`/`SessionIdleData`), com timeout de segurança (120s), bridge do permission handler read-only e classificação heurística de falha de autenticação (`SDKAuthenticationError`).
+- **Dependência real do SDK declarada**: extra `sdk` do `pyproject.toml` (antes vazio) agora fixa `github-copilot-sdk>=1.0.0`; workflow atualizado com o passo obrigatório `python -m copilot download-runtime` e extra `dev` (pytest/mypy) incluído na instalação de CI.
+- **Correção crítica de governança de hooks (`.github/hooks/context-mode.json`)**: achado descoberto pela própria execução real do SDK — o hook `preToolUse` invocava o binário `context-mode` sem guarda de existência, causando falha do hook e **deny categórico de todo tool call** (incluindo leituras) em qualquer ambiente sem o binário instalado (ex.: runners `ubuntu-latest` de CI). Aplicada guarda defensiva (`command -v context-mode || exit 0` / `Get-Command context-mode`) nas 12 entradas de hook, tornando-as no-op silencioso fora do ambiente de desenvolvimento local, sem alterar o comportamento em máquinas com a extensão instalada.
+- **Correção de permissão inválida em workflow**: `copilot-requests: write-all` (valor inválido por-escopo, causava falha instantânea de parsing do workflow) corrigido para `copilot-requests: write`.
+- **Gaps não-bloqueantes registrados para a Fase Piloto**: confirmação manual do painel de billing/quota da conta; wiring de `--report checks,pr-comment` em `cli.py::main()` (reporters implementados mas ainda não invocados pelo entrypoint).
+- **Documentação**: `RUNBOOK_VALIDACAO_Q01_COPILOT_SDK_CI.md` §6/§7 preenchidos com evidências reais (run id, custo, trace_id, achado do hook); `PLANO_DECOMPOSICAO_COPILOT_SDK_HEADLESS_RUNNER.md` subtasks 26/27 marcadas ✅.
+
+---
+
 ## [2.46.0] — 2026-09-28
 
 ### Adicionado — Runner Headless Copilot SDK e Roteamento Determinístico em Código

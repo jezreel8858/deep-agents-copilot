@@ -4,96 +4,96 @@
     "sessionStart": [
       {
         "type": "command",
-        "bash": "IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook jetbrains-copilot sessionstart",
-        "powershell": "$env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook jetbrains-copilot sessionstart",
+        "bash": "command -v context-mode >/dev/null 2>&1 || exit 0; IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook jetbrains-copilot sessionstart",
+        "powershell": "if (-not (Get-Command context-mode -ErrorAction SilentlyContinue)) { exit 0 }; $env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook jetbrains-copilot sessionstart",
         "cwd": "."
       }
     ],
     "SessionStart": [
       {
         "type": "command",
-        "bash": "IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook jetbrains-copilot sessionstart",
-        "powershell": "$env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook jetbrains-copilot sessionstart",
+        "bash": "command -v context-mode >/dev/null 2>&1 || exit 0; IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook jetbrains-copilot sessionstart",
+        "powershell": "if (-not (Get-Command context-mode -ErrorAction SilentlyContinue)) { exit 0 }; $env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook jetbrains-copilot sessionstart",
         "cwd": "."
       }
     ],
     "userPromptSubmitted": [
       {
         "type": "command",
-        "bash": "IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook claude-code userpromptsubmit",
-        "powershell": "$env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook claude-code userpromptsubmit",
+        "bash": "command -v context-mode >/dev/null 2>&1 || exit 0; IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook claude-code userpromptsubmit",
+        "powershell": "if (-not (Get-Command context-mode -ErrorAction SilentlyContinue)) { exit 0 }; $env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook claude-code userpromptsubmit",
         "cwd": "."
       }
     ],
     "UserPromptSubmitted": [
       {
         "type": "command",
-        "bash": "IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook claude-code userpromptsubmit",
-        "powershell": "$env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook claude-code userpromptsubmit",
+        "bash": "command -v context-mode >/dev/null 2>&1 || exit 0; IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook claude-code userpromptsubmit",
+        "powershell": "if (-not (Get-Command context-mode -ErrorAction SilentlyContinue)) { exit 0 }; $env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook claude-code userpromptsubmit",
         "cwd": "."
       }
     ],
     "preToolUse": [
       {
         "type": "command",
-        "bash": "IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook jetbrains-copilot pretooluse",
-        "powershell": "$env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook jetbrains-copilot pretooluse",
+        "bash": "command -v context-mode >/dev/null 2>&1 || exit 0; IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook jetbrains-copilot pretooluse",
+        "powershell": "if (-not (Get-Command context-mode -ErrorAction SilentlyContinue)) { exit 0 }; $env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook jetbrains-copilot pretooluse",
         "cwd": "."
       }
     ],
     "PreToolUse": [
       {
         "type": "command",
-        "bash": "IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook jetbrains-copilot pretooluse",
-        "powershell": "$env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook jetbrains-copilot pretooluse",
+        "bash": "command -v context-mode >/dev/null 2>&1 || exit 0; IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook jetbrains-copilot pretooluse",
+        "powershell": "if (-not (Get-Command context-mode -ErrorAction SilentlyContinue)) { exit 0 }; $env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook jetbrains-copilot pretooluse",
         "cwd": "."
       }
     ],
     "postToolUse": [
       {
         "type": "command",
-        "bash": "IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook jetbrains-copilot posttooluse",
-        "powershell": "$env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook jetbrains-copilot posttooluse",
+        "bash": "command -v context-mode >/dev/null 2>&1 || exit 0; IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook jetbrains-copilot posttooluse",
+        "powershell": "if (-not (Get-Command context-mode -ErrorAction SilentlyContinue)) { exit 0 }; $env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook jetbrains-copilot posttooluse",
         "cwd": "."
       }
     ],
     "PostToolUse": [
       {
         "type": "command",
-        "bash": "IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook jetbrains-copilot posttooluse",
-        "powershell": "$env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook jetbrains-copilot posttooluse",
+        "bash": "command -v context-mode >/dev/null 2>&1 || exit 0; IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook jetbrains-copilot posttooluse",
+        "powershell": "if (-not (Get-Command context-mode -ErrorAction SilentlyContinue)) { exit 0 }; $env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook jetbrains-copilot posttooluse",
         "cwd": "."
       }
     ],
     "preCompact": [
       {
         "type": "command",
-        "bash": "IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook jetbrains-copilot precompact",
-        "powershell": "$env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook jetbrains-copilot precompact",
+        "bash": "command -v context-mode >/dev/null 2>&1 || exit 0; IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook jetbrains-copilot precompact",
+        "powershell": "if (-not (Get-Command context-mode -ErrorAction SilentlyContinue)) { exit 0 }; $env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook jetbrains-copilot precompact",
         "cwd": "."
       }
     ],
     "PreCompact": [
       {
         "type": "command",
-        "bash": "IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook jetbrains-copilot precompact",
-        "powershell": "$env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook jetbrains-copilot precompact",
+        "bash": "command -v context-mode >/dev/null 2>&1 || exit 0; IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook jetbrains-copilot precompact",
+        "powershell": "if (-not (Get-Command context-mode -ErrorAction SilentlyContinue)) { exit 0 }; $env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook jetbrains-copilot precompact",
         "cwd": "."
       }
     ],
     "errorOccurred": [
       {
         "type": "command",
-        "bash": "IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook claude-code posttooluse",
-        "powershell": "$env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook claude-code posttooluse",
+        "bash": "command -v context-mode >/dev/null 2>&1 || exit 0; IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook claude-code posttooluse",
+        "powershell": "if (-not (Get-Command context-mode -ErrorAction SilentlyContinue)) { exit 0 }; $env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook claude-code posttooluse",
         "cwd": "."
       }
     ],
     "ErrorOccurred": [
       {
         "type": "command",
-        "bash": "IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook claude-code posttooluse",
-        "powershell": "$env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook claude-code posttooluse",
+        "bash": "command -v context-mode >/dev/null 2>&1 || exit 0; IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook claude-code posttooluse",
+        "powershell": "if (-not (Get-Command context-mode -ErrorAction SilentlyContinue)) { exit 0 }; $env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook claude-code posttooluse",
         "cwd": "."
       }
     ]
