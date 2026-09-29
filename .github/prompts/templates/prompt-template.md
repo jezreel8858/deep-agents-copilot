@@ -1,6 +1,7 @@
 ---
 name: '<verbo>-<objeto>'
-description: '<Ação imperativa em 1 linha — ex.: Analisa e refatora o arquivo ativo aplicando padrões de Clean Architecture>'
+description: >-
+    <Ação imperativa em 1 linha — ex.: Analisa e refatora o arquivo ativo aplicando padrões de Clean Architecture>
 agent: 'agent'
 model: "Gemini 3.8 Flash"
 tools: ['read_file', 'get_errors', 'context-mode/ctx_execute', 'context-mode/ctx_batch_execute', 'context-mode/ctx_search']

@@ -73,6 +73,8 @@ Prompts operacionais para workflow de execução no chat.
 
 ---
 
+| `/strategic-review` | `.github/prompts/strategic-review.prompt.md` | ⭐ **(NEW)** Revisão estratégica sob demanda do próprio framework (prompt chaining R-033): pesquisa de mercado (`@deep-search`) → diagnóstico read-only (`@agent-auditor`) → plano de simplificação sem execução (`@refactor-planner`) → handoff condicional pós-aprovação humana (`@governance-factory`/`@governance-maintainer`). Nunca fixa model premium permanente (R-021). |
+
 ## Prompts de Context Mode
 
 | Command | Arquivo | Descrição |

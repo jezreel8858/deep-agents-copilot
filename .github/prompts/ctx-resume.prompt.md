@@ -11,6 +11,8 @@ source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
   - .github/skills/context-mode/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
+  - .github/skills/agent-memory-policy/SKILL.md
 ---
 
 # `/ctx-resume`
@@ -162,6 +164,40 @@ Posso seguir com [ação proposta]?
 - Timeline geral (`sort: "timeline"`) é fallback apenas se `source: "checkpoint::"` retornar vazio.
 - Não executar build/teste automaticamente.
 - Não usar terminal; somente tools `ctx_*`.
+
+## Retomada Após Crash/Trava SEM Checkpoint Prévio (Fallback Best-Effort)
+
+Quando não há checkpoint salvo via `/ctx-checkpoint` (nem checkpoint automático pré-risco de `agent-memory-policy/SKILL.md` § 3.2) — sessão travou/crashou sem persistência prévia — aplicar reconstrução best-effort.
+
+### Passo F1 — Inspecionar estado do repositório
+
+```bash
+git --no-pager status
+git --no-pager diff --stat
+```
+
+### Passo F2 — Inspecionar arquivos recentemente modificados (via sandbox, nunca via terminal find/ls)
+
+```javascript
+const { execSync } = require('child_process');
+console.log(execSync('git --no-pager diff --name-only', { encoding: 'utf8' }));
+```
+
+### Passo F3 — Reportar reconstrução ao usuário e confirmar antes de prosseguir
+
+```markdown
+⚠️ Nenhum checkpoint encontrado — reconstrução best-effort a partir do estado do repositório:
+
+**Arquivos modificados (não commitados):** <lista de git diff --stat>
+**Último commit:** <git log -1 --oneline>
+
+Não é possível recuperar decisões/raciocínio de sessões anteriores. Confirme se devo prosseguir a partir deste estado ou se prefere descartar as mudanças pendentes.
+```
+
+- Nunca assumir automaticamente o próximo passo — sempre confirmar via `ask_questions` antes de prosseguir.
+- Esta é a via de **último recurso**; o checkpoint automático pré-risco (`agent-memory-policy/SKILL.md` § 3.2) existe justamente para evitar cair neste cenário.
+
+---
 
 ## Combina Com
 

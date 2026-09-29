@@ -18,6 +18,7 @@ source_docs:
   - .github/skills/agent-contracts/SKILL.md
   - .github/skills/context-mode/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/skills/handoff-governance/SKILL.md
 ---
 
 # Perfil Operacional
@@ -241,6 +242,7 @@ Próximo passo mínimo:
 4. **Comandos curtos não suspendem a regra**: Prompts curtos ("prosseguir", "continue", "pode seguir") NÃO isentam o agente do limiar >= 2 nem do context-mode em lote — a regra vincula-se ao escopo da tarefa, nunca ao tamanho do prompt.
 5. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo. Turno 1: Warm Start + Batch Gather; Turno 2: Processamento aprofundado/Queries agregadas; Turno 3: Validação/Síntese. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index e entrega a resposta final ou solicita clarificação, vedando loops infinitos de O(N^2) tokens.
 6. **Warm Start Compulsório (Build-if-Missing) & Batch Querying (R-060)**: Antes de invocar queries de grafo (find_cycles, module_map, query), o agente DEVE verificar silenciosamente se .codegraph/graph.db existe; se ausente, executa codegraph build . no mesmo comando ou lote inicial (build-if-missing), nunca falhando para obrigar o LLM a raciocinar sobre o erro. Consultas a múltiplos símbolos devem usar batch_query ou query SQL consolidada via ctx_execute no SQLite, destilando o resultado na borda (Edge Truncation).
+7. **Emissão Obrigatória de Telemetria de Handoff (R-042 / handoff-governance § 2.4)**: a cada chamada real de `run_subagent`, emitir compulsoriamente um evento `telemetry_entry` (tag `[HANDOFF]`) via `ctx_index`, incluindo `session_id` (reaproveitado do `sessionStart` do hook `context-mode`) e `sequence_index` (ordenação determinística dentro da sessão).
 </execution_protocol>
 
 

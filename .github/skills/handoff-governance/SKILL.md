@@ -221,13 +221,25 @@ telemetry_entry:
   para: "<agent-receptor>"
   motivo: "<motivo-objetivo>"
   task_id: "<id-da-tarefa-ou-sessao>"
+  # Extensões aditivas e retrocompatíveis (v1.3+ / telemetria de sessão):
+  session_id: "<id-da-sessao>"           # string — correlaciona eventos de um mesmo chat do início ao fim (reaproveita sessionStart do context-mode)
+  sequence_index: 0                     # integer — ordenação determinística dos eventos dentro da sessão (0, 1, 2...)
+  call_stack_depth: 1                   # integer — profundidade do handoff/subagent na árvore de chamadas (detecta aninhamento excessivo)
+  outcome_summary: "sucesso"            # string curta — resultado do nó de handoff (ex.: "sucesso", "desvio_detectado", "loop_excedido")
 ```
 
-> **Consulta e Pruning**: consulte via `ctx_search(queries: ["[INTENT_DRIFT]"], source: "handoff-telemetry:<projeto>")`. O ciclo de vida desta telemetria segue a política de retenção episódica (TTL 7 dias, conforme `agent-memory-policy`).
+> **Especificação dos Campos Aditivos de Telemetria (Fase 2 / Sessão & Rastreabilidade)**:
+> - `session_id` (string): correlaciona todos os eventos de um mesmo chat/sessão do início ao fim. DEVE reaproveitar o identificador de sessão já emitido pelo hook `.github/hooks/context-mode.json` no evento `sessionStart` (variantes `sessionStart` e `SessionStart`, disparado via comando `context-mode hook jetbrains-copilot sessionstart` / `claude-code`). É terminantemente proibido criar qualquer mecanismo de ID de sessão paralelo.
+> - `sequence_index` (inteiro): ordenação sequencial determinística dos eventos emitidos dentro da sessão corrente, permitindo a reconstrução exata da timeline.
+> - `call_stack_depth` (inteiro): profundidade do handoff ou subagent na árvore hierárquica de chamadas, essencial para contenção de aninhamento excessivo e disparo de Circuit Breaker.
+> - `outcome_summary` (string curta): síntese do resultado da transição (ex.: `"sucesso"`, `"desvio_detectado"`, `"loop_excedido"`, `"rejeicao_guardrail"`).
+> - **Garantia de Retrocompatibilidade**: todos os 4 novos campos são estritamente aditivos e opcionais. A ausência de qualquer um deles em registros indexados anteriormente não quebra consultas via `ctx_search`, relatórios de auditoria nem parsers de mineração de evals.
+>
+> **Consulta e Pruning**: consulte via `ctx_search(queries: ["[INTENT_DRIFT]"], source: "handoff-telemetry:<projeto>")`. O ciclo de vida desta telemetria segue a política de retenção episódica com segmentação por tag (conforme `agent-memory-policy`).
 
 ---
 
-### 2.4) Intake Guardrail & Circuit Breaker em Runtime
+### 2.5) Intake Guardrail & Circuit Breaker em Runtime
 
 Para mitigar riscos de *Excessive Agency* (OWASP Agentic AI) e loops de execução não intencionais entre agentes (A → B → A), todo fluxo de handoff deve operar sob dois mecanismos de contenção em runtime:
 
@@ -272,7 +284,7 @@ Quando o Circuit Breaker desarmar ou a cadeia abortar por erro irrecuperável du
 
 ---
 
-### 2.5) Governança de Context Engineering & Offloading de Artefatos em Handoffs (2026)
+### 2.6) Governança de Context Engineering & Offloading de Artefatos em Handoffs (2026)
 
 O aumento da complexidade de workflows multi-agente exige a transição formal de "Prompt Engineering" para **Context Engineering** (*Write, Select, Compress, Isolate*), garantindo eficiência de custos, preservação de KV-cache e prevenção de *Context Poisoning*.
 

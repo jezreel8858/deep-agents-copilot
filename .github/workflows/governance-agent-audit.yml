@@ -1,0 +1,94 @@
+name: Governance · Agent Audit
+
+# Subtask 25 do PLANO_DECOMPOSICAO_COPILOT_SDK_HEADLESS_RUNNER.md (Fase PoC, Bloco C).
+# Runner headless (governance-runner) para o caso de uso "agent-audit", read-only.
+# Conclusão sempre `neutral` nesta fase — nunca bloqueia merge (ver blueprint §5.4/§11).
+#
+# Escopo restrito (custo/credits): dispara SOMENTE em PR de `develop` para `main`
+# (nunca em PRs de feature branch para develop) — filtro duplo: `branches: [main]`
+# no gatilho (base) + `head.ref == 'develop'` na condicao do job.
+#
+# Feature-flag de ativacao (sem editar este arquivo): variavel de repositorio
+# `vars.GOVERNANCE_AGENT_AUDIT_ENABLED`. Default (variavel ausente) = DESATIVADO
+# (opt-in seguro — zero consumo de premium requests ate ativacao explicita).
+# Ativar/desativar em: Settings > Secrets and variables > Actions > Variables >
+# `GOVERNANCE_AGENT_AUDIT_ENABLED` = "true" / "false" (ou remover a variavel).
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/agents/**'
+      - '.github/skills/**'
+      - '.github/prompts/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+  copilot-requests: write
+
+concurrency:
+  group: agent-audit-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    # Guardrails: (1) feature-flag opt-in via variavel de repositorio (custo/credits);
+    # (2) restrito a PR develop->main; (3) nunca em PR de fork (sem secrets);
+    # (4) nunca em PR ainda em rascunho (RK-04).
+    if: >
+      vars.GOVERNANCE_AGENT_AUDIT_ENABLED == 'true' &&
+      github.event.pull_request.base.ref == 'main' &&
+      github.event.pull_request.head.ref == 'develop' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      !github.event.pull_request.draft
+    runs-on: ubuntu-latest
+    services:
+      otel:
+        image: otel/opentelemetry-collector-contrib
+        ports:
+          - 4318:4318
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Instalar governance-runner
+        run: pip install -e "tools/headless-governance-runner[sdk,otel,dev]"
+
+      - name: Baixar runtime do Copilot SDK
+        # Wheels publicadas do github-copilot-sdk incluem versao de runtime
+        # pinada, mas o binario e baixado separadamente (README oficial).
+        run: python -m copilot download-runtime
+
+      - name: Gate mecânico — suíte determinística de roteamento
+        # Nenhum premium request é gasto se o motor de roteamento estiver quebrado.
+        run: pytest tools/headless-governance-runner -q
+
+      - name: Executar auditoria de governança (agent-audit)
+        run: >
+          governance-runner
+          --use-case agent-audit
+          --base "${{ github.event.pull_request.base.sha }}"
+          --report checks,pr-comment
+          --repo "${{ github.repository }}"
+          --sha "${{ github.event.pull_request.head.sha }}"
+          --pr-number "${{ github.event.pull_request.number }}"
+        env:
+          # Q-01 (autenticação do Copilot SDK em CI, resolvida via @deep-search nesta sessão):
+          # usar token dedicado (GitHub App / fine-grained PAT com "Copilot Requests: write"
+          # em conta de serviço com licença Copilot) OU BYOK. GITHUB_TOKEN padrão só funciona
+          # com `permissions: copilot-requests: write` + política de org "billed to organization".
+          COPILOT_SDK_TOKEN: ${{ secrets.COPILOT_SDK_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+          OTEL_EXPORTER_OTLP_ENDPOINT: http://localhost:4318
+          GOV_MAX_PREMIUM_REQUESTS: '15'
+

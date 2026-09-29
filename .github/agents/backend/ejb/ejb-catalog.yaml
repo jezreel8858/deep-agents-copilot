@@ -39,16 +39,16 @@ agents:
       - "cmt bmt"
       - "transacao jta"
     tools:
-      - "file_search"
-      - "grep_search"
-      - "list_dir"
-      - "ask_questions"
-      - "run_subagent"
-      - "context-mode/ctx_search"
-      - "context-mode/ctx_execute"
-      - "context-mode/ctx_batch_execute"
-      - "context-mode/ctx_execute_file"
-      - "context-mode/ctx_index"
+    - file_search
+    - grep_search
+    - list_dir
+    - ask_questions
+    - run_subagent
+    - context-mode/ctx_search
+    - context-mode/ctx_execute
+    - context-mode/ctx_batch_execute
+    - context-mode/ctx_execute_file
+    - context-mode/ctx_index
     skills:
       - "java-jdk-backend-governance"
       - "specialist-hybrid-advisory-implementation-patterns"
@@ -58,7 +58,7 @@ agents:
 
   ejb-feature-developer:
     id: "ejb-feature-developer"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "implementer"
     domain: "Desenvolvimento e manutenção de Session Beans (Stateless/Stateful), MDBs, interfaces remotas/locais e DTOs POJO"
     description: "Desenvolvedor de features EJB: implementa @Stateless, @Stateful, @MessageDriven (JMS), DAOs JDBC/JPA e DTOs sob TDD com JUnit 4/5 e Mockito."
@@ -71,18 +71,18 @@ agents:
       - "ejb local remote"
       - "tdd ejb"
     tools:
-      - "file_search"
-      - "grep_search"
-      - "list_dir"
-      - "ask_questions"
-      - "run_subagent"
-      - "get_errors"
-      - "run_in_terminal"
-      - "context-mode/ctx_execute"
-      - "context-mode/ctx_search"
-      - "context-mode/ctx_batch_execute"
-      - "context-mode/ctx_index"
-      - "context-mode/ctx_execute_file"
+    - file_search
+    - grep_search
+    - list_dir
+    - ask_questions
+    - run_subagent
+    - get_errors
+    - run_in_terminal
+    - context-mode/ctx_execute
+    - context-mode/ctx_search
+    - context-mode/ctx_batch_execute
+    - context-mode/ctx_index
+    - context-mode/ctx_execute_file
     skills:
       - "java-jdk-backend-governance"
       - "terminal-governance"
@@ -91,7 +91,7 @@ agents:
 
   ejb-bug-fixer:
     id: "ejb-bug-fixer"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "fixer"
     domain: "Correções cirúrgicas de TransactionRolledbackLocalException, ConcurrentAccessTimeoutException, vazamentos de Stateful Beans e bugs de concorrência"
     description: "Especialista em resolução rápida de bugs EJB: corrige falhas transacionais CMT/BMT, deadlocks de concorrência e exceptions de serialização com diff mínimo."
@@ -220,7 +220,7 @@ agents:
 
   ejb-test-fixer:
     id: "ejb-test-fixer"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "fixer"
     domain: "Diagnóstico e resolução de suítes de teste de contêiner EJB quebradas no Maven/Ant"
     description: "Diagnostica e corrige falhas em builds legados: NamingException em lookups JNDI, incompatibilidades de InitialContext, vazamentos de memória em suites de teste."

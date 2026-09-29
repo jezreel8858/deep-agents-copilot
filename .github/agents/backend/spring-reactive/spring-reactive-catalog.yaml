@@ -38,16 +38,16 @@ agents:
       - "r2dbc"
       - "backpressure"
     tools:
-      - "file_search"
-      - "grep_search"
-      - "list_dir"
-      - "ask_questions"
-      - "run_subagent"
-      - "context-mode/ctx_search"
-      - "context-mode/ctx_execute"
-      - "context-mode/ctx_batch_execute"
-      - "context-mode/ctx_execute_file"
-      - "context-mode/ctx_index"
+    - file_search
+    - grep_search
+    - list_dir
+    - ask_questions
+    - run_subagent
+    - context-mode/ctx_search
+    - context-mode/ctx_execute
+    - context-mode/ctx_batch_execute
+    - context-mode/ctx_execute_file
+    - context-mode/ctx_index
     skills:
       - "spring-reactive-webflux-patterns"
       - "java-jdk-backend-governance"
@@ -57,7 +57,7 @@ agents:
 
   spring-reactive-feature-developer:
     id: "spring-reactive-feature-developer"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "implementer"
     domain: "Desenvolvimento de endpoints reativos, pipelines funcionais WebFlux, R2DBC e DTOs Records via TDD"
     description: "Desenvolvedor de features: cria RouterFunctions/Controllers reativos, pipelines não-bloqueantes com Mono/Flux, R2DBC e Records sob TDD."
@@ -69,18 +69,18 @@ agents:
       - "tdd reativo"
       - "routerfunction"
     tools:
-      - "file_search"
-      - "grep_search"
-      - "list_dir"
-      - "ask_questions"
-      - "run_subagent"
-      - "get_errors"
-      - "run_in_terminal"
-      - "context-mode/ctx_execute"
-      - "context-mode/ctx_search"
-      - "context-mode/ctx_batch_execute"
-      - "context-mode/ctx_index"
-      - "context-mode/ctx_execute_file"
+    - file_search
+    - grep_search
+    - list_dir
+    - ask_questions
+    - run_subagent
+    - get_errors
+    - run_in_terminal
+    - context-mode/ctx_execute
+    - context-mode/ctx_search
+    - context-mode/ctx_batch_execute
+    - context-mode/ctx_index
+    - context-mode/ctx_execute_file
     skills:
       - "spring-reactive-implementation-patterns"
       - "spring-reactive-webflux-patterns"
@@ -90,7 +90,7 @@ agents:
 
   spring-reactive-bug-fixer:
     id: "spring-reactive-bug-fixer"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "fixer"
     domain: "Correções cirúrgicas de bloqueios acidentais em Event Loop, vazamentos de Subscription e falhas de fluxo reativo"
     description: "Especialista em resolução rápida de bugs reativos: detecta e remove bloqueios acidentais no Netty, corrige onErrorResume e memory leaks de buffer com diff mínimo."
@@ -121,19 +121,20 @@ agents:
       - "context-mode"
       - "efficient-batch-code-modification"
 
-  spring-reactive-resilience-tuner:
-    id: "spring-reactive-resilience-tuner"
+  spring-reactive-perf-tuner:
+    id: "spring-reactive-perf-tuner"
     model: "Gemini 3.8 Flash"
     role: "performance"
-    domain: "Ajuste de resiliência, backpressure, circuit breakers (Resilience4j), connection pool R2DBC e dimensionamento Netty"
-    description: "Especialista em resiliência: configura backpressure com onBackpressureDrop/Buffer, Circuit Breakers, rate limiters e dimensionamento de threads Netty."
+    domain: "Profiling e tuning de backpressure, schedulers, pipelines Mono/Flux e detecção de bloqueio de event-loop Netty"
+    description: "Especialista em profiling e resiliência reativa: calibra limitRate/buffer strategies, dimensiona Schedulers (boundedElastic vs parallel), perfila pipelines sob carga, detecta bloqueio do event-loop com BlockHound e integra Circuit Breakers/Rate Limiters/Retries com Resilience4j reativo."
     keywords:
-      - "backpressure webflux"
-      - "resilience4j spring"
-      - "circuit breaker reativo"
-      - "performance netty"
-      - "r2dbc pool"
-      - "tuning reativo"
+      - "profiling webflux"
+      - "backpressure tuning"
+      - "scheduler boundedelastic"
+      - "blockhound"
+      - "flatmap concurrency"
+      - "netty event loop performance"
+      - "r2dbc pool sizing"
     tools:
       - "file_search"
       - "grep_search"
@@ -220,7 +221,7 @@ agents:
 
   spring-reactive-test-fixer:
     id: "spring-reactive-test-fixer"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "fixer"
     domain: "Diagnóstico e resolução de suítes de teste reativas quebradas por timeouts, sinais inesperados ou race conditions"
     description: "Analisa relatórios de falha de StepVerifier, corrige asserções fora de ordem, cancelamentos prematuros de subscription e timeouts em testes assíncronos."

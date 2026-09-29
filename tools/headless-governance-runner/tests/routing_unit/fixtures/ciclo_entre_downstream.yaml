@@ -1,0 +1,28 @@
+version: "1.0"
+nos:
+  - id: agent-router
+    tipo: entry_point
+    descricao: "Entry point"
+  - id: refactor-planner
+    tipo: downstream
+    descricao: "Planeja refatoração"
+  - id: code-review
+    tipo: downstream
+    descricao: "Revisa código"
+workflows: []
+arestas:
+  - de: agent-router
+    para: refactor-planner
+    prioridade: 1
+    threshold_score: 0.9
+    nivel_routing: rule-based
+  - de: refactor-planner
+    para: code-review
+    prioridade: 1
+    threshold_score: 0.8
+    nivel_routing: rule-based
+  - de: code-review
+    para: refactor-planner
+    prioridade: 1
+    threshold_score: 0.8
+    nivel_routing: rule-based

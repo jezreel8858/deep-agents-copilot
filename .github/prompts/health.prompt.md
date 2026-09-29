@@ -1,6 +1,6 @@
 ---
 name: health
-description:
+description: >-
   Verifica saúde completa da infraestrutura de governança. Valida catalog.yaml,
   .index.json, binding context, agents acessíveis e sincronização entre arquivos.
   Vai além do /ctx-doctor (que cobre apenas Context Mode MCP).

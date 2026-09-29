@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "governance-runner"
+version = "0.1.0"
+description = "Motor determinístico de roteamento/governança (routing/) e runner headless (CI) do Copilot SDK. Ver docs/architecture/BLUEPRINT_COPILOT_SDK_HEADLESS_RUNNER.md."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Proprietary" }
+dependencies = [
+    "PyYAML>=6.0",
+    "jsonschema>=4.20.0",
+]
+
+[project.optional-dependencies]
+# Extra "sdk": pacote real do Copilot SDK (confirmado via @deep-search —
+# github/copilot-sdk, PyPI `github-copilot-sdk`, modulo importavel `copilot`).
+# Requer runtime baixado apos a instalacao: `python -m copilot download-runtime`.
+sdk = ["github-copilot-sdk>=1.0.0"]
+# Extra "otel": instrumentação de telemetria OTel GenAI do runner (subtasks futuras, Bloco C+).
+otel = []
+dev = [
+    "pytest>=8.0",
+    "mypy>=1.8",
+]
+
+[project.scripts]
+governance-runner = "governance_runner.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/routing_unit", "tests/runner_unit"]
+
+[tool.mypy]
+strict = true
+python_version = "3.11"

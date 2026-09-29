@@ -1,6 +1,6 @@
 ---
 name: add-project-context
-description: 
+description: >-
   DESCOBERTA DE PROJETO — Execute DEPOIS de `/init-context`.
   Orquestra descoberta estruturada de projeto com Intent Classification + Multi-Query RRF.
   Análise estática offline → geração automática de YAML/Markdown → validação e binding atômico.

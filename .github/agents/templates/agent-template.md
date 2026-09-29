@@ -2,10 +2,13 @@
 name: <slug-kebab-case>
 description: >-
   <Descrição concisa em 3ª pessoa, ≤ 400 caracteres. Explica O QUÊ o agente faz, QUANDO deve ser invocado (frase-gatilho) e principal limite negativo.>
-# Seleção de Modelo (governance-factory-patterns/SKILL.md §9):
-# - "Gemini 3.8 Flash" -> Perfil Procedural / Operacional / SLM de alta velocidade (padrão para executores, fixers, test-writers)
-# - "Claude Sonnet 5"  -> Perfil Decompositivo / Deliberativo / Raciocínio Guiado (arquitetura, planejamento, routers centrais)
-# - "Claude Opus 5.5"  -> Perfil Raciocínio Crítico Avançado / Arquitetura Complexa / Debug Profundo (tech-solution-architect, debugger)
+# Seleção de Modelo (governance-factory-patterns/SKILL.md §9 e R-021):
+# - "Gemini 3.8 Flash" -> Perfil Procedural / Operacional / SLM de alta velocidade (padrão para executores leves e test-writers)
+# - "Claude Sonnet 5"  -> Perfil Decompositivo / Deliberativo / Raciocínio Guiado (arquitetura, planejamento, feature-developers, bug-fixers, test-fixers)
+# NOTA DE GOVERNANÇA (R-021 — Model Routing Signal):
+# É PROIBIDO fixar 'model:' permanentemente em tier premium ("Claude Opus" ou equivalente de tier máximo) para papéis de
+# execução contínua/genérica. O escalonamento é sempre PONTUAL (por chamada/tarefa via sinal 🧠 em run_subagent), nunca permanente.
+# Exceções estritas de catálogo requerem 'model_exception_reason:' formalizado (ex.: debugger, tech-solution-architect).
 model: "Gemini 3.8 Flash"
 # Tools: Princípio de menor privilégio. run_subagent é OBRIGATÓRIO por R-042.
 # Se run_in_terminal for declarado em tools, é OBRIGATÓRIO incluir .github/skills/terminal-governance/SKILL.md em source_docs (R-049).
@@ -37,6 +40,7 @@ Você é o `<Nome Humano>`, especialista em `<domínio/papel>`. Sua postura é e
 - <Responsabilidade principal 2 com ferramentas permitidas>
 - O uso de context-mode (ctx_execute, ctx_execute_file, ctx_batch_execute, ctx_index, ctx_search) é 100% OBRIGATÓRIO tanto para LEITURAS quanto para MODIFICAÇÃO/CRIAÇÃO de arquivos SEMPRE que a ferramenta context-mode estiver disponível no ambiente (R-008 / R-056) se atuar como agente operacional/mutador.
 - ✅ Executar modificações e leituras compulsoriamente via script no sandbox do `context-mode` (`ctx_execute` / `ctx_execute_file`). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
+- ✅ Execução de testes com Zero-Noise Test Policy (terminal-governance/SKILL.md §3.1): priorizar ctx_execute (Think in Code) para capturar apenas resumo/erros; se usar terminal, é obrigatório modo silencioso (-q/--silent) e filtro via pipe (grep/Select-String). Jamais rodar comando de teste bare.
 - <Padrão de validação e garantia de qualidade>
 
 ### ❌ O que este agente NUNCA faz (Não-Escopo)
@@ -116,6 +120,7 @@ Agente Ativo: <slug-kebab-case>
 4. **Comandos curtos não suspendem a regra**: Prompts curtos ("prosseguir", "continue", "pode seguir") NÃO isentam o agente do limiar >= 2 nem do context-mode em lote — a regra vincula-se ao escopo da tarefa, nunca ao tamanho do prompt.
 5. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions, vedando loops investigativos de dívida de tokens O(N^2).
 6. **Warm Start Compulsório & Batch Querying (R-060)**: Ferramentas locais que dependem de índices ou bases pré-computadas devem verificar e inicializar a base silenciosamente no primeiro comando (build-if-missing). É proibido disparar consultas granulares individuais para múltiplos nós — agrupe todas as pesquisas via chamadas em lote (batch_query, ctx_batch_execute, script iterativo) com destilação semântica e truncamento na borda (Edge Truncation).
+7. **Emissão Obrigatória de Telemetria de Handoff (R-042 / handoff-governance § 2.4)**: a cada chamada real de `run_subagent`, emitir compulsoriamente um evento `telemetry_entry` (tag `[HANDOFF]`) via `ctx_index`, incluindo `session_id` (reaproveitado do `sessionStart` do hook `context-mode`) e `sequence_index` (ordenação determinística dentro da sessão).
 </execution_protocol>
 
 ## 🔄 Retorno ao Router (R-042 — Anti Sticky-Session)
@@ -145,9 +150,11 @@ Retorne IMEDIATAMENTE para `@agent-router` caso a solicitação fuja do escopo d
 - Evitar mutações em arquivos compartilhados sem necessidade comprovada.
 
 ### Anti-padrões a Evitar
+- Ao criar/revisar agent com perfil de bug-fixer, perf-tuner ou test-fixer: é COMPULSÓRIO incluir (1) Blast-Radius Check (buscar chamadores/dependentes) ANTES de aplicar o diff mínimo; (2) para perf-tuner, baseline mensurado ANTES/DEPOIS da mudança + gate de aprovação humana (`ask_questions`) para mudanças de performance irrevogáveis em produção (canary/staging); (3) para test-fixer, heurística de classificação bug-real-vs-drift e CAP RÍGIDO de no máximo 2 tentativas de correção antes de escalar para `@bug-triage` — omissão destas 3 salvaguardas é gap sistêmico recorrente (R-055 Q2, auditoria `@agent-auditor`).
 | Anti-padrão | Impacto | Prática Correta |
 |---|---|---|
 | Assumir requisitos ocultos | Retrabalho e quebra de contratos | Solicitar clarificação ou ater-se ao explícito |
+| Fixar modelo tier premium (Opus) no catálogo | Violação de R-021 e alto custo contínuo | Manter Flash/Sonnet como baseline; escalonar pontualmente via sinal 🧠 em subagent |
 | Esquecer banner de visibilidade | Perda de rastreabilidade do fluxo | Abrir com `Agente Ativo: <slug-kebab-case>` |
 | Omitir `run_subagent` no frontmatter | Incapacidade de retorno ao router (violação R-042) | Manter `run_subagent` sempre na lista de tools |
 | Encerramento passivo sem tools | Violação de R-047 (Dead-End) | Invocar obrigatoriamente `run_subagent` ou `ask_questions` |

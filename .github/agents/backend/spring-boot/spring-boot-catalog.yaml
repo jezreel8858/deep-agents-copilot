@@ -39,16 +39,16 @@ agents:
       - "upgrade spring"
       - "migracao spring boot"
     tools:
-      - "file_search"
-      - "grep_search"
-      - "list_dir"
-      - "ask_questions"
-      - "run_subagent"
-      - "context-mode/ctx_search"
-      - "context-mode/ctx_execute"
-      - "context-mode/ctx_batch_execute"
-      - "context-mode/ctx_execute_file"
-      - "context-mode/ctx_index"
+    - file_search
+    - grep_search
+    - list_dir
+    - ask_questions
+    - run_subagent
+    - context-mode/ctx_search
+    - context-mode/ctx_execute
+    - context-mode/ctx_batch_execute
+    - context-mode/ctx_execute_file
+    - context-mode/ctx_index
     skills:
       - "spring-boot-backend-patterns"
       - "java-jdk-backend-governance"
@@ -58,7 +58,7 @@ agents:
 
   spring-boot-feature-developer:
     id: "spring-boot-feature-developer"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "implementer"
     domain: "Desenvolvimento de endpoints REST, services transacionais, DTOs Records e repositories JPA via TDD estrito"
     description: "Desenvolvedor de features: cria controllers REST (/v1/), services transacionais, entidades Jakarta Persistence e DTOs Records sob TDD."
@@ -71,18 +71,18 @@ agents:
       - "record dto"
       - "tdd spring"
     tools:
-      - "file_search"
-      - "grep_search"
-      - "list_dir"
-      - "ask_questions"
-      - "run_subagent"
-      - "get_errors"
-      - "run_in_terminal"
-      - "context-mode/ctx_execute"
-      - "context-mode/ctx_search"
-      - "context-mode/ctx_batch_execute"
-      - "context-mode/ctx_index"
-      - "context-mode/ctx_execute_file"
+    - file_search
+    - grep_search
+    - list_dir
+    - ask_questions
+    - run_subagent
+    - get_errors
+    - run_in_terminal
+    - context-mode/ctx_execute
+    - context-mode/ctx_search
+    - context-mode/ctx_batch_execute
+    - context-mode/ctx_index
+    - context-mode/ctx_execute_file
     skills:
       - "spring-boot-implementation-patterns"
       - "test-implementation-spring-boot"
@@ -91,7 +91,7 @@ agents:
 
   spring-boot-bug-fixer:
     id: "spring-boot-bug-fixer"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "fixer"
     domain: "Correções cirúrgicas de exceptions de runtime, transações e bugs em produção"
     description: "Especialista em resolução rápida de bugs: corrige BusinessException, LazyInitializationException, rollbacks incorretos e deadlocks com diff mínimo e teste de regressão."
@@ -221,7 +221,7 @@ agents:
 
   spring-boot-test-fixer:
     id: "spring-boot-test-fixer"
-    model: "Gemini 3.8 Flash"
+    model: "Claude Sonnet 5"
     role: "fixer"
     domain: "Diagnóstico e autocorreção de logs de falha de testes em Maven/Gradle"
     description: "Analisa relatórios de falhas de suítes de teste Java, corrige falhas de Mockito, quebras de contexto Spring e fixtures desatualizadas."

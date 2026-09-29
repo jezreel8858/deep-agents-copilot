@@ -1,0 +1,18 @@
+version: "1.0"
+nos:
+  - id: agent-router
+    tipo: entry_point
+    descricao: "Entry point"
+  - id: bug-triage
+    tipo: downstream
+    descricao: "Alcançável"
+  - id: adapter-generator
+    tipo: downstream
+    descricao: "Órfão — invocado apenas via slash-command, sem aresta de entrada (gap real observado em produção)"
+workflows: []
+arestas:
+  - de: agent-router
+    para: bug-triage
+    prioridade: 1
+    threshold_score: 0.9
+    nivel_routing: rule-based

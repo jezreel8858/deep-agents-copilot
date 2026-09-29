@@ -1,0 +1,100 @@
+version: "1.0"
+description: "Fixture reduzida para testes unitários de graph_loader."
+last_updated: "2026-01-01"
+
+nos:
+  - id: agent-router
+    tipo: entry_point
+    descricao: "Entry point único"
+  - id: binding-initializer
+    tipo: health_check
+    descricao: "Health check pré-triagem"
+  - id: prompt-structuring
+    tipo: mandatory_pre_step
+    descricao: "Pré-passo obrigatório de estruturação"
+  - id: python-router
+    tipo: domain_router
+    descricao: "Domain router de stack Python"
+  - id: bug-triage
+    tipo: downstream
+    descricao: "Triagem de bugs"
+  - id: code-review
+    tipo: downstream
+    descricao: "Revisão de código"
+  - id: deep-search
+    tipo: fallback
+    descricao: "Fallback de pesquisa"
+
+convencao_papeis_genericos:
+  descricao: "Nomes specialist-<papel> são aliases genéricos resolvidos pelo domain router ativo."
+  excecao: "database-specialist é agente único cross-stack."
+
+workflows:
+  - id: WORKFLOW-BUG-FIX
+    nome: "Resolução de Bugs"
+    regra: "R-050"
+    fast_path: true
+    gatilhos: ["bug", "erro"]
+    estados:
+      - etapa: 1
+        nome: "triage_and_root_cause"
+        agent: "bug-triage"
+      - etapa: 2
+        nome: "implementation"
+        agent: "domain-router | specialist-bug-fixer"
+        checkpoint_humano: "ask_questions"
+      - etapa: 3
+        nome: "review"
+        agent: "code-review"
+  - id: WORKFLOW-TECHNICAL-ANALYSIS
+    nome: "Análise Técnica"
+    estados:
+      - etapa: 1
+        nome: "fan_out_analysis"
+        agents_permitidos: ["code-review", "deep-search"]
+
+arestas:
+  - de: agent-router
+    para: binding-initializer
+    prioridade: 0
+    threshold_score: 0
+    nivel_routing: rule-based
+    condicoes:
+      tipo: health_check
+      regra: "R-034"
+      gatilho: "instructions ausentes"
+  - de: agent-router
+    para: bug-triage
+    prioridade: 1
+    threshold_score: 0.9
+    nivel_routing: rule-based
+    condicoes:
+      keywords: ["bug", "erro"]
+      sinal_r006: "É bug?"
+  - de: agent-router
+    para: python-router
+    prioridade: 1
+    threshold_score: 0.9
+    nivel_routing: rule-based
+    condicoes:
+      keywords: ["python"]
+  - de: python-router
+    para: code-review
+    prioridade: 1
+    threshold_score: 0.8
+    nivel_routing: rule-based
+  - de: bug-triage
+    para: code-review
+    prioridade: 1
+    threshold_score: 0.8
+    nivel_routing: rule-based
+  - de: "*downstream"
+    para: agent-router
+    prioridade: 0
+    threshold_score: 0
+    nivel_routing: rule-based
+    condicoes:
+      tipo: intent_drift_detected
+      regra: "R-042"
+      aplica_a: "todos os nos tipo downstream"
+      acao: "handoff imediato para agent-router"

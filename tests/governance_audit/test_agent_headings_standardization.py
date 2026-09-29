@@ -140,7 +140,7 @@ def test_template_has_exact_standardized_h1(template_path: Path):
 # ─────────────────────────────────────────────────────────────
 
 def test_coverage_exhaustion_count():
-    """Garante que a suíte auditou exatamente os 86 agents e 4 templates do repositório."""
+    """Garante que a suíte auditou exatamente os 87 agents e 4 templates do repositório."""
     agents = get_all_agent_files()
     templates = get_all_template_files()
     

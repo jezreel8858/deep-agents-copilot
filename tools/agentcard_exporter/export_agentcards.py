@@ -1,11 +1,22 @@
 """
 AgentCard Exporter — A2A Standard (Linux Foundation v1.0.0 / IETF draft-aevum-agentcard-00)
 Exporta metadados dos catálogos de agentes em .github/agents/ para o padrão aberto AgentCard.
+
+Guard-rails de Execução (R-051 / R-040):
+    python tools/agentcard_exporter/export_agentcards.py            # modo --check (default: fail-safe, exit code 1 se drift)
+    python tools/agentcard_exporter/export_agentcards.py --check    # modo CI explícito
+    python tools/agentcard_exporter/export_agentcards.py --dry-run  # simulação com visualização de diffs sem gravar em disco
+    python tools/agentcard_exporter/export_agentcards.py --apply    # aplica gravação em .a2a/agentcards/
 """
 
+from __future__ import annotations
+
+import argparse
+import difflib
 import json
 import os
 import glob
+import sys
 from pathlib import Path
 from typing import Dict, Any, List
 import yaml
@@ -125,16 +136,22 @@ def convert_agent_to_agentcard(agent_id: str, data: Dict[str, Any], catalog_path
     return card
 
 
-def export_all_agentcards() -> Dict[str, Any]:
-    """Varre todos os catálogos e gera os arquivos AgentCard JSON."""
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
+def export_all_agentcards(mode: str = "apply") -> Dict[str, Any]:
+    """
+    Gera AgentCards a partir dos catálogos.
+    Modos:
+      - 'apply': grava arquivos em disco (.a2a/agentcards/)
+      - 'check': apenas verifica drift e validade de schema sem gravar nada
+      - 'dry-run': calcula e exibe diffs sem gravar nada
+    """
     with open(SCHEMA_PATH, "r", encoding="utf-8") as f:
         schema = json.load(f)
 
     catalog_files = glob.glob(str(AGENTS_DIR / "**/*catalog*.yaml"), recursive=True)
-    exported = {}
-    validation_errors = []
+    exported: Dict[str, Any] = {}
+    validation_errors: List[str] = []
+    drifted: List[str] = []
+    diff_outputs: List[str] = []
 
     for cpath_str in catalog_files:
         cpath = Path(cpath_str)
@@ -146,7 +163,6 @@ def export_all_agentcards() -> Dict[str, Any]:
                 continue
             card = convert_agent_to_agentcard(aid, adata, cpath)
 
-            # Validar contra o schema
             try:
                 jsonschema.validate(instance=card, schema=schema)
             except jsonschema.ValidationError as err:
@@ -154,32 +170,121 @@ def export_all_agentcards() -> Dict[str, Any]:
                 continue
 
             card_file = OUTPUT_DIR / f"{aid}.agentcard.json"
-            with open(card_file, "w", encoding="utf-8") as out:
-                json.dump(card, out, indent=2, ensure_ascii=False)
+            new_content = json.dumps(card, indent=2, ensure_ascii=False) + "\n"
+
+            if not card_file.is_file():
+                drifted.append(f"{aid} (arquivo ausente em disco)")
+                if mode == "dry-run":
+                    diff_outputs.append(f"[NOVO] {card_file.name}")
+            else:
+                old_content = card_file.read_text(encoding="utf-8")
+                # Comparação normalizada
+                if json.loads(old_content) != card:
+                    drifted.append(f"{aid} (conteúdo divergente)")
+                    if mode == "dry-run":
+                        diff = difflib.unified_diff(
+                            old_content.splitlines(keepends=True),
+                            new_content.splitlines(keepends=True),
+                            fromfile=f"a/{card_file.name}",
+                            tofile=f"b/{card_file.name}",
+                        )
+                        diff_outputs.append("".join(diff))
+
+            if mode == "apply":
+                OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+                with open(card_file, "w", encoding="utf-8") as out:
+                    out.write(new_content)
+
             exported[aid] = card
 
-    # Gerar índice consolidado
+    # Validar index consolidado
     index_file = OUTPUT_DIR / "agentcards.index.json"
     index_data = {
         "protocol": "A2A/1.0.0",
         "total_agentcards": len(exported),
-        "agents": {aid: {"name": c["name"], "role": c["role"], "domain": c["domain"], "version": c["version"]} for aid, c in exported.items()}
+        "agents": {
+            aid: {"name": c["name"], "role": c["role"], "domain": c["domain"], "version": c["version"]}
+            for aid, c in sorted(exported.items())
+        }
     }
-    with open(index_file, "w", encoding="utf-8") as out:
-        json.dump(index_data, out, indent=2, ensure_ascii=False)
+    index_content = json.dumps(index_data, indent=2, ensure_ascii=False) + "\n"
+    if not index_file.is_file():
+        drifted.append("agentcards.index.json (ausente em disco)")
+    else:
+        old_idx = index_file.read_text(encoding="utf-8")
+        if json.loads(old_idx) != index_data:
+            drifted.append("agentcards.index.json (conteúdo divergente)")
+            if mode == "dry-run":
+                diff = difflib.unified_diff(
+                    old_idx.splitlines(keepends=True),
+                    index_content.splitlines(keepends=True),
+                    fromfile="a/agentcards.index.json",
+                    tofile="b/agentcards.index.json",
+                )
+                diff_outputs.append("".join(diff))
+
+    if mode == "apply":
+        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+        with open(index_file, "w", encoding="utf-8") as out:
+            out.write(index_content)
 
     return {
         "total_exported": len(exported),
         "output_dir": str(OUTPUT_DIR),
-        "validation_errors": validation_errors
+        "validation_errors": validation_errors,
+        "drifted": drifted,
+        "diff_outputs": diff_outputs,
+        "mode": mode
     }
 
 
-if __name__ == "__main__":
-    result = export_all_agentcards()
-    print(f"Exported {result['total_exported']} AgentCards to {result['output_dir']}")
-    if result["validation_errors"]:
-        print(f"Errors ({len(result['validation_errors'])}):")
-        for e in result["validation_errors"]:
-            print(" -", e)
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--apply", action="store_true", help="Aplica a gravação dos AgentCards atualizados em disco (.a2a/agentcards/).")
+    parser.add_argument("--dry-run", action="store_true", help="Simula a exportação e exibe diffs sem gravar nada em disco.")
+    parser.add_argument("--check", action="store_true", help="Modo CI fail-safe: exit code 1 se houver drift, não grava nada (default).")
+    args = parser.parse_args()
 
+    # Comportamento default: se nenhuma flag for informada, opera como --check (fail-safe)
+    if args.apply:
+        mode = "apply"
+    elif args.dry_run:
+        mode = "dry-run"
+    else:
+        mode = "check"
+
+    result = export_all_agentcards(mode=mode)
+    print(f"Modo: {mode}")
+    print(f"Catálogos processados: {result['total_exported']} AgentCards mapeados")
+    print(f"Drift detectado: {len(result['drifted'])}")
+
+    if result["drifted"]:
+        for d in result["drifted"]:
+            print(f"  - {d}")
+
+    if mode == "dry-run" and result["diff_outputs"]:
+        print("\nDiffs detectados:")
+        for diff in result["diff_outputs"]:
+            print(diff)
+
+    if result["validation_errors"]:
+        print(f"\nErros de validação de schema ({len(result['validation_errors'])}):")
+        for err in result["validation_errors"]:
+            print(f"  - {err}")
+
+    if mode == "check":
+        if result["drifted"] or result["validation_errors"]:
+            print("\nExecute 'python tools/agentcard_exporter/export_agentcards.py --apply' para sincronizar os AgentCards.")
+            return 1
+        print("AgentCards 100% em paridade com os catálogos (drift=0).")
+        return 0
+
+    if mode == "apply":
+        print(f"AgentCards gravados com sucesso em {result['output_dir']}.")
+        return 1 if result["validation_errors"] else 0
+
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

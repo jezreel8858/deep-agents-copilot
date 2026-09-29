@@ -1,0 +1,7 @@
+version: "1.0"
+nos:
+  - id: bug-triage
+    tipo: downstream
+    descricao: "Sem entry_point"
+workflows: []
+arestas: []

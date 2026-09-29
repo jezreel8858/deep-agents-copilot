@@ -206,24 +206,52 @@ export GIT_PAGER=cat
 
 ---
 
-## 5) Um Comando por Vez (serialização obrigatória)
+## 5) Serialização de Comandos vs Comando Potencialmente Bloqueante
 
-- **Nunca** executar dois comandos `run_in_terminal` em paralelo na mesma sessão.
-- Aguardar o output completo do comando anterior antes de executar o próximo.
-- Se comandos são independentes e não disputam recursos: agrupar em uma chamada com `&&` ou `;`.
+### 5.1) Serialização de Comandos Independentes Rápidos
+
+- Comandos independentes, rápidos e sem risco de bloqueio (leitura de estado, `git status`, `mkdir`) podem ser agrupados em uma única chamada com `&&`/`;`.
+- **Nunca** executar dois comandos `run_in_terminal` em paralelo na mesma sessão quando disputam o mesmo recurso.
 
 ```bash
 # Correto — agrupado em uma chamada
 cd projeto && npm install && echo "Instalado com sucesso"
-
-# Errado — duas chamadas run_in_terminal separadas quando podem ser agrupadas
-# Chamada 1: cd projeto
-# Chamada 2: npm install
 ```
 
 **Exceção válida para separar**: quando o output do primeiro comando determina o próximo (dependência de decisão).
 
----
+### 5.2) Comando Potencialmente Bloqueante — Watchdog Obrigatório (Correção de Antipadrão)
+
+> **Correção normativa**: versões anteriores desta skill prescreviam "aguardar o output completo do comando anterior antes do próximo" para todo comando, sem distinção. Essa prescrição genérica é o antipadrão que causa travamento indefinido de sessão quando o comando não possui timeout nativo — trata-se de comportamento publicamente documentado do client (issues relatam hang de `run_in_terminal` aguardando retorno bloqueante de scripts/processos de longa duração desconhecida). Esta seção substitui e corrige essa prescrição.
+
+**Classificação de risco**: todo script Python/Node ad-hoc, comando interativo, ou processo de duração desconhecida (sem timeout nativo embutido) é **potencialmente bloqueante** e exige as duas camadas abaixo.
+
+**A) Watchdog de tempo (timeout externo obrigatório)**
+
+| Ambiente | Wrapper obrigatório |
+|---|---|
+| Linux / WSL / Git Bash | `timeout -k <graça> <limite> <cmd>` (ex.: `timeout -k 10 120 python script.py`) |
+| PowerShell (Windows nativo) | `Start-Job { <cmd> }` + `Wait-Job -Timeout <N>` + `Stop-Job` se exceder o limite |
+
+**B) Execução não bloqueante + leitura posterior (obrigatório no client JetBrains)**
+
+- Disparar via `run_in_terminal` com `isBackground:true` — **NUNCA** aguardar retorno direto e bloqueante do comando.
+- Redirecionar saída a arquivo: `<cmd> | tee saida.log` ou `<cmd> > saida.log 2>&1`.
+- Ler o resultado posteriormente via `read_file` ou `ctx_execute_file` — nunca via `cat` direto no terminal.
+
+```bash
+# Padrão obrigatório para comando de risco (Linux/Git Bash) — isBackground:true no terminal
+timeout -k 10 120 python script.py > saida.log 2>&1 &
+```
+
+```powershell
+# Padrão obrigatório para comando de risco (PowerShell) — isBackground:true no terminal
+$job = Start-Job { python script.py *> saida.log }
+Wait-Job $job -Timeout 120 | Out-Null
+if ($job.State -eq 'Running') { Stop-Job $job }
+```
+
+- [ ] Antes de disparar comando classificado como risco, executar o checkpoint automático pré-risco definido em `agent-memory-policy/SKILL.md` § "Checkpoint Automático Pré-Risco".
 
 ## 6) Padrões Proibidos (bloqueantes absolutos)
 
@@ -241,6 +269,7 @@ cd projeto && npm install && echo "Instalado com sucesso"
 | `rm -rf` sem confirmação | Destrutivo e irreversível | Pedir aprovação explícita antes |
 | `git reset --hard` sem confirmação | Perde trabalho irreversivelmente | Pedir aprovação explícita antes |
 | `sudo` sem aprovação explícita | Escalada de privilégio não solicitada | Sempre pedir confirmação antes |
+| Aguardar retorno bloqueante direto de script/processo sem timeout nativo | Trava a sessão indefinidamente (comportamento documentado do client) | Watchdog (`timeout -k` / `Start-Job`+`Wait-Job`) + `isBackground:true` + redirect a arquivo (§ 5.2) |
 
 ---
 

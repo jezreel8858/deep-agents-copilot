@@ -1,0 +1,50 @@
+version: "1.0"
+description: "Fixture reduzida para testes do runner (agent-audit, subtask 19)."
+last_updated: "2026-01-01"
+
+nos:
+  - id: agent-router
+    tipo: entry_point
+    descricao: "Entry point unico"
+  - id: binding-initializer
+    tipo: health_check
+    descricao: "Health check pre-triagem"
+  - id: agent-auditor
+    tipo: downstream
+    descricao: "Auditoria read-only de agentes/skills/prompts sob governanca"
+
+workflows:
+  - id: WORKFLOW-GOVERNANCE-MAINTENANCE
+    nome: "Manutencao de Governanca"
+    estados:
+      - etapa: 1
+        nome: "agent_audit"
+        agent: "agent-auditor"
+
+arestas:
+  - de: agent-router
+    para: binding-initializer
+    prioridade: 0
+    threshold_score: 0
+    nivel_routing: rule-based
+    condicoes:
+      tipo: health_check
+      regra: "R-034"
+      gatilho: "instructions ausentes"
+  - de: agent-router
+    para: agent-auditor
+    prioridade: 1
+    threshold_score: 0.9
+    nivel_routing: rule-based
+    condicoes:
+      keywords: ["auditoria"]
+  - de: "*downstream"
+    para: agent-router
+    prioridade: 0
+    threshold_score: 0
+    nivel_routing: rule-based
+    condicoes:
+      tipo: intent_drift_detected
+      regra: "R-042"
+      aplica_a: "todos os nos tipo downstream"
+      acao: "handoff imediato para agent-router"

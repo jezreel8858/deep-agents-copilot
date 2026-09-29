@@ -1,19 +1,20 @@
 {
   "schemaVersion": "1.0.0",
   "protocol": "A2A/1.0.0",
-  "id": "spring-reactive-resilience-tuner",
-  "name": "Spring Reactive Resilience Tuner",
+  "id": "spring-reactive-perf-tuner",
+  "name": "Spring Reactive Perf Tuner",
   "version": "1.0.0",
-  "description": "Especialista em resiliência: configura backpressure com onBackpressureDrop/Buffer, Circuit Breakers, rate limiters e dimensionamento de threads Netty.",
-  "domain": "Ajuste de resiliência, backpressure, circuit breakers (Resilience4j), connection pool R2DBC e dimensionamento Netty",
+  "description": "Especialista em profiling e resiliência reativa: calibra limitRate/buffer strategies, dimensiona Schedulers (boundedElastic vs parallel), perfila pipelines sob carga, detecta bloqueio do event-loop com BlockHound e integra Circuit Breakers/Rate Limiters/Retries com Resilience4j reativo.",
+  "domain": "Profiling e tuning de backpressure, schedulers, pipelines Mono/Flux e detecção de bloqueio de event-loop Netty",
   "role": "specialist",
   "capabilities": [
-    "backpressure webflux",
-    "resilience4j spring",
-    "circuit breaker reativo",
-    "performance netty",
-    "r2dbc pool",
-    "tuning reativo"
+    "profiling webflux",
+    "backpressure tuning",
+    "scheduler boundedelastic",
+    "blockhound",
+    "flatmap concurrency",
+    "netty event loop performance",
+    "r2dbc pool sizing"
   ],
   "skills": [
     "agent-contracts",

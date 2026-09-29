@@ -76,3 +76,31 @@ def test_least_privilege_mcp_scoping_for_advisory_agents(agentcard_schema):
             )
             assert card["security_profile"]["least_privilege_level"] == "strict"
 
+
+
+def test_export_agentcards_cli_check_returns_zero():
+    """Garante que a execução de export_agentcards.py com --check (ou default) retorna exit code 0 e drift=0."""
+    import subprocess
+    import sys
+    script = BASE_DIR / "tools" / "agentcard_exporter" / "export_agentcards.py"
+
+    # Default sem flags (deve ser --check)
+    p_default = subprocess.run([sys.executable, str(script)], cwd=str(BASE_DIR), capture_output=True, text=True)
+    assert p_default.returncode == 0, f"export_agentcards default falhou: {p_default.stderr}"
+    assert "Drift detectado: 0" in p_default.stdout
+
+    # Com --check explícito
+    p_check = subprocess.run([sys.executable, str(script), "--check"], cwd=str(BASE_DIR), capture_output=True, text=True)
+    assert p_check.returncode == 0, f"export_agentcards --check falhou: {p_check.stderr}"
+    assert "Drift detectado: 0" in p_check.stdout
+
+
+def test_export_agentcards_cli_dry_run_returns_zero():
+    """Garante que a execução de export_agentcards.py com --dry-run executa simulação com sucesso."""
+    import subprocess
+    import sys
+    script = BASE_DIR / "tools" / "agentcard_exporter" / "export_agentcards.py"
+
+    p_dry = subprocess.run([sys.executable, str(script), "--dry-run"], cwd=str(BASE_DIR), capture_output=True, text=True)
+    assert p_dry.returncode == 0, f"export_agentcards --dry-run falhou: {p_dry.stderr}"
+    assert "Modo: dry-run" in p_dry.stdout

@@ -19,6 +19,7 @@ source_docs:
   - .github/skills/context-mode/SKILL.md
   - .github/skills/agent-evals-lab/SKILL.md
   - .github/skills/prompt-engineering-patterns/SKILL.md
+  - .github/skills/handoff-governance/SKILL.md
 ---
 
 # Perfil Operacional
@@ -168,7 +169,7 @@ Estrutura um ecossistema tecnológico completo em sua própria pasta, com isolam
    - **Gate de Validação**: Conformidade verificada pela suíte `tests/governance_audit/test_router_agents.py`.
 
 4. **Pacote Canônico de Especialistas (.agent.md)**:
-   - **Backend**: `arch-advisor`, `feature-developer`, `bug-fixer`, `perf-tuner` (ou `resilience-tuner`), `unit-test-writer`, `integration-test-writer`, `test-fixer`.
+   - **Backend**: `arch-advisor`, `feature-developer`, `bug-fixer`, `perf-tuner`, `unit-test-writer`, `integration-test-writer`, `test-fixer`.
    - **Frontend (Padrão Test-Last & Isenção de UI)**: `arch-advisor`, `feature-developer` (Test-Last / Implementation-First), `bug-fixer` (Test-Last cirúrgico), `ui-stylist` (estritamente visual, **isento de criar ou executar testes unitários**), `unit-test-writer`, `component-test-writer`, `test-fixer`, `e2e-writer`.
 
 5. **Integração Atômica Global (R-015 — obrigatória na mesma entrega)**:
@@ -276,11 +277,12 @@ Substitui `agent-factory` + `skill-factory` + `prompt-factory`, que já delegava
 4. **Comandos curtos não suspendem a regra**: Prompts curtos ("prosseguir", "continue", "pode seguir") NÃO isentam o agente do limiar >= 2 nem do context-mode em lote — a regra vincula-se ao escopo da tarefa, nunca ao tamanho do prompt.
 5. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions, vedando loops investigativos de dívida de tokens O(N²).
 6. **Warm Start Compulsório & Batch Querying (R-060)**: Ferramentas locais que dependem de índices ou bases pré-computadas devem verificar e inicializar a base silenciosamente no primeiro comando (build-if-missing). É proibido disparar consultas granulares individuais para múltiplos nós — agrupe todas as pesquisas via chamadas em lote (batch_query, ctx_batch_execute, script iterativo) com destilação semântica e truncamento na borda (Edge Truncation).
+7. **Emissão Obrigatória de Telemetria de Handoff (R-042 / handoff-governance § 2.4)**: a cada chamada real de `run_subagent`, emitir compulsoriamente um evento `telemetry_entry` (tag `[HANDOFF]`) via `ctx_index`, incluindo `session_id` (reaproveitado do `sessionStart` do hook `context-mode`) e `sequence_index` (ordenação determinística dentro da sessão).
 </execution_protocol>
 
 ## Retorno ao Router (R-042 — Anti Sticky-Session)
 
-**Banner obrigatório (visibilidade de fluxo)**: toda resposta deste agent abre com a linha `Agente Ativo: governance-factory` antes de qualquer outro conteúdo. Se esta resposta é resultado de handoff/re-triagem recebido, adicionar `Handoff: <agent-origem> → governance-factory (motivo: <motivo>)` na linha seguinte.
+**Banner obrigatório (visibilidade de fluxo)**: toda resposta deste agent abre com a linha `Agente Ativo: governance-factory` antes de qualquer outro conteúdo — mesmo sem handoff neste turno. Se esta resposta é resultado de handoff/re-triagem recebido, adicionar `Handoff: <agent-origem> → governance-factory (motivo: <motivo>)` na linha seguinte. Padrão de mercado: OpenAI Agents SDK (`HandoffOutputItem` — "Handed off from X to Y") e LangGraph (campo `active_agent` streamado ao usuário) — ver `agent-contracts/SKILL.md` seção 0.
 
 Se a solicitação pivotar de "criar/revisar artefato de governança" para "implementar aplicação", retornar para `@agent-router` com handoff (`handoff-governance/SKILL.md` § 2.1, `motivo: "deriva_de_intencao"`).
 

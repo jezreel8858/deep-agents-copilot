@@ -6,6 +6,97 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.49.0] — 2026-09-28
+
+### Adicionado — Salvaguardas de Mercado 2025/2026, Model Tiering e Blindagem por Testes
+
+- **R-064 Gate & Model Tiering em Domain Routers**: adicionada etapa obrigatória `implementation_plan_authoring` para `<stack>-arch-advisor` antes de codemod em `WORKFLOW-FRAMEWORK-MIGRATION` (`routing-graph.yaml`). Elevação do `model` para `Claude Sonnet 5` nos 6 domain routers (`ejb`, `spring-boot`, `spring-reactive`, `python`, `struts`, `angular`) por alinhamento à orquestração de fan-out (R-021.1).
+- **Fronteiras de Autoria de Testes & Paridade Test-Last**: barreira explícita proibindo autoria de testes por `*-feature-developer` em todas as 6 stacks com handoff obrigatório para test-writers. Preservação formal e blindada por teste do desvio `Test-Last` do ecossistema Angular (`excecao_dominio_frontend`). Inclusão da etapa `e2e_journey_validation` em `WORKFLOW-FEATURE-DEVELOPMENT`.
+- **Salvaguardas Operacionais 2025/2026**:
+  - `*-bug-fixer` (6 stacks): verificação obrigatória de blast radius antes do diff cirúrgico.
+  - `*-perf-tuner` (5 stacks backend): medição de baseline antes/depois e safety gate proibindo push direto sem canary/staging e aprovação humana.
+  - `*-test-fixer` (6 stacks): heurística binária (defeito real vs flakiness/drift) com cap rígido de 2 tentativas antes de escalar para o bug-fixer.
+  - `*-test-writer` (12 especialistas): mutation testing awareness e foco em boundary values / edge cases.
+  - `angular-e2e-writer`: cap de 2 tentativas de self-healing.
+- **Consolidação do Domínio Spring Reactive**: remoção do agente fora de padrão `spring-reactive-resilience-tuner`, absorvendo escopo (Resilience4j / Circuit Breaker) em `spring-reactive-perf-tuner` e restaurando a topologia canônica de 7 especialistas por stack backend (86 agentes ativos no total).
+- **Blindagem por Testes de Governança**: 10 novas suítes de testes determinísticos em `tests/governance_audit/` cobrindo todas as novas regras e topologias (suíte completa: 373 passed, 1 skipped).
+
+---
+
+## [2.48.0] — 2026-09-28
+
+### Adicionado / Resolvido — Fechamento das Pendências Não-Bloqueantes da Fase PoC (Runner Headless)
+
+- **Wiring completo dos reporters (`cli.py::main()`)**: o canal `--report checks,pr-comment` agora efetivamente publica o resultado da auditoria via Checks API (`reporters/checks.py`) e comentário sticky de PR (`reporters/pr_comment.py`), antes apenas impresso em stdout. Publicação é **fail-open**: falha em qualquer canal de reporting emite aviso em stderr mas nunca altera o exit code da auditoria (a auditoria read-only permanece sempre concluída).
+- **Novos argumentos do CLI**: `--repo` (default `$GITHUB_REPOSITORY`), `--sha` (default `$GITHUB_SHA`), `--pr-number` — necessários para os reporters identificarem onde publicar.
+- **Escopo de execução restrito por custo/credits (`governance-agent-audit.yml`)**: o workflow agora dispara **exclusivamente** em Pull Requests de `develop` para `main` (filtro duplo: `branches: [main]` no gatilho + `head.ref == 'develop'` na condição do job) — nunca mais em PRs de feature branch para `develop`.
+- **Feature-flag de ativação sem editar o workflow**: variável de repositório `vars.GOVERNANCE_AGENT_AUDIT_ENABLED` controla se o job roda. Default (variável ausente) é **desativado** — modelo opt-in seguro que garante zero consumo de premium requests até ativação explícita via Settings > Actions > Variables, sem exigir novo commit para ligar/desligar.
+- **Pendência remanescente (não bloqueante)**: confirmação manual do painel de billing/quota da conta associada ao PAT — ação humana fora do escopo de automação.
+
+---
+
+## [2.47.0] — 2026-09-28
+
+### Resolvido — Q-01 Validado Empiricamente em CI Real + Correções de Integração do Runner Headless
+
+- **Gate PoC → Piloto (subtask 26/27) APROVADO**: primeira execução real e autenticada do `governance-agent-audit.yml` contra o Copilot SDK verdadeiro em GitHub Actions (PR #55, run #6) — autenticação bem-sucedida via PAT dedicado (`COPILOT_SDK_TOKEN`, escopo "Copilot Requests: Read-only"), `veredito='neutral'`, custo `{premium_requests:1, turnos:1}` (dentro do teto `GOV_MAX_PREMIUM_REQUESTS=15`), fail-open do OTel Collector confirmado em produção (não apenas em mock).
+- **Correção de path de resolução do grafo (`cli.py`)**: `_GRAFO_PADRAO` usava `Path(__file__).parents[3]` (resolvia para `tools/`); corrigido para `parents[4]` (raiz do repositório).
+- **Integração real com o Copilot SDK implementada (`sdk_adapter.py`)**: substituída a implementação-placeholder (`NotImplementedError` pendente de confirmação de API) por uma ponte síncrona real (`_ClienteSDKReal`) sobre a API assíncrona confirmada via pesquisa externa (pacote PyPI `github-copilot-sdk`, módulo importável `copilot`, `CopilotClient(github_token=...)`, eventos `AssistantMessageData`/`SessionIdleData`), com timeout de segurança (120s), bridge do permission handler read-only e classificação heurística de falha de autenticação (`SDKAuthenticationError`).
+- **Dependência real do SDK declarada**: extra `sdk` do `pyproject.toml` (antes vazio) agora fixa `github-copilot-sdk>=1.0.0`; workflow atualizado com o passo obrigatório `python -m copilot download-runtime` e extra `dev` (pytest/mypy) incluído na instalação de CI.
+- **Correção crítica de governança de hooks (`.github/hooks/context-mode.json`)**: achado descoberto pela própria execução real do SDK — o hook `preToolUse` invocava o binário `context-mode` sem guarda de existência, causando falha do hook e **deny categórico de todo tool call** (incluindo leituras) em qualquer ambiente sem o binário instalado (ex.: runners `ubuntu-latest` de CI). Aplicada guarda defensiva (`command -v context-mode || exit 0` / `Get-Command context-mode`) nas 12 entradas de hook, tornando-as no-op silencioso fora do ambiente de desenvolvimento local, sem alterar o comportamento em máquinas com a extensão instalada.
+- **Correção de permissão inválida em workflow**: `copilot-requests: write-all` (valor inválido por-escopo, causava falha instantânea de parsing do workflow) corrigido para `copilot-requests: write`.
+- **Gaps não-bloqueantes registrados para a Fase Piloto**: confirmação manual do painel de billing/quota da conta; wiring de `--report checks,pr-comment` em `cli.py::main()` (reporters implementados mas ainda não invocados pelo entrypoint).
+- **Documentação**: `RUNBOOK_VALIDACAO_Q01_COPILOT_SDK_CI.md` §6/§7 preenchidos com evidências reais (run id, custo, trace_id, achado do hook); `PLANO_DECOMPOSICAO_COPILOT_SDK_HEADLESS_RUNNER.md` subtasks 26/27 marcadas ✅.
+
+---
+
+## [2.46.0] — 2026-09-28
+
+### Adicionado — Runner Headless Copilot SDK e Roteamento Determinístico em Código
+
+- **Motor Determinístico de Roteamento (`governance_runner.routing`)**:
+  - Implementação em código puro Python da máquina de estados finita e guard clauses das regras normativas R-037 (agent-router first), R-042 (detecção de deriva de intenção com short-circuit de continuidade), R-050 (9 workflows canônicos e avanço sequencial estrito), R-052 (reset mandatório pós-conclusão) e R-064 (checkpoint humano).
+  - Parser e validador de `routing-graph.yaml` contra JSON Schema Draft-07 (`graph_loader.py`), com compilação imutável para `TabelaTransicao` e resolução resiliente dos gaps RG-01 a RG-04.
+  - Algoritmo de scoring rule-based determinístico (`router.py`) com política de cascata de 4 níveis (0.9 / 0.7 / 0.5 / 0.0) e desempate por prioridade na zona de ambiguidade ($\Delta \le 0.05$).
+  - Validador estrito de payload de handoff v1.3 (`handoff.py`) conforme `handoff-governance/SKILL.md`, com verificação fail-closed contra vazamento de segredos e credenciais (PX-08).
+- **Runner Headless para CI/CD (`governance_runner.runner`)**:
+  - Protocol abstrato `CopilotSDKClient` desacoplado da dependência direta de runtime, com Permission Handler restrito a operações read-only para o caso de uso `agent-audit`.
+  - Controle orçamentário de execução (`budget.py`) com teto configurável de requisições premium (`GOV_MAX_PREMIUM_REQUESTS`) e teto rígido de 5 turnos (R-060), retornando conclusão `neutral` com motivo `budget_exhausted` sem quebrar o processo.
+  - Reporters para GitHub Checks API e comentários estruturados em PR (`reporters/`).
+  - Observabilidade OpenTelemetry com política fail-open (`telemetry/otel.py`).
+  - Entrypoint CLI `governance-runner` para automação headless via terminal e CI.
+- **Suíte Canônica de Testes de Roteamento (`tests/routing_unit/` e `tests/runner_unit/`)**:
+  - 161 testes unitários e de integração (110 em `routing_unit` cobrindo TC01 a TC08, integridade referencial cruzada e idempotência; 51 em `runner_unit` cobrindo TC09 a TC13 e smoke tests E2E).
+  - Verificação de zero flakiness com 10 execuções consecutivas 100% verdes e conformidade estrita de tipagem (`mypy --strict`).
+- **Pipeline de Auditoria Automatizada em CI**:
+  - Workflow `.github/workflows/governance-agent-audit.yml` disparado em PRs que tocam `.github/{agents,skills,prompts}/**`, executando gate mecânico prévio via `pytest` e conclusão `neutral` na fase PoC.
+- **Documentação Técnica e Governança**:
+  - Blueprint Técnico C4 e Matriz de Requisitos: `docs/architecture/BLUEPRINT_COPILOT_SDK_HEADLESS_RUNNER.md`.
+  - Plano de Decomposição em 46 Subtasks: `docs/architecture/PLANO_DECOMPOSICAO_COPILOT_SDK_HEADLESS_RUNNER.md`.
+  - Runbook Operacional para Validação de Autenticação/Billing Q-01 em CI Real: `docs/architecture/RUNBOOK_VALIDACAO_Q01_COPILOT_SDK_CI.md`.
+
+---
+
+## [2.45.0] — 2026-09-27
+
+### Adicionado / Modificado — Roteamento Híbrido de Modelo e Política Zero-Noise de Testes
+
+- **Roteamento Híbrido de Modelo (18 Agents Promovidos)**: Promoção dos executores centrais de desenvolvimento e reparo (`*-feature-developer`, `*-bug-fixer`, `*-test-fixer`) nas stacks Angular, Spring Boot, Spring Reactive, EJB, Python e Struts de "Gemini 3.8 Flash" para "Claude Sonnet 5" em seus frontmatters e catálogos de stack (`*-catalog.yaml`), mantendo os 12 `*-test-writer` em "Gemini 3.8 Flash".
+- **Nova Regra Normativa R-021.2 (Retry-Rate Model Escalation)**: Formalizada em `.github/copilot-instructions.md` (§3) a exigência de escalonamento pontual para modelo superior (🧠) quando o mesmo teste ou ciclo TDD falhar 2 vezes consecutivas na sessão, evitando queima agregada de retries em modelos de menor capacidade.
+- **Reforço Textual da Zero-Noise Test Policy**: Padronização literal da menção a `Zero-Noise Test Policy (terminal-governance/SKILL.md §3.1)` em todos os 30 agents executores e nos templates canônicos (`agent-template.md` e `operational-agent.md`), garantindo execução filtrada sem poluição de contexto.
+- **Quality Gate Determinístico de Roteamento de Modelo**: Novo teste de auditoria estática em `tests/governance_audit/test_hybrid_model_routing_and_zero_noise_governance.py` garantindo que desvios de modelo em executores, ausência de `terminal-governance` ou omissões textuais de Zero-Noise causem falha imediata no CI.
+
+## [2.44.0] — 2026-09-27
+
+### Adicionado / Modificado — Persistência de Estado de Sessão e Recuperação de Crash (Terminal Hang)
+
+- **Watchdog de Comando Bloqueante (`terminal-governance/SKILL.md` § 5.2)**: nova seção normativa exigindo wrapper `timeout -k <graça> <limite> <cmd>` (Linux/WSL/Git Bash) ou `Start-Job`+`Wait-Job -Timeout`+`Stop-Job` (PowerShell) para qualquer script/processo sem timeout nativo; correção do antipadrão anterior ("aguardar output completo do comando anterior") que causava hang indefinido de `run_in_terminal` no client JetBrains — agora exige `isBackground:true` + redirect a arquivo + leitura via `read_file`/`ctx_execute_file`.
+- **Checkpoint Automático Pré-Risco (`agent-memory-policy/SKILL.md` § 3.2)**: formalização de checkpoint via `ctx_index` (formato híbrido reaproveitado de `/ctx-checkpoint`) obrigatório antes de qualquer comando classificado como risco; documentada a limitação do schema de `.github/hooks/context-mode.json` (sem matcher condicional por conteúdo de tool) — disparo permanece responsabilidade do agent.
+- **Fallback de Retomada Sem Checkpoint (`ctx-resume.prompt.md`)**: novo protocolo de reconstrução best-effort via `git --no-pager status`/`git --no-pager diff --stat` + inspeção de arquivos modificados para cenário de crash/trava sem checkpoint prévio salvo.
+- **Nota de Reúso Sistêmico (R-055)**: a correção em `terminal-governance/SKILL.md` é referenciada (não duplicada) pelos ~61 agents que declaram `run_in_terminal` em seu frontmatter — propagação automática via skill compartilhada, sem necessidade de edição individual por agent.
+- Pendente para Etapa 4 (`@governance-maintainer`): criação de teste determinístico em `tests/governance_audit/` validando presença dos termos normativos `timeout -k` / `isBackground` em `terminal-governance/SKILL.md`.
+
+
 ## [2.43.0] — 2026-09-27
 
 ### Modificado / Manutenção de Governança
