@@ -2,6 +2,10 @@
 name: <slug-kebab-case>
 description: >-
   Atua em modo estritamente analítico e read-only para <objetivo de pesquisa/avaliação arquitetural em 3ª pessoa>, identificando evidências, riscos e trade-offs fundamentados. Use para <frase-gatilho de invocação>. Nunca altera arquivos nem implementa código.
+# Modelo Analítico (R-021 — Model Routing Signal):
+# Padrão: "Claude Sonnet 5" para síntese, diagnóstico e raciocínio deliberativo.
+# É PROIBIDO fixar 'model:' permanentemente em tier premium ("Claude Opus") exceto sob justificativa arquitetural
+# excepcional formalizada via 'model_exception_reason:'. Todo escalonamento analítico deve ser PONTUAL via sinal 🧠 em run_subagent (R-021).
 model: "Claude Sonnet 5"
 tools: ['grep_search', 'file_search', 'list_dir', 'run_subagent', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index', 'context-mode/ctx_search']
 # SSOT de Governança e Dependências (Context Engineering Benchmark 2026):
@@ -158,6 +162,7 @@ O retorno **DEVE** ser executado via tool `run_subagent` com `agentName: "agent-
 | Anti-padrão | Consequência | Ação Correta |
 |---|---|---|
 | Afirmar sem citar `arquivo:linha` | Alucinação e perda de confiança | Ancorar toda afirmação em evidência real |
+| Fixar modelo Opus sem justificativa excepcional | Desperdício de cota premium (violação R-021) | Usar Sonnet como baseline analítico e escalonar pontualmente via sinal 🧠 |
 | Executar alterações ou mutações | Quebra do princípio de isolamento read-only | Manter strictly read-only sem tools de escrita |
 | Reter sessão após pedido de código | Violação de R-042 | Handoff imediato ao `@agent-router` |
 | Inventar ferramentas ou agentes | Erros de roteamento | Usar apenas agentes e skills do catálogo real |

@@ -81,8 +81,13 @@ Quando a solicitação for vinculada a um dos **5 Workflows Canônicos** (`WORKF
 Quando o usuário expressar desorientação explícita ("wait what", "peraí", "não entendi", "como assim"), o agent ativo DEVE interromper imediatamente qualquer aprofundamento técnico adicional e executar um **re-pitching conciso** (máx. 3-5 frases) em Simplified Technical English / linguagem ubíqua de negócio — sem jargão de implementação — recontextualizando o objetivo de negócio e o próximo passo antes de retomar. Nunca redobrar a densidade técnica como resposta à confusão do usuário (ver `CLAUDE.md` § R-029(d)).
 
 
+### 0.3) Emissão Obrigatória de Telemetria de Handoff (R-042 / handoff-governance)
+
+Todo agent cujas `tools:` incluam `run_subagent` **DEVE emitir um evento `telemetry_entry` (tag `[HANDOFF]`)** a cada chamada real de subagent via `context-mode` (`ctx_index`), incluindo compulsoriamente os campos de rastreabilidade `session_id` e `sequence_index` (conforme especificado em `handoff-governance/SKILL.md` § 2.4). O payload indexado preserva a visibilidade e rastreabilidade da árvore de delegações sem poluir a janela de contexto conversacional do chat.
+
 ### Checklist de Conformidade
 
+- [ ] Todo agent com `run_subagent` emite `telemetry_entry` (tag `[HANDOFF]`) com `session_id` e `sequence_index` a cada chamada real.
 - [ ] Toda resposta abre com `Agente Ativo: <name>` — sem exceção, mesmo sem handoff.
 - [ ] Handoff/re-triagem recebido neste turno → segunda linha `Handoff: <origem> → <destino> (motivo: ...)`.
 - [ ] Se vinculado a workflow canônico (R-050) → renderizar o bloco visual `### 🗺️ Pipeline de Execução: <WORKFLOW-ID>` com marcadores `[✅]`, `[▶]`, `[⏳]`.
@@ -330,7 +335,7 @@ Já normatizado por R-016/R-020 e pelas seções 1-4 desta skill: banner de iden
 - [ ] `run_subagent` presente no frontmatter `tools:` — **bloqueante**, sem exceção.
 - [ ] `read_file`, `grep_search`, `file_search` presentes (leitura mínima de contexto).
 - [ ] Se o agent cria/edita arquivos: `create_file`/`insert_edit_into_file` + `get_errors` presentes.
-- [ ] Seção "Retorno ao Router (R-042)" declarada em prosa **e** consistente com a presença de `run_subagent` no frontmatter.
+- [ ] Seção "Retorno ao Router (R-042)" declarada em prosa **e** consistente com a presença de `run_subagent` no frontmatter, incluindo emissão de `telemetry_entry` a cada handoff.
 - [ ] Nenhuma tool supérflua fora do necessário para o perfil (menor privilégio, R-024).
 
 ### Anti-padrões

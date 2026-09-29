@@ -286,6 +286,10 @@ Solicitação do Usuário (turno N)
 - **Governança & Orquestração**: `governance-factory` (unifica criação/revisão de agents, skills, prompts e stacks), `governance-maintainer`, `agent-auditor`, `binding-initializer`, `adapter-generator`, `compliance-guardrails`, `pr-gatekeeper`
 
 ### Artefatos Estruturais de Orquestração
+### Governance Sync Scripts & Automação Determinística
+- `tools/agent_protocol_sync/sync_execution_protocol.py` — sincronização determinística do protocolo de execução `<execution_protocol>` em lote (R-059/R-060) com `--check`, `--dry-run` e `--apply` ([README](tools/agent_protocol_sync/README.md))
+- `tools/agentcard_exporter/export_agentcards.py` — exportador e validador de conformidade do padrão A2A AgentCard v1.0.0 (R-051) com `--check`, `--dry-run` e `--apply` ([README](tools/agentcard_exporter/README.md))
+
 - `.github/agents/routing-graph.yaml` — grafo de roteamento (R-040): 37 nós de agents + 5 nós de workflows, arestas com condições, política de cascata
 - `.github/agents/evals/casos-roteamento.yaml` — suíte de evals de regressão de roteamento (81 casos)
 

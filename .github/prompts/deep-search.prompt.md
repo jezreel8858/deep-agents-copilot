@@ -1,6 +1,6 @@
 ---
 name: deep-search
-description:
+description: >-
   Aciona o agent @deep-search — Retriever/Researcher especializado em pesquisa
   interna (codebase/context-mode) e externa (Tavily), com decisão de
   profundidade (atômica vs composta), budget de chamadas Tavily e síntese com

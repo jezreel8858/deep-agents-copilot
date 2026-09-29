@@ -1,6 +1,6 @@
 ---
 name: del-project-context
-description:
+description: >-
   Remove contexto estruturado de um projeto do overlay local (projects.local.yaml,
   gitignored — R-043) e do cache Context Mode. Operação destrutiva com validação
   prévia, confirmação e rollback via Git. NUNCA toca .github/agents/catalog.yaml

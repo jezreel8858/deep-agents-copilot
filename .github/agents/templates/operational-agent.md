@@ -2,6 +2,10 @@
 name: <slug-kebab-case>
 description: >-
   Executa <ação procedural objetiva em 3ª pessoa>, aplicando alterações determinísticas de código, testes ou configurações com validação imediata de integridade. Use quando precisar de <frase-gatilho de invocação>. Não use para análises arquiteturais abertas.
+# Modelo Operacional (R-021 — Model Routing Signal):
+# Padrão: "Gemini 3.8 Flash" (ou "Claude Sonnet 5" para tarefas deliberativas de código).
+# É PROIBIDO fixar 'model:' permanentemente em tier premium (ex.: "Claude Opus") para executores contínuos.
+# Escalonamento de modelo é estritamente PONTUAL (via sinal 🧠 em run_subagent conforme R-021), nunca permanente no catálogo.
 model: "Gemini 3.8 Flash"
 tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_search']
 # SSOT de Governança e Dependências (Context Engineering Benchmark 2026):
@@ -151,6 +155,7 @@ O retorno **DEVE** ser executado via tool `run_subagent` com `agentName: "agent-
 | Anti-padrão | Consequência | Ação Correta |
 |---|---|---|
 | Modificar arquivos sem ler o baseline | Quebra de contratos existentes | Ler arquivos com `read_file` antes de editar |
+| Fixar modelo tier premium (Opus) no catálogo | Violação de R-021 e desperdício de tokens | Usar Flash/Sonnet e escalonar pontualmente via sinal 🧠 em run_subagent |
 | Omitir `get_errors` pós-edição | Regressões sintáticas silenciosas | Chamar `get_errors` em todo arquivo tocado |
 | Reter a sessão em deriva de escopo | Violação de R-042 (Sticky Session) | Delegar via `run_subagent` ao `agent-router` |
 | Edições incrementais de 1 linha por turno | Desperdício de tokens e latência | Single-Turn Batching em bloco |

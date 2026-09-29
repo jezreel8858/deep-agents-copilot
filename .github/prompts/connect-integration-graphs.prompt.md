@@ -1,6 +1,6 @@
 ---
 name: connect-integration-graphs
-description:
+description: >-
   Audita integrações cross-repo entre projetos já registrados — levanta contratos/endpoints
   expostos e consumidos por projeto, varre o grafo de conhecimento existente restrito apenas
   aos arquivos do fluxo de integração, e aplica as fronteiras (`manifesto.boundaries`) que

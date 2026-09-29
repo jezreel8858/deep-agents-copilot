@@ -444,6 +444,7 @@ Cada adapter na raiz de `.github/instructions/` deve:
 
 ## 7) Índices de Governança
 
+- **Governance Sync Scripts:** `tools/agent_protocol_sync/` ([README](tools/agent_protocol_sync/README.md)) e `tools/agentcard_exporter/` ([README](tools/agentcard_exporter/README.md)) (sincronização determinística em lote de protocolos e AgentCards com gates CI `--check`).
 - **Mapa do Repositório (Repo Map):** `docs/repo-map.md` (fonte de verdade de navegação determinística de arquivos)
 - **Catálogo de Agents:** `.github/agents/catalog.yaml` (único catalog.yaml do repositório — metadados e modelos)
 - **Adapters/Binding:** `.github/instructions/README.md` (manifest de carregamento hierárquico — NUNCA buscar agents aqui)

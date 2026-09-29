@@ -1,0 +1,18 @@
+{
+  "rules": [
+    {
+      "id": "run_subagent_requires_handoff_and_contracts",
+      "description": "Agents que declaram 'run_subagent' em tools: devem referenciar formalmente handoff-governance e agent-contracts em source_docs: (R-042 / agent-contracts § 0.3)",
+      "condition": {
+        "tools_contains": "run_subagent"
+      },
+      "exclude_files": [
+        "agent-router.agent.md"
+      ],
+      "required_source_docs": [
+        ".github/skills/handoff-governance/SKILL.md",
+        ".github/skills/agent-contracts/SKILL.md"
+      ]
+    }
+  ]
+}

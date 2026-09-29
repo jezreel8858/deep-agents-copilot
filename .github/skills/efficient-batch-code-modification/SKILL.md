@@ -241,6 +241,29 @@ Uma sessão ingênua com 20 tool turns pode inflar o volume de tokens processado
 
 ---
 
-## 7. Referências Cruzadas
+## 7. Quando Preferir Script Python Determinístico vs. ctx_batch_execute
+
+### 7.1. Critério de Mercado e Limiar de Volume (≥ 6 Arquivos Homogêneos)
+Enquanto o `ctx_batch_execute` ou scripts iterativos em `ctx_execute` são ideais para modificações pontuais multi-arquivo (de 2 a 5 arquivos) com raciocínio contextual, **a partir de ~6 edições homogêneas repetidas em múltiplos arquivos**, um script Python determinístico dedicado torna-se expressivamente superior em custo, velocidade e segurança.
+
+| Dimensão | Edição via Tool-Calls (`ctx_execute` / Chat) | Script Python Determinístico (`tools/...`) |
+| :--- | :--- | :--- |
+| **Custo de Tokens** | Queima tokens de raciocínio a cada reexecução | Custo de inferência **zero** durante a execução |
+| **Determinismo** | Sujeito a deriva estocástica do modelo em larga escala | 100% determinístico e idempotente |
+| **Gate em CI** | Inviável rodar raciocínio de chat em pre-commit/PR | Execução instantânea em CI via flag `--check` (fail-hard) |
+| **Auditoria e Reversão** | Diffs dispersos em histórico de conversação | Arquitetura `--dry-run` e `--apply` com controle de versão |
+
+### 7.2. O Padrão Canônico da Governança (`tools/agent_protocol_sync/`)
+O repositório adota como referência arquitetural o utilitário `tools/agent_protocol_sync/sync_execution_protocol.py` (e analogamente `tools/agentcard_exporter/export_agentcards.py`):
+1. **Fonte Canônica Isolada:** Fragmento centralizado em arquivo Markdown (`_execution-protocol-fragment.md`).
+2. **Contrato de CLI Unificado:**
+   - `--check` (default/CI): Retorna exit code `1` se houver drift, `0` se em conformidade. Não escreve em disco.
+   - `--dry-run`: Exibe o diff cirúrgico no console sem gravar em disco.
+   - `--apply`: Aplica a substituição atômica nos $N$ arquivos alvo.
+3. **Invariantes em Testes:** Acompanhado de testes pytest que validam idempotência e ausência de falso-positivo.
+
+---
+
+## 8. Referências Cruzadas
 
 - Ver exemplo few-shot Anti-Padrão vs Padrão Correto de batching em `.github/skills/context-mode/SKILL.md § 4.3`.

@@ -1,6 +1,6 @@
 ---
 name: commit
-description:
+description: >-
   Gera mensagem de commit convencional (PT-BR) baseada no stage e no padrão
   global (docs/ai-copilot/global-git-commit-instructions.md). Analisa arquivos,
   aplica guardrail de secrets, verifica atomicidade, estrutura por complexidade

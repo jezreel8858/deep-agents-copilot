@@ -15,6 +15,7 @@ source_docs:
   - .github/skills/prompt-engineering-patterns/SKILL.md
   - .github/skills/agent-contracts/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/skills/handoff-governance/SKILL.md
 ---
 
 # Perfil Operacional
@@ -147,9 +148,9 @@ Próximo passo mínimo: classificar intenção com o prompt acima
 
 - Sempre e exclusivamente para [`@agent-router`](agent-router.agent.md) — não existe outro destino de handoff.
 
-## Retorno ao Router (R-042 — nota de consistência)
+## Retorno ao Router (R-042 — Anti Sticky-Session)
 
-**Banner obrigatorio (visibilidade de fluxo)**: toda resposta deste agent abre com a linha `Agente Ativo: prompt-structuring` antes de qualquer outro conteudo -- mesmo sem handoff neste turno. Se esta resposta e resultado de handoff/re-triagem recebido, adicionar `Handoff: <agent-origem> -> prompt-structuring (motivo: <motivo>)` na linha seguinte. Padrao de mercado: OpenAI Agents SDK (`HandoffOutputItem` -- "Handed off from X to Y") e LangGraph (campo `active_agent` streamado ao usuario) -- ver `agent-contracts/SKILL.md` secao 0.
+**Banner obrigatório (visibilidade de fluxo)**: toda resposta deste agent abre com a linha `Agente Ativo: prompt-structuring` antes de qualquer outro conteúdo — mesmo sem handoff neste turno. Se esta resposta é resultado de handoff/re-triagem recebido, adicionar `Handoff: <agent-origem> → prompt-structuring (motivo: <motivo>)` na linha seguinte. Padrão de mercado: OpenAI Agents SDK (`HandoffOutputItem` — "Handed off from X to Y") e LangGraph (campo `active_agent` streamado ao usuário) — ver `agent-contracts/SKILL.md` seção 0.
 
 Este agent já retorna 100% das vezes ao `@agent-router` por desenho (nunca roteia a downstream). R-042 não introduz gatilho adicional aqui — apenas reforça que o `agent-router`, ao receber o prompt estruturado, deve reavaliar a intenção do zero (não presumir a rota anterior).
 

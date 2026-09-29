@@ -80,8 +80,13 @@ episodica:
 | Namespace / Source | TTL | Estratégia de Pruning | Finalidade |
 |---|---|---|---|
 | `episodica-<projeto>` | 30 dias | Expirar entradas sem acesso recente | Decisões arquiteturais e preferências confirmadas |
-| `handoff-telemetry:*` | 7 dias | Pruning automático após 7 dias | Telemetria de transição, detecção de deriva e loops |
+| `handoff-telemetry:*` | 7 dias (default) / 90 dias / Permanente | Pruning condicional por tag | Retenção padrão: 7 dias para `[SUCCESS]`. Retenção estendida (90 dias) ou permanente (`ttl: null`) para `[INTENT_DRIFT]` e `[LOOP_LIMIT]` |
 | `session-cache:*` | 24 horas | Invalidação ao término da sessão | Contexto efêmero e dados intermediários de tool |
+
+> **Segmentação de TTL por Tag de Telemetria (R-055 / Governança de Retenção)**:
+> - **Tag `[SUCCESS]`**: preserva o TTL de 7 dias (comportamento padrão de telemetria episódica para transições bem-sucedidas de rotina).
+> - **Tags `[INTENT_DRIFT]` e `[LOOP_LIMIT]`**: retidas por período estendido de 90 dias OU promovidas automaticamente para armazenamento permanente (`ttl: null`) no momento da emissão, condicionadas exclusivamente à tag do evento (independente de heurísticas frágeis de conteúdo), garantindo insumos históricos duradouros para auditoria e retroalimentação do laboratório de evals (`agent-evals-lab`).
+> - **Nota de Implementação Técnica**: A segmentação de TTL por tag documentada acima constitui diretriz contratual e normativa da política de governança documental. A aplicação técnica automatizada desse TTL diferenciado nos scripts de hook em `.github/hooks/context-mode.json` ou motores de background constitui um item de engenharia desacoplado, condicionado a aprovação humana adicional prévia (não implementado nesta etapa).
 
 ---
 

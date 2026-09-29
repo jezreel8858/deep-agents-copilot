@@ -300,15 +300,35 @@ Ciclo de retroalimentação contínua (*evals flywheel*): transforma falhas de r
 
 ### 10.1) Consulta de Telemetria
 
-A mineração é executada sob demanda (ex.: auditoria periódica pelo `agent-auditor` ou rotina de curadoria de qualidade) utilizando as tags padronizadas de telemetria:
+A mineração é executada sob demanda (ex.: auditoria periódica pelo `agent-auditor` ou rotina de curadoria de qualidade) utilizando as tags padronizadas e os campos aditivos de telemetria (`session_id`, `sequence_index`, `call_stack_depth`, `outcome_summary`):
 
 ```json
-// Recupera turnos onde houve falha de roteamento, deriva de intenção ou loop operacional
+// (a) Reconstruir timeline completa de uma sessão determinística via session_id + sequence_index
 {
-  "queries": ["[INTENT_DRIFT]", "[LOOP_LIMIT]"],
+  "queries": ["session_id:<id_da_sessao>", "sequence_index"],
+  "source": "handoff-telemetry:*",
+  "sort": "timeline"
+}
+```
+> **Finalidade (a)**: Permite auditar e validar se a trajetória do ecossistema e das delegações comportou-se de forma correta e sem desvios do início ao fim do chat.
+
+```json
+// (b) Detectar desvio de intenção/escopo via tag [INTENT_DRIFT] + outcome_summary
+{
+  "queries": ["[INTENT_DRIFT]", "outcome_summary"],
   "source": "handoff-telemetry:*"
 }
 ```
+> **Finalidade (b)**: Identifica transições onde agentes downstream reportaram deriva de escopo ou retorno ao router, permitindo isolar prompts ambíguos ou gaps de escopo no catálogo.
+
+```json
+// (c) Detectar complexidade excessiva via call_stack_depth elevado ou [LOOP_LIMIT] recorrente
+{
+  "queries": ["call_stack_depth", "[LOOP_LIMIT]"],
+  "source": "handoff-telemetry:*"
+}
+```
+> **Finalidade (c)**: Localiza aninhamentos excessivos de subagentes ou esgotamento de loops operacionais, elegendo automaticamente os fluxos anômalos como candidatos primários à simplificação arquitetural e refatoração de roteamento (handoff imediato para `@refactor-planner`).
 
 ### 10.2) Protocolo de Extração e Estruturação
 
