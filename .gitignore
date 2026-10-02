@@ -28,6 +28,7 @@ build/
 
 .env.local
 .env.*.local
+.coverage
 
 # Angular CLI and build artefacts
 /.angular-cli.json

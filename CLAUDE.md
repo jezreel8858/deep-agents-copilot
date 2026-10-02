@@ -274,6 +274,7 @@ Solicitação do Usuário (turno N)
 - **Arquitetura & Design**: `tech-solution-architect`, `code-knowledge-graph`, `business-rules-extractor`, `refactor-planner`, `ddd-bounded-context-mapper`, `adr-sentinel`
 - **Implementação (Domain Routers & Specialists)**:
   - `angular-router` — orquestra os 8 especialistas em `.github/agents/frontend/angular/`
+  - `react-router` — orquestra os 8 especialistas em `.github/agents/frontend/react/`
   - `spring-boot-router` — orquestra os 7 especialistas em `.github/agents/backend/spring-boot/`
   - `spring-reactive-router` — orquestra os 7 especialistas em `.github/agents/backend/spring-reactive/`
   - `ejb-router` — orquestra os 7 especialistas em `.github/agents/backend/ejb/`
