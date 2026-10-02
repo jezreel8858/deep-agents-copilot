@@ -457,6 +457,21 @@ canonicos:
     critico: true
     threshold: 0.90
 
+  - id: "canon-037"
+    descricao: "Implementação de nova feature React com TanStack Query/Zustand sob TDD roteada para react-router (feature-developer)"
+    input:
+      solicitacao: "Criar componente React com hook customizado, TanStack Query e testes unitários prévios (TDD)"
+    expected:
+      agent_route: "react-router"
+      nivel_routing: "rule-based"
+      confianca: "alta"
+      score_minimo: 0.85
+      output_contains:
+        - "Agente Ativo: react-router"
+        - "react-feature-developer"
+    critico: true
+    threshold: 0.90
+
   - id: "canon-036"
     descricao: "Elaboração de Technical Blueprint com contratos de API e divisão de tarefas por stack"
     input:

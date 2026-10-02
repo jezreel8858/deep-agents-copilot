@@ -91,6 +91,11 @@ nos:
     descricao: "Supervisor hierárquico do domínio Angular — despacha para os 8 especialistas registrados em .github/agents/frontend/angular/angular-catalog.yaml"
 
 
+  - id: react-router
+    tipo: domain_router
+    descricao: "Supervisor hierárquico do domínio React — despacha para os 8 especialistas registrados em .github/agents/frontend/react/react-catalog.yaml"
+
+
   - id: spring-boot-router
     tipo: domain_router
     descricao: "Supervisor hierárquico do domínio Spring Boot — despacha para os 7 especialistas registrados em .github/agents/backend/spring-boot/spring-boot-catalog.yaml"
@@ -397,7 +402,7 @@ workflows:
       - etapa: 7
         nome: "e2e_journey_validation"
         agent: "specialist-e2e-writer"
-        aplicavel_quando: "domain-router = angular-router"
+        aplicavel_quando: "domain-router = angular-router | react-router"
         condicional: true
         nota: "Etapa opcional/condicional — aplicavel somente em stacks com especialista E2E dedicado no catalogo local (ex.: @angular-e2e-writer). Stacks sem E2E writer dedicado pulam esta etapa sem bloqueio."
       - etapa: 8
@@ -1139,6 +1144,41 @@ arestas:
         - "métodos do store cobrem campos do modelo"
         - "análise de aderência de store"
       sinal_r006: "É qualquer solicitação do ecossistema Angular ou análise semântica de modelos/stores/services Angular? (despacha para o catálogo de 8 especialistas de frontend em .github/agents/frontend/angular/angular-catalog.yaml)"
+
+  # Supervisor e roteador de domínio React (Hierarchical Sub-Router)
+  - de: agent-router
+    para: react-router
+    prioridade: 1.5
+    threshold_score: 0.85
+    nivel_routing: rule-based
+    condicoes:
+      keywords:
+        - "react"
+        - "react router"
+        - "frontend react"
+        - "componente react"
+        - "server components"
+        - "client components"
+        - "hooks"
+        - "tanstack query"
+        - "zustand"
+        - "core web vitals react"
+        - "auditoria react"
+        - "upgrade react"
+        - "feature react"
+        - "bug react"
+        - "fix react"
+        - "tailwind react"
+        - "layout react"
+        - "responsivo react"
+        - "a11y react"
+        - "testes react"
+        - "react component test"
+        - "react testing library"
+        - "vitest react"
+        - "react e2e"
+        - "playwright react"
+      sinal_r006: "É qualquer solicitação do ecossistema React ou análise semântica de componentes/hooks/estado React? (despacha para o catálogo de 8 especialistas de frontend em .github/agents/frontend/react/react-catalog.yaml)"
 
   # Supervisor e roteador de domínio Spring Boot (Hierarchical Sub-Router)
   - de: agent-router

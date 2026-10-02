@@ -1671,6 +1671,56 @@ agents:
     - .github/agents/frontend/angular/angular-catalog.yaml
     estimated_time_minutes: 15
   database-router:
+  react-router:
+    id: react-router
+    version: 1.0.0
+    model: Claude Sonnet 5
+    priority: 8.5
+    domain: Supervisor hierarquico e roteador do dominio React
+    description: Roteador de domínio React e supervisor hierárquico — recebe solicitações
+      de frontend React do agent-router central e despacha para os 8 especialistas
+      do catálogo React (arch-advisor, feature-developer, bug-fixer, ui-stylist,
+      unit-test, component-test, test-fixer e e2e-writer).
+    keywords:
+    - react
+    - react router
+    - frontend router
+    - orquestrador react
+    - server components
+    - hooks
+    - tanstack query
+    - zustand
+    prerequisite_docs:
+    - CLAUDE.md
+    - .github/copilot-instructions.md
+    - .github/agents/frontend/react/react-catalog.yaml
+    related_agents:
+    - agent-router
+    - react-arch-advisor
+    - react-feature-developer
+    - react-bug-fixer
+    - react-ui-stylist
+    - react-unit-test-writer
+    - react-component-test-writer
+    - react-test-fixer
+    - react-e2e-writer
+    tools:
+    - read_file
+    - file_search
+    - grep_search
+    - list_dir
+    - ask_questions
+    - run_subagent
+    - context-mode/ctx_search
+    related_skills:
+    - agent-contracts
+    - handoff-governance
+    - context-mode
+    source_docs:
+    - .github/agents/frontend/react/react-router.agent.md
+    - .github/agents/frontend/react/react-catalog.yaml
+    estimated_time_minutes: 15
+  database-router:
     id: database-router
     version: 2.0.0
     model: Gemini 3.8 Flash

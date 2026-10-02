@@ -3,7 +3,7 @@
   "domain": "governanca-ai-generica",
   "generated_at": "2026-09-26",
   "summary": {
-    "total_skills": 67
+    "total_skills": 72
   },
   "skills": [
     {
@@ -1082,6 +1082,61 @@
       "related_skills": [
         "structured-intake-patterns",
         "requirements-engineering-patterns"
+      ]
+    },
+    {
+      "name": "react-frontend-patterns",
+      "tier": 2,
+      "category": "quality",
+      "description": "Boas práticas e patterns de codificação React moderno (React 19+) para componentes, Server/Client Components, hooks, reatividade, segurança e consistência arquitetural.",
+      "path": ".github/skills/react-frontend-patterns/SKILL.md",
+      "related_agents": [
+        "@react-router",
+        "@tech-solution-architect",
+        "@test-strategy"
+      ]
+    },
+    {
+      "name": "react-implementation-patterns",
+      "tier": 2,
+      "category": "quality",
+      "description": "Padrões de mercado 2025/2026 para implementar features/bugs em React (hooks, TanStack Query + Zustand, TDD red-green-refactor, checklist de PR) — contraparte de execução de react-frontend-patterns.",
+      "path": ".github/skills/react-implementation-patterns/SKILL.md",
+      "related_agents": [
+        "@react-feature-developer",
+        "@react-bug-fixer"
+      ]
+    },
+    {
+      "name": "react-performance-patterns",
+      "tier": 2,
+      "category": "quality",
+      "description": "Diretrizes de performance e Core Web Vitals para aplicações React (React Compiler, code-splitting, streaming SSR, memoização orientada a medição).",
+      "path": ".github/skills/react-performance-patterns/SKILL.md",
+      "related_agents": [
+        "@react-arch-advisor"
+      ]
+    },
+    {
+      "name": "react-responsive-ui-patterns",
+      "tier": 2,
+      "category": "quality",
+      "description": "Padrões de estilização Tailwind CSS/CSS Modules, layout responsivo mobile-first e acessibilidade WCAG 2.2 AA para componentes React.",
+      "path": ".github/skills/react-responsive-ui-patterns/SKILL.md",
+      "related_agents": [
+        "@react-ui-stylist"
+      ]
+    },
+    {
+      "name": "test-implementation-react-vitest",
+      "tier": 2,
+      "category": "quality",
+      "description": "Padrões de teste unitário e de componente para React com Vitest e React Testing Library — mocks isolados, queries acessíveis e boundary de responsabilidade entre unit e component tests.",
+      "path": ".github/skills/test-implementation-react-vitest/SKILL.md",
+      "related_agents": [
+        "@react-unit-test-writer",
+        "@react-component-test-writer",
+        "@react-test-fixer"
       ]
     }
   ],
