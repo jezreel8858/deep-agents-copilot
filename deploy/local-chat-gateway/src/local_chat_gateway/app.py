@@ -13,6 +13,7 @@ from local_chat_gateway.api.routes import router
 from local_chat_gateway.prompts_catalog import descobrir_comandos
 from local_chat_gateway.config import Settings, get_settings
 from local_chat_gateway.logging_config import configurar_logging
+from local_chat_gateway.session_store import get_session_store
 
 
 @asynccontextmanager
@@ -54,6 +55,15 @@ async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
     # (mesmo padrao tolerante de `custom_agents` -- falha de descoberta
     # NUNCA derruba o startup, lista vazia e um resultado valido).
     app.state.commands_catalog = descobrir_comandos(settings.governance_github_dir)
+    # Retencao automatica da tabela `turns` (pedido explicito do usuario,
+    # 2026-10-02): expurgo 1x no startup, nunca em request path -- ver
+    # `Settings.gateway_turn_retention_days` e `SessionStore.purge_old_turns`.
+    store = get_session_store(
+        settings.gateway_db_path,
+        session_ttl_s=settings.gateway_session_ttl_s,
+        max_premium_per_day=settings.gateway_max_premium_per_day,
+    )
+    store.purge_old_turns(settings.gateway_turn_retention_days)
     yield
 
 

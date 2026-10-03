@@ -60,6 +60,15 @@ class Settings(BaseSettings):
         default=300, alias="GATEWAY_REQUEST_TIMEOUT_S"
     )
     gateway_session_ttl_s: int = Field(default=1800, alias="GATEWAY_SESSION_TTL_S")
+    # Retencao automatica do historico de turnos (tabela `turns`, pedido
+    # explicito do usuario 2026-10-02): registros com `created_at` mais
+    # antigo que N dias sao apagados via `SessionStore.purge_old_turns`,
+    # disparado 1 vez no startup do lifespan (`app.py`). Escopo
+    # deliberadamente restrito a `turns` -- `sessions`/`checkpoints` ja tem
+    # seu proprio ciclo de vida via `gateway_session_ttl_s`.
+    gateway_turn_retention_days: int = Field(
+        default=30, alias="GATEWAY_TURN_RETENTION_DAYS"
+    )
     # Fix 3 (2026-10-04): logging em arquivo aditivo (ver `logging_config.py`)
     # -- gap de observabilidade, logs dependiam 100% do stdout do uvicorn,
     # perdidos ao fechar o terminal/sessao de `dev_watch.py`.

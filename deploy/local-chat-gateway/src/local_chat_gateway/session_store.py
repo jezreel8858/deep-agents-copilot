@@ -14,6 +14,7 @@ preservar retrocompatibilidade com sessoes gravadas antes desta mudanca
 
 from __future__ import annotations
 
+import logging
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -28,6 +29,7 @@ from sqlalchemy import (
     String,
     Table,
     create_engine,
+    delete,
     func,
     insert,
     inspect,
@@ -36,6 +38,8 @@ from sqlalchemy import (
     update,
 )
 from sqlalchemy.engine import Engine
+
+logger = logging.getLogger(__name__)
 
 metadata = MetaData()
 
@@ -657,6 +661,30 @@ class SessionStore:
         if row is None:
             return None
         return self._row_para_turn_record(row)
+
+    def purge_old_turns(self, retention_days: int) -> int:
+        """Apaga turnos com `created_at` mais antigo que `retention_days`.
+
+        Escopo deliberadamente restrito a `turns_table` -- `sessions` e
+        `checkpoints` tem seu proprio ciclo de vida via `session_ttl_s`.
+        Disparado 1x no startup do lifespan (`app.py`). `retention_days <= 0`
+        desativa o expurgo (retorna 0 sem tocar o banco).
+        """
+        if retention_days <= 0:
+            return 0
+        cutoff = int(time.time()) - (retention_days * 86400)
+        with self._engine.begin() as conn:
+            result = conn.execute(
+                delete(turns_table).where(turns_table.c.created_at < cutoff)
+            )
+            deleted = result.rowcount or 0
+        if deleted:
+            logger.info(
+                "purge_old_turns: %d turno(s) removido(s) (retention_days=%d)",
+                deleted,
+                retention_days,
+            )
+        return deleted
 
 
 _session_store_instance: SessionStore | None = None

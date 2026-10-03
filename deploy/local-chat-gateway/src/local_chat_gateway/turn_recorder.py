@@ -104,6 +104,14 @@ class AcumuladorDeTurno:
     # stream_chat_ag_ui` prefere `agent_model` quando disponivel (mais
     # legivel) e cai para este campo tecnico como fallback.
     modelo_usado_real: str | None = None
+    # Janela de contexto (context window) REAL da sessao -- capturada do
+    # evento nativo `SessionUsageInfoData` (2026-10-03, pedido explicito do
+    # usuario: exibir context-window no chat, paridade com o plugin Copilot
+    # da IDE). Pode ser emitido MULTIPLAS vezes por turno (a cada mudanca
+    # de contagem de tokens da sessao) -- mantemos sempre a ULTIMA ocorrencia
+    # (estado mais recente da janela no momento em que o turno termina).
+    contexto_tokens_atuais: int | None = None
+    contexto_tokens_limite: int | None = None
 
 
 def adicionar_texto_resposta(turno: AcumuladorDeTurno, texto: str) -> None:
@@ -208,6 +216,26 @@ def registrar_uso_assistente(turno: AcumuladorDeTurno, dado: Any) -> None:
                 turno.time_to_first_token_ms = int(ttft.total_seconds() * 1000)
             except AttributeError:
                 logger.debug("turn_recorder_ttft_tipo_inesperado: %r", ttft)
+
+
+def registrar_info_contexto(turno: AcumuladorDeTurno, dado: Any) -> None:
+    """`SessionUsageInfoData` -- estatisticas REAIS de uso da janela de
+    contexto (context window) da sessao, campos `currentTokens`/
+    `tokenLimit` confirmados por introspeccao da wheel (2026-10-03, pedido
+    explicito do usuario: exibir context-window no chat, paridade com o
+    plugin Copilot da IDE). Pode ser emitido MULTIPLAS vezes por turno (a
+    cada mudanca na contagem de tokens da sessao) -- mantemos sempre a
+    ULTIMA ocorrencia (estado mais recente no momento em que o turno
+    termina), nunca acumulamos/somamos (ao contrario de tokens/custo em
+    `registrar_uso_assistente`): `current_tokens`/`token_limit` ja sao
+    valores ABSOLUTOS da sessao inteira, nao incrementos por chamada.
+    """
+    current_tokens = getattr(dado, "current_tokens", None)
+    token_limit = getattr(dado, "token_limit", None)
+    if current_tokens is not None:
+        turno.contexto_tokens_atuais = int(current_tokens)
+    if token_limit is not None:
+        turno.contexto_tokens_limite = int(token_limit)
 
 
 def registrar_falha_model_call(turno: AcumuladorDeTurno, dado: Any) -> None:

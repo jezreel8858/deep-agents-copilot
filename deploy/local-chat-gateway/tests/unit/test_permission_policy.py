@@ -717,7 +717,7 @@ class TestToolMcpECataloga:
 
     # Achado code-review 🟠 #2: risco aceito -- codegraph/tavily_search
     # permanecem liberados sem exigir denylist (ver docstring/comentario de
-    # `tool_call_nao_escrita_e_segura` com a analise do @code-knowledge-graph).
+    # `tool_call_nao_escrita_e_segura` com a analise do @codegraph-engine).
 
     # Achado code-review 4a iteracao (fail-open em `ctx_batch_execute`):
     # o campo `commands` (lista de `{label, command}`) nao era reconhecido

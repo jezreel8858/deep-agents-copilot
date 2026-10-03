@@ -492,7 +492,7 @@ def tool_call_nao_escrita_e_segura(
         # tool arbitrario fora dos 3 servers homologados).
         #
         # RISCO ACEITO DOCUMENTADO (achado 🟠 #2, analise deterministica do
-        # @code-knowledge-graph, sem LLM): `mcp_codegraph_*` e 100%
+        # @codegraph-engine, sem LLM): `mcp_codegraph_*` e 100%
         # read-only/offline contra `.codegraph/graph.db` -- zero risco de
         # RCE/FS arbitrario/SSRF, tratado como seguro sem denylist adicional.
         # `mcp_tavily_search`/`tavily_research` processam apenas strings de

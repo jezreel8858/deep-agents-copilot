@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 from pathlib import Path
 
 import sqlalchemy as sa
@@ -503,5 +504,49 @@ class TestTurnsTable:
         assert len(turnos) == 2
         # Mais recentes primeiro: t-4, t-3.
         assert [t.turn_id for t in turnos] == ["t-4", "t-3"]
+
+    def test_purge_old_turns_remove_apenas_registros_mais_antigos_que_retention(
+        self, tmp_db_path: Path
+    ) -> None:
+        store = SessionStore(tmp_db_path)
+        agora = int(time.time())
+        trinta_e_um_dias_atras = agora - (31 * 86400)
+        vinte_e_nove_dias_atras = agora - (29 * 86400)
+        store.record_turn(
+            TurnRecord(turn_id="t-velho", session_id="s", created_at=trinta_e_um_dias_atras)
+        )
+        store.record_turn(
+            TurnRecord(turn_id="t-recente", session_id="s", created_at=vinte_e_nove_dias_atras)
+        )
+
+        removidos = store.purge_old_turns(retention_days=30)
+
+        assert removidos == 1
+        assert store.get_turn("t-velho") is None
+        assert store.get_turn("t-recente") is not None
+
+    def test_purge_old_turns_com_retention_days_zero_ou_negativo_nao_remove_nada(
+        self, tmp_db_path: Path
+    ) -> None:
+        store = SessionStore(tmp_db_path)
+        muito_antigo = int(time.time()) - (365 * 86400)
+        store.record_turn(
+            TurnRecord(turn_id="t-antigo", session_id="s", created_at=muito_antigo)
+        )
+
+        assert store.purge_old_turns(retention_days=0) == 0
+        assert store.purge_old_turns(retention_days=-5) == 0
+        assert store.get_turn("t-antigo") is not None
+
+    def test_purge_old_turns_sem_registros_antigos_retorna_zero(
+        self, tmp_db_path: Path
+    ) -> None:
+        store = SessionStore(tmp_db_path)
+        store.record_turn(
+            TurnRecord(turn_id="t-novo", session_id="s", created_at=int(time.time()))
+        )
+
+        assert store.purge_old_turns(retention_days=30) == 0
+        assert store.get_turn("t-novo") is not None
 
 

@@ -265,6 +265,18 @@ def _joined_prompt(messages: Sequence[ChatMessage]) -> str:
     return "\n".join(f"{m.role}: {m.content or ''}" for m in messages)
 
 
+def _formatar_tokens_compacto(valor: int) -> str:
+    """Formata uma contagem de tokens em notacao compacta (`84.2k`, `1.2M`)
+    para o badge de context-window (2026-10-03) -- `token_limit` tipico de
+    modelos atuais (128k-1M) fica ilegivel por extenso ("200000 tokens")
+    dentro de uma unica linha de badge curta."""
+    if valor >= 1_000_000:
+        return f"{valor / 1_000_000:.1f}M"
+    if valor >= 1_000:
+        return f"{valor / 1_000:.1f}k"
+    return str(valor)
+
+
 def _compor_prompt_com_sistema(
     system_message: str | None, mensagens_unidas: str
 ) -> str:
@@ -831,6 +843,25 @@ async def stream_chat(
             # quando nao-vazio -- `None` preserva o comportamento legado
             # (sessao sem custom agents, ex.: chamadores antigos/testes).
             custom_agents=(list(custom_agents) if custom_agents else None),
+            # Bloqueio DURO da tool nativa `task` (bug real investigado
+            # 2026-10-03, log `.tmp/gateway.log` linha 9739-9778): a tool
+            # `task` (`copilot.BUILTIN_TOOLS_ISOLATED`) e SEMPRE exposta ao
+            # modelo independente do `tools:` configurado por agent, e
+            # aceita qualquer `agent_name`/label livre escolhido pelo
+            # proprio modelo SEM validacao contra `custom_agents` -- a
+            # instrucao textual `_NOTA_GATEWAY_HEADLESS` (soft) ja avisava
+            # o modelo a nao usa-la, mas foi IGNORADA em producao: log real
+            # confirmou `agent_name=task agent_display_name="Run session_
+            # store tests"` (badge "Agente Ativo: Run session_store tests"
+            # -- nome nao existe no catalogo de 95 agents), consumindo
+            # 332554 tokens / 9 tool calls / 1m32s so para uma delegacao
+            # fantasma. `excluded_tools` remove a tool do catalogo
+            # repassado ao modelo (hard block via SDK), nao apenas uma
+            # instrucao textual -- `run_subagent`/`task` ficam
+            # definitivamente inertes nesta sessao (ver tambem
+            # `agent_catalog._ALIAS_TOOLS_SDK_HEADLESS`, que ja NAO
+            # traduz `run_subagent` para `task` desde 2026-10-04).
+            excluded_tools=["task"],
         ) as session:
             session.on(_on_event)
             await session.send(_joined_prompt(messages))
@@ -1408,6 +1439,7 @@ async def stream_chat_ag_ui(
         SessionCompletionReceiptData,
         SessionErrorData,
         SessionTruncationData,
+        SessionUsageInfoData,
         SubagentCompletedData,
         SubagentFailedData,
         SubagentStartedData,
@@ -1975,6 +2007,15 @@ async def stream_chat_ag_ui(
             # explicito do usuario 2026-10-02) -- nao gera nenhum evento
             # AG-UI visivel, apenas alimenta o historico duravel do turno.
             turn_recorder.registrar_uso_assistente(turno_acumulado, dado)
+        elif isinstance(dado, SessionUsageInfoData):
+            # Estatisticas REAIS da janela de contexto (context window) da
+            # sessao -- `current_tokens`/`token_limit` (pedido explicito do
+            # usuario 2026-10-03: exibir context-window no chat). Mesmo
+            # padrao de `AssistantUsageData`: nao gera evento AG-UI visivel
+            # aqui, apenas alimenta o historico do turno -- o badge de
+            # texto consolidado (credito + contexto) e montado 1 unica vez
+            # ao final do turno, ver bloco apos o loop principal abaixo.
+            turn_recorder.registrar_info_contexto(turno_acumulado, dado)
         elif isinstance(dado, ModelCallFailureData):
             turn_recorder.registrar_falha_model_call(turno_acumulado, dado)
         elif isinstance(dado, AssistantTurnRetryData):
@@ -2226,6 +2267,11 @@ async def stream_chat_ag_ui(
                     else {"mode": "append", "content": _REFORCO_ASK_USER_ELICITATION}
                 ),
                 custom_agents=(list(custom_agents) if custom_agents else None),
+                # Bloqueio DURO da tool nativa `task` -- ver comentario
+                # completo na outra chamada de `create_session` acima
+                # (bug real: log confirmou delegacao fantasma `agent_name=
+                # task` com label livre nao-catalogado, ~332k tokens).
+                excluded_tools=["task"],
             ) as session:
                 session.on(_on_event)
                 await session.send(
@@ -2239,27 +2285,49 @@ async def stream_chat_ag_ui(
                     if item is None:
                         break
                     yield item
-        # Badge de creditos (2026-10-03, pedido explicito do usuario --
-        # paridade com o plugin Copilot da IDE: "<Modelo> · <N> Credits" ao
-        # final de cada resposta). Formula OFICIAL confirmada em docs.
+        # Badge de creditos + context-window (2026-10-03, pedido explicito
+        # do usuario -- paridade com o plugin Copilot da IDE: "<Modelo> ·
+        # <N> Credits" e indicador de uso da janela de contexto ao final de
+        # cada resposta). Formula OFICIAL de creditos confirmada em docs.
         # github.com/en/copilot/how-tos/copilot-sdk/features/usage-and-
         # billing: AI credits = copilot_usage.total_nano_aiu / 1e9 -- ja
         # acumulado em `turno_acumulado.cost_nano_aiu` por
         # `turn_recorder.registrar_uso_assistente` (1 evento `AssistantUsageData`
-        # por chamada real de modelo, incluindo subagents). So' exibido
-        # quando o SDK de fato reportou uso (>0) -- sessao stub/erro ANTES
-        # de qualquer chamada real de modelo (`SDKUnavailableError`, ver
-        # bloco `except SDKUnavailableError` acima, que retorna cedo) nunca
-        # chega aqui, entao nenhum badge falso-zero e' mostrado. Preferido
+        # por chamada real de modelo, incluindo subagents). O context-window
+        # vem do evento nativo `SessionUsageInfoData` (`current_tokens`/
+        # `token_limit`, ver `turn_recorder.registrar_info_contexto`) --
+        # ambos os pedacos sao OPCIONAIS e independentes: cada um so aparece
+        # se o SDK de fato reportou o dado correspondente nesta sessao
+        # (sessao stub/erro ANTES de qualquer chamada real de modelo, ver
+        # bloco `except SDKUnavailableError` acima que retorna cedo, nunca
+        # chega aqui -- nenhum badge falso-zero/vazio e' mostrado). Preferido
         # `agent_model` (nome amigavel do frontmatter, ex.: "Claude Sonnet
         # 5") sobre `modelo_usado_real` (id tecnico da API, ex.:
         # "claude-sonnet-4-5") quando ambos disponiveis -- mesma convencao
         # do badge "Agente Ativo" aberto no topo desta funcao.
+        partes_badge: list[str] = []
         if turno_acumulado.cost_nano_aiu > 0:
             creditos = turno_acumulado.cost_nano_aiu / 1e9
             modelo_exibicao = agent_model or turno_acumulado.modelo_usado_real
             prefixo_modelo = f"{modelo_exibicao} · " if modelo_exibicao else ""
-            texto_creditos = f"\n\n*🧮 {prefixo_modelo}{creditos:.1f} Credits*"
+            partes_badge.append(f"{prefixo_modelo}{creditos:.1f} Credits")
+        if (
+            turno_acumulado.contexto_tokens_atuais is not None
+            and turno_acumulado.contexto_tokens_limite is not None
+            and turno_acumulado.contexto_tokens_limite > 0
+        ):
+            percentual_contexto = (
+                turno_acumulado.contexto_tokens_atuais
+                / turno_acumulado.contexto_tokens_limite
+                * 100
+            )
+            partes_badge.append(
+                f"{percentual_contexto:.0f}% contexto "
+                f"({_formatar_tokens_compacto(turno_acumulado.contexto_tokens_atuais)}/"
+                f"{_formatar_tokens_compacto(turno_acumulado.contexto_tokens_limite)} tokens)"
+            )
+        if partes_badge:
+            texto_creditos = f"\n\n*🧮 {' · '.join(partes_badge)}*"
             if estado["mensagem_atual_id"] is None:
                 estado["mensagem_atual_id"] = uuid.uuid4().hex
                 yield TextMessageStartEvent(

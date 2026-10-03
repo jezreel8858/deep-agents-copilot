@@ -105,7 +105,21 @@ def _registrar_placeholders_novos_eventos_turn_recorder(
             for chave, valor in kwargs.items():
                 setattr(self, chave, valor)
 
+    class SessionUsageInfoData:
+        """Fake construtivel (2026-10-03) -- mesma razao de
+        `AssistantUsageData` acima: `turn_recorder.registrar_info_contexto`
+        le `current_tokens`/`token_limit` via `getattr` (duck typing).
+        `TestStreamChatAgUiContextWindowBadge` instancia de fato via
+        `_instalar_copilot_falso(..., context_current_tokens=...,
+        context_token_limit=...)` para exercitar o badge real de
+        context-window ("N% contexto (X/Y tokens)")."""
+
+        def __init__(self, **kwargs: Any) -> None:
+            for chave, valor in kwargs.items():
+                setattr(self, chave, valor)
+
     setattr(fake_session_events, "AssistantUsageData", AssistantUsageData)
+    setattr(fake_session_events, "SessionUsageInfoData", SessionUsageInfoData)
     for nome in (
         "ModelCallFailureData",
         "AssistantTurnRetryData",
@@ -136,6 +150,8 @@ def _instalar_copilot_falso(
     mcp_read_only: bool = False,
     usage_total_nano_aiu: float | None = None,
     usage_model: str | None = None,
+    context_current_tokens: int | None = None,
+    context_token_limit: int | None = None,
 ) -> None:
     """Injeta um `copilot` falso em `sys.modules` simulando 1 sessao real.
 
@@ -367,6 +383,19 @@ def _instalar_copilot_falso(
                         )
                     )
                 )
+            if context_current_tokens is not None or context_token_limit is not None:
+                # `SessionUsageInfoData` real (2026-10-03, badge de
+                # context-window): mesmo padrao de `AssistantUsageData`
+                # acima -- referenciada via `fake_session_events.
+                # SessionUsageInfoData`, nunca como nome solto.
+                self._callback(
+                    _Evento(
+                        fake_session_events.SessionUsageInfoData(
+                            current_tokens=context_current_tokens,
+                            token_limit=context_token_limit,
+                        )
+                    )
+                )
             self._callback(_Evento(AssistantIdleData()))
 
         async def __aenter__(self) -> "_FakeSession":
@@ -402,6 +431,7 @@ def _instalar_copilot_falso(
             system_message: Any = None,
             custom_agents: Any = None,
             mcp_servers: Any = None,
+            excluded_tools: Any = None,
             # Aceitos apenas para compatibilidade com `stream_chat_ag_ui`
             # (RT-05) -- esta fake nao exercita elicitation/`ask_user`,
             # apenas precisa nao quebrar com `TypeError: unexpected keyword
@@ -419,6 +449,7 @@ def _instalar_copilot_falso(
             self.system_message_recebido = system_message
             self.custom_agents_recebido = custom_agents
             self.mcp_servers_recebido = mcp_servers
+            self.excluded_tools_recebido = excluded_tools
             sessao = _FakeSession(on_permission_request)
             self.ultima_sessao = sessao
             return sessao
@@ -1847,11 +1878,18 @@ class TestStreamChatMcpServers:
             def __init__(self, github_token: str) -> None:
                 type(self).ultima_instancia = self
                 self.mcp_servers_recebido: Any = None
+                self.excluded_tools_recebido: Any = None
 
             async def create_session(
-                self, *, on_permission_request: Any, mcp_servers: Any = None, **_kw: Any
+                self,
+                *,
+                on_permission_request: Any,
+                mcp_servers: Any = None,
+                excluded_tools: Any = None,
+                **_kw: Any,
             ) -> _FakeSessionLocal:
                 self.mcp_servers_recebido = mcp_servers
+                self.excluded_tools_recebido = excluded_tools
                 return _FakeSessionLocal(on_permission_request)
 
             async def __aenter__(self) -> "_FakeClientLocal":
@@ -2042,3 +2080,267 @@ class TestStreamChatAgUiCreditsBadge:
             e.delta for e in eventos if isinstance(e, TextMessageContentEvent)
         )
         assert "claude-sonnet-4-5 · 0.5 Credits" in texto_completo
+
+
+class TestStreamChatAgUiContextWindowBadge:
+    """Badge de context-window ao final do turno (2026-10-03, pedido
+    explicito do usuario: "conseguimos no front do chat mostrar o
+    context-window do copilot?"). Confirmado via introspeccao real da
+    wheel (`github_copilot_sdk==1.0.16`, `copilot.generated.session_events.
+    SessionUsageInfoData`, docstring: "Current context window usage
+    statistics including token and message counts") que o SDK emite este
+    evento nativo com `current_tokens`/`token_limit` -- combinado no MESMO
+    badge de creditos ja existente (`TestStreamChatAgUiCreditsBadge`), cada
+    pedaco aparecendo de forma independente conforme o SDK reportar."""
+
+    async def test_deve_exibir_percentual_de_contexto_quando_sdk_reporta_uso(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        eventos_disparados: list[str] = []
+        _instalar_copilot_falso(
+            monkeypatch,
+            eventos_disparados=eventos_disparados,
+            tipo_permission_request="read",
+            context_current_tokens=84_200,
+            context_token_limit=200_000,
+        )
+
+        from ag_ui.core import TextMessageContentEvent
+        from local_chat_gateway.api.schemas import ChatMessage
+
+        eventos = [
+            evento
+            async for evento in stream_chat_ag_ui(
+                token="tok-valido",
+                model=None,
+                messages=[ChatMessage(role="user", content="oi")],
+                permission_handler=lambda *_: True,
+                thread_id="thread-1",
+                run_id="run-1",
+            )
+        ]
+
+        texto_completo = "".join(
+            e.delta for e in eventos if isinstance(e, TextMessageContentEvent)
+        )
+        # 84200 / 200000 = 42.1% -> arredondado para 42%; notacao compacta
+        # de tokens (84.2k/200.0k) evita "84200/200000 tokens" ilegivel.
+        assert "42% contexto (84.2k/200.0k tokens)" in texto_completo
+
+    async def test_deve_combinar_creditos_e_contexto_no_mesmo_badge(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        eventos_disparados: list[str] = []
+        _instalar_copilot_falso(
+            monkeypatch,
+            eventos_disparados=eventos_disparados,
+            tipo_permission_request="read",
+            usage_total_nano_aiu=1_924_000_000.0,
+            usage_model="claude-sonnet-4-5",
+            context_current_tokens=50_000,
+            context_token_limit=200_000,
+        )
+
+        from ag_ui.core import TextMessageContentEvent
+        from local_chat_gateway.api.schemas import ChatMessage
+
+        eventos = [
+            evento
+            async for evento in stream_chat_ag_ui(
+                token="tok-valido",
+                model=None,
+                messages=[ChatMessage(role="user", content="oi")],
+                permission_handler=lambda *_: True,
+                thread_id="thread-1",
+                run_id="run-1",
+                agent_model="Claude Sonnet 5",
+            )
+        ]
+
+        texto_completo = "".join(
+            e.delta
+            for e in eventos
+            if isinstance(e, TextMessageContentEvent) and e.subagent_run_id is None
+        )
+        assert (
+            "*🧮 Claude Sonnet 5 · 1.9 Credits · 25% contexto (50.0k/200.0k tokens)*"
+            in texto_completo
+        )
+
+    async def test_nao_deve_exibir_contexto_quando_sdk_nao_reporta_token_limit(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Guarda contra divisao por zero/dado incompleto: so' exibe o
+        percentual quando AMBOS `current_tokens` e `token_limit` (> 0)
+        estao disponiveis."""
+        eventos_disparados: list[str] = []
+        _instalar_copilot_falso(
+            monkeypatch,
+            eventos_disparados=eventos_disparados,
+            tipo_permission_request="read",
+            context_current_tokens=50_000,
+            context_token_limit=None,
+        )
+
+        from ag_ui.core import TextMessageContentEvent
+        from local_chat_gateway.api.schemas import ChatMessage
+
+        eventos = [
+            evento
+            async for evento in stream_chat_ag_ui(
+                token="tok-valido",
+                model=None,
+                messages=[ChatMessage(role="user", content="oi")],
+                permission_handler=lambda *_: True,
+                thread_id="thread-1",
+                run_id="run-1",
+            )
+        ]
+
+        texto_completo = "".join(
+            e.delta for e in eventos if isinstance(e, TextMessageContentEvent)
+        )
+        assert "contexto" not in texto_completo
+
+
+class TestStreamChatExcludedToolsBloqueiaTaskFantasma:
+    """Bug real investigado 2026-10-03 (log `.tmp/gateway.log` linha
+    9739-9778): a tool nativa `task` (`copilot.BUILTIN_TOOLS_ISOLATED`,
+    SEMPRE exposta independente do `tools:` do agent) foi invocada
+    diretamente pelo modelo com `agent_name=task` e um label livre
+    ("Run session_store tests") como `agent_display_name` -- nome ausente
+    nos custom_agents reais (badge "Agente Ativo: Run session_store tests"
+    exibido na UI, nome que nao existe no catalogo), consumindo 332554
+    tokens / 9 tool calls so para uma delegacao fantasma. A instrucao
+    textual `_NOTA_GATEWAY_HEADLESS` (soft) ja orientava o modelo a nao
+    usar `run_subagent`/`task`, mas foi ignorada -- `excluded_tools=["task"]`
+    e o bloqueio DURO via SDK (remove a tool do catalogo repassado ao
+    modelo), validado aqui nos 2 call-sites de `client.create_session`
+    (`stream_chat` e `stream_chat_ag_ui`), mesmo padrao de cobertura de
+    `TestStreamChatMcpServers` (T11/T12)."""
+
+    async def test_deve_repassar_excluded_tools_task_ao_create_session_stream_chat(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from local_chat_gateway.api.schemas import ChatMessage
+
+        _instalar_copilot_falso(monkeypatch, eventos_disparados=[])
+
+        async for _ in stream_chat(
+            token="tok-valido",
+            model=None,
+            messages=[ChatMessage(role="user", content="oi")],
+            permission_handler=lambda *_: False,
+        ):
+            pass
+
+        fake_copilot_module = sys.modules["copilot"]
+        classe_cliente = getattr(fake_copilot_module, "FakeClientRef")
+        instancia = classe_cliente.ultima_instancia
+        assert instancia is not None
+        assert instancia.excluded_tools_recebido == ["task"]
+
+    async def test_deve_repassar_excluded_tools_task_ao_create_session_stream_chat_ag_ui(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Fake minimo e dedicado (2o call-site, `stream_chat_ag_ui`),
+        espelhando `test_deve_repassar_mcp_servers_ao_create_session_
+        stream_chat_ag_ui` -- nao reaproveita o fixture de `stream_chat`
+        (assinatura keyword-only incompativel com os parametros extras de
+        `stream_chat_ag_ui`)."""
+        from local_chat_gateway.api.schemas import ChatMessage
+
+        class _PlaceholderVazioLocal2:
+            pass
+
+        class AssistantIdleDataLocal2:
+            pass
+
+        class _FakeSessionLocal2:
+            def __init__(self, on_permission_request: Any) -> None:
+                self._on_permission_request = on_permission_request
+                self._callback: Any = None
+
+            def on(self, callback: Any) -> None:
+                self._callback = callback
+
+            async def send(self, prompt: str, attachments: Any = None) -> None:
+                self._callback(
+                    types.SimpleNamespace(data=AssistantIdleDataLocal2())
+                )
+
+            async def __aenter__(self) -> "_FakeSessionLocal2":
+                return self
+
+            async def __aexit__(self, *exc: object) -> None:
+                return None
+
+        class _FakeClientLocal2:
+            ultima_instancia: "_FakeClientLocal2 | None" = None
+
+            def __init__(self, github_token: str) -> None:
+                type(self).ultima_instancia = self
+                self.excluded_tools_recebido: Any = None
+
+            async def create_session(
+                self,
+                *,
+                on_permission_request: Any,
+                excluded_tools: Any = None,
+                **_kw: Any,
+            ) -> _FakeSessionLocal2:
+                self.excluded_tools_recebido = excluded_tools
+                return _FakeSessionLocal2(on_permission_request)
+
+            async def __aenter__(self) -> "_FakeClientLocal2":
+                return self
+
+            async def __aexit__(self, *exc: object) -> None:
+                return None
+
+        fake_copilot = types.ModuleType("copilot")
+        fake_copilot.CopilotClient = _FakeClientLocal2  # type: ignore[attr-defined]
+
+        fake_session_events = types.ModuleType("copilot.session_events")
+        for nome in (
+            "AssistantMessageData",
+            "ToolExecutionStartData",
+            "ToolExecutionCompleteData",
+            "SubagentStartedData",
+            "SubagentCompletedData",
+            "SubagentFailedData",
+            "SessionErrorData",
+            "PermissionRequestRead",
+            "PermissionRequestWrite",
+            "PermissionRequestMcp",
+            "PermissionRequestCustomTool",
+            "PermissionRequestShell",
+        ):
+            setattr(fake_session_events, nome, _PlaceholderVazioLocal2)
+        setattr(fake_session_events, "AssistantIdleData", AssistantIdleDataLocal2)
+        _registrar_placeholders_novos_eventos_turn_recorder(fake_session_events)
+
+        fake_rpc = types.ModuleType("copilot.generated.rpc")
+        setattr(fake_rpc, "PermissionDecisionApproveOnce", type("PDA2", (), {}))
+        setattr(
+            fake_rpc,
+            "PermissionDecisionReject",
+            type("PDR2", (), {"__init__": lambda self, feedback=None: None}),
+        )
+
+        monkeypatch.setitem(sys.modules, "copilot", fake_copilot)
+        monkeypatch.setitem(sys.modules, "copilot.session_events", fake_session_events)
+        monkeypatch.setitem(sys.modules, "copilot.generated.rpc", fake_rpc)
+
+        async for _ in stream_chat_ag_ui(
+            token="tok-valido",
+            model=None,
+            messages=[ChatMessage(role="user", content="oi")],
+            permission_handler=lambda *_: True,
+            thread_id="t1",
+            run_id="r1",
+        ):
+            pass
+
+        assert _FakeClientLocal2.ultima_instancia is not None
+        assert _FakeClientLocal2.ultima_instancia.excluded_tools_recebido == ["task"]
