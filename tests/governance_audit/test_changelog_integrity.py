@@ -343,7 +343,10 @@ def test_anti_truncation_hook_e2e_git_commit_simulation(tmp_path: Path):
     changelog = tmp_path / "CHANGELOG.md"
     changelog.write_text("# CHANGELOG\n\n## [1.0.0] — 2026-01-01\n- Versão inicial.\n", encoding="utf-8")
     subprocess.run([git_bin, "add", "CHANGELOG.md"], cwd=tmp_path, check=True)
-    res_init = subprocess.run([git_bin, "commit", "-m", "chore: initial changelog"], cwd=tmp_path, capture_output=True, text=True, env=env)
+    res_init = subprocess.run(
+        [git_bin, "commit", "-m", "chore: initial changelog"],
+        cwd=tmp_path, capture_output=True, text=True, encoding="utf-8", errors="replace", env=env,
+    )
     assert res_init.returncode == 0, f"Commit inicial falhou indevidamente: {res_init.stderr}"
 
     # 2. Inserção de versões novas antes de 1.0.0 (cenário de falso positivo do Myers diff)
@@ -355,7 +358,10 @@ def test_anti_truncation_hook_e2e_git_commit_simulation(tmp_path: Path):
         encoding="utf-8"
     )
     subprocess.run([git_bin, "add", "CHANGELOG.md"], cwd=tmp_path, check=True)
-    res_additive = subprocess.run([git_bin, "commit", "-m", "feat: add 1.1.0 and 1.2.0"], cwd=tmp_path, capture_output=True, text=True, env=env)
+    res_additive = subprocess.run(
+        [git_bin, "commit", "-m", "feat: add 1.1.0 and 1.2.0"],
+        cwd=tmp_path, capture_output=True, text=True, encoding="utf-8", errors="replace", env=env,
+    )
     assert res_additive.returncode == 0, (
         f"Falso positivo no hook! Inserção aditiva de versões foi bloqueada: {res_additive.stderr}"
     )
@@ -369,7 +375,10 @@ def test_anti_truncation_hook_e2e_git_commit_simulation(tmp_path: Path):
         encoding="utf-8"
     )
     subprocess.run([git_bin, "add", "CHANGELOG.md"], cwd=tmp_path, check=True)
-    res_removal = subprocess.run([git_bin, "commit", "-m", "bad: remove 1.1.0"], cwd=tmp_path, capture_output=True, text=True, env=env)
+    res_removal = subprocess.run(
+        [git_bin, "commit", "-m", "bad: remove 1.1.0"],
+        cwd=tmp_path, capture_output=True, text=True, encoding="utf-8", errors="replace", env=env,
+    )
     assert res_removal.returncode != 0, "Hook falhou em bloquear a remoção líquida da versão 1.1.0!"
     combined_output = res_removal.stdout + res_removal.stderr
     assert "Anti-Truncamento" in combined_output
@@ -431,6 +440,8 @@ def test_anti_truncation_hook_blocks_duplicate_header_removal_safe_by_default(tm
         cwd=tmp_path,
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         env=env
     )
     assert res_init.returncode == 0, f"Commit inicial falhou indevidamente: {res_init.stderr}"
@@ -448,6 +459,8 @@ def test_anti_truncation_hook_blocks_duplicate_header_removal_safe_by_default(tm
         cwd=tmp_path,
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         env=env
     )
 

@@ -19,9 +19,17 @@ from __future__ import annotations
 from pathlib import Path
 import pytest
 
+from tests.governance_audit.test_ctx_execute_capability_profile import GATHER_ONLY_AGENTS
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 AGENTS_DIR = REPO_ROOT / ".github" / "agents"
 SKILLS_DIR = REPO_ROOT / ".github" / "skills"
+
+# Nomes de arquivo (.agent.md) dos 26 agentes Gather-only (R-055/Smell 2.32) — fonte única
+# em test_ctx_execute_capability_profile.py::GATHER_ONLY_AGENTS. Estes agentes NÃO possuem
+# 'context-mode/ctx_execute'/'context-mode/ctx_execute_file' por design (poda cirúrgica em
+# [2.52.4]), mas continuam exigidos para as demais 3 ferramentas context-mode.
+GATHER_ONLY_AGENT_FILES = {f"{name}.agent.md" for name in GATHER_ONLY_AGENTS}
 
 
 def test_r008_and_r056_declared_in_claude_md():
@@ -402,7 +410,8 @@ def test_all_non_router_agents_declare_ctx_batch_execute_and_ctx_execute():
         rel = str(af.relative_to(REPO_ROOT))
         if "context-mode/ctx_batch_execute" not in tools_str:
             missing_batch.append(rel)
-        if "context-mode/ctx_execute" not in tools_str:
+        # Agentes Gather-only (R-055/Smell 2.32) são isentos de ctx_execute por design.
+        if af.name not in GATHER_ONLY_AGENT_FILES and "context-mode/ctx_execute" not in tools_str:
             missing_exec.append(rel)
 
     assert not missing_batch, (
@@ -410,7 +419,7 @@ def test_all_non_router_agents_declare_ctx_batch_execute_and_ctx_execute():
         + "\n".join(missing_batch)
     )
     assert not missing_exec, (
-        f"100% dos agentes não-roteadores DEVEM possuir ctx_execute. Faltam ({len(missing_exec)}):\n"
+        f"100% dos agentes não-roteadores Gather+Process DEVEM possuir ctx_execute. Faltam ({len(missing_exec)}):\n"
         + "\n".join(missing_exec)
     )
 
@@ -552,18 +561,19 @@ def test_all_executor_agents_absence_of_native_editor_tools():
 
 def test_all_executor_agents_declare_all_ctx_tools():
     """
-    Valida que 100% dos 50 agentes executores declaram compulsoriamente todas as 5 ferramentas
-    context-mode (ctx_execute, ctx_execute_file, ctx_batch_execute, ctx_index, ctx_search) em tools:.
+    Valida que 100% dos 50 agentes executores declaram compulsoriamente as 3 ferramentas
+    context-mode universais (ctx_batch_execute, ctx_index, ctx_search) em tools:, e que os
+    agentes Gather+Process (não classificados como Gather-only em R-055/Smell 2.32) também
+    declaram ctx_execute/ctx_execute_file.
     """
     import re
 
-    required_ctx = [
-        "context-mode/ctx_execute",
-        "context-mode/ctx_execute_file",
+    universal_ctx = [
         "context-mode/ctx_batch_execute",
         "context-mode/ctx_index",
         "context-mode/ctx_search",
     ]
+    heavy_ctx = ["context-mode/ctx_execute", "context-mode/ctx_execute_file"]
     agent_files = [
         p for p in AGENTS_DIR.glob("**/*.agent.md")
         if p.name in EXECUTOR_AGENT_NAMES
@@ -580,7 +590,8 @@ def test_all_executor_agents_declare_all_ctx_tools():
         if not tools_match:
             continue
         tools_str = tools_match.group(1)
-        missing = [t for t in required_ctx if t not in tools_str]
+        required = universal_ctx if af.name in GATHER_ONLY_AGENT_FILES else universal_ctx + heavy_ctx
+        missing = [t for t in required if t not in tools_str]
         if missing:
             violations.append(f"[{af.name}] ferramentas context-mode ausentes: {missing}")
 
@@ -664,17 +675,18 @@ def test_all_non_router_agents_absence_of_native_editor_tools():
 def test_all_non_router_agents_declare_all_ctx_tools():
     """
     Valida que 100% de todos os agentes nao-roteadores (exceto prompt-structuring) declaram
-    compulsoriamente todas as 5 ferramentas context-mode (ctx_execute, ctx_execute_file, ctx_batch_execute, ctx_index, ctx_search) em tools:.
+    compulsoriamente as 3 ferramentas context-mode universais (ctx_batch_execute, ctx_index,
+    ctx_search) em tools:, e que os agentes Gather+Process (fora da lista Gather-only de
+    R-055/Smell 2.32) também declaram ctx_execute/ctx_execute_file.
     """
     import re
 
-    required_ctx = [
-        "context-mode/ctx_execute",
-        "context-mode/ctx_execute_file",
+    universal_ctx = [
         "context-mode/ctx_batch_execute",
         "context-mode/ctx_index",
         "context-mode/ctx_search",
     ]
+    heavy_ctx = ["context-mode/ctx_execute", "context-mode/ctx_execute_file"]
     all_agents = [
         p for p in AGENTS_DIR.glob("**/*.agent.md")
         if "templates" not in p.parts
@@ -695,7 +707,8 @@ def test_all_non_router_agents_declare_all_ctx_tools():
         if not tools_match:
             continue
         tools_str = tools_match.group(1)
-        missing = [t for t in required_ctx if t not in tools_str]
+        required = universal_ctx if af.name in GATHER_ONLY_AGENT_FILES else universal_ctx + heavy_ctx
+        missing = [t for t in required if t not in tools_str]
         if missing:
             violations.append(f"[{af.name}] ferramentas context-mode ausentes: {missing}")
 
