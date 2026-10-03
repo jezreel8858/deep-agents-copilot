@@ -13,6 +13,8 @@ from __future__ import annotations
 from pathlib import Path
 import pytest
 
+from tests.governance_audit._helpers import read_workflows_full_content
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 AGENTS_DIR = REPO_ROOT / ".github" / "agents"
 SKILLS_DIR = REPO_ROOT / ".github" / "skills"
@@ -46,13 +48,12 @@ def test_r055_declared_in_copilot_instructions():
 
 
 def test_systemic_reuse_gate_declared_in_workflows():
-    """Valida se workflows.md formaliza o Systemic Reuse Gate no WORKFLOW-GOVERNANCE-MAINTENANCE."""
-    wf_file = AGENTS_DIR / "workflows.md"
-    assert wf_file.exists()
-    content = wf_file.read_text(encoding="utf-8")
+    """Valida se workflows.md (fatiado em .github/agents/workflows/, R-066/F3) formaliza
+    o Systemic Reuse Gate no WORKFLOW-GOVERNANCE-MAINTENANCE."""
+    content = read_workflows_full_content(REPO_ROOT)
 
     assert "Portão de Reúso e Generalização Sistêmica" in content, (
-        "workflows.md DEVE declarar a seção do Portão de Reúso e Generalização Sistêmica"
+        "workflows.md (ou arquivos fatiados em workflows/) DEVE declarar a seção do Portão de Reúso e Generalização Sistêmica"
     )
     assert "R-055" in content, "workflows.md DEVE vincular o gate à regra R-055"
     assert "Q1" in content and "Q2" in content and "Q3" in content, (

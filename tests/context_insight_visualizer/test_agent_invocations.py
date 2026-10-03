@@ -36,7 +36,7 @@ def test_load_known_agents_contains_canonical():
     agents = load_known_agents()
     assert "agent-router" in agents
     assert "feature-planner" in agents
-    assert "code-knowledge-graph" in agents
+    assert "codegraph-engine" in agents
     assert "prompt-structuring" in agents
     assert "deep-search" in agents
     assert "test-strategy" in agents
@@ -47,7 +47,7 @@ def test_subagent_pattern_detection():
     samples = [
         ('run_subagent(agentName="feature-planner", task="planejar")', "feature-planner"),
         ('run_subagent(agentName: "Search", task="buscar")', "Search"),
-        ('agentName: "code-knowledge-graph"', "code-knowledge-graph"),
+        ('agentName: "codegraph-engine"', "codegraph-engine"),
         ('This is what has been accomplished by Custom Agent "agent-router":', "agent-router"),
         ('Delegando para @prompt-structuring — modelo solicitado', "prompt-structuring"),
         ('Delegado: @angular-router', "angular-router"),
@@ -71,7 +71,7 @@ def test_direct_pattern_detection():
         ("chame o agent angular-router", "angular-router"),
         ("Follow instructions in [commit](file:///d%3A/workspace/deep-agents-copilot/.github/prompts/commit.prompt.md).", "commit"),
         ("/agent-router como estruturar", "agent-router"),
-        ("Agente Ativo: @code-knowledge-graph", "code-knowledge-graph"),
+        ("Agente Ativo: @codegraph-engine", "codegraph-engine"),
     ]
 
     for text, expected_agent in samples:

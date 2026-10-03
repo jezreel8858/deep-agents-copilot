@@ -15,6 +15,8 @@ from __future__ import annotations
 from pathlib import Path
 import pytest
 
+from tests.governance_audit._helpers import read_workflows_full_content
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CLAUDE_PATH = REPO_ROOT / "CLAUDE.md"
 COPILOT_INSTRUCTIONS_PATH = REPO_ROOT / ".github" / "copilot-instructions.md"
@@ -107,8 +109,9 @@ def test_governance_factory_enforces_anti_manual_user_delegation():
 
 
 def test_workflows_declare_anti_manual_user_delegation_invariant():
-    """Valida se workflows.md declara o Invariante de proibição de terceirização de execução ao usuário."""
-    content = WORKFLOWS_PATH.read_text(encoding="utf-8")
+    """Valida se workflows.md (fatiado em .github/agents/workflows/, R-066/F3) declara o
+    Invariante de proibição de terceirização de execução ao usuário."""
+    content = read_workflows_full_content(REPO_ROOT)
     assert "Invariante de Proibição Estrita de Terceirização ao Usuário" in content or "R-057" in content, (
-        "workflows.md DEVE formalizar o invariante anti-terceirização de execução ao usuário em etapas analíticas/diagnósticas"
+        "workflows.md (ou arquivos fatiados em workflows/) DEVE formalizar o invariante anti-terceirização de execução ao usuário em etapas analíticas/diagnósticas"
     )

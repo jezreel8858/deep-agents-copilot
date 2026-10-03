@@ -90,7 +90,7 @@ def test_execution_protocol_and_router_declarations_for_telemetry_emission():
     Garante que a emissão obrigatória de telemetria de handoff está embutida diretamente:
     1. No fragmento canônico do execution_protocol (STANDARD - item 7).
     2. No template canônico de novos agents executores (agent-template.md).
-    3. No agent CUSTOM pinado com run_subagent (code-knowledge-graph.agent.md).
+    3. No agent CUSTOM pinado com run_subagent (codegraph-engine.agent.md).
     4. Nos routers (router-agent.md template e agent-router.agent.md), formalizando
        a decisão arquitetural de baseline R-054 (Least Privilege: router sem ctx_index;
        emissão física a cargo do agent receptor/delegado).
@@ -108,7 +108,7 @@ def test_execution_protocol_and_router_declarations_for_telemetry_emission():
     assert "Emissão Obrigatória de Telemetria de Handoff (R-042" in tpl_text
     assert "[HANDOFF]" in tpl_text
 
-    ckg_path = REPO_ROOT / ".github" / "agents" / "code-knowledge-graph.agent.md"
+    ckg_path = REPO_ROOT / ".github" / "agents" / "codegraph-engine.agent.md"
     ckg_text = ckg_path.read_text(encoding="utf-8")
     assert "Emissão Obrigatória de Telemetria de Handoff (R-042" in ckg_text
     assert "[HANDOFF]" in ckg_text

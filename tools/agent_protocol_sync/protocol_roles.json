@@ -13,7 +13,7 @@
   "binding-initializer": "STANDARD",
   "bug-triage": "STANDARD",
   "business-rules-extractor": "STANDARD",
-  "code-knowledge-graph": "CUSTOM",
+  "codegraph-engine": "CUSTOM",
   "code-review": "STANDARD",
   "code-style-enforcer": "STANDARD",
   "compliance-guardrails": "STANDARD",

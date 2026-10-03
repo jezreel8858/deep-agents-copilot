@@ -17,6 +17,8 @@ from pathlib import Path
 import pytest
 import yaml
 
+from tests.governance_audit._helpers import read_workflows_full_content
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CLAUDE_PATH = REPO_ROOT / "CLAUDE.md"
 COPILOT_INSTRUCTIONS_PATH = REPO_ROOT / ".github" / "copilot-instructions.md"
@@ -82,11 +84,11 @@ def test_router_template_declares_r058_and_blueprint_gate():
 
 
 def test_workflows_feature_development_declares_invariant_20():
-    """Valida se workflows.md formaliza o Invariante 20 no WORKFLOW-FEATURE-DEVELOPMENT."""
-    assert WORKFLOWS_PATH.exists(), "workflows.md não encontrado"
-    content = WORKFLOWS_PATH.read_text(encoding="utf-8")
+    """Valida se workflows.md (fatiado em .github/agents/workflows/, R-066/F3) formaliza
+    o Invariante 20 no WORKFLOW-FEATURE-DEVELOPMENT."""
+    content = read_workflows_full_content(REPO_ROOT)
     assert "Invariante de Blueprint Técnico e Decomposição Obrigatórios" in content or "Invariante 20" in content, (
-        "workflows.md DEVE declarar o Invariante 20"
+        "workflows.md (ou arquivos fatiados em workflows/) DEVE declarar o Invariante 20"
     )
     assert "R-058" in content, "workflows.md DEVE vincular o Invariante 20 à regra R-058"
     assert "Smell 2.27" in content, "workflows.md DEVE vincular o Invariante 20 ao Smell 2.27"

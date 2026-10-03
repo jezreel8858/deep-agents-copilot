@@ -11,7 +11,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 CLAUDE_MD = REPO_ROOT / "CLAUDE.md"
 COPILOT_INSTRUCTIONS = REPO_ROOT / ".github" / "copilot-instructions.md"
 AGENT_TEMPLATE = REPO_ROOT / ".github" / "agents" / "templates" / "agent-template.md"
-CKG_AGENT = REPO_ROOT / ".github" / "agents" / "code-knowledge-graph.agent.md"
+CKG_AGENT = REPO_ROOT / ".github" / "agents" / "codegraph-engine.agent.md"
 CODEGRAPH_SKILL = REPO_ROOT / ".github" / "skills" / "codegraph-optave-usage" / "SKILL.md"
 EFFICIENT_BATCH_SKILL = REPO_ROOT / ".github" / "skills" / "efficient-batch-code-modification" / "SKILL.md"
 CHANGELOG_MD = REPO_ROOT / "CHANGELOG.md"
@@ -76,7 +76,7 @@ def test_agent_template_declares_turn_budget_in_execution_protocol():
     assert "R-060" in text
 
 
-def test_code_knowledge_graph_declares_turn_budget_and_warm_start():
+def test_codegraph_engine_declares_turn_budget_and_warm_start():
     text = CKG_AGENT.read_text(encoding="utf-8")
     assert "<execution_protocol>" in text
     assert "Teto R" in text
@@ -95,7 +95,7 @@ def test_all_non_router_agents_declare_r060_turn_budget():
     Garante propagacao sistemica de R-060 (Teto de Tool Turns, Warm Start,
     Batch Querying) para 100 por cento dos agentes executores nao-roteadores.
     Previne a regressao do gap onde R-060 existia apenas no template e no
-    code-knowledge-graph, mas nao nos demais 76 agentes executores.
+    codegraph-engine, mas nao nos demais 76 agentes executores.
     """
     non_routers = get_non_router_agent_files()
     missing = []

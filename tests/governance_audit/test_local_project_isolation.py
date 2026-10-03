@@ -17,6 +17,8 @@ from pathlib import Path
 import pytest
 import yaml
 
+from tests.governance_audit._helpers import read_workflows_full_content
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 THIS_REPO_NAME = REPO_ROOT.name.lower()
 THIS_REPO_TOKENS = {THIS_REPO_NAME, "deep-agents-copilot", "deep_agents_copilot", "deep agents copilot"}
@@ -197,11 +199,10 @@ def test_unique_catalog_and_zero_projects_in_shared_files():
 # ─────────────────────────────────────────────────────────────
 
 def test_generic_placeholders_in_workflow_and_router():
-    """Valida que workflows.md, agent-router e handoff usam placeholders genéricos padronizados."""
-    workflows_md = REPO_ROOT / ".github" / "agents" / "workflows.md"
-    assert workflows_md.exists()
-    content_wf = workflows_md.read_text(encoding="utf-8")
-    assert "[PROJETO-ALVO]" in content_wf, "workflows.md deve usar o placeholder genérico [PROJETO-ALVO]"
+    """Valida que workflows.md (fatiado em .github/agents/workflows/, R-066/F3), agent-router
+    e handoff usam placeholders genéricos padronizados."""
+    content_wf = read_workflows_full_content(REPO_ROOT)
+    assert "[PROJETO-ALVO]" in content_wf, "workflows.md (ou arquivos fatiados em workflows/) deve usar o placeholder genérico [PROJETO-ALVO]"
 
     router_agent = REPO_ROOT / ".github" / "agents" / "agent-router.agent.md"
     assert router_agent.exists()

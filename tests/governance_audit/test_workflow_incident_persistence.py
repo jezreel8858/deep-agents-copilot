@@ -145,7 +145,7 @@ def test_sqlite_sink_record_and_query_incident():
         incident = WorkflowIncident(
             workflow_id="WF-TEST-001",
             workflow_name="WORKFLOW-TECHNICAL-ANALYSIS",
-            agent_id="code-knowledge-graph",
+            agent_id="codegraph-engine",
             step_index=2,
             step_name="Mapeamento de Chamadas",
             severity="MEDIUM",

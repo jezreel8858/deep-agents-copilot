@@ -107,7 +107,7 @@ Abaixo detalha-se o escopo de cobertura e a importância crítica de cada arquiv
 #### `test_operational_workflows.py`
 - **O que cobre**: Consistência sistêmica e integridade conceitual dos workflows canônicos (R-050):
   - Validação da sintaxe e renderização dos diagramas Mermaid no `README.md`.
-  - Validação dos Golden Paths operacionais (ex.: `prompt-structuring` após router, `code-knowledge-graph` obrigatório em refatorações, `deep-search` obrigatório na criação de artefatos).
+  - Validação dos Golden Paths operacionais (ex.: `prompt-structuring` após router, `codegraph-engine` obrigatório em refatorações, `deep-search` obrigatório na criação de artefatos).
   - Presença dos 5 workflows em `workflows.md` e `routing-graph.yaml`.
   - Schema v1.3 de handoff (`workflow_tracking`, `projeto_alvo`, `chaining`).
 - **Importância para a qualidade**: **Prevenção de Becos Sem Saída (Anti-Dead-End)**. Garante que os fluxos declarados na documentação e no grafo de roteamento possuam correspondência real no código e que nenhum agente aponte para um sucessor inexistente.
@@ -153,7 +153,7 @@ Abaixo detalha-se o escopo de cobertura e a importância crítica de cada arquiv
   - Detecção de quebra de fronteiras arquiteturais entre módulos.
   - Cálculo de métricas de acoplamento e detecção de ciclos de dependência.
   - Geração de relatórios HTML autocontidos.
-- **Importância para a qualidade**: **Integridade Arquitetural**. Garante que o visualizador de grafos forneça evidências matemáticas confiáveis sobre acoplamento e contratos de API para o `@code-knowledge-graph`.
+- **Importância para a qualidade**: **Integridade Arquitetural**. Garante que o visualizador de grafos forneça evidências matemáticas confiáveis sobre acoplamento e contratos de API para o `@codegraph-engine`.
 
 #### `tests/context_insight_visualizer/`
 - **Arquivos**: `test_agent_invocations.py`.
