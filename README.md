@@ -193,7 +193,7 @@ flowchart TD
     FP -- "Sim (Fast-Path R-050)" --> WF["Workflows Canônicos\n(Pipelines Determinísticos)"]
 
     E & WF --> G1["🎯 Planning/Analysis\nrequirements-analyst · deep-search\nfeature-planner"]
-    E & WF --> G2["📐 Architecture/Design\ntech-solution-architect · code-knowledge-graph\nbusiness-rules-extractor · refactor-planner\nddd-bounded-context-mapper · adr-sentinel"]
+    E & WF --> G2["📐 Architecture/Design\ntech-solution-architect · codegraph-engine\nbusiness-rules-extractor · refactor-planner\nddd-bounded-context-mapper · adr-sentinel"]
     E & WF --> G3["💻 Implementation (Domain Routers & Specialists)\nangular-router · spring-boot-router · spring-reactive-router\nejb-router · python-router · database-router · database-specialist"]
     E & WF --> G4["✅ Quality/Validation\nbug-triage · debugger · test-strategy\ncode-review · code-style-enforcer · security-reviewer\nperformance-agent · devops-engineer · runtime-verifier\nrepo-hygiene-auditor"]
     E & WF --> G5["📚 Documentation/Learning\ndocs-engineer"]
@@ -241,7 +241,7 @@ Frameworks de referência (Claude Code/Agent SDK da Anthropic, Microsoft Agent F
 | Categoria de Mercado | Perfis Esperados | Cobertos Neste Projeto | Cobertura |
 |---|---|---|---|
 | 🎯 Planning & Analysis | Planner, PM/Analyst, Researcher | `requirements-analyst`, `deep-search`, `feature-planner` | ✅ 100% |
-| 📐 Architecture & Design | Architect, Impact Analyzer, Rules Extractor, Refactor Planner, DDD, ADR | `tech-solution-architect`, `code-knowledge-graph`, `business-rules-extractor`, `refactor-planner`, `ddd-bounded-context-mapper`, `adr-sentinel` | ✅ 100% |
+| 📐 Architecture & Design | Architect, Impact Analyzer, Rules Extractor, Refactor Planner, DDD, ADR | `tech-solution-architect`, `codegraph-engine`, `business-rules-extractor`, `refactor-planner`, `ddd-bounded-context-mapper`, `adr-sentinel` | ✅ 100% |
 | 💻 Implementation | Coder por stack, Debugger, DB Specialist | `angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `python-router`, `database-router`, `database-specialist` | ✅ 100% |
 | ✅ Quality & Validation | Test Strategy/Impl, Reviewer, Security, Performance, QA, Runtime | `bug-triage`, `debugger`, `test-strategy`, `code-review`, `code-style-enforcer`, `security-reviewer`, `performance-agent`, `devops-engineer`, `runtime-verifier`, `repo-hygiene-auditor` | ✅ 100% |
 | 📚 Documentation & Learning | Docs Engineer, Context Builder | `docs-engineer` | ✅ 100% |
@@ -262,7 +262,7 @@ flowchart TB
 
         subgraph CAT2["📐 ARCHITECTURE &amp; DESIGN"]
             direction TB
-            B1[tech-solution-architect] ~~~ B2[code-knowledge-graph] ~~~ B3[business-rules-extractor]
+            B1[tech-solution-architect] ~~~ B2[codegraph-engine] ~~~ B3[business-rules-extractor]
             B4[refactor-planner] ~~~ B5["ddd-bounded-context-mapper 🗺️"] ~~~ B6["adr-sentinel 📜"]
         end
 
@@ -378,7 +378,7 @@ flowchart TB
 - ✅ `prompt-structuring` — passo mandatório pós-Health Check (R-041), loop de auto-refinamento (máx. 5 iterações)
 - ✅ 34 agents downstream especializados, agrupados por função:
   - **Planejamento/Análise:** `requirements-analyst`, `deep-search`, `feature-planner`
-  - **Arquitetura/Design:** `tech-solution-architect`, `code-knowledge-graph`, `business-rules-extractor`, `refactor-planner`, `ddd-bounded-context-mapper`, `adr-sentinel`
+  - **Arquitetura/Design:** `tech-solution-architect`, `codegraph-engine`, `business-rules-extractor`, `refactor-planner`, `ddd-bounded-context-mapper`, `adr-sentinel`
   - **Implementação (Domain Routers & Specialists):** `angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `python-router`, `database-router`, `database-specialist`
   - **Qualidade/Validação:** `bug-triage`, `debugger`, `test-strategy`, `code-review`, `code-style-enforcer`, `security-reviewer`, `performance-agent`, `devops-engineer`, `runtime-verifier`
   - **Documentação:** `docs-engineer` (modos `author`/`curate`)

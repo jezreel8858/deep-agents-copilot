@@ -13,11 +13,12 @@ triggers:
   - "roteamento downstream"
   - "transferir tarefa"
   - "agent delegation"
-source_docs:
+source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/agents/catalog.yaml
 tools: []
+source_docs:
+  - .github/agents/catalog.yaml
 ---
 
 # Handoff Governance
@@ -301,7 +302,7 @@ O aumento da complexidade de workflows multi-agente exige a transição formal d
     ```yaml
     evidencias:
       - tipo: "pointer"
-        artifact_ref: "docs/architecture/technical-blueprint.md" # ou "ctx:code-knowledge-graph:ast-dump"
+        artifact_ref: "docs/architecture/technical-blueprint.md" # ou "ctx:codegraph-engine:ast-dump"
         hash: "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         mime_type: "text/markdown"
         tamanho_bytes: 8420

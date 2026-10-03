@@ -1,0 +1,81 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deep-agents-gateway"
+version = "0.1.0"
+description = "Deep Agents Gateway: gateway OpenAI-compatible local para Copilot SDK com governanca aplicada em codigo (MVP). Ver docs/architecture/BLUEPRINT_LOCAL_CHAT_GATEWAY.md."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Proprietary" }
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "pydantic>=2.5",
+    "pydantic-settings>=2.2",
+    "sqlalchemy>=2.0",
+    # ag-ui-protocol: tipos + EventEncoder do protocolo AG-UI (docs.ag-ui.com),
+    # usado pelo endpoint nativo "/v2/agent" (Fase 2 -- paridade visual com o
+    # plugin Copilot da IDE: subagent como card nativo via
+    # SubagentStarted/Finished/ErrorEvent, AG-UI 1.0, em vez de texto
+    # achatado). Dependencia BASE (nao opcional [sdk]): o endpoint emite
+    # RunErrorEvent/stub via este encoder mesmo sem o SDK real instalado.
+    "ag-ui-protocol>=1.0.0",
+    # PyYAML: leitura de projects.local.yaml (projects_catalog.py) para
+    # descoberta automatica de projetos (R-043). Ja transitiva via
+    # governance-runner, declarada aqui explicitamente por clareza.
+    "PyYAML>=6.0",
+    # pathspec: matching de padroes estilo .gitignore (sintaxe gitwildmatch,
+    # com suporte a negacao `!padrao`) usado por `workspace_catalog.py` para
+    # o picker `#` do composer -- replica o comportamento real do ripgrep/
+    # picker da IDE (.gitignore + .ignore + .rgignore, dotfiles ocultos por
+    # padrao exceto quando desocultados via negacao). Ja transitiva via
+    # `black` (dev extra), declarada aqui explicitamente por ser dependencia
+    # de producao deste modulo.
+    "pathspec>=0.12",
+    # governance_runner (distribuido como "governance-runner", modulo importavel
+    # "governance_runner") DEVE ser instalado via path editavel local ANTES
+    # deste pacote, nunca via git+/vendoring/copia de codigo:
+    #   pip install -e ../../tools/headless-governance-runner
+    #   pip install -e .[dev]
+    # Rastreabilidade de auditoria: ver Secao 2 do plano de implementacao
+    # docs/implementation-plans/20260929-feature-development-local-chat-gateway-mvp.md
+    "governance-runner",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "httpx>=0.27",
+    "mypy>=1.8",
+    "black>=24.0",
+    "isort>=5.13",
+    "flake8>=7.0",
+]
+# Fase 3: integracao real com o Copilot SDK (opcional). Sem este extra
+# instalado, o gateway funciona normalmente via fallback deterministico
+# (stub) em `sdk_session.SDKUnavailableError` -- ver routes.py.
+sdk = [
+    "github-copilot-sdk>=1.0.15",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.mypy]
+strict = true
+plugins = ["pydantic.mypy"]
+python_version = "3.11"
+
+[tool.black]
+line-length = 88
+
+[tool.isort]
+profile = "black"
+line_length = 88

@@ -17,9 +17,9 @@ triggers:
   - "granularidade de tarefa"
   - "dependência entre tarefas"
   - "plano de execução"
-source_docs:
-  - "CLAUDE.md"
-  - ".github/copilot-instructions.md"
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 tools: []
 ---
 

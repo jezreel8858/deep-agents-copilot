@@ -88,7 +88,7 @@ A estrutura documental e operacional do `deep-agents-copilot` mapeia diretamente
 | Função NIST AI RMF | Expressão Documental e Prática no Repositório |
 |---|---|
 | **GOVERN (Governar)** | Políticas canônicas estabelecidas em `CLAUDE.md` (R-001 a R-056), separação estrita de camadas (Global vs Adapters), guardrails inegociáveis de autonomia e convenções de commit/PR (`pr-gatekeeper`). |
-| **MAP (Mapear)** | Inventário exaustivo de agentes em `.github/agents/catalog.yaml`, catálogo de skills em `.index.json`, mapeamento determinístico de dependências via `@code-knowledge-graph` e taxonomia formal de perfis. |
+| **MAP (Mapear)** | Inventário exaustivo de agentes em `.github/agents/catalog.yaml`, catálogo de skills em `.index.json`, mapeamento determinístico de dependências via `@codegraph-engine` e taxonomia formal de perfis. |
 | **MEASURE (Medir)** | Suíte determinística de 169+ testes automatizados em pytest (`tests/governance_audit/`), suíte de evals comportamentais (`agent-evals-lab`), métricas de complexidade e auditoria contínua de smells via `@agent-auditor`. |
 | **MANAGE (Gerenciar)** | Circuit Breakers de execução (R-050.2), checkpoints humanos obrigatórios (`ask_questions`), sandboxing em subprocessos seguros via `context-mode` (R-056) e camadas redundantes de pós-migração. |
 

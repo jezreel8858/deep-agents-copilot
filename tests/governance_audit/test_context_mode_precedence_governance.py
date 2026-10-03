@@ -739,22 +739,22 @@ def test_all_non_router_agents_contain_execution_protocol_block():
     )
 
 
-def test_code_knowledge_graph_specific_plan_then_batch_safeguard():
+def test_codegraph_engine_specific_plan_then_batch_safeguard():
     """
-    Valida se code-knowledge-graph.agent.md contem salvaguarda especifica exigindo ctx_batch_execute
+    Valida se codegraph-engine.agent.md contem salvaguarda especifica exigindo ctx_batch_execute
     ou script de leitura em lote consolidado antes de queries de grafo, proibindo N chamadas de ctx_execute (Smell 2.26 / R-059).
     """
-    ckg_file = AGENTS_DIR / "code-knowledge-graph.agent.md"
+    ckg_file = AGENTS_DIR / "codegraph-engine.agent.md"
     assert ckg_file.exists()
     content = ckg_file.read_text(encoding="utf-8")
 
-    assert "ctx_batch_execute" in content, "code-knowledge-graph deve referenciar ctx_batch_execute"
-    assert "<execution_protocol>" in content, "code-knowledge-graph deve conter <execution_protocol>"
+    assert "ctx_batch_execute" in content, "codegraph-engine deve referenciar ctx_batch_execute"
+    assert "<execution_protocol>" in content, "codegraph-engine deve conter <execution_protocol>"
     assert "N chamadas" in content or "chamadas sequenciais unitárias" in content, (
-        "code-knowledge-graph deve proibir explicitamente N chamadas unitarias de ctx_execute"
+        "codegraph-engine deve proibir explicitamente N chamadas unitarias de ctx_execute"
     )
     assert "inspeção de múltiplos arquivos" in content or "inspeções multi-arquivo" in content, (
-        "code-knowledge-graph deve conter regra especifica para inspecao multi-arquivo em lote"
+        "codegraph-engine deve conter regra especifica para inspecao multi-arquivo em lote"
     )
 
 

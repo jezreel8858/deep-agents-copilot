@@ -129,7 +129,7 @@ Enquanto o destino da migração for um projeto novo (green-field) ou novo módu
   ```
 
 ### REQ-008 [EARS - Invariante]: Auditoria Reversa e Detecção Mecânica de Órfãos Pós-Migração (Reverse Orphan Audit)
-Após o término da implementação e antes de qualquer autorização de cutover para produção, o motor de migração deve acionar uma auditoria reversa determinística e independente (@code-review + @code-knowledge-graph) que varre 100% da base legada em busca de métodos, queries nativas, classes, tags de configuração XML/properties ou regras de negócio que não possuam correspondência ativa na aplicação moderna ([✅ MIGRADO]) ou justificativa formal de descarte aprovada ([ℹ️ DESACOPLADO] / [🚫 OBSOLETO]). Se qualquer símbolo legado estiver órfão ou omitido, o cutover deve ser sumariamente bloqueado.
+Após o término da implementação e antes de qualquer autorização de cutover para produção, o motor de migração deve acionar uma auditoria reversa determinística e independente (@code-review + @codegraph-engine) que varre 100% da base legada em busca de métodos, queries nativas, classes, tags de configuração XML/properties ou regras de negócio que não possuam correspondência ativa na aplicação moderna ([✅ MIGRADO]) ou justificativa formal de descarte aprovada ([ℹ️ DESACOPLADO] / [🚫 OBSOLETO]). Se qualquer símbolo legado estiver órfão ou omitido, o cutover deve ser sumariamente bloqueado.
 - **Rastreabilidade:** *"preciso consolidar nossa estrategia para o deixar mais deterministico possivel nao dando margem para o agents envolvidos deixarem passar algum código com isso gerando gaps que o usuario precisa indentificar, outro ponto que vc deve pesquisar é sobre o pos migracao para termos uma redundancia"*
 - **Prioridade:** Must Have (MoSCoW)
 - **Critério de Aceite (Gherkin):**
@@ -189,7 +189,7 @@ Qualquer stack de tecnologia suportada deve estar em estrita conformidade com os
 
 ### RNF-004 [Supportability / Observabilidade]: Rastreabilidade de Transição e Auditoria
 O motor de migração deve emitir evidências estruturadas de cada fase:
-1. Baseline report do legado (métricas de complexidade e grafo de chamadas via `@code-knowledge-graph`).
+1. Baseline report do legado (métricas de complexidade e grafo de chamadas via `@codegraph-engine`).
 2. Artefato de IR intermediário versionado.
 3. Matriz de regras de negócio de-para.
 4. Relatório comparativo de execução dos testes Golden Master.

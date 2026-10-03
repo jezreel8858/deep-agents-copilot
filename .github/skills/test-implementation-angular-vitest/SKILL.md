@@ -23,11 +23,12 @@ triggers:
   - "vitest coverage angular"
 stack: "Angular 20+ + Vitest 3+ + @angular/build:unit-test + @vitest/coverage-v8"
 source_docs:
-  - CLAUDE.md
-  - .github/copilot-instructions.md
   - .github/instructions/angular-v21-frontend.instructions.md
   - .github/skills/test-implementation-frontend/SKILL.md
   - .github/skills/test-coverage-governance/SKILL.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 tools: []
 ---
 

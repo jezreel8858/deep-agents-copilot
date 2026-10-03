@@ -30,9 +30,9 @@ tools:
   - "context-mode/ctx_execute"
   - "context-mode/ctx_execute_file"
   - "context-mode/ctx_batch_execute"
-source_docs:
-  - "CLAUDE.md"
-  - ".github/copilot-instructions.md"
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 ---
 
 # Efficient Batch Code Modification (Edição em Lote com Economia de Tokens)
@@ -180,7 +180,7 @@ Antes de iniciar a gravação de alterações:
 
 > ⚠️ **INCIDENTES REAIS PREVENIDOS (2026-09)**:
 > 1. **Truncamento por `insert_edit_into_file`**: durante uma auditoria de workflows, `insert_edit_into_file` foi usado para inserir um pequeno bloco em `workflows.md` (~600 linhas, Markdown+Mermaid) e em `routing-graph.yaml` (~1200 linhas, YAML). Em três ocasiões distintas, a tool truncou o arquivo para menos de 20 linhas — descartando quase todo o conteúdo — sem aviso confiável.
-> 2. **Corrupção e Wiping por `replace_string_in_file` com Fuzzy Matching**: durante a inclusão de co-agentes em `code-knowledge-graph.agent.md`, `replace_string_in_file` foi invocado com um trecho-âncora que colidia com seções repetidas e tabelas similares. O motor do editor ativou estratégias de fallback de correspondência aproximada (fuzzy/multiple matching), casando no ponto errado, apagando o frontmatter YAML e as primeiras 70 linhas do arquivo, além de duplicar linhas de tabela no final.
+> 2. **Corrupção e Wiping por `replace_string_in_file` com Fuzzy Matching**: durante a inclusão de co-agentes em `codegraph-engine.agent.md`, `replace_string_in_file` foi invocado com um trecho-âncora que colidia com seções repetidas e tabelas similares. O motor do editor ativou estratégias de fallback de correspondência aproximada (fuzzy/multiple matching), casando no ponto errado, apagando o frontmatter YAML e as primeiras 70 linhas do arquivo, além de duplicar linhas de tabela no final.
 
 ### 5.1 Regra (R-051): Escopo de Proteção Obrigatória
 

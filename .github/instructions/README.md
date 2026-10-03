@@ -63,6 +63,7 @@ Cada arquivo de adapter declara um **frontmatter YAML nativo com `applyTo`**, li
 |---|---|---|
 | [`spring-boot-backend.instructions.md`](spring-boot-backend.instructions.md) | Java / Spring Boot (genérico) | `**/*.java` |
 | [`angular-v21-frontend.instructions.md`](angular-v21-frontend.instructions.md) | Frontend Angular 21 (genérico) | `**/*.ts`, `**/*.js` |
+| [`react-frontend.instructions.md`](react-frontend.instructions.md) | Frontend React 19+ (genérico) | `**/*.tsx`, `**/*.jsx`, `**/*.ts`, `**/*.js` |
 | [`python-backend.instructions.md`](python-backend.instructions.md) | Backend Python (genérico) | `**/*.py`, `**/requirements*.txt`, `**/pyproject.toml` |
 | [`database.instructions.md`](database.instructions.md) | Banco de Dados / Migrações (genérico) | `migrations/**`, `schema/**`, `**/*.sql` |
 | [`devops.instructions.md`](devops.instructions.md) | DevOps / CI-CD / Containers (genérico) | `**/Dockerfile*`, `kubernetes/**`, `.github/workflows/**` |

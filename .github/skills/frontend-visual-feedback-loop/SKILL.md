@@ -16,10 +16,11 @@ triggers:
   - "validar layout multi-viewport"
   - "inspecionar arvore acessibilidade aom"
 source_docs:
-  - CLAUDE.md
-  - .github/copilot-instructions.md
   - .github/skills/frontend-componentization-patterns/SKILL.md
   - .github/skills/design-system-component-contracts/SKILL.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 tools: []
 ---
 

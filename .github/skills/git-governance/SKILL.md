@@ -11,9 +11,9 @@ triggers:
   - "mensagem de commit"
   - "branch naming"
 tools: []
-source_docs:
-  - "CLAUDE.md"
-  - ".github/copilot-instructions.md"
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 ---
 
 # Git Governance

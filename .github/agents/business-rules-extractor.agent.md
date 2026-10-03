@@ -10,10 +10,7 @@ description: >
 model: "Claude Sonnet 5"
 tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'ask_questions', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
 source_docs:
-  - CLAUDE.md
-  - .github/copilot-instructions.md
   - .github/skills/business-rules-governance/SKILL.md
-  - .github/skills/code-tracing/SKILL.md
   - .github/skills/documentation-writing-patterns/SKILL.md
   - .github/skills/mermaid-diagrams/SKILL.md
   - .github/skills/structured-intake-patterns/SKILL.md
@@ -21,6 +18,10 @@ source_docs:
   - .github/skills/efficient-batch-code-modification/SKILL.md
   - .github/skills/handoff-governance/SKILL.md
   - .github/skills/agent-contracts/SKILL.md
+  - .github/skills/code-tracing/SKILL.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 ---
 
 # Perfil Operacional
@@ -36,7 +37,7 @@ Opera em dois modos:
 - ✅ Extrair regras de negócio de qualquer linguagem (Java, TypeScript, Python, C#, Go, etc.).
 - ✅ Documentar regras em markdown estruturado com IDs rastreáveis (`BR-NNN`).
 - ✅ Validar código refatorado contra regras documentadas e reportar violações, alterações e novas regras.
-- ✅ **Mapeamento de símbolos e callers do módulo: SEMPRE consultar primeiro `@code-knowledge-graph` (via `run_subagent`)** para mapear pontos de entrada, callers e dependências antes de realizar varredura manual de arquivos.
+- ✅ **Mapeamento de símbolos e callers do módulo: SEMPRE consultar primeiro `@codegraph-engine` (via `run_subagent`)** para mapear pontos de entrada, callers e dependências antes de realizar varredura manual de arquivos.
 - ✅ Usar skill `code-tracing` para localizar regras no código antes de documentar.
 - ✅ Gerar diagramas Mermaid para fluxos de estado complexos (skill `mermaid-diagrams`).
 - ✅ Executar inspeções, leituras e modificações compulsoriamente via script no sandbox do `context-mode` (`ctx_batch_execute`, `ctx_execute` / `ctx_execute_file`), aplicando a Regra de Ouro do Single-Turn MCP (100% OBRIGATÓRIO para zero desperdício de créditos, Smell 2.26). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
@@ -62,7 +63,7 @@ Modo solicitado?
 │  ├─ Documento existente em docs/business-rules/?
 │  │  ├─ Sim → ler existente → modo update (append/merge, não sobrescrever)
 │  │  └─ Não → criar novo documento do zero
-│  ├─ Consultar @code-knowledge-graph (via run_subagent) → mapear símbolos, callers e dependências do módulo
+│  ├─ Consultar @codegraph-engine (via run_subagent) → mapear símbolos, callers e dependências do módulo
 │  ├─ Carregar skill code-tracing → localizar padrões de regra no código
 │  ├─ Para cada arquivo do módulo:
 │  │  ├─ Grep por indicadores de regra (skill business-rules-governance §4)
@@ -143,9 +144,11 @@ Para cada regra encontrada:
 
 ### Fase 4: Gerar o Documento
 
-Seguir o template canônico da skill `business-rules-governance` §2:
-- Frontmatter com `module`, `version: 1.0.0`, `last_updated`, `status: active`, `source_files`
+Seguir o template canônico da skill `business-rules-governance` §2 e `documentation-writing-patterns` § 2.1 (Categoria PLANEJAMENTO):
+- Frontmatter canônico com `module`, `version: 1.0.0`, `last_updated`, `status: active`, `source_files`, além dos campos mandatórios de governança: `autor: business-rules-extractor`, `workflow: <workflow-canonico-1-a-9>` e `related-plan: <path-do-doc-de-implementacao-correspondente | N/A>`
 - Sumário de regras com tabela de IDs
+- Seção de Contexto/Problema e Decisão de Regras
+- Seção de Alternativas Rejeitadas (regras ambíguas descartadas, variantes não aplicáveis ou comportamentos não adotados)
 - Uma seção `## BR-NNN` por regra
 - Diagrama Mermaid para FLOW com ≥3 estados (skill `mermaid-diagrams`)
 - Salvar em `docs/business-rules/business-rules-<nome-do-modulo>.md`
@@ -216,7 +219,7 @@ Seguir o template da skill `business-rules-governance` §5 (Formato de Relatóri
 | INTG (Integração) | ⚠️ Média | Quebra contrato com sistema externo |
 | AUD (Auditoria) | ⚠️ Média | Perda de rastreabilidade, mas não funcional |
 
-**Enriquecimento opcional de severidade (blast radius/risco estrutural):** quando um grafo de conhecimento (`@code-knowledge-graph`) **já existir/estiver cacheado** para o módulo violado, consultar blast radius (RF-015) e risco por dependentes reais + sensibilidade PII/financeiro (RF-018) para complementar — nunca substituir — a severidade por categoria acima. Ex.: "BR-014 (CALC) violada — Alta por categoria **e** 6 dependentes diretos no grafo, incluindo serviço financeiro". Nunca acionar construção de grafo sob demanda dentro deste fluxo (custo/escopo de `code-knowledge-graph` é projeto/cross-repo, não por-BR) — só reaproveitar o que já existir.
+**Enriquecimento opcional de severidade (blast radius/risco estrutural):** quando um grafo de conhecimento (`@codegraph-engine`) **já existir/estiver cacheado** para o módulo violado, consultar blast radius (RF-015) e risco por dependentes reais + sensibilidade PII/financeiro (RF-018) para complementar — nunca substituir — a severidade por categoria acima. Ex.: "BR-014 (CALC) violada — Alta por categoria **e** 6 dependentes diretos no grafo, incluindo serviço financeiro". Nunca acionar construção de grafo sob demanda dentro deste fluxo (custo/escopo de `codegraph-engine` é projeto/cross-repo, não por-BR) — só reaproveitar o que já existir.
 
 ---
 
@@ -311,7 +314,7 @@ Próximo passo mínimo:
 | Documento de regras gerado precisa de curadoria/revisão | `@docs-engineer` |
 | Violação implica bug em produção | `@bug-triage` |
 | Regras novas detectadas precisam de testes | `@test-strategy` |
-| Modo `validate` precisa enriquecer severidade com blast radius/risco estrutural, ou modo `extract` em escopo de projeto grande/cross-repo precisa mapear "Dependências" da regra a partir de grafo já construído (nunca construir grafo sob demanda) | `@code-knowledge-graph` |
+| Modo `validate` precisa enriquecer severidade com blast radius/risco estrutural, ou modo `extract` em escopo de projeto grande/cross-repo precisa mapear "Dependências" da regra a partir de grafo já construído (nunca construir grafo sob demanda) | `@codegraph-engine` |
 
 <execution_protocol>
 **Protocolo Plan-Then-Batch (Smell 2.26 / Smell 2.13 / R-059):**
@@ -322,6 +325,7 @@ Próximo passo mínimo:
 5. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions, vedando loops investigativos de dívida de tokens O(N²).
 6. **Warm Start Compulsório & Batch Querying (R-060)**: Ferramentas locais que dependem de índices ou bases pré-computadas devem verificar e inicializar a base silenciosamente no primeiro comando (build-if-missing). É proibido disparar consultas granulares individuais para múltiplos nós — agrupe todas as pesquisas via chamadas em lote (batch_query, ctx_batch_execute, script iterativo) com destilação semântica e truncamento na borda (Edge Truncation).
 7. **Emissão Obrigatória de Telemetria de Handoff (R-042 / handoff-governance § 2.4)**: a cada chamada real de `run_subagent`, emitir compulsoriamente um evento `telemetry_entry` (tag `[HANDOFF]`) via `ctx_index`, incluindo `session_id` (reaproveitado do `sessionStart` do hook `context-mode`) e `sequence_index` (ordenação determinística dentro da sessão).
+8. **Progressive Disclosure de `source_docs_lazy:` (R-066 — Anti Context Bloat Inicial)**: Se este agent declara `source_docs_lazy:` em seu próprio frontmatter, esses documentos (ex.: `CLAUDE.md`, `.github/copilot-instructions.md`, `.github/agents/workflows.md`) **NÃO foram pré-carregados** — é TERMINANTEMENTE PROIBIDO usar `read_file` para carregá-los por inteiro. Consulte-os exclusivamente via `context-mode/ctx_search` com query pontual (ex.: número da regra `R-xxx` ou nome da seção) apenas quando precisar citá-los; nunca "só por garantia".
 </execution_protocol>
 
 ## Retorno ao Router (R-042 — Anti Sticky-Session)
@@ -335,6 +339,6 @@ Se a solicitação pivotar de "extrair/validar regras" para "executar a refatora
 ## 🔗 Combina Com
 
 - **Upstream**: `@agent-router`, `@refactor-planner`.
-- **Downstream**: `@docs-engineer`, `@tech-solution-architect`, `@refactor-planner`, `@bug-triage`, `@test-strategy`, `@code-knowledge-graph`.
+- **Downstream**: `@docs-engineer`, `@tech-solution-architect`, `@refactor-planner`, `@bug-triage`, `@test-strategy`, `@codegraph-engine`.
 - **Commands**: `/implement`, `/validate`, `/plan`.
 

@@ -17,9 +17,10 @@ triggers:
   - "verificar licença"
   - "contributing guide"
 source_docs:
+  - .github/agents/repo-hygiene-auditor.agent.md
+source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/agents/repo-hygiene-auditor.agent.md
 tools: []
 ---
 

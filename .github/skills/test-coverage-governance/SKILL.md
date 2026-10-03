@@ -14,13 +14,14 @@ triggers:
   - "jacoco"
   - "istanbul"
 source_docs:
-  - "CLAUDE.md"
-  - ".github/copilot-instructions.md"
-  - ".github/skills/test-implementation-backend/SKILL.md"
-  - ".github/skills/test-implementation-spring-boot/SKILL.md"
-  - ".github/skills/test-implementation-angular-jasmine/SKILL.md"
-  - ".github/skills/test-implementation-angular-vitest/SKILL.md"
-  - ".github/skills/test-implementation-python/SKILL.md"
+  - .github/skills/test-implementation-backend/SKILL.md
+  - .github/skills/test-implementation-python/SKILL.md
+  - .github/skills/test-implementation-spring-boot/SKILL.md
+  - .github/skills/test-implementation-angular-jasmine/SKILL.md
+  - .github/skills/test-implementation-angular-vitest/SKILL.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 tools: []
 ---
 

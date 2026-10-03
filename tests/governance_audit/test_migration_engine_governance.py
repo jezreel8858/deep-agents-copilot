@@ -12,6 +12,8 @@ import json
 from pathlib import Path
 import pytest
 
+from tests.governance_audit._helpers import read_workflows_full_content
+
 try:
     import jsonschema
     from jsonschema import Draft202012Validator
@@ -357,10 +359,9 @@ def test_post_migration_verification_redundancy_gate_contract():
 # ── Teste Estrutural de Conformidade do WORKFLOW-FRAMEWORK-MIGRATION ─────────
 
 def test_workflow_7_declares_six_canonical_steps_and_post_migration_invariants():
-    """Valida estaticamente em workflows.md que o Workflow 7 possui as 6 etapas canônicas e seus invariantes"""
-    workflows_file = REPO_ROOT / ".github" / "agents" / "workflows.md"
-    assert workflows_file.exists(), "workflows.md deve existir"
-    content = workflows_file.read_text(encoding="utf-8")
+    """Valida estaticamente (via workflows.md + .github/agents/workflows/, R-066/F3)
+    que o Workflow 7 possui as 6 etapas canônicas e seus invariantes"""
+    content = read_workflows_full_content(REPO_ROOT)
 
     # 1. Deve declarar 6 etapas canônicas no objetivo
     assert "6 etapas canônicas" in content, "Workflow 7 deve declarar formalmente 6 etapas canônicas"

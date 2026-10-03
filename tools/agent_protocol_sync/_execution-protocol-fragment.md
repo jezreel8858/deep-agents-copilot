@@ -1,6 +1,7 @@
 <!--
   FONTE CANONICA UNICA do bloco <execution_protocol> (Protocolo Plan-Then-Batch R-059 +
-  Teto de Tool Turns / Warm Start R-060 + Emissão Obrigatória de Telemetria R-042)
+  Teto de Tool Turns / Warm Start R-060 + Emissão Obrigatória de Telemetria R-042 +
+  Progressive Disclosure de source_docs_lazy R-066)
   para os 77 agents executores nao-roteadores.
 
   Este arquivo NAO e um template de agent (nao segue o padrao de frontmatter/H1
@@ -15,7 +16,7 @@
   - STANDARD: todo agent executor nao-roteador (mutating ou read-only). A redacao do
     item 3 ("mutacoes ou leituras... quando aplicavel") ja cobre ambos os casos -
     nao ha mais distincao MUTATING/READONLY (unificado em 2026-09-23, ver CHANGELOG [2.33.4]).
-  - CUSTOM: agents com protocolo proprio pinado (ex.: code-knowledge-graph) - o script
+  - CUSTOM: agents com protocolo proprio pinado (ex.: codegraph-engine) - o script
     NAO sobrescreve agents CUSTOM, apenas valida presenca de "R-060" neles.
 -->
 
@@ -28,4 +29,5 @@
 5. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions, vedando loops investigativos de dívida de tokens O(N²).
 6. **Warm Start Compulsório & Batch Querying (R-060)**: Ferramentas locais que dependem de índices ou bases pré-computadas devem verificar e inicializar a base silenciosamente no primeiro comando (build-if-missing). É proibido disparar consultas granulares individuais para múltiplos nós — agrupe todas as pesquisas via chamadas em lote (batch_query, ctx_batch_execute, script iterativo) com destilação semântica e truncamento na borda (Edge Truncation).
 7. **Emissão Obrigatória de Telemetria de Handoff (R-042 / handoff-governance § 2.4)**: a cada chamada real de `run_subagent`, emitir compulsoriamente um evento `telemetry_entry` (tag `[HANDOFF]`) via `ctx_index`, incluindo `session_id` (reaproveitado do `sessionStart` do hook `context-mode`) e `sequence_index` (ordenação determinística dentro da sessão).
+8. **Progressive Disclosure de `source_docs_lazy:` (R-066 — Anti Context Bloat Inicial)**: Se este agent declara `source_docs_lazy:` em seu próprio frontmatter, esses documentos (ex.: `CLAUDE.md`, `.github/copilot-instructions.md`, `.github/agents/workflows.md`) **NÃO foram pré-carregados** — é TERMINANTEMENTE PROIBIDO usar `read_file` para carregá-los por inteiro. Consulte-os exclusivamente via `context-mode/ctx_search` com query pontual (ex.: número da regra `R-xxx` ou nome da seção) apenas quando precisar citá-los; nunca "só por garantia".
 <!-- END:STANDARD -->

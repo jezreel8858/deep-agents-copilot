@@ -1,0 +1,17 @@
+{
+  "manifesto": {
+    "boundaries": {
+      "modules": {
+        "deep-agents-chat": "apps/web/**",
+        "deep-agents-gateway": "deploy/local-chat-gateway/src/**"
+      },
+      "rules": [
+        {
+          "from": "deep-agents-chat",
+          "onlyTo": ["deep-agents-gateway"]
+        }
+      ]
+    }
+  }
+}
+

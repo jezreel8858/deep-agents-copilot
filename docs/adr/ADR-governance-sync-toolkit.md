@@ -8,7 +8,7 @@ decision-makers:
   - tech-solution-architect
 consulted:
   - agent-auditor
-  - code-knowledge-graph
+  - codegraph-engine
 informed:
   - adr-sentinel
   - pr-gatekeeper

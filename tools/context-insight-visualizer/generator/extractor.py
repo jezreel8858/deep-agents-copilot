@@ -28,7 +28,7 @@ def load_known_agents() -> set:
         "analysis-architect", "angular-arch-advisor", "angular-bug-fixer",
         "angular-component-test-writer", "angular-e2e-writer", "angular-feature-developer",
         "angular-router", "angular-test-fixer", "angular-ui-stylist", "angular-unit-test-writer",
-        "binding-initializer", "bug-triage", "business-rules-extractor", "code-knowledge-graph",
+        "binding-initializer", "bug-triage", "business-rules-extractor", "codegraph-engine",
         "code-review", "code-style-enforcer", "code-summarizer", "compliance-guardrails",
         "context-builder", "database-specialist", "debugger", "deep-search", "devops-engineer",
         "docs-engineer", "ejb-arch-advisor", "ejb-bug-fixer", "ejb-feature-developer",

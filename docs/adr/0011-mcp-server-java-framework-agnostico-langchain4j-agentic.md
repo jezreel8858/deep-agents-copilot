@@ -7,7 +7,7 @@ decision-makers:
   - tech-solution-architect
   - docs-engineer
 consulted:
-  - code-knowledge-graph
+  - codegraph-engine
   - deep-search
 informed:
   - adr-sentinel

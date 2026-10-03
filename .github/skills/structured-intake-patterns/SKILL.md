@@ -14,12 +14,13 @@ triggers:
   - "intake de bug"
   - "pré-contexto validado"
 source_docs:
+  - .github/agents/test-strategy.agent.md
+  - .github/agents/requirements-analyst.agent.md
+  - .github/agents/bug-triage.agent.md
+  - .github/agents/business-rules-extractor.agent.md
+source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/agents/bug-triage.agent.md
-  - .github/agents/test-strategy.agent.md
-  - .github/agents/business-rules-extractor.agent.md
-  - .github/agents/requirements-analyst.agent.md
 tools: ['ask_questions']
 ---
 

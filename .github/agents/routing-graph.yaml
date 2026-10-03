@@ -52,7 +52,7 @@ nos:
     tipo: downstream
     descricao: "Elicitação e estruturação de requisitos funcionais/não-funcionais a partir de pedido de negócio ambíguo (EARS/INVEST/Gherkin/FURPS+); detecta solution-jumping via Five Whys; prospectivo (pedido → requisito), nunca decide arquitetura, não confundir com business-rules-extractor (reverso: código → regra)"
 
-  - id: code-knowledge-graph
+  - id: codegraph-engine
     tipo: downstream
     descricao: "Ponto de entrada único para construção/consulta do grafo de conhecimento de código-fonte cross-projeto (RF-001/RF-002/RF-011): nós arquivo/classe/função, arestas import/chamada/herança/tabela-SQL, reaproveitando AST do code-summarizer; puramente determinístico, sem fallback LLM (RNF-008); nunca substituído por chamada direta a lib de parsing/grafo (RNF-004)"
 
@@ -89,6 +89,11 @@ nos:
   - id: angular-router
     tipo: domain_router
     descricao: "Supervisor hierárquico do domínio Angular — despacha para os 8 especialistas registrados em .github/agents/frontend/angular/angular-catalog.yaml"
+
+
+  - id: react-router
+    tipo: domain_router
+    descricao: "Supervisor hierárquico do domínio React — despacha para os 8 especialistas registrados em .github/agents/frontend/react/react-catalog.yaml"
 
 
   - id: spring-boot-router
@@ -161,7 +166,7 @@ nos:
     descricao: "Auditor de governança em meta-nível para analisar smells e gaps no catálogo de agents/skills/prompts, validando templates canônicos, R-046/batching, especificações e alinhamento de perfil sem mutação direta, com recomendações e handoff para executores"
   - id: ddd-bounded-context-mapper
     tipo: downstream
-    descricao: "Mapeamento semântico de Bounded Contexts (DDD), domínios de negócio e God Classes a partir de nomenclatura e pacotes; contraparte semântica do code-knowledge-graph; read-only"
+    descricao: "Mapeamento semântico de Bounded Contexts (DDD), domínios de negócio e God Classes a partir de nomenclatura e pacotes; contraparte semântica do codegraph-engine; read-only"
   - id: adr-sentinel
     tipo: downstream
     descricao: "Auditoria de conformidade arquitetural contra Architectural Decision Records (ADRs) documentados no projeto, identificando violações, decisões obsoletas e ADRs ausentes; read-only"
@@ -219,7 +224,7 @@ workflows:
       - etapa: 1
         nome: "triage_and_root_cause"
         agent: "bug-triage"
-        sub_rotinas_permitidas: ["debugger", "code-knowledge-graph"]
+        sub_rotinas_permitidas: ["debugger", "codegraph-engine"]
         rca_gate: "5_whys | fishbone com 2 fontes independentes de evidencia (logs, traces, network, APM)"
         classificacao_defeito: "flaky vs regressao_real (isolar concorrencia/ambiente se flaky)"
         repro_gate: "debugger (tracepoint) | ask_questions"
@@ -275,7 +280,7 @@ workflows:
         agent: "business-rules-extractor"
       - etapa: 2
         nome: "blast_radius_and_graph_mapping"
-        agent: "code-knowledge-graph"
+        agent: "codegraph-engine"
         sub_rotinas_permitidas: ["tech-solution-architect"]
         contract_gate: "contract_testing (Pact-style consumer-driven ou OpenAPI diff) se afetar APIs publicas ou consumidores"
         safety_net_gate: "specialist-unit-test-writer (golden master check)"
@@ -297,7 +302,7 @@ workflows:
         nome: "ground_truth_validation_and_review"
         agent: "business-rules-extractor"
         co_agentes: ["code-review"]
-        redundancia_proporcional: "auditoria reversa de simbolos (code-knowledge-graph) + mini mutation gate (test-strategy) + differential replay leve proporcionais ao blast radius"
+        redundancia_proporcional: "auditoria reversa de simbolos (codegraph-engine) + mini mutation gate (test-strategy) + differential replay leve proporcionais ao blast radius"
         circuit_breaker: "refactor-planner (decide_escopo_readonly) -> domain-router/specialist por no (executa_revert registrando blast_radius_revertido)"
 
   - id: WORKFLOW-TECHNICAL-ANALYSIS
@@ -320,7 +325,7 @@ workflows:
       - etapa: 1
         nome: "specialist_analyst_dispatch"
         agents_permitidos:
-          - "code-knowledge-graph"
+          - "codegraph-engine"
           - "ddd-bounded-context-mapper"
           - "adr-sentinel"
           - "security-reviewer"
@@ -340,7 +345,7 @@ workflows:
       - etapa: 2
         nome: "deterministic_read_only_collection"
         modo: "advisory_read_only"
-        sub_rotinas_permitidas: ["tech-solution-architect", "code-knowledge-graph", "deep-search"]
+        sub_rotinas_permitidas: ["tech-solution-architect", "codegraph-engine", "deep-search"]
         max_depth_subrotina: 3
       - etapa: 3
         nome: "synthesis_and_next_step"
@@ -397,7 +402,7 @@ workflows:
       - etapa: 7
         nome: "e2e_journey_validation"
         agent: "specialist-e2e-writer"
-        aplicavel_quando: "domain-router = angular-router"
+        aplicavel_quando: "domain-router = angular-router | react-router"
         condicional: true
         nota: "Etapa opcional/condicional — aplicavel somente em stacks com especialista E2E dedicado no catalogo local (ex.: @angular-e2e-writer). Stacks sem E2E writer dedicado pulam esta etapa sem bloqueio."
       - etapa: 8
@@ -467,7 +472,7 @@ workflows:
         sub_rotinas_permitidas: ["deep-search"]
       - etapa: 2
         nome: "dependency_blast_radius_mapping"
-        agent: "code-knowledge-graph"
+        agent: "codegraph-engine"
         sub_rotinas_permitidas: ["tech-solution-architect"]
       - etapa: 3
         nome: "manifest_bump_and_lockfile_sync"
@@ -514,14 +519,14 @@ workflows:
       criterio_fechamento: "zero itens PENDENTE ou DIVERGENTE no modulo; 100% dos elementos em MIGRADO com teste ou DESACOPLADO com justificativa"
     exclusividade_motor_grafo:
       regra: "R-045"
-      obrigatorio: "code-knowledge-graph e co-agente OBRIGATORIO (nao apenas sub-rotina) nas etapas 1, 3, 4 e 5 - migracao de framework e refatoracao estrutural em larga escala; blast radius/ciclos/dead-code NUNCA sao mapeados manualmente por tech-solution-architect ou domain routers"
+      obrigatorio: "codegraph-engine e co-agente OBRIGATORIO (nao apenas sub-rotina) nas etapas 1, 3, 4 e 5 - migracao de framework e refatoracao estrutural em larga escala; blast radius/ciclos/dead-code NUNCA sao mapeados manualmente por tech-solution-architect ou domain routers"
     estados:
       - etapa: 1
         nome: "pre_flight_compatibility_assessment"
         agent: "tech-solution-architect"
-        co_agentes: ["code-knowledge-graph (obrigatorio, R-045 - inventario de dependencias/blast radius/ciclos do legado)", "domain-router-stack-origem (obrigatorio se cross-stack, ex: ejb-router|struts-router)", "business-rules-extractor"]
+        co_agentes: ["codegraph-engine (obrigatorio, R-045 - inventario de dependencias/blast radius/ciclos do legado)", "domain-router-stack-origem (obrigatorio se cross-stack, ex: ejb-router|struts-router)", "business-rules-extractor"]
         sub_rotinas_permitidas: ["deep-search"]
-        nota: "code-knowledge-graph mapeia dependencias, blast radius e ciclos do codigo legado ANTES do blueprint; domain-router-stack-origem eh convocado via run_subagent para inventariar regras de negocio nas 5 dimensoes criticas (borda, regras, persistencia, downstream, saida); em cenario brownfield_in_flight, executa compulsoriamente o sub-estado 1b de Reconciliacao Delta e auditoria de gaps pre-existentes"
+        nota: "codegraph-engine mapeia dependencias, blast radius e ciclos do codigo legado ANTES do blueprint; domain-router-stack-origem eh convocado via run_subagent para inventariar regras de negocio nas 5 dimensoes criticas (borda, regras, persistencia, downstream, saida); em cenario brownfield_in_flight, executa compulsoriamente o sub-estado 1b de Reconciliacao Delta e auditoria de gaps pre-existentes"
       - etapa: 2
         nome: "migration_blueprint_and_phasing"
         agent: "tech-solution-architect"
@@ -539,18 +544,18 @@ workflows:
       - etapa: 4
         nome: "codemod_and_batch_rewrite"
         agent: "domain-router-stack-destino | specialist-feature-developer"
-        co_agentes: ["domain-router-stack-origem (consultivo, obrigatorio se cross-stack)", "code-knowledge-graph (obrigatorio, R-045 - blast radius por lote antes de cada micro-batch)"]
+        co_agentes: ["domain-router-stack-origem (consultivo, obrigatorio se cross-stack)", "codegraph-engine (obrigatorio, R-045 - blast radius por lote antes de cada micro-batch)"]
         protocolo: "efficient-batch-code-modification"
-        nota: "execucao dos codemods estritamente orientada aos IDs da Matriz De-Para da fase ativa; domain-router-stack-origem permanece ativo validando paridade; code-knowledge-graph recalcula blast radius"
+        nota: "execucao dos codemods estritamente orientada aos IDs da Matriz De-Para da fase ativa; domain-router-stack-origem permanece ativo validando paridade; codegraph-engine recalcula blast radius"
       - etapa: 5
         nome: "refinement_and_parity_testing"
         agent: "domain-router-stack-destino | specialist-unit-test-writer | specialist-component-test-writer"
-        co_agentes: ["domain-router-stack-origem (dual_verification)", "business-rules-extractor (modo validate)", "code-knowledge-graph (obrigatorio, R-045 - find_cycles e dead-code pos-codemod)"]
-        gate: "dual_verification_gate (golden_master_100 + matriz_de_para_100_resolvida + regras_de_negocio_100_cobertas + zero_ciclos_dead_code_novos, ver workflows.md § 3.7.1)"
+        co_agentes: ["domain-router-stack-origem (dual_verification)", "business-rules-extractor (modo validate)", "codegraph-engine (obrigatorio, R-045 - find_cycles e dead-code pos-codemod)"]
+        gate: "dual_verification_gate (golden_master_100 + matriz_de_para_100_resolvida + regras_de_negocio_100_cobertas + zero_ciclos_dead_code_novos, ver .github/agents/workflows/workflow-framework-migration.md § 3.7.1, fatiado de workflows.md R-066/F3)"
       - etapa: 6
         nome: "baseline_and_quality_gate"
         agent: "runtime-verifier | code-review"
-        co_agentes: ["domain-router-stack-origem (sign-off final de paridade e fechamento de 100% da Matriz De-Para, obrigatorio se cross-stack)", "code-knowledge-graph (obrigatorio, R-045 - verificacao final de zero ciclos novos e zero dead-code introduzido)"]
+        co_agentes: ["domain-router-stack-origem (sign-off final de paridade e fechamento de 100% da Matriz De-Para, obrigatorio se cross-stack)", "codegraph-engine (obrigatorio, R-045 - verificacao final de zero ciclos novos e zero dead-code introduzido)"]
 
   - id: WORKFLOW-RELEASE-READINESS
     nome: "Prontidão de Release, Breaking Changes & Deploy Pre-Flight"
@@ -568,7 +573,7 @@ workflows:
       - etapa: 1
         nome: "contract_and_api_compatibility_audit"
         agent: "tech-solution-architect"
-        sub_rotinas_permitidas: ["code-knowledge-graph"]
+        sub_rotinas_permitidas: ["codegraph-engine"]
       - etapa: 2
         nome: "database_rollout_pre_flight"
         agent: "database-specialist"
@@ -604,7 +609,7 @@ workflows:
         invariantes: ["ask_questions_obrigatorio_em_ambiguidade", "proibicao_alucinacao_regras", "delimitar_problem_space"]
       - etapa: 2
         nome: "codebase_context_grounding"
-        agent: "code-knowledge-graph"
+        agent: "codegraph-engine"
         sub_rotinas_permitidas: ["deep-search"]
         mineracoes: ["caminhos_reais_arquivos", "interfaces_dto", "irmaos_canonicos"]
       - etapa: 3
@@ -869,7 +874,7 @@ arestas:
 
   # Grafo de conhecimento de código-fonte cross-projeto (RF-001/RF-002/RF-011)
   - de: agent-router
-    para: code-knowledge-graph
+    para: codegraph-engine
     prioridade: 1.59
     threshold_score: 0.85
     nivel_routing: rule-based
@@ -895,9 +900,9 @@ arestas:
         - "acoplamento arquitetural entre sistemas" # → tech-solution-architect (cross-sistema/contratos)
         - "análise semântica de paridade/cobertura de atributos entre modelo, persistência e store" # → domain-router (ex.: angular-router / angular-arch-advisor) ou business-rules-extractor
 
-  # Delegação interna: qualquer agent downstream pode invocar code-knowledge-graph sob demanda (RF-002)
+  # Delegação interna: qualquer agent downstream pode invocar codegraph-engine sob demanda (RF-002)
   - de: "*downstream"
-    para: code-knowledge-graph
+    para: codegraph-engine
     prioridade: 0.5
     threshold_score: 1.00
     nivel_routing: rule-based
@@ -1139,6 +1144,41 @@ arestas:
         - "métodos do store cobrem campos do modelo"
         - "análise de aderência de store"
       sinal_r006: "É qualquer solicitação do ecossistema Angular ou análise semântica de modelos/stores/services Angular? (despacha para o catálogo de 8 especialistas de frontend em .github/agents/frontend/angular/angular-catalog.yaml)"
+
+  # Supervisor e roteador de domínio React (Hierarchical Sub-Router)
+  - de: agent-router
+    para: react-router
+    prioridade: 1.5
+    threshold_score: 0.85
+    nivel_routing: rule-based
+    condicoes:
+      keywords:
+        - "react"
+        - "react router"
+        - "frontend react"
+        - "componente react"
+        - "server components"
+        - "client components"
+        - "hooks"
+        - "tanstack query"
+        - "zustand"
+        - "core web vitals react"
+        - "auditoria react"
+        - "upgrade react"
+        - "feature react"
+        - "bug react"
+        - "fix react"
+        - "tailwind react"
+        - "layout react"
+        - "responsivo react"
+        - "a11y react"
+        - "testes react"
+        - "react component test"
+        - "react testing library"
+        - "vitest react"
+        - "react e2e"
+        - "playwright react"
+      sinal_r006: "É qualquer solicitação do ecossistema React ou análise semântica de componentes/hooks/estado React? (despacha para o catálogo de 8 especialistas de frontend em .github/agents/frontend/react/react-catalog.yaml)"
 
   # Supervisor e roteador de domínio Spring Boot (Hierarchical Sub-Router)
   - de: agent-router
@@ -1401,7 +1441,7 @@ arestas:
         - "reverse ddd"
       sinal_r006: "É mapeamento de Bounded Contexts (DDD), domínios de negócio semânticos por nomenclatura ou identificação de God Classes/fronteiras invadidas?"
       nao_confundir_com:
-        - "grafo determinístico de imports/chamadas"  # → code-knowledge-graph
+        - "grafo determinístico de imports/chamadas"  # → codegraph-engine
         - "planejamento de refatoração estrutural"     # → refactor-planner
   # Auditoria de conformidade arquitetural contra Architectural Decision Records (ADRs)
   - de: agent-router

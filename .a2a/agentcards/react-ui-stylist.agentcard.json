@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "react-ui-stylist",
+  "name": "React Ui Stylist",
+  "version": "1.0.0",
+  "description": "Especialista de apresentação: refatora JSX semântico, aplica Tailwind CSS/CSS Modules, layout responsivo mobile-first e conformidade WCAG 2.2 AA (estritamente visual, isento de criar ou rodar testes unitários).",
+  "domain": "Templates JSX, Tailwind CSS/CSS Modules, layout responsivo e acessibilidade WCAG",
+  "role": "specialist",
+  "capabilities": [
+    "tailwind react",
+    "css react",
+    "jsx template",
+    "layout responsivo",
+    "breakpoints",
+    "a11y react",
+    "wcag"
+  ],
+  "skills": [
+    "agent-contracts",
+    "handoff-governance"
+  ],
+  "tools": [
+    "file_search",
+    "grep_search",
+    "list_dir",
+    "ask_questions",
+    "run_subagent",
+    "get_errors",
+    "run_in_terminal",
+    "context-mode/ctx_execute",
+    "context-mode/ctx_search",
+    "context-mode/ctx_batch_execute",
+    "context-mode/ctx_execute_file",
+    "context-mode/ctx_index"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only",
+      "execution"
+    ],
+    "least_privilege_level": "elevated",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Gemini 3.8 Flash",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/frontend/react/react-catalog.yaml",
+    "priority": 10,
+    "estimated_time_minutes": 15
+  }
+}

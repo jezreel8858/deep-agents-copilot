@@ -11,12 +11,13 @@ model: "Claude Sonnet 5"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'run_in_terminal', 'tavily/tavily_search', 'tavily/tavily_extract', 'tavily/tavily_crawl', 'tavily/tavily_map', 'tavily/tavily_research', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_fetch_and_index', 'context-mode/ctx_batch_execute']
 argument-hint: '[tema-ou-pergunta-de-pesquisa]'
 source_docs:
-  - CLAUDE.md
-  - .github/copilot-instructions.md
   - .github/agents/deep-search.agent.md
   - .github/skills/tavily/SKILL.md
   - .github/skills/context-mode/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 ---
 
 # `/deep-search`
@@ -94,3 +95,15 @@ Seguir exatamente o "Formato de Saída" do agent `@deep-search` (Rota, Motivo, C
 ---
 
 *v2.0 — deep-search prompt — 2026-09-01 (renomeado de `/research`; alias fino do agent `@deep-search`, sem duplicação de lógica — R-003)*
+
+<execution_protocol>
+**Protocolo Plan-Then-Batch (Smell 2.26 / Smell 2.13 / R-059):**
+1. **ENUMERAR**: Antes de qualquer ação de modificação ou inspeção, liste internamente todos os arquivos e comandos necessários para a demanda completa (não apenas o próximo passo aparente).
+2. **CONSOLIDAR (Limiar >= 2)**: Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de `ctx_execute` por alvo no chat. Use compulsoriamente `ctx_batch_execute(commands, queries)` OU script iterativo consolidado em `ctx_execute`.
+3. **DESPACHAR & VALIDAR**: Aplique todas as mutações ou leituras em processo único no sandbox (all-or-nothing verificado, R-051) e execute `get_errors` agrupado uma única vez ao final com a lista completa de arquivos alterados (quando aplicável).
+4. **Comandos curtos não suspendem a regra**: Prompts curtos ("prosseguir", "continue", "pode seguir") NÃO isentam o agente do limiar >= 2 nem do context-mode em lote — a regra vincula-se ao escopo da tarefa, nunca ao tamanho do prompt.
+5. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions, vedando loops investigativos de dívida de tokens O(N²).
+6. **Warm Start Compulsório & Batch Querying (R-060)**: Ferramentas locais que dependem de índices ou bases pré-computadas devem verificar e inicializar a base silenciosamente no primeiro comando (build-if-missing). É proibido disparar consultas granulares individuais para múltiplos nós — agrupe todas as pesquisas via chamadas em lote (batch_query, ctx_batch_execute, script iterativo) com destilação semântica e truncamento na borda (Edge Truncation).
+7. **Emissão Obrigatória de Telemetria de Handoff (R-042 / handoff-governance § 2.4)**: a cada chamada real de `run_subagent`, emitir compulsoriamente um evento `telemetry_entry` (tag `[HANDOFF]`) via `ctx_index`, incluindo `session_id` (reaproveitado do `sessionStart` do hook `context-mode`) e `sequence_index` (ordenação determinística dentro da sessão).
+8. **Progressive Disclosure de `source_docs_lazy:` (R-066 — Anti Context Bloat Inicial)**: Se este agent declara `source_docs_lazy:` em seu próprio frontmatter, esses documentos (ex.: `CLAUDE.md`, `.github/copilot-instructions.md`, `.github/agents/workflows.md`) **NÃO foram pré-carregados** — é TERMINANTEMENTE PROIBIDO usar `read_file` para carregá-los por inteiro. Consulte-os exclusivamente via `context-mode/ctx_search` com query pontual (ex.: número da regra `R-xxx` ou nome da seção) apenas quando precisar citá-los; nunca "só por garantia".
+</execution_protocol>

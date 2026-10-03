@@ -1,6 +1,6 @@
 {
   "protocol": "A2A/1.0.0",
-  "total_agentcards": 86,
+  "total_agentcards": 95,
   "agents": {
     "adapter-generator": {
       "name": "Adapter Generator",
@@ -98,12 +98,6 @@
       "domain": "Extracao e validacao de regras de negocio",
       "version": "1.1.0"
     },
-    "code-knowledge-graph": {
-      "name": "Code Knowledge Graph",
-      "role": "specialist",
-      "domain": "Grafo de conhecimento de codigo-fonte (imports, chamadas, blast radius, dataflow/CFG, ciclos, dead code), motor unico via lib externa @optave/codegraph (CLI local, zero API keys, Node.js/TypeScript nativo)",
-      "version": "4.1.1"
-    },
     "code-review": {
       "name": "Code Review",
       "role": "specialist",
@@ -115,6 +109,12 @@
       "role": "specialist",
       "domain": "Verificacao de aderencia a convencoes de estilo (read-only)",
       "version": "1.0.0"
+    },
+    "codegraph-engine": {
+      "name": "Codegraph Engine",
+      "role": "specialist",
+      "domain": "Grafo de conhecimento de codigo-fonte (imports, chamadas, blast radius, dataflow/CFG, ciclos, dead code), motor unico via lib externa @optave/codegraph (CLI local, zero API keys, Node.js/TypeScript nativo)",
+      "version": "4.1.1"
     },
     "compliance-guardrails": {
       "name": "Compliance Guardrails",
@@ -330,6 +330,60 @@
       "name": "Python Unit Test Writer",
       "role": "tester",
       "domain": "Testes unitários puros em Python com pytest, pytest-mock, unittest.mock e fixtures em conftest.py",
+      "version": "1.0.0"
+    },
+    "react-arch-advisor": {
+      "name": "React Arch Advisor",
+      "role": "advisor",
+      "domain": "Arquitetura React, Server/Client Components, React Compiler, Performance CWV",
+      "version": "1.0.0"
+    },
+    "react-bug-fixer": {
+      "name": "React Bug Fixer",
+      "role": "fixer",
+      "domain": "Correções cirúrgicas de bugs e runtime errors em produção",
+      "version": "1.0.0"
+    },
+    "react-component-test-writer": {
+      "name": "React Component Test Writer",
+      "role": "tester",
+      "domain": "Testes de componentes com React Testing Library, renderização e interações do usuário",
+      "version": "1.0.0"
+    },
+    "react-e2e-writer": {
+      "name": "React E2E Writer",
+      "role": "specialist",
+      "domain": "Testes ponta a ponta (E2E) com Playwright em aplicações React",
+      "version": "1.0.0"
+    },
+    "react-feature-developer": {
+      "name": "React Feature Developer",
+      "role": "implementer",
+      "domain": "Desenvolvimento de features novas, componentes, hooks e gerenciamento de estado (TanStack Query + Zustand)",
+      "version": "1.0.0"
+    },
+    "react-router": {
+      "name": "React Router",
+      "role": "router",
+      "domain": "Supervisor hierarquico e roteador do dominio React",
+      "version": "1.0.0"
+    },
+    "react-test-fixer": {
+      "name": "React Test Fixer",
+      "role": "fixer",
+      "domain": "Diagnóstico e autocorreção de logs de falha de runners (Vitest, Playwright)",
+      "version": "1.0.0"
+    },
+    "react-ui-stylist": {
+      "name": "React Ui Stylist",
+      "role": "specialist",
+      "domain": "Templates JSX, Tailwind CSS/CSS Modules, layout responsivo e acessibilidade WCAG",
+      "version": "1.0.0"
+    },
+    "react-unit-test-writer": {
+      "name": "React Unit Test Writer",
+      "role": "tester",
+      "domain": "Testes unitários de hooks, stores Zustand, selectors TanStack Query e utilitários com mocks isolados",
       "version": "1.0.0"
     },
     "refactor-planner": {

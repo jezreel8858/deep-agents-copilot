@@ -11,11 +11,12 @@ triggers:
   - "inicialização guiada"
   - "scaffolding"
   - "HITL interativo"
-source_docs:
+source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/skills/terminal-governance/SKILL.md
 tools: []
+source_docs:
+  - .github/skills/terminal-governance/SKILL.md
 ---
 
 # Interactive Wizard Patterns

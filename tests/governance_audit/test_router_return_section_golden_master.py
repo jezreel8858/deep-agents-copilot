@@ -63,7 +63,7 @@ def test_router_return_section_golden_master_characterization():
     )
 
     # Todos os 85 agents não-roteadores têm seção
-    assert len(agent_files) - len(missing) == 85
+    assert len(agent_files) - len(missing) == 94
 
     # Relatório de variantes capturadas
     print(f"\n=== GOLDEN MASTER SNAPSHOT: R-042 RETORNO AO ROUTER ===")

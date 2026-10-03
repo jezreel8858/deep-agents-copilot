@@ -159,7 +159,7 @@ class TestTC06StateMachineIllegalTransition:
             origem="usuario",
             tipo=TipoEvento.DECISAO_ROTEAMENTO,
             workflow_solicitado=Workflow.TECHNICAL_ANALYSIS,
-            agente_solicitado="code-knowledge-graph",
+            agente_solicitado="codegraph-engine",
         )
 
         # Act & Assert

@@ -18,9 +18,10 @@ triggers:
   - "r2dbc pool sizing"
   - "direct memory leak netty"
 source_docs:
+  - .github/agents/backend/spring-reactive/spring-reactive-router.agent.md
+source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/agents/backend/spring-reactive/spring-reactive-router.agent.md
 tools: []
 ---
 

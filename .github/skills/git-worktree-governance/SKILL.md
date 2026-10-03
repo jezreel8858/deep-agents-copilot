@@ -13,10 +13,11 @@ triggers:
 tools:
   - "run_in_terminal"
 source_docs:
-  - "CLAUDE.md"
-  - ".github/copilot-instructions.md"
-  - ".github/skills/terminal-governance/SKILL.md"
-  - ".github/skills/git-governance/SKILL.md"
+  - .github/skills/git-governance/SKILL.md
+  - .github/skills/terminal-governance/SKILL.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 ---
 
 # Git Worktree Governance
@@ -43,7 +44,7 @@ O padrão **Git Worktree** resolve essa limitação ao permitir que cada agente 
 - Em sessões longas de auto-remediação ou TDD com múltiplos ciclos de tentativa.
 
 ### ❌ Quando NÃO Usar
-- Em tarefas de análise estritamente read-only (consultas via AST, `code-knowledge-graph`, `deep-search` ou revisões de código) — dispensam isolamento de working directory.
+- Em tarefas de análise estritamente read-only (consultas via AST, `codegraph-engine`, `deep-search` ou revisões de código) — dispensam isolamento de working directory.
 - Para alterações pontuais sequenciais em um único arquivo (onde `Single-Turn Batching` R-046 é suficiente).
 - Em repositórios sem controle Git inicializado.
 

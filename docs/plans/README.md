@@ -17,9 +17,11 @@ docs/plans/<AAAAMMDD>-<workflow>-<identificador-curto>.md
 - **Quando é gerado**: Ao final da etapa de elicitação de requisitos, RCA, escopo macro ou blueprint de viabilidade (Etapa 1/2 de cada workflow em R-050).
 - **Autoria**: O agente especialista dono canônico da etapa inicial de planejamento do workflow (ex.: `@requirements-analyst` / `@tech-solution-architect` em Feature; `@bug-triage` em Bug-Fix; `@refactor-planner` em Refactoring; `@agent-auditor` / `@repo-hygiene-auditor` em Governance; `@tech-solution-architect` em Migration).
 - **Materialização e Aprovação**: Como os especialistas analíticos operam em perfil Read-Only, o Orquestrador Raiz materializa o Markdown neste diretório e aciona compulsoriamente `ask_questions` para aprovação humana explícita antes de avançar para a fase técnica subsequente.
-- **Conteúdo Mínimo Obrigatório**:
-  1. Objetivo e motivação técnica/negócio.
-  2. Escopo delimitado e artefatos/arquivos impactados (mapeados via `@code-knowledge-graph` quando aplicável).
-  3. Não-escopo explícito.
-  4. Riscos técnicos e blast radius inicial.
-  5. Critério de aceite e Definition of Done.
+- **Conteúdo Mínimo Obrigatório** (conforme `.github/skills/documentation-writing-patterns/SKILL.md` § 2.1 — Categoria PLANEJAMENTO):
+  1. Front-matter YAML de planejamento canônico (`status: draft`, `date`, `autor`, `workflow`, `related-plan: <path | N/A>`).
+  2. Contexto/Problema, formulação do objetivo e motivação técnica/negócio.
+  3. Opções consideradas e Decisão técnica adotada.
+  4. Alternativas Rejeitadas (seção obrigatória justificando descartes e trade-offs).
+  5. Escopo delimitado, artefatos/arquivos impactados (mapeados via `@codegraph-engine` quando aplicável) e Não-escopo explícito.
+  6. Riscos técnicos, consequências e blast radius inicial.
+  7. Critério de aceite e Definition of Done (único a nível de documento, sem checklist obrigatório de execução).

@@ -23,10 +23,11 @@ triggers:
   - "controle de acesso"
   - "evidência de controle"
 source_docs:
-  - "CLAUDE.md"
-  - ".github/copilot-instructions.md"
-  - ".github/skills/agent-safety-guardrails/SKILL.md"
-  - ".github/skills/security-review-patterns/SKILL.md"
+  - .github/skills/agent-safety-guardrails/SKILL.md
+  - .github/skills/security-review-patterns/SKILL.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 tools: []
 ---
 

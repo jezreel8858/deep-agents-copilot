@@ -14,9 +14,9 @@ triggers:
   - "documentar decisão técnica"
   - "gerar arquivo .md de documentação"
 tools: []
-source_docs:
-  - "CLAUDE.md"
-  - ".github/copilot-instructions.md"
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 ---
 
 # Documentation Writing Patterns
@@ -51,6 +51,110 @@ Todo documento pertence a **exatamente um** dos 4 quadrantes — nunca misturar 
 | **Postmortem** | Resumo do incidente → Timeline → Causa raiz → Impacto → Ações corretivas (owner + prazo) |
 | **RFC** | Motivação → Especificação/Design → Alternativas rejeitadas → Impacto/Riscos |
 | **PRD** | Problema → Objetivo/Métrica de sucesso → Escopo (in/out) → Requisitos → Riscos |
+
+## 2.1) Documentos de Planejamento de Workflow (Plan/Blueprint/Spec/Implementation Plan)
+
+Documentos produzidos pelos agentes de planejamento (`tech-solution-architect`, `refactor-planner`, `requirements-analyst`, `feature-planner`, `business-rules-extractor`, `*-arch-advisor`) pertencem a **uma de duas categorias**, análogas ao fluxo `spec.md → plan.md → tasks.md` do GitHub Spec Kit. Nunca misturar as duas no mesmo arquivo.
+
+### Categoria A — Documento de PLANEJAMENTO (prosa/escopo/decisão)
+
+Exemplos: Blueprint, Plano de Planejamento, Requisitos (`requirements-analyst`), extração de regras de negócio. Foco em **decidir**, não em executar. **Sem checklist obrigatório.**
+
+Front-matter YAML canônico:
+
+```yaml
+---
+status: draft # draft | approved | superseded
+date: YYYY-MM-DD
+autor: <nome-do-agent-gerador>
+workflow: <workflow-canonico-1-a-9>
+related-plan: <path-do-doc-de-implementacao-correspondente | N/A>
+---
+```
+
+Estrutura mínima obrigatória: Front-matter → Contexto/Problema → Opções consideradas → Decisão → **Alternativas Rejeitadas (obrigatória)** → Consequências/Riscos → DoD (1 critério único de "pronto" a nível de documento).
+
+### Categoria B — Documento de IMPLEMENTAÇÃO (passos executáveis)
+
+Exemplos: Plano de Implementação, Plano de Refatoração (`refactor-planner`), Subtasks (`feature-planner`). Foco em **executar** uma decisão já aprovada. **Checklist GFM obrigatório.**
+
+Front-matter YAML canônico (superset da Categoria A):
+
+```yaml
+---
+status: draft # draft | approved | superseded
+date: YYYY-MM-DD
+autor: <nome-do-agent-gerador>
+workflow: <workflow-canonico-1-a-9>
+related-planning-doc: <path-do-doc-de-planejamento-aprovado> # obrigatório, R-064
+progress: 0 # percentual opcional, calculável a partir do checklist
+---
+```
+
+Checklist GFM obrigatório (formato único, GFM puro `[ ]`/`[x]` — substitui convenções customizadas como `[ ] Nó N` ou `[S]`/`[P]`):
+
+```markdown
+Progresso: 3/12 tarefas concluídas
+
+- [ ] <descrição atômica e rastreável da tarefa> `{paralelizavel: true, responsavel: "<stack>-bug-fixer"}`
+- [x] <tarefa já concluída> `{paralelizavel: false, responsavel: "feature-developer"}`
+```
+
+Regras do checklist:
+- Cada item é atômico (uma única unidade de trabalho rastreável) e carrega metadado inline `{paralelizavel: bool, responsavel: "<agent>"}`.
+- GFM define nativamente só 2 estados (`[ ]`/`[x]`); estados extras (in-progress/blocked) **não são padrão** — não inventar novas notações de caixa.
+- Seção de progresso agregado ("Progresso: N/M tarefas concluídas") no topo do documento, antes do primeiro item.
+- **Alternativas Rejeitadas não é obrigatória** (documento é prescritivo, não decisório) — referenciar o doc de planejamento aprovado via `related-planning-doc` para o racional da decisão.
+
+### DoD vs Acceptance Criteria (não fundir)
+
+| Conceito | Nível | Cardinalidade | Onde aparece |
+|---|---|---|---|
+| **DoD** (Definition of Done) | Documento | 1 único critério geral de "pronto" | Fim do doc de PLANEJAMENTO |
+| **Acceptance Criteria** | Item de checklist | Opcional, por item ambíguo | Sub-bullet dentro do item de IMPLEMENTAÇÃO |
+
+### Exemplo mínimo — doc de PLANEJAMENTO (<15 linhas)
+
+```markdown
+---
+status: approved
+date: 2026-01-10
+autor: tech-solution-architect
+workflow: 3-arquitetura
+related-plan: docs/plan/refactor-auth-module-plan.md
+---
+
+# Blueprint: Migração do módulo de autenticação
+
+## Contexto
+...
+## Decisão
+...
+## Alternativas Rejeitadas
+- Opção X: rejeitada por Y.
+## DoD
+Módulo aprovado por @tech-solution-architect e plano de implementação vinculado existe.
+```
+
+### Exemplo mínimo — doc de IMPLEMENTAÇÃO (<15 linhas)
+
+```markdown
+---
+status: draft
+date: 2026-01-11
+autor: refactor-planner
+workflow: 3-arquitetura
+related-planning-doc: docs/plan/refactor-auth-module-blueprint.md
+progress: 0
+---
+
+# Plano de Refatoração: Módulo de autenticação
+
+Progresso: 0/3 tarefas concluídas
+
+- [ ] Extrair `AuthService` para interface `{paralelizavel: false, responsavel: "spring-boot-feature-developer"}`
+- [ ] Atualizar testes unitários `{paralelizavel: true, responsavel: "spring-boot-unit-test-writer"}`
+```
 
 ## 3) Convenções de Formatação Obrigatórias
 

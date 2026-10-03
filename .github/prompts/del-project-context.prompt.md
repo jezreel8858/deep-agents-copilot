@@ -10,9 +10,10 @@ model: "Gemini 3.8 Flash"
 tools: ['read_file', 'insert_edit_into_file', 'file_search', 'list_dir', 'ask_questions', 'run_subagent']
 argument-hint: '<nome-do-projeto>'
 source_docs:
-  - CLAUDE.md
   - .github/projects.local.yaml.example
   - .github/instructions/README.md
+source_docs_lazy:
+  - CLAUDE.md
 ---
 
 # `/del-project-context`

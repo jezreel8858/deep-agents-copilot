@@ -15,6 +15,8 @@ from pathlib import Path
 import pytest
 import yaml
 
+from tests.governance_audit._helpers import read_workflows_full_content
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 AGENTS_DIR = REPO_ROOT / ".github" / "agents"
 ROUTING_GRAPH_PATH = AGENTS_DIR / "routing-graph.yaml"
@@ -48,7 +50,7 @@ READONLY_ADVISORY_AGENTS = {
     "runtime-verifier",
     # Ampliação carry-forward (auditoria Workflow 3 — 2026-09): especialistas read-only
     # despachados por WORKFLOW-TECHNICAL-ANALYSIS sem cobertura de teste equivalente.
-    "code-knowledge-graph",
+    "codegraph-engine",
     "devops-engineer",
     "tech-solution-architect",
     "angular-arch-advisor",
@@ -176,11 +178,11 @@ def test_operational_golden_path_router_to_prompt_structuring(routing_graph):
 
 
 def test_operational_golden_path_refactor_requires_codegraph(all_existing_agents):
-    """Golden Path 2 (R-045): refactor-planner deve delegar compulsoriamente para code-knowledge-graph"""
+    """Golden Path 2 (R-045): refactor-planner deve delegar compulsoriamente para codegraph-engine"""
     planner_file = all_existing_agents.get("refactor-planner")
     assert planner_file is not None
     content = planner_file.read_text(encoding="utf-8")
-    assert "code-knowledge-graph" in content
+    assert "codegraph-engine" in content
 
 
 def test_operational_golden_path_governance_factory_requires_deep_search(all_existing_agents):
@@ -192,11 +194,11 @@ def test_operational_golden_path_governance_factory_requires_deep_search(all_exi
 
 
 def test_operational_golden_path_ddd_mapper_requires_codegraph(all_existing_agents):
-    """Golden Path 4: ddd-bounded-context-mapper deve consumir o mapa estrutural de code-knowledge-graph"""
+    """Golden Path 4: ddd-bounded-context-mapper deve consumir o mapa estrutural de codegraph-engine"""
     ddd_file = all_existing_agents.get("ddd-bounded-context-mapper")
     assert ddd_file is not None
     content = ddd_file.read_text(encoding="utf-8")
-    assert "code-knowledge-graph" in content
+    assert "codegraph-engine" in content
 
 
 def test_readonly_advisory_agents_do_not_contain_mutation_tools(all_existing_agents):
@@ -226,9 +228,10 @@ CANONICAL_WORKFLOW_IDS = {
     "WORKFLOW-GOVERNANCE-MAINTENANCE",
 }
 def test_workflows_specification_file_exists_and_covers_all_five():
-    """Valida que workflows.md existe, possui sintaxe válida e cobre os 5 workflows canônicos (R-050)."""
+    """Valida que workflows.md (+ arquivos fatiados em .github/agents/workflows/,
+    R-066/F3) existe, possui sintaxe válida e cobre os 5 workflows canônicos (R-050)."""
     assert WORKFLOWS_MD_PATH.exists(), f"Arquivo de especificação não encontrado: {WORKFLOWS_MD_PATH}"
-    content = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    content = read_workflows_full_content(REPO_ROOT)
     for wf_id in CANONICAL_WORKFLOW_IDS:
         assert wf_id in content, f"workflows.md deve especificar o workflow: {wf_id}"
     assert "workflow_tracking" in content, "workflows.md deve documentar o bloco workflow_tracking de handoff"
@@ -270,7 +273,7 @@ def test_handoff_governance_supports_workflow_tracking():
 def test_workflows_support_fast_chaining_circuit_breaker_and_multi_project():
     """Valida que workflows.md documenta Fast-Chaining (R-050.1), Circuit Breaker/Rollback (R-050.2)
     e Multi-Project Target Tracking (R-050.3)."""
-    content = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    content = read_workflows_full_content(REPO_ROOT)
     assert "Fast-Chaining" in content, "workflows.md deve especificar o protocolo de Fast-Chaining"
     assert "Circuit Breaker" in content, "workflows.md deve especificar o Circuit Breaker"
     assert "projeto_alvo" in content, "workflows.md deve especificar o rastreamento de projeto_alvo"
@@ -281,7 +284,7 @@ def test_workflows_support_fast_chaining_circuit_breaker_and_multi_project():
 def test_workflows_support_quality_review_loop_r050_4():
     """Valida que workflows.md documenta o Loop de Revisão de Qualidade (§ 1.5, R-050.4)
     e que os 6 workflows aplicáveis possuem a referência cruzada com teto de 3 iterações."""
-    content = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    content = read_workflows_full_content(REPO_ROOT)
     assert "### 1.5 Loop de Revisão de Qualidade (Quality Review Loop)" in content
     assert "Evaluator-Optimizer" in content
     assert "quality_review_loop:" in content
@@ -314,7 +317,7 @@ def test_agent_router_fast_chaining_and_target_project():
 
 def test_workflow_bug_fix_edge_scenarios_and_state_bag(routing_graph):
     """Valida que WORKFLOW-BUG-FIX cobre cenários de layout, DDL, repro gate, baseline e typed state bag."""
-    content_wf = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    content_wf = read_workflows_full_content(REPO_ROOT)
     assert "Repro Gate" in content_wf, "workflows.md deve especificar o Repro Gate para bugs intermitentes"
     assert "Layout Spec" in content_wf, "workflows.md deve especificar a ramificação de Layout/CSS"
     assert "Migração DDL" in content_wf, "workflows.md deve cobrir dependência de DDL via database-specialist"
@@ -356,7 +359,7 @@ def test_workflow_bug_fix_edge_scenarios_and_state_bag(routing_graph):
 def test_workflow_refactoring_edge_scenarios_and_state_bag(routing_graph):
     """Valida que WORKFLOW-REFACTORING cobre cenários de Golden Master, Breaking Changes,
     Expand and Contract (BD), Árvore Mikado e Typed State Bag."""
-    content_wf = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    content_wf = read_workflows_full_content(REPO_ROOT)
     assert "Golden Master" in content_wf, "workflows.md deve especificar Golden Master Safety Net para código legado"
     assert "Contract & Deprecation Plan" in content_wf or "Contract Testing" in content_wf, "workflows.md deve cobrir gate de breaking change/contratos"
     assert "Pact-style" in content_wf or "consumer-driven" in content_wf, "workflows.md deve especificar Contract Testing (Pact-style / consumer-driven)"
@@ -394,7 +397,7 @@ def test_workflow_bug_fix_and_refactoring_rigor_and_governance_parity(routing_gr
     - Invariante 15: Contract Testing (Pact-style consumer-driven), redundância proporcional ao blast radius
       (auditoria reversa de símbolos, mini mutation gate, differential replay leve) e rollback com blast radius revertido.
     """
-    content_wf = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    content_wf = read_workflows_full_content(REPO_ROOT)
     assert "14. **Invariante de RCA Estruturado, Dupla Evidência e Mini Mutation em Bugfix (WORKFLOW-BUG-FIX)**:" in content_wf
     assert "15. **Invariante de Contract Testing, Redundância Proporcional e Rollback com Blast Radius Revertido em Refatoração (WORKFLOW-REFACTORING)**:" in content_wf
     assert "reverse_symbol_audit" in content_wf or "Auditoria Reversa de Símbolos" in content_wf
@@ -404,7 +407,7 @@ def test_workflow_bug_fix_and_refactoring_rigor_and_governance_parity(routing_gr
 def test_workflow_technical_analysis_edge_scenarios_and_proposals(routing_graph):
     """Valida que WORKFLOW-TECHNICAL-ANALYSIS cobre arquitetura de stack (Angular, Spring, EJB),
     análise composta, tabela de propostas acionáveis para Fast-Chaining e Typed State Bag."""
-    content_wf = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    content_wf = read_workflows_full_content(REPO_ROOT)
     assert "angular-arch-advisor" in content_wf, "workflows.md deve incluir angular-arch-advisor"
     assert "spring-boot-arch-advisor" in content_wf, "workflows.md deve incluir spring-boot-arch-advisor"
     assert "Sub-rotina Analítica Composta" in content_wf, "workflows.md deve especificar análise composta"
@@ -424,7 +427,7 @@ def test_workflow_technical_analysis_edge_scenarios_and_proposals(routing_graph)
 def test_workflow_feature_development_edge_scenarios_and_state_bag(routing_graph):
     """Valida que WORKFLOW-FEATURE-DEVELOPMENT cobre particionamento de escopo (Fullstack/Back/Front),
     Checkpoint de Blueprint, Contract-First TDD, Security Gate (OWASP) e Typed State Bag."""
-    content_wf = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    content_wf = read_workflows_full_content(REPO_ROOT)
     assert "Checkpoint de Blueprint" in content_wf, "workflows.md deve exigir Checkpoint de Blueprint"
     assert "Contract-First" in content_wf, "workflows.md deve exigir Contract-First TDD"
     assert "Security Review (OWASP)" in content_wf, "workflows.md deve incluir security-reviewer no gate"
@@ -444,7 +447,7 @@ def test_workflow_feature_development_edge_scenarios_and_state_bag(routing_graph
 def test_workflow_governance_maintenance_edge_scenarios_and_state_bag(routing_graph):
     """Valida que WORKFLOW-GOVERNANCE-MAINTENANCE cobre pesquisa prévia de mercado via deep-search,
     Checkpoint de Aprovação Humana, Sincronização Quádrupla SSOT (R-015), Quality Gate Tier 1 e State Bag."""
-    content_wf = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    content_wf = read_workflows_full_content(REPO_ROOT)
     assert "Pesquisa Prévia de Mercado" in content_wf, "workflows.md deve especificar pesquisa prévia"
     assert "Checkpoint de Aprovação" in content_wf, "workflows.md deve exigir aprovação humana"
     assert "Sincronização Quádrupla SSOT" in content_wf, "workflows.md deve exigir sincronização quádrupla R-015"
@@ -469,7 +472,7 @@ def test_workflow_governance_maintenance_edge_scenarios_and_state_bag(routing_gr
 def test_workflow_dependency_remediation_edge_scenarios_and_state_bag(routing_graph):
     """Valida que WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION cobre triagem SCA, blast radius,
     bump de manifesto, adaptação de breaking changes e Typed State Bag."""
-    content_wf = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    content_wf = read_workflows_full_content(REPO_ROOT)
     assert "WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION" in content_wf
     assert "Triagem de Vulnerabilidade & Advisory" in content_wf
     assert "Mapeamento de Blast Radius da Dependência" in content_wf
@@ -481,13 +484,13 @@ def test_workflow_dependency_remediation_edge_scenarios_and_state_bag(routing_gr
     etapa1 = next((e for e in estados if e["etapa"] == 1), {})
     assert "security-reviewer" in etapa1.get("agent", "")
     etapa2 = next((e for e in estados if e["etapa"] == 2), {})
-    assert "code-knowledge-graph" in etapa2.get("agent", "")
+    assert "codegraph-engine" in etapa2.get("agent", "")
 
 
 def test_workflow_framework_migration_edge_scenarios_and_state_bag(routing_graph):
     """Valida que WORKFLOW-FRAMEWORK-MIGRATION cobre avaliação de compatibilidade pre-flight,
     decomposição em fases, codemods automatizados, testes de paridade e State Bag."""
-    content_wf = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    content_wf = read_workflows_full_content(REPO_ROOT)
     assert "WORKFLOW-FRAMEWORK-MIGRATION" in content_wf
     assert "Pre-Flight Compatibility Assessment" in content_wf
     assert "Migration Phasing & Blueprint" in content_wf
@@ -509,7 +512,7 @@ def test_workflow_framework_migration_depara_matrix_and_brownfield_reconciliatio
     - Obrigatoriedade da Matriz De-Para com taxonomia estrita de status
     - Dual-Verification Gate com resolução integral (zero pendentes/divergentes)
     """
-    content_wf = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    content_wf = read_workflows_full_content(REPO_ROOT)
     assert "A Estratégia de Prevenção de Gaps em 5 Dimensões Críticas:" in content_wf
     assert "Dimensão 1: Borda, Contratos de Entrada & Validações Fail-Fast" in content_wf
     assert "Dimensão 3: Pegada de Persistência Relacional & Transações" in content_wf
@@ -532,7 +535,7 @@ def test_workflow_framework_migration_depara_matrix_and_brownfield_reconciliatio
 def test_workflow_release_readiness_edge_scenarios_and_state_bag(routing_graph):
     """Valida que WORKFLOW-RELEASE-READINESS cobre auditoria de contratos OpenAPI, rollout DDL
     com rollback testado, varredura de segredos, packaging semântico e State Bag."""
-    content_wf = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    content_wf = read_workflows_full_content(REPO_ROOT)
     assert "WORKFLOW-RELEASE-READINESS" in content_wf
     assert "Contract & API Compatibility Audit" in content_wf
     assert "Database Rollout Pre-Flight" in content_wf
@@ -552,7 +555,7 @@ def test_workflow_release_readiness_edge_scenarios_and_state_bag(routing_graph):
 def test_workflow_prompt_synthesis_edge_scenarios_and_state_bag(routing_graph):
     """Valida que WORKFLOW-PROMPT-SYNTHESIS cobre elicitação no problem space, grounding AST,
     restrições e não-escopo, otimização para prompt caching, emissão em bloco markdown e State Bag."""
-    content_wf = WORKFLOWS_MD_PATH.read_text(encoding="utf-8")
+    content_wf = read_workflows_full_content(REPO_ROOT)
     assert "WORKFLOW-PROMPT-SYNTHESIS" in content_wf
     assert "Elicitação & Problem Space" in content_wf or "Elicitação & Intake" in content_wf
     assert "Context Grounding & AST Mining" in content_wf
@@ -565,12 +568,12 @@ def test_workflow_prompt_synthesis_edge_scenarios_and_state_bag(routing_graph):
     assert "requirements-analyst" in etapa1.get("agent", "") or "requirements-analyst" in str(etapa1.get("co_agentes", []))
     assert "prompt-structuring" in etapa1.get("agent", "") or "prompt-structuring" in str(etapa1.get("co_agentes", []))
     etapa2 = next((e for e in estados if e["etapa"] == 2), {})
-    assert "code-knowledge-graph" in etapa2.get("agent", "")
+    assert "codegraph-engine" in etapa2.get("agent", "")
     etapa4 = next((e for e in estados if e["etapa"] == 4), {})
     assert "prompt-structuring" in etapa4.get("agent", "")
     etapa5 = next((e for e in estados if e["etapa"] == 5), {})
     assert etapa5.get("formato_entrega") == "markdown_code_block"
     assert "Invariante de Visibilidade Progressiva" in content_wf, "workflows.md deve exigir visibilidade progressiva no Workflow 9"
     assert "Painel de Evidências" in content_wf, "workflows.md deve exigir Painel de Evidências no Workflow 9"
-    assert "Invariante de Invocação Compulsória do Motor de Grafo" in content_wf, "workflows.md deve exigir invocação compulsória de @code-knowledge-graph na Etapa 2"
+    assert "Invariante de Invocação Compulsória do Motor de Grafo" in content_wf, "workflows.md deve exigir invocação compulsória de @codegraph-engine na Etapa 2"
     assert "Invariante de Interrupção Compulsória por Ambiguidade" in content_wf, "workflows.md deve exigir Invariante 19 de interrupção compulsória"

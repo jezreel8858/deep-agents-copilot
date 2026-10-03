@@ -15,6 +15,8 @@ from pathlib import Path
 import pytest
 import yaml
 
+from tests.governance_audit._helpers import read_workflows_full_content
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CATALOG_PATH = REPO_ROOT / ".github" / "agents" / "catalog.yaml"
 WORKFLOWS_PATH = REPO_ROOT / ".github" / "agents" / "workflows.md"
@@ -42,7 +44,7 @@ def test_all_catalog_agents_referenced_in_workflows_or_documented_exceptions():
     catalog_agents = set(catalog_data.get("agents", {}).keys())
     assert len(catalog_agents) >= 30, f"Catálogo incompleto: {len(catalog_agents)} agents encontrados"
 
-    wf_content = WORKFLOWS_PATH.read_text(encoding="utf-8")
+    wf_content = read_workflows_full_content(REPO_ROOT)
 
     missing_agents: list[str] = []
     for agent_id in sorted(catalog_agents):
@@ -65,7 +67,7 @@ def test_bootstrap_exception_agents_documented_in_workflows():
     Valida que os agents de bootstrap em BOOTSTRAP_EXCEPTION_AGENTS possuem nota de
     exceção explícita formalmente documentada em workflows.md.
     """
-    wf_content = WORKFLOWS_PATH.read_text(encoding="utf-8")
+    wf_content = read_workflows_full_content(REPO_ROOT)
 
     assert "Nota de Exceção Explícita de Governança" in wf_content, (
         "workflows.md DEVE conter a nota de exceção explícita para agentes de bootstrap"

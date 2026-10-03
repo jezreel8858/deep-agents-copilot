@@ -217,14 +217,14 @@ Este documento consolida padrões multi-agent de:
 | **Empresas** | Padrão enterprise — Anthropic mentions em context management |
 | **Nota** | Essencial para manter comportamento durante refatorações. Agnóstico de linguagem. |
 
-### 1️⃣5️⃣ **CODE KNOWLEDGE GRAPH BUILDER**
+### 1️⃣5️⃣ **CODEGRAPH ENGINE BUILDER**
 
 | Atributo | Detalhe |
 |----------|---------|
 | **Responsabilidade** | Construção de grafo de conhecimento de código, dependências, impacto analysis |
 | **Entrada** | Codebase, AST, símbolos |
 | **Saída** | Grafo de dependências, blast radius, ciclos, acoplamento |
-| **Exemplo** | Dependency mapping, SWE-agent analysis, code-knowledge-graph patterns |
+| **Exemplo** | Dependency mapping, SWE-agent analysis, codegraph-engine patterns |
 | **Empresas** | Google, Microsoft, Princeton SWE-agent |
 | **Nota** | Determinístico (AST parsing) + opcional LLM fallback. Multi-linguagem. |
 
@@ -326,7 +326,7 @@ Baseado em padrões consolidados do mercado (Microsoft, Anthropic, GitHub), os a
 📐 CATEGORIA 2: ARCHITECTURE & DESIGN (Validação Técnica)
 ├─ Architect / Designer            → Design de alto nível (não-código)
 ├─ Impact Architect                → Análise de impacto cross-sistema
-├─ Code Knowledge Graph Builder    → Mapeamento de dependências
+├─ CodeGraph Engine Builder    → Mapeamento de dependências
 ├─ Refactor Planner                → Planejamento de mudanças
 ├─ Business Rules Extractor        → Documentação de comportamento
 └─ [Hierarquia]: Architect → Impact → Refactor Planner (cascata)
@@ -351,7 +351,7 @@ Baseado em padrões consolidados do mercado (Microsoft, Anthropic, GitHub), os a
 📚 CATEGORIA 5: DOCUMENTATION & LEARNING (Conhecimento)
 ├─ Documentation Writer            → Geração de docs
 ├─ Business Rules Extractor        → Extração de regras
-├─ Code Knowledge Graph            → Grafo de dependências
+├─ CodeGraph Engine            → Grafo de dependências
 └─ [Hierarquia]: Extractor → Writer (sequência)
 
 🔄 CATEGORIA 6: GOVERNANCE & ORCHESTRATION (Meta-Nível)
@@ -384,7 +384,7 @@ ENTRADA (Usuário/Stakeholder)
     ↓
 [CATEGORIA 2] Architect (design + validação)
     ↓
-[CATEGORIA 2] Code Knowledge Graph (mapeamento de impacto)
+[CATEGORIA 2] CodeGraph Engine (mapeamento de impacto)
     ↓
 [CATEGORIA 2] Refactor Planner (plano de mudança)
     ↓
@@ -429,7 +429,7 @@ Total: **26 agents** identificados
 | 3 | `requirements-analyst` | Planning | Analyst | ✅ Entrada |
 | 4 | `deep-search` | Planning | Researcher | ✅ Pesquisa |
 | 5 | `tech-solution-architect` | Architecture | Architect | ✅ Design |
-| 6 | `code-knowledge-graph` | Architecture | Graph Builder | ✅ Mapeamento |
+| 6 | `codegraph-engine` | Architecture | Graph Builder | ✅ Mapeamento |
 | 7 | `business-rules-extractor` | Architecture | Rules Extractor | ✅ Documentação |
 | 8 | `refactor-planner` | Architecture | Planner | ✅ Estratégia |
 | 9 | `spring-boot` | Implementation | Coder (Stack) | ✅ Java/Spring |
@@ -486,7 +486,7 @@ Total: **26 agents** identificados
 | ✅ Memory Manager | ❌ **Parcial** (context-builder apenas) | **GAP** |
 | ✅ Guardrails / Compliance | ❌ **FALTA** | **GAP** |
 | ✅ Business Rules Extractor | `business-rules-extractor` | **Completo** |
-| ✅ Code Knowledge Graph | `code-knowledge-graph` | **Completo** |
+| ✅ CodeGraph Engine | `codegraph-engine` | **Completo** |
 | ✅ Impact Architect | `tech-solution-architect` | **Cobertura Parcial** (análise genérica) |
 | ✅ Refactor Planner | `refactor-planner` | **Completo** |
 | ✅ Test Strategy | `test-strategy` | **Completo** |

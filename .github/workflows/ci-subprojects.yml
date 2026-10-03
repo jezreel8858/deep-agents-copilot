@@ -1,0 +1,68 @@
+name: CI · Sub-projetos (apps/web & local-chat-gateway)
+
+# Pipeline de build/test para os dois sub-projetos aplicativos do monorepo.
+# Cada job só dispara quando arquivos do respectivo path forem alterados,
+# evitando execuções desnecessárias (custo/credits).
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'apps/web/**'
+      - 'deploy/local-chat-gateway/**'
+      - '.github/workflows/ci-subprojects.yml'
+  pull_request:
+    paths:
+      - 'apps/web/**'
+      - 'deploy/local-chat-gateway/**'
+      - '.github/workflows/ci-subprojects.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  web-lint-build:
+    name: apps/web · lint & build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+  gateway-tests:
+    name: local-chat-gateway · pytest
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: deploy/local-chat-gateway
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[dev]
+
+      - name: Run tests
+        run: pytest -q

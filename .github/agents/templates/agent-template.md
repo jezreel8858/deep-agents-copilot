@@ -16,13 +16,18 @@ model: "Gemini 3.8 Flash"
 # Read-Only / Analítico: ['read_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'mcp_context-mode_ctx_search']
 tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_search']
 # SSOT de Governança e Dependências (Context Engineering Benchmark 2026):
-# 100% das dependências documentais e skills DEVEM residir exclusivamente em source_docs: no frontmatter.
+# 100% das dependências documentais e skills DEVEM residir exclusivamente em source_docs:/source_docs_lazy: no frontmatter.
 # É TERMINANTEMENTE PROIBIDO criar seções redundantes de herança, catálogo, skills ou pré-carregamento no corpo markdown.
 # O gate de testes determinístico (test_template_sections.py) bloqueia compulsoriamente seções não homologadas.
+# R-066 (Progressive Disclosure): CLAUDE.md e .github/copilot-instructions.md NUNCA vão em source_docs: (full-load) —
+# são documentos de alto fan-in (>300 linhas) consultados exclusivamente via context-mode/ctx_search sob demanda.
+# Use source_docs: apenas para docs <500 linhas (full-load seguro); source_docs_lazy: para CLAUDE.md/copilot-instructions.md/
+# workflows.md e qualquer doc fatiado >300 linhas (ver tools/agent_source_docs_sync/sync_lazy_source_docs.py).
 source_docs:
+  - .github/skills/<skill-principal>/SKILL.md
+source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/skills/<skill-principal>/SKILL.md
 ---
 
 # Perfil Operacional

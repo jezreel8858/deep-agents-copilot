@@ -63,7 +63,14 @@ if [ -n "$staged_gov_files" ]; then
   done <<< "$staged_gov_files"
 fi
 
-# 5) Bloqueio de nomes de projetos locais externos em arquivos staged (R-044)
+# 5) Bloqueio de nomes de projetos locais EXTERNOS em arquivos staged (R-044).
+#    Projetos cujo path_externo resolve DENTRO da própria raiz deste repositório
+#    (ex.: sub-projetos do monorepo como apps/web ou deploy/local-chat-gateway)
+#    NÃO são "evidência de análise de repositório externo" — são o próprio
+#    código sendo versionado aqui, e seus nomes de pacote aparecem legitimamente
+#    em package.json/pyproject.toml/Dockerfiles/docs. Apenas ids cujo
+#    path_externo aponta para FORA da raiz deste repo são tratados como vazamento
+#    real de nome de projeto local privado (R-043/R-044).
 target_catalog=""
 if [ -f ".github/projects.local.yaml" ]; then
   target_catalog=".github/projects.local.yaml"
@@ -72,15 +79,32 @@ elif [ -f "docs/ai-context/catalog.local.yaml" ]; then
 fi
 
 if [ -n "$target_catalog" ]; then
-  local_ids=$(grep -E '^\s*-\s*id:' "$target_catalog" | awk -F'"' '{print $2}' | grep -v 'deep-agents-copilot' || true)
-  for proj_id in $local_ids; do
+  repo_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+  repo_root_norm=$(printf '%s' "$repo_root" | tr '[:upper:]' '[:lower:]' | sed -E 's#\\\\|\\#/#g' | sed -E 's#^([a-z]):/#/\1/#')
+
+  all_ids=$(grep -E '^\s*-\s*id:' "$target_catalog" | awk -F'"' '{print $2}')
+  all_paths=$(grep -E '^\s*path_externo:' "$target_catalog" | awk -F'"' '{print $2}')
+
+  idx=0
+  while IFS= read -r proj_id; do
+    idx=$((idx + 1))
     [ -z "$proj_id" ] && continue
+    [ "$proj_id" = "deep-agents-copilot" ] && continue
+
+    proj_path=$(printf '%s\n' "$all_paths" | sed -n "${idx}p")
+    proj_path_norm=$(printf '%s' "$proj_path" | tr '[:upper:]' '[:lower:]' | sed -E 's#\\\\|\\#/#g' | sed -E 's#^([a-z]):/#/\1/#')
+
+    # Sub-projeto do próprio monorepo (path_externo dentro da raiz do repo atual) — não bloquear.
+    case "$proj_path_norm" in
+      "$repo_root_norm"/*|"$repo_root_norm") continue ;;
+    esac
+
     if git diff --cached | grep -qiE "^\+.*$proj_id"; then
       echo "❌ [R-044] Bloqueado: diff staged contém referência nominal ao projeto local '$proj_id'."
       echo "   → Genericize para [PROJETO-ALVO] ou [PROJETO-EXEMPLO]. Ver CLAUDE.md § R-044."
       blocked=1
     fi
-  done
+  done <<< "$all_ids"
 fi
 
 # 6) Defesa Anti-Truncamento de Histórico para CHANGELOG.md:

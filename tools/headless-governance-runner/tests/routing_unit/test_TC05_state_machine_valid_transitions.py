@@ -116,12 +116,12 @@ class TestTC05StateMachineValidTransitions:
         assert s1.etapa == 1
         assert s1.agente_ativo == "business-rules-extractor"
 
-        # 2. Etapa 2 (code-knowledge-graph)
+        # 2. Etapa 2 (codegraph-engine)
         ev_2 = Evento(
             origem="usuario",
             tipo=TipoEvento.AVANCO_ETAPA,
             etapa_solicitada=2,
-            agente_solicitado="code-knowledge-graph",
+            agente_solicitado="codegraph-engine",
         )
         s2 = transicionar(s1, ev_2, tabela_real)
         assert s2.etapa == 2

@@ -86,13 +86,13 @@ cenarios:
           exigir_banner: "Agente Ativo: business-rules-extractor"
         output_esperado:
           - "Ground Truth de Regras de Negócio"
-        proximos_permitidos: ["code-knowledge-graph"]
+        proximos_permitidos: ["codegraph-engine"]
       - etapa: 2
         nome_etapa: "Mapeamento Estrutural e Blast Radius"
-        agente: "code-knowledge-graph"
+        agente: "codegraph-engine"
         invariantes:
           proibir_mutacao: true
-          exigir_banner: "Agente Ativo: code-knowledge-graph"
+          exigir_banner: "Agente Ativo: codegraph-engine"
         output_esperado:
           - "Blast Radius"
           - "Impact Analysis"
@@ -154,13 +154,13 @@ cenarios:
         output_esperado:
           - "Diagnóstico de Arquitetura"
           - "Trade-offs e Riscos"
-        proximos_permitidos: ["code-knowledge-graph", "deep-search"]
+        proximos_permitidos: ["codegraph-engine", "deep-search"]
       - etapa: 2
         nome_etapa: "Análise Determinística de Código e Chamadas"
-        agente: "code-knowledge-graph"
+        agente: "codegraph-engine"
         invariantes:
           proibir_mutacao: true
-          exigir_banner: "Agente Ativo: code-knowledge-graph"
+          exigir_banner: "Agente Ativo: codegraph-engine"
         output_esperado:
           - "Grafo de Componentes Afetados"
         proximos_permitidos: ["docs-engineer", "tech-solution-architect"]
@@ -292,13 +292,13 @@ cenarios:
         output_esperado:
           - "Versão Corrigida Identificada"
           - "Severidade CVSS"
-        proximos_permitidos: ["code-knowledge-graph"]
+        proximos_permitidos: ["codegraph-engine"]
       - etapa: 2
         nome_etapa: "Blast Radius & Mapeamento de Consumidores"
-        agente: "code-knowledge-graph"
+        agente: "codegraph-engine"
         invariantes:
           proibir_mutacao: true
-          exigir_banner: "Agente Ativo: code-knowledge-graph"
+          exigir_banner: "Agente Ativo: codegraph-engine"
         output_esperado:
           - "Mapeamento de Importações e Callers"
         proximos_permitidos: ["angular-feature-developer", "spring-boot-feature-developer"]
@@ -523,13 +523,13 @@ cenarios:
         output_esperado:
           - "Problem Space"
           - "Critérios de Aceitação"
-        proximos_permitidos: ["code-knowledge-graph"]
+        proximos_permitidos: ["codegraph-engine"]
       - etapa: 2
         nome_etapa: "Context Grounding & AST Mining"
-        agente: "code-knowledge-graph"
+        agente: "codegraph-engine"
         invariantes:
           proibir_mutacao: true
-          exigir_banner: "Agente Ativo: code-knowledge-graph"
+          exigir_banner: "Agente Ativo: codegraph-engine"
         output_esperado:
           - "grounded_files"
           - "irmaos_canonicos"

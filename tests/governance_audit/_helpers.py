@@ -12,6 +12,8 @@ Acionável / Non-Actionable Assertion Message).
 """
 from __future__ import annotations
 
+from pathlib import Path
+
 
 def remediation(message: str, *, fix_hint: str) -> str:
     """Formata uma mensagem de assert com bloco de remediação acionável.
@@ -26,3 +28,29 @@ def remediation(message: str, *, fix_hint: str) -> str:
         Mensagem multilinha pronta para uso em `assert cond, remediation(...)`.
     """
     return f"{message}\n  REMEDIATION: {fix_hint}"
+
+
+def read_workflows_full_content(repo_root: Path) -> str:
+    """Reconstrói o conteúdo completo e equivalente ao antigo `workflows.md`
+    monolítico, concatenando o índice raiz + os 9 arquivos de workflow +
+    o arquivo transversal de invariantes/protocolos (R-066 / F3 — fatiamento
+    de `.github/agents/workflows.md` em `.github/agents/workflows/`).
+
+    Use esta função em vez de `(AGENTS_DIR / "workflows.md").read_text()` sempre
+    que o teste precisar fazer `assert <string> in content` contra qualquer seção
+    do antigo arquivo monolítico — o conteúdo normativo foi apenas reorganizado
+    fisicamente, nunca removido.
+    """
+    agents_dir = repo_root / ".github" / "agents"
+    index_path = agents_dir / "workflows.md"
+    workflows_dir = agents_dir / "workflows"
+
+    parts: list[str] = []
+    if index_path.is_file():
+        parts.append(index_path.read_text(encoding="utf-8"))
+    if workflows_dir.is_dir():
+        for p in sorted(workflows_dir.glob("*.md")):
+            parts.append(p.read_text(encoding="utf-8"))
+    return "\n".join(parts)
+
+

@@ -61,6 +61,9 @@ Toda skill deve declarar no topo:
 | **`agent-memory-policy`** | 🧠 **Tier 3** | Política de memória long-term para agents: tipos episódico, semântico e procedimental, incluindo checkpoint automático pré-risco (`ctx_index` antes de comando de risco). Foco em memória procedimental (agents auto-adaptativos) com guardrails e aprovação humana obrigatória |
 | **`frontend-componentization-patterns`** | 🧩 **Tier 2** | Padrões genéricos de componentização frontend (responsabilidade única, composição, contrato de componente, fronteiras de estado) |
 | **`angular-frontend-patterns`** | 🅰️ **Tier 2** | Boas práticas/patterns de codificação Angular (standalone, template/binding, Signals+RxJS, segurança e consistência) |
+| **`react-frontend-patterns`** | ⚛️ **Tier 2** | Boas práticas/patterns de codificação React moderno (Server/Client Components, hooks, segurança e consistência arquitetural) |
+| **`react-performance-patterns`** | ⚛️⚡ **Tier 2** | Core Web Vitals, React Compiler e code-splitting para aplicações React |
+| **`react-responsive-ui-patterns`** | ⚛️🎨 **Tier 2** | Tailwind CSS/CSS Modules, layout responsivo mobile-first e WCAG 2.2 AA para componentes React |
 | **`angular-performance-patterns`** | 🅰️⚡ **Tier 2** | ⭐ ***(NEW)*** Engenharia de performance Angular: Zoneless, Signals fine-grained, @defer, incremental hydration, Core Web Vitals e memory leaks — base dos especialistas do ecossistema `angular-router` |
 | **`angular-responsive-ui-patterns`** | 📱 **Tier 2** | Responsividade Angular (mobile-first, breakpoints, container queries, layout fluido, imagens responsivas e validação multi-viewport) |
 | **`frontend-visual-feedback-loop`** | 👁️ **Tier 2** | ⭐ ***(NEW)*** Visual Feedback Loop (VFL) agnóstico (Angular, React, Vue, Svelte): renderização isolada (Storybook/dev-server), inspeção multimodal (viewports 375/768/1440px), Árvore de Acessibilidade (AOM) e asserções visuais Playwright |
@@ -72,6 +75,8 @@ Toda skill deve declarar no topo:
 | **`spring-reactive-performance-patterns`** | ⚛️⚡ **Tier 2** | ⭐ ***(NEW)*** Engenharia de performance reativa: proteção event-loop com BlockHound, flatMap concurrency, backpressure, Netty memory e r2dbc-pool — base dos especialistas do ecossistema `spring-reactive-router` |
 | **`spring-reactive-implementation-patterns`** | ⚛️⚙️ **Tier 2** | Padrões de mercado 2026 para **implementar** features/bugs em WebFlux/Reactor (composição não-bloqueante, tratamento de erro por operador, StepVerifier/WebTestClient) — contraparte de execução de `spring-reactive-webflux-patterns` |
 | **`angular-implementation-patterns`** | 🅰️⚙️ **Tier 2** | Padrões de mercado 2026 para **implementar** features/bugs em Angular (fronteira Signals/RxJS, testing-first, checklist de PR) — contraparte de execução de `angular-frontend-patterns` |
+| **`react-implementation-patterns`** | ⚛️⚙️ **Tier 2** | Padrões de mercado 2025/2026 para **implementar** features/bugs em React (TanStack Query + Zustand, TDD, checklist de PR) — contraparte de execução de `react-frontend-patterns` |
+| **`test-implementation-react-vitest`** | ⚛️🧪 **Tier 2** | Padrões de teste unitário e de componente React com Vitest e React Testing Library |
 | **`java-jdk-backend-governance`** | ☕ **Tier 1** | Governança de versões Java/JDK backend (LTS, compatibilidade, segurança, performance e trilha de migração) |
 | **`documentation-writing-patterns`** | 📝 **Tier 2** | Diretrizes agnósticas de domínio para escrever documentação técnica em `.md` (Diátaxis, ADR/MADR, README, formatação chunking-friendly para IA) — base do agent `docs-engineer` |
 | **`code-review-patterns`** | 🔎 **Tier 2** | Diretrizes de mercado para revisão de código por IA — severidade (bloqueador/alta/sugestão), dimensões (correção/segurança/convenções/impacto/testes/performance), critérios de bloqueio de merge — base do agent `code-review` |
@@ -90,7 +95,7 @@ Toda skill deve declarar no topo:
 | **`task-decomposition-patterns`** | 📋 **Tier 2** | ⭐ ***(NEW)*** Decomposição sequencial/hierárquica/paralela, granularidade 2-3 níveis, validação de dependências — base do agent `feature-planner` |
 | **`refactoring-planning-patterns`** | 🏗️ **Tier 2** | ⭐ ***(NEW)*** Planejamento de refatoração estrutural (Mikado Method, Strangler Fig, Branch by Abstraction, Characterization Tests, DAG de etapas e rollback multicamada) — base do agent `refactor-planner` |
 | **`devops-agent-patterns`** | 🐳 **Tier 2** | ⭐ ***(NEW)*** Checklists de revisão Dockerfile/Kubernetes/CI-CD/IaC e estratégias de deployment — base do agent `devops-engineer` |
-| **`codegraph-optave-usage`** | 🕸️ **Tier 2** | ⭐ ***(NEW)*** Uso da lib externa `@optave/codegraph` (CLI local e MCP Server enxuto, zero API keys) como motor único de build/consulta de grafo de código — query, blast radius, ciclos, dead code, dataflow e CI gate. Base do agent `code-knowledge-graph` |
+| **`codegraph-optave-usage`** | 🕸️ **Tier 2** | ⭐ ***(NEW)*** Uso da lib externa `@optave/codegraph` (CLI local e MCP Server enxuto, zero API keys) como motor único de build/consulta de grafo de código — query, blast radius, ciclos, dead code, dataflow e CI gate. Base do agent `codegraph-engine` |
 | **`efficient-batch-code-modification`** | ⚡ **Tier 1** | ⭐ ***(NEW)*** Edição em lote otimizada para economia de tokens e créditos Copilot — análise prévia (dry-run), tool calls agrupadas na mesma rodada, minimal diffs cirúrgicos e proteção anti-corrupção em arquivo único grande/estruturado via padrão verificado (R-051) |
 
 > 💡 **Cross-Reference & Guias Especializados**:

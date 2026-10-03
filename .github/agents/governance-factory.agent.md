@@ -10,16 +10,17 @@ description: >-
 model: "Claude Sonnet 5"
 tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute', 'context-mode/ctx_index', 'context-mode/ctx_execute_file']
 source_docs:
-  - CLAUDE.md
-  - .github/copilot-instructions.md
-  - .github/skills/governance-factory-patterns/SKILL.md
-  - .github/skills/governance-audit-patterns/SKILL.md
-  - .github/skills/agent-contracts/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
   - .github/skills/context-mode/SKILL.md
-  - .github/skills/agent-evals-lab/SKILL.md
   - .github/skills/prompt-engineering-patterns/SKILL.md
   - .github/skills/handoff-governance/SKILL.md
+  - .github/skills/agent-contracts/SKILL.md
+  - .github/skills/governance-factory-patterns/SKILL.md
+  - .github/skills/governance-audit-patterns/SKILL.md
+  - .github/skills/agent-evals-lab/SKILL.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 ---
 
 # Perfil Operacional
@@ -237,6 +238,7 @@ Executar o checklist genérico de `governance-factory-patterns` §3, mais:
 - [ ] Portão de Reúso Sistêmico (R-055 / Q1-Q2-Q3) avaliado: checado se a melhoria deve ser propagada para artefatos irmãos (Q1), templates canônicos (Q2) e testes determinísticos (Q3).
 - [ ] Catálogo(s) correspondente(s) ao tipo mapeado para atualização atômica (R-015).
 - [ ] `model:` (quando presente) validado via `get_errors`.
+- [ ] Se o novo agent criado possui perfil de AUTOR de documento `.md` de planejamento/blueprint/spec/implementation-plan, referenciar obrigatoriamente a seção "Documentos de Planejamento de Workflow" da skill `documentation-writing-patterns` em seu `source_docs:`, e garantir que o contrato do agent determine corretamente se o documento gerado é do tipo PLANEJAMENTO (front-matter + Alternativas Rejeitadas) ou IMPLEMENTAÇÃO (front-matter + checklist GFM obrigatório).
 - [ ] Se `run_in_terminal` for declarado em `tools:` (agent, prompt ou stack): inclusão compulsória de `.github/skills/terminal-governance/SKILL.md` em `source_docs` (ou `skills:` locais) (R-049).
 
 ## Diretrizes
@@ -278,6 +280,7 @@ Substitui `agent-factory` + `skill-factory` + `prompt-factory`, que já delegava
 5. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions, vedando loops investigativos de dívida de tokens O(N²).
 6. **Warm Start Compulsório & Batch Querying (R-060)**: Ferramentas locais que dependem de índices ou bases pré-computadas devem verificar e inicializar a base silenciosamente no primeiro comando (build-if-missing). É proibido disparar consultas granulares individuais para múltiplos nós — agrupe todas as pesquisas via chamadas em lote (batch_query, ctx_batch_execute, script iterativo) com destilação semântica e truncamento na borda (Edge Truncation).
 7. **Emissão Obrigatória de Telemetria de Handoff (R-042 / handoff-governance § 2.4)**: a cada chamada real de `run_subagent`, emitir compulsoriamente um evento `telemetry_entry` (tag `[HANDOFF]`) via `ctx_index`, incluindo `session_id` (reaproveitado do `sessionStart` do hook `context-mode`) e `sequence_index` (ordenação determinística dentro da sessão).
+8. **Progressive Disclosure de `source_docs_lazy:` (R-066 — Anti Context Bloat Inicial)**: Se este agent declara `source_docs_lazy:` em seu próprio frontmatter, esses documentos (ex.: `CLAUDE.md`, `.github/copilot-instructions.md`, `.github/agents/workflows.md`) **NÃO foram pré-carregados** — é TERMINANTEMENTE PROIBIDO usar `read_file` para carregá-los por inteiro. Consulte-os exclusivamente via `context-mode/ctx_search` com query pontual (ex.: número da regra `R-xxx` ou nome da seção) apenas quando precisar citá-los; nunca "só por garantia".
 </execution_protocol>
 
 ## Retorno ao Router (R-042 — Anti Sticky-Session)

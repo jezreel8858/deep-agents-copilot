@@ -28,6 +28,7 @@ build/
 
 .env.local
 .env.*.local
+.coverage
 
 # Angular CLI and build artefacts
 /.angular-cli.json
@@ -46,6 +47,7 @@ yarn-error.log*
 __pycache__/
 *.pyc
 .pytest_cache/
+.venv/
 
 # ============================================
 # Local Project Overlay (R-043) — NUNCA COMMITAR
@@ -56,6 +58,11 @@ __pycache__/
 docs/ai-context/catalog.local.yaml
 .github/instructions/local/
 
+# Estado efêmero do circuit breaker mecânico ctx-sequence-guard (PreToolUse hook)
+.github/hooks/.state/
+
 .codegraph/
 .worktrees/
 .gemini/
+
+nul

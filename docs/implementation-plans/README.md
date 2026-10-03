@@ -19,10 +19,12 @@ docs/implementation-plans/<AAAAMMDD>-<workflow>-<identificador-curto>.md
   - Quando o workflow possui stack de domínio identificada: o respectivo especialista **`<stack>-arch-advisor`** (Angular, Spring Boot, Spring Reactive, EJB, Struts, Python — perfil Read-Only) estrutura o plano técnico detalhado.
   - Em workflows agnósticos ou transversais (Governance, Dependency Vulnerability, Framework Migration, Technical Analysis): o especialista analítico responsável pelo planejamento técnico daquele workflow assume a autoria.
 - **Materialização e Aprovação**: O Orquestrador Raiz materializa o arquivo neste diretório e submete ao usuário via `ask_questions` para aprovação prévia obrigatória. Nenhuma mutação de código pode ser iniciada com o plano pendente ou sob ajuste solicitado.
-- **Conteúdo Mínimo Obrigatório**:
-  1. Referência explícita ao Plano de Planejamento aprovado correspondente.
-  2. Lista exata dos arquivos a serem criados, alterados ou removidos.
-  3. Sequência cronológica de alterações (ordem de execução em lote / Plan-Then-Batch, R-059).
-  4. Abordagem técnica de baixo nível e diffs conceituais planejados.
-  5. Riscos de regressão e matriz de blast radius.
-  6. Estratégia de rollback e plano de contingência por etapa (R-031 / R-050.2).
+- **Conteúdo Mínimo Obrigatório** (conforme `.github/skills/documentation-writing-patterns/SKILL.md` § 2.1 — Categoria IMPLEMENTAÇÃO):
+  1. Front-matter YAML de implementação canônico (`status: draft`, `date`, `autor`, `workflow`, `related-planning-doc: <path-do-doc-de-planejamento-aprovado>`, `progress: 0`) — obrigatório R-064.
+  2. Referência explícita ao Plano de Planejamento aprovado correspondente (`related-planning-doc`).
+  3. Checklist GFM unificado obrigatório no formato `- [ ] <descrição> {paralelizavel: bool, responsavel: "<agent>"}` com indicador agregado `Progresso: N/M tarefas concluídas`.
+  4. Lista exata dos arquivos a serem criados, alterados ou removidos.
+  5. Sequência cronológica de alterações (ordem de execução em lote / Plan-Then-Batch, R-059).
+  6. Abordagem técnica de baixo nível e diffs conceituais planejados.
+  7. Riscos de regressão e matriz de blast radius.
+  8. Estratégia de rollback e plano de contingência por etapa (R-031 / R-050.2).

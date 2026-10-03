@@ -322,7 +322,9 @@ def test_smell_2_9_all_agents_have_mandatory_source_docs():
 
 
 def test_smell_2_9_all_prompts_have_mandatory_source_docs():
-    """Valida se 100% dos prompts possuem a chave obrigatória 'source_docs:' com ao menos 1 documento"""
+    """Valida se 100% dos prompts possuem referência normativa, via 'source_docs:'
+    (full-load) e/ou 'source_docs_lazy:' (R-066 — consumo via ctx_search, nunca
+    read_file integral), com ao menos 1 documento no total entre as duas chaves."""
     prompt_files = get_all_prompt_files()
     assert len(prompt_files) >= 5, remediation(
         "Deve existir ao menos 5 prompts no repositório",
@@ -334,19 +336,27 @@ def test_smell_2_9_all_prompts_have_mandatory_source_docs():
         fm = parse_frontmatter(content)
         rel_path = prompt_file.relative_to(REPO_ROOT)
 
-        assert "source_docs" in fm, remediation(
-            f"[{rel_path}] Ausência do campo obrigatório 'source_docs:' no frontmatter",
-            fix_hint=f"Adicione 'source_docs:' com ao menos 1 documento normativo a {rel_path}.",
+        assert "source_docs" in fm or "source_docs_lazy" in fm, remediation(
+            f"[{rel_path}] Ausência dos campos 'source_docs:'/'source_docs_lazy:' no frontmatter",
+            fix_hint=f"Adicione 'source_docs:' (full-load, <500 linhas) e/ou 'source_docs_lazy:' (R-066, docs > 300 linhas como CLAUDE.md) com ao menos 1 documento normativo a {rel_path}.",
         )
-        docs = fm.get("source_docs")
-        assert isinstance(docs, list) and len(docs) >= 1, remediation(
-            f"[{rel_path}] 'source_docs' deve ser uma lista não vazia de documentos (atual: {docs})",
-            fix_hint=f"Converta 'source_docs:' em {rel_path} para uma lista YAML ('- caminho/arquivo.md') com >= 1 item.",
+        docs_full = fm.get("source_docs") or []
+        docs_lazy = fm.get("source_docs_lazy") or []
+        if isinstance(docs_full, str):
+            docs_full = [docs_full]
+        if isinstance(docs_lazy, str):
+            docs_lazy = [docs_lazy]
+        total_docs = len(docs_full) + len(docs_lazy)
+        assert total_docs >= 1, remediation(
+            f"[{rel_path}] 'source_docs'/'source_docs_lazy' devem somar ao menos 1 documento (atual: full={docs_full}, lazy={docs_lazy})",
+            fix_hint=f"Converta 'source_docs:'/'source_docs_lazy:' em {rel_path} para listas YAML ('- caminho/arquivo.md') somando >= 1 item.",
         )
 
 
 def test_smell_2_9_all_skills_have_mandatory_source_docs():
-    """Valida se 100% das skills possuem a chave obrigatória 'source_docs:' com ao menos 1 documento"""
+    """Valida se 100% das skills possuem referência normativa, via 'source_docs:'
+    (full-load) e/ou 'source_docs_lazy:' (R-066 — consumo via ctx_search, nunca
+    read_file integral), com ao menos 1 documento no total entre as duas chaves."""
     skill_files = get_all_skill_files()
     assert len(skill_files) >= 10, remediation(
         "Deve existir ao menos 10 skills no repositório",
@@ -358,14 +368,20 @@ def test_smell_2_9_all_skills_have_mandatory_source_docs():
         fm = parse_frontmatter(content)
         rel_path = skill_file.relative_to(REPO_ROOT)
 
-        assert "source_docs" in fm, remediation(
-            f"[{rel_path}] Ausência do campo obrigatório 'source_docs:' no frontmatter",
-            fix_hint=f"Adicione 'source_docs:' com ao menos 1 documento normativo a {rel_path}.",
+        assert "source_docs" in fm or "source_docs_lazy" in fm, remediation(
+            f"[{rel_path}] Ausência dos campos 'source_docs:'/'source_docs_lazy:' no frontmatter",
+            fix_hint=f"Adicione 'source_docs:' (full-load, <500 linhas) e/ou 'source_docs_lazy:' (R-066, docs > 300 linhas como CLAUDE.md) com ao menos 1 documento normativo a {rel_path}.",
         )
-        docs = fm.get("source_docs")
-        assert isinstance(docs, list) and len(docs) >= 1, remediation(
-            f"[{rel_path}] 'source_docs' deve ser uma lista não vazia de documentos (atual: {docs})",
-            fix_hint=f"Converta 'source_docs:' em {rel_path} para uma lista YAML ('- caminho/arquivo.md') com >= 1 item.",
+        docs_full = fm.get("source_docs") or []
+        docs_lazy = fm.get("source_docs_lazy") or []
+        if isinstance(docs_full, str):
+            docs_full = [docs_full]
+        if isinstance(docs_lazy, str):
+            docs_lazy = [docs_lazy]
+        total_docs = len(docs_full) + len(docs_lazy)
+        assert total_docs >= 1, remediation(
+            f"[{rel_path}] 'source_docs'/'source_docs_lazy' devem somar ao menos 1 documento (atual: full={docs_full}, lazy={docs_lazy})",
+            fix_hint=f"Converta 'source_docs:'/'source_docs_lazy:' em {rel_path} para listas YAML ('- caminho/arquivo.md') somando >= 1 item.",
         )
 
 

@@ -103,6 +103,12 @@ No IntelliJ IDEA (versões 2025.x / 2026.x):
 
 ---
 
+## 2.1 Filtro de Ruído: Spans Internos de Inicialização da IDE
+
+A IDE emite spans de instrumentação interna prefixados com `session.timing.*` (`turn_setup`, `model_resolution`, `mcp_catalog`, `lsp_initialization`, `tool_cache_validation`, etc.) que **não carregam dados de agent/tool/decisão** e só poluem a análise de fluxo no Langfuse (ex.: ao depurar um prompt de refatoração/migração de framework e identificar em qual agent houve desvio). O `otel-collector-config.yaml` descarta esses spans antes do envio ao Langfuse (processor `filter/drop_ide_session_timing_noise`) — os spans relevantes (`chat`, `invoke_agent`, `execute_tool`, `governance.*`) permanecem intactos. Ver `tools/otel-langfuse/README.md` § "Filtro de Ruído" para estender o padrão.
+
+---
+
 ## 3. Configuração no VS Code
 
 No VS Code, as configurações do GitHub Copilot Chat OTel são definidas em `settings.json`:

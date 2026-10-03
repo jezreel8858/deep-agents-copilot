@@ -128,7 +128,7 @@ A segurança é operacionalizada de forma determinística dentro dos Workflows C
 
 ### 5.2 No `WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION` (Workflow 6)
 - Despachado imediatamente quando um alerta SCA (Snyk/Trivy/Dependabot) reporta CVE em biblioteca.
-- A sequência canônica executa: *(1)* Triagem pelo `@security-reviewer`; *(2)* Mapeamento de blast radius pelo `@code-knowledge-graph` (R-045); *(3)* Bump cirúrgico de versão do manifesto no sandbox pelo especialista; *(4)* Adaptação de eventuais breaking changes com suite de testes; e *(5)* Validação final com nova varredura limpa.
+- A sequência canônica executa: *(1)* Triagem pelo `@security-reviewer`; *(2)* Mapeamento de blast radius pelo `@codegraph-engine` (R-045); *(3)* Bump cirúrgico de versão do manifesto no sandbox pelo especialista; *(4)* Adaptação de eventuais breaking changes com suite de testes; e *(5)* Validação final com nova varredura limpa.
 
 ### 5.3 No `WORKFLOW-RELEASE-READINESS` (Workflow 8 — Estado 3)
 - Antes de qualquer tag ou release, o `@security-reviewer` em conjunto com o `@repo-hygiene-auditor` executa a **Varredura Final de Segredos e Higiene**.
