@@ -71,6 +71,40 @@ body {
   color: #fff;
 }
 
+/* -- ThemeToggle (icone de tema claro/escuro no header) --------------------
+   Ver `components/ThemeToggle.tsx` -- alterna a classe `.dark` em `<html>`,
+   MESMA convencao de ancestral que o CSS compilado do CopilotKit v2 ja usa
+   (`:is(.dark *)`), entao o chat embutido reage automaticamente. Este botao
+   so precisa do proprio estilo (claro aqui; escuro na secao "Tema Escuro"
+   ao final do arquivo) -- empurrado para o canto direito do nav via
+   `margin-left: auto` (unico item flexivel do `.app-shell__nav`). */
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-left: auto;
+  padding: 0;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  background: transparent;
+  color: #555;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.theme-toggle:hover:not(:disabled) {
+  background: #f0f0f0;
+  color: #111;
+}
+
+.theme-toggle:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
 .app-shell__main {
   flex: 1 1 auto;
   min-height: 0;
@@ -203,7 +237,7 @@ body {
 .elicitation-bridge__card {
   position: relative;
   width: 100%;
-  max-width: 440px;
+  max-width: 60vw;
   max-height: 85vh;
   overflow-y: auto;
   padding: 1.75rem;
@@ -1128,10 +1162,298 @@ tr[data-tipo="removida"] .file-edit-bridge__marcador {
   word-break: inherit;
 }
 
+/* Streamdown (markdown renderer do CopilotKit v2) -- alinhamento e padding
+   de tabelas. Bug real corrigido: a <table> renderizada usa os atributos
+   [data-streamdown=table-header-cell] / [data-streamdown=table-cell]
+   (CSS compilado do CopilotKit v2), que define padding uniforme mas NAO
+   declara `vertical-align`. O container markdown tambem recebe a classe
+   Tailwind Typography `.cpk:prose`, que define `vertical-align:bottom`
+   em `thead th` e `vertical-align:baseline` em `tbody td` -- como o
+   streamdown nao disputa essa propriedade, a regra do prose "vaza" sem
+   conflito de especificidade. Quando uma celula quebra em 2+ linhas
+   (ex.: texto de diff "Antes"/"Depois"), cabecalho e corpo ficam
+   alinhados verticalmente de forma diferente, dando a impressao de
+   colunas desalinhadas. A tabela tambem fica dentro de um wrapper flex
+   com scroll horizontal, onde `table-layout:auto` (padrao) pode calcular
+   larguras de coluna de forma inconsistente com conteudo assimetrico. */
+
+.deep-agents-chat [data-streamdown="table"] {
+  table-layout: fixed;
+}
+
+.deep-agents-chat [data-streamdown="table-header-cell"],
+.deep-agents-chat [data-streamdown="table-cell"] {
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+
+.deep-agents-chat [data-streamdown="table-cell"] {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 /* Icones/emoji usados nos banners de governanca (status, avisos, setas
    etc.) e nos marcadores de lista do markdown (bullets, numeracao) devem
    permanecer visiveis e nao ser cortados pelo `cpk:prose` ao quebrar
    linha em telas estreitas. */
 .deep-agents-chat .cpk\:prose li {
   overflow-wrap: anywhere;
+}
+
+
+/* ==========================================================================
+   Tema Escuro (Dark Mode) -- pedido explicito do usuario (2026-10-03):
+   icone no header para alternar claro/escuro (ver `components/
+   ThemeToggle.tsx`). Ativado via classe `.dark` em `<html>` -- MESMA
+   convencao de ancestral (`:is(.dark *)`) que o CSS compilado do
+   CopilotKit v2 ja usa (confirmado por introspeccao real de
+   `node_modules/@copilotkit/react-core/dist/v2/index.css`), entao o
+   `<CopilotChat>`/Streamdown/prose inteiro reage automaticamente -- este
+   bloco cobre APENAS o chrome proprio desta aplicacao (nav, cards, popovers,
+   botoes) que usa cores fixas declaradas nas secoes acima.
+   ========================================================================== */
+
+.dark body {
+  background: #0d0d0e;
+  color: #e4e4e4;
+}
+
+.dark .app-shell__nav {
+  background: #161617;
+  border-bottom-color: #2a2a2a;
+}
+
+.dark .app-shell__nav a {
+  color: #b5b5b5;
+}
+
+.dark .app-shell__nav a:hover {
+  background: #232324;
+  color: #fff;
+}
+
+.dark .app-shell__nav a[data-active="true"] {
+  background: #fff;
+  color: #111;
+}
+
+.dark .theme-toggle {
+  border-color: #2a2a2a;
+  color: #e4e4e4;
+}
+
+.dark .theme-toggle:hover:not(:disabled) {
+  background: #232324;
+  color: #fff;
+}
+
+.dark .workspace-page p {
+  color: #b5b5b5;
+}
+
+.dark .workspace-page textarea {
+  background: #161617;
+  border-color: #2a2a2a;
+  color: #e4e4e4;
+}
+
+.dark .login-page {
+  background: #0d0d0e;
+}
+
+.dark .login-card {
+  background: #161617;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+}
+
+.dark .login-card h1 {
+  color: #e4e4e4;
+}
+
+.dark .login-card input {
+  background: #0d0d0e;
+  border-color: #2a2a2a;
+  color: #e4e4e4;
+}
+
+.dark .elicitation-bridge__card,
+.dark .file-edit-bridge__card {
+  background: #161617;
+  color: #e4e4e4;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+.dark .elicitation-bridge__fechar,
+.dark .file-edit-bridge__maximizar {
+  color: #9a9a9a;
+}
+
+.dark .elicitation-bridge__fechar:hover:not(:disabled),
+.dark .file-edit-bridge__maximizar:hover {
+  background: #232324;
+  color: #fff;
+}
+
+.dark .elicitation-bridge__card .rjsf input.form-control,
+.dark .elicitation-bridge__card .rjsf select.form-control,
+.dark .elicitation-bridge__card .rjsf textarea.form-control {
+  background: #0d0d0e;
+  border-color: #2a2a2a;
+  color: #e4e4e4;
+}
+
+.dark .elicitation-bridge__card .rjsf label.control-label {
+  color: #d5d5d5;
+}
+
+.dark .ask-user-bridge__choices button,
+.dark .ask-user-bridge__freeform input {
+  background: #0d0d0e;
+  border-color: #2a2a2a;
+  color: #e4e4e4;
+}
+
+.dark .ask-user-bridge__choices button:hover:not(:disabled) {
+  background: #232324;
+}
+
+.dark .file-edit-bridge__diff,
+.dark .tool-call-box {
+  background: #161617;
+  border-color: #2a2a2a;
+  color: #e4e4e4;
+}
+
+.dark .tool-call-box[data-status="concluido"] {
+  background: #161617;
+  border-color: #2a2a2a;
+}
+
+.dark .tool-call-box__detalhes pre {
+  background: #0d0d0e;
+  border-color: #2a2a2a;
+  color: #d5d5d5;
+}
+
+.dark .mention-popover {
+  background: #161617;
+  border-color: #2a2a2a;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.dark .mention-popover__header {
+  color: #9a9a9a;
+  border-bottom-color: #2a2a2a;
+}
+
+.dark .mention-popover__item {
+  color: #e4e4e4;
+}
+
+.dark .mention-popover__item:hover,
+.dark .mention-popover__item[data-active="true"] {
+  background: #232324;
+}
+
+.dark .mention-chip {
+  background: #232324;
+  border-color: #2a2a2a;
+  color: #e4e4e4;
+}
+
+.dark .mention-chip[data-kind="agent"] {
+  background: #1d2240;
+  border-color: #2e3566;
+}
+
+
+/* -- Tema Escuro -- cobertura adicional (2026-10-03, bug real reportado
+   pelo usuario via screenshot: "linhas ilegiveis" no dark mode) ---------
+   Causa raiz: varios elementos usam cores SEMANTICAS fixas claras (fundo
+   verde/vermelho de diff, amarelo de aviso, azul de hunk, vermelho de
+   erro) sem nenhuma variante escura -- texto escuro sobre fundo CLARO
+   continuava legivel isoladamente, mas o restante da UI ja estava escuro
+   ao redor, e o STATUS "executando" do tool-call-box (fundo azul claro
+   fixo) ficava ilegivel quando a cor de texto generica do `.dark
+   .tool-call-box` (clara) caia por cima de um fundo tambem claro.
+   Cobre: status do tool-call-box, tabela de diff do FileEditBridge
+   (linhas adicionadas/removidas/hunk + fila), painel de erros do RJSF. */
+
+.dark .tool-call-box[data-status="executando"] {
+  border-color: #2a3a5c;
+  background: #15213a;
+}
+
+.dark .tool-call-box__detalhes {
+  border-top-color: #2a2a2a;
+}
+
+.dark .tool-call-box__detalhes summary {
+  color: #9a9a9a;
+}
+
+.dark .file-edit-bridge__tabela tr[data-tipo="adicionada"] {
+  background: #0f2b1a;
+}
+
+.dark .file-edit-bridge__tabela tr[data-tipo="removida"] {
+  background: #341414;
+}
+
+.dark .file-edit-bridge__linha-hunk td {
+  background: #10243d;
+  color: #b7c6da;
+}
+
+.dark .file-edit-bridge__num {
+  color: #7a7a7a;
+  border-right-color: #2a2a2a;
+}
+
+.dark .file-edit-bridge__sem-diff {
+  color: #9a9a9a;
+}
+
+.dark .file-edit-bridge__fila {
+  background: #3a2f0a;
+  border-color: #5c4a10;
+  color: #e8c766;
+}
+
+.dark .file-edit-bridge__fila-nav button {
+  background: #161617;
+  border-color: #5c4a10;
+  color: #e8c766;
+}
+
+.dark .file-edit-bridge__fila-nav button:hover:not(:disabled) {
+  background: #3a2f0a;
+}
+
+.dark .elicitation-bridge__card .rjsf .panel.errors {
+  background: #341414;
+  border-color: #5c2424;
+}
+
+.dark .elicitation-bridge__card .rjsf .panel.errors .panel-heading,
+.dark .elicitation-bridge__card .rjsf .panel.errors .panel-title,
+.dark .elicitation-bridge__card .rjsf .panel.errors ul,
+.dark .elicitation-bridge__card .rjsf .text-danger {
+  color: #ff8080;
+}
+
+.dark .elicitation-bridge__card .rjsf #root__description,
+.dark .elicitation-bridge__card .rjsf .field-description {
+  color: #9a9a9a;
+}
+
+.dark .elicitation-bridge__message {
+  color: #e4e4e4;
+}
+
+.dark .elicitation-bridge__expirada {
+  background: #3a2f0a;
+  border-color: #5c4a10;
+  color: #e8c766;
 }
