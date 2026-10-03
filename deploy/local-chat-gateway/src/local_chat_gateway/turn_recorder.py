@@ -95,6 +95,15 @@ class AcumuladorDeTurno:
     tokens_removidos_truncamento: int = 0
     compaction_disparada: bool = False
     error_type: str | None = None
+    # Modelo REAL (id tecnico da API, ex.: "claude-sonnet-4-5") reportado
+    # pela ULTIMA `AssistantUsageData` do turno -- usado apenas para exibir
+    # o badge de creditos no chat (2026-10-03, paridade com o plugin
+    # Copilot da IDE, que mostra "<Modelo> · <N> Credits" ao final de cada
+    # resposta). Distinto de `agent_model` (nome AMIGAVEL declarado no
+    # frontmatter do `.agent.md`, ex.: "Claude Sonnet 5") -- `sdk_session.
+    # stream_chat_ag_ui` prefere `agent_model` quando disponivel (mais
+    # legivel) e cai para este campo tecnico como fallback.
+    modelo_usado_real: str | None = None
 
 
 def adicionar_texto_resposta(turno: AcumuladorDeTurno, texto: str) -> None:
@@ -160,13 +169,38 @@ def registrar_uso_assistente(turno: AcumuladorDeTurno, dado: Any) -> None:
     (1 por chamada de modelo real, incluindo 1 por subagent executado) --
     acumula (soma) tokens/custo do turno INTEIRO; `time_to_first_token_ms`
     usa a PRIMEIRA ocorrencia (latencia ate a 1a reacao percebida pelo
-    usuario, nao a de cada subagent interno)."""
+    usuario, nao a de cada subagent interno).
+
+    Custo/creditos (2026-10-03, pedido explicito do usuario -- paridade com
+    o badge "<Modelo> · <N> Credits" do plugin Copilot da IDE): a formula
+    OFICIAL confirmada em docs.github.com/en/copilot/how-tos/copilot-sdk/
+    features/usage-and-billing e' `AI credits = copilot_usage.total_nano_aiu
+    / 1e9` -- valor AUTORITATIVO reportado pelo backend real do Copilot
+    (CAPI), calculado a partir do token usage e da tabela de precos por
+    modelo. Isto e' DISTINTO do campo top-level `dado.cost` (marcado
+    "Experimental" na wheel do SDK) -- usado aqui apenas como FALLBACK caso
+    `copilot_usage` venha ausente (ex.: versao mais antiga do CLI/SDK sem
+    este campo preenchido), nunca como fonte primaria quando o valor
+    autoritativo esta disponivel.
+    """
     turno.tokens_input += int(getattr(dado, "input_tokens", None) or 0)
     turno.tokens_output += int(getattr(dado, "output_tokens", None) or 0)
     turno.tokens_reasoning += int(getattr(dado, "reasoning_tokens", None) or 0)
     turno.tokens_cache_read += int(getattr(dado, "cache_read_tokens", None) or 0)
     turno.tokens_cache_write += int(getattr(dado, "cache_write_tokens", None) or 0)
-    turno.cost_nano_aiu += float(getattr(dado, "cost", None) or 0.0)
+    copilot_usage = getattr(dado, "copilot_usage", None)
+    nano_aiu_autoritativo = getattr(copilot_usage, "total_nano_aiu", None)
+    if nano_aiu_autoritativo is not None:
+        turno.cost_nano_aiu += float(nano_aiu_autoritativo)
+    else:
+        # Fallback (ver docstring acima): ainda em "nano AIU" por convencao
+        # de unidade -- `dado.cost` e' um valor experimental/estimado, mas
+        # mantido na MESMA escala para que a divisao por 1e9 em
+        # `sdk_session.stream_chat_ag_ui` continue correta em ambos os casos.
+        turno.cost_nano_aiu += float(getattr(dado, "cost", None) or 0.0)
+    modelo_real = getattr(dado, "model", None)
+    if modelo_real:
+        turno.modelo_usado_real = str(modelo_real)
     if turno.time_to_first_token_ms is None:
         ttft = getattr(dado, "time_to_first_token", None)
         if ttft is not None:

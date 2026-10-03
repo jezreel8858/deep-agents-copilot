@@ -2239,6 +2239,36 @@ async def stream_chat_ag_ui(
                     if item is None:
                         break
                     yield item
+        # Badge de creditos (2026-10-03, pedido explicito do usuario --
+        # paridade com o plugin Copilot da IDE: "<Modelo> · <N> Credits" ao
+        # final de cada resposta). Formula OFICIAL confirmada em docs.
+        # github.com/en/copilot/how-tos/copilot-sdk/features/usage-and-
+        # billing: AI credits = copilot_usage.total_nano_aiu / 1e9 -- ja
+        # acumulado em `turno_acumulado.cost_nano_aiu` por
+        # `turn_recorder.registrar_uso_assistente` (1 evento `AssistantUsageData`
+        # por chamada real de modelo, incluindo subagents). So' exibido
+        # quando o SDK de fato reportou uso (>0) -- sessao stub/erro ANTES
+        # de qualquer chamada real de modelo (`SDKUnavailableError`, ver
+        # bloco `except SDKUnavailableError` acima, que retorna cedo) nunca
+        # chega aqui, entao nenhum badge falso-zero e' mostrado. Preferido
+        # `agent_model` (nome amigavel do frontmatter, ex.: "Claude Sonnet
+        # 5") sobre `modelo_usado_real` (id tecnico da API, ex.:
+        # "claude-sonnet-4-5") quando ambos disponiveis -- mesma convencao
+        # do badge "Agente Ativo" aberto no topo desta funcao.
+        if turno_acumulado.cost_nano_aiu > 0:
+            creditos = turno_acumulado.cost_nano_aiu / 1e9
+            modelo_exibicao = agent_model or turno_acumulado.modelo_usado_real
+            prefixo_modelo = f"{modelo_exibicao} · " if modelo_exibicao else ""
+            texto_creditos = f"\n\n*🧮 {prefixo_modelo}{creditos:.1f} Credits*"
+            if estado["mensagem_atual_id"] is None:
+                estado["mensagem_atual_id"] = uuid.uuid4().hex
+                yield TextMessageStartEvent(
+                    message_id=estado["mensagem_atual_id"], role="assistant"
+                )
+            yield TextMessageContentEvent(
+                message_id=estado["mensagem_atual_id"], delta=texto_creditos
+            )
+            turn_recorder.adicionar_texto_resposta(turno_acumulado, texto_creditos)
         if estado["mensagem_atual_id"] is not None:
             yield TextMessageEndEvent(message_id=estado["mensagem_atual_id"])
         turn_recorder.persistir(turno_acumulado, turn_recorder_store)

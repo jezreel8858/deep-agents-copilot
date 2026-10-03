@@ -87,9 +87,26 @@ def _registrar_placeholders_novos_eventos_turn_recorder(
     `TestStreamChatAgUiSubagentNesting`/`TestBridgeEdicaoArquivoFallback
     ResolvedPath` para os testes dedicados de `turn_recorder`, e
     `TestPermissionRequestShell` para os testes dedicados do reconhecimento
-    nativo de comandos de shell)."""
+    nativo de comandos de shell).
+
+    `AssistantUsageData` e' um placeholder construtivel de verdade (nao
+    apenas `type(nome, (), {})` vazio) -- `TestStreamChatAgUiCreditsBadge`
+    (2026-10-03) o instancia de fato via `_instalar_copilot_falso(...,
+    usage_total_nano_aiu=...)` para exercitar o badge real de creditos
+    ("<Modelo> · <N> Credits"); os demais eventos desta lista permanecem
+    placeholders vazios -- nenhum teste alem deste exercita seu conteudo."""
+
+    class AssistantUsageData:
+        """Fake minimo e' suficiente: `turn_recorder.registrar_uso_assistente`
+        so' le atributos via `getattr(dado, nome, None)` (duck typing),
+        nunca isinstance/dataclass real."""
+
+        def __init__(self, **kwargs: Any) -> None:
+            for chave, valor in kwargs.items():
+                setattr(self, chave, valor)
+
+    setattr(fake_session_events, "AssistantUsageData", AssistantUsageData)
     for nome in (
-        "AssistantUsageData",
         "ModelCallFailureData",
         "AssistantTurnRetryData",
         "AssistantIntentData",
@@ -117,6 +134,8 @@ def _instalar_copilot_falso(
     mcp_tool_name: str = "ctx_batch_execute",
     mcp_server_name: str = "context-mode",
     mcp_read_only: bool = False,
+    usage_total_nano_aiu: float | None = None,
+    usage_model: str | None = None,
 ) -> None:
     """Injeta um `copilot` falso em `sys.modules` simulando 1 sessao real.
 
@@ -269,7 +288,9 @@ def _instalar_copilot_falso(
         def on(self, callback: Any) -> None:
             self._callback = callback
 
-        async def send(self, prompt: str) -> None:
+        async def send(
+            self, prompt: str, *, attachments: Any = None
+        ) -> None:
             assert prompt  # prompt concatenado nao deve ser vazio
             self.prompt_recebido = prompt
             decisao = self._on_permission_request(
@@ -327,6 +348,25 @@ def _instalar_copilot_falso(
                         )
                     )
             self._callback(_Evento(AssistantMessageData("mundo")))
+            if usage_total_nano_aiu is not None:
+                # `AssistantUsageData` real (2026-10-03, badge de creditos):
+                # referenciada via `fake_session_events.AssistantUsageData`
+                # (nao como nome solto) -- a classe construtivel real e'
+                # definida em `_registrar_placeholders_novos_eventos_turn_
+                # recorder`, fora do escopo lexico desta funcao/metodo.
+                # `copilot_usage` e' um objeto SIMPLES com `.total_nano_aiu`
+                # (duck typing -- `turn_recorder.registrar_uso_assistente`
+                # nunca faz isinstance contra o tipo real do SDK).
+                self._callback(
+                    _Evento(
+                        fake_session_events.AssistantUsageData(
+                            model=usage_model,
+                            copilot_usage=types.SimpleNamespace(
+                                total_nano_aiu=usage_total_nano_aiu
+                            ),
+                        )
+                    )
+                )
             self._callback(_Evento(AssistantIdleData()))
 
         async def __aenter__(self) -> "_FakeSession":
@@ -362,6 +402,14 @@ def _instalar_copilot_falso(
             system_message: Any = None,
             custom_agents: Any = None,
             mcp_servers: Any = None,
+            # Aceitos apenas para compatibilidade com `stream_chat_ag_ui`
+            # (RT-05) -- esta fake nao exercita elicitation/`ask_user`,
+            # apenas precisa nao quebrar com `TypeError: unexpected keyword
+            # argument` quando reusada por testes de `stream_chat_ag_ui`
+            # (ex.: `TestStreamChatAgUiCreditsBadge`, 2026-10-03).
+            on_elicitation_request: Any = None,
+            on_user_input_request: Any = None,
+            ask_user_variant: str | None = None,
         ) -> _FakeSession:
             self.session_id_recebido = session_id
             self.working_directory_recebido = working_directory
@@ -1881,3 +1929,116 @@ class TestPermissionRequestShellWrapperUnwrap:
             ],
         )
         assert _comando_shell_e_seguro(perm_request) is True
+
+
+class TestStreamChatAgUiCreditsBadge:
+    """Badge de creditos ao final do turno (2026-10-03, pedido explicito do
+    usuario -- paridade com o plugin Copilot da IDE: "<Modelo> · <N>
+    Credits"). Formula oficial confirmada em docs.github.com/en/copilot/
+    how-tos/copilot-sdk/features/usage-and-billing: AI credits =
+    `copilot_usage.total_nano_aiu / 1e9`."""
+
+    async def test_deve_exibir_badge_de_creditos_quando_sdk_reporta_uso_real(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        eventos_disparados: list[str] = []
+        _instalar_copilot_falso(
+            monkeypatch,
+            eventos_disparados=eventos_disparados,
+            tipo_permission_request="read",  # aprovado nativamente, sem handler
+            usage_total_nano_aiu=1_924_000_000.0,  # 1.924e9 nano-AIU == 1.9 credits
+            usage_model="claude-sonnet-4-5",
+        )
+
+        from ag_ui.core import TextMessageContentEvent
+        from local_chat_gateway.api.schemas import ChatMessage
+
+        eventos = [
+            evento
+            async for evento in stream_chat_ag_ui(
+                token="tok-valido",
+                model=None,
+                messages=[ChatMessage(role="user", content="oi")],
+                permission_handler=lambda *_: True,
+                thread_id="thread-1",
+                run_id="run-1",
+                agent_model="Claude Sonnet 5",
+            )
+        ]
+
+        texto_completo = "".join(
+            e.delta
+            for e in eventos
+            if isinstance(e, TextMessageContentEvent) and e.subagent_run_id is None
+        )
+        # agent_model (nome amigavel) tem precedencia sobre usage_model (id
+        # tecnico da API) na exibicao -- mesma convencao do badge "Agente Ativo".
+        assert "Claude Sonnet 5 · 1.9 Credits" in texto_completo
+
+    async def test_nao_deve_exibir_badge_quando_sdk_nao_reporta_nenhum_uso(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Comportamento legado (sem `usage_total_nano_aiu`): nenhum badge
+        falso-zero e' mostrado -- cobre o caso real de sessao stub/erro
+        ANTES de qualquer chamada de modelo."""
+        eventos_disparados: list[str] = []
+        _instalar_copilot_falso(
+            monkeypatch,
+            eventos_disparados=eventos_disparados,
+            tipo_permission_request="read",
+        )
+
+        from ag_ui.core import TextMessageContentEvent
+        from local_chat_gateway.api.schemas import ChatMessage
+
+        eventos = [
+            evento
+            async for evento in stream_chat_ag_ui(
+                token="tok-valido",
+                model=None,
+                messages=[ChatMessage(role="user", content="oi")],
+                permission_handler=lambda *_: True,
+                thread_id="thread-1",
+                run_id="run-1",
+                agent_model="Claude Sonnet 5",
+            )
+        ]
+
+        texto_completo = "".join(
+            e.delta for e in eventos if isinstance(e, TextMessageContentEvent)
+        )
+        assert "Credits" not in texto_completo
+
+    async def test_deve_usar_modelo_tecnico_quando_agent_model_ausente(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Sem `agent_model` (agent sem `model:` no frontmatter), cai para
+        o id tecnico reportado pela ULTIMA `AssistantUsageData` do turno."""
+        eventos_disparados: list[str] = []
+        _instalar_copilot_falso(
+            monkeypatch,
+            eventos_disparados=eventos_disparados,
+            tipo_permission_request="read",
+            usage_total_nano_aiu=500_000_000.0,  # 0.5 credits
+            usage_model="claude-sonnet-4-5",
+        )
+
+        from ag_ui.core import TextMessageContentEvent
+        from local_chat_gateway.api.schemas import ChatMessage
+
+        eventos = [
+            evento
+            async for evento in stream_chat_ag_ui(
+                token="tok-valido",
+                model=None,
+                messages=[ChatMessage(role="user", content="oi")],
+                permission_handler=lambda *_: True,
+                thread_id="thread-1",
+                run_id="run-1",
+            )
+        ]
+
+        texto_completo = "".join(
+            e.delta for e in eventos if isinstance(e, TextMessageContentEvent)
+        )
+        assert "claude-sonnet-4-5 · 0.5 Credits" in texto_completo
