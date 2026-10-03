@@ -30,9 +30,9 @@ tools:
   - "context-mode/ctx_upgrade"
   - "context-mode/ctx_purge"
   - "context-mode/ctx_insight"
-source_docs:
-  - "CLAUDE.md"
-  - ".github/copilot-instructions.md"
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 ---
 
 # context-mode — Operação de alto rendimento
@@ -45,6 +45,12 @@ Skill para operar `ctx_*` com mínimo consumo de contexto: coletar em lote, proc
 - Transformar saída bruta em resultado compacto e acionável.
 - Preservar histórico consultável para sessões longas.
 - Reduzir custo de créditos por chamada desnecessária ou redundante.
+
+> **Princípio Arquitetural de Assimetria (Input vs. Output Context):**
+> O `context-mode` soluciona a exaustão de contexto no lado do **output** (suprime o retorno de dados brutos de ferramentas, logs e inspeções). Ele **não** reduz o custo de tokens no lado do **input** (definições e schemas JSON de ferramentas carregadas no prompt do sistema). Para conter o overhead de input, combine esta skill com desativação seletiva de MCP servers não utilizados na sessão.
+
+> **Framing Assimétrico Obrigatório entre `ctx_execute` e `ctx_batch_execute` (reforço comportamental, complementar ao hook de § 4.1.1):**
+> Trate mentalmente `ctx_batch_execute` como a ferramenta **DEFAULT** para qualquer tarefa com 2+ alvos/comandos, e `ctx_execute` isolado como uma **exceção pontual de 1 único uso exploratório** por fase de tarefa — nunca uma rota alternativa igualmente válida. Pesquisa da própria Anthropic confirma que modelos (incl. os mais fortes) tendem a preferir o caminho mais simples disponível quando nada no enunciado da tarefa reforça explicitamente a simultaneidade; por isso, ao planejar, formule o objetivo internamente como "fazer X e Y e Z **simultaneamente em uma única chamada**", nunca como uma lista sequencial de passos.
 
 ## 2) Ordem obrigatória de roteamento
 
@@ -67,6 +73,8 @@ Skill para operar `ctx_*` com mínimo consumo de contexto: coletar em lote, proc
 | Docs/web externa | fetch/manual | `ctx_fetch_and_index` + `ctx_search` |
 | Indexação de payload grande | `ctx_index(content: ...)` | `ctx_index(path: ...)` |
 | Mapear código-fonte de projeto para busca | Varredura com grep/find/cat no terminal | `ctx_index(path: "<projeto>/src", source: "code:<project-id>", exclude: [...])` |
+| Chamada HTTP externa / consulta API | `curl`, `wget` ou fetch via terminal | `ctx_fetch_and_index` (HTML/docs) ou `fetch()` em `ctx_execute` |
+| Snapshot de testes / dumps (ex.: Playwright) | Dump bruto no stdout/chat | Gravação em arquivo (`filename`) + `ctx_execute_file` |
 
 ## 3.1) Padrão de Indexação de Código-Fonte de Projetos (`code:<project-id>`)
 
@@ -102,6 +110,14 @@ Recomenda-se manter um arquivo `CONTEXT.md` na raiz ou em `docs/` (baseado no te
 - **Benefício**: Proporciona "compressão semântica de tokens", evitando que humanos precisem re-explicar conceitos de domínio complexos a cada sessão conversacional.
 - **Uso com context-mode**: O arquivo deve ser indexado sob `source: "domain:context-glossary"` para que o agente utilize `ctx_search` para desambiguação rápida e instantânea de regras e terminologias de domínio antes de propor soluções ou blueprints.
 
+## 3.4) Padrão para Snapshots e Payloads Volumosos de Terceiros (ex.: Playwright / Profilers)
+
+Ferramentas de automação e observabilidade (como Playwright, profilers de memória e dumps de rede) geram dezenas de kilobytes de dados estruturais que degradam a janela conversacional se emitidos no stdout:
+
+1. **Gravação Compulsória em Arquivo**: Ao disparar comandos dessas ferramentas, utilize parâmetros de persistência em disco (ex.: `--output`, `--filename` ou redirecionamento de stream).
+2. **Processamento em Sandbox**: Inspecione o artefato resultante exclusivamente através de `ctx_execute_file`, extraindo métricas específicas (ex.: status de asserções, falhas de seletores, nós DOM críticos).
+3. **Redução de Impacto**: Garante que capturas volumosas (ex.: snapshot de 56 KB) entrem no contexto do modelo resumidas a métricas pontuais (menos de 300 bytes), preservando a estabilidade da sessão.
+
 ## 4) Guardrails de economia (token budget)
 
 - **Single-Turn MCP Batching Compulsório (Smell 2.26)**: É terminantemente proibido encadear múltiplas chamadas unitárias de `ctx_execute` no chat para analisar múltiplos alvos; usar compulsoriamente `ctx_batch_execute(commands, queries)` em rodada única OU um script síncrono consolidado em `ctx_execute`.
@@ -112,7 +128,8 @@ Recomenda-se manter um arquivo `CONTEXT.md` na raiz ou em `docs/` (baseado no te
   3. **DESPACHAR**: dispare apenas 1 chamada de ferramenta de leitura/processamento por fase da tarefa — nunca N chamadas sequenciais para N alvos previsíveis.
   4. **Comandos curtos não suspendem a regra**: prompts do usuário como "prosseguir", "continue", "pode seguir" NÃO isentam o agente da obrigatoriedade de context-mode nem do limiar >= 2 — a obrigação é da TAREFA em andamento, não do tamanho do prompt do turno atual.
   *(SSOT Normativa: `.github/copilot-instructions.md` § 2.1; diretrizes de batching em `.github/skills/efficient-batch-code-modification/SKILL.md`)*.
-- Sempre agrupar perguntas no mesmo `queries: [...]`.
+- **Concorrência Otimizada para I/O (`concurrency: 4-8`)**: Em operações I/O-bound (múltiplas requisições web em `ctx_fetch_and_index` ou consultas paralelas de rede em `ctx_batch_execute`), utilize `concurrency: 4` a `8`. Mantenha `concurrency: 1` para comandos com contenção de CPU, locks de pacotes ou escrita concorrente em disco.
+- **Single-Turn Query Aggregation**: Ao consultar o índice persistente após uma coleta, consolide todas as dúvidas em um único array no parâmetro `queries: [...]`. É proibido disparar múltiplos turnos de `ctx_search` contendo uma única pergunta por turno.
 - Sempre informar `source` quando houver múltiplas fontes indexadas.
 - Em `ctx_batch_execute`, preferir `query_scope: "batch"` quando o foco for apenas a coleta atual.
 - Não imprimir JSON bruto no stdout; imprimir resumo, contagem, IDs e evidência objetiva.
@@ -127,8 +144,17 @@ Para conter a degradação de contexto e a queima descontrolada de créditos pro
 - **Transição de Estados**:
   - `CLOSED` (Operação Normal): Uso de `ctx_batch_execute` ou até 1 chamada exploratória pontual isolada.
   - `OPEN` (Disparado): 2 chamadas consecutivas de `ctx_execute`/`ctx_execute_file` sem lote interposto. É **terminantemente proibido** disparar a 3ª chamada unitária no chat. O agente deve reagrupar os alvos pendentes em lote ou emitir síntese conclusiva com o que foi coletado até então.
-- **Declaração de Limitação Conhecida (Mitigação Comportamental)**: Este Circuit Breaker opera no nível de *prompt engineering* e governança comportamental do modelo; não constitui trava mecânica em nível de protocolo/infraestrutura (uma vez que o runtime MCP atual não dispõe de hooks automáticos de contagem e bloqueio). Portanto, modelos compactos ou rápidos exigem atenção redobrada a esta diretriz estática.
+- **Enforcement em Duas Camadas (Behavioral + Mecânico)**: Esta seção descreve a camada **comportamental** (prompt-level, probabilística). A partir de 2026-10, existe também uma camada **mecânica** real no harness — ver § 4.1.1. Agents devem obedecer a ambas; a camada comportamental continua sendo a primeira linha de defesa (evita até chegar a precisar do bloqueio mecânico).
 - **Precedente Arquitetural**: Alinhado ao padrão de Circuit Breaker Stateful de subagentes formalizado em `.github/skills/handoff-governance/SKILL.md` § 2.4.
+
+#### 4.1.1) Enforcement Mecânico via PreToolUse Hook (Complemento Determinístico ao Circuit Breaker)
+
+Instrução prompt-only é **probabilística**, não determinística — nenhum nível de ênfase textual garante compliance de 100% dos modelos em 100% das tarefas (comportamento documentado também em modelos fortes, não só em modelos compactos). Por isso, além da regra comportamental acima, este repositório mantém uma camada **mecânica** real: um hook `PreToolUse` (`.github/hooks/ctx-sequence-guard.ps1` / `.sh`) que conta chamadas consecutivas de `ctx_execute`/`ctx_execute_file` e retorna `{"permissionDecision":"deny", ...}` ao atingir 2 chamadas sem `ctx_batch_execute` interposto — bloqueio real, independente da decisão do modelo.
+
+- **Reação esperada a um `deny` deste hook**: tratar como feedback automatizado corrigível (equivalente a erro de lint/CI) — replanejar imediatamente com `ctx_batch_execute` e prosseguir, **nunca** parar ou pedir confirmação ao usuário.
+- **Fail-open absoluto**: qualquer erro interno do hook sempre resulta em `allow` — a camada mecânica nunca é causa de bloqueio indevido.
+- **Cobertura Conhecida e Incompleta (Escopo = agente raiz, não subagents)**: hosts com arquitetura de hooks derivada do padrão `preToolUse` têm precedente documentado de **não interceptar tool calls originadas de dentro de um subagent** (delegação via `run_subagent`/`task`), apenas as do agente principal do turno. Nesse caso, a camada mecânica **não cobre** subagents, e a camada comportamental (§ 4.1) permanece a **única linha de defesa real** para chamadas `ctx_execute` feitas a partir de um subagent delegado — reforce-a com atenção redobrada nesse contexto específico.
+- **Detalhes de implementação, limitações por host e histórico de diagnóstico**: ver `.github/hooks/README.md` (documento técnico de operação dos hooks). Problemas específicos de IDE/host (ex.: JetBrains) ficam em `docs/context/setup-context-mode-intellij.md`.
 
 ### 4.2) Mitigação Mandatória de Diretório de Execução (`cwd` Explícito no Sandbox)
 
@@ -151,9 +177,23 @@ Regra textual abstrata sozinha é insuficiente para modelos de menor capacidade 
 
 **Regra de decisão rápida**: se ao planejar a tarefa você identificar mentalmente a palavra "próximo arquivo" ou "e depois o outro", pare — isso é o sinal de que a tarefa exige `ctx_batch_execute` com todos os alvos enumerados no mesmo payload, não uma sequência de chamadas unitárias.
 
+### 4.4) Health Check de Adapter e Prevenção de Rota Fantasma (ROI Negativo)
+
+Divergências de versão ou falhas de vinculação de handlers no adapter MCP do host podem registrar ferramentas de instrução sem executores reais ativos. Isso gera custo recorrente de tokens no prompt do sistema sem retorno operacional (ROI negativo documentado):
+
+- **Verificação Preventiva**: Se ferramentas `ctx_*` falharem silenciosamente ou não produzirem saída esperada no início de uma sessão em ambiente novo, execute `ctx doctor` para certificar o emparelhamento dos binários (`cli.js`).
+- **Auditoria de Utilização**: Consulte periodicamente `ctx stats` para confirmar que as chamadas foram contabilizadas pelo subsistema do context-mode e que os índices SQLite FTS5 estão operacionais.
+
+### 4.5) Degradação Graciosa em Runtimes com Serialização Rígida de Parâmetros
+
+Determinados hosts ou adapters (ex.: variações do OpenCode) convertem internamente todos os argumentos JSON para strings puras antes do repasse ao servidor MCP, causando falhas de validação de schema (erros Zod ao esperar `array` ou `number` em `ctx_search` ou `ctx_batch_execute`):
+
+- **Workaround de Compatibilidade**: Ao operar em ambientes que apresentem incompatibilidade de schema Zod com arrays, priorize ferramentas com payloads de texto plano (`ctx_execute` e `ctx_fetch_and_index`), encapsulando a iteração em código scriptado dentro do sandbox até a estabilização do adapter.
+
 ## 5) Terminal e fallback
 
-- Terminal só para: `git`, `mkdir`, `rm`, `mv`, `cd`, `ls`, `npm install`, `pip install`.
+- Terminal restrito a operações de infraestrutura local: `git`, `mkdir`, `rm`, `mv`, `cd`, `ls`, `npm install`, `pip install`.
+- **Proibição de Requisições Inline**: É terminantemente proibido executar `curl`, `wget` ou requisições HTTP arbitrárias via linha de comando no terminal. Utilize `ctx_fetch_and_index` para páginas/documentação ou execute `fetch()` programático dentro de `ctx_execute`.
 - Se MCP estiver indisponível: reportar falha compacta e aguardar aprovação antes de fallback amplo.
 
 ## 6) Anti-padrões (proibidos)
@@ -204,16 +244,16 @@ ctx_execute_file({
 | `ctx stats` | chamar `ctx_stats` e exibir saída completa |
 | `ctx doctor` | chamar `ctx_doctor`, executar comando retornado e reportar checklist |
 | `ctx upgrade` | chamar `ctx_upgrade`, executar comando retornado e reportar checklist |
-| `ctx purge` | chamar `ctx_purge(confirm: true)` com aviso explícito de destruição |
+| `ctx purge` | chamar `ctx_purge(confirm: true)` — Ação destrutiva irreversível. Limpa a base FTS5 SQLite e estatísticas. **Nota**: O banco do context-mode sobrevive a comandos `/clear` ou `/compact`; `ctx_purge` é a única via de reinicialização completa. |
 
-## 9) Recursos
+### 8.1) Governança de Telemetria e Dashboard Organizacional (Insight)
 
-- `./examples/hierarquia-ferramentas.md`
-- `docs/agent-context/context-mode.md`
-- Context Engineering (Sourcegraph, 2026): https://sourcegraph.com/blog/context-engineering
-- Long Context Management (Zylos, 2026): https://zylos.ai/research/2026-01-19-llm-context-management
+Quando conectado a coletores ou dashboards analíticos organizacionais (ex.: Insight):
 
-## 10) Dimensões de Memória: Short-Term vs Long-Term
+- **Política de Metadados Exclusivos (Zero-Leakage)**: O rastreamento deve coletar estritamente metadados estruturais de processo (nomes de ferramentas invocadas, caminhos de arquivo, códigos de erro e durações).
+- **Proteção de Código e Conteúdo**: É vedado o envio de trechos de código-fonte, prompts do usuário, argumentos de texto livre ou conteúdos lidos de arquivos para plataformas de observabilidade externas.
+
+## 9) Dimensões de Memória: Short-Term vs Long-Term
 
 O `context-mode` gerencia dois tipos distintos de memória com semântica diferente:
 
@@ -245,3 +285,37 @@ ctx_index({ path: "docs/context/decisoes-arquiteturais.md", source: "projeto-alp
 - ❌ Tratar `ctx_index` sem `source` como memória permanente (comportamento não garantido entre sessões)
 
 > **Memória procedimental** (avançado): capacidade de agents atualizarem seus próprios system prompts com base em feedback acumulado. Consulte a skill [`agent-memory-policy`](./../agent-memory-policy/SKILL.md) (Tier 3 — Experimental) para política completa, guardrails e ciclo de atualização controlada.
+
+## 10) Trade-offs Arquiteturais e Limitações Conhecidas
+
+A transição de chamadas diretas de ferramentas (tool-calling declarativo) para execução de código intermediada por sandbox impõe compromissos operacionais:
+
+| Dimensão | Vantagem com `context-mode` | Trade-off / Limitação |
+|---|---|---|
+| **Janela de Contexto** | Redução drástica de tokens (até ~98% em saídas volumosas). | Apenas suprime tokens de saída; schemas de entrada continuam pesando no prompt. |
+| **Flexibilidade Analítica** | Filtragem e derivação arbitrária via código em sandbox. | Requer ambiente capaz de spawnar subprocessos locais (incompatível com runtimes restritos tipo Cloudflare Workers puros). |
+| **Segurança e Isolamento** | Código é executado localmente sem vazar payloads para APIs externas. | Demanda superfície confiável de execução de comandos locais na máquina do desenvolvedor. |
+| **Persistência de Memória** | Base SQLite FTS5 indexada mantém dados entre comandos `/compact`. | Exige disciplina de indexação estruturada (`source:` explícito) para evitar fragmentação de índices. |
+
+## 11) Recursos
+
+- `./examples/hierarquia-ferramentas.md`
+- `docs/agent-context/context-mode.md`
+- Context Engineering (Sourcegraph, 2026): https://sourcegraph.com/blog/context-engineering
+- Long Context Management (Zylos, 2026): https://zylos.ai/research/2026-01-19-llm-context-management
+- Repositório oficial `context-mode` (README, SKILL.md, SYSTEM.md): https://github.com/mksglu/context-mode
+- Landing oficial / Insight dashboard: https://context-mode.com
+- Post do autor (arquitetura FTS5/BM25, métricas de economia): https://mksg.lu/blog/context-mode
+- Code execution with MCP (Anthropic, fundamentação do padrão "Think in Code"): https://www.anthropic.com/engineering/code-execution-with-mcp
+- Discussão da comunidade (Hacker News, autor presente): https://news.ycombinator.com/item?id=47193064
+
+### 11.1) Fontes da Pesquisa de Enforcement Mecânico (§ 4.1.1 — 2026-10)
+
+- Parallel tool use — Claude Platform Docs (troubleshooting, "weak prompting", formatação de tool results): https://platform.claude.com/docs/en/agents-and-tools/tool-use/parallel-tool-use
+- Claude Cookbook — "Parallel tool calls on Claude 3.7 Sonnet" (padrão `batch_tool` meta-tool, origem conceitual de `ctx_batch_execute`): https://platform.claude.com/cookbook/tool-use-parallel-tools
+- GitHub issue `anthropic-sdk-typescript#956` — regressão de parallel tool calling em Opus/Sonnet 4.6 mesmo com prompt agressivo ("You MUST call ALL 46 tools"): https://github.com/anthropics/anthropic-sdk-typescript/issues/956
+- GitHub Copilot Hooks Reference (contrato `preToolUse`, `permissionDecision: deny`, fail-closed): https://docs.github.com/en/copilot/reference/hooks-reference
+- Claude Code Hooks Complete Guide — "hooks make the enforcement deterministic where the prompt makes it probabilistic": https://hidekazu-konishi.com/entry/claude_code_hooks_complete_guide.html
+- `anthropics/claude-code#24327` — risco de o modelo parar/desistir ao interpretar um `deny` de hook como negação do usuário em vez de feedback corrigível: https://github.com/anthropics/claude-code/issues/24327
+- `microsoft/copilot-intellij-feedback#1819` — limitação conhecida: JetBrains Copilot honra apenas `deny`, não reescreve input (`updatedInput`/`modifiedArgs`) como VS Code/Copilot CLI: https://github.com/microsoft/copilot-intellij-feedback/issues/1819
+

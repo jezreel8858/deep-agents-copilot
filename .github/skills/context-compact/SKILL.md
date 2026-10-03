@@ -17,10 +17,11 @@ triggers:
   - "sintetizar contexto"
 tools: ["context-mode"]
 source_docs:
-  - "CLAUDE.md"
-  - ".github/instructions/README.md"
-  - ".github/copilot-instructions.md"
-  - ".github/skills/context-mode/SKILL.md"
+  - .github/instructions/README.md
+  - .github/skills/context-mode/SKILL.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 ---
 
 # context-compact — Compactação de contexto pós-leitura

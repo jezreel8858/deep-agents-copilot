@@ -12,10 +12,11 @@ argument-hint: '<caminho-absoluto-do-projeto>'
 source_docs:
   - .github/skills/yaml-governance/SKILL.md
   - .github/skills/context-mode/SKILL.md
+  - .github/projects.local.yaml.example
   - .github/skills/terminal-governance/SKILL.md
+source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/projects.local.yaml.example
 ---
 
 # `/add-project-context`
@@ -277,7 +278,7 @@ O Copilot aplica mudanças **atomicamente por plano validado** (sem depender de 
 
 ### FASE 4: **Construção e Registro Obrigatório no Grafo de Conhecimento** (bloqueante, sem opt-out)
 
-> **Por que é obrigatória (não mais opcional):** o grafo de conhecimento (`code-knowledge-graph`) é a única forma de garantir que o mapa estrutural do projeto (imports, chamadas, acoplamento, blast radius) permaneça **sempre disponível** via `ctx_index`/`ctx_search`, independente de quanto o contexto da conversa cresça ou seja truncado. Modelos de menor capacidade (ex.: Claude Haiku) degradam a retenção de detalhes de projeto conforme o contexto aumenta — indexar o grafo fora da janela de contexto (em cache pesquisável) e registrá-lo no **Registry do Codegraph** para o MCP multi-repo é a mitigação estrutural para essa perda. Por isso esta fase **nunca pergunta "deseja construir?"** — ela sempre executa como parte do registro do projeto, exatamente como FASE 3 (binding).
+> **Por que é obrigatória (não mais opcional):** o grafo de conhecimento (`codegraph-engine`) é a única forma de garantir que o mapa estrutural do projeto (imports, chamadas, acoplamento, blast radius) permaneça **sempre disponível** via `ctx_index`/`ctx_search`, independente de quanto o contexto da conversa cresça ou seja truncado. Modelos de menor capacidade (ex.: Claude Haiku) degradam a retenção de detalhes de projeto conforme o contexto aumenta — indexar o grafo fora da janela de contexto (em cache pesquisável) e registrá-lo no **Registry do Codegraph** para o MCP multi-repo é a mitigação estrutural para essa perda. Por isso esta fase **nunca pergunta "deseja construir?"** — ela sempre executa como parte do registro do projeto, exatamente como FASE 3 (binding).
 
 **Pré-requisito**: FASE 3 concluída com sucesso — `project-id` já existe em `projects.local.yaml` (o agent indexa na chave `code-graph:<project-id>:<hash>`).
 
@@ -286,7 +287,7 @@ O Copilot aplica mudanças **atomicamente por plano validado** (sem depender de 
 3. **Caso contrário (não existe, ou hash mudou)** → invocar SEMPRE, sem pedir confirmação prévia (a própria execução de `/add-project-context` já é o consentimento explícito para esta fase):
    ```
    run_subagent(
-     agentName: "code-knowledge-graph",
+     agentName: "codegraph-engine",
      description: "Construir grafo obrigatório e registrar no MCP do projeto <nome>",
      task: "RF-001 (fluxo MANDATÓRIO de /add-project-context):
             projeto recém-registrado <nome-projeto> (project-id em projects.local.yaml),
@@ -301,7 +302,7 @@ O Copilot aplica mudanças **atomicamente por plano validado** (sem depender de 
 
 **Saída esperada:**
 ```
-[FASE 4 ✅] run_subagent(code-knowledge-graph) — grafo construído e registrado no MCP
+[FASE 4 ✅] run_subagent(codegraph-engine) — grafo construído e registrado no MCP
 ├─ Motor: @optave/codegraph (CLI, .codegraph/graph.db)
 ├─ MCP Registry: ✅ Registrado no catálogo multi-repo (codegraph registry add)
 ├─ Nós: <n> | Arestas: <n> | Cobertura: <%>
@@ -409,7 +410,7 @@ O Copilot aplica mudanças **atomicamente por plano validado** (sem depender de 
    > "Projeto '<nome-projeto>' foi registrado e seu grafo de conhecimento já está indexado. Deseja também iniciar a sumarização de código-fonte via agent especialista agora? (A) Sim, agora (B) Não, decidir depois"
 3. **Se houver resultado prévio** → exibir aviso compacto de 1 linha, sem reabrir `ask_questions`:
    > `ℹ️ Projeto '<nome-projeto>' já possui sumarização anterior — invoque o agent especialista sob demanda se precisar de um resumo atualizado.`
-4. Se usuário escolher (A) → `run_subagent(agentName: "code-knowledge-graph", description: "Sumarizar projeto <nome>", task: "Sumarizar arquivos-fonte do projeto registrado: <nome-projeto>...")`. Esta etapa é **aditiva**: o sucesso das FASES 3 e 4 já foi reportado antes deste passo e não depende dele.
+4. Se usuário escolher (A) → `run_subagent(agentName: "codegraph-engine", description: "Sumarizar projeto <nome>", task: "Sumarizar arquivos-fonte do projeto registrado: <nome-projeto>...")`. Esta etapa é **aditiva**: o sucesso das FASES 3 e 4 já foi reportado antes deste passo e não depende dele.
 
 **Saída esperada (caso A):**
 ```
@@ -463,7 +464,7 @@ Deseja também iniciar a sumarização de código-fonte via agent especialista a
 🚀 Projeto adicionado! Agora pronto para: /deep-search, /plan, /implement
 ```
 
-[FASE 4 ✅] run_subagent(code-knowledge-graph) — grafo obrigatório construído e registrado no MCP
+[FASE 4 ✅] run_subagent(codegraph-engine) — grafo obrigatório construído e registrado no MCP
 ```
 ├─ Motor: @optave/codegraph (CLI, .codegraph/graph.db)
 ├─ MCP Registry: ✅ Registrado no catálogo multi-repo (codegraph registry add)
@@ -556,9 +557,9 @@ Após invocar `/add-project-context <workspace>/[PROJETO]`, verifique:
 - [ ] **Pós-execução**: `.github/projects.local.yaml` foi atualizado (gitignored)?
 - [ ] **Pós-execução**: `.github/instructions/README.md` (compartilhado) permaneceu **intocado**?
 - [ ] **Pós-execução**: `.github/instructions/README.md` foi sincronizado (referência, sem dado real)?
-- [ ] **FASE 4 (OBRIGATÓRIA, sem opt-out)**: `code-knowledge-graph` foi invocado sempre logo após a FASE 3 (gerando o grafo via `codegraph build`, registrando no catálogo MCP via `codegraph registry add` e indexando via `ctx_index`), sem `ask_questions` de "deseja construir?"?
+- [ ] **FASE 4 (OBRIGATÓRIA, sem opt-out)**: `codegraph-engine` foi invocado sempre logo após a FASE 3 (gerando o grafo via `codegraph build`, registrando no catálogo MCP via `codegraph registry add` e indexando via `ctx_index`), sem `ask_questions` de "deseja construir?"?
 - [ ] **FASE 4.1**: se houver >1 projeto registrado em `.github/instructions/local/` (ou `projects.local.yaml`), o Copilot disparou a sequência de `ask_questions` de integração e configurou o manifesto de fronteiras (`manifesto.boundaries`) em `.codegraphrc.json`?
-- [ ] **FASE 4.5 (opcional)**: se usuário aceitou, `code-knowledge-graph` foi invocado **depois** da FASE 4?
+- [ ] **FASE 4.5 (opcional)**: se usuário aceitou, `codegraph-engine` foi invocado **depois** da FASE 4?
 
 **Se todos checkpoints completaram**: ✅ **Sucesso!**  
 **Se algum falhou**: ⚠️ Ver seção Troubleshooting acima.
@@ -584,3 +585,14 @@ Exemplo típico:
 ---
 
 
+<execution_protocol>
+**Protocolo Plan-Then-Batch (Smell 2.26 / Smell 2.13 / R-059):**
+1. **ENUMERAR**: Antes de qualquer ação de modificação ou inspeção, liste internamente todos os arquivos e comandos necessários para a demanda completa (não apenas o próximo passo aparente).
+2. **CONSOLIDAR (Limiar >= 2)**: Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de `ctx_execute` por alvo no chat. Use compulsoriamente `ctx_batch_execute(commands, queries)` OU script iterativo consolidado em `ctx_execute`.
+3. **DESPACHAR & VALIDAR**: Aplique todas as mutações ou leituras em processo único no sandbox (all-or-nothing verificado, R-051) e execute `get_errors` agrupado uma única vez ao final com a lista completa de arquivos alterados (quando aplicável).
+4. **Comandos curtos não suspendem a regra**: Prompts curtos ("prosseguir", "continue", "pode seguir") NÃO isentam o agente do limiar >= 2 nem do context-mode em lote — a regra vincula-se ao escopo da tarefa, nunca ao tamanho do prompt.
+5. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions, vedando loops investigativos de dívida de tokens O(N²).
+6. **Warm Start Compulsório & Batch Querying (R-060)**: Ferramentas locais que dependem de índices ou bases pré-computadas devem verificar e inicializar a base silenciosamente no primeiro comando (build-if-missing). É proibido disparar consultas granulares individuais para múltiplos nós — agrupe todas as pesquisas via chamadas em lote (batch_query, ctx_batch_execute, script iterativo) com destilação semântica e truncamento na borda (Edge Truncation).
+7. **Emissão Obrigatória de Telemetria de Handoff (R-042 / handoff-governance § 2.4)**: a cada chamada real de `run_subagent`, emitir compulsoriamente um evento `telemetry_entry` (tag `[HANDOFF]`) via `ctx_index`, incluindo `session_id` (reaproveitado do `sessionStart` do hook `context-mode`) e `sequence_index` (ordenação determinística dentro da sessão).
+8. **Progressive Disclosure de `source_docs_lazy:` (R-066 — Anti Context Bloat Inicial)**: Se este agent declara `source_docs_lazy:` em seu próprio frontmatter, esses documentos (ex.: `CLAUDE.md`, `.github/copilot-instructions.md`, `.github/agents/workflows.md`) **NÃO foram pré-carregados** — é TERMINANTEMENTE PROIBIDO usar `read_file` para carregá-los por inteiro. Consulte-os exclusivamente via `context-mode/ctx_search` com query pontual (ex.: número da regra `R-xxx` ou nome da seção) apenas quando precisar citá-los; nunca "só por garantia".
+</execution_protocol>

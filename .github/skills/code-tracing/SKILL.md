@@ -28,9 +28,9 @@ tools:
   - "file_search"
   - "read_file"
   - "run_in_terminal"
-source_docs:
-  - "CLAUDE.md"
-  - ".github/copilot-instructions.md"
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 ---
 
 # Code Tracing

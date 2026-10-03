@@ -11,16 +11,17 @@ model: "Claude Sonnet 5"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'ask_questions', 'context-mode/ctx_search', 'context-mode/ctx_execute', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index']
 argument-hint: '[repositório-alvo]'
 source_docs:
-  - CLAUDE.md
-  - .github/copilot-instructions.md
   - .github/instructions/README.md
   - .github/projects.local.yaml.example
   - .github/agents/tech-solution-architect.agent.md
-  - .github/agents/code-knowledge-graph.agent.md
+  - .github/agents/codegraph-engine.agent.md
   - .github/skills/integration-contract-analysis/SKILL.md
   - .github/skills/codegraph-optave-usage/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
   - .github/skills/handoff-governance/SKILL.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 ---
 
 # `/connect-integration-graphs`
@@ -42,11 +43,11 @@ source_docs:
 ## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
 
 - ✅ **APENAS** mapear fronteiras de integração multi-repo (`manifesto.boundaries`) em `.codegraphrc.json`, consultando contratos/endpoints/grafo existentes e propondo/aplicando as fronteiras que fecham gaps reais.
-- ✅ **SEMPRE** preservar isolamento local e respeitar o grafo construído pelo `@code-knowledge-graph`.
-- ✅ **SEMPRE** delegar levantamento de contrato/integração a `@tech-solution-architect` e consulta/validação de grafo a `@code-knowledge-graph` via `run_subagent` — nunca duplicar a lógica desses agents aqui (R-003).
+- ✅ **SEMPRE** preservar isolamento local e respeitar o grafo construído pelo `@codegraph-engine`.
+- ✅ **SEMPRE** delegar levantamento de contrato/integração a `@tech-solution-architect` e consulta/validação de grafo a `@codegraph-engine` via `run_subagent` — nunca duplicar a lógica desses agents aqui (R-003).
 - ❌ **NÃO** implementar ou corrigir código nem alterar endpoints em serviços da aplicação nos projetos analisados.
 - ❌ **NÃO** escrever em `.github/instructions/README.md` nem em `catalog.yaml` (compartilhados, R-043) — projetos vivem em `projects.local.yaml`; leitura apenas.
-- ❌ **NÃO** reconstruir grafo do zero se já existir cache válido — sempre checar `code-graph:*` antes via `@code-knowledge-graph` (RNF-002).
+- ❌ **NÃO** reconstruir grafo do zero se já existir cache válido — sempre checar `code-graph:*` antes via `@codegraph-engine` (RNF-002).
 - ❌ **NÃO** editar ou aplicar `.codegraphrc.json` de nenhum projeto sem confirmação explícita via `ask_questions` (R-009) — é mudança estrutural em projeto(s) externo(s).
 - ❌ **NÃO** afirmar que uma integração existe sem evidência dupla: (a) declarada no levantamento de contrato (FASE 1) **e** (b) confirmada pela aresta real no grafo (FASE 2) — divergência é gap de evidência, não integração fechada.
 
@@ -89,7 +90,7 @@ run_subagent(
 
 ```
 run_subagent(
-  agentName: "code-knowledge-graph",
+  agentName: "codegraph-engine",
   description: "Consultar grafo existente restrito ao fluxo de integração de <nome>",
   task: "RF-002 (sob demanda). project-id=<nome>. Verificar cache code-graph:<nome>:* antes de
          reprocessar. Consultar apenas os símbolos/arquivos levantados na FASE 1 (fn-impact/
@@ -129,7 +130,7 @@ run_subagent(
 
 ```
 run_subagent(
-  agentName: "code-knowledge-graph",
+  agentName: "codegraph-engine",
   description: "Validar fronteiras aplicadas para <nome>",
   task: "RF-002. Rodar codegraph check --staged --boundaries no projeto <nome> após atualização
   de .codegraphrc.json; reportar resultado do gate."
@@ -174,7 +175,7 @@ Resultado final: <N> gaps fechados / <N> gaps remanescentes (com próximo passo 
 
 - [ ] Todos os projetos registrados (merge `catalog.yaml` + `projects.local.yaml`) foram considerados no levantamento — ou apenas o subconjunto explicitamente informado no argumento.
 - [ ] Levantamento de integração delegado a `@tech-solution-architect` com evidência (arquivo:linha) por conclusão.
-- [ ] Varredura de grafo restrita apenas aos arquivos/símbolos do fluxo de integração (nunca full-scan) e delegada a `@code-knowledge-graph`.
+- [ ] Varredura de grafo restrita apenas aos arquivos/símbolos do fluxo de integração (nunca full-scan) e delegada a `@codegraph-engine`.
 - [ ] Cache `code-graph:*` reaproveitado quando válido (sem reconstrução redundante — RNF-002).
 - [ ] Gaps de fronteira (`manifesto.boundaries`) apresentados via `ask_questions` antes de qualquer escrita em `.codegraphrc.json`.
 - [ ] Nenhuma escrita em `.github/instructions/README.md` (compartilhado — R-043).
@@ -195,13 +196,13 @@ Resultado final: <N> gaps fechados / <N> gaps remanescentes (com próximo passo 
 
 - `/add-project-context` → pré-requisito: os projetos precisam estar registrados em `projects.local.yaml` antes desta varredura; a FASE 4.1 daquele prompt já cobre a pergunta de integração no momento do registro de **um** projeto novo — este prompt audita/fecha o que ficou pendente para **todo** o conjunto já registrado.
 - `@tech-solution-architect` → consumido via `run_subagent` para o levantamento de contratos/integrações (FASE 1).
-- `@code-knowledge-graph` → consumido via `run_subagent` para consulta e validação restrita do grafo já existente (FASE 2/3).
+- `@codegraph-engine` → consumido via `run_subagent` para consulta e validação restrita do grafo já existente (FASE 2/3).
 - `/validate` → depois de fechar as pontes, validar a conformidade estrutural do ecossistema como um todo.
 
 ---
 
 > **Notas de manutenção**: este prompt não introduz lógica nova de análise de contrato nem de
-> motor de grafo — apenas orquestra `@tech-solution-architect` e `@code-knowledge-graph`, já
+> motor de grafo — apenas orquestra `@tech-solution-architect` e `@codegraph-engine`, já
 > especializados nesses dois domínios, evitando duplicação (R-003). Projetos sem `path_externo`
 > acessível no momento da execução são reportados como gap remanescente, nunca ignorados
 > silenciosamente.
@@ -214,3 +215,14 @@ Resultado final: <N> gaps fechados / <N> gaps remanescentes (com próximo passo 
 
 *v1.0 — connect-integration-graphs prompt — 2026-09-04*
 
+<execution_protocol>
+**Protocolo Plan-Then-Batch (Smell 2.26 / Smell 2.13 / R-059):**
+1. **ENUMERAR**: Antes de qualquer ação de modificação ou inspeção, liste internamente todos os arquivos e comandos necessários para a demanda completa (não apenas o próximo passo aparente).
+2. **CONSOLIDAR (Limiar >= 2)**: Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de `ctx_execute` por alvo no chat. Use compulsoriamente `ctx_batch_execute(commands, queries)` OU script iterativo consolidado em `ctx_execute`.
+3. **DESPACHAR & VALIDAR**: Aplique todas as mutações ou leituras em processo único no sandbox (all-or-nothing verificado, R-051) e execute `get_errors` agrupado uma única vez ao final com a lista completa de arquivos alterados (quando aplicável).
+4. **Comandos curtos não suspendem a regra**: Prompts curtos ("prosseguir", "continue", "pode seguir") NÃO isentam o agente do limiar >= 2 nem do context-mode em lote — a regra vincula-se ao escopo da tarefa, nunca ao tamanho do prompt.
+5. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions, vedando loops investigativos de dívida de tokens O(N²).
+6. **Warm Start Compulsório & Batch Querying (R-060)**: Ferramentas locais que dependem de índices ou bases pré-computadas devem verificar e inicializar a base silenciosamente no primeiro comando (build-if-missing). É proibido disparar consultas granulares individuais para múltiplos nós — agrupe todas as pesquisas via chamadas em lote (batch_query, ctx_batch_execute, script iterativo) com destilação semântica e truncamento na borda (Edge Truncation).
+7. **Emissão Obrigatória de Telemetria de Handoff (R-042 / handoff-governance § 2.4)**: a cada chamada real de `run_subagent`, emitir compulsoriamente um evento `telemetry_entry` (tag `[HANDOFF]`) via `ctx_index`, incluindo `session_id` (reaproveitado do `sessionStart` do hook `context-mode`) e `sequence_index` (ordenação determinística dentro da sessão).
+8. **Progressive Disclosure de `source_docs_lazy:` (R-066 — Anti Context Bloat Inicial)**: Se este agent declara `source_docs_lazy:` em seu próprio frontmatter, esses documentos (ex.: `CLAUDE.md`, `.github/copilot-instructions.md`, `.github/agents/workflows.md`) **NÃO foram pré-carregados** — é TERMINANTEMENTE PROIBIDO usar `read_file` para carregá-los por inteiro. Consulte-os exclusivamente via `context-mode/ctx_search` com query pontual (ex.: número da regra `R-xxx` ou nome da seção) apenas quando precisar citá-los; nunca "só por garantia".
+</execution_protocol>

@@ -32,13 +32,14 @@ triggers:
   - "redundância de saída em runtime"
   - "hipertrofia instrucional"
 source_docs:
-  - CLAUDE.md
-  - .github/copilot-instructions.md
-  - .github/skills/agent-contracts/SKILL.md
   - .github/skills/code-review-patterns/SKILL.md
   - .github/skills/agent-safety-guardrails/SKILL.md
-  - .github/skills/governance-factory-patterns/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/skills/agent-contracts/SKILL.md
+  - .github/skills/governance-factory-patterns/SKILL.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 tools: []
 ---
 
@@ -129,7 +130,7 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 
 | Campo | Conteúdo |
 |---|---|
-| Sintoma | Arquivo commitado sob `.github/**` (exceto `local/`), `CLAUDE.md` ou `.github/instructions/README.md` contém nome de repositório/classe/método/pacote/namespace/caminho de arquivo REAL derivado de análise de projeto do usuário (típico de agents analíticos como `code-knowledge-graph`, `business-rules-extractor`, `context-builder`, `project-scanner`) |
+| Sintoma | Arquivo commitado sob `.github/**` (exceto `local/`), `CLAUDE.md` ou `.github/instructions/README.md` contém nome de repositório/classe/método/pacote/namespace/caminho de arquivo REAL derivado de análise de projeto do usuário (típico de agents analíticos como `codegraph-engine`, `business-rules-extractor`, `context-builder`, `project-scanner`) |
 | Como detectar | `grep_search` por padrões de caminho absoluto (`[A-Za-z]:\\`, `/home/`, `/Users/`) e por identificadores específicos nos arquivos de governança; comparar com checklist de R-044 |
 | Origem (TrustAgent) | Intrínseco — agent confunde evidência efêmera da conversa com evidência persistível em arquivo compartilhado |
 | Severidade | **Bloqueador** (risco de privacidade e contaminação de workspace) |
@@ -268,7 +269,7 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 | Sintoma | Agent com `insert_edit_into_file` e/ou `replace_string_in_file` no frontmatter `tools:` não referencia `efficient-batch-code-modification` em `source_docs:`/`skills:` — fica sem o guardrail que previne corrupção de arquivo único grande/estruturado e Markdown com seções/âncoras repetidas (R-051) |
 | Como detectar | Para cada `.agent.md` com `insert_edit_into_file` ou `replace_string_in_file` em `tools:`, verificar se `efficient-batch-code-modification` aparece em `source_docs:` ou nas listas `skills:` de sub-catálogos. Ver Tier 1: `test_smell_2_16_mutating_agents_reference_safe_editing_skill` |
 | Origem (TrustAgent) | Intrínseco — agent herda tool de mutação sem herdar o protocolo de segurança correspondente |
-| Severidade | **Bloqueador** (risco de corrupção documentado em R-051: truncamento por `insert_edit_into_file` em `workflows.md`/`routing-graph.yaml` e corrupção/wiping por `replace_string_in_file` com fuzzy matching em `code-knowledge-graph.agent.md`) |
+| Severidade | **Bloqueador** (risco de corrupção documentado em R-051: truncamento por `insert_edit_into_file` em `workflows.md`/`routing-graph.yaml` e corrupção/wiping por `replace_string_in_file` com fuzzy matching em `codegraph-engine.agent.md`) |
 | Remediação | Adicionar `.github/skills/efficient-batch-code-modification/SKILL.md` a `source_docs:` (ou `skills:` no sub-catálogo) do agent afetado via `@governance-maintainer` |
 
 ### 2.17 — Comando Git Sem Desativação de Pager (Violação R-035)
@@ -422,6 +423,32 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 
 ---
 
+### 2.31 — Progressive Disclosure Violation / Full-Load Forçado de Documento Lazy (R-066)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Artefato (`.agent.md`/`SKILL.md`/`*.prompt.md`) declara `CLAUDE.md`, `.github/copilot-instructions.md` ou qualquer documento > 300 linhas dentro de `source_docs:` (camada full-load) em vez de `source_docs_lazy:`; ou um agente executa `read_file` integral de documento classificado como lazy em vez de consultá-lo via `context-mode/ctx_search` |
+| Como detectar | (a) `tests/governance_audit/test_r066_progressive_disclosure_budget.py` — audita o frontmatter declarado (drift determinístico, camada estática/CI); (b) Observação de histórico de tool calls com `read_file` integral de `CLAUDE.md`/`copilot-instructions.md` em sessão de agent especialista (camada observacional, não bloqueante) |
+| Origem (TrustAgent) | Intrínseco — saturação cega da janela de contexto inicial por hábito de full-load indiscriminado de documentação de referência, sem diferenciar metadados (sempre carregados), corpo do agent/skill (carregado no acionamento) e recursos grandes (carregados sob demanda) — padrão de Progressive Disclosure consolidado de mercado (Anthropic Agent Skills) |
+| Severidade | **Alto** (não bloqueador imediato de CI, mas gera custo recorrente de tokens em 100% das sessões/handoffs do agente afetado, agravado em workflows multi-agent com múltiplos `run_subagent`) |
+| Enforcement | **Textual/CI-estático apenas** — `source_docs`/`source_docs_lazy` não são campos reconhecidos nativamente por GitHub Copilot ou Anthropic Agent Skills (confirmado via pesquisa de mercado); não há bloqueio mecânico de runtime, mesma limitação já documentada para R-053/R-062/R-063 |
+| Remediação | (a) Declarar R-066 em `CLAUDE.md` § 3 e espelhar em `copilot-instructions.md`; (b) Rodar `tools/agent_source_docs_sync/sync_required_source_docs.py --apply` para `.agent.md` afetados — nunca editar a chave manualmente; (c) Validar via `tests/governance_audit/test_r066_progressive_disclosure_budget.py` |
+
+---
+
+### 2.32 — Capability Overreach de `ctx_execute`/`ctx_execute_file` em Agent Gather-only (R-008 / R-046 / R-056 / R-059)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Agente puramente analítico, observacional, consultivo ou de auditoria ("Gather-only" — ex.: `agent-auditor`, reviewers, advisors arquiteturais, linters) declara `context-mode/ctx_execute` e/ou `context-mode/ctx_execute_file` em seu frontmatter `tools:`, sem necessidade comprovada de (a) agregação computacional multi-arquivo, (b) estrutura derivada de N variável em runtime, ou (c) codegen condicional. Como o hook `preToolUse` do IDE não intercepta subagents (`run_subagent`), a exposição indevida induz o modelo ao Tool Chaining sequencial (Smell 2.26) e evasão de `ctx_batch_execute`. |
+| Como detectar | (a) Execução de `tests/governance_audit/test_ctx_execute_capability_profile.py` no CI (camada estática determinística); (b) Inspeção de `tools:` cruzada contra os critérios de corte (a)/(b)/(c) definidos no plano canônico `docs/plans/20261003-governance-maintenance-ctx-execute-profile-classification.md`. |
+| Origem (TrustAgent) | Intrínseco — cópia inercial de templates de agentes que propagam a totalidade das ferramentas MCP sem ponderação da superfície mínima de capacidades necessária para a função do agente (Principle of Least Privilege aplicado a Tooling). |
+| Severidade | **Médio** (não corrompe sintaxe, mas degrada determinismo, induz Tool Chaining sequencial e queima desnecessária de tokens e créditos em workflows multi-agent). |
+| Enforcement | **Textual/CI-estático obrigatório** via `test_ctx_execute_capability_profile.py`. |
+| Remediação | Remover cirurgicamente `'context-mode/ctx_execute'` e `'context-mode/ctx_execute_file'` do array `tools:` do `.agent.md` afetado, assegurando a retenção de `'context-mode/ctx_batch_execute'`. Delegar a aplicação em lote ao `@governance-maintainer` via `WORKFLOW-GOVERNANCE-MAINTENANCE`. |
+
+---
+
 ## 3) Severidade — Reaproveitamento da Taxonomia Existente
 
 Esta skill **reaproveita** (não recria) a taxonomia de `code-review-patterns`:
@@ -429,7 +456,7 @@ Esta skill **reaproveita** (não recria) a taxonomia de `code-review-patterns`:
 | Severidade | Critério Objetivo de Enquadramento |
 |---|---|
 | **Bloqueador** | Gap que impede o funcionamento técnico ou a governança do artefato: falta de `run_subagent` (R-042); `model:` inválido ou desconhecido (`Unknown model`); tool de escrita em agent read-only; uso de terminal sem `terminal-governance`; vazamento de evidência real de projeto (R-044); dessincronização crítica no catálogo (R-015); terceirização manual ao usuário por agent analítico (R-057 / Smell 2.25); MCP tool chaining sequencial no chat / omissão de ctx_batch_execute (Smell 2.26); ou desvio prematuro para implementação e despejo de lacunas arquiteturais em executores de código (R-058 / Smell 2.27). |
-| **Alto** | Gap que gera desperdício severo de tokens/créditos, duplicação de manutenção ou risco de drift: violação de batching (R-046); divergência de templates canônicos (ausência de escopo ✅/❌ ou workflow); falta de variáveis nativas em prompts; código inline > 8 linhas em skills (R-026); sobreposição funcional ativa entre 2 agents; ou mensagem de sensor sem remediação acionável (Smell 2.28). |
+| **Alto** | Gap que gera desperdício severo de tokens/créditos, duplicação de manutenção ou risco de drift: violação de batching (R-046); divergência de templates canônicos (ausência de escopo ✅/❌ ou workflow); falta de variáveis nativas em prompts; código inline > 8 linhas em skills (R-026); sobreposição funcional ativa entre 2 agents; mensagem de sensor sem remediação acionável (Smell 2.28); ou progressive disclosure violation / full-load forçado de documento lazy (Smell 2.31 / R-066). |
 | **Sugestão** | Melhoria técnica não urgente ou cosmética: refinamento de `argument-hint`; ajuste fino de `description` dentro do limite; ou gap taxonômico de categoria intencionalmente não coberta. |
 
 ## 4) Cross-check de Segurança (Referência, Não Duplicação)

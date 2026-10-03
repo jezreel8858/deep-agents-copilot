@@ -10,7 +10,7 @@
 - **Agent**: usado quando a tarefa exige decisão de rota, escopo e entrega estruturada.
 - **Skill**: usado quando a tarefa é conhecimento pontual/checklist reutilizável.
 - Regra prática: se precisa classificar intenção e escolher fluxo, use agent.
-- **Workflows Operacionais Determinísticos (R-050)**: toda tarefa segue rigorosamente um dos 8 pipelines determinísticos especificados em [`workflows.md`](workflows.md) (`WORKFLOW-BUG-FIX`, `WORKFLOW-REFACTORING`, `WORKFLOW-TECHNICAL-ANALYSIS`, `WORKFLOW-FEATURE-DEVELOPMENT`, `WORKFLOW-GOVERNANCE-MAINTENANCE`, `WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION`, `WORKFLOW-FRAMEWORK-MIGRATION`, `WORKFLOW-RELEASE-READINESS`).
+- **Workflows Operacionais Determinísticos (R-050)**: toda tarefa segue rigorosamente um dos 9 pipelines determinísticos especificados em [`workflows.md`](workflows.md) (índice leve, R-066/F3) e detalhados em [`workflows/`](workflows/) (`WORKFLOW-BUG-FIX`, `WORKFLOW-REFACTORING`, `WORKFLOW-TECHNICAL-ANALYSIS`, `WORKFLOW-FEATURE-DEVELOPMENT`, `WORKFLOW-GOVERNANCE-MAINTENANCE`, `WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION`, `WORKFLOW-FRAMEWORK-MIGRATION`, `WORKFLOW-RELEASE-READINESS`, `WORKFLOW-PROMPT-SYNTHESIS`).
   - **Paridade de Endurecimento Determinístico**: Bugfix (`WORKFLOW-BUG-FIX`) e Refatoração (`WORKFLOW-REFACTORING`) operam sob o mesmo rigor determinístico e blindagem já consolidados para a migração de frameworks:
     - *Bugfix*: RCA estruturado (5 Whys / Fishbone) exigindo dupla fonte independente de evidência técnica observável (*evidence before hypothesis*), classificação determinística `flaky` vs `regressao_real`, pré-declaração de `blast_radius_estimado` e `rollback_plan` no `workflow_state`, mini mutation-check proporcional ao risco (anti falso-verde) e observação pós-fix / canary gate para defeitos críticos.
     - *Refatoração*: Contract Testing formal (Pact-style consumer-driven ou OpenAPI / JSON Schema Diff) no gate de contratos (Estado 2a), camada de redundância proporcional ao blast radius no Estado 5 (auditoria reversa de símbolos `reverse_symbol_audit` via grafo, mini mutation gate e differential replay leve) e rollback com registro e reporte de `blast_radius_revertido`.
@@ -47,7 +47,7 @@
 | Agent | `docs-engineer` | 📝 ***(FUSÃO)*** Autoria e curadoria de documentação técnica em `.md` — modos `author`/`curate`; substitui docs-writer + docs-curator, que já delegavam entre si a mesma decisão |
 | Agent | `code-review` | 🔎 Revisa código (diff/PR) antes do merge por correção, segurança, convenções, impacto, testes e performance; classifica achados por severidade; read-only; delega para `bug-triage`/`tech-solution-architect`/`test-strategy`/`refactor-planner` |
 | Agent | `requirements-analyst` | 🧾 ***(NEW)*** Elicita e estrutura requisitos funcionais/não-funcionais a partir de pedido de negócio ambíguo (EARS, INVEST, Gherkin, FURPS+); detecta *solution-jumping* via Five Whys; prospectivo (não confundir com `business-rules-extractor`, que é reverso) |
-| Agent | `code-knowledge-graph` | 🕸️ Ponto de entrada único para construção/consulta do grafo de conhecimento de código-fonte cross-projeto. Motor único baseado na lib externa **`@optave/codegraph`** (CLI local e MCP Server enxuto, Node.js/TypeScript nativo, Tree-sitter/Rust, zero API keys/LLM). Suporta dataflow/CFG interprocedural, dead-code, complexity metrics, co-change analysis, detecção de ciclos e visualização interativa via `codegraph plot`. Skill de uso: `codegraph-optave-usage` |
+| Agent | `codegraph-engine` | 🕸️ Ponto de entrada único para construção/consulta do grafo de conhecimento de código-fonte cross-projeto. Motor único baseado na lib externa **`@optave/codegraph`** (CLI local e MCP Server enxuto, Node.js/TypeScript nativo, Tree-sitter/Rust, zero API keys/LLM). Suporta dataflow/CFG interprocedural, dead-code, complexity metrics, co-change analysis, detecção de ciclos e visualização interativa via `codegraph plot`. Skill de uso: `codegraph-optave-usage` |
 | Agent | `security-reviewer` | 🔒 ***(NEW)*** Revisa código de aplicação por segurança especializada (OWASP Top 10:2025, ASVS 5.0, SCA/CVE, secrets) — complementa `code-review` (dimensão genérica) com profundidade de security specialist; read-only |
 | Agent | `performance-agent` | ⚡ ***(NEW)*** Revisa código por performance especializada — Core Web Vitals (frontend), N+1/latência (backend), otimização de query (banco); read-only |
 | Agent | `compliance-guardrails` | 🛡️ ***(NEW)*** Avalia conformidade regulatória de aplicação (SOC 2, GDPR/LGPD, HIPAA, ISO 27001) — audit trails, least privilege, retenção de dado pessoal; distinto de `agent-safety-guardrails` (segurança do próprio agent de IA); read-only |
@@ -88,7 +88,7 @@
 | 📝 Escrever/gerar/curar documentação técnica em `.md` (qualquer domínio) | `docs-engineer` |
 | 🔎 Revisar código (diff/PR) antes do merge, por severidade | `code-review` |
 | 🧾 Elicitar/estruturar requisitos a partir de pedido ambíguo (pré-técnico) | `requirements-analyst` |
-| 🕸️ Construir/consultar grafo de conhecimento de código — nível código (arquivo/classe/função, import/chamada/herança/tabela-SQL) e nível arquitetural (sistema/serviço, blast radius, ciclo, acoplamento, risco, diagrama Mermaid), cross-projeto | `code-knowledge-graph` |
+| 🕸️ Construir/consultar grafo de conhecimento de código — nível código (arquivo/classe/função, import/chamada/herança/tabela-SQL) e nível arquitetural (sistema/serviço, blast radius, ciclo, acoplamento, risco, diagrama Mermaid), cross-projeto | `codegraph-engine` |
 | 🔒 Revisão especializada de segurança de aplicação (OWASP, CVE, secrets), read-only | `security-reviewer` |
 | ⚡ Revisão especializada de performance (Core Web Vitals, N+1, query), read-only | `performance-agent` |
 | 🛡️ Avaliação de conformidade regulatória de aplicação (SOC 2, GDPR/LGPD, HIPAA), read-only | `compliance-guardrails` |
@@ -112,7 +112,7 @@ Antes de tarefas não triviais, anexar ao contexto:
 - `./README.md`
 - `./catalog.yaml`
 - `../skills/README.md`
-- `./workflows.md` — especificação canônica dos 8 workflows operacionais determinísticos e de ciclo de vida (R-050)
+- `./workflows.md` — índice leve dos 9 workflows operacionais determinísticos e de ciclo de vida (R-050); especificação completa fatiada em `./workflows/` (R-066/F3)
 - `./routing-graph.yaml` — grafo de roteamento estrutural (R-040)
 
 ## 5) Regras de Catálogo

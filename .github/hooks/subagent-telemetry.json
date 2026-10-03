@@ -4,16 +4,16 @@
     "postToolUse": [
       {
         "type": "command",
-        "bash": "node tools/context-insight-visualizer/hooks/record-subagent.js",
-        "powershell": "node tools/context-insight-visualizer/hooks/record-subagent.js",
+        "bash": "IN=$(cat); ROOT=$(printf '%s' \"$IN\" | jq -r '.cwd // empty' 2>/dev/null); [ -z \"$ROOT\" ] && ROOT=$(pwd); SCRIPT=\"$ROOT/tools/context-insight-visualizer/hooks/record-subagent.js\"; [ -f \"$SCRIPT\" ] && printf '%s' \"$IN\" | node \"$SCRIPT\"; exit 0",
+        "powershell": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"$in=[Console]::In.ReadToEnd(); $root=$null; try { $j=$in|ConvertFrom-Json; if($j.cwd){$root=$j.cwd} } catch {}; if(-not $root){$root=(Get-Location).Path}; $p=Join-Path $root 'tools/context-insight-visualizer/hooks/record-subagent.js'; if(Test-Path $p){$in | node $p}\"",
         "cwd": "."
       }
     ],
     "PostToolUse": [
       {
         "type": "command",
-        "bash": "node tools/context-insight-visualizer/hooks/record-subagent.js",
-        "powershell": "node tools/context-insight-visualizer/hooks/record-subagent.js",
+        "bash": "IN=$(cat); ROOT=$(printf '%s' \"$IN\" | jq -r '.cwd // empty' 2>/dev/null); [ -z \"$ROOT\" ] && ROOT=$(pwd); SCRIPT=\"$ROOT/tools/context-insight-visualizer/hooks/record-subagent.js\"; [ -f \"$SCRIPT\" ] && printf '%s' \"$IN\" | node \"$SCRIPT\"; exit 0",
+        "powershell": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"$in=[Console]::In.ReadToEnd(); $root=$null; try { $j=$in|ConvertFrom-Json; if($j.cwd){$root=$j.cwd} } catch {}; if(-not $root){$root=(Get-Location).Path}; $p=Join-Path $root 'tools/context-insight-visualizer/hooks/record-subagent.js'; if(Test-Path $p){$in | node $p}\"",
         "cwd": "."
       }
     ]

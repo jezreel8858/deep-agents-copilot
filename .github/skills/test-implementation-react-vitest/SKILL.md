@@ -12,10 +12,11 @@ triggers:
   - "teste unitario react"
   - "teste componente react"
 source_docs:
-  - CLAUDE.md
-  - .github/copilot-instructions.md
   - .github/agents/frontend/react/react-unit-test-writer.agent.md
   - .github/agents/frontend/react/react-component-test-writer.agent.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 tools: []
 ---
 

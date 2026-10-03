@@ -18,9 +18,10 @@ triggers:
   - "decomposição de refatoração"
   - "rollback de refatoração"
 source_docs:
+  - .github/agents/refactor-planner.agent.md
+source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/agents/refactor-planner.agent.md
 tools: []
 ---
 
@@ -168,7 +169,7 @@ Evitar dependência exclusiva de `git revert` em produção. Planejar contingên
 ## Checklist Verificável de Planejamento
 
 - [ ] Código alvo possui safety net (testes unitários confiáveis ou testes de caracterização documentados).
-- [ ] Dependências, fan-in/fan-out e blast radius foram avaliados via `@code-knowledge-graph`.
+- [ ] Dependências, fan-in/fan-out e blast radius foram avaliados via `@codegraph-engine`.
 - [ ] Hotspots históricos e acoplamento temporal (co-change) foram considerados no agrupamento das etapas.
 - [ ] Padrão de migração selecionado adequadamente (Mikado, Branch by Abstraction ou Strangler Fig).
 - [ ] Tarefas organizadas em DAG com no máximo 1 a 3 arquivos alterados por nó.

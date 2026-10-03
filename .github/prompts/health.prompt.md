@@ -9,11 +9,12 @@ model: "Gemini 3.8 Flash"
 tools: ['read_file', 'list_dir', 'file_search', 'run_in_terminal', 'run_subagent']
 argument-hint: '[--quick | categoria]'
 source_docs:
-  - CLAUDE.md
-  - .github/copilot-instructions.md
   - .github/instructions/README.md
   - .github/projects.local.yaml.example
   - .github/skills/terminal-governance/SKILL.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 ---
 
 # `/health`
@@ -200,4 +201,3 @@ CAT-7 (Environment Fingerprint) adicionada: audita se `projects.local.yaml` poss
 escopo exclusivo do `/init-context`); apenas orienta a reexecutar `/init-context` quando ausente
 ou expirado. `source_docs` ganhou `.github/projects.local.yaml.example` (schema de
 referência do fingerprint).
-

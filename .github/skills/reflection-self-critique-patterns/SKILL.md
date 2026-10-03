@@ -13,11 +13,12 @@ triggers:
   - "auto-crítica"
   - "revisar antes de reportar"
   - "generate critique revise"
-source_docs:
+source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/skills/agent-contracts/SKILL.md
 tools: []
+source_docs:
+  - .github/skills/agent-contracts/SKILL.md
 ---
 
 # Reflection / Self-Critique Patterns

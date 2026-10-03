@@ -7,12 +7,13 @@ model: "Gemini 3.8 Flash"
 tools: ['read_file', 'get_errors', 'ask_questions', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch_execute', 'context-mode/ctx_search']
 argument-hint: '[ideia-ou-requisito-inicial]'
 source_docs:
-  - CLAUDE.md
-  - .github/copilot-instructions.md
-  - .github/agents/workflows.md
   - .github/skills/prompt-engineering-patterns/SKILL.md
   - .github/skills/requirements-engineering-patterns/SKILL.md
   - .github/skills/structured-intake-patterns/SKILL.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/agents/workflows.md
 ---
 
 # `/craft-prompt`
@@ -48,14 +49,14 @@ Este prompt utiliza as variáveis de contexto nativas do VS Code / JetBrains Cop
 - ✅ **APENAS** refinar requisitos, minerar contexto determinístico no codebase e sintetizar o prompt canônico final em bloco de código Markdown (`.md`).
 - ✅ **SEMPRE** tratar o prompt sintetizado como de **consumo exclusivo downstream** por outros agents e workflows em uma nova sessão limpa, nunca como resposta ou solução final direta ao usuário.
 - ✅ **SEMPRE** avaliar a natureza da solicitação no Passo 1: se envolver nova feature, regras de negócio ou demanda aberta, assumir compulsoriamente a postura de `@requirements-analyst` e disparar `ask_questions` para validar decisões e regras de domínio com o usuário antes de avançar (R-027 / Invariante 19).
-- ✅ **SEMPRE** invocar compulsoriamente o subagente `@code-knowledge-graph` via `run_subagent` no Passo 2 para grounding determinístico de arquivos e dependências (R-045 / Invariante 18).
+- ✅ **SEMPRE** invocar compulsoriamente o subagente `@codegraph-engine` via `run_subagent` no Passo 2 para grounding determinístico de arquivos e dependências (R-045 / Invariante 18).
 - ✅ **SEMPRE** garantir **Visibilidade Progressiva (Anti-Blackbox Execution)**: detalhar obrigatoriamente no chat os achados e decisões de cada uma das 5 etapas antes de emitir o prompt final.
 - ✅ **SEMPRE** operar no **Problem Space** durante o refino, formalizando Critérios de Aceitação (DoD) e Não-Escopo antes da síntese.
 - ✅ **SEMPRE** identificar e injetar caminhos reais de arquivos (seção `## Arquivos e Referências Grounded`) e componentes irmãos canônicos homologados.
 - ❌ **NÃO** deduzir, supor ou inventar regras de negócio, telas, permissões ou fluxos de aprovação sem confirmação humana direta (proibição expressa de alucinação de requisitos).
 - ❌ **NÃO** tratar checkpoints de validação humana como opcionais em demandas com ambiguidade de domínio ou múltiplos caminhos de negócio viáveis.
-- ❌ **NÃO** realizar varredura manual de pastas, scripts exploratórios de diretório com `fs` no sandbox via `ctx_execute` ou MCP Tool Chaining sequencial (violação gravíssima de R-045 / RNF-004 e Smell 2.26). Toda análise estrutural pertence com exclusividade ao `@code-knowledge-graph`.
-- ❌ **NÃO** simular ou fingir a chamada de `@code-knowledge-graph` no checklist sem tê-lo invocado de fato via `run_subagent`.
+- ❌ **NÃO** realizar varredura manual de pastas, scripts exploratórios de diretório com `fs` no sandbox via `ctx_execute` ou MCP Tool Chaining sequencial (violação gravíssima de R-045 / RNF-004 e Smell 2.26). Toda análise estrutural pertence com exclusividade ao `@codegraph-engine`.
+- ❌ **NÃO** simular ou fingir a chamada de `@codegraph-engine` no checklist sem tê-lo invocado de fato via `run_subagent`.
 - ❌ **NÃO** executar o workflow em silêncio (blackbox) emitindo apenas checkboxes [✅] sem o Painel de Evidências das etapas.
 - ❌ **NÃO** implementar código de aplicação, alterar arquivos de domínio ou executar correções de funcionalidade (responsabilidade do novo chat).
 - ❌ **NÃO** fazer perguntas abertas ou desestruturadas — aplicar elicitação de 5 a 10 rodadas estruturadas de desambiguação via `ask_questions` com opções + campo livre (R-027 / Invariante 19), com teto estrito na 10ª rodada.
@@ -80,12 +81,12 @@ O processamento segue rigorosamente as 5 etapas do **`WORKFLOW-PROMPT-SYNTHESIS`
   - Conduza com `@prompt-structuring` diretamente no Problem Space técnico, delimitando o escopo sem inventar regras de negócio.
 - Registre o resumo executivo desta etapa na seção `### 🔍 Etapa 1: Elicitação & Problem Space`.
 
-### Passo 2 — Mineração Determinística no Codebase via `@code-knowledge-graph` (R-045 / Invariante 18)
+### Passo 2 — Mineração Determinística no Codebase via `@codegraph-engine` (R-045 / Invariante 18)
 - ⚠️ **INVOCAÇÃO OBRIGATÓRIA DE SUBAGENTE**:
-  Você DEVE compulsoriamente invocar o subagente `@code-knowledge-graph` através da ferramenta `run_subagent`:
-  `run_subagent(agentName: 'code-knowledge-graph', description: 'Mapear arquivos reais e dependências do módulo', task: 'Mapear arquivos reais, componentes, interfaces, DTOs e componentes irmãos canônicos no repositório alvo para a funcionalidade: <descricaoTarefa>')`.
+  Você DEVE compulsoriamente invocar o subagente `@codegraph-engine` através da ferramenta `run_subagent`:
+  `run_subagent(agentName: 'codegraph-engine', description: 'Mapear arquivos reais e dependências do módulo', task: 'Mapear arquivos reais, componentes, interfaces, DTOs e componentes irmãos canônicos no repositório alvo para a funcionalidade: <descricaoTarefa>')`.
 - ❌ **TERMINANTEMENTE PROIBIDO**: Escrever scripts ad-hoc no sandbox (`ctx_execute` com `fs.readdirSync` / `fs.readFileSync`) ou fazer múltiplas chamadas manuais para simular o grafo (violação direta de R-045 e Smell 2.26).
-- Aguarde o retorno estruturado do `@code-knowledge-graph` e utilize exclusivamente os caminhos verificados por ele.
+- Aguarde o retorno estruturado do `@codegraph-engine` e utilize exclusivamente os caminhos verificados por ele.
 - Se a tarefa envolver dependência externa nova, acione `run_subagent(agentName: 'deep-search', ...)` para obter versões e documentação oficial.
 - Registre a lista completa retornada pelo subagente na seção `#### 🗺️ Etapa 2: Context Grounding & AST Mining`.
 
@@ -112,7 +113,7 @@ O processamento segue rigorosamente as 5 etapas do **`WORKFLOW-PROMPT-SYNTHESIS`
   2. Bibliotecas, frameworks ou algoritmos não pedidos expressamente;
   3. Arquitetura interna ou design patterns prescritos no lugar de preservar a autonomia do especialista;
   4. Tecnologias não mencionadas na demanda original.
-- Confirme ainda: zero alucinações de caminhos de arquivos (100% verificados via `@code-knowledge-graph`), zero ambiguidades nos critérios de aceite, eliminação de over-prompting prejudicial a modelos de raciocínio frontier e garantia de consumo exclusivo downstream por agents/workflows.
+- Confirme ainda: zero alucinações de caminhos de arquivos (100% verificados via `@codegraph-engine`), zero ambiguidades nos critérios de aceite, eliminação de over-prompting prejudicial a modelos de raciocínio frontier e garantia de consumo exclusivo downstream por agents/workflows.
 - Cláusula de bloqueio: qualquer violação reprova a emissão e força re-síntese cirúrgica no Passo 4.
 - Registre o checklist de verificação na seção `### 🛡️ Etapa 5: Quality Gate & Validação Final`.
 - Emita o bloco de código Markdown (`.md`) completo e autocontido, pronto para ser copiado e colado na primeira mensagem de uma sessão limpa.
@@ -122,7 +123,7 @@ O processamento segue rigorosamente as 5 etapas do **`WORKFLOW-PROMPT-SYNTHESIS`
 ## ✅ Checklist Antes de Apresentar
 
 - [ ] Elicitação com usuário realizada via `ask_questions` para demandas abertas de negócio (zero alucinação de regras).
-- [ ] Subagente `@code-knowledge-graph` invocado formalmente via `run_subagent` na Etapa 2 (zero scripts manuais no sandbox).
+- [ ] Subagente `@codegraph-engine` invocado formalmente via `run_subagent` na Etapa 2 (zero scripts manuais no sandbox).
 - [ ] Pipeline visual `### 🗺️ Pipeline de Execução: WORKFLOW-PROMPT-SYNTHESIS (5 etapas)` exibido no topo.
 - [ ] Painel de Evidências com relatório individual de cada uma das 5 etapas renderizado no chat.
 - [ ] Arquivos e referências mapeados com caminhos reais existentes no repositório (`## Arquivos e Referências Grounded`).
@@ -140,7 +141,7 @@ O processamento segue rigorosamente as 5 etapas do **`WORKFLOW-PROMPT-SYNTHESIS`
 ```markdown
 ### 🗺️ Pipeline de Execução: WORKFLOW-PROMPT-SYNTHESIS (5 etapas)
 - [✅] Etapa 1: Elicitação de Requisitos e Problem Space (@requirements-analyst / ask_questions)
-- [✅] Etapa 2: Mineração de Contexto e Grounding (@code-knowledge-graph)
+- [✅] Etapa 2: Mineração de Contexto e Grounding (@codegraph-engine)
 - [✅] Etapa 3: Mapeamento de Restrições e Não-Escopo (@prompt-structuring)
 - [✅] Etapa 4: Síntese Estruturada e Otimização para Caching (@prompt-structuring)
 - [✅] Etapa 5: Quality Gate e Emissão do Bloco Markdown (@prompt-structuring)
@@ -190,7 +191,7 @@ Copie o bloco de código abaixo e cole na mensagem inicial da sua nova sessão:
 ...
 
 ## Arquivos e Referências Grounded
-<!-- Caminhos reais no repositório verificados via @code-knowledge-graph e componentes irmãos canônicos -->
+<!-- Caminhos reais no repositório verificados via @codegraph-engine e componentes irmãos canônicos -->
 - `caminho/do/arquivo_1`
 - `caminho/do/arquivo_2`
 
@@ -223,7 +224,7 @@ Copie o bloco de código abaixo e cole na mensagem inicial da sua nova sessão:
 
 ## 🚨 Regras de Autonomia
 
-- ❌ **NUNCA** contornar a invocação do subagente `@code-knowledge-graph` utilizando scripts manuais `fs` em `ctx_execute` (violação estrita de R-045 / RNF-004 e Smell 2.26).
+- ❌ **NUNCA** contornar a invocação do subagente `@codegraph-engine` utilizando scripts manuais `fs` em `ctx_execute` (violação estrita de R-045 / RNF-004 e Smell 2.26).
 - ❌ **NUNCA** modificar arquivos de aplicação durante a execução deste prompt — sua saída exclusiva é a especificação e o prompt sintetizado.
 - ❌ **NUNCA** apresentar o prompt sintetizado como solução final ao usuário — o artefato é de consumo exclusivo downstream para inicialização de uma nova sessão limpa.
 - ❌ **NUNCA** emitir uma resposta "caixa-preta" ocultando o Painel de Evidências por Etapa.
@@ -241,3 +242,15 @@ Copie o bloco de código abaixo e cole na mensagem inicial da sua nova sessão:
 - `<solicitação-bruta>`: Ideia inicial, bug report rascunhado ou requisito preliminar.
 - `/craft-prompt`: Este prompt, sintetizando o artefato canônico com visibilidade total por etapa.
 - `[Novo Chat]`: Sessão limpa onde o prompt sintetizado garante execução determinística e sem ruído de contexto anterior.
+
+<execution_protocol>
+**Protocolo Plan-Then-Batch (Smell 2.26 / Smell 2.13 / R-059):**
+1. **ENUMERAR**: Antes de qualquer ação de modificação ou inspeção, liste internamente todos os arquivos e comandos necessários para a demanda completa (não apenas o próximo passo aparente).
+2. **CONSOLIDAR (Limiar >= 2)**: Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de `ctx_execute` por alvo no chat. Use compulsoriamente `ctx_batch_execute(commands, queries)` OU script iterativo consolidado em `ctx_execute`.
+3. **DESPACHAR & VALIDAR**: Aplique todas as mutações ou leituras em processo único no sandbox (all-or-nothing verificado, R-051) e execute `get_errors` agrupado uma única vez ao final com a lista completa de arquivos alterados (quando aplicável).
+4. **Comandos curtos não suspendem a regra**: Prompts curtos ("prosseguir", "continue", "pode seguir") NÃO isentam o agente do limiar >= 2 nem do context-mode em lote — a regra vincula-se ao escopo da tarefa, nunca ao tamanho do prompt.
+5. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions, vedando loops investigativos de dívida de tokens O(N²).
+6. **Warm Start Compulsório & Batch Querying (R-060)**: Ferramentas locais que dependem de índices ou bases pré-computadas devem verificar e inicializar a base silenciosamente no primeiro comando (build-if-missing). É proibido disparar consultas granulares individuais para múltiplos nós — agrupe todas as pesquisas via chamadas em lote (batch_query, ctx_batch_execute, script iterativo) com destilação semântica e truncamento na borda (Edge Truncation).
+7. **Emissão Obrigatória de Telemetria de Handoff (R-042 / handoff-governance § 2.4)**: a cada chamada real de `run_subagent`, emitir compulsoriamente um evento `telemetry_entry` (tag `[HANDOFF]`) via `ctx_index`, incluindo `session_id` (reaproveitado do `sessionStart` do hook `context-mode`) e `sequence_index` (ordenação determinística dentro da sessão).
+8. **Progressive Disclosure de `source_docs_lazy:` (R-066 — Anti Context Bloat Inicial)**: Se este agent declara `source_docs_lazy:` em seu próprio frontmatter, esses documentos (ex.: `CLAUDE.md`, `.github/copilot-instructions.md`, `.github/agents/workflows.md`) **NÃO foram pré-carregados** — é TERMINANTEMENTE PROIBIDO usar `read_file` para carregá-los por inteiro. Consulte-os exclusivamente via `context-mode/ctx_search` com query pontual (ex.: número da regra `R-xxx` ou nome da seção) apenas quando precisar citá-los; nunca "só por garantia".
+</execution_protocol>

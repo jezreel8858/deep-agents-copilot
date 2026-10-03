@@ -4,16 +4,16 @@
     "sessionStart": [
       {
         "type": "command",
-        "bash": "command -v context-mode >/dev/null 2>&1 || exit 0; IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook jetbrains-copilot sessionstart",
-        "powershell": "if (-not (Get-Command context-mode -ErrorAction SilentlyContinue)) { exit 0 }; $env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook jetbrains-copilot sessionstart",
+        "bash": "IN=$(cat); ROOT=$(printf '%s' \"$IN\" | jq -r '.cwd // empty' 2>/dev/null); [ -z \"$ROOT\" ] && ROOT=$(pwd); SCRIPT=\"$ROOT/.github/hooks/ctx-sequence-reset.sh\"; [ -f \"$SCRIPT\" ] && bash \"$SCRIPT\"; exit 0",
+        "powershell": "powershell -NoProfile -ExecutionPolicy Bypass -EncodedCommand JABpAG4APQBbAEMAbwBuAHMAbwBsAGUAXQA6ADoASQBuAC4AUgBlAGEAZABUAG8ARQBuAGQAKAApADsAJAByAG8AbwB0AD0AJABuAHUAbABsADsAdAByAHkAewAkAGoAPQAkAGkAbgB8AEMAbwBuAHYAZQByAHQARgByAG8AbQAtAEoAcwBvAG4AOwBpAGYAKAAkAGoALgBjAHcAZAApAHsAJAByAG8AbwB0AD0AJABqAC4AYwB3AGQAfQB9AGMAYQB0AGMAaAB7AH0AOwBpAGYAKAAtAG4AbwB0ACAAJAByAG8AbwB0ACkAewAkAHIAbwBvAHQAPQAoAEcAZQB0AC0ATABvAGMAYQB0AGkAbwBuACkALgBQAGEAdABoAH0AOwAkAHAAPQBKAG8AaQBuAC0AUABhAHQAaAAgACQAcgBvAG8AdAAgACIALgBnAGkAdABoAHUAYgAvAGgAbwBvAGsAcwAvAGMAdAB4AC0AcwBlAHEAdQBlAG4AYwBlAC0AcgBlAHMAZQB0AC4AcABzADEAIgA7AGkAZgAoAFQAZQBzAHQALQBQAGEAdABoACAAJABwACkAewAmACAAJABwAH0A",
         "cwd": "."
       }
     ],
     "SessionStart": [
       {
         "type": "command",
-        "bash": "command -v context-mode >/dev/null 2>&1 || exit 0; IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook jetbrains-copilot sessionstart",
-        "powershell": "if (-not (Get-Command context-mode -ErrorAction SilentlyContinue)) { exit 0 }; $env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook jetbrains-copilot sessionstart",
+        "bash": "IN=$(cat); ROOT=$(printf '%s' \"$IN\" | jq -r '.cwd // empty' 2>/dev/null); [ -z \"$ROOT\" ] && ROOT=$(pwd); SCRIPT=\"$ROOT/.github/hooks/ctx-sequence-reset.sh\"; [ -f \"$SCRIPT\" ] && bash \"$SCRIPT\"; exit 0",
+        "powershell": "powershell -NoProfile -ExecutionPolicy Bypass -EncodedCommand JABpAG4APQBbAEMAbwBuAHMAbwBsAGUAXQA6ADoASQBuAC4AUgBlAGEAZABUAG8ARQBuAGQAKAApADsAJAByAG8AbwB0AD0AJABuAHUAbABsADsAdAByAHkAewAkAGoAPQAkAGkAbgB8AEMAbwBuAHYAZQByAHQARgByAG8AbQAtAEoAcwBvAG4AOwBpAGYAKAAkAGoALgBjAHcAZAApAHsAJAByAG8AbwB0AD0AJABqAC4AYwB3AGQAfQB9AGMAYQB0AGMAaAB7AH0AOwBpAGYAKAAtAG4AbwB0ACAAJAByAG8AbwB0ACkAewAkAHIAbwBvAHQAPQAoAEcAZQB0AC0ATABvAGMAYQB0AGkAbwBuACkALgBQAGEAdABoAH0AOwAkAHAAPQBKAG8AaQBuAC0AUABhAHQAaAAgACQAcgBvAG8AdAAgACIALgBnAGkAdABoAHUAYgAvAGgAbwBvAGsAcwAvAGMAdAB4AC0AcwBlAHEAdQBlAG4AYwBlAC0AcgBlAHMAZQB0AC4AcABzADEAIgA7AGkAZgAoAFQAZQBzAHQALQBQAGEAdABoACAAJABwACkAewAmACAAJABwAH0A",
         "cwd": "."
       }
     ],
@@ -36,16 +36,16 @@
     "preToolUse": [
       {
         "type": "command",
-        "bash": "command -v context-mode >/dev/null 2>&1 || exit 0; IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook jetbrains-copilot pretooluse",
-        "powershell": "if (-not (Get-Command context-mode -ErrorAction SilentlyContinue)) { exit 0 }; $env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook jetbrains-copilot pretooluse",
+        "bash": "IN=$(cat); ROOT=$(printf '%s' \"$IN\" | jq -r '.cwd // empty' 2>/dev/null); [ -z \"$ROOT\" ] && ROOT=$(pwd); SCRIPT=\"$ROOT/.github/hooks/ctx-sequence-guard.sh\"; if [ -f \"$SCRIPT\" ]; then printf '%s' \"$IN\" | bash \"$SCRIPT\"; else printf '{\"permissionDecision\":\"allow\"}'; fi",
+        "powershell": "powershell -NoProfile -ExecutionPolicy Bypass -EncodedCommand JABpAG4APQBbAEMAbwBuAHMAbwBsAGUAXQA6ADoASQBuAC4AUgBlAGEAZABUAG8ARQBuAGQAKAApADsAJAByAG8AbwB0AD0AJABuAHUAbABsADsAdAByAHkAewAkAGoAPQAkAGkAbgB8AEMAbwBuAHYAZQByAHQARgByAG8AbQAtAEoAcwBvAG4AOwBpAGYAKAAkAGoALgBjAHcAZAApAHsAJAByAG8AbwB0AD0AJABqAC4AYwB3AGQAfQB9AGMAYQB0AGMAaAB7AH0AOwBpAGYAKAAtAG4AbwB0ACAAJAByAG8AbwB0ACkAewAkAHIAbwBvAHQAPQAoAEcAZQB0AC0ATABvAGMAYQB0AGkAbwBuACkALgBQAGEAdABoAH0AOwAkAHAAPQBKAG8AaQBuAC0AUABhAHQAaAAgACQAcgBvAG8AdAAgACIALgBnAGkAdABoAHUAYgAvAGgAbwBvAGsAcwAvAGMAdAB4AC0AcwBlAHEAdQBlAG4AYwBlAC0AZwB1AGEAcgBkAC4AcABzADEAIgA7AGkAZgAoAFQAZQBzAHQALQBQAGEAdABoACAAJABwACkAewAmACAAJABwACAAJABpAG4AfQBlAGwAcwBlAHsAKABAAHsAcABlAHIAbQBpAHMAcwBpAG8AbgBEAGUAYwBpAHMAaQBvAG4APQAiAGEAbABsAG8AdwAiAH0AfABDAG8AbgB2AGUAcgB0AFQAbwAtAEoAcwBvAG4AIAAtAEMAbwBtAHAAcgBlAHMAcwApAH0A",
         "cwd": "."
       }
     ],
     "PreToolUse": [
       {
         "type": "command",
-        "bash": "command -v context-mode >/dev/null 2>&1 || exit 0; IDEA_INITIAL_DIRECTORY=$(pwd -W); IDEA_INITIAL_DIRECTORY=${IDEA_INITIAL_DIRECTORY^}; context-mode hook jetbrains-copilot pretooluse",
-        "powershell": "if (-not (Get-Command context-mode -ErrorAction SilentlyContinue)) { exit 0 }; $env:IDEA_INITIAL_DIRECTORY=$PWD.Path; context-mode hook jetbrains-copilot pretooluse",
+        "bash": "IN=$(cat); ROOT=$(printf '%s' \"$IN\" | jq -r '.cwd // empty' 2>/dev/null); [ -z \"$ROOT\" ] && ROOT=$(pwd); SCRIPT=\"$ROOT/.github/hooks/ctx-sequence-guard.sh\"; if [ -f \"$SCRIPT\" ]; then printf '%s' \"$IN\" | bash \"$SCRIPT\"; else printf '{\"permissionDecision\":\"allow\"}'; fi",
+        "powershell": "powershell -NoProfile -ExecutionPolicy Bypass -EncodedCommand JABpAG4APQBbAEMAbwBuAHMAbwBsAGUAXQA6ADoASQBuAC4AUgBlAGEAZABUAG8ARQBuAGQAKAApADsAJAByAG8AbwB0AD0AJABuAHUAbABsADsAdAByAHkAewAkAGoAPQAkAGkAbgB8AEMAbwBuAHYAZQByAHQARgByAG8AbQAtAEoAcwBvAG4AOwBpAGYAKAAkAGoALgBjAHcAZAApAHsAJAByAG8AbwB0AD0AJABqAC4AYwB3AGQAfQB9AGMAYQB0AGMAaAB7AH0AOwBpAGYAKAAtAG4AbwB0ACAAJAByAG8AbwB0ACkAewAkAHIAbwBvAHQAPQAoAEcAZQB0AC0ATABvAGMAYQB0AGkAbwBuACkALgBQAGEAdABoAH0AOwAkAHAAPQBKAG8AaQBuAC0AUABhAHQAaAAgACQAcgBvAG8AdAAgACIALgBnAGkAdABoAHUAYgAvAGgAbwBvAGsAcwAvAGMAdAB4AC0AcwBlAHEAdQBlAG4AYwBlAC0AZwB1AGEAcgBkAC4AcABzADEAIgA7AGkAZgAoAFQAZQBzAHQALQBQAGEAdABoACAAJABwACkAewAmACAAJABwACAAJABpAG4AfQBlAGwAcwBlAHsAKABAAHsAcABlAHIAbQBpAHMAcwBpAG8AbgBEAGUAYwBpAHMAaQBvAG4APQAiAGEAbABsAG8AdwAiAH0AfABDAG8AbgB2AGUAcgB0AFQAbwAtAEoAcwBvAG4AIAAtAEMAbwBtAHAAcgBlAHMAcwApAH0A",
         "cwd": "."
       }
     ],

@@ -10,7 +10,10 @@ triggers:
 # SSOT e Progressive Disclosure (Anthropic Agent Skills Open Standard):
 # Skills expõem metadados (Nível 1) no frontmatter para descoberta e o blueprint operacional (Nível 2) no corpo.
 # É TERMINANTEMENTE PROIBIDO criar seções de herança, catálogo ou pré-carregamento no corpo markdown.
-source_docs:
+# R-066 (Progressive Disclosure Compulsória): CLAUDE.md e .github/copilot-instructions.md são documentos de alto
+# fan-in (>300 linhas) — NUNCA em source_docs: (full-load); sempre em source_docs_lazy:, consultados
+# exclusivamente via context-mode/ctx_search sob demanda (nunca read_file integral).
+source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---

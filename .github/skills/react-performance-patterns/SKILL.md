@@ -11,9 +11,10 @@ triggers:
   - "react compiler"
   - "code splitting"
 source_docs:
+  - .github/agents/frontend/react/react-arch-advisor.agent.md
+source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/agents/frontend/react/react-arch-advisor.agent.md
 tools: []
 ---
 

@@ -21,12 +21,13 @@ triggers:
   - "código morto em governança"
   - "auditoria periódica"
 source_docs:
-  - CLAUDE.md
-  - .github/copilot-instructions.md
-  - .github/skills/governance-audit-patterns/SKILL.md
   - .github/skills/repository-hygiene-patterns/SKILL.md
   - .github/skills/documentation-writing-patterns/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/skills/governance-audit-patterns/SKILL.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 tools: []
 ---
 
@@ -90,7 +91,7 @@ Enquanto `governance-audit-patterns` cataloga smells **estruturais** (frontmatte
 
 ## 5) Anti-padrões
 
-- ❌ Tratar esta skill como justificativa para rodar scripts de varredura manual fora do `@code-knowledge-graph` quando a análise for de dependências/chamadas de código de aplicação (fora de escopo — isso é R-045).
+- ❌ Tratar esta skill como justificativa para rodar scripts de varredura manual fora do `@codegraph-engine` quando a análise for de dependências/chamadas de código de aplicação (fora de escopo — isso é R-045).
 - ❌ Deletar uma skill ou agent "órfão" sem checkpoint humano.
 - ❌ Duplicar os smells já cobertos por `governance-audit-patterns` — esta skill referencia, não recria.
 - ❌ Promover toda variação cosmética a "drift" — o foco é entropia que causa confusão real ao agente consumidor (contagens erradas, referências quebradas, sincronização de catálogo).

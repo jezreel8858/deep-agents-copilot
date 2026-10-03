@@ -18,9 +18,10 @@ triggers:
   - "atualizar catálogo"
   - "checklist de criação"
 source_docs:
+  - .github/agents/governance-factory.agent.md
+source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/agents/governance-factory.agent.md
 tools: []
 ---
 
@@ -98,6 +99,7 @@ Reportar no Formato de Saída (§4 desta skill)
 - [ ] README correspondente atualizado **na mesma entrega**.
 - [ ] Se `agent`: H1 padronizado exclusivamente para `# Perfil Operacional`, sem identificador nominal no título (o nome reside exclusivamente no frontmatter `name:`).
 - [ ] Se `agent`: `run_subagent` presente no frontmatter `tools:` (bloqueante — R-042); seção "Retorno ao Router" declarada; banner "Agente Ativo" presente no Formato de Saída.
+- [ ] Se `agent`: Classificação obrigatória de perfil de ferramentas em `tools:` (Gather-only vs Gather+Process). O agente necessita de (a) agregação computacional entre múltiplos arquivos (percentil, delta, ratio), (b) estrutura derivada de N variável descoberto em runtime (grafo, catálogo inteiro, bounded context map), ou (c) geração/transformação condicional de código-fonte (codegen/mutação)? Se NÃO (Gather-only), declare exclusivamente `context-mode/ctx_batch_execute` (com `ctx_search` e `ctx_index`), OMITINDO `context-mode/ctx_execute` e `context-mode/ctx_execute_file`. Se SIM (Gather+Process), declare as ferramentas de execução completas.
 - [ ] Se `agent`/`prompt`: `source_docs` presente no frontmatter apontando para as skills/regras que são DEPENDÊNCIA FUNCIONAL REAL do agent (não apenas afinidade temática) — reutilizar o Gate de Autocrítica §3.1 para validar isso.
 - [ ] Se `run_in_terminal` for declarado em `tools:` (agent, prompt ou especialista de stack): inclusão COMPULSÓRIA de `.github/skills/terminal-governance/SKILL.md` em `source_docs:` (ou na seção `skills:` do sub-catálogo local da stack) para assegurar governança de terminal (R-049).
 - [ ] Se `skill`: `tier`, `category`, `triggers` em PT-BR presentes; `source_docs` aponta para arquivos reais (não inventados).
@@ -175,7 +177,7 @@ Nenhuma criação/revisão de artefato de governança é considerada completa se
 - ❌ Reinventar o fluxo de Decision Tree em vez de referenciar esta skill — risco de drift entre os 4 `type` (agent/skill/prompt/stack) do `governance-factory`.
 - ❌ Registrar referência cruzada a outra skill/agent (ex.: "consumidor de X") sem confirmar dependência funcional real — pular o gate §3.1 e validar só a estrutura (achado real: `deep-search` registrado como consumidor de `reflection-self-critique-patterns` sem uso funcional).
 - ❌ Definir `model:` como array ou como slug kebab-case sem rodar `get_errors` (§9) — achado real: 15+ agents/prompts com `Unknown model` por usar `["a","b"]` ou `claude-haiku-4.5` em vez do display name oficial.
-- ❌ `description` do frontmatter virar resumo de changelog/RF-ID (§10) — achado real: `code-knowledge-graph` v2.1.0 com description de +1300 caracteres misturando função do agent com histórico de correções.
+- ❌ `description` do frontmatter virar resumo de changelog/RF-ID (§10) — achado real: `codegraph-engine` v2.1.0 com description de +1300 caracteres misturando função do agent com histórico de correções.
 
 ## 7) Consumidores Mapeados
 
@@ -232,7 +234,7 @@ A tabela oficial declara disponibilidade por superfície (colunas "Visual Studio
 
 ## 10) Tamanho e Conteúdo da `description` (Frontmatter — obrigatório para `agent`, `skill`, `prompt`)
 
-> Fecha gap real (2026-09-01): `code-knowledge-graph.agent.md` acumulou uma `description` de +1300 caracteres em bloco YAML multi-linha (`description: >`), misturando o que o agent faz com changelog de correções ("RF-021 consolidação de motor", "bug corrigido nesta rodada", validação 9/9, histórico de versões). Isso é *anti-padrão* — `description` é metadado de **descoberta** (usado por `@agent search`, `catalog.yaml`, roteamento), não documentação de mudança.
+> Fecha gap real (2026-09-01): `codegraph-engine.agent.md` acumulou uma `description` de +1300 caracteres em bloco YAML multi-linha (`description: >`), misturando o que o agent faz com changelog de correções ("RF-021 consolidação de motor", "bug corrigido nesta rodada", validação 9/9, histórico de versões). Isso é *anti-padrão* — `description` é metadado de **descoberta** (usado por `@agent search`, `catalog.yaml`, roteamento), não documentação de mudança.
 
 ### 10.1) Regra de Ouro (Tamanho)
 
@@ -257,7 +259,7 @@ A tabela oficial declara disponibilidade por superfície (colunas "Visual Studio
 | Justificativa extensa de decisão de design | Corpo, com link para REQ/ADR se existir |
 | Exemplos de uso, tabelas, listas com bullets | Corpo |
 
-### 10.4) Exemplo Real (antes/depois — `code-knowledge-graph`)
+### 10.4) Exemplo Real (antes/depois — `codegraph-engine`)
 
 **❌ Antes (anti-padrão, ~1300 caracteres, 6+ frases, changelog embutido):** descrição misturava função do agent com RF-001..RF-022, RNF-008..RNF-013, "já removidos", "validado em 4 rodadas reais", regras de motor primário/fallback em detalhe.
 
@@ -281,7 +283,7 @@ description: >-
 
 ### 10.6) Anti-padrões
 
-- ❌ `description` como resumo executivo do REQ inteiro (achado real: `code-knowledge-graph` v2.1.0).
+- ❌ `description` como resumo executivo do REQ inteiro (achado real: `codegraph-engine` v2.1.0).
 - ❌ Usar `description: >` (multi-linha) como desculpa para escrever um parágrafo de changelog — o formato YAML permitir múltiplas linhas não significa que o conteúdo deva crescer sem limite.
 - ❌ Copiar a `description` de uma versão anterior e ir "só adicionando mais uma frase" a cada rodada de correção sem nunca revisar o tamanho total.
 - ❌ Repetir no frontmatter o mesmo texto já detalhado em `## Objetivo` — se ambos existem, a `description` deve ser o resumo curto, `## Objetivo` o detalhado.

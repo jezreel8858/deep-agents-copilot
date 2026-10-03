@@ -24,9 +24,10 @@ triggers:
   - "timeline"
   - "mindmap"
 source_docs:
+  - .github/skills/documentation-writing-patterns/SKILL.md
+source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/skills/documentation-writing-patterns/SKILL.md
 tools: []
 ---
 

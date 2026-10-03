@@ -21,13 +21,14 @@ triggers:
   - "memória episódica"
   - "memória semântica"
 source_docs:
-  - CLAUDE.md
-  - .github/copilot-instructions.md
   - .github/skills/context-mode/SKILL.md
   - .github/skills/agent-safety-guardrails/SKILL.md
   - .github/skills/agent-observability-otel/SKILL.md
-  - .github/skills/terminal-governance/SKILL.md
   - .github/prompts/ctx-checkpoint.prompt.md
+  - .github/skills/terminal-governance/SKILL.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 tools: []
 ---
 

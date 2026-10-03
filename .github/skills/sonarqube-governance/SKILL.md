@@ -17,7 +17,7 @@ triggers:
   - "code smell"
   - "sonarcloud"
   - "clean as you code"
-source_docs:
+source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []

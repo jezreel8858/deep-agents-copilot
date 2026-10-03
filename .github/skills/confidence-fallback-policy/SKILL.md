@@ -17,9 +17,10 @@ triggers:
   - "ambiguidade"
   - "re-roteamento"
 source_docs:
+  - .github/agents/README.md
+source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/agents/README.md
 tools: []
 ---
 

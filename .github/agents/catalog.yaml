@@ -111,7 +111,7 @@ agents:
     - agent-router
     - tech-solution-architect
     - test-strategy
-    - code-knowledge-graph
+    - codegraph-engine
     - refactor-planner
     tools:
     - grep_search
@@ -223,7 +223,7 @@ agents:
     - spring-reactive-router
     - database-router
     - database-specialist
-    - code-knowledge-graph
+    - codegraph-engine
     - test-strategy
     tools:
     - grep_search
@@ -357,7 +357,7 @@ agents:
     - .github/agents/README.md
     - .github/skills/README.md
     related_agents:
-    - code-knowledge-graph
+    - codegraph-engine
     - database-specialist
     - test-strategy
     - feature-planner
@@ -728,7 +728,7 @@ agents:
     description: Analisa nomenclatura, pacotes e agrupamentos semanticos do codigo-fonte
       para mapear Bounded Contexts (DDD) por dominio de negocio, revelando fronteiras
       invadidas, God Classes e candidatos a segregacao de modulos/microservicos. Complementa
-      o mapeamento estrutural deterministico do code-knowledge-graph com analise semantica
+      o mapeamento estrutural deterministico do codegraph-engine com analise semantica
       de dominio. Estritamente read-only.
     keywords:
     - bounded context
@@ -745,7 +745,7 @@ agents:
     - .github/agents/catalog.yaml
     related_agents:
     - agent-router
-    - code-knowledge-graph
+    - codegraph-engine
     - tech-solution-architect
     - refactor-planner
     - business-rules-extractor
@@ -799,7 +799,7 @@ agents:
     - agent-router
     - tech-solution-architect
     - docs-engineer
-    - code-knowledge-graph
+    - codegraph-engine
     - business-rules-extractor
     tools:
     - grep_search
@@ -1032,8 +1032,8 @@ agents:
     - .github/skills/code-tracing/SKILL.md
     estimated_time_minutes: 60
     version: 1.1.0
-  code-knowledge-graph:
-    id: code-knowledge-graph
+  codegraph-engine:
+    id: codegraph-engine
     model: Gemini 3.8 Flash
     priority: 4.95
     version: 4.1.1
@@ -1087,7 +1087,7 @@ agents:
     source_docs:
     - CLAUDE.md
     - .github/copilot-instructions.md
-    - .github/agents/code-knowledge-graph.agent.md
+    - .github/agents/codegraph-engine.agent.md
     - .github/skills/codegraph-optave-usage/SKILL.md
     - .github/skills/terminal-governance/SKILL.md
     - .github/skills/context-mode/SKILL.md
@@ -2112,28 +2112,28 @@ metadata:
     v1.1.0 e este changelog) e .github/agents/README.md. total_agents permanece 34.
     | 2026-09-03 (39) — A pedido do usuario (''formalize'', apos analise de quais
     agents tem perfil para consumir @optave/codegraph via delegacao), formalizadas
-    10 referencias reversas faltantes na tabela ''Quando Delegar'' de code-knowledge-graph.agent.md
+    10 referencias reversas faltantes na tabela ''Quando Delegar'' de codegraph-engine.agent.md
     (v4.0.0, sem bump de versao — apenas doc): refactor-executor, debugger, code-review,
     code-style-enforcer, performance-agent, security-reviewer, test-engineer, angular-engineer,
     spring-boot-engineer, spring-reactive-engineer — cada um com o(s) comando(s) codegraph
     mais relevante(s) ao seu perfil (fn-impact/diff-impact/query/path/execution_flow/complexity/node_roles/dataflow/ast_query/check,
     conforme aplicavel). Reciprocamente, adicionada 1 linha em ''Quando Delegar''
-    de cada um desses 10 agents apontando de volta para @code-knowledge-graph (bidirecional).
-    related_agents deste catalog.yaml (entrada code-knowledge-graph) expandido de
+    de cada um desses 10 agents apontando de volta para @codegraph-engine (bidirecional).
+    related_agents deste catalog.yaml (entrada codegraph-engine) expandido de
     6 para 16 para refletir os novos consumidores formalizados. Reforcada a regra
     de governanca ja estabelecida (R-024 Least-Tools, mesmo padrao do par tavily/deep-search):
     nenhum destes 10 agents recebe tools MCP/CLI diretas do codegraph — todos delegam
-    via run_subagent ao @code-knowledge-graph, que permanece unico executor. Validado
+    via run_subagent ao @codegraph-engine, que permanece unico executor. Validado
     com get_errors em todos os 11 arquivos .agent.md editados + catalog.yaml — 0 erros.
     total_agents permanece 34 (nenhum agent novo, apenas cross-referencia de delegacao).
     | 2026-09-03 (38) — A pedido do usuario (via @agent-router, migracao total do
-    motor de code-knowledge-graph de motor-legado para lib externa apos avaliacao
+    motor de codegraph-engine de motor-legado para lib externa apos avaliacao
     de code-review-graph [NO-GO, @analysis-architect], Graphify [rejeitado, usa LLM
     na camada semantica, viola RNF-008] e @optave/codegraph [GO CONDICIONAL hibrido
     recomendado pelo analista, mas usuario optou por migracao TOTAL apos ver os gaps]),
-    reescrito integralmente code-knowledge-graph.agent.md (v3.3.0 -> v4.0.0): motor
+    reescrito integralmente codegraph-engine.agent.md (v3.3.0 -> v4.0.0): motor
     unico agora e @optave/codegraph (CLI local, Node.js/TypeScript nativo, Tree-sitter/Rust,
-    zero API keys/LLM), substituindo motor-legado (mantido em quarentena em snippets/code-knowledge-graph/,
+    zero API keys/LLM), substituindo motor-legado (mantido em quarentena em snippets/codegraph-engine/,
     nao deletado, R-002). Nova skill codegraph-optave-usage/SKILL.md criada via @governance-factory
     (instalacao, tabela de comandos CLI, least-tools MCP subset, secao explicita de
     gaps aceitos). Gate de Paridade Funcional atualizado de 9/9 para 4/9 + 2 parciais
@@ -2386,10 +2386,10 @@ metadata:
     universal (agent-contracts § 9). (2) Adicionada a skill terminal-governance nas
     Docs Sempre Anexadas e no catalog.yaml (related_skills/source_docs) de todos os
     agents que utilizam run_in_terminal (angular, spring-boot, spring-reactive, deep-search,
-    code-knowledge-graph, refactor-executor, code-style-enforcer, security-reviewer,
+    codegraph-engine, refactor-executor, code-style-enforcer, security-reviewer,
     performance-agent, debugger; removida de business-rules-extractor onde era redundante
     sem terminal). (3) Adicionada a skill context-mode nas Docs Sempre Anexadas e
-    no catalog.yaml de todos os agents que utilizam context-mode/* (code-review, code-knowledge-graph,
+    no catalog.yaml de todos os agents que utilizam context-mode/* (code-review, codegraph-engine,
     security-reviewer, performance-agent, compliance-guardrails, devops-engineer,
     debugger, feature-planner). Validado com get_errors em todos os 12 arquivos modificados
     — sem erros. total_agents permanece 35. | 2026-09-02 (29) — A pedido do usuario
@@ -2409,8 +2409,8 @@ metadata:
     — o vetor real de clutter e exclusivamente TypeScript (specs co-localizados em
     src/app). Atualizado: motor-legado (parseArgs com --include-tests, isTestFile(),
     filtro no loop de arquivos, campo testFiles no retorno/summary, module.exports
-    ampliado), code-knowledge-graph.agent.md (nova secao RF-026, paragrafo de decisao
-    do motor atualizado, version 3.2.1->3.3.0), snippets/code-knowledge-graph/README.md
+    ampliado), codegraph-engine.agent.md (nova secao RF-026, paragrafo de decisao
+    do motor atualizado, version 3.2.1->3.3.0), snippets/codegraph-engine/README.md
     (nova linha de capacidade, 2 novas limitacoes conhecidas #12/#13, secao de validacao
     dedicada, exemplo de CLI com --include-tests), catalog.yaml (este, version+domain+changelog).
     Validado com hook .githooks/pre-commit (R-043/R-044) antes de finalizar — sem
@@ -2421,14 +2421,14 @@ metadata:
     ocorra nunca mais''), formalizada regra normativa global **R-044 (Anonimizacao
     Obrigatoria de Evidencia de Analise Real)** em CLAUDE.md, extensao direta de R-038
     para o caso especifico de evidencia (nomes de repo/classe/metodo/namespace/caminho)
-    derivada de agents que analisam projetos reais do usuario (code-knowledge-graph,
+    derivada de agents que analisam projetos reais do usuario (codegraph-engine,
     business-rules-extractor, context-builder, project-scanner) — motivada pelo incidente
     da rodada anterior (27), onde nomes reais vazaram em 5 arquivos antes de correcao
     manual. Regra normativa (R-044) inclui checklist proprio em CLAUDE.md (paralelo
     ao checklist de R-038), permite metricas numericas agregadas reais (nao identificam
     projeto) mas exige genericizacao de nomes/caminhos antes de persistir. Atualizado:
     CLAUDE.md (nova regra R-044 + checklist dedicado, header R-001..R-044), .github/copilot-instructions.md
-    (referencia R-001..R-044, bullet operacional R-044), code-knowledge-graph.agent.md
+    (referencia R-001..R-044, bullet operacional R-044), codegraph-engine.agent.md
     (novo item de nao-escopo citando R-044 e o incidente de origem, version 3.2.0->3.2.1),
     .github/skills/governance-audit-patterns/SKILL.md (nova categoria de smell 2.6
     ''Vazamento de Evidencia Real (R-044)'', catalogo de 5->6 categorias), .githooks/pre-commit
@@ -2463,8 +2463,8 @@ metadata:
     confirmadas como contratos legitimos com servidor fora dos 2 repos validados (nao
     falso-negativo). version bump 3.1.0->3.2.0. Arquivos alterados: motor-legado (soapEndpoints
     collection, deteccao no branch Java, matching pos-loop, campos soap.* no retorno
-    e no summary do main()), code-knowledge-graph.agent.md (RF-025, versao 3.2.0),
-    snippets/code-knowledge-graph/README.md (linha de capacidade RF-025, secao de
+    e no summary do main()), codegraph-engine.agent.md (RF-025, versao 3.2.0),
+    snippets/codegraph-engine/README.md (linha de capacidade RF-025, secao de
     validacao dedicada, limitacao #11), catalog.yaml (este changelog + versao/dominio
     do agent), .github/agents/README.md (linha resumo). Nenhum codigo dos projetos
     analisados foi alterado (analise 100% read-only); sintaxe validada via node --check.
@@ -2506,10 +2506,10 @@ metadata:
     javaRootsByRepo/repoRootFor substituindo JAVA_ROOTS flat, javaFilesByDir + deteccao
     same-package, cycleAdjacency separado, skip de queue dinamico nao resolvido, detectLang
     morto removido, module.exports ampliado para discoverSourceRoots/expandInputRoots
-    — testavel isoladamente), snippets/code-knowledge-graph/README.md (RECRIADO do
+    — testavel isoladamente), snippets/codegraph-engine/README.md (RECRIADO do
     zero apos ter sido encontrado ausente do disco durante a sessao — motivo desconhecido,
     possivelmente operacao de VCS/IDE fora do controle do agent; conteudo integral
-    reconstruido refletindo o estado atual real do script), code-knowledge-graph.agent.md
+    reconstruido refletindo o estado atual real do script), codegraph-engine.agent.md
     (v3.0.0->3.1.0, RF-023/RF-024 documentadas, numeros de validacao atualizados para
     os 13 repos), catalog.yaml (este, version+domain+changelog). Nenhum arquivo de
     codigo real dos 13 repositorios analisados foi modificado — analise 100% read-only,
@@ -2525,7 +2525,7 @@ metadata:
     de nos com layout fcose, API rica para clique-em-no->detalhes/busca/filtro/destaque-de-vizinhanca)
     — superior a Mermaid (sem limite de ~500 nos) e mais adequada que Sigma.js/Cosmograph
     para o caso de uso ''navegar com detalhes'' (exige interatividade rica, nao so
-    performance bruta de renderizacao). Criado script novo e separado snippets/code-knowledge-graph/viewer-legado
+    performance bruta de renderizacao). Criado script novo e separado snippets/codegraph-engine/viewer-legado
     (Node.js puro, zero dependencia instalavel) que le graph.json e gera graph-viewer.html
     com dados embutidos inline (evita CORS de fetch() em file://) — busca por nome/id,
     filtro por tipo/projeto (checkboxes), clique em no exibe painel de detalhes (id,
@@ -2538,9 +2538,9 @@ metadata:
     Artefatos obsoletos (graph.mmd/graph.html do motor Mermaid anterior) removidos
     do disco. Atualizado atomicamente: motor-legado (header + remocao de toMermaid/toHtml
     + summary aponta proximo passo para viewer-legado), viewer-legado (novo arquivo),
-    .gitignore (troca graph.mmd/graph.html por graph-viewer.html), snippets/code-knowledge-graph/README.md
+    .gitignore (troca graph.mmd/graph.html por graph-viewer.html), snippets/codegraph-engine/README.md
     (nova secao de decisao, tabela de Arquivos com os 2 scripts, Como Rodar em 2 passos,
-    Capacidades atualizada), code-knowledge-graph.agent.md (RF-019 reescrita — visualizacao
+    Capacidades atualizada), codegraph-engine.agent.md (RF-019 reescrita — visualizacao
     via viewer-legado/Cytoscape.js substitui Mermaid como saida automatica; Decision
     Tree, Formato de Saida, Gate de Paridade Funcional item 7, Checklist e Anti-padroes
     atualizados; Mermaid mantido apenas para exportacao pontual de subgrafo pequeno
@@ -2550,7 +2550,7 @@ metadata:
     35 (nenhum agent novo, apenas ajuste de saida/visualizacao). | 2026-09-01 (24)
     — Usuario decidiu (''decidi que o uso do motor anterior (subprocess de terceiros)
     deve ser removido sem rastro algum no projeto'') remover integralmente o motor
-    anterior (subprocess Python) do agent code-knowledge-graph (v2.1.0 -> v3.0.0)
+    anterior (subprocess Python) do agent codegraph-engine (v2.1.0 -> v3.0.0)
     apos instabilidade real confirmada em ambiente Windows/MINGW64: timeouts de subprocess,
     execucoes orfas concorrentes competindo por CPU, saida vazia sem erro reportado
     mesmo apos setup correto de venv isolado. Motivador adicional: durante tentativa
@@ -2573,13 +2573,13 @@ metadata:
     da raiz do repositorio). Script validado standalone via `node motor-legado` contra
     os 3 projetos reais ([PROJETO-G] + [PROJETO-C] + [PROJETO-E]), resultado identico
     ao obtido via ctx_execute, execucao em poucos segundos (vs. ~13min do motor anterior
-    (subprocess de terceiros)). Atualizado atomicamente: code-knowledge-graph.agent.md
+    (subprocess de terceiros)). Atualizado atomicamente: codegraph-engine.agent.md
     (reescrito integralmente, v3.0.0 — secao ''Estrategia de Motor Primario+Fallback''
     removida e substituida por ''Motor de Extracao Unico'', Gate de Paridade Funcional
     ajustado para 8/9 com item 3 -filas/eventos- explicitamente pendente, todas as
     ~15 referencias a motor anterior (subprocess de terceiros)/venv/subprocess removidas),
-    snippets/code-knowledge-graph/README.md (reescrito, documenta motor unico + validacao
-    real + comparacao com bug do motor anterior (subprocess de terceiros)), snippets/code-knowledge-graph/.gitignore
+    snippets/codegraph-engine/README.md (reescrito, documenta motor unico + validacao
+    real + comparacao com bug do motor anterior (subprocess de terceiros)), snippets/codegraph-engine/.gitignore
     (remove entrada .venv-motor anterior (subprocess de terceiros)/ e __pycache__/*.pyc,
     obsoletas), catalog.yaml (este, description completa reescrita), add-project-context.prompt.md
     (FASE 4: ''Motor: motor anterior (subprocess de terceiros) (primario)'' -> ''Motor:
@@ -2720,7 +2720,7 @@ metadata:
     atualizado nas 2 entries (description + prerequisite_docs/related_skills incluindo
     governance-factory-patterns, que faltava ser listada apesar de ja ser dependencia
     funcional real). total_agents permanece 26 (nenhum agent novo). | 2026-09-01 (18)
-    — Cobertura de framework (RF-022, novo) internalizada no code-knowledge-graph
+    — Cobertura de framework (RF-022, novo) internalizada no codegraph-engine
     (v2.0.0 -> v2.1.0), a pedido do usuario (''pesquise na web por rules consolidados...
     angular, spring boot, spring reactive e EJB''). Pesquisa @deep-search (clone real
     do registry oficial de regras da ferramenta externa) confirmou que o registry
@@ -2737,13 +2737,13 @@ metadata:
     Bug real encontrado e corrigido: @Repository do Spring Data e tipicamente aplicado
     a interface (extends JpaRepository), nao class (mesma classe de limitacao do motor
     anterior (subprocess de terceiros) AST ja documentada para RF-018 item 8) — regra
-    corrigida com pattern-either cobrindo os 3 idiomas reais. code-knowledge-graph.agent.md
+    corrigida com pattern-either cobrindo os 3 idiomas reais. codegraph-engine.agent.md
     atualizado com nova secao ''Cobertura de Framework (RF-022)''. Registrado atomicamente
     (catalog.yaml, este); total_agents permanece 26. | 2026-09-01 (17) — Consolidacao
-    do motor de extracao do agent code-knowledge-graph (v1.2.0 -> v2.0.0) em subprocess
+    do motor de extracao do agent codegraph-engine (v1.2.0 -> v2.0.0) em subprocess
     Python via CLI externa (unico, RF-021/RNF-013), a pedido explicito do usuario
     apos rejeitar dependency-cruiser (''a lib que voce elencou foi horrivel''). Removidos
-    integralmente os arquivos legados em snippets/code-knowledge-graph/: motor-legado
+    integralmente os arquivos legados em snippets/codegraph-engine/: motor-legado
     (regex artesanal original), poc-dependency-cruiser.js, poc-regras-motor-anterior.yaml,
     poc-regras-motor-anterior-cross-repo.yaml, build-cross-repo-graph.py (script POC
     intermediario) — substituidos por 2 arquivos consolidados: regras-motor-anterior.yaml
@@ -2769,15 +2769,15 @@ metadata:
     | 2026-09-01 (16) — Executado plano de remocao autorizado (docs/requirements/REQ-grafo-conhecimento-codigo.md
     §13.4, rodada 14): removida a skill dependency-graph-mapping do repositorio apos
     Gate de Paridade Funcional (RNF-012) validado 9/9 com evidencia de execucao real
-    (§11/§12 do REQ). Atualizados atomicamente: code-knowledge-graph.agent.md (v1.1.0->v1.2.0,
+    (§11/§12 do REQ). Atualizados atomicamente: codegraph-engine.agent.md (v1.1.0->v1.2.0,
     ~9 referencias ''nao remover''/''permanece intacta'' removidas, RF-017/RF-018/RF-019
     agora fonte normativa propria), analysis-architect.agent.md (referencia a dependency-graph-mapping
-    substituida por @code-knowledge-graph), refactor-planner.agent.md (idem), catalog.yaml
+    substituida por @codegraph-engine), refactor-planner.agent.md (idem), catalog.yaml
     (related_skills/source_docs/description atualizados nos 3 agents), skills/.index.json
     (entrada removida), skills/README.md (linha de catalogo removida) e o proprio
     arquivo .github/skills/dependency-graph-mapping/SKILL.md (removido fisicamente).
     Nenhuma referencia orfa remanescente em .github/ apos varredura final (R-015/R-040).
-    | 2026-09-01 (15) — Estendido agent code-knowledge-graph (v1.0.0 -> v1.1.0) implementando
+    | 2026-09-01 (15) — Estendido agent codegraph-engine (v1.0.0 -> v1.1.0) implementando
     RF-013..RF-019/RNF-011/RNF-012 (docs/requirements/REQ-grafo-conhecimento-codigo.md
     §8.3, plano tecnico do analysis-architect rodada 6): agora cobre tambem o nivel
     arquitetural entre sistemas/servicos — coleta de artefatos de integracao via grep_search/file_search
@@ -2801,7 +2801,7 @@ metadata:
     permanece intocado nesta rodada. Nota de rastreabilidade adicionada ao REQ (§9),
     sem alterar o veredito de RF-012/RNF-009. Registrado atomicamente em catalog.yaml
     e README.md (R-015); total_agents permanece 26. | 2026-09-01 (14) — Criado agent
-    code-knowledge-graph (perfil Operacional/Executor, puramente deterministico) implementando
+    codegraph-engine (perfil Operacional/Executor, puramente deterministico) implementando
     o MVP de nivel codigo (RF-001..RF-011) do REQ docs/requirements/REQ-grafo-conhecimento-codigo.md:
     ponto de entrada unico para construcao/consulta de grafo de conhecimento de codigo-fonte
     cross-projeto (RF-003), 3 granularidades de no (arquivo/classe/funcao, RF-004)

@@ -12,9 +12,10 @@ triggers:
   - "regras de hooks"
   - "arquitetura react"
 source_docs:
+  - .github/agents/frontend/react/react-router.agent.md
+source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/agents/frontend/react/react-router.agent.md
 tools: []
 ---
 

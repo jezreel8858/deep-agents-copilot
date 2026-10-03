@@ -20,9 +20,10 @@ tools:
   - context-mode/ctx_batch_execute
   - context-mode/ctx_execute
 source_docs:
-  - "CLAUDE.md"
-  - ".github/copilot-instructions.md"
-  - ".github/agents/tech-solution-architect.agent.md"
+  - .github/agents/tech-solution-architect.agent.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 ---
 
 # Skill: Análise de Contrato de Integração

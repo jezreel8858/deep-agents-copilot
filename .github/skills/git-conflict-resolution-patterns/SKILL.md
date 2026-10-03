@@ -13,10 +13,11 @@ triggers:
   - "hunk conflitante"
   - "divergência de branch"
 source_docs:
-  - CLAUDE.md
-  - .github/copilot-instructions.md
   - .github/skills/git-governance/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 tools: []
 ---
 

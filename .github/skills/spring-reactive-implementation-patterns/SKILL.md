@@ -14,10 +14,11 @@ triggers:
   - "codar pipeline reactor"
   - "stepverifier implementation"
 source_docs:
-  - CLAUDE.md
-  - .github/copilot-instructions.md
   - .github/agents/backend/spring-reactive/spring-reactive-router.agent.md
   - .github/skills/spring-reactive-webflux-patterns/SKILL.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 tools: []
 ---
 

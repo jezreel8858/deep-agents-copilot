@@ -8,6 +8,9 @@ description: >
 tier: 1
 category: tooling
 triggers:
+  - "governança de terminal"
+  - "governanca terminal"
+  - "politicas de terminal"
   - "run_in_terminal"
   - "executar comando"
   - "terminal"
@@ -29,12 +32,12 @@ triggers:
   - "cascata de subagent"
 tools:
   - "run_in_terminal"
-source_docs:
-  - "CLAUDE.md"
-  - ".github/copilot-instructions.md"
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 ---
 
-# Terminal Governance
+# Terminal Governance — Governança de Terminal e Execução Segura
 
 ## 0) Problema Resolvido & Princípios Fundamentais
 
@@ -299,7 +302,7 @@ a própria capacidade. Execute o comando diretamente.
 |---|---|---|
 | `curl` / `wget` no terminal | Exfiltração de dados, payload malicioso, output irrestrito | `ctx_fetch_and_index` + `ctx_search` |
 | `node -e '...'` ou scripts shell ad-hoc | Poluição de contexto, bypass de ferramentas de parsing e risco de crash | Usar `read_file`, `grep_search`, `ctx_execute_file` ou MCP tools |
-| `codegraph *` fora de `@code-knowledge-graph` | Violação de R-045 / RNF-004; motor exclusivo de grafo | Delegar compulsoriamente via `run_subagent(agentName: 'code-knowledge-graph')` |
+| `codegraph *` fora de `@codegraph-engine` | Violação de R-045 / RNF-004; motor exclusivo de grafo | Delegar compulsoriamente via `run_subagent(agentName: 'codegraph-engine')` |
 | `find`/`grep`/`ls` exploratório no terminal | Polui contexto; proibido em modo Advisory | Usar MCP (`read_file`, `grep_search`, `file_search`, `ctx_search`) |
 | `watch <comando>` | Loop infinito — bloqueia o agent e inflaciona tokens indefinidamente | Executar uma vez com output filtrado |
 | `npm test --watch` / `jest --watch` | Modo watch — agent nunca recebe saída final | Usar `--watchAll=false` ou `--run` |

@@ -15,10 +15,11 @@ triggers:
   - "migrar jasmine vitest"
   - "angular legacy testing"
 source_docs:
-  - CLAUDE.md
-  - .github/copilot-instructions.md
   - .github/instructions/angular-v21-frontend.instructions.md
   - .github/skills/test-implementation-frontend/SKILL.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 tools: []
 ---
 

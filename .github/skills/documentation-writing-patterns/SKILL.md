@@ -14,9 +14,9 @@ triggers:
   - "documentar decisão técnica"
   - "gerar arquivo .md de documentação"
 tools: []
-source_docs:
-  - "CLAUDE.md"
-  - ".github/copilot-instructions.md"
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 ---
 
 # Documentation Writing Patterns

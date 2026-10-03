@@ -16,10 +16,11 @@ triggers:
   - "jacoco"
   - "mvn test"
 source_docs:
-  - CLAUDE.md
-  - .github/copilot-instructions.md
   - .github/instructions/spring-boot-backend.instructions.md
   - .github/skills/test-implementation-backend/SKILL.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 tools: []
 ---
 

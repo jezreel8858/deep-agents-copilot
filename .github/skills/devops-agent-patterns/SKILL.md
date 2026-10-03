@@ -18,9 +18,10 @@ triggers:
   - "github actions"
   - "deployment strategy"
 source_docs:
-  - "CLAUDE.md"
-  - ".github/copilot-instructions.md"
-  - ".github/instructions/devops.instructions.md"
+  - .github/instructions/devops.instructions.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 tools: []
 ---
 

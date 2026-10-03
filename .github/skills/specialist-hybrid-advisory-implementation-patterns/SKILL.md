@@ -14,11 +14,12 @@ triggers:
   - "specialist técnico"
   - "novo especialista de stack"
 source_docs:
-  - CLAUDE.md
-  - .github/copilot-instructions.md
   - .github/agents/frontend/angular/angular-router.agent.md
   - .github/agents/backend/spring-boot/spring-boot-router.agent.md
   - .github/agents/backend/spring-reactive/spring-reactive-router.agent.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 tools: []
 ---
 
@@ -108,9 +109,9 @@ Toda implementação de feature/bugfix no modo Implementação **deve** ser acom
 ## 4.1) Separação de Papéis: Mapeamento Estrutural vs. Especialização de Domínio (R-045 / RNF-004)
 
 - **Modo Advisory é estritamente analítico (read-only)**: specialists NUNCA executam `run_in_terminal` em modo Advisory. O uso de terminal é restrito exclusivamente ao modo Implementação para execução de testes (testing-first) e linter.
-- **Exclusividade do `@code-knowledge-graph`**: o CLI `@optave/codegraph` e a extração determinística de chamadas, blast radius, ciclos e dependências pertencem com exclusividade ao `@code-knowledge-graph`.
+- **Exclusividade do `@codegraph-engine`**: o CLI `@optave/codegraph` e a extração determinística de chamadas, blast radius, ciclos e dependências pertencem com exclusividade ao `@codegraph-engine`.
 - **Proibição de usurpação de papel**: specialists NUNCA executam comandos do CLI `codegraph` diretamente nem realizam varreduras exploratórias de diretórios (`list_dir`, `read_dir`) para mapear arquitetura ou dependências.
-- **Fluxo de delegação obrigatório**: quando a análise exigir relações entre camadas, fluxo de chamadas ou dependências de módulos/serviços, o specialist DEVE invocar `@code-knowledge-graph` via `run_subagent(agentName: 'code-knowledge-graph', ...)`. O papel do specialist é interpretar tecnicamente o resultado do grafo sob a ótica das melhores práticas do seu framework (Angular, Spring, etc.).
+- **Fluxo de delegação obrigatório**: quando a análise exigir relações entre camadas, fluxo de chamadas ou dependências de módulos/serviços, o specialist DEVE invocar `@codegraph-engine` via `run_subagent(agentName: 'codegraph-engine', ...)`. O papel do specialist é interpretar tecnicamente o resultado do grafo sob a ótica das melhores práticas do seu framework (Angular, Spring, etc.).
 
 ## 5) Checklist Unificado — Antes de Analisar/Implementar
 

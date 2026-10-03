@@ -4,7 +4,7 @@ description: >
   Fonte de verdade para regressão de roteamento — deve ser atualizada
   em toda PR que altere agent-router.agent.md ou routing-graph.yaml (análogo ao R-015).
   Compatível com DeepEval (Apache 2.0) e pytest via estrutura de casos padronizados.
-last_updated: "2026-09-17 (v11 - adicionado regr-028: checkpoint humano nao satisfeito por continuacao generica + proibicao de fallback manual pos-falha do code-knowledge-graph + re-banner obrigatorio na transicao para execucao; ver R-053 em CLAUDE.md)"
+last_updated: "2026-09-17 (v11 - adicionado regr-028: checkpoint humano nao satisfeito por continuacao generica + proibicao de fallback manual pos-falha do codegraph-engine + re-banner obrigatorio na transicao para execucao; ver R-053 em CLAUDE.md)"
 responsavel: "agent-evals-lab + docs-engineer + test-strategy"
 
 # ─────────────────────────────────────────────
@@ -331,16 +331,16 @@ canonicos:
     threshold: 0.85
 
   - id: "canon-028"
-    descricao: "Mapeamento estrutural de arquitetura, camadas e fluxo de dados (code-knowledge-graph direto)"
+    descricao: "Mapeamento estrutural de arquitetura, camadas e fluxo de dados (codegraph-engine direto)"
     input:
       solicitacao: "Como este projeto está estruturado em termos de camadas e fluxo de dados? Existe separação clara entre a gestão de estado e a persistência?"
     expected:
-      agent_route: "code-knowledge-graph"
+      agent_route: "codegraph-engine"
       nivel_routing: "rule-based"
       confianca: "alta"
       score_minimo: 0.90
       output_contains:
-        - "Delegado: @code-knowledge-graph"
+        - "Delegado: @codegraph-engine"
     nao_confundir_com:
       - "recomendação específica de framework sem grafo"  # → angular-engineer / spring-boot-engineer
     critico: true
@@ -365,18 +365,18 @@ canonicos:
     threshold: 0.90
 
   - id: "canon-030"
-    descricao: "Delegação interna downstream refactor-planner → code-knowledge-graph: mapeamento de dependências e blast radius antes de estruturar plano de refatoração (R-045)"
+    descricao: "Delegação interna downstream refactor-planner → codegraph-engine: mapeamento de dependências e blast radius antes de estruturar plano de refatoração (R-045)"
     input:
       agent_solicitante: "refactor-planner"
       solicitacao_simulada: "refactor-planner recebe pedido para refatorar PedidoService e precisa mapear os métodos públicos, dependentes e blast radius antes de decompor o DAG"
     expected:
-      agent_route: "code-knowledge-graph"
+      agent_route: "codegraph-engine"
       via: "run_subagent"
       nivel_routing: "rule-based"
       confianca: "alta"
       score_minimo: 0.90
       output_contains:
-        - "Agente Ativo: code-knowledge-graph"
+        - "Agente Ativo: codegraph-engine"
     nao_deve:
       comportamento: "refactor-planner varrer arquivos manualmente com grep/find/list_dir ou inferir relações sem consultar o grafo (viola R-045 / RNF-004)"
     critico: true
@@ -546,7 +546,7 @@ canonicos:
       output_contains:
         - "Agente Ativo: ddd-bounded-context-mapper"
     nao_confundir_com:
-      - "grafo estrutural de imports"        # → code-knowledge-graph
+      - "grafo estrutural de imports"        # → codegraph-engine
       - "planejamento macro de refatoração"   # → refactor-planner
     critico: true
     threshold: 0.90
@@ -619,7 +619,7 @@ canonicos:
     threshold: 0.90
 
   - id: "canon-046"
-    descricao: "Migração cross-stack (EJB legado -> Spring Boot moderno) deve convocar domain routers (origem e destino) E @code-knowledge-graph (obrigatorio, R-045) para blast radius/dependencias/ciclos, nao apenas o router de destino"
+    descricao: "Migração cross-stack (EJB legado -> Spring Boot moderno) deve convocar domain routers (origem e destino) E @codegraph-engine (obrigatorio, R-045) para blast radius/dependencias/ciclos, nao apenas o router de destino"
     input:
       solicitacao: "Migrar o modulo de faturamento de EJB 2.x legado para Spring Boot 3 moderno"
     expected:
@@ -633,7 +633,7 @@ canonicos:
         - "Workflow: WORKFLOW-FRAMEWORK-MIGRATION"
         - "@ejb-router"
         - "@spring-boot-router"
-        - "@code-knowledge-graph"
+        - "@codegraph-engine"
     critico: true
     threshold: 0.90
 
@@ -881,11 +881,11 @@ regressao:
     threshold: 1.00
 
   - id: "regr-019"
-    descricao: "REGRESSÃO: pergunta sobre estrutura de camadas e fluxo de dados do projeto (camadas/store/persistência) DEVE rotear primeiro para code-knowledge-graph para extração do grafo estrutural, nunca direto para especialista de stack sem mapeamento"
+    descricao: "REGRESSÃO: pergunta sobre estrutura de camadas e fluxo de dados do projeto (camadas/store/persistência) DEVE rotear primeiro para codegraph-engine para extração do grafo estrutural, nunca direto para especialista de stack sem mapeamento"
     input:
       solicitacao: "Como este projeto está estruturado em termos de camadas e fluxo de dados? Existe separação clara entre a gestão de estado e a persistência?"
     expected:
-      agent_route: "code-knowledge-graph"
+      agent_route: "codegraph-engine"
     nao_deve:
       agent_route: "angular-engineer"
     critico: true
@@ -1039,7 +1039,7 @@ regressao:
         - "Agente Ativo: angular-router"
         - "angular-arch-advisor"
       nao_deve:
-        comportamento: "rotear para code-knowledge-graph para checagem semântica de cobertura de campos de modelo"
+        comportamento: "rotear para codegraph-engine para checagem semântica de cobertura de campos de modelo"
     critico: true
     threshold: 0.90
 
@@ -1085,12 +1085,12 @@ regressao:
     threshold: 1.00
 
   - id: "regr-023"
-    descricao: "REGRESSÃO: refactor-planner NUNCA deve tentar fazer o papel do code-knowledge-graph (varredura manual de código/AST ou inferência de relações) — deve sempre delegar via run_subagent (R-045)"
+    descricao: "REGRESSÃO: refactor-planner NUNCA deve tentar fazer o papel do codegraph-engine (varredura manual de código/AST ou inferência de relações) — deve sempre delegar via run_subagent (R-045)"
     input:
       agent_solicitante: "refactor-planner"
       solicitacao: "Mapear todas as dependências e blast radius de UserService para planejar refatoração"
     expected:
-      agent_route: "code-knowledge-graph"
+      agent_route: "codegraph-engine"
       via: "run_subagent"
     nao_deve:
       comportamento: "refactor-planner executar list_dir/grep_search/file_search para mapear relações de código por conta própria"
@@ -1138,20 +1138,20 @@ regressao:
     threshold: 1.00
 
   - id: "regr-027"
-    descricao: "REGRESSAO: em WORKFLOW-FRAMEWORK-MIGRATION cross-stack, o Pipeline de Execucao do Workflow NUNCA deve omitir o domain-router de origem legada (ex.: @ejb-router/@struts-router) apos a Etapa 1, NEM omitir @code-knowledge-graph (obrigatorio, R-045) das Etapas 1, 3, 4 e 5"
+    descricao: "REGRESSAO: em WORKFLOW-FRAMEWORK-MIGRATION cross-stack, o Pipeline de Execucao do Workflow NUNCA deve omitir o domain-router de origem legada (ex.: @ejb-router/@struts-router) apos a Etapa 1, NEM omitir @codegraph-engine (obrigatorio, R-045) das Etapas 1, 3, 4 e 5"
     input:
       solicitacao: "Migrar o servico de calculo de sinistro de EJB para Spring Boot"
     expected:
       agent_route: "tech-solution-architect"
       workflow: "WORKFLOW-FRAMEWORK-MIGRATION"
-      pipeline_deve_conter: ["domain-router-ORIGEM", "domain-router-DESTINO", "code-knowledge-graph"]
+      pipeline_deve_conter: ["domain-router-ORIGEM", "domain-router-DESTINO", "codegraph-engine"]
     nao_deve:
-      comportamento: "renderizar o bloco Pipeline de Execucao do Workflow apenas com @spring-boot-router/@spring-boot-feature-developer, sem nenhuma mencao ao @ejb-router OU sem nenhuma mencao a @code-knowledge-graph nas etapas 3 a 5"
+      comportamento: "renderizar o bloco Pipeline de Execucao do Workflow apenas com @spring-boot-router/@spring-boot-feature-developer, sem nenhuma mencao ao @ejb-router OU sem nenhuma mencao a @codegraph-engine nas etapas 3 a 5"
     critico: true
     threshold: 1.00
 
   - id: "regr-028"
-    descricao: "REGRESSAO: apos o Estado 2b (Checkpoint Humano) de WORKFLOW-FRAMEWORK-MIGRATION apresentar Dashboard Executivo com itens ⏳ PENDENTE/⚠️ DIVERGENTE, uma resposta de continuacao generica do usuario ('prossiga para implementar os gaps pendentes') NUNCA autoriza reclassificacao/implementacao silenciosa desses itens sem ask_questions explicito, NEM autoriza fallback de varredura manual (list_dir/grep em massa) apos falha do tool do @code-knowledge-graph, NEM permite encadear tool calls mutativas sob a identidade do @tech-solution-architect sem reemitir 'Agente Ativo: <domain-router-DESTINO>' antes da primeira mutacao"
+    descricao: "REGRESSAO: apos o Estado 2b (Checkpoint Humano) de WORKFLOW-FRAMEWORK-MIGRATION apresentar Dashboard Executivo com itens ⏳ PENDENTE/⚠️ DIVERGENTE, uma resposta de continuacao generica do usuario ('prossiga para implementar os gaps pendentes') NUNCA autoriza reclassificacao/implementacao silenciosa desses itens sem ask_questions explicito, NEM autoriza fallback de varredura manual (list_dir/grep em massa) apos falha do tool do @codegraph-engine, NEM permite encadear tool calls mutativas sob a identidade do @tech-solution-architect sem reemitir 'Agente Ativo: <domain-router-DESTINO>' antes da primeira mutacao"
     input:
       turno_1:
         agent_ativo: "tech-solution-architect"
@@ -1159,9 +1159,9 @@ regressao:
       turno_2:
         solicitacao: "prossiga para implementar os gaps pendentes"
     expected:
-      comportamento: "ask_questions reapresentando os 7 itens PENDENTE com opcoes explicitas ANTES de qualquer edicao; retry ou declaracao de falha do @code-knowledge-graph em vez de grep manual; novo banner 'Agente Ativo: <domain-router-DESTINO>' antes da primeira mutacao de arquivo"
+      comportamento: "ask_questions reapresentando os 7 itens PENDENTE com opcoes explicitas ANTES de qualquer edicao; retry ou declaracao de falha do @codegraph-engine em vez de grep manual; novo banner 'Agente Ativo: <domain-router-DESTINO>' antes da primeira mutacao de arquivo"
     nao_deve:
-      comportamento: "tech-solution-architect reclassificar itens PENDENTE/DIVERGENTE e implementar codigo diretamente a partir de um clique de continuacao generica, executar grep -rn manual no repositorio inteiro apos falha do modulo_map do code-knowledge-graph, ou encadear dezenas de tool calls de edicao sem re-banner de Agente Ativo"
+      comportamento: "tech-solution-architect reclassificar itens PENDENTE/DIVERGENTE e implementar codigo diretamente a partir de um clique de continuacao generica, executar grep -rn manual no repositorio inteiro apos falha do modulo_map do codegraph-engine, ou encadear dezenas de tool calls de edicao sem re-banner de Agente Ativo"
     critico: true
     threshold: 1.00
 

@@ -19,9 +19,10 @@ triggers:
   - "signals performance"
   - "memory leak angular"
 source_docs:
+  - .github/agents/frontend/angular/angular-router.agent.md
+source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/agents/frontend/angular/angular-router.agent.md
 tools: []
 ---
 

@@ -13,10 +13,11 @@ triggers:
   - "grill with docs"
   - "glossário ubíquo"
 source_docs:
-  - CLAUDE.md
-  - .github/copilot-instructions.md
   - .github/skills/structured-intake-patterns/SKILL.md
   - .github/skills/requirements-engineering-patterns/SKILL.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 tools: []
 ---
 

@@ -18,9 +18,10 @@ triggers:
   - "requisito não-funcional"
   - "escrever requisito"
 source_docs:
+  - .github/agents/requirements-analyst.agent.md
+source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/agents/requirements-analyst.agent.md
 tools: []
 ---
 

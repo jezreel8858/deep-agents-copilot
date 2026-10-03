@@ -9,13 +9,16 @@ description: >-
 model: "Gemini 3.8 Flash"
 tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_search']
 # SSOT de Governança e Dependências (Context Engineering Benchmark 2026):
-# 100% das dependências documentais e skills DEVEM residir exclusivamente em source_docs: no frontmatter.
+# 100% das dependências documentais e skills DEVEM residir exclusivamente em source_docs:/source_docs_lazy: no frontmatter.
 # É TERMINANTEMENTE PROIBIDO criar seções redundantes de herança, catálogo, skills ou pré-carregamento no corpo markdown.
 # O gate de testes determinístico (test_template_sections.py) bloqueia compulsoriamente seções não homologadas.
+# R-066 (Progressive Disclosure): CLAUDE.md/copilot-instructions.md NUNCA em source_docs: (full-load) — vão em
+# source_docs_lazy: (docs >300 linhas, consulta exclusiva via context-mode/ctx_search sob demanda).
 source_docs:
+  - .github/skills/<skill-principal>/SKILL.md
+source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/skills/<skill-principal>/SKILL.md
 ---
 
 # Perfil Operacional

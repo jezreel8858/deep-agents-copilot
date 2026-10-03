@@ -20,10 +20,11 @@ triggers:
   - "session tracing agent"
   - "langfuse cli"
 source_docs:
-  - CLAUDE.md
-  - .github/copilot-instructions.md
   - .github/skills/agent-observability-otel/SKILL.md
   - .github/skills/agent-evals-lab/SKILL.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 tools: []
 ---
 

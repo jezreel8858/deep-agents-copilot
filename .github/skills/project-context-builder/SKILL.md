@@ -18,10 +18,10 @@ triggers:
   - "escanear projeto"
 
 source_docs:
-  - ".github/prompts/add-project-context.prompt.md"
-  - ".github/agents/adapter-generator.agent.md"
-  - ".github/instructions/README.md"
-  - ".github/skills/business-rules-governance/SKILL.md"
+  - .github/instructions/README.md
+  - .github/skills/business-rules-governance/SKILL.md
+  - .github/prompts/add-project-context.prompt.md
+  - .github/agents/adapter-generator.agent.md
 
 capabilities:
   - name: "scan_project_structure"

@@ -13,9 +13,10 @@ triggers:
   - "descartável"
   - "HITL rápido"
 source_docs:
+  - .github/skills/prompt-engineering-patterns/SKILL.md
+source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/skills/prompt-engineering-patterns/SKILL.md
 tools: []
 ---
 

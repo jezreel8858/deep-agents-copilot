@@ -15,7 +15,7 @@
  * NUNCA confie cegamente no `replace_string_in_file` quando houver risco de colisão de âncoras:
  * (2026-09): a tool possui fallback fuzzy quando o casamento exato falha, podendo casar no
  * ponto errado em Markdown estruturado, apagando frontmatter e títulos iniciais (incidente real
- * em code-knowledge-graph.agent.md).
+ * em codegraph-engine.agent.md).
  *
  * Contrato do padrão:
  *   1. Ler o arquivo inteiro do disco (fonte da verdade real, nunca a

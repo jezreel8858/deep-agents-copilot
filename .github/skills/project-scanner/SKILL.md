@@ -19,11 +19,12 @@ triggers:
   - "identificar framework"
   - "descobrir convenções"
 source_docs:
-  - "CLAUDE.md"
-  - ".github/copilot-instructions.md"
-  - ".github/agents/adapter-generator.agent.md"
-  - ".github/prompts/add-project-context.prompt.md"
-  - ".github/instructions/README.md"
+  - .github/instructions/README.md
+  - .github/agents/adapter-generator.agent.md
+  - .github/prompts/add-project-context.prompt.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 tools:
   - "read_file"
   - "list_dir"

@@ -23,10 +23,11 @@ triggers:
   - "asvs"
   - "auditoria de segurança"
 source_docs:
-  - "CLAUDE.md"
-  - ".github/copilot-instructions.md"
-  - ".github/skills/code-review-patterns/SKILL.md"
-  - ".github/skills/sonarqube-governance/SKILL.md"
+  - .github/skills/code-review-patterns/SKILL.md
+  - .github/skills/sonarqube-governance/SKILL.md
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 tools: []
 ---
 
@@ -97,7 +98,7 @@ Sem os 3 critérios confirmados → rebaixar para 🟡 sugestão ou não reporta
 
 ### 4.1 Protocolo de Reachability Analysis (Redução de Ruído)
 Ao analisar uma CVE reportada em dependência transitiva:
-1. **Alcançabilidade no Grafo de Chamadas**: A classe ou método vulnerável da biblioteca de fato é invocado pelo código da aplicação (verificável via `@code-knowledge-graph` / callee trace)?
+1. **Alcançabilidade no Grafo de Chamadas**: A classe ou método vulnerável da biblioteca de fato é invocado pelo código da aplicação (verificável via `@codegraph-engine` / callee trace)?
 2. **Critério de Severidade Efetiva**:
    - CVE com CVSS ≥ 7.0 (Alto/Crítico) **e alcançável pelo código da aplicação** → 🔴 **Bloqueador Imediato**.
    - CVE com CVSS ≥ 7.0 **mas comprovadamente inalcançável (dead code/unreachable path)** → 🟠 **Alta Prioridade** (remediação programada, sem travamento de hotfix emergencial).

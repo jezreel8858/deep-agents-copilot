@@ -12,9 +12,10 @@ triggers:
   - "observabilidade spring"
   - "segurança spring boot"
 source_docs:
+  - .github/agents/backend/spring-boot/spring-boot-router.agent.md
+source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
-  - .github/agents/backend/spring-boot/spring-boot-router.agent.md
 tools: []
 ---
 

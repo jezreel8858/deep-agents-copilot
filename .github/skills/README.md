@@ -95,7 +95,7 @@ Toda skill deve declarar no topo:
 | **`task-decomposition-patterns`** | 📋 **Tier 2** | ⭐ ***(NEW)*** Decomposição sequencial/hierárquica/paralela, granularidade 2-3 níveis, validação de dependências — base do agent `feature-planner` |
 | **`refactoring-planning-patterns`** | 🏗️ **Tier 2** | ⭐ ***(NEW)*** Planejamento de refatoração estrutural (Mikado Method, Strangler Fig, Branch by Abstraction, Characterization Tests, DAG de etapas e rollback multicamada) — base do agent `refactor-planner` |
 | **`devops-agent-patterns`** | 🐳 **Tier 2** | ⭐ ***(NEW)*** Checklists de revisão Dockerfile/Kubernetes/CI-CD/IaC e estratégias de deployment — base do agent `devops-engineer` |
-| **`codegraph-optave-usage`** | 🕸️ **Tier 2** | ⭐ ***(NEW)*** Uso da lib externa `@optave/codegraph` (CLI local e MCP Server enxuto, zero API keys) como motor único de build/consulta de grafo de código — query, blast radius, ciclos, dead code, dataflow e CI gate. Base do agent `code-knowledge-graph` |
+| **`codegraph-optave-usage`** | 🕸️ **Tier 2** | ⭐ ***(NEW)*** Uso da lib externa `@optave/codegraph` (CLI local e MCP Server enxuto, zero API keys) como motor único de build/consulta de grafo de código — query, blast radius, ciclos, dead code, dataflow e CI gate. Base do agent `codegraph-engine` |
 | **`efficient-batch-code-modification`** | ⚡ **Tier 1** | ⭐ ***(NEW)*** Edição em lote otimizada para economia de tokens e créditos Copilot — análise prévia (dry-run), tool calls agrupadas na mesma rodada, minimal diffs cirúrgicos e proteção anti-corrupção em arquivo único grande/estruturado via padrão verificado (R-051) |
 
 > 💡 **Cross-Reference & Guias Especializados**:

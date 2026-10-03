@@ -15,9 +15,9 @@ triggers:
   - "impacto de mudanca"
   - "dead code"
   - "call graph"
-source_docs:
-  - "CLAUDE.md"
-  - ".github/copilot-instructions.md"
+source_docs_lazy:
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 ---
 
 # codegraph-optave-usage — Motor de grafo de conhecimento de código
@@ -30,11 +30,11 @@ Skill genérica para operar `@optave/codegraph` (repo `optave/ops-codegraph-tool
 - Responder perguntas de impacto, dependência, dead code, ciclo e complexidade sem depender de scripts legados ad-hoc.
 - Servir de base para `check` em CI (exit code 0/1) e para agents/skills consumidores do grafo.
 
-## 1.1) Governança de Acesso: Operador Exclusivo (@code-knowledge-graph — R-045 / RNF-004)
+## 1.1) Governança de Acesso: Operador Exclusivo (@codegraph-engine — R-045 / RNF-004)
 
-- **Operador único**: os comandos desta skill (`codegraph build`, `codegraph query`, `codegraph fn-impact`, etc.) são de competência e execução **EXCLUSIVAS** do agent `@code-knowledge-graph`.
+- **Operador único**: os comandos desta skill (`codegraph build`, `codegraph query`, `codegraph fn-impact`, etc.) são de competência e execução **EXCLUSIVAS** do agent `@codegraph-engine`.
 - **Proibição universal**: NENHUM outro agent (specialists híbridos como `angular-engineer`, `spring-boot-engineer`, `spring-reactive-engineer`, analistas como `tech-solution-architect`, ou routers) está autorizado a executar o CLI `codegraph` diretamente via terminal (`run_in_terminal`) ou acessar `.codegraph/graph.db`.
-- **Canal de consumo**: qualquer agent que necessite de mapeamento estrutural de dependências, arquitetura, chamadas ou blast radius DEVE invocar compulsoriamente `@code-knowledge-graph` via `run_subagent(agentName: 'code-knowledge-graph', ...)`.
+- **Canal de consumo**: qualquer agent que necessite de mapeamento estrutural de dependências, arquitetura, chamadas ou blast radius DEVE invocar compulsoriamente `@codegraph-engine` via `run_subagent(agentName: 'codegraph-engine', ...)`.
 
 ## 2) Instalação e verificação
 
@@ -226,5 +226,5 @@ Qualquer agent/skill que consuma o grafo produzido por `@optave/codegraph` deve 
 
 - Repositório oficial: `github.com/optave/ops-codegraph-tool`
 - Pacote npm: `@optave/codegraph`
-- Consumidor principal previsto: `.github/agents/code-knowledge-graph.agent.md` — motor oficial de grafo de conhecimento de código no repositório.
+- Consumidor principal previsto: `.github/agents/codegraph-engine.agent.md` — motor oficial de grafo de conhecimento de código no repositório.
 
