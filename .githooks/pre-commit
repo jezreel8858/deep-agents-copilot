@@ -108,16 +108,31 @@ if [ -n "$target_catalog" ]; then
 fi
 
 # 6) Defesa Anti-Truncamento de Histórico para CHANGELOG.md:
-#    O CHANGELOG.md é estritamente aditivo. Qualquer commit que remova cabeçalhos
-#    de versão históricos (linhas iniciadas por '## [') ou reduza drasticamente
-#    o volume do arquivo é bloqueado determinísticamente para prevenir regressão.
+#    O CHANGELOG.md é estritamente aditivo. Comparamos o MULTISET de cabeçalhos
+#    de versão (## [X.Y.Z] — AAAA-MM-DD) entre HEAD e o conteúdo staged (índice).
+#    Bloqueia apenas se um cabeçalho de HEAD estiver genuinamente AUSENTE no
+#    staged — reordenação por inserção de novas entradas antes de um cabeçalho
+#    existente (artefato textual do diff Myers) NÃO é tratada como remoção.
+#
+#    Limitação conhecida (comportamento seguro por padrão):
+#    O comando 'comm -23' opera sobre fluxos ordenados linha a linha e é
+#    sensível à multiplicidade de ocorrências. Se HEAD contiver um cabeçalho
+#    duplicado (ex.: erro histórico anterior) e um commit staged remover uma das
+#    duplicatas mantendo a outra, 'comm -23' detectará a linha excedente como
+#    ausente no staged e bloqueará o commit. Esse falso positivo em correções
+#    legítimas de duplicatas é uma limitação conhecida e aceita: o guard prioriza
+#    sempre a segurança estrita contra perda de histórico (safe by default).
 if git diff --cached --name-only | grep -qE '^CHANGELOG\.md$'; then
-  deleted_headers=$(git diff --cached -- CHANGELOG.md | grep -E '^\-##\s+\[' || true)
-  if [ -n "$deleted_headers" ]; then
-    echo "❌ [Anti-Truncamento] Bloqueado: remoção acidental de cabeçalhos de versão histórica em CHANGELOG.md detectada:"
-    echo "$deleted_headers"
-    echo "   → O CHANGELOG.md deve ser estritamente aditivo. Reversões de versões históricas são proibidas."
-    blocked=1
+  headers_head=$(git show HEAD:CHANGELOG.md 2>/dev/null | grep -E '^##\s+\[' | sort || true)
+  headers_staged=$(git show :CHANGELOG.md 2>/dev/null | grep -E '^##\s+\[' | sort || true)
+  if [ -n "$headers_head" ]; then
+    missing_headers=$(comm -23 <(echo "$headers_head") <(echo "$headers_staged") 2>/dev/null || true)
+    if [ -n "$missing_headers" ]; then
+      echo "❌ [Anti-Truncamento] Bloqueado: remoção líquida de cabeçalho(s) de versão histórica em CHANGELOG.md detectada:"
+      echo "$missing_headers"
+      echo "   → O CHANGELOG.md deve ser estritamente aditivo. Reversões de versões históricas são proibidas."
+      blocked=1
+    fi
   fi
 fi
 
