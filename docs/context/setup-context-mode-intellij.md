@@ -239,7 +239,27 @@ Sempre que houver instabilidade ou ausência de dados no dashboard, utilize os a
 
 ---
 
-### Resumo anterior (legado — para referência)
+### 5.4. Hook registrado mas nunca produz efeito (debug.log/state.json nunca aparecem)
+
+**Sintoma:** mesmo com `Enable Hooks` ativado no plugin e `Editor preview features` habilitado no GitHub.com, um hook customizado (ex.: `.github/hooks/ctx-sequence-guard.ps1`) nunca cria evidência de execução (nenhum log de diagnóstico, nenhum state file).
+
+**Causa raiz confirmada (2026-10-03, via `idea.log` com trace `#com.github.copilot:trace` habilitado em `Help → Diagnostic Tools → Debug Log Settings`)**: o host JetBrains Copilot aplica algum tipo de *template expansion* na string do campo `"powershell"`/`"bash"` do hook antes de repassá-la ao processo, e **apaga silenciosamente qualquer token `$variável`** que não reconheça como variável de template própria. O `stderr` capturado em `hookExecutions` mostra o sintoma de forma inequívoca — toda ocorrência de `$nome` vira vazio:
+
+```
++ =[Console]::In.ReadToEnd(); =; try { =|ConvertFrom-Json; if(.cwd){=.c ...
+```
+
+(deveria ser `$in=[Console]::In.ReadToEnd(); $root=$null; try { $j=$in|ConvertFrom-Json; ...`)
+
+**Diagnóstico**: localizar `idea.log` (`Help → Show Log in Explorer`, caminho típico `%LOCALAPPDATA%\JetBrains\<Produto><Versão>\log\idea.log`) e buscar por `hookExecutions` — se `status: "failure"` com `stderr` mostrando erro de parser com tokens `$` faltando, é este bug.
+
+**Solução**: eliminar `$variável` literal do campo `"powershell"` do hook. Use `-EncodedCommand <Base64 UTF-16LE>` — a string resultante não contém `$` literal, portanto é imune ao templating do host. Detalhes completos (incluindo como regerar o Base64) em `.github/hooks/README.md`.
+
+**Lição geral de troubleshooting**: nunca aceitar "feature desligada" ou "versão desatualizada" como causa raiz de um hook que não produz efeito sem antes consultar `hookExecutions` no `idea.log` com trace habilitado — é o único diagnóstico que revela o `stderr` real do processo spawnado.
+
+---
+
+
 
 1. **Dashboard vazio (No sessions):**
 

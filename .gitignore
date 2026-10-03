@@ -58,6 +58,9 @@ __pycache__/
 docs/ai-context/catalog.local.yaml
 .github/instructions/local/
 
+# Estado efêmero do circuit breaker mecânico ctx-sequence-guard (PreToolUse hook)
+.github/hooks/.state/
+
 .codegraph/
 .worktrees/
 .gemini/

@@ -7,7 +7,7 @@
 <!-- Dados estáticos da aplicação, convenções arquiteturais, dependências e diretrizes para alinhamento com Prompt Caching -->
 
 ## Arquivos e Referências Grounded
-<!-- Caminhos reais no repositório verificados deterministamente via @code-knowledge-graph e componentes irmãos canônicos homologados -->
+<!-- Caminhos reais no repositório verificados deterministamente via @codegraph-engine e componentes irmãos canônicos homologados -->
 - `caminho/do/arquivo_1.ext`
 - `caminho/do/arquivo_2.ext`
 - Componente irmão canônico homologado: `caminho/do/irmao_canonico.ext`

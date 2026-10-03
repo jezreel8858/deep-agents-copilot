@@ -98,12 +98,6 @@
       "domain": "Extracao e validacao de regras de negocio",
       "version": "1.1.0"
     },
-    "code-knowledge-graph": {
-      "name": "Code Knowledge Graph",
-      "role": "specialist",
-      "domain": "Grafo de conhecimento de codigo-fonte (imports, chamadas, blast radius, dataflow/CFG, ciclos, dead code), motor unico via lib externa @optave/codegraph (CLI local, zero API keys, Node.js/TypeScript nativo)",
-      "version": "4.1.1"
-    },
     "code-review": {
       "name": "Code Review",
       "role": "specialist",
@@ -115,6 +109,12 @@
       "role": "specialist",
       "domain": "Verificacao de aderencia a convencoes de estilo (read-only)",
       "version": "1.0.0"
+    },
+    "codegraph-engine": {
+      "name": "Codegraph Engine",
+      "role": "specialist",
+      "domain": "Grafo de conhecimento de codigo-fonte (imports, chamadas, blast radius, dataflow/CFG, ciclos, dead code), motor unico via lib externa @optave/codegraph (CLI local, zero API keys, Node.js/TypeScript nativo)",
+      "version": "4.1.1"
     },
     "compliance-guardrails": {
       "name": "Compliance Guardrails",

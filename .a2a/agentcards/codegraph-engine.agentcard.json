@@ -1,15 +1,15 @@
 {
   "schemaVersion": "1.0.0",
   "protocol": "A2A/1.0.0",
-  "id": "code-knowledge-graph",
-  "name": "Code Knowledge Graph",
+  "id": "codegraph-engine",
+  "name": "Codegraph Engine",
   "version": "4.1.1",
   "description": "Constrói e consulta o grafo de conhecimento de código-fonte (imports, chamadas, blast radius, dataflow/CFG, ciclos, dead code), cross-projeto e puramente determinístico — nunca invoca LLM. Motor único: lib externa `@optave/codegraph` via MCP Server enxuto (Least-Tools) para consultas e CLI local para build/indexação.",
   "domain": "Grafo de conhecimento de codigo-fonte (imports, chamadas, blast radius, dataflow/CFG, ciclos, dead code), motor unico via lib externa @optave/codegraph (CLI local, zero API keys, Node.js/TypeScript nativo)",
   "role": "specialist",
   "capabilities": [
     "specialist",
-    "code knowledge graph"
+    "codegraph engine"
   ],
   "skills": [
     "codegraph-optave-usage",

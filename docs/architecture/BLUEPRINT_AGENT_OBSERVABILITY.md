@@ -14,7 +14,7 @@
 | **Componentes novos** | `tools/mcp-otel-proxy/` (pacote Node), extensão aditiva `handoff_payload.rastreabilidade` (schema v1.4), pipeline de evals sobre os traces do Langfuse. |
 | **Componentes alterados** | `.vscode/mcp.json`, `tools/otel-langfuse/otel-collector-config.yaml`, `tools/otel-langfuse/test-trace.js`, `.env.example`, `.gitignore`, SKILLs agent-observability-otel e handoff-governance (removidos docker-compose local e dependências pesadas de ClickHouse/MinIO/Postgres em favor de Langfuse Cloud). |
 | **Decisões do usuário** | Interceptação via proxy stdio configurado em `.vscode/mcp.json`; **captura completa de conteúdo sempre ativa** (ver §7 — risco e mitigações obrigatórias). |
-| **Blast radius (code-knowledge-graph)** | Não existe `package.json` nem proxy MCP no repo (greenfield). `tools/otel-langfuse` não tem consumidores em runtime. `tests/governance_audit/` não valida o schema de `mcp.json` → **COMPATIBLE**. handoff-governance é referenciado por 136 arquivos → a mudança de schema deve ser **somente aditiva**. |
+| **Blast radius (codegraph-engine)** | Não existe `package.json` nem proxy MCP no repo (greenfield). `tools/otel-langfuse` não tem consumidores em runtime. `tests/governance_audit/` não valida o schema de `mcp.json` → **COMPATIBLE**. handoff-governance é referenciado por 136 arquivos → a mudança de schema deve ser **somente aditiva**. |
 
 ### 1.1 Gaps detectados na infra atual
 

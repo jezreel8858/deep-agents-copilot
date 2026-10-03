@@ -394,5 +394,5 @@ Como decisão consciente de uso de ferramenta focada em AST estático:
 - **Repositório oficial**: [`github.com/optave/ops-codegraph-tool`](https://github.com/optave/ops-codegraph-tool)
 - **Pacote npm**: [`@optave/codegraph`](https://www.npmjs.com/package/@optave/codegraph)
 - **Skill de governança**: [`.github/skills/codegraph-optave-usage/SKILL.md`](../../.github/skills/codegraph-optave-usage/SKILL.md)
-- **Agent integrador**: [`.github/agents/code-knowledge-graph.agent.md`](../../.github/agents/code-knowledge-graph.agent.md)
+- **Agent integrador**: [`.github/agents/codegraph-engine.agent.md`](../../.github/agents/codegraph-engine.agent.md)
 

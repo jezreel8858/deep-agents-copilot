@@ -22,6 +22,6 @@ docs/plans/<AAAAMMDD>-<workflow>-<identificador-curto>.md
   2. Contexto/Problema, formulação do objetivo e motivação técnica/negócio.
   3. Opções consideradas e Decisão técnica adotada.
   4. Alternativas Rejeitadas (seção obrigatória justificando descartes e trade-offs).
-  5. Escopo delimitado, artefatos/arquivos impactados (mapeados via `@code-knowledge-graph` quando aplicável) e Não-escopo explícito.
+  5. Escopo delimitado, artefatos/arquivos impactados (mapeados via `@codegraph-engine` quando aplicável) e Não-escopo explícito.
   6. Riscos técnicos, consequências e blast radius inicial.
   7. Critério de aceite e Definition of Done (único a nível de documento, sem checklist obrigatório de execução).

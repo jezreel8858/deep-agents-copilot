@@ -64,7 +64,7 @@ flowchart TD
 ### Correspondência Direta do Ecossistema Atual com o Diagrama
 
 1. **Supervisor / Orchestrator:** Implementado via `@agent-router` (R-037/R-042), `@feature-planner`, `@refactor-planner` e governado pelo `routing-graph.yaml`.
-2. **Agente de Contexto / RAG:** Coberto por `@code-knowledge-graph`, `@code-summarizer`, `@context-builder`, `@deep-search` e `@business-rules-extractor`.
+2. **Agente de Contexto / RAG:** Coberto por `@codegraph-engine`, `@code-summarizer`, `@context-builder`, `@deep-search` e `@business-rules-extractor`.
 3. **Agente Codificador:** Especialistas por stack (`@angular`, `@spring-boot`, `@spring-reactive`) e executores cirúrgicos (`@refactor-executor`, `@debugger`).
 4. **Agente de Testes:** Coberto pela tríade `@test-strategy` (planejamento), `@test-implementation` (geração) e `@test-fix` (correção direcionada).
 5. **Estado Compartilhado / Memória:** Gerenciado pelo protocolo `context-mode` (MCP) e buffers de diff git.
@@ -80,7 +80,7 @@ Com base na literatura de Engenharia de AI (ACM, IEEE, ArXiv SWE-bench, MetaGPT,
 | # | Grupo Consolidado | Papel Acadêmico / Padrão | Agents do Projeto (35) | Características e Responsabilidades |
 |---|---|---|---|---|
 | **G1** | **Orquestração, Triagem & Planejamento** | *Supervisor, Triage, Task Planner* | `agent-router`, `prompt-structuring`, `feature-planner`, `refactor-planner` | Ponto de entrada obrigatório, decomposição de tarefas em grafos acíclicos, refinamento de prompt (R-041) e planejamento pré-execução sem modificação de código. |
-| **G2** | **Context Retrieval, RAG & Code Intelligence** | *Retriever, AST Parser, Knowledge Graph* | `deep-search`, `code-summarizer`, `code-knowledge-graph`, `context-builder`, `business-rules-extractor` | Coleta de evidências, extração determinística de grafos de chamadas/AST, sumarização para context-mode e extração de regras de negócio. Read-only. |
+| **G2** | **Context Retrieval, RAG & Code Intelligence** | *Retriever, AST Parser, Knowledge Graph* | `deep-search`, `code-summarizer`, `codegraph-engine`, `context-builder`, `business-rules-extractor` | Coleta de evidências, extração determinística de grafos de chamadas/AST, sumarização para context-mode e extração de regras de negócio. Read-only. |
 | **G3** | **Engenharia de Código & Implementação (Coders)** | *Specialist Implementer, Code Fixer* | `angular`, `spring-boot`, `spring-reactive`, `refactor-executor`, `debugger` | Agentes com capacidade de escrita de código de aplicação, migração de componentes e resolução cirúrgica de bugs. Operam sob restrição de diff mínimo. |
 | **G4** | **Engenharia de Qualidade & Testes (QA/Testers)** | *Test Planner, Test Generator, Test Healer* | `test-strategy`, `test-implementation`, `test-fix` | Planejamento de cobertura por risco, geração de suítes completas (Unit, Integration, E2E) e correção automatizada de testes quebrados (Self-Healing Tests). |
 | **G5** | **Crítico, Auditoria & Guardrails (Reviewers)** | *Evaluator-Optimizer, Security Auditor, Linter* | `code-review`, `security-reviewer`, `performance-agent`, `compliance-guardrails`, `code-style-enforcer`, `agent-auditor` | Malha de revisão estritamente read-only. Avaliação multifacetada: qualidade, OWASP/CVE, Core Web Vitals/N+1, LGPD/SOC2, estilo e integridade do meta-catálogo. |
@@ -100,7 +100,7 @@ Com base na literatura de Engenharia de AI (ACM, IEEE, ArXiv SWE-bench, MetaGPT,
 │ refactor-planner         │ G1 - Orquestração           │ Read-Only    │ Sonnet (1x)   │ Planner (Refatoração Segura)  │
 │ deep-search              │ G2 - Context & RAG          │ Read-Only    │ Haiku (0x)    │ Busca Docs / Externa (Tavily) │
 │ code-summarizer          │ G2 - Context & RAG          │ Read-Only    │ Haiku (0x)    │ Busca AST / Context Compact   │
-│ code-knowledge-graph     │ G2 - Context & RAG          │ Read-Only    │ Haiku (0x)    │ Busca AST / Call Graph        │
+│ codegraph-engine     │ G2 - Context & RAG          │ Read-Only    │ Haiku (0x)    │ Busca AST / Call Graph        │
 │ context-builder          │ G2 - Context & RAG          │ Read-Only    │ Haiku (0x)    │ RAG / Consolidação Contexto   │
 │ business-rules-extractor │ G2 - Context & RAG          │ Read-Only    │ Sonnet (1x)   │ Ground Truth de Regras        │
 │ angular                  │ G3 - Codificadores          │ Híbrido/RW   │ Sonnet (1x)   │ AGENTE CODIFICADOR (Frontend) │

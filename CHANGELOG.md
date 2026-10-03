@@ -6,13 +6,80 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.52.4] — 2026-10-03
+
+### Modificado — Poda de Capacidade de Ferramentas de Context-Mode em Agentes Gather-Only (R-055 / R-056 / R-059)
+- **Classificação Canônica de Capacidade**: Formalizada a separação objetiva entre perfis **"Gather-only"** vs **"Gather+Process"** sob o critério de corte aprovado de três condições: (a) agregação computacional multi-arquivo, (b) estrutura derivada de N variável em runtime, ou (c) geração/transformação condicional de código-fonte (codegen/mutação).
+- **Remoção de `ctx_execute` e `ctx_execute_file` em 26 Agentes**: Poda cirúrgica realizada em lote no frontmatter `tools:` de 26 agentes puramente analíticos/consultivos (`agent-auditor`, `adr-sentinel`, `bug-triage`, `code-review`, `code-style-enforcer`, `compliance-guardrails`, `database-specialist`, `debugger`, `deep-search`, `devops-engineer`, `docs-engineer`, `feature-planner`, `pr-gatekeeper`, `repo-hygiene-auditor`, `requirements-analyst`, `runtime-verifier`, `security-reviewer`, `tech-solution-architect`, `test-strategy` e os 7 `*-arch-advisor` de stacks backend e frontend), mantendo compulsoriamente `context-mode/ctx_batch_execute`.
+- **Prevenção de Bypass de Hook em Subagents**: A poda estática fecha a lacuna de runtime em que subagents gerados via `run_subagent` não eram interceptados pelo hook `preToolUse` do IDE, eliminando chamadas sequenciais indevidas de `ctx_execute` no chat (Smell 2.26).
+- **Novo Teste Determinístico (R-055 Q3)**: Criado `tests/governance_audit/test_ctx_execute_capability_profile.py` garantindo não-regressão e conformidade estática contínua dos 26 agentes.
+- **Atualização de Templates e Smells (R-055 Q2)**: Incorporada a pergunta de corte de capacidade no Checklist Estrutural de `governance-factory-patterns/SKILL.md` (§3) e catalogado o **Smell 2.32** em `governance-audit-patterns/SKILL.md`.
+- **Documentação de Governança (R-064)**: Criados os planos versionados `docs/plans/20261003-governance-maintenance-ctx-execute-profile-classification.md` e `docs/implementation-plans/20261003-governance-maintenance-ctx-execute-profile-classification.md`.
+
 ---
+
+## [2.52.3] — 2026-10-03
+
+### Corrigido — Hook `PreToolUse` do Circuit Breaker Mecânico Nunca Executava (Templating de `$` pelo Host JetBrains)
+
+- **Gap identificado** (usuário, validação empírica em sessão real): o Circuit Breaker mecânico do `ctx-sequence-guard` (introduzido para dar enforcement determinístico ao Anti Tool-Chaining Sequencial do `context-mode/SKILL.md` § 4.1) nunca produzia efeito observável — nenhuma entrada em `.github/hooks/.state/ctx-sequence-guard.debug.log` mesmo após múltiplas chamadas sequenciais de `ctx_execute` em sessão nova pós-restart do IDE.
+- **Causa raiz confirmada via `idea.log`** (trace `#com.github.copilot:trace`): o host JetBrains Copilot aplica *template expansion* na string do campo `"powershell"` do hook, apagando silenciosamente qualquer token `$variável` não reconhecido — o bootstrap inline do fix anterior (leitura de `cwd` via `$in`/`$root`/`$j`) nunca chegou a executar, pois virava PowerShell sintaticamente inválido no momento do spawn (`stderr`: `Uma expressão era esperada após '('`).
+- **Correção aplicada**: `.github/hooks/context-mode.json` — os 4 campos `"powershell"` (`preToolUse`/`PreToolUse`/`sessionStart`/`SessionStart`) migrados de comando inline com `$variável` crua para `-EncodedCommand <Base64 UTF-16LE>`, imune ao templating do host (string final não contém `$` literal). Validado via simulação real (`echo payload | powershell -EncodedCommand ...`): sequência `allow → deny` reproduzida com sucesso, `.state/ctx-sequence-guard.debug.log` populado corretamente.
+- **Documentação atualizada**: `.github/hooks/README.md` (causa raiz real + fix + checklist de diagnóstico item 7), `docs/context/setup-context-mode-intellij.md` (§5.4 novo), `.github/skills/context-mode/SKILL.md` § 4.1.1 condensado para regra genérica acionável (removida narrativa forense específica de host, realocada para os documentos técnicos acima — ver R-038 Genericidade Obrigatória).
+
+---
+
+## [2.52.2] — 2026-10-03
+
+### Corrigido — Gap Irmão: Nenhum dos 22 Prompts Possuía `<execution_protocol>`
+
+- **Gap identificado** (usuário, revisão de `test-strategy.agent.md`): confirmado via `ctx_execute` que **100% dos 22 `*.prompt.md` declaram `source_docs_lazy:`** (migrados em [2.52.0]), mas **nenhum** possuía o bloco `<execution_protocol>` — a mesma lacuna corrigida para agents em [2.52.1], nunca propagada para prompts porque `sync_execution_protocol.py` só varria `.github/agents/`.
+- **Correção aplicada**: `tools/agent_protocol_sync/sync_execution_protocol.py` estendido com `get_prompt_files()` + `sync_prompts()` — reaproveita a mesma fonte canônica (`_execution-protocol-fragment.md`) e insere o bloco STANDARD completo (8 itens, incl. item 8/R-066) ao final do corpo de cada prompt (prompts não têm distinção STANDARD/CUSTOM nem seção fixa de ancoragem como os agents). Aplicado via `--apply` nos **22 prompts**; `--check` agora valida agents + prompts em uma única chamada.
+- **Conflito de nomenclatura resolvido**: `test_prompt_synthesis_output_format_governance.py::test_no_residual_xml_prompt_synthesis` tratava `<execution_protocol>` como tag XML residual proibida (conceito histórico do antigo formato de *saída* do `WORKFLOW-PROMPT-SYNTHESIS`, não-relacionado). Corrigido para remover o bloco operacional legítimo do texto antes de escanear por XML residual, preservando a proteção original contra regressão do formato antigo.
+- **Template canônico atualizado**: `prompts/templates/prompt-template.md` já nasce com o bloco `<execution_protocol>` (consistência total de F6 — todo novo artefato já nasce em conformidade).
+- **2 novos testes determinísticos**: `test_all_prompts_contain_execution_protocol_block` (valida diretamente que 100% dos prompts têm o bloco com a instrução de `source_docs_lazy`) — complementa `test_standard_agents_execution_protocol_propagated_with_source_docs_lazy_item`, que agora cobre prompts transitivamente via `sync_execution_protocol.py --check`.
+- **Validação de regressão**: 540/541 testes passando (toda a suíte, exceto a falha pré-existente e não-relacionada já conhecida).
+
+---
+
+## [2.52.1] — 2026-10-03
+
+### Corrigido — Gap de Discovery de `source_docs_lazy:` (Nenhuma Instrução Operacional no Corpo do Agent)
+
+- **Gap identificado**: a migração R-066/[2.52.0] moveu `CLAUDE.md`/`.github/copilot-instructions.md`/`workflows.md` para `source_docs_lazy:` em 188 artefatos, mas **nenhum texto no corpo** desses artefatos explicava ao próprio agente o que fazer com essa chave. A única explicação textual completa (R-066 em `CLAUDE.md`) estava, ironicamente, dentro do próprio arquivo que a migração classificou como lazy — e `agent-contracts/SKILL.md` (skill "banner", full-loaded por dezenas de agents) só tinha a chave no seu próprio frontmatter, sem nenhuma explicação no corpo. Resultado prático: um agente recém-migrado não tinha, no seu próprio prompt de sistema, nenhum gatilho real para saber que devia usar `context-mode/ctx_search` em vez de `read_file` nesses documentos.
+- **Correção aplicada**: adicionado o item 8 ao bloco canônico `<execution_protocol>` em `tools/agent_protocol_sync/_execution-protocol-fragment.md` (fonte única), explicando a semântica de `source_docs_lazy:` diretamente no corpo do agente (não em documentação externa que o próprio agente talvez nunca carregue). Propagado via `python tools/agent_protocol_sync/sync_execution_protocol.py --apply` para os **84 agents STANDARD** (85 mapeados, 1 CUSTOM/`code-knowledge-graph` inalterado por design).
+- **2 novos testes determinísticos** em `test_r066_progressive_disclosure_budget.py`: `test_execution_protocol_fragment_instructs_source_docs_lazy_semantics` (valida que o fragmento canônico contém a instrução) e `test_standard_agents_execution_protocol_propagated_with_source_docs_lazy_item` (valida drift=0 de `sync_execution_protocol.py --check`, confirmando a propagação ponta a ponta).
+- **Lacuna residual reconhecida**: routers (`agent-router`, domain routers) e `code-knowledge-graph` (CUSTOM) não recebem este bloco — aceitável, pois routers operam sob R-054 (Zero Discovery) e não leem `source_docs_lazy` na prática. Skills/prompts herdam a instrução do agent executor hospedeiro no momento em que são ativados.
+- **Validação de regressão**: 539/540 testes passando (toda a suíte, exceto a falha pré-existente e não-relacionada já conhecida).
+
+---
+
+## [2.52.0] — 2026-10-03
+
+### Adicionado — R-066 Progressive Disclosure Compulsória de `source_docs:` (Anti Context Bloat Inicial)
+
+- **Nova regra normativa R-066** (`CLAUDE.md` § 3, espelhada em `.github/copilot-instructions.md` § 2): diferencia `source_docs:` (full-load, <500 linhas) de `source_docs_lazy:` (full-load proibido — `CLAUDE.md`, `.github/copilot-instructions.md`, `.github/agents/workflows.md`; consumo exclusivo via `context-mode/ctx_search`). Enforcement declarado explicitamente como **textual/CI-estático**, não mecânico-runtime (campos sem reconhecimento nativo de plataforma, confirmado via pesquisa de mercado).
+- **Novo Smell 2.31** em `.github/skills/governance-audit-patterns/SKILL.md` § 2 ("Progressive Disclosure Violation / Full-Load Forçado de Documento Lazy").
+- **Nova ferramenta determinística** `tools/agent_source_docs_sync/sync_lazy_source_docs.py` (`--check`/`--dry-run`/`--apply`): migra cirurgicamente `CLAUDE.md`/`.github/copilot-instructions.md`/`.github/agents/workflows.md` de `source_docs:` para `source_docs_lazy:` em `.agent.md`/`SKILL.md`/`*.prompt.md`, preservando formatação (R-051).
+- **Migração em lote aplicada**: 188 artefatos (95 `.agent.md`, 71 `SKILL.md`, 22 `*.prompt.md`) tiveram as referências de alto fan-in realocadas para `source_docs_lazy:`, eliminando full-load redundante de até ~76k tokens por spawn de agent em workflows multi-handoff (R-050).
+- **Novo teste determinístico** `tests/governance_audit/test_r066_progressive_disclosure_budget.py` — valida drift=0 da migração, documentação de R-066/Smell 2.31 e ausência de `CLAUDE.md`/`copilot-instructions.md`/`workflows.md` em `source_docs:` (full).
+- **Teste Smell 2.9 corrigido** (`test_governance_smells.py`) para aceitar `source_docs` **e/ou** `source_docs_lazy` como satisfazendo a obrigatoriedade de referência normativa em skills/prompts.
+- **F6 — Templates canônicos migrados**: os 4 templates de agent (`agent-template.md`, `operational-agent.md`, `research-agent.md`, `router-agent.md`) + `skills/templates/skill-template.md` + `prompts/templates/prompt-template.md` já nascem com o contrato de 2 camadas (`source_docs:`/`source_docs_lazy:`).
+- **F7 — Sub-catálogos stack-specific verificados**: os 8 `*-catalog.yaml` de domínio (spring-boot, spring-reactive, ejb, python, struts, database, angular, react) não replicam o padrão de full-load de `CLAUDE.md` — nenhuma migração necessária.
+- **F3 — Fatiamento de `.github/agents/workflows.md` concluído**: arquivo monolítico (1473 linhas/174k chars) fatiado em 10 arquivos dedicados sob `.github/agents/workflows/` (9 workflows canônicos + `invariantes-e-protocolos.md`), com `workflows.md` reduzido a índice leve (199 linhas, full-load seguro). As 5 referências de produção (`agent-router.agent.md`, `code-knowledge-graph.agent.md`, `README.md`, `routing-graph.yaml`, `runtime-verifier.agent.md`) e os **11 testes de CI** com acoplamento estrutural fino (`test_anti_manual_user_delegation_governance.py`, `test_architectural_blueprint_gate_governance.py`, `test_catalog_agents_referenced_in_canonical_workflows.py`, `test_local_project_isolation.py`, `test_migration_engine_governance.py`, `test_prompt_synthesis_output_format_governance.py`, `test_systemic_reuse_gate.py`, `test_operational_workflows.py` com 13 funções) foram atualizados — novo helper `tests/governance_audit/_helpers.py::read_workflows_full_content()` reconstrói o conteúdo equivalente ao monólito original para assertions de substring.
+- **Validação de regressão**: 508/509 testes passando (`tests/governance_audit` + `tests/operational_flow` + `tests/routing_unit` + `tests/evals` + `tests/routing_gate`), 1 falha pré-existente e não-relacionada (`test_no_local_projects_referenced_in_git_tracked_files`).
+
+### Nota Técnica — Tentativa de Classificação Dinâmica por Linha Revertida
+
+Uma iteração intermediária da migração tentou classificar como lazy qualquer documento referenciado com >300 linhas (não apenas a allowlist fixa de 3 documentos). Isso moveu skills mandatoriamente exigidas em `source_docs:` (ex. `handoff-governance`, `agent-contracts`, `terminal-governance`, por força de R-042/R-049) para lazy, quebrando 6 testes existentes. Revertido cirurgicamente para a allowlist fixa. Generalizar o teto de linhas para todo o universo de documentos permanece como item de um ciclo de governança futuro e separado.
+
+### Pendente (fora de escopo desta rodada)
+
+- Resolução da duplicação `prerequisite_docs:`/`source_docs:` em `.github/agents/catalog.yaml` (campo manualmente mantido, sem gerador automático confirmado — `tools/agent_protocol_sync` não o gera).
 
 ---
 
 ## [2.51.5] — 2026-10-04
-
-### Corrigido — Shell permission persistente, logging em arquivo e fail-fast de porta no Gateway
 
 - **Unwrap de Shell Wrapper e Segurança no Encadeamento (`permission_policy.py`)**:
   - **Causa raiz (RC1)**: Comandos de terminal despachados pelo Copilot SDK envolvidos em wrappers interativos (`powershell -Command "..."`, `cmd.exe /c "..."`, `bash -c "..."`) eram avaliados na íntegra contra a allowlist em vez de inspecionar o subcomando embutido, resultando em falsos positivos de negação e bloqueio persistente de ferramentas de inspeção read-only. Implementada função de unwrap iterativo para extrair o comando interno real antes da validação.
