@@ -122,6 +122,64 @@ No arquivo `settings.json` do VS Code:
 
 ---
 
+## ⚠️ Armadilha Comum: Variáveis de Ambiente do Shell Sobrescrevem o `.env`
+
+O Docker Compose resolve variáveis com a seguinte ordem de precedência: **variáveis exportadas no shell > arquivo `.env` > default do compose file**. Se você já rodou comandos de teste manual como `export LANGFUSE_OTLP_AUTH=...` (ou `LANGFUSE_PUBLIC_KEY`/`LANGFUSE_SECRET_KEY`/`LANGFUSE_HOST`) na sessão atual do terminal, esses valores **têm prioridade sobre o `.env`** mesmo depois de editar o arquivo e rodar `--force-recreate`.
+
+**Sintoma**: `docker compose config` mostra um valor diferente do que está no `.env`, e o coletor sempre recebe `401 Unauthenticated` do Langfuse Cloud mesmo com credenciais corretas no `.env`.
+
+**Diagnóstico**:
+```bash
+# Compare o valor real que o Compose vai usar com o do arquivo .env
+docker compose config | grep -A1 LANGFUSE
+grep LANGFUSE .env
+
+# Se forem diferentes, o shell tem uma variavel exportada sobrescrevendo:
+env | grep LANGFUSE
+```
+
+**Correção**: limpe as variáveis do shell atual e recrie o container:
+```bash
+unset LANGFUSE_OTLP_AUTH LANGFUSE_ENDPOINT LANGFUSE_PUBLIC_KEY LANGFUSE_SECRET_KEY LANGFUSE_HOST
+docker compose --profile otel up -d --force-recreate otel-collector
+```
+
+### ⚠️ Variante do Gateway (`local-chat-gateway`): `OTEL_EXPORTER_OTLP_ENDPOINT`
+
+Bug real de produção encontrado em 2026-10-01: a mesma armadilha de precedência shell > `.env` também afeta `OTEL_EXPORTER_OTLP_ENDPOINT` quando o `deploy/local-chat-gateway/docker-compose.yml` é usado. Se o desenvolvedor já configurou a telemetria da IDE (Seção "Configuração da IDE" acima / `docs/context/setup-telemetry-copilot.md`) com `export OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4318` no perfil do shell, essa variável **sobrescreve silenciosamente** o valor do `.env` do gateway ao rodar `docker compose up` a partir do mesmo terminal — o container do gateway herda `127.0.0.1:4318` (loopback **dele mesmo**, onde nada escuta) em vez de `http://otel-collector:4318`, e **toda a telemetria do gateway é descartada sem nenhum erro visível** (o `telemetry.py` do gateway falha silenciosamente ao tentar conectar).
+
+Por isso, o `docker-compose.yml` do gateway usa deliberadamente o nome **`GATEWAY_OTEL_EXPORTER_OTLP_ENDPOINT`** (exclusivo, sem colisão) para a variável de interpolação no `.env`/shell do host — o nome `OTEL_EXPORTER_OTLP_ENDPOINT` dentro do container (visto por `local_chat_gateway.config.Settings`) permanece inalterado. Se mesmo assim houver dúvida, diagnostique e corrija da mesma forma:
+```bash
+env | grep -i otel
+unset OTEL_EXPORTER_OTLP_ENDPOINT
+docker compose --profile otel up -d --force-recreate gateway
+```
+
+---
+
+## 🧹 Filtro de Ruído: Spans Internos da IDE (`session.timing.*`)
+
+O plugin nativo do GitHub Copilot (IDE) emite, além dos spans úteis (`chat`, `invoke_agent`, `execute_tool`), uma série de spans de **instrumentação interna de inicialização** nomeados `session.timing.*` (ex.: `session.timing.turn_setup`, `session.timing.model_resolution`, `session.timing.mcp_catalog`, `session.timing.lsp_initialization`, `session.timing.tool_cache_validation`). Esses spans:
+
+- Não carregam `gen_ai.agent.name`, `gen_ai.tool.name` nem qualquer dado de decisão/roteamento.
+- Não ajudam a identificar desvio de fluxo de agent, falha de handoff ou violação de guardrail.
+- Poluem o dashboard do Langfuse ao analisar ponta-a-ponta um prompt de refatoração/migração de framework (dezenas de linhas irrelevantes por turno).
+
+O `otel-collector-config.yaml` descarta esses spans **antes do despacho ao Langfuse** via processor `filter/drop_ide_session_timing_noise` (OTTL `IsMatch(name, "^session\\.timing\\..*")`), aplicado tanto a `traces.span` quanto `traces.spanevent` (cobre ambas as representações possíveis). Os spans relevantes para depuração de fluxo (`chat: ...`, `invoke_agent`, `execute_tool: ...`, `governance.health_check`, `governance.route`, `governance.workflow_transition`) **não são afetados**.
+
+**Para adicionar novos padrões de ruído** (caso a IDE passe a emitir outro prefixo irrelevante), edite a lista de condições do processor:
+```yaml
+filter/drop_ide_session_timing_noise:
+  error_mode: ignore
+  traces:
+    span:
+      - 'IsMatch(name, "^session\\.timing\\..*")'
+      - 'IsMatch(name, "^outro\\.prefixo\\..*")'   # novo padrão
+```
+Reinicie o coletor (`docker compose up -d --force-recreate otel-collector` ou `docker restart otel-proxy`) após qualquer alteração.
+
+---
+
 ## 🔍 Como Validar a Conexão
 
 Execute o script de trace sintético via Node.js:

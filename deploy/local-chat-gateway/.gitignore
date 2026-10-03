@@ -1,0 +1,11 @@
+.venv/
+.env
+secrets/
+data/
+.tmp/
+.coverage
+.pytest_cache/
+.mypy_cache/
+__pycache__/
+*.egg-info/
+nul

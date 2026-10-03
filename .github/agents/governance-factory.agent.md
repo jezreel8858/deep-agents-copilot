@@ -237,6 +237,7 @@ Executar o checklist genérico de `governance-factory-patterns` §3, mais:
 - [ ] Portão de Reúso Sistêmico (R-055 / Q1-Q2-Q3) avaliado: checado se a melhoria deve ser propagada para artefatos irmãos (Q1), templates canônicos (Q2) e testes determinísticos (Q3).
 - [ ] Catálogo(s) correspondente(s) ao tipo mapeado para atualização atômica (R-015).
 - [ ] `model:` (quando presente) validado via `get_errors`.
+- [ ] Se o novo agent criado possui perfil de AUTOR de documento `.md` de planejamento/blueprint/spec/implementation-plan, referenciar obrigatoriamente a seção "Documentos de Planejamento de Workflow" da skill `documentation-writing-patterns` em seu `source_docs:`, e garantir que o contrato do agent determine corretamente se o documento gerado é do tipo PLANEJAMENTO (front-matter + Alternativas Rejeitadas) ou IMPLEMENTAÇÃO (front-matter + checklist GFM obrigatório).
 - [ ] Se `run_in_terminal` for declarado em `tools:` (agent, prompt ou stack): inclusão compulsória de `.github/skills/terminal-governance/SKILL.md` em `source_docs` (ou `skills:` locais) (R-049).
 
 ## Diretrizes

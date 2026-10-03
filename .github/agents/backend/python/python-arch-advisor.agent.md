@@ -9,6 +9,7 @@ model: "Claude Sonnet 5"
 tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_execute', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index']
 source_docs:
   - .github/skills/context-mode/SKILL.md
+  - .github/skills/documentation-writing-patterns/SKILL.md
   - CLAUDE.md
   - .github/copilot-instructions.md
   - .github/instructions/python-backend.instructions.md
@@ -54,6 +55,25 @@ Riscos Arquiteturais e de Tipagem:
 
 Plano de Modernização e Próximos Passos:
 - <plano acionável de evolução técnica e desacoplamento>
+```
+
+### Template de Plano de Implementação Técnica (R-064)
+
+```markdown
+---
+status: draft
+date: YYYY-MM-DD
+autor: python-arch-advisor
+workflow: <workflow-canonico-1-a-9>
+related-planning-doc: <path-do-doc-de-planejamento-aprovado> # obrigatório R-064
+progress: 0
+---
+
+Progresso: 0/N tarefas concluídas
+
+### Checklist de Execução Técnica (GFM Unificado)
+- [ ] <descrição atômica da tarefa técnica> `{paralelizavel: bool, responsavel: "@python-feature-developer"}`
+- [ ] <próxima tarefa técnica> `{paralelizavel: bool, responsavel: "@python-feature-developer"}`
 ```
 
 <execution_protocol>

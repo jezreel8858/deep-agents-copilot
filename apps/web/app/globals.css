@@ -1,0 +1,1137 @@
+/* ==========================================================================
+   Deep Agents Chat — estilos base do AppShell, login e paginas (chat).
+   `globals.css` estava vazio desde a migracao v1 -> v2 do CopilotKit
+   (bug visual real, 2026-10-01): sem altura/flex definidos, o container do
+   `<CopilotChat>`/`<CopilotSidebar>` nao tinha onde se encaixar e a UI
+   ficava comprimida no topo da pagina, sem nav estilizada.
+   ========================================================================== */
+
+:root {
+  /* Altere o valor atual para o tamanho desejado */
+  --cpk-container-3xl: 68rem !important;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  background: #f7f7f8;
+  color: #1a1a1a;
+}
+
+/* -- AppShell (nav + area de conteudo em altura cheia) -------------------- */
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.app-shell__nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid #e5e5e5;
+  background: #fff;
+}
+
+.app-shell__nav strong {
+  font-size: 1rem;
+  margin-right: 1rem;
+}
+
+.app-shell__nav a {
+  color: #555;
+  text-decoration: none;
+  font-size: 0.9rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.app-shell__nav a:hover {
+  background: #f0f0f0;
+  color: #111;
+}
+
+.app-shell__nav a[data-active="true"] {
+  background: #111;
+  color: #fff;
+}
+
+.app-shell__main {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* -- Chat (pagina inicial) -------------------------------------------------
+   O container precisa de altura explicita: `<CopilotChat>` so centraliza o
+   placeholder ("How can I help you today?") e distribui o historico de
+   mensagens corretamente quando o pai tem uma altura resolvida (nao apenas
+   `flex: 1` dentro de um pai sem `display: flex`). */
+
+.chat-page {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.deep-agents-chat {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* -- Workspace -------------------------------------------------------------
+   `<CopilotSidebar>` e um overlay (position: fixed, largura propria a
+   partir de 768px — ver node_modules/@copilotkit/react-core/dist/v2/
+   index.css, seletor [data-copilot-sidebar]); nao participa do flex do
+   `.app-shell__main`, entao o conteudo da pagina pode ocupar 100% da
+   largura disponivel sem calculo manual de offset. */
+
+.workspace-page {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1.5rem;
+  max-width: 720px;
+}
+
+.workspace-page h1 {
+  margin: 0 0 0.75rem;
+  font-size: 1.5rem;
+}
+
+.workspace-page p {
+  margin: 0 0 1rem;
+  color: #444;
+  line-height: 1.5;
+}
+
+.workspace-page textarea {
+  width: 100%;
+  max-width: 480px;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  resize: vertical;
+}
+
+/* -- Login ------------------------------------------------------------- */
+
+.login-page {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f7f7f8;
+}
+
+.login-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 320px;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+}
+
+.login-card h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+  text-align: center;
+}
+
+.login-card input {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.login-card button {
+  padding: 0.6rem 0.75rem;
+  border: none;
+  border-radius: 8px;
+  background: #111;
+  color: #fff;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.login-card button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* -- ElicitationBridge ----------------------------------------------------
+   Overlay modal para a elicitation MCP nativa (ex.: `ask_questions`), ver
+   `copilot/ElicitationBridge.tsx`. Formulario renderizado via RJSF
+   (`react-jsonschema-form`) diretamente sobre o `requestedSchema`. */
+
+.elicitation-bridge__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.elicitation-bridge__card {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 1.75rem;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.elicitation-bridge__fechar {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #888;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.elicitation-bridge__fechar:hover:not(:disabled) {
+  background: #f0f0f0;
+  color: #111;
+}
+
+.elicitation-bridge__fechar:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.elicitation-bridge__message {
+  margin: 0 1.75rem 1rem 0;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.elicitation-bridge__actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.elicitation-bridge__actions button[type="submit"] {
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: #111;
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.elicitation-bridge__actions button[type="button"] {
+  padding: 0.6rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  color: #333;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.elicitation-bridge__actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.elicitation-bridge__expirada {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 50;
+  padding: 0.6rem 1rem;
+  background: #fff3cd;
+  border: 1px solid #ffe69c;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+/* -- ElicitationBridge: RJSF (react-jsonschema-form) sem tema Bootstrap --
+   Por padrao o RJSF renderiza fieldset/legend/form-group CRUS (sem CSS),
+   resultando no visual "feio" reportado (borda de fieldset visivel, campos
+   colados, select/checkbox nativos do browser sem espacamento). Estiliza
+   as classes padrao do tema `core` do RJSF (sem depender de bootstrap). */
+
+.elicitation-bridge__card .rjsf {
+  display: flex;
+  flex-direction: column;
+}
+
+.elicitation-bridge__card .rjsf fieldset {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.elicitation-bridge__card .rjsf legend {
+  margin: 0 0 0.75rem;
+  padding: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111;
+}
+
+.elicitation-bridge__card .rjsf #root__description {
+  margin: -0.5rem 0 0.75rem;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.elicitation-bridge__card .rjsf .form-group {
+  margin: 0 0 1rem;
+}
+
+.elicitation-bridge__card .rjsf .form-group:last-child {
+  margin-bottom: 0;
+}
+
+.elicitation-bridge__card .rjsf label.control-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.elicitation-bridge__card .rjsf label.control-label .required {
+  margin-left: 0.15rem;
+  color: #d9534f;
+}
+
+.elicitation-bridge__card .rjsf .field-description {
+  margin: 0.3rem 0 0;
+  font-size: 0.8rem;
+  color: #777;
+}
+
+.elicitation-bridge__card .rjsf input.form-control,
+.elicitation-bridge__card .rjsf select.form-control,
+.elicitation-bridge__card .rjsf textarea.form-control {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  background: #fff;
+  color: #111;
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.elicitation-bridge__card .rjsf input.form-control:focus,
+.elicitation-bridge__card .rjsf select.form-control:focus,
+.elicitation-bridge__card .rjsf textarea.form-control:focus {
+  outline: none;
+  border-color: #111;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
+}
+
+.elicitation-bridge__card .rjsf select.form-control {
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  background-size: 16px;
+  padding-right: 2.2rem;
+}
+
+.elicitation-bridge__card .rjsf .checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.elicitation-bridge__card .rjsf .checkbox label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+}
+
+.elicitation-bridge__card .rjsf .checkbox input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  accent-color: #111;
+  cursor: pointer;
+}
+
+.elicitation-bridge__card .rjsf .panel.errors {
+  margin: 0 0 1rem;
+  padding: 0.65rem 0.85rem;
+  background: #fdecea;
+  border: 1px solid #f5c2c0;
+  border-radius: 8px;
+}
+
+.elicitation-bridge__card .rjsf .panel.errors .panel-heading,
+.elicitation-bridge__card .rjsf .panel.errors .panel-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #c0392b;
+}
+
+.elicitation-bridge__card .rjsf .panel.errors ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.8rem;
+  color: #c0392b;
+}
+
+.elicitation-bridge__card .rjsf .text-danger {
+  color: #c0392b;
+}
+
+/* -- AskUserBridge ---------------------------------------------------------
+   UI nativa (botoes) para a tool `ask_user`, ver `copilot/AskUserBridge.tsx`.
+   Reaproveita `.elicitation-bridge__overlay`/`__card`/`__message`. */
+
+.ask-user-bridge__choices {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ask-user-bridge__choices button {
+  padding: 0.6rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  color: #111;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.ask-user-bridge__choices button:hover:not(:disabled) {
+  background: #f0f0f0;
+}
+
+.ask-user-bridge__choices button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ask-user-bridge__freeform {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.ask-user-bridge__freeform input {
+  flex: 1 1 auto;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.ask-user-bridge__freeform button {
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: #111;
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.ask-user-bridge__freeform button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* -- FileEditBridge ---------------------------------------------------------
+   Visualizacao de DIFF + aprovacao/rejeicao de uma escrita de arquivo
+   proposta pelo agent, ANTES da escrita real ocorrer no disco (pedido
+   explicito do usuario, 2026-10-02 -- paridade com o plugin Copilot da
+   IDE). Reaproveita `.elicitation-bridge__overlay`/`__fechar`/`__actions`
+   (mesmo padrao de overlay modal de `AskUserBridge`/`ElicitationBridge`),
+   com um card proprio mais largo para acomodar o diff linha-a-linha. */
+
+.file-edit-bridge__card {
+  position: relative;
+  width: 100%;
+  max-width: 760px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 1.75rem;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  transition: max-width 0.18s ease, max-height 0.18s ease, width 0.18s ease,
+    height 0.18s ease;
+}
+
+/* Maximizar (pedido do usuario): expande o card para quase toda a
+   viewport, dando mais espaco de leitura para diffs longos, sem sair do
+   padrao de overlay modal (ainda centralizado, ainda com fundo escurecido). */
+.file-edit-bridge__card[data-maximizado="true"] {
+  max-width: 96vw;
+  width: 96vw;
+  max-height: 94vh;
+  height: 94vh;
+}
+
+.file-edit-bridge__card[data-maximizado="true"] .file-edit-bridge__diff {
+  max-height: calc(94vh - 220px);
+}
+
+/* Botoes de utilidade do header (maximizar + fechar), agrupados no canto
+   superior direito do card -- `.elicitation-bridge__fechar` reaproveitado
+   (mesmo estilo circular ja usado por AskUserBridge/ElicitationBridge),
+   `position: static` aqui pois o posicionamento absoluto agora e feito
+   pelo container `.file-edit-bridge__header-actions`. */
+.file-edit-bridge__header-actions {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  z-index: 1;
+}
+
+.file-edit-bridge__header-actions .elicitation-bridge__fechar {
+  position: static;
+}
+
+.file-edit-bridge__maximizar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #888;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.file-edit-bridge__maximizar:hover {
+  background: #f0f0f0;
+  color: #111;
+}
+
+.file-edit-bridge__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin: 0 3.75rem 1rem 0;
+}
+
+.file-edit-bridge__icone {
+  font-size: 1.1rem;
+  line-height: 1.4;
+}
+
+.file-edit-bridge__titulo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.file-edit-bridge__arquivo {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.92rem;
+  word-break: break-all;
+}
+
+.file-edit-bridge__intencao {
+  margin-top: 0.15rem;
+  font-size: 0.82rem;
+  color: #666;
+}
+
+/* Indicador de fila (pedido do usuario, 2026-10-02): visivel quando ha MAIS
+   de 1 arquivo no total (pendentes + ja decididos nesta sessao) -- mostra
+   posicao real e dinamica ("Arquivo X de N", nao mais um "1" fixo) e
+   navegacao Voltar/Avançar entre os arquivos da fila. */
+.file-edit-bridge__fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin: -0.5rem 0 0.9rem;
+  padding: 0.4rem 0.65rem;
+  background: #fff8e1;
+  border: 1px solid #ffe69c;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  color: #7a5c00;
+}
+
+.file-edit-bridge__fila-nav {
+  display: flex;
+  gap: 0.35rem;
+  flex: 0 0 auto;
+}
+
+.file-edit-bridge__fila-nav button {
+  padding: 0.2rem 0.55rem;
+  font-size: 0.75rem;
+  color: #7a5c00;
+  background: #fff;
+  border: 1px solid #ffe69c;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.file-edit-bridge__fila-nav button:hover:not(:disabled) {
+  background: #fff3cd;
+}
+
+.file-edit-bridge__fila-nav button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Badge de decisao ja tomada (modo somente-leitura ao navegar "Voltar"
+   para um arquivo ja decidido) -- substitui os botoes de acao Ignorar/
+   Aplicar, que so fazem sentido para o item ATUAL (vivo) da fila. */
+.file-edit-bridge__decisao-badge {
+  display: flex;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.file-edit-bridge__decisao-badge[data-decisao="approve"] {
+  color: #1a7f37;
+}
+
+.file-edit-bridge__decisao-badge[data-decisao="reject"] {
+  color: #57606a;
+}
+
+
+.file-edit-bridge__resumo {
+  flex: 0 0 auto;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.file-edit-bridge__resumo-add {
+  color: #1a7f37;
+}
+
+.file-edit-bridge__resumo-rem {
+  color: #cf222e;
+}
+
+.file-edit-bridge__diff {
+  max-height: 50vh;
+  overflow: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+  transition: max-height 0.18s ease;
+}
+
+.file-edit-bridge__sem-diff {
+  margin: 0;
+  padding: 1rem;
+  font-size: 0.85rem;
+  color: #777;
+}
+
+.file-edit-bridge__tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.file-edit-bridge__tabela tr[data-tipo="adicionada"] {
+  background: #e6ffed;
+}
+
+.file-edit-bridge__tabela tr[data-tipo="removida"] {
+  background: #ffeef0;
+}
+
+.file-edit-bridge__num {
+  width: 1%;
+  padding: 0 0.5rem;
+  color: #999;
+  text-align: right;
+  user-select: none;
+  white-space: nowrap;
+  border-right: 1px solid #ececec;
+}
+
+.file-edit-bridge__conteudo {
+  padding: 0 0.6rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.file-edit-bridge__marcador {
+  display: inline-block;
+  width: 1ch;
+  margin-right: 0.3rem;
+  color: #999;
+  user-select: none;
+}
+
+tr[data-tipo="adicionada"] .file-edit-bridge__marcador {
+  color: #1a7f37;
+  font-weight: 700;
+}
+
+tr[data-tipo="removida"] .file-edit-bridge__marcador {
+  color: #cf222e;
+  font-weight: 700;
+}
+
+.file-edit-bridge__linha-hunk td {
+  padding: 0.3rem 0.6rem;
+  background: #f1f8ff;
+  color: #555;
+  font-size: 0.75rem;
+}
+
+/* Tema de cor dos botoes de acao (pedido do usuario): "Aplicar alterações"
+   como acao primaria de sucesso (verde solido, com elevacao sutil no
+   hover/active) e "Ignorar" como acao secundaria neutra (outline cinza,
+   sem conotacao de perigo/erro -- ignorar nao e uma acao destrutiva) em
+   vez do botao branco generico reaproveitado de `.elicitation-bridge__
+   actions button[type="button"]`. Ambos com `!important` pontual para
+   sobrepor o estilo generico compartilhado do overlay modal. */
+.file-edit-bridge__aprovar {
+  background: #1a7f37 !important;
+  color: #fff !important;
+  border-color: #1a7f37 !important;
+  box-shadow: 0 1px 2px rgba(26, 127, 55, 0.25);
+  transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+.file-edit-bridge__aprovar:hover:not(:disabled) {
+  background: #166c2e !important;
+  box-shadow: 0 2px 6px rgba(26, 127, 55, 0.35);
+}
+
+.file-edit-bridge__aprovar:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.file-edit-bridge__ignorar {
+  background: #fff !important;
+  color: #57606a !important;
+  border: 1px solid #d0d7de !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.file-edit-bridge__ignorar:hover:not(:disabled) {
+  background: #f6f8fa !important;
+  border-color: #afb8c1 !important;
+  color: #24292f !important;
+}
+
+/* -- tool-call-box -----------------------------------------------------
+   Rotulo amigavel de tool calls (useDefaultRenderTool em actions.tsx +
+   copilot/toolLabels.ts) -- substitui o nome tecnico cru (`glob`, `view`,
+   `context-mode/ctx_search`...) por icone + verbo humano em PT-BR.
+   Layout em caixa pouco arredondada (border-radius 8px, nao mais pill
+   999px) para se aproximar da "caixa do Tavily" do plugin Copilot na IDE:
+   cabecalho compacto (icone + rotulo + indicador de status em 1 simbolo)
+   e corpo expansivel ("detalhes") sem o texto verboso anterior
+   ("✓ concluído" / "⏳ em execução…" -- irrelevante ao usuario). */
+
+.tool-call-box {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  background: #fafafa;
+  font-size: 0.85rem;
+  color: #333;
+  margin: 0.3rem 0;
+  overflow: hidden;
+}
+
+.tool-call-box[data-status="executando"] {
+  border-color: #cfe3ff;
+  background: #f3f8ff;
+}
+
+.tool-call-box[data-status="concluido"] {
+  border-color: #e0e0e0;
+  background: #fff;
+}
+
+.tool-call-box__header {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.75rem;
+}
+
+.tool-call-box__icone {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.tool-call-box__rotulo {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tool-call-box__indicador {
+  margin-left: 0.15rem;
+  font-size: 0.8rem;
+  line-height: 1;
+  color: #2e7d32;
+}
+
+.tool-call-box[data-status="executando"] .tool-call-box__indicador {
+  color: #777;
+}
+
+.tool-call-box__detalhes {
+  border-top: 1px solid #ececec;
+  padding: 0.4rem 0.75rem 0.55rem;
+}
+
+.tool-call-box__detalhes summary {
+  cursor: pointer;
+  color: #666;
+  font-size: 0.78rem;
+  list-style: none;
+}
+
+.tool-call-box__detalhes summary::-webkit-details-marker {
+  display: none;
+}
+
+.tool-call-box__detalhes summary::before {
+  content: "▶ ";
+  font-size: 0.7rem;
+}
+
+.tool-call-box__detalhes[open] summary::before {
+  content: "▼ ";
+}
+
+.tool-call-box__detalhes pre {
+  margin-top: 0.4rem;
+  max-height: 200px;
+  overflow: auto;
+  background: #f7f7f7;
+  border: 1px solid #ececec;
+  border-radius: 6px;
+  padding: 0.5rem;
+  font-size: 0.75rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+
+
+
+
+/* -- MentionTextArea / MentionPopover --------------------------------------
+   Picker "#" (arquivos do workspace) e "@" (agents disponiveis) sobre o
+   composer do chat, paridade visual com o plugin Copilot da IDE (ver
+   copilot/mentions/MentionTextArea.tsx + MentionPopover.tsx). */
+
+.mention-textarea-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.mention-popover {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 0.4rem);
+  z-index: 40;
+  min-width: 320px;
+  max-height: 280px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.mention-popover__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #666;
+  border-bottom: 1px solid #eee;
+}
+
+.mention-popover__loading {
+  font-weight: 400;
+  color: #999;
+}
+
+.mention-popover__list {
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem;
+}
+
+/* Item em 2 linhas (nome em cima, descricao embaixo) em vez de 1 linha so
+   -- bug real corrigido: descricoes longas de agent (frases completas)
+   "roubavam" o espaco flex do nome/arquivo numa unica linha, deixando o
+   nome ilegivel (truncado em 2-3 caracteres). Empilhar garante que o nome
+   SEMPRE tenha a largura inteira do item disponivel. */
+.mention-popover__item {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.15rem;
+  width: 100%;
+  min-width: 0;
+  padding: 0.5rem 0.65rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  text-align: left;
+  font-size: 0.85rem;
+  color: #222;
+  cursor: pointer;
+}
+
+.mention-popover__item:hover,
+.mention-popover__item[data-active="true"] {
+  background: #f0f0f0;
+}
+
+.mention-popover__row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.mention-popover__trigger {
+  flex: 0 0 auto;
+  color: #888;
+  font-weight: 600;
+}
+
+.mention-popover__label {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 600;
+  font-size: 0.92rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mention-popover__description {
+  min-width: 0;
+  color: #888;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* -- MentionChatInput / MentionChipsBar ------------------------------------
+   Chips removiveis acima do composer para mencoes "#"/"@" selecionadas,
+   paridade visual com o plugin Copilot da IDE (ver
+   copilot/mentions/MentionChatInput.tsx + MentionChipsBar.tsx). */
+
+.mention-chat-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+/* Alinhamento com o composer real (bug real corrigido): `CopilotChatInput`
+   centraliza o proprio corpo com `max-width: 48rem; margin: 0 auto;
+   padding: 0 1rem;` (classes `cpk:max-w-3xl cpk:mx-auto cpk:px-4`,
+   confirmadas por introspeccao do bundle instalado em
+   node_modules/@copilotkit/react-core). Como os chips sao um IRMAO do
+   `<CopilotChatInput>` renderizado por `MentionChatInput` (nao um filho
+   dele), replicar exatamente a mesma formula de largura/centralizacao e a
+   unica forma dos chips alinharem com a caixa de texto em vez de ocuparem
+   a largura inteira da tela, flush a esquerda. `pointer-events: auto`
+   reativa cliques no botao de remover -- o container pai (overlay do
+   CopilotKit que posiciona o composer no rodape) usa `pointer-events: none`
+   por padrao, so reativado pelos proprios elementos interativos. */
+.mention-chips-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  max-width: var(--cpk-container-3xl);
+  margin: 0 auto;
+  padding: 0 1rem;
+  box-sizing: border-box;
+  pointer-events: auto;
+}
+
+.mention-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 260px;
+  padding: 0.25rem 0.5rem;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  color: #222;
+}
+
+.mention-chip[data-kind="agent"] {
+  background: #eef2ff;
+  border-color: #d8ddfb;
+}
+
+.mention-chip__icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background: #e5e5e5;
+  color: #555;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.mention-chip[data-kind="agent"] .mention-chip__icon {
+  background: #dde3fb;
+  color: #3b4bb8;
+}
+
+.mention-chip__label {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mention-chip__remove {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #888;
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mention-chip__remove:hover {
+  background: #e0e0e0;
+  color: #111;
+}
+
+
+/* -- Streamdown (markdown renderer do CopilotKit v2) -- quebra de linha em
+   blocos de codigo -----------------------------------------------------
+   Bug real corrigido (2026-10-03): o renderer "streamdown" usado pelo
+   <CopilotChatAssistantMessage.MarkdownRenderer> aplica `overflow-x-auto`
+   no <pre data-streamdown="code-block-body"> (gerado via Shiki) SEM
+   `white-space: pre-wrap`. Resultado: linhas longas (ex.: mensagem de
+   commit, texto plano dentro de bloco ```) nao quebram -- ficam cortadas
+   exigindo scroll horizontal dentro da caixa de codigo, em vez de quebrar
+   como o restante do markdown. Forcamos quebra de linha preservando
+   indentacao (`pre-wrap`) e permitindo quebra de tokens muito longos sem
+   espaco (hashes, URLs) via `overflow-wrap: anywhere`. Mantemos
+   `overflow-hidden` do wrapper externo (`[data-streamdown="code-block"]`)
+   intacto -- so cuida do recorte das bordas arredondadas do cabecalho. */
+
+.deep-agents-chat [data-streamdown="code-block-body"] {
+  overflow-x: visible !important;
+  white-space: pre-wrap !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+  max-width: 100%;
+}
+
+.deep-agents-chat [data-streamdown="code-block-body"] code {
+  white-space: inherit;
+  overflow-wrap: inherit;
+  word-break: inherit;
+}
+
+/* Icones/emoji usados nos banners de governanca (status, avisos, setas
+   etc.) e nos marcadores de lista do markdown (bullets, numeracao) devem
+   permanecer visiveis e nao ser cortados pelo `cpk:prose` ao quebrar
+   linha em telas estreitas. */
+.deep-agents-chat .cpk\:prose li {
+  overflow-wrap: anywhere;
+}

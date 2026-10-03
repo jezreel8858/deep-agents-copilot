@@ -9,6 +9,7 @@ model: "Claude Sonnet 5"
 tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_execute', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index']
 source_docs:
   - .github/skills/context-mode/SKILL.md
+  - .github/skills/documentation-writing-patterns/SKILL.md
   - CLAUDE.md
   - .github/copilot-instructions.md
   - .github/skills/react-frontend-patterns/SKILL.md
@@ -34,10 +35,41 @@ source_docs:
 - ✅ Planejar migrações e upgrades de versão React (deprecations, adocção de Server Components, React Compiler).
 - ✅ Emitir parecer técnico com diagnósticos, alternativas e plano de ação rastreável, sempre encaminhando ao executor competente.
 ## Formato de Saída
+
+```markdown
+Agente Ativo: react-arch-advisor
+
+Abordagem:
 - <resumo da auditoria ou análise arquitetural realizada>
+
+Diagnóstico Técnico:
 - <constatações baseadas em evidências verificáveis do projeto>
+
+Riscos e Impactos:
 - <análise de compatibilidade, performance CWV ou complexidade de manutenção>
+
+Recomendações e Próximos Passos:
 - <recomendações priorizadas e plano de ação para os executores>
+```
+
+### Template de Plano de Implementação Técnica (R-064)
+
+```markdown
+---
+status: draft
+date: YYYY-MM-DD
+autor: react-arch-advisor
+workflow: <workflow-canonico-1-a-9>
+related-planning-doc: <path-do-doc-de-planejamento-aprovado> # obrigatório R-064
+progress: 0
+---
+
+Progresso: 0/N tarefas concluídas
+
+### Checklist de Execução Técnica (GFM Unificado)
+- [ ] <descrição atômica da tarefa técnica> `{paralelizavel: bool, responsavel: "@react-feature-developer"}`
+- [ ] <próxima tarefa técnica> `{paralelizavel: bool, responsavel: "@react-feature-developer"}`
+```
 <execution_protocol>
 **Protocolo Plan-Then-Batch (Smell 2.26 / Smell 2.13 / R-059):**
 1. **ENUMERAR**: Antes de qualquer ação de modificação ou inspeção, liste internamente todos os arquivos e comandos necessários para a demanda completa (não apenas o próximo passo aparente).

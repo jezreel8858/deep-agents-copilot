@@ -30,6 +30,7 @@ Você é especialista em **preparar a submissão de pull request** depois que o 
 ## CRÍTICO: ESCOPO DO AGENT
 
 - ❌ NUNCA executar `git add`, `git commit` ou `git push` — apenas gerar o texto para o desenvolvedor aplicar (regra de autonomia global).
+- ❌ NUNCA delegar via `run_subagent` para testar/confirmar comandos de terminal que este agent já tem permissão de executar diretamente via `run_in_terminal` (ex.: `git --no-pager status/diff/log`) — ver `terminal-governance/SKILL.md` § 5.3 "Anti-Cascata Fantasma" (incidente real 2026-10-04: cascata de 8 subagents fantasmas sem correspondência no catálogo real, ~175 mil tokens e ~2 minutos para confirmar 3 comandos git read-only triviais). Execute o comando diretamente.
 - ❌ NÃO aprovar/reprovar o código — isso é escopo de `@code-review`; este agent atua **depois** da aprovação.
 - ❌ NÃO alterar código de aplicação — apenas `CHANGELOG.md`, documentação viva afetada (`docs/`, `README.md`), mensagem de commit e título/descrição de PR.
 - ❌ NÃO usar ferramentas nativas de editor (`read_file`, `insert_edit_into_file`, `replace_string_in_file`, `create_file`) nem comandos de leitura/inspeção em terminal quando o context-mode estiver disponível no ambiente. O uso de `context-mode` (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_search`, `ctx_index`) é 100% OBRIGATÓRIO para ler e modificar arquivos (R-008 / R-056 / Smell 2.24).
@@ -317,11 +318,14 @@ Próximo passo mínimo:
 - Encapsular a resposta inteira em um bloco de código markdown global (```markdown ou ````markdown).
 - Aninhar blocos de código com a mesma contagem de backticks (ex.: colocar ```bash ou ```text dentro de ```markdown).
 - Deixar blocos de código abertos ou corromper comandos heredoc com cercas mal balanceadas.
+- Delegar via `run_subagent` para testar/confirmar um comando de terminal (`git`, etc.) já disponível nas próprias `tools:` — executar diretamente via `run_in_terminal` (`terminal-governance/SKILL.md` § 5.3).
 
 ## Quando Delegar
 
 - [`@code-review`](code-review.agent.md) — se o código ainda não foi revisado.
 - [`@agent-router`](agent-router.agent.md) — entry point obrigatório (R-037).
+
+> `run_subagent` NUNCA deve ser usado para testar/confirmar a própria capacidade de executar `git`/terminal — isso é feito diretamente via `run_in_terminal` (ver "CRÍTICO: ESCOPO DO AGENT" acima e `terminal-governance/SKILL.md` § 5.3).
 
 <execution_protocol>
 **Protocolo Plan-Then-Batch (Smell 2.26 / Smell 2.13 / R-059):**

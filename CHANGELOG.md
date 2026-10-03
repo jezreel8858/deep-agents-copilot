@@ -6,6 +6,171 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+---
+
+---
+
+## [2.51.5] — 2026-10-04
+
+### Corrigido — Shell permission persistente, logging em arquivo e fail-fast de porta no Gateway
+
+- **Unwrap de Shell Wrapper e Segurança no Encadeamento (`permission_policy.py`)**:
+  - **Causa raiz (RC1)**: Comandos de terminal despachados pelo Copilot SDK envolvidos em wrappers interativos (`powershell -Command "..."`, `cmd.exe /c "..."`, `bash -c "..."`) eram avaliados na íntegra contra a allowlist em vez de inspecionar o subcomando embutido, resultando em falsos positivos de negação e bloqueio persistente de ferramentas de inspeção read-only. Implementada função de unwrap iterativo para extrair o comando interno real antes da validação.
+  - **Correção de Segurança pós-Quality Gate**: Adicionado o operador `"&"` a `_SEPARADORES_ENCADEAMENTO` e introduzida verificação estrita via `_bate_subcomando` com delimitadores de palavra/argumento, eliminando vulnerabilidades de prefix-match ambíguo onde comandos maliciosos podiam simular prefixos permitidos (ex.: `git-malicious` ou `dir&&calc`).
+- **Detecção Fail-Fast de Porta Ocupada (`dev_watch.py`)**:
+  - Implementada função `_porta_ocupada(host, port)` utilizando `socket.create_connection` para abortar a inicialização imediatamente com código de erro 1 e mensagem descritiva caso a porta configurada (default `8000`) já esteja em uso por outro processo zumbi ou instância prévia, prevenindo loops de reinicialização silenciosos do watcher.
+- **Sistema de Logging Aditivo em Arquivo Rotativo (`logging_config.py`)**:
+  - Adicionado novo módulo com suporte a `RotatingFileHandler` gravando logs estruturados em formato texto legível em `.tmp/gateway.log` (com rotação configurável de 10 MB e até 5 backups).
+  - Configuração idempotente com guardrail para evitar acúmulo duplicado de handlers ao recarregar a aplicação (`app.py` e `config.py`).
+  - Governança de arquivos: `.tmp/` e `.tmp/*.log` adicionados a `.gitignore`, `Dockerfile.dockerignore` e documentados em `.env.example` e `README.md`.
+- **Testes e Cobertura**:
+  - Adicionados 24+ novos testes unitários (`test_permission_policy.py`, `test_dev_watch_port_check.py`, `test_logging_config.py`).
+  - Suíte de permissões: 78/78 passed; suíte combinada do gateway: 114/115 passed (1 falha ambiental pré-existente e não-relacionada).
+- **Ressalva do Quality Gate (Backlog)**:
+  - Identificada oportunidade de hardening futuro para operadores de redirecionamento de shell (`>`, `>>`, `<`) fora do escopo estrito deste bugfix, recomendada para issue separada.
+- **Planos**:
+  - `docs/plans/20261004-bugfix-shell-permission-persistente-logging-arquivo.md`
+  - `docs/implementation-plans/20261004-bugfix-shell-permission-persistente-logging-arquivo.md`
+
+---
+
+## [2.51.4] — 2026-10-02
+
+### Corrigido — MCP servers (context-mode/tavily/codegraph) e tools de IDE nunca registrados no Copilot SDK Headless Runner
+
+- **Causa raiz (complementar à `[2.51.3]`)**: agentes servidos via Copilot SDK Headless Runner no `deep-agents-gateway` (`deploy/local-chat-gateway`) não tinham acesso a `ask_questions`, `run_in_terminal`, `run_subagent` nem aos servidores MCP (`context-mode`, `tavily`, `codegraph`) porque (RC1) `_ALIAS_TOOLS_SDK_HEADLESS` (`agent_catalog.py`) só traduzia `ask_questions`→`ask_user`, deixando as demais tools de convenção de IDE sem mapeamento para os nomes nativos do SDK (`bash`, `powershell`, `shell`, `grep`, `create`, `str_replace_editor`, `task`, `web_fetch`, `ask_user`); e (RC2) nenhuma das duas chamadas `client.create_session(...)` (`sdk_session.py`) passava o parâmetro `mcp_servers=`, apesar de o SDK suportá-lo nativamente. `.vscode/mcp.json` só é lido pelo VS Code/Agent Host, nunca pelo processo Python headless do gateway.
+- **Catálogo e Configuração MCP**: novo módulo `mcp_servers_catalog.py` com lista fechada dos 3 servidores MCP homologados (context-mode, tavily, codegraph), variáveis de ambiente isoladas via `_env_minimo()` (nunca herda `os.environ` completo) e credenciais lidas exclusivamente por referência de variável de ambiente (nunca hardcoded); 8 novos campos em `config.py` (`Settings`); injeção de `mcp_servers=` em `stream_chat` e `stream_chat_ag_ui`.
+- **Mapeamento de aliases e allowlist de shell nativo**: `_ALIAS_TOOLS_SDK_HEADLESS` expandido com o mapeamento completo IDE→SDK nativo; nova `_agent_autorizado_para_shell_nativo` em `agent_catalog.py` — allowlist deny-by-default que só libera `bash`/`powershell`/`shell` para agents que declarem `run_in_terminal` em `tools:` **e** vinculem `terminal-governance/SKILL.md` em `source_docs:` (R-049), fail-closed por padrão.
+- **Hardening de Segurança em `permission_policy.py` (4 camadas, Quality Gate com 3 iterações do loop R-050.4 + 1 correção pontual aprovada pelo usuário)**:
+  1. Integração das novas tools MCP/shell ao fluxo existente de validação (`tool_call_nao_escrita_e_segura`), sem caminho paralelo de bypass.
+  2. Denylist estendida para o payload real `code`/`language` das tools `ctx_execute`/`ctx_execute_file` (fechou bypass em que o payload de execução de código não era reconhecido pela heurística de comando perigoso).
+  3. `_PADROES_PERIGOSOS_MULTI_LINGUAGEM` (17 padrões destrutivos/exfiltração em Python/JS/TS, ex. `shutil.rmtree`, `fs.rmSync`, `requests.post`) + heurística de `path`/`cwd` suspeito (travessia `..`, diretórios sensíveis); risco residual documentado explicitamente no código para `mcp_codegraph_*` (confirmado 100% read-only/offline via `@code-knowledge-graph`) e `mcp_tavily_*` extract/crawl/map (mitigado via allowlist de agente, não denylist de conteúdo).
+  4. Fechamento de fail-open no parâmetro `commands` (array) da tool `ctx_batch_execute` — `_extrair_comandos_batch`/`_comando_batch_item_e_seguro` validam cada item do lote individualmente, negando o lote inteiro se qualquer item for inseguro ou malformado.
+- **Testes**: ~32 novos testes unitários distribuídos em `test_agent_catalog.py`, `test_mcp_servers_catalog.py` (novo), `test_config.py`, `test_sdk_session.py` e `test_permission_policy.py`. Suíte completa do gateway revalidada ao final: 331 passed (1 falha ambiental pré-existente e não-relacionada, já conhecida desde `[2.51.3]`).
+- **Planos aprovados**: `docs/plans/20261002-bugfix-mcp-tools-headless-sdk.md` e `docs/implementation-plans/20261002-bugfix-mcp-tools-headless-sdk.md` (Security Checkpoint do `@tech-solution-architect` + Quality Gate do `@code-review`, ambos documentados nos arquivos).
+
+---
+
+## [2.51.3] — 2026-10-02
+
+### Corrigido — Causa raiz real do bloqueio de `run_in_terminal`/git: `PermissionRequestShell` nunca reconhecida pelo SDK
+
+- **Investigação via `ctx_execute` (sandbox)**: introspecção real do pacote `github-copilot-sdk` instalado no `.venv` do gateway (`copilot.session_events`) revelou que comandos de terminal/PowerShell chegam como uma classe **distinta e dedicada** — `PermissionRequestShell` (campos `full_command_text`, `commands: list[PermissionRequestShellCommand]`, cada um com `identifier` + `read_only: bool` **nativo do próprio SDK**) — e **NÃO** como `PermissionRequestCustomTool`/`PermissionRequestMcp`. A correção anterior (`[2.51.1]`), que atuava via `tool_name`/`params["command"]`, nunca chegava a ser consultada: `_identificador_e_seguro_nativo` (`sdk_session.py`) não reconhecia `PermissionRequestShell`, caindo sempre no branch genérico (`seguro_nativo=False`) — por isso `pr-gatekeeper` continuava recebendo "bloqueado pela política local" mesmo após o fix anterior, inclusive para `git --no-pager status`/`diff` 100% read-only.
+- **Regressão adicional encontrada e corrigida durante a investigação**: uma edição anterior (ferramenta de merge automático) havia reintroduzido acidentalmente uma chamada `await _bridge_edicao_arquivo(...)` dentro da versão **síncrona** de `_bridge_permissao` (função `stream_chat`, endpoint legado `/v1/chat/completions`) — código que só existe na versão `async` de `stream_chat_ag_ui`. Isso quebrava `SyntaxError: 'await' outside async function` na importação do módulo inteiro (derrubando o gateway por completo). Revertido cirurgicamente ao comportamento correto (aprovação direta após os 2 guards de segurança, sem pausa adicional nesse endpoint legado), com verificação estrita de conteúdo antes da escrita (R-051) via `ctx_execute`.
+- **Correção definitiva**: `PermissionRequestShell` agora é reconhecida nativamente em `_identificador_e_seguro_nativo` (ambas as variantes, `stream_chat` e `stream_chat_ag_ui`) via nova função `_comando_shell_e_seguro()`, que exige **dois sinais concordantes** (defesa em profundidade): (1) o flag `read_only` nativo do SDK em **todos** os comandos identificados, e (2) `permission_policy.comando_terminal_e_seguro()` (heurística própria já introduzida em `[2.51.1]`) sobre o texto completo do comando. Comandos git mutantes (`commit`/`push`/`add`/...) ou destrutivos continuam bloqueados mesmo que o SDK os marque erroneamente como `read_only`.
+- **Testes**: 1 nova classe `TestPermissionRequestShell` em `test_sdk_session.py` (4 testes unitários puros + 1 teste de integração fim-a-fim via `stream_chat`) + placeholder de `PermissionRequestShell` registrado na fixture compartilhada `_registrar_placeholders_novos_eventos_turn_recorder` (necessário para os 24 testes pré-existentes que mockam `copilot.session_events` não quebrarem com `ImportError`). Suíte completa revalidada: 237/238 (1 falha ambiental pré-existente e não-relacionada, dependente de `/workspaces` real).
+- **Validação**: `black`/`isort`/`flake8` 100% limpos nos arquivos alterados (avisos remanescentes de `flake8` confirmados pré-existentes via comparação linha a linha do diff).
+
+---
+
+## [2.51.2] — 2026-10-02
+
+### Corrigido — `POST /v1/ask-user/{id}/respond` (e irmãos `elicitation`/`file-edit`) 404 silencioso em modo dev
+
+- **Sintoma real reportado em sessão de desenvolvimento**: logo após a correção de permissão acima, o usuário reportou um NOVO sintoma ao responder um diálogo de pergunta (`ask_questions`/`pr-gatekeeper`) na UI: `POST /v1/ask-user/{id}/respond` retornou `404 Not Found`, e o modal fechou como se a resposta tivesse sido entregue — mas o chat ficou parado, sem nenhum feedback visível.
+- **Causa raiz**: `deploy/local-chat-gateway/dev_watch.py` sobe o uvicorn com `--reload` e `reload_dirs=["src"]`; qualquer edição de arquivo `.py` sob `src/` (inclusive a correção acima, feita enquanto a sessão do usuário estava aberta) reinicia o processo do gateway, descartando o `asyncio.Future` pendente em memória (`_PERGUNTAS_PENDENTES`/equivalentes de elicitation/file-edit). O endpoint responde corretamente com `404` nesse caso (`resolver_pergunta_usuario` retorna `False` por design), mas os 3 componentes de ponte do frontend (`AskUserBridge.tsx`, `ElicitationBridge.tsx`, `FileEditBridge.tsx`) nunca checavam `response.ok` do `fetch` — fechavam o diálogo silenciosamente em qualquer resultado, inclusive falha.
+- **Correção**: os 3 componentes agora checam o status HTTP da resposta (e capturam falha de rede via `try/catch`) e, quando a entrega falha em uma ação que o usuário esperava ver refletida no agente (responder pergunta/aceitar elicitation/aplicar diff), exibem um banner `role="alert"` explicando a causa provável (reinício do gateway em modo dev) e orientando a reenviar a mensagem no chat — em vez de fechar silenciosamente deixando a conversa travada sem explicação. Ações de "fechar/cancelar/rejeitar" (onde a falha de entrega é inofensiva à intenção do usuário) permanecem silenciosas.
+- **Não-escopo desta correção**: a perda do `asyncio.Future` em si após um reload é uma limitação arquitetural inerente ao estado em memória + `--reload` em dev (fora do Docker, onde não há reload); não há persistência cross-processo implementada nesta correção — o foco foi eliminar o **silêncio** da falha, não a possibilidade dela ocorrer.
+- **Validação**: `tsc --noEmit` e `eslint` 100% limpos nos 3 arquivos alterados.
+
+---
+
+## [2.51.1] — 2026-10-02
+
+### Corrigido — Negação de `run_in_terminal`/comandos de shell mesmo em `GATEWAY_PERMISSION_MODE=apply`
+
+- **Sintoma real reportado em sessão de desenvolvimento** (Deep Agents Chat + Deep Agents Gateway em modo dev): o agent `pr-gatekeeper` reportou no chat "Não tenho permissão para executar comandos git nesta sessão (bloqueado pela política local do gateway)" mesmo com `GATEWAY_PERMISSION_MODE=apply` definido em `deploy/local-chat-gateway/.env` — impedindo qualquer agent de inspecionar o repositório via `git --no-pager diff/log/status` (leitura pura, sem escrita) para montar mensagem de commit/PR.
+- **Causa raiz**: `GATEWAY_PERMISSION_MODE` só era consultado para tools nativas `PermissionRequestWrite` (escrita de arquivo por caminho). Qualquer outra tool (ex.: `run_in_terminal`/Shell, MCP custom tools) passava por `_conservative_permission_handler` (`api/routes.py`), que liberava **apenas** nomes de tool com prefixo `read_`/`ler_`/`grep_`/`list_`/`file_search` — nunca inspecionava o COMANDO efetivamente executado, bloqueando até operações 100% read-only (`git status`, `git diff`, `ls`, `cat`).
+- **Correção**: centralizada em `local_chat_gateway/permission_policy.py` (fonte única, evitando duplicação entre `_conservative_permission_handler` e `_governance_permission_handler`) a função `comando_terminal_e_seguro()` — classifica heuristicamente comandos de shell como seguros (git read-only: `status`/`diff`/`log`/`show`/`fetch`/`rev-parse`/...; utilitários inócuos: `ls`/`pwd`/`cat`/`mkdir`/instaladores) e **sempre** bloqueia subcomandos git mutantes (`commit`/`push`/`add`/`reset`/`rebase`/...) e padrões destrutivos (`rm -rf`, `sudo`, `curl`/`wget` com pipe para shell), reforçando na infraestrutura do gateway o mesmo princípio de nenhum agent executar commit/push autônomo (R-031) já aplicado via instrução de prompt.
+- **Benefício sistêmico**: a correção é aplicada nos 2 handlers de permissão do gateway (`_conservative_permission_handler` e `_governance_permission_handler`), beneficiando **todos** os agents do catálogo que dependam de `run_in_terminal` para operações read-only (não apenas `pr-gatekeeper`) — ex.: `runtime-verifier`, `debugger`, specialists `*-test-fixer`.
+- **Testes**: 12 novos casos em `tests/unit/test_permission_policy.py` cobrindo comandos git read-only/mutantes, comandos destrutivos, encadeamento (`&&`/`;`/`|`) e a decisão central `tool_call_nao_escrita_e_segura()`; suíte completa revalidada (232/233 — 1 falha pré-existente e não-relacionada em `test_sdk_session.py`, dependente de `/workspaces` real no ambiente local).
+
+---
+
+## [2.51.0] — 2026-10-02
+
+### Alterado — Consolidação de Nomenclatura (Deep Agents Chat / Deep Agents Gateway)
+
+- **Nome de exibição consolidado**: o frontend em `apps/web` (Next.js 16 + CopilotKit v2) agora se identifica como **"Deep Agents Chat"** (`package.json#name = "deep-agents-chat"`, títulos de UI, README, `STORAGE_KEY` do localStorage de threads) e o backend em `deploy/local-chat-gateway` (FastAPI) como **"Deep Agents Gateway"** (`pyproject.toml#name = "deep-agents-gateway"`, título do FastAPI/OpenAPI docs, README, `docker-compose.yml` — `image`/`container_name`/rede, `Dockerfile`, `dev_watch.py`, atributo OTel `telemetry.sdk.name`).
+- **Escopo deliberadamente limitado a metadados de exibição**: o pacote Python importável `local_chat_gateway` (namespace de módulos) e os caminhos de pasta (`apps/web/`, `deploy/local-chat-gateway/`) permanecem **intocados** — confirmado via `@code-knowledge-graph` (blast radius estrutural zero: nenhum import/dependência real de código quebrado). Nomes de pacote em `package.json`/`pyproject.toml` seguem kebab-case (`deep-agents-chat`/`deep-agents-gateway`) por exigência das especificações npm/PEP 621 (proíbem espaços/maiúsculas), reservando "Deep Agents Chat"/"Deep Agents Gateway" para títulos e strings de exibição.
+
+6-09-29
+
+### Removido — Consolidação Exclusiva no Lobe Chat
+
+- **Consolidação Exclusiva no Lobe Chat**: eliminação de serviços e profiles visuais alternativos de `deploy/local-chat-gateway/docker-compose.yml`, remoção de dependências de imagens desnecessárias e sincronização dos diagramas Mermaid, blueprints de arquitetura, planos de implementação e documentação de deploy. Lobe Chat consolidado como interface visual local exclusiva (`--profile lobe`), alinhando o ecossistema com a Decisão de Design D4.
+
+### Adicionado — Local Chat Gateway MVP (FastAPI OpenAI-Compatible com Governança em Código)
+
+- **Pacote `local_chat_gateway` (`deploy/local-chat-gateway/`)**: esqueleto MVP de gateway local opt-in (1 dev = 1 token pessoal do Copilot, nunca multi-tenant — mesmo espírito do Local Overlay Pattern R-043) expondo contratos OpenAI-compatible (`/v1/models`, `/v1/chat/completions`, `/healthz`) para consumo por Lobe Chat (MVP, consolidado como interface exclusiva). Cline e outras UIs alternativas foram explicitamente descartados do escopo desta iniciativa.
+- **Governança em Código (Zero Cópia)**: integração com `governance_runner` (`tools/headless-governance-runner/`) via dependência editável local — `checkpoint_engine` (gramática R-027 + Invariante 11 de respostas vagas), `permission_policy` (stub `read_only`/`propose`/`apply` com as 4 guardas de escrita), `session_store` (SQLAlchemy Core/SQLite), `event_mapper` (3 eventos confirmados pelo spike RT-01), `auth` (Bearer local com `hmac.compare_digest`), sem duplicar `rotear`/`transicionar`/`detectar_deriva`/`Budget`.
+- **Camada de Segurança e Auditoria**: comparação de token em tempo constante, recusa de startup com segredo placeholder (`GATEWAY_API_KEY=change-me`), logging estruturado (`logger.warning`/`logger.info`) nas decisões de autenticação e nas 6 decisões de `autorizar_escrita`, sem nunca logar segredo/token/conteúdo de arquivo.
+- **Infraestrutura Docker (Fase 2)**: `Dockerfile` multi-stage não-root (`python:3.12-slim`, `USER 10001`, `HEALTHCHECK` via stdlib) e `docker-compose.yml` com profiles (`lobe` ativo por padrão conforme D4, `otel` opcional), hardening completo (`read_only`, `cap_drop: [ALL]`, `no-new-privileges`, Docker secret para o token do Copilot, binds em `127.0.0.1`). Tags de imagem fixadas (`lobehub/lobe-chat:v1.19.13`, `otel/opentelemetry-collector-contrib:0.111.0`) após revisão `@devops-engineer`.
+- **Spike RT-01 Resolvido (2/3 gaps)**: inspeção real de runtime do `github-copilot-sdk==1.0.15` confirmou as classes de evento (`ToolExecutionStartData`, `ToolExecutionCompleteData`, `AssistantMessageDeltaData`) e a ausência de suporte nativo a `"ask"`/composição de múltiplos `on_permission_request` — validando as decisões conservadoras já tomadas no blueprint. Gap de tamanho de imagem Docker permanece aberto (ambiente sem Docker daemon disponível para medição).
+- **Documentação Técnica**: blueprint canônico [`docs/architecture/BLUEPRINT_LOCAL_CHAT_GATEWAY.md`](docs/architecture/BLUEPRINT_LOCAL_CHAT_GATEWAY.md) (Mermaid, contrato OpenAPI, matriz de risco RT-01..RT-09, spike de viabilidade do SDK) e plano de implementação [`docs/implementation-plans/20260929-feature-development-local-chat-gateway-mvp.md`](docs/implementation-plans/20260929-feature-development-local-chat-gateway-mvp.md).
+- **Blindagem por Testes**: 91 testes (unitários + integração) 100% aprovados, cobertura 100% em `checkpoint_engine.py`/`permission_policy.py`, conformidade `mypy --strict`/`black`/`isort`/`flake8`; `docker compose config` validado sintaticamente (build real não executado neste ambiente).
+- **Não-escopo desta entrega (Fase 1-2 de N)**: sem integração real do SDK do Copilot no `event_mapper` (classes confirmadas, wiring de sessão real ainda pendente), sem streaming SSE real no endpoint (stub determinístico), sem build/deploy real de imagem.
+
+### Corrigido — 2 Bugs Reais de Build Descobertos em Teste Manual do Usuário
+
+- **`pull access denied for local-chat-gateway`**: `docker compose up` (sem `--build`) tentava fazer `pull` da imagem `local-chat-gateway:local` como se fosse de um registry, mesmo com `build:` declarado. Corrigido com `pull_policy: build` no serviço `gateway` (`docker-compose.yml`) — o Compose agora nunca tenta pull dessa imagem, sempre constrói localmente.
+- **`No matching distribution found for governance-runner`**: o `Dockerfile` instalava `governance-runner` e `local-chat-gateway` em 2 comandos `pip install` separados (mesmo com `--prefix=/install` idêntico); o resolver de dependências do 2º comando não enxergava o pacote instalado pelo 1º (caminho `--prefix` fora do `sys.path` de resolução) e tentava buscar `governance-runner` no PyPI público, onde não existe. Corrigido unindo os 2 pacotes locais em uma única invocação de `pip install` — validado com `docker build` real e completo (`Successfully installed ... governance-runner-0.1.0 ... local-chat-gateway-0.1.0`).
+- **`Automatic OpenTelemetry export requires fastapi[opentelemetry]...`**: o FastAPI 0.142.0 (resolvido no build) introduziu auto-configuração nativa de OpenTelemetry no startup, que falha sem o extra opcional instalado (não instalado deliberadamente — imagem mínima). Corrigido passando `telemetry={"auto_configure": False}` em `FastAPI()` (`app.py`), já que o gateway tem sua própria camada OTel opcional (Seção 9 do blueprint, via `OTEL_EXPORTER_OTLP_ENDPOINT`/`otel-collector`). Validado com smoke test real (`docker run` isolado): `Application startup complete`, `GET /healthz → 200 OK`, container `Up ... (healthy)`. Suíte completa revalidada (91/91 verde, zero regressão).
+- **Streaming SSE real no endpoint (era stub HTTP 501)**: Lobe Chat envia `stream=true` por padrão; o endpoint `/v1/chat/completions` rejeitava com HTTP 501 (não-escopo declarado da entrega anterior), quebrando o fluxo padrão de UI. Implementado streaming SSE real (role-chunk → content-chunk(s) → stop-chunk → `[DONE]`) com `response_model=None` (necessário pois `ChatCompletion | StreamingResponse` não é um tipo Pydantic válido para geração automática de response model).
+- **`OPENAI_MODEL_LIST` ausente no Lobe Chat**: sem essa variável, o seletor de modelos do Lobe exibe o catálogo padrão OpenAI/Ollama (não reconhecido pelo gateway). Corrigido com `OPENAI_MODEL_LIST: "-all,+deep-agents/router=Deep Agents Router"` no serviço `lobe-chat` (`docker-compose.yml`), injetando exclusivamente o modelo do gateway.
+
+### Adicionado — Fase 3 (Integração Real com o SDK do Copilot)
+
+- **Módulo `sdk_session.py`**: wrapper de import tardio (lazy) do pacote opcional `copilot` (extra `[sdk]`), leitura de token (`read_sdk_token`) e `stream_chat()` (async generator) conectando a uma sessão real do Copilot SDK, com fallback determinístico via `SDKUnavailableError` quando o extra não está instalado ou o token está ausente/vazio — nunca quebra a resposta HTTP.
+- **`routes.py` rewired**: ambos os caminhos (streaming e non-streaming) tentam a sessão real primeiro (`_real_or_stub_stream`/`_real_or_stub_completion`), com fallback silencioso ao stub em qualquer `SDKUnavailableError`.
+- **`pyproject.toml`**: novo extra opcional `[sdk]` (`github-copilot-sdk>=1.0.15`), mantendo a imagem mínima por padrão (extra só instalado explicitamente no `Dockerfile`).
+- **`permission_handler` conservador**: função simples que só permite tools com prefixo `read_`/`ler_`/`grep_`/`list_`/`file_search`, como non-escopo explícito desta fase (o `PermissionPolicyStub` já existente com os 3 modos/4 guardas de escrita ainda não foi religado ao handler de permissão real do SDK — fica para fase futura).
+- **Testes**: `test_sdk_session.py` com módulo `copilot` falso injetado via `sys.modules` (token ausente/vazio, SDK não instalado, sequência completa de chunks incluindo tool-start/tool-complete).
+
+### Corrigido — Fase 3 — 4 Bugs Descobertos em Teste Real com Token do Usuário
+
+- **Extra `[sdk]` não instalado no Dockerfile**: o `pip install` do estágio `builder` só instalava `local-chat-gateway` (sem o extra), então o pacote `copilot` nunca existia na imagem — o gateway sempre caía no stub, mesmo com token real montado. Corrigido para `"/build/deploy/local-chat-gateway[sdk]"`.
+- **`OSError: [Errno 30] Read-only file system: '/home/gateway'`**: o usuário `gateway` era criado com `useradd --no-create-home`; combinado com `read_only: true` no container, não havia `$HOME` gravável algum para o SDK cachear o runtime CLI baixado no primeiro uso real. Corrigido com `useradd --create-home`, `ENV HOME=/home/gateway` e um volume nomeado montado sobre esse diretório.
+- **Nomes de evento do SDK errados (conteúdo chegava vazio)**: o spike RT-01 (inspeção estática via `dir()`) identificou corretamente os NOMES de classe existentes no pacote `copilot.session_events`, mas a hipótese de QUAL classe carrega o texto e QUAL sinaliza fim de turno estava errada. `AssistantMessageDeltaData` (hipotetizado para conteúdo) e `SessionIdleData` (hipotetizado para fim de turno) nunca disparam nessa sessão real; os eventos reais são `AssistantMessageData` (campo `.content`) e `AssistantIdleData`. Diagnosticado com logging temporário de qualquer evento não mapeado em uma sessão real (`docker logs` capturando o catálogo completo: `SessionStartData`, `UserMessageData`, `AssistantTurnStartData`, `ModelCallStartData`, `AssistantMessageData`, `AssistantUsageData`, `AssistantTurnEndData`, `AssistantIdleData`, `SessionShutdownData`, entre ~15 outros). Corrigido em `sdk_session.py` (docstring atualizada com a correção e proveniência); teste final real retornou `"content": "teste ok"`.
+- **`EROFS: Read-only file system` na criação da sessão (via Lobe Chat/docker-compose, não reproduzia em `docker run` isolado sem `read_only`)**: o volume gravável cobria apenas `/home/gateway/.cache`, mas o SDK grava logs do processo nativo e estado adicional em outros subdiretórios de `$HOME` (fora do `.cache`); qualquer escrita fora do subdiretório montado caía no filesystem raiz `read_only: true` e falhava. Corrigido montando o volume nomeado sobre `/home/gateway` inteiro (renomeado `gateway-sdk-cache` → `gateway-home` em `docker-compose.yml`, comentários atualizados no `Dockerfile`). Validado com teste isolado replicando `--read-only --tmpfs /tmp` + volume cobrindo todo o `$HOME`: resposta real `"content": "teste read-only ok"`, zero traceback nos logs.
+
+### Corrigido — Fase 3 — 2 Bugs Adicionais Descobertos em 2º Teste Real via Lobe Chat
+
+- **Agente reportava "não tenho acesso ao diretório `/app`"/"nenhum repositório carregado"**: `stream_chat()` não repassava `working_directory` ao `create_session()` do SDK real, então a sessão usava o CWD do processo (`/app`, o `WORKDIR` da imagem, read-only e sem o repositório do usuário) em vez do bind mount `/workspace`. Corrigido adicionando o parâmetro `working_directory: str = "/workspace"` a `stream_chat()`, repassado a `client.create_session(...)`. Adicionalmente, identificado que `WORKSPACE_PATH` no `.env` do usuário estava vazio (fallback documentado para o placeholder vazio) — configurado para o path real do repositório-alvo (`projects.local.yaml`).
+- **`AttributeError: 'dict' object has no attribute 'to_dict'` em toda chamada de tool (permission handler quebrava silenciosamente)**: `_bridge_permissao` retornava um dict puro (`{"permissionDecision": "allow"/"deny"}`), mas a API real do SDK (`on_permission_request`) exige uma instância tipada de `PermissionRequestResult` (`PermissionDecisionApproveOnce`/`PermissionDecisionReject`, de `copilot.generated.rpc`) — o dict quebrava internamente ao tentar `.to_dict()`. Descoberto também que `PermissionRequest` é uma união de 12 classes (`PermissionRequestShell`/`Write`/`Read`/`Mcp`/`CustomTool`/...) sem campo `tool_name` unificado (confirmado via `dataclasses.fields()`: só `Mcp`/`CustomTool` têm `tool_name`; `Read` é sempre seguro por natureza). Corrigido com `_identificador_e_seguro_nativo()` (resolve identificador + sinal de leitura segura por tipo real de request) e retorno tipado (`PermissionDecisionApproveOnce()`/`PermissionDecisionReject(feedback=...)`). Bônus: corrigido também o `"tool: ? concluido"` no log (evento `ToolExecutionCompleteData` não possui campo `tool_name`; corrigido com cache `tool_call_id -> tool_name` populado no evento de start). Validado com teste isolado (repo real montado em `/workspace`): resposta real e correta sobre o projeto, `tool: view` executando/concluindo sem traceback. Suíte revalidada (98/98 verde, incluindo 2 novos testes: `working_directory` repassado corretamente e `PermissionRequestRead` aprovado nativamente sem consultar o handler).
+
+### Adicionado — Fase 4 (Governança Runtime, Multi-Turno, Checkpoints & SQLite)
+
+- **Causa Raiz do 401 Unauthenticated no Langfuse Cloud — Poluição de Variáveis de Ambiente no Shell**:
+  - Diagnosticado que o `.env` do gateway já continha o token Base64 correto de `LANGFUSE_OTLP_AUTH`, mas o Docker Compose resolvia o valor **antigo/placeholder** mesmo após `--force-recreate`. Causa raiz: variáveis `LANGFUSE_OTLP_AUTH`/`LANGFUSE_ENDPOINT`/`LANGFUSE_PUBLIC_KEY`/`LANGFUSE_SECRET_KEY`/`LANGFUSE_HOST` **exportadas diretamente no ambiente do shell** (de testes manuais anteriores nesta sessão), que têm precedência sobre o arquivo `.env` na resolução de variáveis do `docker compose` (comportamento documentado do Compose: env do processo pai > `.env`).
+  - Corrigido com `unset` das variáveis poluídas no shell; `docker compose config` passou a resolver corretamente o token real (reaproveitado do container `otel-proxy` legado, já validado em produção).
+  - Validado com teste real: trace exportado com sucesso ao Langfuse Cloud (`us.cloud.langfuse.com`) — zero erros de `Unauthenticated` nos logs do `otel-collector` após a correção.
+
+- **Emissão Ativa de Telemetria GenAI OTel (`telemetry.py`)**:
+  - Implementado emissor assíncrono não-bloqueante (`emit_chat_trace`) no gateway conforme GenAI Semconv v1.41+ (`invoke_agent`, `chat`, `execute_tool`).
+  - Resolução inteligente de endpoints em containers (`_resolve_candidate_endpoints`), permitindo que configurações com `127.0.0.1` ou `localhost` encontrem automaticamente o coletor na rede interna (`http://otel-collector:4318`) ou no host (`http://host.docker.internal:4318`), eliminando falhas silenciosas de `Connection refused`.
+  - Parametrização dinâmica do endpoint Langfuse (`LANGFUSE_ENDPOINT`) com suporte nativo às regiões EU (`cloud.langfuse.com`) e US (`us.cloud.langfuse.com`).
+
+- **Correção no Coletor OpenTelemetry (`--profile otel`)**:
+  - Ajustada a sintaxe do exporter OTLP HTTP de `otlp_http/langfuse` para `otlphttp/langfuse` em `tools/otel-langfuse/otel-collector-config.yaml` e `docs/architecture/BLUEPRINT_AGENT_OBSERVABILITY.md` (o Collector v0.111+ rejeitava `otlp_http` com erro fatal de parsing).
+  - Repasse da variável `LANGFUSE_OTLP_AUTH` no `environment` do serviço `otel-collector` no `docker-compose.yml`, eliminando warnings de variável não definida e habilitando a autenticação Basic OTLP com o Langfuse Cloud.
+  - Documentação atualizada em `deploy/local-chat-gateway/.env.example` e `.env`.
+
+- **Fiação do `SessionStore` SQLite em `/v1/chat/completions`**:
+  - `session_id` extraído do cabeçalho `x-session-id` / `x-conversation-id` ou gerado via hash determinístico da primeira mensagem.
+  - Reuso e touch de sessão em `SessionStore` (SQLite persistido no volume `gateway-data`), repassando `session_id` nativamente ao `client.create_session(...)` do SDK.
+- **Enforcement de Teto Diário (`GATEWAY_MAX_PREMIUM_PER_DAY`)**:
+  - Bloqueio automático com HTTP 429 (`rate_limit_error`) se o consumo do dia ultrapassar o limite configurado (default: 100 requests).
+  - Registro atômico de consumo no SQLite por dia (`budget_daily`).
+- **Enforcement da Invariante 11 nos Endpoints**:
+  - Se houver checkpoint pendente na sessão, respostas vagas ("ok", "prossiga", "sim") ou fora da gramática reemitem a pergunta localmente via streaming SSE ou JSON com custo zero (zero chamadas de rede ou LLM).
+  - Respostas válidas resolvem o checkpoint no SQLite e liberam o fluxo normal.
+- **Bridge de Permissões com as 4 Guardas**:
+  - `PermissionRequestWrite` integrado: negado em `read_only` e `propose`; em `apply`, bloqueado se houver checkpoint pendente ou se o arquivo for sensível (`.git`, `secrets`, `.env`, `.pem` — Guarda 4).
+- **Cobertura de Testes**: 119 testes automatizados (103 unitários + 16 de integração) cobrindo todos os cenários da Fase 4.
+
+---
+
 ## [2.49.0] — 2026-09-28
 
 ### Adicionado — Salvaguardas de Mercado 2025/2026, Model Tiering e Blindagem por Testes

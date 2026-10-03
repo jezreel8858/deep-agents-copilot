@@ -1,0 +1,30 @@
+# NOTA (BuildKit): este e o UNICO arquivo de ignore ativo para este build
+# context. Quando o build context e a raiz do repositorio (obrigatorio aqui,
+# ver Dockerfile) e o Dockerfile e referenciado via "-f", o BuildKit procura o
+# arquivo de ignore em "<caminho-do-dockerfile>.dockerignore" a partir da raiz
+# do contexto -- ou seja, neste "Dockerfile.dockerignore" (padrao no Docker >=
+# 23). O ".dockerignore" simples deste diretorio foi removido para eliminar
+# risco de drift silencioso entre duas copias (ver README.md).
+
+.venv/
+__pycache__/
+**/__pycache__/
+.pytest_cache/
+.mypy_cache/
+*.egg-info/
+**/*.egg-info/
+.coverage
+tests/
+**/tests/
+.git/
+.env
+secrets/
+data/
+.tmp/
+**/.tmp/
+# apps/web/ nao e usado pelo build do gateway (ver COPY no Dockerfile),
+# mas sem esta exclusao o BuildKit ainda transfere node_modules/.next
+# inteiros no "load build context" (desperdicio de centenas de MB/varios
+# minutos a cada build do gateway).
+apps/web/node_modules/
+apps/web/.next/

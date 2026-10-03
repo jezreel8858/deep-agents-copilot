@@ -47,6 +47,7 @@ yarn-error.log*
 __pycache__/
 *.pyc
 .pytest_cache/
+.venv/
 
 # ============================================
 # Local Project Overlay (R-043) — NUNCA COMMITAR
@@ -60,3 +61,5 @@ docs/ai-context/catalog.local.yaml
 .codegraph/
 .worktrees/
 .gemini/
+
+nul

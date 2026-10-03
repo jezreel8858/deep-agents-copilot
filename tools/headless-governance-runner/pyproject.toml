@@ -32,6 +32,14 @@ governance-runner = "governance_runner.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+# Sem esta secao, o setuptools empacota apenas arquivos `.py` por padrao --
+# `routing-graph.schema.json` (schema padrao embutido, Q-03) ficava ausente
+# em `site-packages` apos `pip install`, causando
+# `FileNotFoundError`/`GraphValidationError` em runtime (bug real encontrado
+# ao subir `docker compose --profile lobe --profile otel up`, 2026-10-01).
+[tool.setuptools.package-data]
+governance_runner = ["routing/*.json"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests/routing_unit", "tests/runner_unit"]
 

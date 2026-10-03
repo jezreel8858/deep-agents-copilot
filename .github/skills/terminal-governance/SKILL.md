@@ -23,6 +23,10 @@ triggers:
   - "curl no terminal"
   - "output grande"
   - "token budget terminal"
+  - "run_subagent"
+  - "subagent fantasma"
+  - "delegacao redundante"
+  - "cascata de subagent"
 tools:
   - "run_in_terminal"
 source_docs:
@@ -253,6 +257,42 @@ if ($job.State -eq 'Running') { Stop-Job $job }
 
 - [ ] Antes de disparar comando classificado como risco, executar o checkpoint automático pré-risco definido em `agent-memory-policy/SKILL.md` § "Checkpoint Automático Pré-Risco".
 
+### 5.3) Proibição de Delegação Redundante via `run_subagent` (Anti-Cascata Fantasma)
+
+> **Incidente real investigado (2026-10-04)**: um agent com AMBAS `run_in_terminal` e
+> `run_subagent` nas próprias `tools:` (ex.: `pr-gatekeeper`), ao ser solicitado a
+> "testar se consegue usar `git --no-pager status/diff/log`", delegou a verificação
+> via `run_subagent` em vez de simplesmente executar o comando. No SDK headless do
+> gateway, `run_subagent` é traduzido para a tool NATIVA genérica `task`/
+> `general-purpose` -- que NÃO valida o nome do agent delegado contra nenhum
+> catálogo real, aceita um label livre INVENTADO pelo próprio modelo e spawna um
+> modelo auxiliar próprio (ex.: `gpt-5.6-luna`), desconectado do agent original.
+> Resultado observado em produção: uma cascata recursiva de 8 "subagents fantasmas"
+> com nomes como `git-readonly-check`, `git-output`, `exact-git-output`,
+> `git-readonly-runner`, `git-inspection` -- nenhum deles um agent real do catálogo
+> `.github/agents/**/*.agent.md` -- consumindo ~2 minutos e ~175 mil tokens apenas
+> para confirmar 3 comandos git read-only triviais que o agent já tinha permissão
+> de rodar diretamente.
+
+**REGRA INVIOLÁVEL**: se o agent já possui `run_in_terminal` (ou `ctx_execute`/
+`ctx_batch_execute`) disponível em suas próprias `tools:` e o comando solicitado
+está dentro do seu escopo de competência, é **TERMINANTEMENTE PROIBIDO** delegar
+essa execução via `run_subagent` apenas para "testar", "confirmar" ou "verificar"
+a própria capacidade. Execute o comando diretamente.
+
+`run_subagent` é reservado exclusivamente para:
+- Handoff genuíno de escopo para outro agent especializado (ex.: `@code-review`,
+  `@agent-router`) quando a tarefa sai da competência do agent atual (R-042).
+- Delegação a um agent **nomeado explicitamente e existente** no catálogo
+  (`.github/agents/**/*.agent.md`) -- nunca um nome/label inventado ad-hoc para
+  descrever uma sub-tarefa genérica de teste/verificação.
+
+| Sintoma de uso incorreto | Correção |
+|---|---|
+| "Vou delegar para testar o comando X" quando X já está nas próprias `tools:` | Executar X diretamente via `run_in_terminal`/`ctx_execute` |
+| Nome de subagent que não corresponde a nenhum `.agent.md` real do catálogo | Não invocar `run_subagent` -- tratar como ação própria |
+| Múltiplas invocações sucessivas de `run_subagent` para "confirmar de outro jeito" a mesma verificação | Parar na primeira tentativa bem-sucedida; nunca re-testar a mesma coisa via subagent |
+
 ## 6) Padrões Proibidos (bloqueantes absolutos)
 
 | Padrão | Por quê é proibido | Alternativa |
@@ -270,6 +310,7 @@ if ($job.State -eq 'Running') { Stop-Job $job }
 | `git reset --hard` sem confirmação | Perde trabalho irreversivelmente | Pedir aprovação explícita antes |
 | `sudo` sem aprovação explícita | Escalada de privilégio não solicitada | Sempre pedir confirmação antes |
 | Aguardar retorno bloqueante direto de script/processo sem timeout nativo | Trava a sessão indefinidamente (comportamento documentado do client) | Watchdog (`timeout -k` / `Start-Job`+`Wait-Job`) + `isBackground:true` + redirect a arquivo (§ 5.2) |
+| `run_subagent` para testar/confirmar comando já disponível nas próprias `tools:` | Gera cascata recursiva de subagents fantasmas sem correspondência no catálogo real (§ 5.3), desperdiçando tokens/tempo | Executar o comando diretamente via `run_in_terminal`/`ctx_execute` |
 
 ---
 
@@ -345,4 +386,5 @@ Nunca colar o output bruto integralmente. Sempre extrair apenas o que é relevan
 - [ ] Zero comandos proibidos executados no terminal (`curl`, `wget`, `find`, `node -e`).
 - [ ] Orçamento de tokens respeitado (≤ 50 linhas de saída esperada).
 - [ ] Confirmação de erro reportada no formato compacto de 3 linhas (R-020).
+- [ ] Nenhuma delegação via `run_subagent` usada para testar/confirmar ação já disponível nas próprias `tools:` (§ 5.3 -- Anti-Cascata Fantasma).
 

@@ -1,0 +1,216 @@
+# ==============================================================================
+# Deep Agents Gateway - docker-compose.yml (MVP)
+# Ver docs/architecture/BLUEPRINT_LOCAL_CHAT_GATEWAY.md Secao 3.1.
+#
+# Decisao D4-rev (aprovada, 2026-10-01): Lobe Chat substituido por frontend
+# proprio Next.js + CopilotKit (apps/web/). Ver ADR de migracao em
+# docs/adr/ e docs/implementation-plans/.
+#
+# Build context = raiz do repositorio (necessario para instalar a dependencia
+# editavel local "governance-runner"). Execute os comandos abaixo a partir
+# deste diretorio (deploy/local-chat-gateway/); o compose resolve os paths
+# relativos (context, volumes) a partir da localizacao deste arquivo.
+#
+# Uso:
+#   docker compose up
+#   docker compose --profile otel up
+#
+# Nota: os servicos "gateway" e "web" usam pull_policy=build, entao o
+# Compose SEMPRE constroi a imagem localmente (nunca tenta pull de
+# registry). Apos alterar codigo-fonte em src/ ou apps/web/, use "--build"
+# (ou "docker compose build gateway web") para forcar a reconstrucao.
+# ==============================================================================
+
+services:
+  gateway:
+    build:
+      context: ../..
+      dockerfile: deploy/local-chat-gateway/Dockerfile
+    image: deep-agents-gateway:local
+    # pull_policy=build evita o erro "pull access denied for deep-agents-gateway"
+    # em `docker compose up` sem a flag --build: instrui o Compose a NUNCA
+    # tentar puxar esta imagem de um registry, sempre construir localmente
+    # a partir do Dockerfile acima (a imagem "deep-agents-gateway:local" nao
+    # existe em nenhum registry -- e um nome puramente local).
+    pull_policy: build
+    container_name: deep-agents-gateway
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${GATEWAY_PORT:-8080}:8080"
+    environment:
+      # GATEWAY_BIND nao se aplica dentro do container (o CMD do Dockerfile ja
+      # forca --host 0.0.0.0 para a porta publicada acima funcionar); mantido
+      # aqui apenas por rastreabilidade de configuracao.
+      GATEWAY_API_KEY: ${GATEWAY_API_KEY:?defina GATEWAY_API_KEY no .env (nunca "change-me")}
+      GATEWAY_PORT: "8080"
+      # Docker secret monta o token em /run/secrets/<nome>; sobrescreve o path
+      # de host default do .env.example (./secrets/copilot_token).
+      COPILOT_SDK_TOKEN_FILE: /run/secrets/copilot_sdk_token
+      # Diretorio-pai comum (path do HOST) contendo TODOS os projetos
+      # registrados em projects.local.yaml -- montado abaixo em
+      # "/workspaces". Ver README.md "Configuracao de PROJECTS_ROOT_PATH".
+      PROJECTS_ROOT_PATH: ${PROJECTS_ROOT_PATH:-}
+      PROJECTS_LOCAL_YAML: ${PROJECTS_LOCAL_YAML:-/governance/.github/projects.local.yaml}
+      GATEWAY_PERMISSION_MODE: ${GATEWAY_PERMISSION_MODE:-read_only}
+      GOV_MAX_PREMIUM_REQUESTS: ${GOV_MAX_PREMIUM_REQUESTS:-15}
+      GATEWAY_MAX_PREMIUM_PER_DAY: ${GATEWAY_MAX_PREMIUM_PER_DAY:-100}
+      GATEWAY_REQUEST_TIMEOUT_S: ${GATEWAY_REQUEST_TIMEOUT_S:-300}
+      GATEWAY_SESSION_TTL_S: ${GATEWAY_SESSION_TTL_S:-1800}
+      # Nome de variavel HOST deliberadamente distinto de "OTEL_EXPORTER_OTLP_
+      # ENDPOINT" (bug real de producao, 2026-10-01): o proxy OTel standalone
+      # do host (tools/otel-langfuse/, usado pela telemetria da IDE -- ver
+      # docs/context/setup-telemetry-copilot.md) convenciona exportar
+      # "OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4318" no shell/perfil do
+      # desenvolvedor. Docker Compose da precedencia a variaveis de shell sobre
+      # o ".env" -- reusar o MESMO nome aqui faria o container do gateway herdar
+      # silenciosamente "127.0.0.1:4318" (loopback DELE MESMO, onde nada
+      # escuta) em vez de "otel-collector:4318", quebrando toda a telemetria
+      # emitida por "telemetry.py" sem erro visivel. "GATEWAY_OTEL_EXPORTER_
+      # OTLP_ENDPOINT" e exclusivo deste compose -- nao colide com nenhuma
+      # convencao de IDE/host.
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${GATEWAY_OTEL_EXPORTER_OTLP_ENDPOINT:-http://otel-collector:4318}
+      COPILOT_MODEL: ${COPILOT_MODEL:-}
+      # Grafo de roteamento/governanca (Q-01..Q-05 -- Fase 5). Fail-fast
+      # obrigatorio no lifespan (governance_pipeline.carregar_contexto_governanca)
+      # se ausente/invalido -- ver docs/implementation-plans/20261001-feature-
+      # development-governance-runner-sdk-integration.md Secao 4. Default aponta
+      # para o grafo canonico do proprio repositorio de governanca, ja montado
+      # read-only em "/governance" (volume abaixo).
+      GOVERNANCE_GRAPH_PATH: ${GOVERNANCE_GRAPH_PATH:-/governance/.github/agents/routing-graph.yaml}
+      # Vazio = usa o schema JSON padrao embutido no pacote governance_runner.routing (Q-03).
+      GOVERNANCE_SCHEMA_PATH: ${GOVERNANCE_SCHEMA_PATH:-}
+      # Raiz de .github/ para persona/nucleo injetados no system_message
+      # (Addendum 5, bug real 2026-10-01): default ja aponta para o volume
+      # read-only "/governance" montado abaixo -- normalmente nao precisa
+      # ser alterado.
+      GOVERNANCE_GITHUB_DIR: ${GOVERNANCE_GITHUB_DIR:-/governance/.github}
+    secrets:
+      - copilot_sdk_token
+    volumes:
+      # Dado persistido do SessionStore (SQLite); necessario pois o container
+      # roda com "read_only: true" no filesystem raiz.
+      - gateway-data:/app/data
+      # HOME inteiro do usuario gateway, gravavel (nao apenas ".cache"):
+      # o SDK real do Copilot grava, alem do cache do runtime CLI baixado em
+      # "$HOME/.cache/github-copilot-sdk/...", tambem logs do processo nativo
+      # e estado de sessao em outros subdiretorios de $HOME (ex.:
+      # "$HOME/.local/state/...", "$HOME/.config/..."). Montar o volume so
+      # em "/home/gateway/.cache" NAO e suficiente: qualquer escrita fora
+      # desse subdiretorio cai no filesystem raiz (read_only: true) e falha
+      # com "EROFS: Read-only file system" -- confirmado em teste real via
+      # Lobe Chat (docker-compose), que reproduziu o erro que o teste
+      # isolado com "docker run" (sem read_only) nao pegava. Volume nomeado
+      # cobrindo o HOME inteiro -> sobrevive a restarts e cobre qualquer
+      # caminho de escrita futuro do SDK sob $HOME.
+      - gateway-home:/home/gateway
+      # Diretorio-pai comum de TODOS os projetos registrados em
+      # projects.local.yaml (path do host em PROJECTS_ROOT_PATH), montado
+      # UMA UNICA VEZ em "/workspaces" -- descoberta automatica via
+      # `projects_catalog.py` (traduz `path_externo` -> path no container).
+      # Adicionar um novo projeto ao projects.local.yaml, clonado sob o
+      # mesmo diretorio-pai no host, o torna acessivel ao gateway/SDK real
+      # SEM qualquer edicao deste arquivo. Fallback local evita "bind source
+      # path does not exist" quando a variavel nao foi definida.
+      - ${PROJECTS_ROOT_PATH:-./.workspace-placeholder}:/workspaces
+      # Repositorio de governanca, somente leitura (regras/routing consultados
+      # pelo governance_runner; nunca escrito pelo gateway). Contem tambem
+      # `.github/projects.local.yaml`, lido por `projects_catalog.py`.
+      - ../..:/governance:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+    networks:
+      - deep-agents-net
+
+  web:
+    build:
+      context: ../..
+      dockerfile: apps/web/Dockerfile
+    image: deep-agents-chat:local
+    pull_policy: build
+    container_name: deep-agents-chat
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${WEB_PORT:-3000}:3000"
+    environment:
+      GATEWAY_BASE_URL: http://gateway:8080
+      GATEWAY_API_KEY: ${GATEWAY_API_KEY:?defina GATEWAY_API_KEY no .env (nunca "change-me")}
+      GATEWAY_MODEL: deep-agents/router
+      WEB_ACCESS_CODE: ${WEB_ACCESS_CODE:?defina WEB_ACCESS_CODE no .env (nunca "change-me")}
+      COPILOTKIT_TELEMETRY_DISABLED: "true"
+      NEXT_TELEMETRY_DISABLED: "1"
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /app/.next/cache
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+    depends_on:
+      gateway:
+        condition: service_healthy
+    networks:
+      - deep-agents-net
+
+  # ----------------------------------------------------------------------------
+  # Profile "otel" -- opcional; habilite com --profile otel. Reusa a config
+  # existente em tools/otel-langfuse/otel-collector-config.yaml (sem duplicar).
+  # ----------------------------------------------------------------------------
+  otel-collector:
+    # fixado em 2026-09-29, verificar releases antes de atualizar
+    # (https://github.com/open-telemetry/opentelemetry-collector-releases/releases).
+    # Versao conhecida estavel no momento da fixacao; nao necessariamente a mais recente.
+    image: otel/opentelemetry-collector-contrib:0.111.0
+    container_name: deep-agents-otel-collector
+    restart: unless-stopped
+    profiles:
+      - otel
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    environment:
+      # Credencial Basic Auth (Base64) injetada no coletor para despacho ao Langfuse Cloud
+      LANGFUSE_OTLP_AUTH: ${LANGFUSE_OTLP_AUTH:-}
+      # Regiao do Langfuse Cloud (EU: https://cloud.langfuse.com/api/public/otel |
+      # US: https://us.cloud.langfuse.com/api/public/otel). BUG REAL encontrado
+      # em 2026-10-01: esta variavel nunca era repassada ao container do
+      # coletor, entao "tools/otel-langfuse/otel-collector-config.yaml" sempre
+      # usava o default hard-coded (EU), mesmo com credenciais de uma conta
+      # Langfuse da regiao US no ".env" -- causando
+      # "401 Unauthenticated" em 100% dos traces (chaves de uma regiao nao
+      # autenticam contra o endpoint de outra regiao).
+      LANGFUSE_ENDPOINT: ${LANGFUSE_ENDPOINT:-https://cloud.langfuse.com/api/public/otel}
+    volumes:
+      - ../../tools/otel-langfuse/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml:ro
+    # Sem porta publicada no host (consumido apenas internamente pela rede do
+    # compose); ajuste OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
+    # no .env do gateway para habilitar o envio.
+    networks:
+      - deep-agents-net
+
+secrets:
+  copilot_sdk_token:
+    file: ${COPILOT_SDK_TOKEN_FILE:-./secrets/copilot_token}
+
+volumes:
+  gateway-data: {}
+  gateway-home: {}
+
+networks:
+  deep-agents-net:
+    driver: bridge

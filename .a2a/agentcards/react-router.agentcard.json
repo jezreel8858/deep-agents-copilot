@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "react-router",
+  "name": "React Router",
+  "version": "1.0.0",
+  "description": "Roteador de domínio React e supervisor hierárquico — recebe solicitações de frontend React do agent-router central e despacha para os 8 especialistas do catálogo React (arch-advisor, feature-developer, bug-fixer, ui-stylist, unit-test, component-test, test-fixer e e2e-writer).",
+  "domain": "Supervisor hierarquico e roteador do dominio React",
+  "role": "router",
+  "capabilities": [
+    "react",
+    "react router",
+    "frontend router",
+    "orquestrador react",
+    "server components",
+    "hooks",
+    "tanstack query",
+    "zustand"
+  ],
+  "skills": [
+    "agent-contracts",
+    "handoff-governance",
+    "context-mode"
+  ],
+  "tools": [
+    "read_file",
+    "file_search",
+    "grep_search",
+    "list_dir",
+    "ask_questions",
+    "run_subagent",
+    "context-mode/ctx_search"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only"
+    ],
+    "least_privilege_level": "standard",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Claude Sonnet 5",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/catalog.yaml",
+    "priority": 8.5,
+    "estimated_time_minutes": 15
+  }
+}

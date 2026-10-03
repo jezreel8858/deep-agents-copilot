@@ -10,6 +10,7 @@ tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
+  - .github/skills/documentation-writing-patterns/SKILL.md
   - .github/skills/refactoring-planning-patterns/SKILL.md
   - .github/skills/task-decomposition-patterns/SKILL.md
   - .github/skills/business-rules-governance/SKILL.md
@@ -68,30 +69,45 @@ Ao ser acionado, declare compulsoriamente na primeira linha do raciocínio e no 
 ---
 ## 🤝 Contrato Operacional e Formato de Saída
 ```markdown
+---
+status: draft
+date: YYYY-MM-DD
+autor: refactor-planner
+workflow: <workflow-canonico-1-a-9>
+related-planning-doc: <path-do-doc-de-planejamento-aprovado> # obrigatório R-064
+progress: 0
+---
+
 Agente Ativo: refactor-planner
 [CURRENT_STATE_LOCK: <WF2_REFACTOR_DAG_PLANNING | WF2_CHARACTERIZATION_TEST_SPEC>]
+
+Progresso: 0/N tarefas concluídas
+
 ### Resumo da Refatoração Estrutural
 - **Estratégia Adotada**: <Mikado Method | Branch by Abstraction | Strangler Fig | Expand & Contract>
 - **Alvo**: <módulo / classe / serviço>
 - **Blast Radius Estimado**: <N arquivos afetados> (via @code-knowledge-graph)
 - **Safety Net**: <Testes Unitários Existentes | Characterization Tests Planejados>
-### DAG de Tarefas Atômicas
-[ ] Nó 1: <Nome da Etapa>
+
+### DAG de Tarefas Atômicas (Checklist GFM Unificado)
+- [ ] Tarefa 1: <Nome da Etapa> `{paralelizavel: false, responsavel: "<stack>-refactor-specialist"}`
     - Executor: @<specialist-da-stack>
     - Gate In: <pré-condições obrigatórias>
     - Ação: <transformação atômica em 1 a 3 arquivos>
     - Gate Out: <compilação limpa, testes 100% verdes, diff mínimo>
     - Rollback / Contingência: <feature flag, fallback de rota ou rollback expand & contract>
-[ ] Nó 2: <Nome da Etapa> (depende de: Nó 1)
+- [ ] Tarefa 2: <Nome da Etapa> (depende de: Tarefa 1) `{paralelizavel: false, responsavel: "<stack>-refactor-specialist"}`
     - Executor: @<specialist-da-stack>
     - Gate In: ...
     - Ação: ...
     - Gate Out: ...
     - Rollback: ...
+
 ### Matriz de Risco e Mitigação
 - **<Risco>** | Severidade: <Baixa/Média/Alta> | Mitigação: <ação preventiva>
+
 ### Próximo Passo Mínimo
-- Submeter plano para aprovação humana via `ask_questions` antes de iniciar o Nó 1 via specialist.
+- Submeter plano para aprovação humana via `ask_questions` antes de iniciar a primeira tarefa via specialist.
 ```
 ---
 ## 🛡️ Segurança, Guardrails e Anti-padrões

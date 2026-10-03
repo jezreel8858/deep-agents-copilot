@@ -17,8 +17,9 @@ API de fachada pública (subtask 7 — Convergência do Eixo 2):
     Funções: `carregar_grafo`, `compilar_tabela_transicao`, `rotear`,
     `transicionar`, `detectar_deriva`, `validar_handoff`.
     Tipos/Erros: `Sessao`, `Evento`, `Turno`, `Fase`, `Workflow`,
-    `DecisaoRota`, `Deriva`, `TransicaoInvalidaError`,
-    `GraphValidationError`, `RoteamentoError`, `HandoffPayloadInvalidoError`.
+    `DecisaoRota`, `Deriva`, `Catalogo`, `TabelaTransicao`, `NivelRouting`,
+    `TransicaoInvalidaError`, `GraphValidationError`, `RoteamentoError`,
+    `HandoffPayloadInvalidoError`.
 
 Todo consumidor externo (runner headless, testes de integração) deve
 importar exclusivamente a partir deste pacote (`governance_runner.routing`)
@@ -36,11 +37,15 @@ from governance_runner.routing.graph_loader import (
 )
 from governance_runner.routing.handoff import HandoffPayloadInvalidoError, validar_handoff
 from governance_runner.routing.model import (
+    Catalogo,
     DecisaoRota,
     Deriva,
     Evento,
     Fase,
+    NivelRouting,
     Sessao,
+    TabelaTransicao,
+    TipoEvento,
     Turno,
     Workflow,
 )
@@ -63,6 +68,10 @@ __all__ = [
     "Workflow",
     "DecisaoRota",
     "Deriva",
+    "Catalogo",
+    "TabelaTransicao",
+    "TipoEvento",
+    "NivelRouting",
     "TransicaoInvalidaError",
     "GraphValidationError",
     "RoteamentoError",

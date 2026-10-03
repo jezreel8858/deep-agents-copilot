@@ -20,7 +20,7 @@
 
 | ID | Gap | Evidência | Correção |
 |---|---|---|---|
-| G-01 | Credencial Basic do Langfuse fixa no config do Collector | `otel-collector-config.yaml` → `exporters.otlp_http/langfuse.headers` | Mover para `${env:LANGFUSE_OTLP_AUTH}` |
+| G-01 | Credencial Basic do Langfuse fixa no config do Collector | `otel-collector-config.yaml` → `exporters.otlphttp/langfuse.headers` | Mover para `${env:LANGFUSE_OTLP_AUTH}` |
 | G-02 | Pipeline de métricas só exporta para `debug` | `service.pipelines.metrics` | Conector `spanmetrics` + exporter `file/metrics` (Prometheus opcional) |
 | G-03 | Trace sintético usa `gen_ai.system` (deprecado desde v1.36) | `test-trace.js` | Emitir `gen_ai.provider.name` + span `execute_tool` MCP |
 | G-04 | Sem `memory_limiter`, normalização ou mascaramento | `processors: [batch]` | Pipeline de processors da §4.3 |
@@ -311,7 +311,7 @@ connectors:
       - name: gen_ai.agent.name
 
 exporters:
-  otlp_http/langfuse:
+  otlphttp/langfuse:
     endpoint: "https://cloud.langfuse.com/api/public/otel"    # Langfuse Cloud SaaS
     headers: { Authorization: "Basic ${env:LANGFUSE_OTLP_AUTH}" }   # G-01
   file/traces:  { path: /var/log/otel/traces.json,  rotation: { max_megabytes: 100, max_backups: 5 } }
@@ -323,7 +323,7 @@ service:
     traces:
       receivers: [otlp]
       processors: [memory_limiter, resource/defaults, transform/semconv, transform/redact-secrets, batch]
-      exporters: [otlp_http/langfuse, file/traces, spanmetrics, debug]
+      exporters: [otlphttp/langfuse, file/traces, spanmetrics, debug]
     metrics:
       receivers: [otlp, spanmetrics]
       processors: [memory_limiter, resource/defaults, batch]

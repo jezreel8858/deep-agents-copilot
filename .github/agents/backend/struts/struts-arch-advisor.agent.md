@@ -9,6 +9,7 @@ model: "Claude Sonnet 5"
 tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_execute', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index']
 source_docs:
   - .github/skills/context-mode/SKILL.md
+  - .github/skills/documentation-writing-patterns/SKILL.md
   - CLAUDE.md
   - .github/copilot-instructions.md
   - .github/skills/java-jdk-backend-governance/SKILL.md
@@ -57,6 +58,25 @@ Plano de Ação Recomendado:
 
 Próximo passo mínimo:
 - <delegação para @struts-feature-developer para implementação ou @struts-bug-fixer para correção cirúrgica>
+```
+
+### Template de Plano de Implementação Técnica (R-064)
+
+```markdown
+---
+status: draft
+date: YYYY-MM-DD
+autor: struts-arch-advisor
+workflow: <workflow-canonico-1-a-9>
+related-planning-doc: <path-do-doc-de-planejamento-aprovado> # obrigatório R-064
+progress: 0
+---
+
+Progresso: 0/N tarefas concluídas
+
+### Checklist de Execução Técnica (GFM Unificado)
+- [ ] <descrição atômica da tarefa técnica> `{paralelizavel: bool, responsavel: "@struts-feature-developer"}`
+- [ ] <próxima tarefa técnica> `{paralelizavel: bool, responsavel: "@struts-feature-developer"}`
 ```
 
 <execution_protocol>

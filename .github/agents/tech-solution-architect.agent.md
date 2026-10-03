@@ -105,6 +105,14 @@ Identifique o workflow ativo e o estado específico de invocação. Declare comp
 ### Formato A: Parecer Compacto de Gate / Checkpoint (`WF1_SEC`, `WF2_DEPR`, `WF8_RELEASE`)
 
 ```markdown
+---
+status: draft # draft | approved | superseded
+date: YYYY-MM-DD
+autor: tech-solution-architect
+workflow: <workflow-canonico-1-a-9>
+related-plan: <path-do-doc-de-implementacao-correspondente | N/A>
+---
+
 Agente Ativo: tech-solution-architect
 [CURRENT_STATE_LOCK: <WF1_SECURITY_CHECKPOINT | WF2_CONTRACT_DEPRECATION | WF8_RELEASE_CONTRACT_AUDIT>]
 
@@ -112,6 +120,9 @@ Agente Ativo: tech-solution-architect
 - **Status**: <APROVADO | VETADO | MITIGAÇÃO_EXIGIDA | RETROCOMPATÍVEL | BREAKING_CHANGE_DETECTADA>
 - **Escopo Analisado**: <Contrato, endpoint, método ou credencial sob auditoria>
 - **Superfície de Risco / Blast Radius**: <Consumidores afetados ou vetores de risco identificados>
+
+### Alternativas Rejeitadas (Obrigatória)
+- <opção descartada e justificativa técnica do descarte>
 
 ### Diretrizes de Contorno / Mitigação
 - <Requisito técnico mandatório a ser seguido pelo executor downstream>
@@ -123,6 +134,14 @@ Agente Ativo: tech-solution-architect
 ### Formato B: Technical Blueprint Canônico & Context Firewall (`WF3_TECH_ANALYSIS`, `WF4_BLUEPRINT_SPEC`)
 
 ```markdown
+---
+status: draft # draft | approved | superseded
+date: YYYY-MM-DD
+autor: tech-solution-architect
+workflow: <workflow-canonico-1-a-9>
+related-plan: <path-do-doc-de-implementacao-correspondente | N/A>
+---
+
 Agente Ativo: tech-solution-architect
 [CURRENT_STATE_LOCK: <WF3_TECH_ANALYSIS | WF4_BLUEPRINT_SPEC>]
 
@@ -138,6 +157,9 @@ Agente Ativo: tech-solution-architect
 
 ### Contratos e Interfaces (Spec-First)
 <Especificações OpenAPI v3 YAML / schemas Flyway DDL / contratos de eventos>
+
+### Alternativas Rejeitadas (Obrigatória)
+- <alternativa arquitetural ou de design descartada e justificativa técnica do descarte>
 
 ### Context Firewall — Divisão de Tarefas por Stack
 
@@ -155,6 +177,14 @@ Agente Ativo: tech-solution-architect
 ### Formato C: Matriz De-Para & 5D Migration Assessment (`WF7_MIGRATION_ORCHESTRATION`)
 
 ```markdown
+---
+status: draft # draft | approved | superseded
+date: YYYY-MM-DD
+autor: tech-solution-architect
+workflow: <workflow-canonico-1-a-9>
+related-plan: <path-do-doc-de-implementacao-correspondente | N/A>
+---
+
 Agente Ativo: tech-solution-architect
 [CURRENT_STATE_LOCK: WF7_MIGRATION_ORCHESTRATION]
 
@@ -164,6 +194,9 @@ Agente Ativo: tech-solution-architect
 - **3. Persistência Relacional**: <Tabelas, queries nativas, triggers, sequences>
 - **4. Integrações Downstream**: <Clients REST, filas RabbitMQ, WebServices SOAP>
 - **5. Saída & Efeitos Colaterais**: <Eventos disparados, notificações, relatórios>
+
+### Alternativas Rejeitadas (Obrigatória)
+- <estratégia de modernização descartada e justificativa técnica do descarte>
 
 ### Matriz De-Para Canônica (Referência: docs/migrations/matriz-de-para-<alvo>.md)
 | ID | Elemento Legado | Elemento Moderno | Dimensão 5D | Status | Fase |

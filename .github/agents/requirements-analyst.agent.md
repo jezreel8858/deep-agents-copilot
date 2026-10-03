@@ -68,11 +68,28 @@ Ao ser acionado, declare compulsoriamente na primeira linha do raciocínio e no 
 ---
 ## 🤝 Contrato Operacional e Formato de Saída
 ```markdown
+---
+status: draft # draft | approved | superseded
+date: YYYY-MM-DD
+autor: requirements-analyst
+workflow: <workflow-canonico-1-a-9>
+related-plan: <path-do-doc-de-implementacao-correspondente | N/A>
+---
+
 Agente Ativo: requirements-analyst
 [CURRENT_STATE_LOCK: <WF4_REQUIREMENTS_ELICITATION | WF4_REQUIREMENTS_REFINEMENT>]
+
 ### Requisitos Estruturados — <Módulo / Feature>
 - **Fonte do Pedido**: "<citação literal do stakeholder>"
 - **Objetivo de Negócio**: <síntese em 1 frase>
+
+### Contexto e Decisão de Escopo
+- **Problema de Negócio**: <descrição clara do problema a resolver>
+- **Decisão Negocial**: <escopo funcional e regras acordadas>
+
+### Alternativas Rejeitadas (Obrigatória)
+- <requisito, abordagem funcional ou regra descartada com justificativa de negócio>
+
 ### Requisitos Funcionais (EARS / Gherkin)
 - **REQ-001** [EARS] <declaração do requisito> — Prioridade: <Must|Should|Could|Won't>
   - *Critério de Aceite (Gherkin)*:

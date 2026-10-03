@@ -19,6 +19,29 @@ processors:
     limit_mib: 512
     spike_limit_mib: 128
 
+  # Descarta ruido interno de instrumentacao nativa da IDE (plugin GitHub
+  # Copilot) que nao agrega valor a depuracao de FLUXO DE AGENTS (quem
+  # desviou do workflow, qual handoff falhou, qual tool/agent causou o
+  # problema). Esses spans "session.timing.*" sao breadcrumbs de
+  # performance de inicializacao interna do proprio plugin da IDE (parsing
+  # de preamble, resolucao de modelo, carga de skills/system prompt,
+  # inicializacao de LSP/MCP, cache de tools, prompt do shell, etc.) --
+  # nao carregam `gen_ai.agent.name`, `gen_ai.tool.name` nem qualquer dado
+  # de decisao/roteamento e POLUEM o dashboard do Langfuse (ex.: analise
+  # de ponta-a-ponta de um prompt de refatoracao/migracao de framework).
+  # Mantemos intactos os spans uteis: "chat: ...", "invoke_agent",
+  # "execute_tool: ..." e os customizados "governance.*" (emitidos por
+  # local_chat_gateway/telemetry.py) -- estes SIM carregam `gen_ai.*` /
+  # `deep_agents.*` e sao a evidencia necessaria para identificar desvio
+  # de agent, falha de handoff e violacao de guardrail.
+  filter/drop_ide_session_timing_noise:
+    error_mode: ignore
+    traces:
+      span:
+        - 'IsMatch(name, "^session\\.timing\\..*")'
+      spanevent:
+        - 'IsMatch(name, "^session\\.timing\\..*")'
+
   resource/defaults:
     attributes:
       - key: service.namespace
@@ -64,9 +87,9 @@ connectors:
       - name: gen_ai.agent.name
 
 exporters:
-  otlp_http/langfuse:
+  otlphttp/langfuse:
     # Langfuse Cloud SaaS endpoint (EU: https://cloud.langfuse.com/api/public/otel | US: https://us.cloud.langfuse.com/api/public/otel)
-    endpoint: "https://us.cloud.langfuse.com/api/public/otel"
+    endpoint: "${env:LANGFUSE_ENDPOINT:-https://cloud.langfuse.com/api/public/otel}"
     headers:
       Authorization: "Basic ${env:LANGFUSE_OTLP_AUTH}"
 
@@ -89,8 +112,8 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [memory_limiter, resource/defaults, transform/semconv, transform/redact-secrets, batch]
-      exporters: [otlp_http/langfuse, spanmetrics, debug]
+      processors: [memory_limiter, filter/drop_ide_session_timing_noise, resource/defaults, transform/semconv, transform/redact-secrets, batch]
+      exporters: [otlphttp/langfuse, spanmetrics, debug]
     metrics:
       receivers: [otlp, spanmetrics]
       processors: [memory_limiter, resource/defaults, batch]

@@ -8,3 +8,4 @@ mypy>=1.8
 [otel]
 
 [sdk]
+github-copilot-sdk>=1.0.0

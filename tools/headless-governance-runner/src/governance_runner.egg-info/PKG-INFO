@@ -8,6 +8,7 @@ Description-Content-Type: text/markdown
 Requires-Dist: PyYAML>=6.0
 Requires-Dist: jsonschema>=4.20.0
 Provides-Extra: sdk
+Requires-Dist: github-copilot-sdk>=1.0.0; extra == "sdk"
 Provides-Extra: otel
 Provides-Extra: dev
 Requires-Dist: pytest>=8.0; extra == "dev"

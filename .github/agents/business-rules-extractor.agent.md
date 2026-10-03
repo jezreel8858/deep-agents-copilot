@@ -143,9 +143,11 @@ Para cada regra encontrada:
 
 ### Fase 4: Gerar o Documento
 
-Seguir o template canônico da skill `business-rules-governance` §2:
-- Frontmatter com `module`, `version: 1.0.0`, `last_updated`, `status: active`, `source_files`
+Seguir o template canônico da skill `business-rules-governance` §2 e `documentation-writing-patterns` § 2.1 (Categoria PLANEJAMENTO):
+- Frontmatter canônico com `module`, `version: 1.0.0`, `last_updated`, `status: active`, `source_files`, além dos campos mandatórios de governança: `autor: business-rules-extractor`, `workflow: <workflow-canonico-1-a-9>` e `related-plan: <path-do-doc-de-implementacao-correspondente | N/A>`
 - Sumário de regras com tabela de IDs
+- Seção de Contexto/Problema e Decisão de Regras
+- Seção de Alternativas Rejeitadas (regras ambíguas descartadas, variantes não aplicáveis ou comportamentos não adotados)
 - Uma seção `## BR-NNN` por regra
 - Diagrama Mermaid para FLOW com ≥3 estados (skill `mermaid-diagrams`)
 - Salvar em `docs/business-rules/business-rules-<nome-do-modulo>.md`

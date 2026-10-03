@@ -378,6 +378,7 @@ Agente Ativo: bug-triage
 | Bug exigir refatoração estrutural ampla ou decomposição de mini-refactoring | `@refactor-planner` |
 | Impacto técnico local ampliado | `@tech-solution-architect` (tier B1) |
 | Impacto cross-sistema ou multi-projeto | `@tech-solution-architect` |
+| Autoria do Plano de Implementação (`docs/implementation-plans/`, R-064) no WORKFLOW-BUG-FIX | `<stack>-arch-advisor` (resolvido dinamicamente pelo domain-router ativo da stack detectada — ex.: `python-arch-advisor`, `spring-boot-arch-advisor`, `angular-arch-advisor`, conforme a stack do bug em triagem). **NUNCA** `@tech-solution-architect` para esta finalidade — esse agent só atua no WORKFLOW-BUG-FIX através do estado `WF1_SECURITY_CHECKPOINT` (parecer de segurança read-only, Formato A), sem autorização para materializar documentos de planejamento/implementação. O Orquestrador Raiz materializa o arquivo em disco (R-064); o `<stack>-arch-advisor` é o AUTOR do conteúdo técnico, não quem escreve o arquivo fisicamente. |
 | Fix exige criação/estratégia de testes | `@test-strategy` |
 | Fix está aprovado e precisa ser implementado | `@agent-router` (despacho ao router de stack correspondente) |
 

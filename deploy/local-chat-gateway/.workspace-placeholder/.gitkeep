@@ -1,0 +1,1 @@
+# placeholder: usado como bind mount de /workspace quando WORKSPACE_PATH nao esta definida no .env
