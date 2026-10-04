@@ -30,7 +30,25 @@
     "context-mode/ctx_search",
     "context-mode/ctx_batch_execute",
     "context-mode/ctx_execute_file",
-    "context-mode/ctx_index"
+    "context-mode/ctx_index",
+    "playwright/browser_snapshot",
+    "playwright/browser_navigate",
+    "playwright/browser_navigate_back",
+    "playwright/browser_click",
+    "playwright/browser_type",
+    "playwright/browser_hover",
+    "playwright/browser_select_option",
+    "playwright/browser_press_key",
+    "playwright/browser_fill_form",
+    "playwright/browser_file_upload",
+    "playwright/browser_handle_dialog",
+    "playwright/browser_wait_for",
+    "playwright/browser_tabs",
+    "playwright/browser_close",
+    "playwright/browser_console_messages",
+    "playwright/browser_network_requests",
+    "playwright/browser_take_screenshot",
+    "playwright/browser_resize"
   ],
   "security_profile": {
     "tool_zones": [

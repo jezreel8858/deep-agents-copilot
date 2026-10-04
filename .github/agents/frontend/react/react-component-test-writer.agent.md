@@ -6,7 +6,7 @@ description: >-
   renderização de JSX, interações do usuário (`userEvent`) e asserções acessíveis
   (queries por role/texto) em vez de detalhes de implementação.
 model: "Gemini 3.8 Flash"
-tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_execute_file']
+tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_execute_file', 'playwright/browser_snapshot', 'playwright/browser_navigate', 'playwright/browser_click', 'playwright/browser_type', 'playwright/browser_wait_for', 'playwright/browser_console_messages', 'playwright/browser_network_requests', 'playwright/browser_tabs', 'playwright/browser_close', 'playwright/browser_snapshot', 'playwright/browser_navigate', 'playwright/browser_click', 'playwright/browser_type', 'playwright/browser_wait_for', 'playwright/browser_console_messages', 'playwright/browser_network_requests', 'playwright/browser_tabs', 'playwright/browser_close']
 source_docs:
   - .github/skills/test-implementation-react-vitest/SKILL.md
   - .github/skills/test-implementation-frontend/SKILL.md
@@ -15,6 +15,7 @@ source_docs:
   - .github/skills/handoff-governance/SKILL.md
   - .github/skills/agent-contracts/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
+  - .github/skills/playwright-mcp/SKILL.md
 source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md

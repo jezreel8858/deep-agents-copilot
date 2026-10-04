@@ -6,7 +6,7 @@ description: >-
   focado em diffs mínimos, correção de re-render storms, violações de regras de hooks,
   memory leaks e race conditions, com testes de regressão (TDD).
 model: "Claude Sonnet 5"
-tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_execute_file']
+tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_execute_file', 'playwright/browser_snapshot', 'playwright/browser_navigate', 'playwright/browser_navigate_back', 'playwright/browser_click', 'playwright/browser_type', 'playwright/browser_hover', 'playwright/browser_select_option', 'playwright/browser_press_key', 'playwright/browser_fill_form', 'playwright/browser_file_upload', 'playwright/browser_handle_dialog', 'playwright/browser_wait_for', 'playwright/browser_tabs', 'playwright/browser_close', 'playwright/browser_console_messages', 'playwright/browser_network_requests', 'playwright/browser_take_screenshot', 'playwright/browser_resize', 'playwright/browser_snapshot', 'playwright/browser_navigate', 'playwright/browser_navigate_back', 'playwright/browser_click', 'playwright/browser_type', 'playwright/browser_hover', 'playwright/browser_select_option', 'playwright/browser_press_key', 'playwright/browser_fill_form', 'playwright/browser_file_upload', 'playwright/browser_handle_dialog', 'playwright/browser_wait_for', 'playwright/browser_tabs', 'playwright/browser_close', 'playwright/browser_console_messages', 'playwright/browser_network_requests', 'playwright/browser_take_screenshot', 'playwright/browser_resize']
 source_docs:
   - .github/skills/react-implementation-patterns/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
@@ -15,6 +15,7 @@ source_docs:
   - .github/skills/agent-contracts/SKILL.md
   - .github/skills/code-tracing/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
+  - .github/skills/playwright-mcp/SKILL.md
 source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md

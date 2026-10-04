@@ -14,6 +14,14 @@ model: "Gemini 3.8 Flash"
 # Se run_in_terminal for declarado em tools, é OBRIGATÓRIO incluir .github/skills/terminal-governance/SKILL.md em source_docs (R-049).
 # Operacional: ['read_file', 'insert_edit_into_file', 'create_file', 'grep_search', 'file_search', 'list_dir', 'get_errors', 'run_subagent']
 # Read-Only / Analítico: ['read_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'mcp_context-mode_ctx_search']
+# Herança de Tooling playwright-mcp (R-055 Q2 — Anti-Silo Fix):
+# Agents de frontend com perfil *-e2e-writer, *-ui-stylist, *-component-test-writer, *-feature-developer ou
+# *-bug-fixer (Angular/React e stacks futuras equivalentes) DEVEM incluir as tools 'playwright/browser_*'
+# (servidor MCP microsoft/playwright-mcp, ver .config/idea_mcp.json) conforme o tier de privilégio do papel
+# (INSPECT: ui-stylist / COMPONENT: component-test-writer e feature-developer / FULL: e2e-writer e bug-fixer)
+# e referenciar compulsoriamente '.github/skills/playwright-mcp/SKILL.md' em source_docs:. Esta herança é
+# formalizada deterministicamente em tools/agent_source_docs_sync/required_source_docs_rules.json
+# (regra 'playwright_mcp_requires_skill_doc') e detalhada em docs/plan/agent-profiles-taxonomy.md (Addendum).
 tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_search']
 # SSOT de Governança e Dependências (Context Engineering Benchmark 2026):
 # 100% das dependências documentais e skills DEVEM residir exclusivamente em source_docs:/source_docs_lazy: no frontmatter.

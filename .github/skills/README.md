@@ -45,6 +45,7 @@ Toda skill deve declarar no topo:
 | **`test-implementation-backend`** | ⭐ **Tier 2** | Padrões **genéricos** de testes backend (agnóstico de framework — pirâmide, AAA, mocks) |
 | **`test-implementation-spring-boot`** | ⭐ **Tier 2** | Padrões **específicos** JUnit 5 + Mockito + JaCoCo para Spring Boot |
 | **`test-implementation-frontend`** | ⭐ **Tier 2** | Padrões **genéricos** de testes frontend (agnóstico de framework — componentes, E2E) |
+| **`playwright-mcp`** | 🧠 **Tier 1** | Automação de navegador real via Accessibility Tree (`browser_snapshot`) para o servidor MCP `microsoft/playwright-mcp` — seletores semânticos, ciclo de vida de abas, inspeção de rede/console e guardrails de segurança (RCE, prompt injection) |
 | **`test-implementation-angular-jasmine`** | ⭐ **Tier 2** | Padrões **específicos** Jasmine/Karma + Playwright para Angular 21 (legado/migração) |
 | **`test-implementation-angular-vitest`** | ⭐ **Tier 2** | Padrões **específicos** Vitest 3+ + @angular/build:unit-test para Angular 20/21+ (oficial/novo padrão) |
 | **`test-implementation-python`** | ⭐ **Tier 2** | Padrões **específicos** pytest + coverage.py para Python |
