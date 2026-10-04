@@ -791,3 +791,38 @@ Phase 4 (Futuro)
 **Versão**: 1.0  
 **Próxima Review**: 2026-10-01
 
+
+
+---
+
+## 🧩 Addendum (governance-factory, atualização pontual): Herança Automática de Tooling `playwright-mcp`
+
+> Complementa o perfil **5️⃣ DEBUGGER / TESTER** e formaliza um padrão transversal de **tool inheritance** para
+> especialistas de frontend de automação de navegador (Angular/React e stacks futuras equivalentes), consolidado
+> a partir da criação da skill `.github/skills/playwright-mcp/SKILL.md` (servidor MCP `microsoft/playwright-mcp`,
+> `npx -y @playwright/mcp@latest`, configurado em `.config/idea_mcp.json`).
+
+### Regra de Herança (R-055 Q2 — Portão de Reúso Sistêmico)
+
+Todo agent de frontend criado futuramente com um dos 5 perfis abaixo **herda automaticamente** o conjunto de
+tools `playwright/browser_*` (Accessibility Tree / `browser_snapshot`) correspondente ao seu tier de privilégio,
+e referencia compulsoriamente `.github/skills/playwright-mcp/SKILL.md` em `source_docs:`:
+
+| Perfil | Tier de Tooling | Ferramentas `playwright/*` |
+|---|---|---|
+| `*-e2e-writer` | **FULL** (18 tools) | Navegação, interação completa (click/type/fill_form/drag/hover/select_option/press_key/file_upload/handle_dialog), espera, abas, rede, console, screenshot, resize |
+| `*-bug-fixer` | **FULL** (18 tools) | Idêntico ao `e2e-writer` — reprodução fiel de bugs requer o mesmo poder de interação e introspecção |
+| `*-feature-developer` | **COMPONENT** (9 tools) | Navegação, clique, digitação, espera, console, rede, abas — validação visual/funcional pós-implementação |
+| `*-component-test-writer` | **COMPONENT** (9 tools) | Idêntico ao `feature-developer` — validação de componente renderizado em browser real |
+| `*-ui-stylist` | **INSPECT** (7 tools, read-only) | Navegação, resize, screenshot, console, abas — **sem** tools de interação/mutação (mantém a isenção estrita de testes do papel) |
+
+Esta herança é **determinística e auto-validada**, não dependendo de memória do agente criador: a regra
+`playwright_mcp_requires_skill_doc` em `tools/agent_source_docs_sync/required_source_docs_rules.json` injeta
+automaticamente `.github/skills/playwright-mcp/SKILL.md` em `source_docs:` sempre que a tool
+`playwright/browser_snapshot` for declarada, validado por `tests/governance_audit/test_sync_required_source_docs_invariants.py`.
+Nenhum dos 10 agentes elegíveis recebe `playwright/browser_run_code_unsafe` por padrão (least privilege —
+guardrail RCE formalizado na própria skill).
+
+**Referência de implementação**: `.github/agents/templates/agent-template.md` (comentário de herança no bloco
+`tools:`), `.github/skills/playwright-mcp/SKILL.md` (corpo operacional completo), `.github/skills/.index.json`
+e `.github/skills/README.md` (registro Tier 1/tooling).

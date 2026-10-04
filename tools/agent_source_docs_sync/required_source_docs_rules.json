@@ -13,6 +13,17 @@
         ".github/skills/handoff-governance/SKILL.md",
         ".github/skills/agent-contracts/SKILL.md"
       ]
+    },
+    {
+      "id": "playwright_mcp_requires_skill_doc",
+      "description": "Agents que declaram qualquer tool 'playwright/browser_snapshot' em tools: (perfil frontend e2e-writer/ui-stylist/component-test-writer/feature-developer/bug-fixer com automação de navegador via Playwright MCP) devem referenciar formalmente playwright-mcp/SKILL.md em source_docs: (R-055 Q2 — herança sistêmica de template)",
+      "condition": {
+        "tools_contains": "playwright/browser_snapshot"
+      },
+      "exclude_files": [],
+      "required_source_docs": [
+        ".github/skills/playwright-mcp/SKILL.md"
+      ]
     }
   ]
 }

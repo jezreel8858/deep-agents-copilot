@@ -6,6 +6,23 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.53.0] — 2026-10-04
+
+### Adicionado — Integração do MCP Playwright (`microsoft/playwright-mcp`) e Skill Canônica para Agentes Frontend
+
+- **Nova Skill Canônica `playwright-mcp` (Tier 1)**: Criada a skill `.github/skills/playwright-mcp/SKILL.md` fornecendo diretrizes de automação de navegador real orientada a Accessibility Tree (`browser_snapshot`), seletores semânticos por role/nome, ciclo de vida de abas, inspeção de rede/console e guardrails rígidos de segurança (prevenção a RCE, prompt injection e vazamento de sessão).
+- **Integração de Tooling MCP em Agentes Frontend**: Habilitada a ferramenta MCP `playwright` no frontmatter de 10 agentes especializados de frontend (Angular e React):
+  - Angular: `angular-e2e-writer`, `angular-component-test-writer`, `angular-feature-developer`, `angular-bug-fixer`, `angular-ui-stylist`.
+  - React: `react-e2e-writer`, `react-component-test-writer`, `react-feature-developer`, `react-bug-fixer`, `react-ui-stylist`.
+- **Configuração de MCP no Host IDE (`.config/idea_mcp.json`)**: Adicionado o servidor MCP `@playwright/mcp` via `npx -y @playwright/mcp@latest` com configuração padronizada para suporte a automação interativa no IDE.
+- **Sincronização de Contratos e Metadados A2A**:
+  - Atualizados os 10 arquivos `.a2a/agentcards/*.agentcard.json` correspondentes com as novas capacidades de ferramentas de automação visual/E2E.
+  - Atualizados os catálogos `.github/agents/frontend/angular/angular-catalog.yaml` e `.github/agents/frontend/react/react-catalog.yaml`.
+  - Atualizado `.github/skills/.index.json` e `.github/skills/README.md` com a catalogação formal da nova skill.
+  - Atualizados `tools/agent_source_docs_sync/required_source_docs_rules.json`, `.github/agents/templates/agent-template.md` e `docs/plan/agent-profiles-taxonomy.md`.
+
+---
+
 ## [2.52.4] — 2026-10-03
 
 ### Modificado — Poda de Capacidade de Ferramentas de Context-Mode em Agentes Gather-Only (R-055 / R-056 / R-059)
