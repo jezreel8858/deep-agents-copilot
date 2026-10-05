@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "HarnessEvalClaim",
+  "description": "Schema de validação estrutural de claims testáveis extraídos de um harness/prompt-alvo (harness-eval Passo 2).",
+  "type": "object",
+  "required": [
+    "id",
+    "statement",
+    "track",
+    "test_cases"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Identificador único do claim (ex.: 'claim-001')."
+    },
+    "statement": {
+      "type": "string",
+      "description": "Afirmação comportamental testável em linguagem natural."
+    },
+    "track": {
+      "type": "string",
+      "enum": [
+        "A",
+        "B",
+        "C"
+      ],
+      "description": "Trilha de avaliação associada."
+    },
+    "test_cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "input"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "canonico",
+              "borda"
+            ]
+          },
+          "input": {
+            "type": "string"
+          },
+          "expected_behavior": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "verdict": {
+      "type": "object",
+      "properties": {
+        "judge_a": {
+          "type": "string",
+          "enum": [
+            "confirma",
+            "contradiz",
+            "inconclusivo"
+          ]
+        },
+        "judge_b": {
+          "type": "string",
+          "enum": [
+            "confirma",
+            "contradiz",
+            "inconclusivo"
+          ]
+        },
+        "final_score": {
+          "type": "string",
+          "enum": [
+            "aprovado",
+            "reprovado",
+            "divergente"
+          ]
+        },
+        "human_tiebreak": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

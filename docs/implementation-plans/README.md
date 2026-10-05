@@ -39,3 +39,14 @@ Todo documento de implementação técnica DEVE incorporar ao final o checklist 
 - [ ] **Controle de Acesso & Autorização**: Validação de escopos, papéis e permissões no nível de serviço/controlador para evitar broken object level authorization (BOLA/IDOR).
 - [ ] **Tratamento Seguro de Falhas**: Exceções tratadas sem expor stacktraces ou dados internos ao usuário final, mantendo estado consistente.
 - [ ] **Cobertura de Testes Defensivos**: Testes cobrindo fluxos de erro, inputs maliciosos/inválidos e limites de contorno.
+  9. Checklist Defensivo Pré-Code-Review obrigatório com validações de segurança prévias à submissão.
+
+## 🔒 Checklist Defensivo Pré-Code-Review
+
+Todo documento de implementação técnica DEVE incorporar ao final o checklist defensivo com os seguintes itens obrigatórios:
+- [ ] **Sanitização & Validação de Borda**: Validação estrita de tipos, tamanhos e formatos em todos os pontos de entrada e parâmetros externos.
+- [ ] **Zero Hardcoded Secrets**: Ausência absoluta de credenciais, tokens de API, senhas ou certificados codificados no código ou fixtures.
+- [ ] **Logging & Dados Sensíveis**: Mascaramento ou omissão de PII, senhas, tokens e dados sensíveis em logs de depuração e traces.
+- [ ] **Controle de Acesso & Autorização**: Validação de escopos, papéis e permissões no nível de serviço/controlador para evitar broken object level authorization (BOLA/IDOR).
+- [ ] **Tratamento Seguro de Falhas**: Exceções tratadas sem expor stacktraces ou dados internos ao usuário final, mantendo estado consistente.
+- [ ] **Cobertura de Testes Defensivos**: Testes cobrindo fluxos de erro, inputs maliciosos/inválidos e limites de contorno.
