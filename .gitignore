@@ -66,8 +66,3 @@ docs/ai-context/catalog.local.yaml
 .gemini/
 
 nul
-
-# Copilot Orchestrator temporary files
-.orchestrator/
-.copilot-cli/
-.github/instructions/orchestrator-*.instructions.md

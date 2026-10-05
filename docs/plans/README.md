@@ -33,3 +33,11 @@ Todo documento de planejamento DEVE incluir formalmente a análise de segurança
 - **Requisitos de Segurança Mandatórios**: Autenticação, autorização (RBAC/ABAC), criptografia em repouso e trânsito, proteção de dados sensíveis (LGPD/GDPR).
 - **Validações de Borda**: Contratos de entrada estritos, validação de schemas, sanitização de inputs e mitigação de injeções.
 - **Trilha de Auditoria e Observabilidade**: Logging seguro de eventos de segurança sem vazamento de PII ou credenciais.
+
+## 🛡️ Modelagem de Ameaças & Requisitos de Segurança (Shift-Left)
+
+Todo documento de planejamento DEVE incluir formalmente a análise de segurança prévia (Shift-Left Security):
+- **Vetores de Risco & Superfície de Ataque**: Mapeamento preventivo contra vulnerabilidades comuns (STRIDE, OWASP Top 10, CWEs relevantes ao domínio).
+- **Requisitos de Segurança Mandatórios**: Autenticação, autorização (RBAC/ABAC), criptografia em repouso e trânsito, proteção de dados sensíveis (LGPD/GDPR).
+- **Validações de Borda**: Contratos de entrada estritos, validação de schemas, sanitização de inputs e mitigação de injeções.
+- **Trilha de Auditoria e Observabilidade**: Logging seguro de eventos de segurança sem vazamento de PII ou credenciais.
