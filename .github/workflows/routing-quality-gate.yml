@@ -52,5 +52,5 @@ jobs:
           python tools/agentcard_exporter/export_agentcards.py --check
 
       - name: Run Routing Quality Gate & Governance Smells Suite
-        run: pytest tests/routing_gate/ tests/governance_audit/ tests/operational_flow/ -v --tb=short
+        run: pytest tests/routing_gate/ tests/governance_audit/ tests/operational_flow/ -v --tb=short -m "slow or not slow"
 

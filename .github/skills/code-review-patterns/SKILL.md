@@ -2,10 +2,16 @@
 name: code-review-patterns
 description: >-
   Diretrizes de mercado para revisão de código automatizada por IA — taxonomia
-  de severidade, dimensões de análise, critérios de bloqueio de merge e
-  anti-padrões de review (review fatigue, falso-positivo, revisão fora do diff).
+  de severidade, dimensões de análise, critérios de bloqueio de merge,
+  anti-padrões de review (review fatigue, falso-positivo, revisão fora do
+  diff), Convergence Contract (rodadas 1-3 anti ping-pong), Noise Budget
+  quantificado (teto de 5 nits), Evidence-First/pesquisa obrigatória e
+  heurística anti-AI Slop.
 tier: 2
 category: quality
+license: "CC-BY-4.0"
+source_attribution: "Tech Leads Club (agent-skills) — conceitos assimilados de 'the-judge', autor Felipe Rodrigues"
+imported_from: "https://github.com/tech-leads-club/agent-skills/tree/main/packages/skills-catalog/skills/(development)/the-judge"
 triggers:
   - "revisar código"
   - "code review"
@@ -13,6 +19,10 @@ triggers:
   - "analisar pull request"
   - "revisar diff"
   - "severidade de achado"
+  - "review ping-pong"
+  - "rodada de revisão"
+  - "noise budget"
+  - "código gerado por IA com ruído"
 tools: []
 source_docs_lazy:
   - CLAUDE.md
@@ -169,12 +179,54 @@ Demais achados → alertar (🟠/🟡), nunca bloquear por preferência de estil
 - ❌ Aprovar PR de feature frontend com rota nova sem verificar se está integrada à navegação do projeto (menu/sidenav) — feature entregue porém inalcançável (Smell 2.18).
 - ❌ Aprovar componente de UI novo sem verificar reaproveitamento de `shared/`/design system já documentado no projeto (Smell 2.19).
 - ❌ Aprovar PR com alterações relevantes de arquitetura, rotas, schemas ou regras de negócio sem que a documentação viva (`docs/`, README, ADRs) tenha sido sincronizada (drift documental — R-033).
+- ❌ Exceder 3 rodadas de revisão sem declarar convergência/escalar para decisão humana (review ping-pong).
+- ❌ Afirmar comportamento de biblioteca/API/framework externo sem citar documentação oficial ou changelog da versão em uso.
+- ❌ Ignorar ou aprovar silenciosamente código/comentário inflado por IA (refraseio óbvio, abstração especulativa, try/catch defensivo redundante).
 ## 6) Formato de Saída Recomendado
 
 - Sumário executivo no topo (contagem por severidade + veredito).
 - Achados agrupados por severidade, não por arquivo (facilita priorização).
 - Cada achado: `[categoria] descrição → arquivo:linha`.
 - Veredito final: `APROVADO | APROVADO COM RESSALVAS | BLOQUEADO`.
+
+## 7) Convergence Contract (Protocolo de Rodadas de Revisão 1-3)
+
+> Assimilado de `the-judge` (Tech Leads Club, CC-BY-4.0) para evitar *review ping-pong* (ciclos infinitos de idas e vindas entre revisor e autor).
+
+| Rodada | Objetivo | Regra |
+|---|---|---|
+| **1 — Inicial** | Revisão completa do diff | Reporta todos os achados (Bloqueador/Alta/Sugestão) com evidência `arquivo:linha`. |
+| **2 — Foco em pendências** | Revisão incremental | Reavalia **apenas** os itens pendentes da Rodada 1; não reabre pontos já aprovados nem introduz nits novos fora do diff incremental. |
+| **3 — Convergência final** | Decisão definitiva | Se ainda houver 🔴 Bloqueador, declarar explicitamente que é a última rodada automática e escalar para decisão humana/arbitragem — nunca iniciar uma 4ª rodada sozinho. |
+
+- Todo relatório de revisão declara `Rodada: N/3` no sumário executivo.
+- Ultrapassar 3 rodadas sem convergência é anti-padrão (review ping-pong).
+
+## 8) Noise Budget Quantificado (Teto de Nits)
+
+- Máximo de **5 (cinco)** apontamentos cosméticos/nitpick (🟡 Sugestão de estilo sem impacto funcional) exibidos **inline** no corpo do relatório por rodada.
+- Excedente ao teto: NÃO descartar — agrupar e reportar como **métrica agregada** no sumário executivo (ex.: "+12 nits adicionais agrupados").
+- 🔴 Bloqueador e 🟠 Alta prioridade **nunca** contam para o Noise Budget — o teto aplica-se exclusivamente a 🟡 Sugestão cosmética.
+- Finalidade: mitigar review fatigue sem perder rastreabilidade do achado.
+
+## 9) Evidence-First & Pesquisa Obrigatória
+
+- **Verificação em código/repro local obrigatória**: antes de afirmar que uma função falha, quebra contrato ou introduz bug, localizar a evidência real no diff (`arquivo:linha`) — nunca por suposição.
+- **Consulta obrigatória a documentação oficial/changelog**: antes de alegar comportamento de biblioteca, API ou framework externo (ex.: "essa versão não suporta X", "método depreciado"), é obrigatório consultar a documentação oficial ou changelog da versão em uso — nunca afirmar por recall de treinamento desatualizado.
+- Toda alegação sobre comportamento externo cita a fonte (link de doc oficial/changelog/release notes), equivalente à exigência de `arquivo:linha` para achados internos.
+- Hipótese não verificada deve ser rotulada explicitamente como hipótese — nunca classificada como 🔴 Bloqueador.
+
+## 10) Heurística Anti-AI Slop (Código/Comentário Inflado por IA)
+
+| Padrão de AI Slop | Sintoma no diff |
+|---|---|
+| Comentário que só refraseia o código | Comentário acima da linha repete literalmente o que o código já diz, sem valor informativo adicional |
+| Abstração especulativa (YAGNI) | Interface/classe genérica criada para um único caso de uso concreto, sem segundo consumidor real |
+| Try/catch defensivo redundante | Bloco try/catch envolvendo chamada síncrona confiável, sem tratamento real do erro — apenas suprimindo exceção |
+| Nomenclatura prolixa redundante | Nome de variável/função repete o tipo ou comentário adjacente sem agregar semântica de domínio |
+
+- Classificar como 🟡 Sugestão (salvo quando compromete legibilidade crítica → 🟠 Alta).
+- Não bloqueia merge isoladamente; acumula-se no Noise Budget (seção 8) quando for puramente cosmético.
 
 ## Checklist
 
@@ -184,6 +236,10 @@ Demais achados → alertar (🟠/🟡), nunca bloquear por preferência de estil
 - [ ] Contexto de PR/issue considerado antes de classificar.
 - [ ] Nenhuma correção aplicada — apenas relatório.
 - [ ] Veredito final declarado (APROVADO/RESSALVAS/BLOQUEADO).
+- [ ] Rodada de revisão declarada (`Rodada: N/3`) e convergência respeitada (≤ 3 rodadas, escalar se persistir Bloqueador).
+- [ ] Nits cosméticos respeitam o Noise Budget (máx. 5 inline; excedente agrupado como métrica).
+- [ ] Alegações sobre comportamento de lib/API externa citam fonte oficial (doc/changelog).
+- [ ] Código/comentário inflado por IA (AI Slop) sinalizado quando presente.
 
 ## Referências
 
@@ -192,4 +248,5 @@ Demais achados → alertar (🟠/🟡), nunca bloquear por preferência de estil
 - Google Engineering Practices — Code Review Guide: https://google.github.io/eng-practices/review/
 - OWASP Top 10: https://owasp.org/www-project-top-ten/
 - Padrões observados em ferramentas de mercado (CodeRabbit, Qodo/PR-Agent, Sourcery, DeepSource, SonarQube AI CodeFix) — revisão diff-only, severidade blocker/major/minor, complemento a SAST/lint.
+- Tech Leads Club — *agent-skills*: `the-judge` (autor Felipe Rodrigues, licença CC-BY-4.0) — https://github.com/tech-leads-club/agent-skills — fonte do Convergence Contract, Noise Budget, Evidence-First e heurística anti-AI Slop.
 

@@ -308,4 +308,4 @@ ng test --list
 - Jasmine: https://jasmine.github.io/
 - Playwright: https://playwright.dev/
 - Karma: https://karma-runner.github.io/
-
+- [Padrões Genéricos Frontend (Base)](../test-implementation-frontend/SKILL.md)

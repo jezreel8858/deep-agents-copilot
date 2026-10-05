@@ -3,7 +3,7 @@
   "protocol": "A2A/1.0.0",
   "id": "agent-auditor",
   "name": "Agent Auditor",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Audita o proprio catalogo de governanca (agents/skills/prompts), detecta smells e gaps estruturais, classifica severidade (Bloqueador/Alto/Sugestao) e recomenda handoff para agentes executores; nunca aplica correcao diretamente.",
   "domain": "Auditoria semantica de governanca do catalogo (meta-nivel, read-only)",
   "role": "auditor",

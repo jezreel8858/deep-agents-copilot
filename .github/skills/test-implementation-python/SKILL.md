@@ -289,4 +289,4 @@ def service() -> Generator[[Entidade]Service, None, None]:
 - coverage.py: https://coverage.readthedocs.io/
 - respx: https://lundberg.github.io/respx/
 - freezegun: https://github.com/spulec/freezegun
-
+- [Padrões Genéricos Backend (Base)](../test-implementation-backend/SKILL.md)

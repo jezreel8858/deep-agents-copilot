@@ -70,6 +70,8 @@ nos:
       Fusão de agent-factory + skill-factory + prompt-factory: cria/revisa
       agent (.agent.md), skill (SKILL.md) ou prompt (.prompt.md) via
       parâmetro type, com atualização atômica do catálogo correspondente.
+      Toda importação de skill externa passa compulsoriamente pelo Protocolo
+      de Avaliação de Pertinência (R-067) antes de qualquer mutação de arquivo.
 
   - id: governance-maintainer
     tipo: downstream
@@ -1033,6 +1035,9 @@ arestas:
         - "criar skill"
         - "nova skill"
         - "revisar skill"
+        - "importar skill"
+        - "importação de skill"
+        - "skill externa"
         - "criar prompt"
         - "novo prompt"
         - "revisar prompt"

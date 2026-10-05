@@ -3,7 +3,7 @@
   "protocol": "A2A/1.0.0",
   "id": "governance-factory",
   "name": "Governance Factory",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Fusao de agent-factory + skill-factory + prompt-factory: cria/revisa agent (.agent.md), skill (SKILL.md), prompt (.prompt.md) ou stack (ecossistema completo com router e especialistas) via parametro type; na criacao, delega compulsoriamente pesquisa previa de melhores diretrizes e skills ao deep-search, com atualizacao atomica de catalogo (R-015).",
   "domain": "Governanca e autoria de artefatos e stacks (agent/skill/prompt/stack)",
   "role": "implementer",

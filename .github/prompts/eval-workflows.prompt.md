@@ -11,6 +11,7 @@ source_docs_lazy:
 source_docs:
   - .github/skills/agent-evals-lab/SKILL.md
   - .github/skills/handoff-governance/SKILL.md
+  - .github/skills/harness-eval/SKILL.md
 ---
 
 # `eval-workflows`

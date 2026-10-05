@@ -405,7 +405,7 @@ agents:
     id: agent-auditor
     model: Claude Sonnet 5
     priority: 8.4
-    version: 1.0.0
+    version: 1.2.0
     domain: Auditoria semantica de governanca do catalogo (meta-nivel, read-only)
     description: Audita o proprio catalogo de governanca (agents/skills/prompts),
       detecta smells e gaps estruturais, classifica severidade (Bloqueador/Alto/Sugestao)
@@ -424,6 +424,7 @@ agents:
     - .github/agents/catalog.yaml
     - .github/skills/governance-audit-patterns/SKILL.md
     - .github/skills/agent-contracts/SKILL.md
+    - .github/skills/harness-eval/SKILL.md
     related_agents:
     - agent-router
     - governance-factory
@@ -461,7 +462,7 @@ agents:
     id: governance-factory
     model: Claude Sonnet 5
     priority: 9
-    version: 1.2.0
+    version: 1.3.0
     domain: Governanca e autoria de artefatos e stacks (agent/skill/prompt/stack)
     description: 'Fusao de agent-factory + skill-factory + prompt-factory: cria/revisa
       agent (.agent.md), skill (SKILL.md), prompt (.prompt.md) ou stack (ecossistema
@@ -481,6 +482,7 @@ agents:
     - .github/copilot-instructions.md
     - .github/agents/README.md
     - .github/skills/governance-factory-patterns/SKILL.md
+    - .github/skills/harness-eval/SKILL.md
     related_agents:
     - deep-search
     - tech-solution-architect
@@ -535,6 +537,7 @@ agents:
     - .github/copilot-instructions.md
     - .github/agents/README.md
     - .github/skills/efficient-batch-code-modification/SKILL.md
+    - .github/skills/harness-eval/SKILL.md
     related_agents:
     - agent-router
     - governance-factory

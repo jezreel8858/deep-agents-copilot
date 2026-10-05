@@ -11,6 +11,7 @@ model: "Claude Sonnet 5"
 tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index']
 source_docs:
   - .github/skills/documentation-writing-patterns/SKILL.md
+  - .github/skills/security-review-patterns/SKILL.md
   - .github/skills/task-decomposition-patterns/SKILL.md
   - .github/skills/requirements-engineering-patterns/SKILL.md
   - .github/skills/context-mode/SKILL.md
@@ -93,6 +94,12 @@ Progresso: 0/N tarefas concluídas
     - Entrada: ...
     - Saída / DoD: ...
 
+### 🔒 Checklist Defensivo Pré-Code-Review
+- [ ] Sanitização e validação de inputs e boundary checks nas novas interfaces
+- [ ] Zero secrets hardcoded e logging seguro sem vazamento de dados sensíveis
+- [ ] Permissões e regras de acesso validadas contra matriz de autorização
+- [ ] Testes de validação defensiva e cobertura de edge cases implementados
+
 ### Critério de Conclusão (Definition of Done Geral)
 - <lista de validações integradas obrigatórias>
 
@@ -106,6 +113,7 @@ Progresso: 0/N tarefas concluídas
 - **Isolamento de Estado**: Proibido marcar como paralelizável (`{paralelizavel: true}`) subtasks que compartilham recursos mutáveis.
 ---
 ## 🎯 Checklist Antes de Entregar
+- [ ] Plano gerado inclui a seção obrigatória "### 🔒 Checklist Defensivo Pré-Code-Review".
 - [ ] `[CURRENT_STATE_LOCK: WF4_FEATURE_DECOMPOSITION]` declarado na primeira linha.
 - [ ] Subtasks atômicas com entrada e saída claras.
 - [ ] Metadados de paralelização (`{paralelizavel: bool, responsavel}`) presentes em todas as subtasks.

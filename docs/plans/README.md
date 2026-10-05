@@ -25,3 +25,11 @@ docs/plans/<AAAAMMDD>-<workflow>-<identificador-curto>.md
   5. Escopo delimitado, artefatos/arquivos impactados (mapeados via `@codegraph-engine` quando aplicável) e Não-escopo explícito.
   6. Riscos técnicos, consequências e blast radius inicial.
   7. Critério de aceite e Definition of Done (único a nível de documento, sem checklist obrigatório de execução).
+
+## 🛡️ Modelagem de Ameaças & Requisitos de Segurança (Shift-Left)
+
+Todo documento de planejamento DEVE incluir formalmente a análise de segurança prévia (Shift-Left Security):
+- **Vetores de Risco & Superfície de Ataque**: Mapeamento preventivo contra vulnerabilidades comuns (STRIDE, OWASP Top 10, CWEs relevantes ao domínio).
+- **Requisitos de Segurança Mandatórios**: Autenticação, autorização (RBAC/ABAC), criptografia em repouso e trânsito, proteção de dados sensíveis (LGPD/GDPR).
+- **Validações de Borda**: Contratos de entrada estritos, validação de schemas, sanitização de inputs e mitigação de injeções.
+- **Trilha de Auditoria e Observabilidade**: Logging seguro de eventos de segurança sem vazamento de PII ou credenciais.

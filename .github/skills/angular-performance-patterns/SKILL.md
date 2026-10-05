@@ -19,6 +19,7 @@ triggers:
   - "signals performance"
   - "memory leak angular"
 source_docs:
+  - .github/skills/performance-engineering-patterns/SKILL.md
   - .github/agents/frontend/angular/angular-router.agent.md
 source_docs_lazy:
   - CLAUDE.md
@@ -27,6 +28,8 @@ tools: []
 ---
 
 # Angular Performance Patterns
+
+> **Relação com Padrões Universais**: Esta skill especializa as diretrizes arquiteturais e thresholds de performance definidos em [.github/skills/performance-engineering-patterns/SKILL.md](../performance-engineering-patterns/SKILL.md) para o ecossistema Angular moderno (Signals, Zoneless, @defer). Consulte a skill genérica para métricas globais (Core Web Vitals thresholds, SLA/SLO, pirâmide de diagnóstico).
 
 > Base de conhecimento especializada em **engenharia de performance frontend** para aplicações Angular modernas (v17 a v21+). Utilizada pelo `@angular-engineer` em modo Advisory (auditoria, diagnóstico de gargalos) e Implementação (aplicação direta de código otimizado).
 
@@ -151,4 +154,4 @@ class ExemploComponent {
 - Angular Docs: *Optimizing Images with NgOptimizedImage* (https://angular.dev/guide/image-optimization)
 - Angular Experts: *Zoneless Angular Guide* (https://angularexperts.io/blog/zoneless-angular)
 - Google Web Vitals: *Optimize INP, LCP, CLS* (https://web.dev/explore/metrics)
-
+- [Padrões Globais de Performance (Base)](../performance-engineering-patterns/SKILL.md)

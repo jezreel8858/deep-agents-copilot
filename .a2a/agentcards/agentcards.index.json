@@ -18,7 +18,7 @@
       "name": "Agent Auditor",
       "role": "auditor",
       "domain": "Auditoria semantica de governanca do catalogo (meta-nivel, read-only)",
-      "version": "1.0.0"
+      "version": "1.2.0"
     },
     "agent-router": {
       "name": "Agent Router",
@@ -222,7 +222,7 @@
       "name": "Governance Factory",
       "role": "implementer",
       "domain": "Governanca e autoria de artefatos e stacks (agent/skill/prompt/stack)",
-      "version": "1.2.0"
+      "version": "1.3.0"
     },
     "governance-maintainer": {
       "name": "Governance Maintainer",

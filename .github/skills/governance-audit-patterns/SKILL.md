@@ -449,6 +449,19 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 
 ---
 
+### 2.33 — Importação de Skill Externa sem Avaliação de Pertinência (Skill Import Viability Gate / R-067)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Skill externa (catálogo/repositório de terceiros) é importada/materializada em `.github/skills/` sem o `@governance-factory` ter executado previamente a avaliação de pertinência (domínio, duplicidade, aderência estrutural, guardrails R-031/R-038), resultando em skill redundante, fora de escopo ou semanticamente concorrente com skill já catalogada — sem reporte de impacto negativo nem proposta de solução alternativa ao usuário. |
+| Como detectar | (a) Auditoria manual/`agent-auditor` comparando nova skill importada contra `.index.json` por sobreposição semântica de `category`/`triggers`; (b) Ausência, no histórico de conversa/relatório de entrega, do bloco "Gate de Viabilidade de Importação" previsto em `governance-factory-patterns/SKILL.md` § 3.4; (c) `source_attribution`/`imported_from` preenchidos no frontmatter sem evidência de avaliação prévia documentada. |
+| Origem (TrustAgent) | Intrínseco — tendência do modelo em atender literalmente ao pedido de "importar X" sem avaliação crítica prévia de pertinência ou alternativas (Sycophancy / Instruction Over-Compliance). |
+| Severidade | **Alto** (gera duplicidade conceitual, poluição de Progressive Disclosure e risco de licenciamento/autonomia indevida não mitigado). |
+| Enforcement | **Textual/Instrucional obrigatório** via `governance-factory-patterns/SKILL.md` § 3.4 e `CLAUDE.md` § R-067; validação determinística de presença da regra via `tests/governance_audit/test_skill_import_viability_gate.py`. |
+| Remediação | `@governance-factory` executa retroativamente o Protocolo de Avaliação de Pertinência (§3.4): se a skill já importada for considerada não pertinente ou redundante, reportar o impacto negativo e propor remoção/consolidação; se o conceito for útil mas mal importado, aplicar retrofit de assimilação seletiva na skill já existente mais próxima. |
+
+---
+
 ## 3) Severidade — Reaproveitamento da Taxonomia Existente
 
 Esta skill **reaproveita** (não recria) a taxonomia de `code-review-patterns`:
@@ -483,7 +496,8 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 
 ## 6) Checklist de Conformidade da Auditoria
 
-- [ ] Todo achado classificado estritamente em uma das 28 categorias de smell (2.1..2.28).
+- [ ] Todo achado classificado estritamente em uma das 33 categorias de smell (2.1..2.33).
+- [ ] Toda solicitação de importação de skill externa passou pela avaliação de pertinência (R-067 / §2.33) antes de qualquer mutação de arquivo.
 - [ ] Severidade reaproveitada de `code-review-patterns` (Bloqueador/Alto/Sugestão).
 - [ ] Origem classificada como intrínseca ou extrínseca (TrustAgent) quando relevante.
 - [ ] Remediação aponta agent executor real do catálogo (nunca "corrigir diretamente" — agent de auditoria é estritamente read-only).
@@ -503,10 +517,12 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 - ❌ Duplicar taxonomia de severidade ou checklist de segurança já existentes em outras skills.
 - ❌ Reportar achado sem apontar agent executor de remediação (relatório inacionável).
 - ❌ Classificar achados como Bloqueadores sem critério estrutural comprovado.
+- ❌ Importar/materializar skill externa sem o gate de pertinência (R-067) ter sido executado e reportado (Smell 2.33).
 
 ## 8) Consumidor Mapeado
 
-- `agent-auditor` (único consumidor inicial — Critic/Analyst de meta-nível sobre o próprio catálogo de governança).
+- `agent-auditor` (consumidor inicial — Critic/Analyst de meta-nível sobre o próprio catálogo de governança).
+- `governance-factory` (consumidor do Smell 2.33 — Skill Import Viability Gate — para autoavaliação prévia à importação de skills externas, antes de qualquer criação de arquivo).
 
 ## 9) Referências
 

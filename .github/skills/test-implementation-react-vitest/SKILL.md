@@ -12,6 +12,7 @@ triggers:
   - "teste unitario react"
   - "teste componente react"
 source_docs:
+  - .github/skills/test-implementation-frontend/SKILL.md
   - .github/agents/frontend/react/react-unit-test-writer.agent.md
   - .github/agents/frontend/react/react-component-test-writer.agent.md
 source_docs_lazy:
@@ -49,3 +50,4 @@ tools: []
 - Vitest Docs: https://vitest.dev/
 - React Testing Library: https://testing-library.com/docs/react-testing-library/intro/
 - MSW Docs: https://mswjs.io/
+- [Padrões Genéricos Frontend (Base)](../test-implementation-frontend/SKILL.md)

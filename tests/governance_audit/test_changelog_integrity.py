@@ -304,6 +304,7 @@ def test_anti_truncation_multiset_empty_head_does_not_block():
     assert missing == []
 
 
+@pytest.mark.slow
 def test_anti_truncation_hook_e2e_git_commit_simulation(tmp_path: Path):
     """
     Teste de Regressão Ponta-a-Ponta (E2E) via subprocess em repositório Git temporário:
@@ -312,6 +313,17 @@ def test_anti_truncation_hook_e2e_git_commit_simulation(tmp_path: Path):
     1. Commit inicial com CHANGELOG.md passa (HEAD vazio sem falso positivo).
     2. Commit inserindo múltiplas versões novas antes de uma existente passa (eliminação do falso positivo).
     3. Commit com remoção líquida real de versão histórica é bloqueado com saída explicativa.
+
+    NOTA DE PERFORMANCE (marcado @pytest.mark.slow): cada `git commit` real aqui
+    dispara o hook bash `.githooks/pre-commit`, que por sua vez spawna ~10-15
+    processos filhos (git diff/grep/sed/comm). No Windows + Git-for-Windows
+    (MSYS2), quando o subprocess Python usa `capture_output=True` (stdio via
+    pipes anônimos, sem console real), o spawn de processos MSYS2 fica
+    drasticamente mais lento (medido: ~30s por `git commit` isolado vs. <1s
+    rodando o mesmo comando interativamente no bash). Este teste soma 3 commits,
+    podendo levar 1-2+ minutos nesse ambiente. Não é um bug de lógica do teste —
+    é uma característica conhecida do MSYS2/Cygwin com I/O redirecionado.
+    Execute explicitamente com `pytest -m slow`; excluído do loop rápido padrão.
     """
     import os
     import shutil
@@ -384,6 +396,7 @@ def test_anti_truncation_hook_e2e_git_commit_simulation(tmp_path: Path):
     assert "Anti-Truncamento" in combined_output
     assert "## [1.1.0] — 2026-01-02" in combined_output
 
+@pytest.mark.slow
 def test_anti_truncation_hook_blocks_duplicate_header_removal_safe_by_default(tmp_path: Path):
     """
     Teste de Regressão / Semântica Multiset do Hook Bash Real:
@@ -398,6 +411,10 @@ def test_anti_truncation_hook_blocks_duplicate_header_removal_safe_by_default(tm
     (semântica de multiset). Por ser incapaz de distinguir entre a limpeza de uma duplicata
     ilegítima e uma perda inadvertida de histórico, o hook bloqueia o commit por precaução.
     Este é um comportamento seguro por padrão conhecido e aceito para um guard de governança.
+
+    NOTA DE PERFORMANCE (marcado @pytest.mark.slow): ver nota equivalente em
+    `test_anti_truncation_hook_e2e_git_commit_simulation` — cada `git commit`
+    real aqui é lento no Windows/MSYS2 por redirecionamento de stdio via pipes.
     """
     import os
     import shutil

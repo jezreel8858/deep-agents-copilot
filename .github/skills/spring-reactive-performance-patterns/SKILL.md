@@ -18,6 +18,7 @@ triggers:
   - "r2dbc pool sizing"
   - "direct memory leak netty"
 source_docs:
+  - .github/skills/performance-engineering-patterns/SKILL.md
   - .github/agents/backend/spring-reactive/spring-reactive-router.agent.md
 source_docs_lazy:
   - CLAUDE.md
@@ -26,6 +27,8 @@ tools: []
 ---
 
 # Spring Reactive Performance Patterns
+
+> **Relação com Padrões Universais**: Esta skill especializa as diretrizes arquiteturais e thresholds de performance definidos em [.github/skills/performance-engineering-patterns/SKILL.md](../performance-engineering-patterns/SKILL.md) para o ecossistema Spring WebFlux / Project Reactor (Event-Loop, backpressure, Netty). Consulte a skill genérica para métricas globais (Core Web Vitals thresholds, SLA/SLO, pirâmide de diagnóstico).
 
 > Base de conhecimento especializada em **engenharia de performance reativa e não-bloqueante** para aplicações Spring WebFlux e Project Reactor. Utilizada pelo `@spring-reactive-engineer` em modo Advisory (auditoria de capacidade, backpressure, diagnóstico de saturação) e Implementação (aplicação direta de fluxos otimizados sem bloqueio).
 
@@ -156,4 +159,4 @@ ConnectionProvider criarProvider() {
 - Reactor Netty Docs: *ConnectionProvider and Memory Tuning* (https://projectreactor.io/docs/netty/snapshot/reference/)
 - BlockHound Project: *Java Agent for Detecting Blocking Calls* (https://github.com/reactor/BlockHound)
 - R2DBC Pool Specification: (https://github.com/r2dbc/r2dbc-pool)
-
+- [Padrões Globais de Performance (Base)](../performance-engineering-patterns/SKILL.md)

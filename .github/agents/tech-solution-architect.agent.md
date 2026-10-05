@@ -10,6 +10,7 @@ model_exception_reason: "R-021: Papel de arquitetura complexa, viabilidade técn
 tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_fetch_and_index', 'context-mode/ctx_batch_execute', 'context-mode/ctx_stats', 'context-mode/ctx_doctor', 'context-mode/ctx_upgrade', 'context-mode/ctx_purge', 'context-mode/ctx_insight']
 source_docs:
   - .github/skills/documentation-writing-patterns/SKILL.md
+  - .github/skills/security-review-patterns/SKILL.md
   - .github/skills/context-mode/SKILL.md
   - .github/skills/integration-contract-analysis/SKILL.md
   - .github/skills/mermaid-diagrams/SKILL.md
@@ -125,6 +126,10 @@ Agente Ativo: tech-solution-architect
 ### Alternativas Rejeitadas (Obrigatória)
 - <opção descartada e justificativa técnica do descarte>
 
+### 🛡️ Modelagem de Ameaças & Requisitos de Segurança (Shift-Left)
+- **Vetores de Risco Identificados**: <ameaças STRIDE/OWASP e superfícies vulneráveis mapeadas>
+- **Requisitos de Segurança Mandatórios**: <autenticação, autorização, criptografia, sanitização e conformidade>
+
 ### Diretrizes de Contorno / Mitigação
 - <Requisito técnico mandatório a ser seguido pelo executor downstream>
 
@@ -161,6 +166,10 @@ Agente Ativo: tech-solution-architect
 
 ### Alternativas Rejeitadas (Obrigatória)
 - <alternativa arquitetural ou de design descartada e justificativa técnica do descarte>
+
+### 🛡️ Modelagem de Ameaças & Requisitos de Segurança (Shift-Left)
+- **Vetores de Risco & Superfície de Ataque**: <análise STRIDE / OWASP Top 10 para os contratos e serviços>
+- **Requisitos de Segurança Mandatórios**: <RBAC, validação de payload, criptografia em trânsito/repouso, mascaramento de PII>
 
 ### Context Firewall — Divisão de Tarefas por Stack
 
@@ -199,6 +208,10 @@ Agente Ativo: tech-solution-architect
 ### Alternativas Rejeitadas (Obrigatória)
 - <estratégia de modernização descartada e justificativa técnica do descarte>
 
+### 🛡️ Modelagem de Ameaças & Requisitos de Segurança (Shift-Left)
+- **Impacto de Segurança na Modernização**: <riscos de paridade de autorização, migração segura de credenciais/sessões>
+- **Requisitos Defensivos de Migração**: <validação de payloads legados vs modernos, auditoria de segurança>
+
 ### Matriz De-Para Canônica (Referência: docs/migrations/matriz-de-para-<alvo>.md)
 | ID | Elemento Legado | Elemento Moderno | Dimensão 5D | Status | Fase |
 |---|---|---|---|---|---|
@@ -226,7 +239,7 @@ Para garantir que o modelo Claude Sonnet 5 não tome iniciativas espúrias ou at
 ---
 
 ## 🎯 Checklist Antes de Entregar
-
+- [ ] Blueprint e docs de planejamento incluem formalmente a seção "### 🛡️ Modelagem de Ameaças & Requisitos de Segurança (Shift-Left)".
 - [ ] Identificador `[CURRENT_STATE_LOCK: ...]` declarado na primeira linha da análise.
 - [ ] `@codegraph-engine` consultado via `run_subagent` para dependências e acoplamento (R-045).
 - [ ] Zero varredura manual realizada caso o grafo tenha falhado (Invariante 10).

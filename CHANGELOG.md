@@ -6,6 +6,21 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.54.0] — 2026-10-05
+
+### Modificado — Consolidação de Skills e Decomposição de Outliers
+
+- **Decomposição da Skill Outlier `test-implementation-angular-vitest`**: Refatorado o arquivo da skill para focar exclusivamente nas particularidades do Angular 20/21+ com Vitest, eliminando redundâncias conceituais e delegando padrões agnósticos para `test-implementation-frontend`.
+- **Cross-References Canônicas de Skills**: Estabelecidas referências cruzadas bidirecionais entre a skill central `test-implementation-frontend` e seus runners específicos (Angular Vitest, Jasmine, React Vitest, Python, Spring Boot), bem como entre `performance-engineering-patterns` e skills de performance por stack.
+- **Atualização de Catálogos e Metadados A2A**: Sincronizados `.github/skills/.index.json`, `.github/skills/README.md`, catálogos de agentes e arquivos `.a2a/agentcards/*.agentcard.json`.
+
+### Adicionado — Gates Automatizados de Auditoria de Governança
+
+- **Gate de Tamanho e Cross-References de Skills**: Adicionada a suíte `tests/governance_audit/test_stack_skills_cross_reference_and_size_outlier.py` para impedir crescimento desmedido de skills individuais e garantir rastreabilidade dos links canônicos.
+- **Suítes de Conformidade e Viabilidade**: Adicionados testes em `test_plan_conformance_skill_boundaries.py` e `test_skill_import_viability_gate.py`.
+
+---
+
 ## [2.53.0] — 2026-10-04
 
 ### Adicionado — Integração do MCP Playwright (`microsoft/playwright-mcp`) e Skill Canônica para Agentes Frontend

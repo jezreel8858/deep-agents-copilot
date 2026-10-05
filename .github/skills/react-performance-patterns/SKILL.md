@@ -11,6 +11,7 @@ triggers:
   - "react compiler"
   - "code splitting"
 source_docs:
+  - .github/skills/performance-engineering-patterns/SKILL.md
   - .github/agents/frontend/react/react-arch-advisor.agent.md
 source_docs_lazy:
   - CLAUDE.md
@@ -19,6 +20,8 @@ tools: []
 ---
 
 # React Performance Patterns
+
+> **Relação com Padrões Universais**: Esta skill especializa as diretrizes arquiteturais e thresholds de performance definidos em [.github/skills/performance-engineering-patterns/SKILL.md](../performance-engineering-patterns/SKILL.md) para o ecossistema React (React Compiler, streaming SSR, Suspense). Consulte a skill genérica para métricas globais (Core Web Vitals thresholds, SLA/SLO, pirâmide de diagnóstico).
 
 ## Quando Usar
 
@@ -44,3 +47,4 @@ tools: []
 
 - Web.dev Core Web Vitals: https://web.dev/vitals/
 - React Compiler: https://react.dev/learn/react-compiler
+- [Padrões Globais de Performance (Base)](../performance-engineering-patterns/SKILL.md)

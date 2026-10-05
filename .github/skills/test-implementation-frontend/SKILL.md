@@ -28,8 +28,10 @@ source_docs:
 
 > **Escopo**: padrões **agnósticos de framework** para qualquer projeto frontend.
 > Para implementação específica por stack, consulte:
-> - `test-implementation-angular-jasmine` → Angular 21 + Jasmine + Karma + Playwright
-> - *(criar adapter para React/Jest, Vue/Vitest quando necessário)*
+> - `test-implementation-angular-vitest` → Angular 20/21+ + Vitest + TestBed
+> - `test-implementation-angular-jasmine` → Angular 21 + Jasmine + Karma (legado)
+> - `test-implementation-react-vitest` → React + Vitest + Testing Library
+> - *(criar adapter para Vue/Vitest, Svelte quando necessário)*
 >
 > **Quando usar esta skill**: ao definir estratégia de testes, revisar cobertura
 > ou trabalhar em projeto com stack de frontend ainda não catalogada.
@@ -133,6 +135,30 @@ Preferência (mais estável → menos estável):
   5. nth-child / deep nesting        ← EVITAR: muito frágil
 ```
 
+### 5.1) E2E Tests com Playwright (Padrão Moderno Frontend)
+
+Para validação de jornadas completas de usuário com browsers reais em qualquer stack frontend:
+
+- **Web-First Assertions**: sempre utilizar asserções com auto-waiting assíncrono (`await expect(locator).toBeVisible()`).
+- **Isolamento de Estado**: cada teste deve operar com contexto de browser limpo (`browser.newContext()`) ou usuário independente.
+- **Seletores Semânticos**: priorizar `page.getByTestId('...')` e `page.getByRole('...')`.
+
+```typescript
+// Exemplo canônico Playwright agnóstico
+import { test, expect } from '@playwright/test';
+
+test('deve autenticar e redirecionar para tela principal', async ({ page }) => {
+  await page.goto('/login');
+
+  await page.getByTestId('input-email').fill('usuario@exemplo.com');
+  await page.getByTestId('input-senha').fill('senha123');
+  await page.getByRole('button', { name: 'Entrar' }).click();
+
+  await expect(page).toHaveURL('/dashboard');
+  await expect(page.getByTestId('painel-resumo')).toBeVisible();
+});
+```
+
 ## 6) Nomenclatura de Testes
 
 ```
@@ -146,6 +172,26 @@ Exemplos PT-BR:
   deve redirecionar para dashboard quando login bem-sucedido
 ```
 
+### 6.1) Execução de Testes com Zero Ruído (R-008 / R-049)
+
+Ao validar suites de teste frontend, os agentes de IA devem proteger ativamente a janela de contexto contra poluição de logs (INFO, download de dependências e banners de build):
+
+1. **Prioridade 1 — Sandbox `ctx_execute` (Think-in-Code)**: Execute o runner de teste (`vitest`, `jest`, `playwright`) dentro do sandbox isolado. Capture stdout/stderr em código, filtre linhas de compilação/pass e imprima apenas o resumo de testes ou stack traces estritos de falha.
+2. **Prioridade 2 — Terminal Silencioso com Filtro**: Se executar diretamente no terminal via `run_in_terminal`, é **OBRIGATÓRIO** usar a flag silenciosa da stack (`--silent`, `--reporter=basic`, `-q`) e canalizar a saída através de filtro (`grep -E "FAIL|PASS|Tests"`) limitado a 40 linhas (`head -40`).
+3. **Proibição Absoluta**: É terminantemente proibido executar comandos de teste "bare" (`npm test`, `ng test`, `npx vitest`) em modo watch ou sem flags de supressão de ruído.
+
+### 6.2) Snapshot Testing (Regressão Visual Estruturada)
+
+- **Quando Usar**: validação de integridade estrutural de árvores de marcação complexas (SVG, templates HTML renderizados sem estado mutável frequente).
+- **Quando NÃO Usar**: testes de comportamento, lógica condicional de negócio ou asserts de texto simples.
+- **Ciclo de Vida**: arquivos `.snap` residem em `__snapshots__/`, devem ser versionados em Git e atualizados conscientemente via flag de update (`--update-snapshots`).
+
+### 6.3) Diagnóstico Cirúrgico e Correção de Falhas (Test Fixer)
+
+- **Regra de Ouro**: NUNCA alterar regras de negócio da aplicação para fazer o teste passar. Apenas o arquivo de teste ou fixtures devem ser ajustados quando a falha for de especificação.
+- **Assincronia e Ciclo de Vida**: verificar se o framework necessita de flush de microtasks (`await fixture.whenStable()`, `waitFor()`, `act()`) antes das asserções.
+- **Contratos de Mock**: certificar-se de que mocks retornem Promises ou Observables de acordo com a assinatura esperada pelo componente.
+
 ## 7) Checklist Universal de Qualidade
 
 - [ ] Componente renderiza sem erros (inicialização básica)
@@ -158,22 +204,25 @@ Exemplos PT-BR:
 
 ## 8) Anti-padrões Universais
 
+- ❌ Executar comandos de teste em modo watch interativo ou sem filtro de ruído
 - ❌ Testar estado interno privado em vez de comportamento visível
 - ❌ Mocks parciais frágeis (mockar apenas parte do serviço)
 - ❌ Usar `setTimeout` real em testes (use timer fakes)
 - ❌ Seletores CSS instáveis em E2E (mudam com refatoração)
 - ❌ Testes E2E para cenários cobertos por unit tests (custo alto)
+- ❌ Usar snapshot para verificar lógica de negócio
 - ❌ Cobertura de linha sem cobertura de branch crítica
 - ❌ Testes lentos em pipeline (E2E sem agrupamento/parallelism)
 
 ## 9) Skills Específicas por Stack
 
-| Stack | Skill Específica |
-|---|---|
-| Angular 21 + Jasmine/Karma + Playwright | `test-implementation-angular-jasmine` |
-| React + Jest + Testing Library | *(criar adapter quando necessário)* |
-| Vue + Vitest + Playwright | *(criar adapter quando necessário)* |
-| Svelte + Vitest | *(criar adapter quando necessário)* |
+| Stack | Skill Específica | Foco Principal |
+|---|---|---|
+| Angular 20/21+ + Vitest | `test-implementation-angular-vitest` | TestBed zoneless, Signals, `@angular/build:unit-test`, `@vitest/coverage-v8` |
+| Angular 21 + Jasmine/Karma (legado) | `test-implementation-angular-jasmine` | TestBed tradicional com Zone.js, Karma, migração para Vitest |
+| React + Vitest + Testing Library | `test-implementation-react-vitest` | RTL `user-event`, hooks isolados, React Compiler boundary |
+| Vue + Vitest + Playwright | *(criar adapter quando necessário)* | Vue Test Utils, composables reativos |
+| Svelte + Vitest | *(criar adapter quando necessário)* | Svelte Testing Library, runes |
 
 ## Referências
 

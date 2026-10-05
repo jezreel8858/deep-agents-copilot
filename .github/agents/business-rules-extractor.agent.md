@@ -149,6 +149,7 @@ Seguir o template canônico da skill `business-rules-governance` §2 e `document
 - Sumário de regras com tabela de IDs
 - Seção de Contexto/Problema e Decisão de Regras
 - Seção de Alternativas Rejeitadas (regras ambíguas descartadas, variantes não aplicáveis ou comportamentos não adotados)
+- Seção de Modelagem de Ameaças & Requisitos de Segurança (Shift-Left) (regras de segurança, validações defensivas, restrições de autorização e proteção de dados sensíveis vinculadas às regras de negócio)
 - Uma seção `## BR-NNN` por regra
 - Diagrama Mermaid para FLOW com ≥3 estados (skill `mermaid-diagrams`)
 - Salvar em `docs/business-rules/business-rules-<nome-do-modulo>.md`
