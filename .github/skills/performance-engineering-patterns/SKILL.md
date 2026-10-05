@@ -101,6 +101,18 @@ Bloquear (🔴) **somente** quando:
 
 Demais achados → alertar (🟠/🟡), não bloquear por otimização especulativa sem medição.
 
+
+## 6) Skills Especializadas por Stack (Performance Extensions)
+
+Para diagnósticos e otimizações arquiteturais aprofundadas por ecossistema, consulte as skills especializadas correspondentes:
+
+| Stack | Skill Especializada | Foco e Diretrizes Principais |
+|---|---|---|
+| **Angular** (v17–v21+) | `angular-performance-patterns` | Zoneless Signals, `@defer` views, incremental hydration SSR, bundle budgets |
+| **React** (v19+) | `react-performance-patterns` | React Compiler, streaming SSR com Suspense, route code-splitting, Profiler |
+| **Spring Boot** (Java 21–25+) | `spring-boot-performance-patterns` | Virtual Threads Loom, HikariCP tuning, eliminação N+1, cache L1/L2, ZGC |
+| **Spring Reactive** (WebFlux) | `spring-reactive-performance-patterns` | Proteção de Event-Loop (BlockHound), flatMap concurrency/prefetch, backpressure, Netty memory |
+
 ## Checklist de Saída
 
 - [ ] Padrão de degradação identificado com evidência (`arquivo:linha` ou query).

@@ -18,6 +18,7 @@ triggers:
   - "spring boot aot cds"
   - "jvm gc tuning"
 source_docs:
+  - .github/skills/performance-engineering-patterns/SKILL.md
   - .github/agents/backend/spring-boot/spring-boot-router.agent.md
 source_docs_lazy:
   - CLAUDE.md
@@ -26,6 +27,8 @@ tools: []
 ---
 
 # Spring Boot Performance Patterns
+
+> **Relação com Padrões Universais**: Esta skill especializa as diretrizes arquiteturais e thresholds de performance definidos em [.github/skills/performance-engineering-patterns/SKILL.md](../performance-engineering-patterns/SKILL.md) para o ecossistema Spring Boot / Java (Virtual Threads Loom, HikariCP, JPA N+1). Consulte a skill genérica para métricas globais (Core Web Vitals thresholds, SLA/SLO, pirâmide de diagnóstico).
 
 > Base de conhecimento especializada em **engenharia de performance backend** para aplicações Spring Boot modernas (Java 21 a Java 25+). Utilizada pelo `@spring-boot-engineer` em modo Advisory (auditoria, dimensionamento, gargalos) e Implementação (aplicação direta de código otimizado).
 
@@ -146,4 +149,4 @@ List<Pedido> findTop100ByStatusOrderByDataDesc(StatusPedido status);
 - OpenJDK: *JEP 439: Generational ZGC* (https://inside.java/2023/11/28/gen-zgc-explainer)
 - Brett Wooldridge: *HikariCP Pool Sizing* (https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing)
 - Spring Boot Docs: *Class Data Sharing and AOT* (https://docs.spring.io/spring-boot/docs/current/reference/html/deployment.html)
-
+- [Padrões Globais de Performance (Base)](../performance-engineering-patterns/SKILL.md)

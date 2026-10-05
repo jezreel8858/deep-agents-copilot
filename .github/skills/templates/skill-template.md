@@ -7,6 +7,10 @@ category: process
 triggers:
   - "<expressão gatilho 1 em PT-BR>"
   - "<expressão gatilho 2 em PT-BR>"
+# Metadados opcionais para skills importadas/adaptadas de fontes externas (conformidade de licença):
+# license: "CC-BY-4.0"
+# source_attribution: "<Nome da organização/repositório de origem>"
+# imported_from: "<URL canônica da fonte original>"
 # SSOT e Progressive Disclosure (Anthropic Agent Skills Open Standard):
 # Skills expõem metadados (Nível 1) no frontmatter para descoberta e o blueprint operacional (Nível 2) no corpo.
 # É TERMINANTEMENTE PROIBIDO criar seções de herança, catálogo ou pré-carregamento no corpo markdown.
@@ -28,6 +32,10 @@ source_docs_lazy:
 > - **Nível 3 (Recursos Suplementares)**: Pastas opcionais `references/` (documentações extensas), `scripts/` (utilitários de automação) e `snippets/` (exemplos de código longos > 8 linhas, conforme R-026), carregadas sob demanda.
 
 Esta skill formaliza as práticas recomendadas e diretrizes operacionais para `<resolver o problema X>`, evitando divergências de implementação, retrabalho e quebras de conformidade arquitetural no repositório.
+
+> **Skills Importadas/Adaptadas de Fontes Externas**: Quando esta skill for derivada total ou parcialmente de um repositório/pacote externo (ex.: catálogos de skills de mercado), preencher obrigatoriamente os campos opcionais `license:`, `source_attribution:` e `imported_from:` no frontmatter. Skills sob licença permissiva (ex.: CC-BY-4.0) exigem atribuição explícita de autoria na origem — nunca omitir a procedência nem apresentar conteúdo adaptado como criação original do repositório.
+>
+> **Pré-requisito Obrigatório (R-067)**: Antes de preencher os campos acima, o `@governance-factory` DEVE ter executado o Protocolo de Avaliação de Pertinência de Importação de Skills (`governance-factory-patterns/SKILL.md` § 3.4) — pertinência, ausência de duplicidade, aderência estrutural e conformidade com guardrails. Resultado não pertinente ou importação literal inadequada interrompe a materialização deste arquivo até reporte/decisão do usuário.
 
 ---
 

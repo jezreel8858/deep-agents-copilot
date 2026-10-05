@@ -21,7 +21,8 @@ source_docs_lazy:
 ## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
 
 - ✅ **APENAS** elaborar plano detalhado com fases atômicas, rastreabilidade e estimativas.
-- ✅ **SEMPRE** mapear dependências `[P]` (paralelo) ou `[S]` (sequencial) e contingências inline `[fallback: X]`.
+- ✅ **SEMPRE** mapear dependências e responsabilidades no formato `{paralelizavel: bool, responsavel: "<agent>"}` e contingências inline `[fallback: X]`.
+- ✅ **SEMPRE** incorporar análise de segurança Shift-Left e Checklist Defensivo Pré-Code-Review nos planos gerados.
 - ❌ **NÃO** implementar código ou criar arquivos da aplicação (foco exclusivo em planejamento).
 - ❌ **NÃO** tomar decisões arquiteturais irreversíveis sem explicitar trade-offs e alternativas.
 
@@ -120,7 +121,9 @@ Após aprovação do outline, escreva o plano com:
 - Visão Geral
 - Estado Atual vs Desejado
 - O Que NÃO Faremos (escopo explícito)
-- Fases com: passos, critério de verificação automatizada, critério manual
+- 🛡️ Modelagem de Ameaças & Requisitos de Segurança (Shift-Left)
+- Fases com: passos, critério de verificação automatizada, critério manual (formato `{paralelizavel: bool, responsavel: "<agent>"}`)
+- 🔒 Checklist Defensivo Pré-Code-Review
 - Decisões Tomadas durante o planejamento
 
 ### ✅ Checklist de Autonomia — Gate Obrigatório
@@ -134,6 +137,9 @@ Após aprovação do outline, escreva o plano com:
 - [ ] Dependências entre fases documentadas na tabela
 - [ ] Edge cases de negócio resolvidos ou explicitamente fora do escopo
 - [ ] Decisões tomadas durante planejamento registradas
+- [ ] Modelagem de ameaças & requisitos de segurança Shift-Left documentados
+- [ ] Checklist Defensivo Pré-Code-Review integrado com validações de segurança
+- [ ] Tags de paralelismo e responsabilidade normalizadas no formato `{paralelizavel: bool, responsavel: "<agent>"}`
 - [ ] Nenhuma pergunta ao usuário ficará em aberto durante `/implement`
 
 ### Aviso ao usuário (inclua no plano gerado):

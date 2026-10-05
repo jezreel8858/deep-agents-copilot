@@ -10,6 +10,7 @@ tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent
 source_docs:
   - .github/skills/context-mode/SKILL.md
   - .github/skills/documentation-writing-patterns/SKILL.md
+  - .github/skills/security-review-patterns/SKILL.md
   - .github/skills/angular-frontend-patterns/SKILL.md
   - .github/skills/specialist-hybrid-advisory-implementation-patterns/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
@@ -72,6 +73,12 @@ Progresso: 0/N tarefas concluídas
 ### Checklist de Execução Técnica (GFM Unificado)
 - [ ] <descrição atômica da tarefa técnica> `{paralelizavel: bool, responsavel: "@angular-feature-developer"}`
 - [ ] <próxima tarefa técnica> `{paralelizavel: bool, responsavel: "@angular-feature-developer"}`
+
+### 🔒 Checklist Defensivo Pré-Code-Review
+- [ ] Sanitização e validação de inputs em todas as bordas expostas
+- [ ] Ausência de segredos, tokens ou dados sensíveis em hardcode e logging seguro sem PII
+- [ ] Tratamento defensivo de exceções e controle de autorização/permissões validado
+- [ ] Testes unitários/integração defensivos atendendo aos quality gates
 ```
 
 <execution_protocol>

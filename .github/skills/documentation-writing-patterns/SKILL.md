@@ -72,7 +72,7 @@ related-plan: <path-do-doc-de-implementacao-correspondente | N/A>
 ---
 ```
 
-Estrutura mínima obrigatória: Front-matter → Contexto/Problema → Opções consideradas → Decisão → **Alternativas Rejeitadas (obrigatória)** → Consequências/Riscos → DoD (1 critério único de "pronto" a nível de documento).
+Estrutura mínima obrigatória: Front-matter → Contexto/Problema → Opções consideradas → Decisão → **Alternativas Rejeitadas (obrigatória)** → **🛡️ Modelagem de Ameaças & Requisitos de Segurança (Shift-Left) (obrigatória)** → Consequências/Riscos → DoD (1 critério único de "pronto" a nível de documento).
 
 ### Categoria B — Documento de IMPLEMENTAÇÃO (passos executáveis)
 
@@ -105,6 +105,7 @@ Regras do checklist:
 - GFM define nativamente só 2 estados (`[ ]`/`[x]`); estados extras (in-progress/blocked) **não são padrão** — não inventar novas notações de caixa.
 - Seção de progresso agregado ("Progresso: N/M tarefas concluídas") no topo do documento, antes do primeiro item.
 - **Alternativas Rejeitadas não é obrigatória** (documento é prescritivo, não decisório) — referenciar o doc de planejamento aprovado via `related-planning-doc` para o racional da decisão.
+- **Checklist Defensivo Pré-Code-Review é obrigatório** no encerramento do documento para garantir validações de segurança (sanitização de inputs, ausência de secrets/tokens hardcoded, tratamento seguro de erros e conformidade de autorização) antes da submissão a code-review.
 
 ### DoD vs Acceptance Criteria (não fundir)
 
@@ -154,6 +155,12 @@ Progresso: 0/3 tarefas concluídas
 
 - [ ] Extrair `AuthService` para interface `{paralelizavel: false, responsavel: "spring-boot-feature-developer"}`
 - [ ] Atualizar testes unitários `{paralelizavel: true, responsavel: "spring-boot-unit-test-writer"}`
+
+## 🔒 Checklist Defensivo Pré-Code-Review
+- [ ] Sanitização e validação de inputs em todas as fronteiras de entrada
+- [ ] Zero secrets, credenciais ou tokens em hardcode e logging seguro sem PII
+- [ ] Controle de acesso e autorização preservados ou reforçados
+- [ ] Testes defensivos de regressão e segurança 100% verdes
 ```
 
 ## 3) Convenções de Formatação Obrigatórias

@@ -38,6 +38,14 @@ Solicitação de criar/revisar/auditar artefato de governança
     ↓
 Tipo de artefato? → agent | skill | prompt | stack
     ↓
+[Se tipo = skill E origem = IMPORTAÇÃO EXTERNA — OBRIGATÓRIO, R-067]
+    Executar o Protocolo de Avaliação de Pertinência de Importação de Skills (§3.4)
+    ANTES de qualquer alteração de código/arquivo:
+      ├─ Pertinente, sem duplicidade e sem alternativa melhor → prosseguir normalmente
+      ├─ NÃO pertinente → reportar impacto negativo da importação (§3.4) e PARAR (zero mutação)
+      └─ Conceito útil mas importação literal inadequada → propor solução alternativa (§3.4)
+              e aguardar decisão do usuário antes de prosseguir
+    ↓
 Já existe artefato/ecossistema equivalente? (busca por nome + escopo semântico)
     ├─ Sim → propor REVISÃO do existente (nunca duplicar)
     │        [OBRIGATÓRIO - R-055 Systemic Reuse Gate (§3.2)]
@@ -72,6 +80,10 @@ Atualizar catálogo(s) + README na MESMA entrega (R-015 — atomicidade obrigat�
     ├─ skill  → .index.json + README.md
     ├─ prompt → README.md de prompts
     └─ stack  → catalog.yaml (apenas router) + routing-graph.yaml + agent-router.agent.md + README.md
+    ↓
+[Se tipo = skill — OBRIGATÓRIO] Pós-criação: Varrer catalog.yaml e .github/prompts/ para identificar
+  artefatos aptos (agents/prompts com domínio/keywords aderentes) -> Aplicar retrofit em lote de
+  source_docs/source_docs_lazy nos artefatos identificados (R-015/R-055, ver §3.3)
     ↓
 Reportar no Formato de Saída (§4 desta skill)
 ```
@@ -131,6 +143,33 @@ Toda revisão de agent, prompt ou skill DEVE obrigatoriamente passar pelo crivo 
 2. **Q2 (Prevenção Futura / Templates)**: *O template canônico em `templates/` (`router-agent.md`, `operational-agent.md`, etc.) reflete essa nova regra?* Se não, atualizar o template correspondente na mesma entrega para que futuros artefatos gerados pelo `@governance-factory` já nasçam em conformidade.
 3. **Q3 (Blindagem por Teste / Quality Gate)**: *A suíte determinística em `tests/governance_audit/` já valida essa regra?* Se não, criar asserção no pytest para impedir regressões futuras.
 
+### 3.3) Retrofit e Descoberta de Consumidores Pós-Criação de Skill (obrigatório)
+
+Toda finalização de CRIAÇÃO de uma nova skill DEVE compulsoriamente mapear e vincular os agents e prompts aptos no mesmo ciclo de entrega, eliminando o anti-padrão de skills "órfãs" sem consumidores declarados:
+
+1. **Varredura**: Varrer `catalog.yaml` (agents) e `.github/prompts/` por aderência temática — domínio, `keywords` e descrição semanticamente correlatos ao propósito da nova skill.
+2. **Identificação**: Selecionar os agents e prompts aptos ao consumo (sobreposição de domínio/escopo funcional).
+3. **Retrofit em lote**: Aplicar imediatamente a inclusão da nova skill em `source_docs` (prompts e agents sem Progressive Disclosure) ou `source_docs_lazy` (agents com R-066 aplicado) dos artefatos identificados, na MESMA entrega (R-015/R-055).
+
+### 3.4) Protocolo de Avaliação de Pertinência de Importação de Skills (Skill Import Viability & Solution Alternative Gate — R-067, obrigatório em toda importação externa)
+
+Toda solicitação de importação de skill externa (catálogo/repositório de terceiros) DEVE compulsoriamente passar por esta avaliação ANTES de qualquer criação/alteração de arquivo:
+
+1. **Critério de Pertinência**: A skill externa atende a um domínio/escopo real e não-coberto deste repositório de governança?
+2. **Critério de Duplicidade/Concorrência**: Já existe skill catalogada (`.github/skills/.index.json`) com escopo equivalente ou sobreposto? (busca por nome E por escopo semântico, análoga a R-003).
+3. **Critério de Aderência Estrutural**: O conteúdo pode ser adaptado ao padrão N1/N2/N3 (frontmatter, Progressive Disclosure, `tier`/`category`/`triggers` em PT-BR) sem violar `governance-factory-patterns`?
+4. **Critério de Guardrails**: O conteúdo é compatível com R-031 (Plano Auto-Implementável), R-038 (Genericidade Obrigatória) e demais regras normativas vigentes (sem instrução de autonomia indevida, sem conteúdo específico de projeto)?
+
+**Resultado da avaliação:**
+
+| Resultado | Ação Obrigatória |
+|---|---|
+| ✅ Pertinente, sem duplicidade, aderente | Prosseguir normalmente para a Decision Tree de CRIAÇÃO (§1), incluindo pesquisa via `@deep-search` para validar paridade de mercado. |
+| ❌ NÃO pertinente | PARAR — nenhuma alteração de arquivo. Reportar formalmente ao usuário o **impacto negativo específico** de importá-la (ex.: poluição de contexto/Progressive Disclosure, quebra de fronteira de responsabilidade com skill(s) existente(s), duplicidade conceitual, riscos de segurança/licenciamento, concessão de autonomia indevida) e aguardar nova orientação via `ask_questions`. |
+| 🔁 Conceito útil, importação literal inadequada | PARAR a importação literal. Propor **solução alternativa concreta** (assimilação seletiva de conceitos via retrofit em skill já existente — ver §3.3 —, adaptação de formato/escopo, ou modularização sem dependência de fonte externa) e aguardar decisão do usuário via `ask_questions` antes de materializar qualquer arquivo. |
+
+Catalogação da violação em `.github/skills/governance-audit-patterns/SKILL.md` § 2.33 (Smell — Importação de Skill Externa sem Avaliação de Pertinência).
+
 ## 4) Formato de Saída — Bloco de Validações ✅/❌ (parametrizável)
 
 ```markdown
@@ -152,6 +191,7 @@ Validações:
 - [se agent/prompt/stack] model: string única, Title Case oficial, validado via get_errors (§9): ✅/❌
 - [se stack] Sub-catálogo local e supervisor configurados (§11): ✅/❌
 - [se stack] Quádrupla sincronização global executada (catalog + routing-graph + agent-router + README): ✅/❌
+- [se skill IMPORTADA de fonte externa] Gate de Viabilidade de Importação executado (R-067 — pertinente/não pertinente/solução alternativa proposta): ✅/❌/N/A
 - description do frontmatter ≤ 500 caracteres, sem changelog/RF-ID embutido (§10): ✅/❌
 
 Arquivos atualizados:
@@ -179,6 +219,8 @@ Nenhuma criação/revisão de artefato de governança é considerada completa se
 - ❌ Definir `model:` como array ou como slug kebab-case sem rodar `get_errors` (§9) — achado real: 15+ agents/prompts com `Unknown model` por usar `["a","b"]` ou `claude-haiku-4.5` em vez do display name oficial.
 - ❌ `description` do frontmatter virar resumo de changelog/RF-ID (§10) — achado real: `codegraph-engine` v2.1.0 com description de +1300 caracteres misturando função do agent com histórico de correções.
 
+- ❌ Importar skill externa (ou materializar qualquer arquivo decorrente) sem executar previamente o Protocolo de Avaliação de Pertinência de Importação de Skills (§3.4 / R-067) — omitir o relato de impacto negativo quando não pertinente, ou deixar de propor solução alternativa quando o conceito é útil mas a importação literal é inadequada.
+
 ## 7) Consumidores Mapeados
 
 - `governance-factory` — único consumidor; mantém especificidade por `type` (templates `operational-agent.md`, `research-agent.md` e `agent-template.md` para `type: agent`, template `skill-template.md` para `type: skill`, template `prompt-template.md` para `type: prompt`, e topologia hierárquica §11 para `type: stack`), referencia esta skill para o fluxo genérico e checklist comum a todos os tipos.
@@ -191,6 +233,7 @@ Nenhuma criação/revisão de artefato de governança é considerada completa se
 - `.github/skills/agent-contracts/SKILL.md` §8-9 — baseline de formato de saída e tooling mínimo por perfil.
 - `.github/skills/reflection-self-critique-patterns/SKILL.md` — padrão de autocrítica grounded 1-round usado no gate §3.1.
 - `.github/skills/governance-audit-patterns/SKILL.md` — taxonomia de smells usada como referência de coerência semântica no gate §3.1 (auditoria pós-hoc equivalente feita por `agent-auditor`).
+- `CLAUDE.md` — R-067 (Protocolo de Avaliação de Pertinência de Importação de Skills).
 - GitHub Docs — [Supported AI models in GitHub Copilot](https://docs.github.com/copilot/reference/ai-models/supported-models) — fonte oficial de nomenclatura de modelo, usada em §9.
 
 ## 9) Seleção e Validação de Modelo (`model:` — obrigatório para `agent`/`prompt`)

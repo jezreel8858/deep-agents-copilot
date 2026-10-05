@@ -134,3 +134,91 @@ def test_no_implementation_agent_references_legacy_checklist_notation(agent_name
     assert not re.search(r"Marcação\s+`?\[[SP]\]`?/`?\[[SP]\]`?", content), (
         f"Agente '{agent_name}' ainda referencia a notação legada '[S]/[P]' no texto explicativo."
     )
+
+ARCH_ADVISOR_AGENTS = [
+    "ejb-arch-advisor",
+    "python-arch-advisor",
+    "spring-boot-arch-advisor",
+    "spring-reactive-arch-advisor",
+    "struts-arch-advisor",
+    "angular-arch-advisor",
+    "react-arch-advisor",
+]
+
+
+@pytest.mark.parametrize("agent_name", ARCH_ADVISOR_AGENTS)
+def test_arch_advisors_reference_security_review_patterns(agent_name: str):
+    """5. Os 7 specialist-arch-advisors referenciam 'security-review-patterns' em source_docs: (R-046 / R-051)."""
+    path = _find_agent_file(agent_name)
+    agent_content = path.read_text(encoding="utf-8")
+    fm, _ = _parse_frontmatter(agent_content)
+    source_docs = fm.get("source_docs", [])
+    has_sec_review = any("security-review-patterns" in str(doc) for doc in source_docs)
+    assert has_sec_review, (
+        f"Arch advisor '{agent_name}' ({path.relative_to(REPO_ROOT)}) não referencia "
+        f"'security-review-patterns' em frontmatter.source_docs: {source_docs}"
+    )
+
+
+@pytest.mark.parametrize("agent_name", IMPLEMENTATION_AGENTS)
+def test_implementation_agents_have_defensive_checklist(agent_name: str):
+    """6. Os 9 agents de IMPLEMENTAÇÃO contêm a seção 'Checklist Defensivo Pré-Code-Review' (R-046 / R-051)."""
+    path = _find_agent_file(agent_name)
+    agent_content = path.read_text(encoding="utf-8")
+    assert "Checklist Defensivo" in agent_content, (
+        f"Agente de implementação '{agent_name}' não contém 'Checklist Defensivo' em seu template/corpo."
+    )
+
+
+@pytest.mark.parametrize("agent_name", PLANNING_AGENTS)
+def test_planning_agents_have_threat_modeling_shift_left(agent_name: str):
+    """7. Os 3 agents de PLANEJAMENTO contêm a seção 'Modelagem de Ameaças & Requisitos de Segurança (Shift-Left)' (R-046 / R-051)."""
+    path = _find_agent_file(agent_name)
+    agent_content = path.read_text(encoding="utf-8")
+    assert "Modelagem de Ameaças" in agent_content, (
+        f"Agente de planejamento '{agent_name}' não contém 'Modelagem de Ameaças' em seu template/corpo."
+    )
+
+
+def test_canonical_documentation_templates_contain_security_sections():
+    """8. Templates canônicos em SKILL.md e READMEs de planos contêm as seções mandatórias de segurança (R-046 / R-064)."""
+    skill_path = REPO_ROOT / ".github" / "skills" / "documentation-writing-patterns" / "SKILL.md"
+    assert skill_path.exists(), "documentation-writing-patterns/SKILL.md deve existir"
+    skill_content = skill_path.read_text(encoding="utf-8")
+    assert "Modelagem de Ameaças & Requisitos de Segurança (Shift-Left)" in skill_content, (
+        "documentation-writing-patterns/SKILL.md deve conter 'Modelagem de Ameaças & Requisitos de Segurança (Shift-Left)'"
+    )
+    assert "Checklist Defensivo Pré-Code-Review" in skill_content, (
+        "documentation-writing-patterns/SKILL.md deve conter 'Checklist Defensivo Pré-Code-Review'"
+    )
+
+    plans_readme = REPO_ROOT / "docs" / "plans" / "README.md"
+    assert plans_readme.exists(), "docs/plans/README.md deve existir"
+    plans_content = plans_readme.read_text(encoding="utf-8")
+    assert "Modelagem de Ameaças & Requisitos de Segurança (Shift-Left)" in plans_content, (
+        "docs/plans/README.md deve conter a seção 'Modelagem de Ameaças & Requisitos de Segurança (Shift-Left)'"
+    )
+
+    impl_readme = REPO_ROOT / "docs" / "implementation-plans" / "README.md"
+    assert impl_readme.exists(), "docs/implementation-plans/README.md deve existir"
+    impl_content = impl_readme.read_text(encoding="utf-8")
+    assert "Checklist Defensivo Pré-Code-Review" in impl_content, (
+        "docs/implementation-plans/README.md deve conter a seção 'Checklist Defensivo Pré-Code-Review'"
+    )
+
+
+def test_plan_prompt_contains_defensive_sections_and_normalized_tags():
+    """9. Prompt /plan contém referências a segurança Shift-Left, Checklist Defensivo e tags normalizadas (R-046 / R-051)."""
+    prompt_path = REPO_ROOT / ".github" / "prompts" / "plan.prompt.md"
+    assert prompt_path.exists(), ".github/prompts/plan.prompt.md deve existir"
+    prompt_content = prompt_path.read_text(encoding="utf-8")
+
+    assert "Modelagem de Ameaças & Requisitos de Segurança (Shift-Left)" in prompt_content, (
+        "plan.prompt.md deve mencionar 'Modelagem de Ameaças & Requisitos de Segurança (Shift-Left)'"
+    )
+    assert "Checklist Defensivo Pré-Code-Review" in prompt_content, (
+        "plan.prompt.md deve mencionar 'Checklist Defensivo Pré-Code-Review'"
+    )
+    assert '{paralelizavel: bool, responsavel: "<agent>"}' in prompt_content, (
+        "plan.prompt.md deve especificar notação de tag '{paralelizavel: bool, responsavel: "<agent>"}'"
+    )

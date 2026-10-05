@@ -62,6 +62,7 @@ Esta skill consolida heurísticas de mercado (2026) — práticas de Matt Pocock
 - Para avaliar se a **resposta do modelo** está correta/factual — isso é `agent-evals-lab` (métricas de faithfulness, hallucination, tool correctness).
 - Para estruturar o prompt de uma tarefa específica no formato canônico Markdown (## Tarefa, ## Contexto, ## Restrições e Não-Escopo, ## Formato de Saída Esperado) — isso é `prompt-engineering-patterns`.
 - Para o payload/portabilidade de handoff entre agents — isso é `handoff-governance`.
+- Para executar auditoria dual-judge de claims ou calibração formal de prompts via protocolo de 3 trilhas (Track A: regressão de instruções; Track B: calibração; Track C: auditoria dual-judge) — isso é `harness-eval`.
 
 ---
 

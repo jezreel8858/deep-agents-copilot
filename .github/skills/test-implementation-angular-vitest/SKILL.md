@@ -35,22 +35,20 @@ tools: []
 # Test Implementation — Angular + Vitest
 
 > **Escopo**: implementação específica para **Angular 20/21+ com Vitest** como test runner oficial.
-> Para padrões agnósticos de frontend, consulte `test-implementation-frontend`.
+> Esta skill especializa os conceitos agnósticos de arquitetura de testes frontend estabelecidos em:
+> - [.github/skills/test-implementation-frontend/SKILL.md](../test-implementation-frontend/SKILL.md)
 > Para padrões com Jasmine/Karma (legado), consulte `test-implementation-angular-jasmine`.
 
 ## Contexto
 
-A partir do **Angular 20**, o suporte nativo ao Vitest foi introduzido de forma experimental via builder `@angular/build:unit-test`. No **Angular 21** o suporte tornou-se **estável e padrão** para novos projetos — ao rodar `ng new`, Vitest é sugerido como opção padrão e Karma/Jasmine são considerados legado.
+A partir do **Angular 20**, o suporte nativo ao Vitest foi introduzido via builder `@angular/build:unit-test`. No **Angular 21** o suporte tornou-se **estável e padrão** para novos projetos — ao rodar `ng new`, Vitest é a opção padrão e Karma/Jasmine são considerados legado.
 
-**Por que Vitest:**
-- Baseado em Vite — startup ultra-rápido (HMR nativo)
-- Modo watch instantâneo com hot reload de testes
-- API 100% compatível com Jest (`describe`, `it`, `expect`, `vi.fn()`)
-- `globals: true` → sem imports de `describe`/`it`/`expect` em cada arquivo
-- Suporte nativo a TypeScript sem transpilação extra
-- Coverage com provider `v8` (veloz) ou `istanbul` (preciso)
-
-**Karma foi oficialmente depreciado em 2023.** Jasmine segue sendo suportado como runner alternativo, mas Vitest é o caminho oficial de novos projetos Angular 20+.
+**Vantagens da Stack Modernizada:**
+- Baseado em Vite — startup ultra-rápido (HMR nativo) e watch instantâneo.
+- API compatível com Jest (`describe`, `it`, `expect`, `vi.fn()`).
+- `globals: true` dispensa imports de `describe`/`it`/`expect` em cada spec.
+- Suporte nativo a TypeScript sem transpilação extra.
+- Coverage com provider `v8` de alta performance.
 
 ---
 
@@ -60,16 +58,8 @@ A partir do **Angular 20**, o suporte nativo ao Vitest foi introduzido de forma 
 
 ```bash
 # Instalação mínima (happy-dom é detectado automaticamente pelo Angular CLI)
-npm install -D vitest happy-dom
-
-# Para coverage
-npm install -D @vitest/coverage-v8
-
-# Alternativa de ambiente DOM (fallback se happy-dom não estiver instalado)
-npm install -D jsdom
+npm install -D vitest happy-dom @vitest/coverage-v8
 ```
-
-> **Nota**: `happy-dom` é preferido por ser mais rápido. O Angular CLI detecta automaticamente qual está instalado. Se ambos estiverem, `happy-dom` tem precedência.
 
 ### angular.json
 
@@ -118,21 +108,21 @@ export default [
 }
 ```
 
-### vitest.config.ts (configuração estendida — opcional)
+### vitest.config.ts (configuração estendida)
 
 ```typescript
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
-    globals: true,                          // describe/it/expect sem imports
-    environment: 'happy-dom',              // ou 'jsdom'
-    setupFiles: ['src/test-setup.ts'],     // se necessário setup adicional
+    globals: true,
+    environment: 'happy-dom',
+    setupFiles: ['src/test-setup.ts'],
     include: ['src/**/*.spec.ts'],
-    restoreMocks: true,                    // ✅ limpa vi.spyOn/vi.fn após cada teste
+    restoreMocks: true,                    // limpa vi.spyOn/vi.fn após cada teste
     clearMocks: true,                      // limpa mock.calls entre testes
     coverage: {
-      provider: 'v8',                      // v8 (rápido) ou 'istanbul' (preciso)
+      provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
       reportsDirectory: 'coverage',
       thresholds: {
@@ -141,24 +131,10 @@ export default defineConfig({
         functions: 80,
         lines: 80,
       },
-      exclude: [
-        'src/environments/**',
-        '**/*.config.ts',
-        '**/*.module.ts',
-        'src/main.ts',
-      ],
+      exclude: ['src/environments/**', '**/*.config.ts', '**/*.routes.ts'],
     },
   },
 });
-```
-
-**Referenciando o config no angular.json:**
-
-```json
-"options": {
-  "runner": "vitest",
-  "runnerConfig": "vitest.config.ts"
-}
 ```
 
 ---
@@ -176,34 +152,28 @@ import { [Nome]Service } from '../services/[nome].service';
 describe('[Nome]Component', () => {
   let component: [Nome]Component;
   let fixture: ComponentFixture<[Nome]Component>;
-  let [nome]Service: ReturnType<typeof vi.fn>;
+  let [nome]Service: { buscar: ReturnType<typeof vi.fn>; salvar: ReturnType<typeof vi.fn> };
 
   beforeEach(async () => {
+    [nome]Service = {
+      buscar: vi.fn().mockResolvedValue([{ id: 1, nome: 'Teste' }]),
+      salvar: vi.fn().mockResolvedValue({ id: 2 }),
+    };
+
     await TestBed.configureTestingModule({
       imports: [[Nome]Component],  // standalone
       providers: [
-        {
-          provide: [Nome]Service,
-          useValue: {
-            buscar: vi.fn().mockResolvedValue([{ id: 1, nome: 'Teste' }]),
-            salvar: vi.fn().mockResolvedValue({ id: 2 }),
-          },
-        },
+        { provide: [Nome]Service, useValue: [nome]Service },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent([Nome]Component);
     component = fixture.componentInstance;
-    [nome]Service = TestBed.inject([Nome]Service) as any;
-  });
-
-  it('deve criar o componente', () => {
-    expect(component).toBeTruthy();
   });
 
   it('deve carregar dados ao inicializar', async () => {
     fixture.detectChanges();
-    await fixture.whenStable();  // aguarda efeitos assíncronos (zoneless)
+    await fixture.whenStable();  // aguarda efeitos assíncronos zoneless
 
     expect([nome]Service.buscar).toHaveBeenCalledOnce();
     expect(component.itens()).toHaveLength(1);  // Signal
@@ -220,189 +190,73 @@ describe('[Nome]Component', () => {
 });
 ```
 
-### Checklist de Unit Test
+### Component Harnesses (`@angular/cdk/testing`)
 
-- [ ] `TestBed.configureTestingModule` com imports do componente standalone
-- [ ] Dependências mockadas via `providers` + `useValue` com `vi.fn()`
-- [ ] `fixture.detectChanges()` após setup do estado inicial
-- [ ] `await fixture.whenStable()` para efeitos assíncronos (zoneless)
-- [ ] Happy path + edge cases + error path testados
-- [ ] `restoreMocks: true` configurado no vitest.config.ts
-
-### 2.2) Component Harnesses (`@angular/cdk/testing`)
-
-O uso de Component Harnesses desacopla os testes da estrutura interna do DOM do componente (evitando quebras por mudanças em classes CSS ou tags):
+Desacopla os testes da estrutura interna do DOM do componente:
 
 ```typescript
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 
-describe('[Nome]Component com Harness', () => {
-  let loader: HarnessLoader;
-  let fixture: ComponentFixture<[Nome]Component>;
+it('deve disparar clique via Harness', async () => {
+  const loader = TestbedHarnessEnvironment.loader(fixture);
+  const botaoSalvar = await loader.getHarness(MatButtonHarness.with({ text: 'Salvar' }));
 
-  beforeEach(async () => {
-    // ... TestBed setup ...
-    fixture = TestBed.createComponent([Nome]Component);
-    loader = TestbedHarnessEnvironment.loader(fixture);
-    fixture.detectChanges();
-  });
-
-  it('deve disparar clique via Harness', async () => {
-    const botaoSalvar = await loader.getHarness(
-      MatButtonHarness.with({ text: 'Salvar' })
-    );
-
-    expect(await botaoSalvar.isDisabled()).toBe(false);
-    await botaoSalvar.click();
-
-    await fixture.whenStable();
-    // asserções de efeito...
-  });
+  expect(await botaoSalvar.isDisabled()).toBe(false);
+  await botaoSalvar.click();
+  await fixture.whenStable();
 });
 ```
 
 ---
 
-## 3) Mocking — vi.fn() e vi.spyOn()
+## 3) Mocking com Vitest — vi.fn() e vi.spyOn()
 
-### vi.fn() — substitui jasmine.createSpy()
+### vi.fn() vs jasmine.createSpy()
 
 ```typescript
-// Jasmine (legado)
-const spy = jasmine.createSpy('meuMetodo').and.returnValue(of(dados));
-
-// Vitest (moderno)
-const spy = vi.fn().mockReturnValue(dados);           // retorno síncrono
-const spy = vi.fn().mockResolvedValue(dados);          // retorno assíncrono (Promise)
-const spy = vi.fn().mockReturnValueOnce(dados).mockReturnValue(null); // uma vez e depois padrão
-const spy = vi.fn().mockImplementation((id) => ({ id, nome: 'Mock' })); // implementação customizada
-const spy = vi.fn().mockRejectedValue(new Error('erro')); // rejeitar Promise
-
-// Com nome descritivo (melhor feedback no output)
-const spy = vi.fn().mockName('buscarUsuario');
+// Vitest: mock síncrono e assíncrono
+const spy = vi.fn().mockReturnValue(dados);           // síncrono
+const spyAsync = vi.fn().mockResolvedValue(dados);    // Promise resolvida
+const spyRx = vi.fn().mockReturnValue(of(dados));     // Observable do RxJS
 ```
 
-### ⚠️ Diferença crítica: comportamento padrão de spies
+### ⚠️ Diferença crítica de spies (Vitest vs Jasmine)
+
+- **Jasmine**: `spyOn(service, 'metodo')` substitui o método por um stub que retorna `undefined`.
+- **Vitest**: `vi.spyOn(service, 'metodo')` **EXECUTA o método original por padrão**. Para substituir o comportamento, use `.mockReturnValue()` ou `.mockImplementation()`.
 
 ```typescript
-// JASMINE: spy retorna undefined por padrão (não chama o original)
-spyOn(service, 'metodo'); // NÃO chama implementação real
-
-// VITEST: vi.spyOn() EXECUTA a implementação original por padrão
-vi.spyOn(service, 'metodo'); // ← CHAMA a implementação real!
-
-// Para substituir (equivalente ao Jasmine):
-vi.spyOn(service, 'metodo').mockReturnValue(dadosFalsos);
-```
-
-### vi.spyOn() — espionar métodos existentes
-
-```typescript
-it('deve chamar serviço com parâmetros corretos', () => {
-  const spy = vi.spyOn([nome]Service, 'salvar').mockResolvedValue({ id: 1 });
-
-  component.salvar({ campo: 'valor' });
-
-  expect(spy).toHaveBeenCalledWith({ campo: 'valor' });
-  expect(spy).toHaveBeenCalledOnce();
-});
-```
-
-### Verificação de chamadas
-
-```typescript
-// Quantas vezes foi chamado
-expect(spy).toHaveBeenCalledTimes(2);
-expect(spy).toHaveBeenCalledOnce();  // equivalente a toHaveBeenCalledTimes(1)
-
-// Com quais argumentos
-expect(spy).toHaveBeenCalledWith({ id: 1, nome: 'Teste' });
-expect(spy).toHaveBeenLastCalledWith({ id: 2 });
-
-// Nunca foi chamado
-expect(spy).not.toHaveBeenCalled();
-
-// Inspecionar chamadas individualmente
-expect(spy.mock.calls[0][0]).toEqual({ id: 1 });  // primeira chamada, primeiro argumento
-```
-
-### Limpeza de mocks entre testes
-
-```typescript
-// Opção 1 (PREFERIDA): configurar no vitest.config.ts
-// restoreMocks: true — restaura implementação original após cada teste
-// clearMocks: true — limpa mock.calls entre testes
-
-// Opção 2: manual em afterEach
-afterEach(() => {
-  vi.restoreAllMocks();  // restaura implementações originais
-  vi.clearAllMocks();    // limpa calls/instances sem restaurar
-});
+// Para isolar o método real:
+vi.spyOn(service, 'salvar').mockResolvedValue({ id: 1 });
 ```
 
 ---
 
 ## 4) Async Testing — Zoneless (Angular 21+)
 
-> **Atenção**: Angular 21 é zoneless por padrão. `fakeAsync()` e `waitForAsync()` de `@angular/core/testing` **não funcionam** sem Zone.js.
-
-### async/await (substitui waitForAsync)
+No Angular 21 zoneless, `fakeAsync()` e `waitForAsync()` com Zone.js são desnecessários. Use `async/await` com `fixture.whenStable()` e Fake Timers do Vitest:
 
 ```typescript
-// ANTES (Zone.js)
-it('deve carregar dados', waitForAsync(() => {
-  component.ngOnInit();
-  fixture.whenStable().then(() => {
-    expect(component.dados).toBeDefined();
-  });
-}));
+it('deve avançar timers em testes assíncronos', async () => {
+  vi.useFakeTimers();
 
-// AGORA (zoneless)
-it('deve carregar dados', async () => {
-  fixture.detectChanges();
+  component.iniciarDebounce();
+  await vi.advanceTimersByTimeAsync(500);  // avança 500ms processando microtasks
   await fixture.whenStable();
-  expect(component.dados()).toBeDefined();
-});
-```
 
-### Vitest Fake Timers (substitui fakeAsync/tick)
-
-```typescript
-import { vi } from 'vitest';
-
-it('deve executar após timeout', async () => {
-  vi.useFakeTimers();
-
-  let executado = false;
-  setTimeout(() => { executado = true; }, 3000);
-
-  expect(executado).toBe(false);
-  await vi.advanceTimersByTimeAsync(3000);  // avança 3s (async-aware)
-  expect(executado).toBe(true);
-
-  vi.useRealTimers();  // restaurar sempre após o teste
-});
-
-// Ou usando flush (avança TODOS os timers pendentes):
-it('deve completar todos os timers pendentes', async () => {
-  vi.useFakeTimers();
-  // ... setup
-  await vi.runAllTimersAsync();
-  // ... assert
+  expect(component.executado()).toBe(true);
   vi.useRealTimers();
 });
 ```
-
-> **Nota**: use `vi.advanceTimersByTimeAsync` (com `Async`) no contexto zoneless para garantir que microtasks sejam processadas corretamente.
 
 ---
 
 ## 5) Signals Testing
 
 ```typescript
-import { signal, computed, effect } from '@angular/core';
+import { signal, computed } from '@angular/core';
 
 it('deve atualizar computed quando signal muda', () => {
   const count = signal(0);
@@ -413,24 +267,7 @@ it('deve atualizar computed quando signal muda', () => {
   expect(doubled()).toBe(10);
 });
 
-it('deve disparar effect quando signal muda', async () => {
-  let valorCapturado = 0;
-  const valor = signal(0);
-
-  TestBed.runInInjectionContext(() => {
-    effect(() => { valorCapturado = valor(); });
-  });
-
-  await fixture.whenStable();  // processa effect inicial
-  expect(valorCapturado).toBe(0);
-
-  valor.set(42);
-  await fixture.whenStable();  // processa effect após mudança
-  expect(valorCapturado).toBe(42);
-});
-
 it('deve testar input signal de componente', async () => {
-  // Angular 17+ input signals
   fixture.componentRef.setInput('titulo', 'Novo Título');
   fixture.detectChanges();
   await fixture.whenStable();
@@ -442,7 +279,7 @@ it('deve testar input signal de componente', async () => {
 
 ---
 
-## 6) HTTP Testing
+## 6) HTTP Testing com HttpTestingController
 
 ```typescript
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
@@ -454,238 +291,98 @@ describe('[Nome]Service — HTTP', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        [Nome]Service,
-        provideHttpClient(),
-        provideHttpClientTesting(),
-      ],
+      providers: [[Nome]Service, provideHttpClient(), provideHttpClientTesting()],
     });
-
     service = TestBed.inject([Nome]Service);
     httpMock = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => httpMock.verify());  // garante que não há requisições pendentes
+  afterEach(() => httpMock.verify());
 
   it('deve fazer GET e retornar dados', () => {
-    const mockData = [{ id: 1, nome: 'Item' }];
-
-    service.buscar().subscribe(data => {
-      expect(data).toEqual(mockData);
-    });
-
+    service.buscar().subscribe(data => expect(data).toEqual([{ id: 1 }]));
     const req = httpMock.expectOne('/api/[recurso]');
     expect(req.request.method).toBe('GET');
-    req.flush(mockData);
-  });
-
-  it('deve tratar erro HTTP 500', () => {
-    service.buscar().subscribe({
-      error: (err) => expect(err.status).toBe(500),
-    });
-
-    httpMock.expectOne('/api/[recurso]').flush('Erro', { status: 500, statusText: 'Server Error' });
+    req.flush([{ id: 1 }]);
   });
 });
 ```
 
 ---
 
-## 7) Testes de Serviço (sem componente)
+## 7) Testes de Snapshot e Coverage
+
+Consulte as diretrizes e ciclo de vida universal de snapshots e coverage em `test-implementation-frontend`.
 
 ```typescript
-describe('[Nome]Service', () => {
-  let service: [Nome]Service;
-  let dependencia: { metodo: ReturnType<typeof vi.fn> };
-
-  beforeEach(() => {
-    dependencia = { metodo: vi.fn().mockResolvedValue('resultado') };
-
-    TestBed.configureTestingModule({
-      providers: [
-        [Nome]Service,
-        { provide: [Dependencia], useValue: dependencia },
-      ],
-    });
-
-    service = TestBed.inject([Nome]Service);
-  });
-
-  it('deve processar e retornar resultado transformado', async () => {
-    const resultado = await service.processar('entrada');
-
-    expect(dependencia.metodo).toHaveBeenCalledWith('entrada');
-    expect(resultado).toBe('RESULTADO');  // se serviço transforma para uppercase
-  });
-
-  it('deve lançar erro quando dependência falhar', async () => {
-    dependencia.metodo.mockRejectedValue(new Error('Falha'));
-
-    await expect(service.processar('entrada')).rejects.toThrow('Falha');
-  });
-});
-```
-
----
-
-## 8) Snapshot Tests
-
-```typescript
+// Snapshot Angular específico
 it('deve renderizar componente conforme snapshot', async () => {
   fixture.detectChanges();
   await fixture.whenStable();
-
-  // Cria/compara snapshot do HTML renderizado
   expect(fixture.nativeElement).toMatchSnapshot();
 });
 ```
 
-> Snapshots são salvos em `__snapshots__/[nome].spec.ts.snap`. Adicionar ao Git.
-> Para atualizar snapshots: `ng test -- --update-snapshots` ou `vitest --update-snapshots`.
-
----
-
-## 9) Coverage — @vitest/coverage-v8
-
-### Configuração (vitest.config.ts)
-
-```typescript
-coverage: {
-  provider: 'v8',
-  reporter: ['text', 'html', 'lcov'],
-  reportsDirectory: 'coverage',
-  thresholds: {
-    statements: 80,
-    branches: 70,
-    functions: 80,
-    lines: 80,
-    // Thresholds específicos por módulo
-    'src/app/core/**/*.ts': { statements: 90, branches: 85 },
-  },
-  exclude: [
-    'src/environments/**',
-    'src/main.ts',
-    '**/*.config.ts',
-    '**/*.module.ts',
-    '**/*.routes.ts',
-  ],
-}
-```
-
-### Excluir código específico do coverage
-
+Diretiva para ignorar linhas específicas no coverage v8:
 ```typescript
 /* v8 ignore next -- @preserve */
-if (environment.production) {
-  console.log('Produção');
-}
-
-/* v8 ignore next 3 -- @preserve */
-function codigoNaoTestavel() {
-  // Linhas ignoradas
-}
 ```
 
 ---
 
-## 10) Comandos
+## 8) Comandos com Zero Ruído (R-008 / R-049)
 
-> **Zero-Noise Test Policy (R-008 / R-049)**: Nunca rodar comandos de teste interativos ou bare. Use flags silenciosas (`--silent`, `--reporter=basic`) e filtros pipe, ou execute via `ctx_execute` (Think-in-Code).
-
-### A) Via `ctx_execute` (Think-in-Code — Recomendado)
-
-```javascript
-const { execSync } = require('child_process');
-try {
-  const out = execSync('npx vitest run src/app/features/[caminho]/[nome].spec.ts --silent --reporter=basic', { encoding: 'utf8' });
-  console.log(out.trim());
-} catch (err) {
-  const full = (err.stdout || '') + '\n' + (err.stderr || '');
-  console.log(full.split('\n').filter(l => /(FAIL|Error:|Tests.*failed)/i).slice(0, 30).join('\n'));
-}
-```
-
-### B) Via Terminal com Filtro Obrigatório
+Consulte `test-implementation-frontend` (§6.1) para a política geral de Zero Ruído.
 
 ```bash
-# Arquivo específico via Vitest (silencioso e sem watch)
+# Execução silenciosa via Vitest
 npx vitest run src/app/features/[caminho]/[nome].spec.ts --silent --reporter=basic 2>&1 | grep -E "FAIL|PASS|Tests" | head -40
 
-# Arquivo específico via Angular CLI (sem watch, sem progresso)
+# Execução silenciosa via Angular CLI
 ng test --include="**/[nome].component.spec.ts" --watch=false --progress=false 2>&1 | grep -E "FAILED|SUCCESS|Executed" | head -40
-
-# Coverage conciso
-npx vitest run --coverage --silent --reporter=basic 2>&1 | grep -E "FAIL|PASS|All files|TOTAL" | head -40
-
-# Em PowerShell / Windows:
-npx vitest run src/app/features/[caminho]/[nome].spec.ts --silent --reporter=basic
 ```
 
 ---
 
-## 11) Migração de Jasmine/Karma
+## 9) Migração de Jasmine/Karma para Vitest
 
 | Jasmine/Karma | Vitest |
 |---|---|
 | `jasmine.createSpy()` | `vi.fn()` |
 | `spy.and.returnValue(v)` | `spy.mockReturnValue(v)` |
-| `spy.and.returnValue(of(v))` | `spy.mockReturnValue(of(v))` |
-| `spy.and.callFake(fn)` | `spy.mockImplementation(fn)` |
-| `spyOn(obj, 'met')` | `vi.spyOn(obj, 'met')` |
-| `expect(spy).toHaveBeenCalled()` | `expect(spy).toHaveBeenCalled()` ✓ (igual) |
-| `expect(spy).toHaveBeenCalledTimes(n)` | `expect(spy).toHaveBeenCalledTimes(n)` ✓ |
-| `fakeAsync(() => { ... tick(1000); })` | `vi.useFakeTimers()` + `vi.advanceTimersByTimeAsync(1000)` |
-| `waitForAsync(() => { ... })` | `async () => { await fixture.whenStable(); }` |
-| `jasmine.clock().install()` | `vi.useFakeTimers()` |
-| `jasmine.clock().tick(n)` | `vi.advanceTimersByTimeAsync(n)` |
-| `afterEach(() => { ... })` | `afterEach(() => { vi.restoreAllMocks(); })` |
-| `karma.conf.js` + `angular.json test: karma` | `vitest.config.ts` + `angular.json test: @angular/build:unit-test` |
-
-### Script de migração automática (Angular CLI schematic)
-
-```bash
-# Aplicar schematic de migração oficial (quando disponível)
-ng generate @angular/core:migrate-to-vitest
-
-# Alternativa via AnalogJS
-ng generate @analogjs/vitest-angular:setup
-```
+| `spyOn(obj, 'met')` | `vi.spyOn(obj, 'met').mockReturnValue(...)` |
+| `fakeAsync(() => { tick(n); })` | `vi.useFakeTimers()` + `vi.advanceTimersByTimeAsync(n)` |
+| `waitForAsync(() => {})` | `async () => { await fixture.whenStable(); }` |
+| `karma.conf.js` | `vitest.config.ts` |
 
 ---
 
-## 11.1) Diagnóstico e Correção de Falhas (Test Fixer)
+## 10) Diagnóstico Cirúrgico Angular (Test Fixer)
 
-Diretrizes cirúrgicas para correção de testes quebrados em Angular (sem alterar regras de produção):
+Consulte a metodologia agnóstica em `test-implementation-frontend` (§6.3). Erros específicos de Angular:
 
 | Sintoma do Erro | Causa Provável | Ação de Correção |
 |---|---|---|
-| `AssertionError: expected spy to have been called` | Efeito/Signal assíncrono não processado | Adicionar `await fixture.whenStable()` ou `TestBed.flushEffects()` antes do `expect` |
-| `Cannot read properties of undefined (reading 'subscribe')` | Mock de Service não retorna Observable | Configurar mock com `of(valor)` do RxJS: `vi.fn().mockReturnValue(of(dados))` |
-| `NG0100: ExpressionChangedAfterItHasBeenCheckedError` | Mutação de estado síncrona pós-renderização | Revisar fluxo de atualização ou disparar `fixture.detectChanges()` imediatamente após evento |
-| `Error: Expected 1 matching element, found 0` | Renderização dependente de `@if` assíncrono | Aguardar Promise/Signal resolver (`await fixture.whenStable()`) antes de consultar o DOM |
-| `TypeError: vi.spyOn is not a function` | Configuração de Vitest sem `globals: true` | Importar `vi` de `'vitest'` ou habilitar `globals: true` no `vitest.config.ts` |
+| `AssertionError: expected spy to have been called` | Signal ou efeito assíncrono não processado | Adicionar `await fixture.whenStable()` ou `TestBed.flushEffects()` |
+| `Cannot read properties of undefined (reading 'subscribe')` | Mock de Service não retorna Observable | Usar `vi.fn().mockReturnValue(of(dados))` |
+| `NG0100: ExpressionChangedAfterItHasBeenCheckedError` | Mutação síncrona pós-renderização | Inspecionar signals vinculados ao template |
+| `TypeError: vi.spyOn is not a function` | Falta de `globals: true` no `vitest.config.ts` | Configurar `globals: true` ou importar `vi` de `'vitest'` |
 
 ---
 
-## 11.2) Testes E2E com Playwright em Aplicações Angular
+## 11) Testes E2E com Playwright em Angular
 
-Para validação de jornadas completas de usuário com browsers reais:
+Para padrões e boas práticas agnósticas de E2E, consulte `test-implementation-frontend` (§5.1). No Angular, utilize roteamento client-side e asserções web-first:
 
 ```typescript
-// e2e/specs/login.spec.ts
+// e2e/specs/fluxo-angular.spec.ts
 import { test, expect } from '@playwright/test';
 
-test('deve autenticar e redirecionar para tela principal', async ({ page }) => {
-  await page.goto('/login');
-
-  // Seletores semânticos resilientes
-  await page.getByTestId('input-email').fill('usuario@exemplo.com');
-  await page.getByTestId('input-senha').fill('senha123');
-  await page.getByRole('button', { name: 'Entrar' }).click();
-
-  // Asserção web-first com auto-wait
-  await expect(page).toHaveURL('/dashboard');
-  await expect(page.getByTestId('painel-resumo')).toBeVisible();
+test('deve navegar entre rotas standalone', async ({ page }) => {
+  await page.goto('/');
+  await page.getByTestId('nav-pedidos').click();
+  await expect(page).toHaveURL('/pedidos');
+  await expect(page.getByTestId('tabela-pedidos')).toBeVisible();
 });
 ```
 
@@ -693,43 +390,17 @@ test('deve autenticar e redirecionar para tela principal', async ({ page }) => {
 
 ## 12) Anti-padrões
 
-- ❌ Usar `fakeAsync/tick` sem Zone.js (não funciona em zoneless)
-- ❌ Não chamar `vi.restoreAllMocks()` — spies vazam entre testes
-- ❌ Não usar `restoreMocks: true` no config e esquecer cleanup manual
-- ❌ `vi.spyOn(service, 'metodo')` sem `.mockReturnValue()` — chama implementação real (diferente do Jasmine!)
-- ❌ Não chamar `httpMock.verify()` em `afterEach` (requisições pendentes não detectadas)
-- ❌ Usar `snapshot` para testes de comportamento (use apenas para output de HTML estruturado)
-- ❌ Misturar `globals: true` e imports explícitos (`import { describe } from 'vitest'`) no mesmo projeto
-- ❌ Não remover `zone.js` de `polyfills` ao migrar para zoneless (conflito)
-
----
-
-## 13) Estrutura de Arquivos
-
-```
-src/
-  app/
-    [feature]/
-      [nome].component.ts
-      [nome].component.spec.ts      ← testes do componente
-      [nome].service.ts
-      [nome].service.spec.ts        ← testes do serviço
-  test-providers.ts                 ← providers globais (provideZonelessChangeDetection)
-  test-setup.ts                     ← setup adicional se necessário
-
-vitest.config.ts                    ← config estendida (opcional)
-coverage/                           ← relatórios de coverage
-__snapshots__/                      ← snapshots gerados (commitar no Git)
-```
+- ❌ Usar `fakeAsync/tick` do `@angular/core/testing` sem Zone.js (incompatível com zoneless).
+- ❌ Não chamar `vi.restoreAllMocks()` ou omitir `restoreMocks: true` no `vitest.config.ts`.
+- ❌ `vi.spyOn(service, 'metodo')` sem `.mockReturnValue()` esperando que vire stub (diferente do Jasmine).
+- ❌ Esquecer `httpMock.verify()` em `afterEach` no `HttpTestingController`.
+- ❌ Manter `zone.js` em `polyfills` ao rodar em modo zoneless nativo.
 
 ---
 
 ## Referências
 
-- Angular Testing com Vitest (Tim Deschryver): https://timdeschryver.dev/blog/angular-testing-library-with-vitest
-- Vitest + Angular 21 — Migração (angular.schule): https://angular.schule/blog/2025-11-migrate-to-vitest
-- Angular University — Modern Vitest: https://blog.angular-university.io/angular-testing-vitest
-- Docs Vitest Coverage: https://vitest.dev/guide/coverage
-- Analog JS Vitest Angular: https://analogjs.org/docs/features/testing/vitest
-- Angular Component Testing Scenarios: https://angular.dev/guide/testing/components-scenarios
-
+- [Padrões Genéricos Frontend (Base)](../test-implementation-frontend/SKILL.md)
+- Angular Testing Guide: https://angular.dev/guide/testing
+- Vitest Documentation: https://vitest.dev/
+- AnalogJS Vitest Angular: https://analogjs.org/docs/features/testing/vitest

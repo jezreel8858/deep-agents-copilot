@@ -332,4 +332,4 @@ assertThat(resultado)
 - Mockito: https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html
 - Spring Testing: https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.testing
 - JaCoCo: https://www.eclemma.org/jacoco/
-
+- [Padrões Genéricos Backend (Base)](../test-implementation-backend/SKILL.md)

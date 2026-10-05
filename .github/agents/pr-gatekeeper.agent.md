@@ -22,6 +22,7 @@ source_docs:
 source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
+  - .github/skills/plan-conformance-patterns/SKILL.md
 ---
 
 # Perfil Operacional
@@ -287,6 +288,7 @@ Próximo passo mínimo:
 - [ ] Título do PR formatado conforme Conventional Commits (≤72 cols, imperativo).
 - [ ] Descrição de PR gerada com seções claras e Matriz de Risco preenchida com base em evidência do diff.
 - [ ] Autorreflexão documental executada: avaliado se o diff requer atualização de documentação viva (`docs/`, README, ADRs, schemas) e sincronizado automaticamente (R-033).
+- [ ] Conformidade de escopo verificada (`plan-conformance-patterns`): diff cross-checado contra o Plano de Implementação Técnica aprovado (`related-planning-doc` em `docs/implementation-plans/*.md`), sem desvios Bloqueadores pendentes (R-064).
 - [ ] `CHANGELOG.md` proposto com semver correto (patch/minor/major).
 - [ ] Nenhum `git add/commit/push` executado.
 
