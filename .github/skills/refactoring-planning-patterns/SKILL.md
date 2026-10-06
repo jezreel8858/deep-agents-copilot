@@ -156,6 +156,8 @@ Cada nó do plano de refatoração deve ser estruturado com contratos estritos:
 
 ## 5) Matriz de Rollback Multicamada (Zero-Downtime)
 
+> Esta matriz detalha o rollback específico de refatorações zero-downtime; para a classificação genérica de reversibilidade (T1/T2/T3) aplicável a qualquer plano de decomposição, ver `task-decomposition-patterns/SKILL.md` §7 (fonte canônica, evitar redefinição divergente — R-055).
+
 Evitar dependência exclusiva de `git revert` em produção. Planejar contingência por camada:
 
 | Camada | Padrão Aplicado | Mecanismo de Rollback Rápido |

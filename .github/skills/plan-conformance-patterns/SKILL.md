@@ -21,6 +21,8 @@ triggers:
   - "blast radius do diff fora do planejado"
   - "arquivo alterado fora do plano de implementação"
   - "desvio de escopo em relação ao related-planning-doc"
+  - "tier de reversibilidade do diff"
+  - "mutação T3 sem rollback explícito"
 source_docs:
   - .github/agents/code-review.agent.md
   - .github/agents/pr-gatekeeper.agent.md
@@ -29,6 +31,7 @@ source_docs:
 source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
+  - .github/skills/task-decomposition-patterns/SKILL.md
 tools: []
 ---
 
@@ -71,6 +74,11 @@ Esta skill materializa, no momento do merge, a garantia de que o Duplo Gate Docu
 2. Comparar o blast radius estrutural retornado (dependências diretas/indiretas, fan-in/fan-out) contra o blast radius declarado no plano aprovado.
 3. Arquivos órfãos de dependência (alterados sem nenhuma relação estrutural com o escopo planejado) são candidatos a desvio **Bloqueador** (§3).
 
+### Nível 2.1 — Verificação de Reversibilidade (Tiers T1/T2/T3)
+1. Extrair o metadado `[Reversibilidade: T1|T2|T3]` declarado no plano aprovado (taxonomia canônica em `task-decomposition-patterns/SKILL.md` §7).
+2. Qualquer arquivo/efeito classificado como **T3** (mutação externa/banco/deploy) sem estratégia de rollback explícita documentada no plano é desvio **Bloqueador** (§3), independentemente de estar dentro do blast radius estrutural.
+3. Divergência entre o tier declarado no plano e o tier real do efeito observado no diff (ex.: migration de banco classificada como T2) é desvio **Alto** — reclassificar e exigir confirmação humana via `ask_questions` antes do merge.
+
 ### Nível 3 — Checagem Semântica Assistida de Escopo
 1. Produzir um resumo funcional objetivo do diff (o que o código efetivamente faz).
 2. Confrontar esse resumo contra o checklist GFM (`- [ ] <descrição>`) do documento de implementação aprovado.
@@ -93,3 +101,4 @@ Esta skill materializa, no momento do merge, a garantia de que o Duplo Gate Docu
 - [ ] Todo desvio identificado foi classificado por severidade (Bloqueador | Alto | Sugestão) conforme §2, com evidência `arquivo:linha`.
 - [ ] Verificação executada em chamada única consolidada de batch-gather (diff + allowlist + `@codegraph-engine`), nunca em chamadas sequenciais por arquivo (R-046/R-060).
 - [ ] Nenhum desvio Bloqueador pendente antes de `@pr-gatekeeper` gerar a submissão final do PR.
+- [ ] Nível 2.1 (Reversibilidade): tier T1/T2/T3 declarado no plano confere com o efeito real do diff; mutações T3 possuem estratégia de rollback explícita e confirmação humana registrada.

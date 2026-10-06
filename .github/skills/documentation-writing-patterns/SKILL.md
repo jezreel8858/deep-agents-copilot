@@ -88,6 +88,7 @@ autor: <nome-do-agent-gerador>
 workflow: <workflow-canonico-1-a-9>
 related-planning-doc: <path-do-doc-de-planejamento-aprovado> # obrigatório, R-064
 progress: 0 # percentual opcional, calculável a partir do checklist
+reversibility: T1 | T2 | T3 # obrigatório, R-064 — tier predominante do documento, ver task-decomposition-patterns/SKILL.md §7
 ---
 ```
 
@@ -106,6 +107,7 @@ Regras do checklist:
 - Seção de progresso agregado ("Progresso: N/M tarefas concluídas") no topo do documento, antes do primeiro item.
 - **Alternativas Rejeitadas não é obrigatória** (documento é prescritivo, não decisório) — referenciar o doc de planejamento aprovado via `related-planning-doc` para o racional da decisão.
 - **Checklist Defensivo Pré-Code-Review é obrigatório** no encerramento do documento para garantir validações de segurança (sanitização de inputs, ausência de secrets/tokens hardcoded, tratamento seguro de erros e conformidade de autorização) antes da submissão a code-review.
+- **`reversibility` é obrigatório** (R-064): declarar o tier T1/T2/T3 predominante do documento conforme `task-decomposition-patterns/SKILL.md` §7; mutações T3 exigem confirmação humana explícita e estratégia de rollback dedicada antes da execução.
 
 ### DoD vs Acceptance Criteria (não fundir)
 
@@ -147,6 +149,7 @@ autor: refactor-planner
 workflow: 3-arquitetura
 related-planning-doc: docs/plan/refactor-auth-module-blueprint.md
 progress: 0
+reversibility: T2
 ---
 
 # Plano de Refatoração: Módulo de autenticação
