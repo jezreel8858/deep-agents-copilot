@@ -111,6 +111,13 @@ Para tarefas longas e bem delimitadas com critério de saída objetivo (ex.: imp
 
 ---
 
+### 2.5) Poda Cirúrgica Anti-Bloat ("Delete e Observe" — R-061(d))
+
+Suspeita de degradação por acúmulo de instrução redundante, ambígua ou excessivamente verbosa deve ser tratada através de poda cirúrgica:
+- **Procedimento**: Remova cirurgicamente o excesso instrucional suspeito (nunca silenciosamente) e execute os testes automatizados ou o ciclo de evals para observar a normalização do comportamento.
+- **Proteção Normativa**: É expressamente VEDADO remover qualquer regra normativa (`R-xxx`) sem aprovação humana explícita via `ask_questions`.
+- **Destino Canônico**: Regras especializadas ou checklists extensos devem migrar para suas respectivas skills (`.github/skills/`) ou adapters (`.github/instructions/`), preservando os arquivos-raiz de instrução enxutos e estritamente globais.
+
 ## 3) Padrões Canônicos com Exemplos Contrastantes
 
 ### Padrão: Diagnóstico Antes de Escalar Modelo

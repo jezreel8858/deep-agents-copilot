@@ -170,6 +170,34 @@ Toda solicitação de importação de skill externa (catálogo/repositório de t
 
 Catalogação da violação em `.github/skills/governance-audit-patterns/SKILL.md` § 2.33 (Smell — Importação de Skill Externa sem Avaliação de Pertinência).
 
+### 3.5) Checklist de Genericidade (R-038)
+
+**ANTES de submeter arquivo novo em `.github/` (agents, skills, prompts, copilot-instructions):**
+
+- [ ] Substitua mentalmente todos os nomes de projeto por `[PROJETO]` — o texto faz sentido?
+- [ ] Substitua todas as tecnologias/frameworks por `[TECH]` — o texto ainda é válido?
+- [ ] Nenhuma referência a: domínio de negócio, linguagem de programação específica, framework exclusivo.
+- [ ] Se há customização de tech/domínio, está em `.github/instructions/*.instructions.md` (adapter)?
+- [ ] Se há lista de exemplos concretos, apontam para `.github/instructions/README.md` e nunca duplicam?
+
+**Teste rápido**: Seu documento continua útil para um projeto completamente diferente (ex: Go backend, React frontend)?
+- ✅ Sim? → Pode ir para `.github/` (global)
+- ❌ Não? → Deve ir para `.github/instructions/<adapter>.instructions.md` (adapter)
+
+### 3.6) Checklist de Anonimização de Evidência Real (R-044)
+
+**ANTES de persistir qualquer changelog, seção de validação ou exemplo derivado de análise de repositório real** (aplica-se sobretudo a agents analíticos: `codegraph-engine`, `business-rules-extractor`, `context-builder`, `project-scanner`):
+
+- [ ] Nomes de repositório/projeto genericizados (`[PROJETO-A]`, `[PROJETO-B]`, ...)?
+- [ ] Nomes de classe/método/variável reais trocados por equivalentes de exemplo (`ServicoExemploX`, `operacaoExemploX`)?
+- [ ] Pacotes/namespaces/domínios reais (`com.empresa.*`, URLs reais) trocados por `com.exemplo.*`/`http://contrato.exemplo.com/...`?
+- [ ] Caminhos absolutos de sistema de arquivos (ex.: `[DRIVE]:\[USUARIO]\...`, `[DRIVE]:\[WORKSPACE]\...`, `/[HOME]/[USUARIO]/...`) trocados por `<workspace>/[PROJETO-X]` ou removidos?
+- [ ] Nome de empresa/ecossistema real trocado por `exemplo`/`[ECOSSISTEMA]`?
+- [ ] Métricas numéricas agregadas (contagem de nós, arestas, órfãos, cobertura %) mantidas reais?
+- [ ] Evidência efêmera mantida apenas no chat e NUNCA gravada em arquivo commitável de governança compartilhada?
+
+**Teste objetivo**: Um terceiro lendo o arquivo commitado NÃO deve conseguir inferir qual projeto/empresa foi analisado.
+
 ## 4) Formato de Saída — Bloco de Validações ✅/❌ (parametrizável)
 
 ```markdown
