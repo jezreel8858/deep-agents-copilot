@@ -47,6 +47,19 @@ def get_forbidden_project_identifiers() -> set[str]:
             for proj in data.get("projetos", []):
                 p_id = (proj.get("id") or "").strip().lower()
                 p_name = (proj.get("name") or "").strip().lower()
+                p_path = (proj.get("path_externo") or "").strip()
+
+                # Projetos cujo path_externo resolve DENTRO da própria raiz deste repositório
+                # (ex.: sub-projetos do monorepo como apps/web ou deploy/local-chat-gateway)
+                # NÃO são projetos locais externos privados.
+                if p_path:
+                    try:
+                        resolved = Path(p_path).resolve()
+                        if resolved == REPO_ROOT or REPO_ROOT in resolved.parents:
+                            continue
+                    except Exception:
+                        pass
+
                 if p_id and p_id not in THIS_REPO_TOKENS:
                     forbidden.add(p_id)
                 if p_name and p_name not in THIS_REPO_TOKENS:
