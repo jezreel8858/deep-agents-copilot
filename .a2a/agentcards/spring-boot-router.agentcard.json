@@ -4,7 +4,7 @@
   "id": "spring-boot-router",
   "name": "Spring Boot Router",
   "version": "2.0.0",
-  "description": "Roteador de domínio Spring Boot e supervisor hierárquico — recebe solicitações de backend Java/Spring Boot do agent-router central e despacha para os 7 especialistas do catálogo Spring Boot (arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer e test-fixer).",
+  "description": "Roteador de domínio Spring Boot e supervisor hierárquico — recebe solicitações de backend Java/Spring Boot do agent-router central e despacha para os 3 especialistas do catálogo Spring Boot (arch-advisor, developer e test-engineer).",
   "domain": "Supervisor hierarquico e roteador do dominio Spring Boot",
   "role": "router",
   "capabilities": [
@@ -38,7 +38,7 @@
     "data_sensitivity": "internal"
   },
   "model_preferences": {
-    "recommended_model": "Claude Sonnet 5",
+    "recommended_model": "Claude Sonnet 5.5",
     "cost_tier": "1x"
   },
   "input_contract": {

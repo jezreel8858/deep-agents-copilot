@@ -4,7 +4,7 @@
   "id": "database-router",
   "name": "Database Router",
   "version": "2.0.0",
-  "description": "Roteador de domínio de Banco de Dados e supervisor hierárquico — recebe solicitações de banco (Oracle e Informix) do agent-router central e despacha para os 6 especialistas do catálogo database (oracle-migration-dev, oracle-plsql-expert, oracle-query-tuner, informix-migration-dev, informix-spl-expert e informix-query-tuner).",
+  "description": "Roteador de domínio de Banco de Dados e supervisor hierárquico — recebe solicitações de banco (Oracle e Informix) do agent-router central e despacha para os 3 especialistas do catálogo database (database-arch-advisor, oracle-database-specialist e informix-database-specialist).",
   "domain": "Supervisor hierarquico e roteador do dominio Banco de Dados",
   "role": "router",
   "capabilities": [
@@ -39,7 +39,7 @@
     "data_sensitivity": "internal"
   },
   "model_preferences": {
-    "recommended_model": "Gemini 3.8 Flash",
+    "recommended_model": "Claude Sonnet 5.5",
     "cost_tier": "1x"
   },
   "input_contract": {

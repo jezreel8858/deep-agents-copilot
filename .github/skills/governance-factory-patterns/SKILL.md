@@ -275,10 +275,10 @@ A governança do repositório adota dois paradigmas fundamentais para a atribui�
 | Paradigma | Perfil / Casos de Uso | Modelo |
 |---|---|---|
 | **Prompt Procedural** (SLM / Alta Velocidade) | Execuções determinísticas, diretas e algorítmicas, sem planejamento abstrato ou análise deliberativa aberta (scanners, templates, geradores, roteadores de stack, implementadores TDD, fixers, test-writers, enforcers). **Escolha padrão em toda a base.** | **`"Gemini 3.8 Flash"`** |
-| **Prompt Decompositivo / Raciocínio Guiado** (Pensamento Profundo) | Análises deliberativas, orquestração central, exploração de múltiplos caminhos de decisão, trade-offs e avaliação crítica de riscos antes da resposta final (`agent-router`, `refactor-planner`, `requirements-analyst`, `deep-search`, especialistas advisor de arquitetura). | **`"Claude Sonnet 5"`** |
+| **Prompt Decompositivo / Raciocínio Guiado** (Pensamento Profundo) | Análises deliberativas, orquestração central, exploração de múltiplos caminhos de decisão, trade-offs e avaliação crítica de riscos antes da resposta final (`agent-router`, `refactor-planner`, `requirements-analyst`, `deep-search`, especialistas advisor de arquitetura). | **`"Claude Sonnet 5.5"`** |
 | **Raciocínio Crítico Avançado / Diagnóstico Profundo** (High-Complexity Thinking) | Arquitetura técnica complexa, Technical Blueprint formal, análise de causa raiz profunda e investigação minuciosa de bugs críticos (`tech-solution-architect`, `debugger`). | **`"Claude Opus 5.5"`** |
 
-**Regra de ouro (redução de créditos):** nunca escalar para `"Claude Sonnet 5"` sem justificativa objetiva de raciocínio profundo, orquestração ou arquitetura complexa — um agent operacional ou procedural em Sonnet é desperdício de créditos sem ganho de qualidade.
+**Regra de ouro (redução de créditos):** nunca escalar para `"Claude Sonnet 5.5"` sem justificativa objetiva de raciocínio profundo, orquestração ou arquitetura complexa — um agent operacional ou procedural em Sonnet é desperdício de créditos sem ganho de qualidade.
 
 ### 9.2) Validação de Disponibilidade Real (obrigatória — antes de finalizar o artefato)
 

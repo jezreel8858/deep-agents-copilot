@@ -3,7 +3,7 @@ name: <slug-kebab-case>
 description: >-
   Executa <ação procedural objetiva em 3ª pessoa>, aplicando alterações determinísticas de código, testes ou configurações com validação imediata de integridade. Use quando precisar de <frase-gatilho de invocação>. Não use para análises arquiteturais abertas.
 # Modelo Operacional (R-021 — Model Routing Signal):
-# Padrão: "Gemini 3.8 Flash" (ou "Claude Sonnet 5" para tarefas deliberativas de código).
+# Padrão: "Gemini 3.8 Flash" (ou "Claude Sonnet 5.5" para tarefas deliberativas de código).
 # É PROIBIDO fixar 'model:' permanentemente em tier premium (ex.: "Claude Opus") para executores contínuos.
 # Escalonamento de modelo é estritamente PONTUAL (via sinal 🧠 em run_subagent conforme R-021), nunca permanente no catálogo.
 model: "Gemini 3.8 Flash"

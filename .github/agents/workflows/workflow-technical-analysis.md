@@ -17,7 +17,7 @@ flowchart TD
 
     CatGlobal -- "Arquitetura Global / Domínio" --> A1["@codegraph-engine / @ddd-bounded-context-mapper / @adr-sentinel"]
     CatGlobal -- "Segurança & Compliance" --> A2["@security-reviewer / @compliance-guardrails"]
-    CatGlobal -- "Performance & Otimização" --> A3["@performance-agent / @oracle-query-tuner / @informix-query-tuner"]
+    CatGlobal -- "Performance & Otimização" --> A3["@performance-agent / @database-arch-advisor"]
     CatGlobal -- "Arquitetura de Tela / Frontend" --> A4["@angular-router → @angular-arch-advisor (Read-Only)"]
     CatGlobal -- "Arquitetura de Serviço / Backend" --> A5["@spring-boot-router / @spring-reactive-router / @ejb-router / @struts-router / @database-router / @python-router (Advisors)"]
     CatGlobal -- "Solução Cross-Stack / Contratos" --> A6["@tech-solution-architect"]
@@ -41,7 +41,7 @@ flowchart TD
 1. **Estado 1 — Despacho para Especialista Analítico**: O router direciona sem desvios para o agente cujo domínio ou stack cobre a pergunta:
    - *Arquitetura Estrutural & Grafo*: `@codegraph-engine` (dependências/ciclos), `@ddd-bounded-context-mapper` (domínios/God Classes), `@adr-sentinel` (conformidade arquitetural).
    - *Segurança & Governança*: `@security-reviewer` (OWASP/CVE/secrets), `@compliance-guardrails` (LGPD/SOC 2).
-   - *Engenharia de Performance*: `@performance-agent` (CWV/N+1/profiling), `@oracle-query-tuner` / `@informix-query-tuner` (planos de execução SQL).
+   - *Engenharia de Performance*: `@performance-agent` (CWV/N+1/profiling), `@database-arch-advisor` (planos de execução SQL Oracle/Informix).
    - *Arquitetura de Telas & Fluxos por Stack*: `@angular-arch-advisor` (reatividade de estado, memory leaks, detecção de mudança, SSR), `@spring-boot-arch-advisor` (concorrência, camada de persistência, clean architecture), `@spring-reactive-arch-advisor` (reatividade não-bloqueante, backpressure, event-loop), `@ejb-arch-advisor` (transações distribuídas, Stateless pools).
    - *Viabilidade Técnica & Contratos*: `@tech-solution-architect` (Technical Blueprint, OpenAPI, modelo de dados).
    - *Infraestrutura & DevOps*: `@devops-engineer` (Dockerfile, Kubernetes, pipelines CI/CD, Infrastructure-as-Code — read-only).

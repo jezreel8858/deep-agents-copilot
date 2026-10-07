@@ -41,7 +41,7 @@ def test_router_return_section_golden_master_characterization():
     - Mapeia variantes textuais e emite relatório estruturado.
     """
     agent_files = sorted(AGENTS_DIR.glob("**/*.agent.md"))
-    assert len(agent_files) >= 86, f"Esperado >= 86 agents, encontrados {len(agent_files)}"
+    assert len(agent_files) >= 62, f"Esperado >= 62 agents (após consolidação Fase 4/5), encontrados {len(agent_files)}"
 
     variants: dict[str, list[str]] = defaultdict(list)
     missing: list[str] = []
@@ -63,7 +63,7 @@ def test_router_return_section_golden_master_characterization():
     )
 
     # Todos os 85 agents não-roteadores têm seção
-    assert len(agent_files) - len(missing) == 94
+    assert len(agent_files) - len(missing) == len(agent_files) - 1
 
     # Relatório de variantes capturadas
     print(f"\n=== GOLDEN MASTER SNAPSHOT: R-042 RETORNO AO ROUTER ===")

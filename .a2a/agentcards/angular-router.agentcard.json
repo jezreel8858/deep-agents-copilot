@@ -4,7 +4,7 @@
   "id": "angular-router",
   "name": "Angular Router",
   "version": "2.0.0",
-  "description": "Roteador de domínio Angular e supervisor hierárquico — recebe solicitações de frontend Angular do agent-router central e despacha para os 8 especialistas do catálogo Angular (arch-advisor, feature-developer, bug-fixer, ui-stylist, unit-test, component-test, test-fixer e e2e-writer).",
+  "description": "Roteador de domínio Angular e supervisor hierárquico — recebe solicitações de frontend Angular do agent-router central e despacha para os 3 especialistas consolidados do catálogo Angular (angular-arch-advisor, angular-developer e angular-test-engineer).",
   "domain": "Supervisor hierarquico e roteador do dominio Angular",
   "role": "router",
   "capabilities": [
@@ -38,7 +38,7 @@
     "data_sensitivity": "internal"
   },
   "model_preferences": {
-    "recommended_model": "Claude Sonnet 5",
+    "recommended_model": "Claude Sonnet 5.5",
     "cost_tier": "1x"
   },
   "input_contract": {

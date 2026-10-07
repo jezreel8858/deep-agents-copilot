@@ -1,359 +1,142 @@
-version: "1.0"
-domain: "frontend-angular"
-description: >-
-  Sub-catálogo hierárquico de agentes especializados em Angular (Frontend Sub-Router).
-  Isola a topologia de especialistas de frontend do catálogo central global,
-  evitando explosão de nós no agent-router e permitindo orquestração local por domínio.
-
-router:
-  id: "angular-router"
-  role: "supervisor"
-  description: "Roteador central do domínio Angular — tria e despacha para os 8 especialistas de frontend"
-  tools:
-    - "read_file"
-    - "file_search"
-    - "grep_search"
-    - "list_dir"
-    - "ask_questions"
-    - "run_subagent"
-    - "context-mode/ctx_search"
-  skills:
-    - "agent-contracts"
-    - "handoff-governance"
-    - "context-mode"
-
+version: '2.0'
+domain: frontend-angular
+description: Sub-catálogo hierárquico consolidado de agentes especializados em Angular
+  (Padrão Triádico 3+1). Isola a topologia de especialistas de frontend do catálogo
+  central global, garantindo coesão máxima, menor latência de handoffs e alinhamento
+  à governança Test-Last.
 agents:
   angular-arch-advisor:
-    id: "angular-arch-advisor"
-    model: "Claude Sonnet 5"
-    role: "advisory"
-    domain: "Arquitetura Angular, Standalone, Signals, SSR e Performance CWV"
-    description: "Especialista analítico read-only: diagnósticos arquiteturais, CWV (INP/LCP), SSR/hydration, @defer e planos de upgrade/migração Angular."
+    id: angular-arch-advisor
+    role: architecture
+    description: Read-only advisor para arquitetura frontend Angular, design de Signals/RxJS,
+      SSR/Hydration e governança corporativa.
     keywords:
-      - "auditoria angular"
-      - "arquitetura angular"
-      - "core web vitals"
-      - "inp"
-      - "lcp"
-      - "ssr"
-      - "hydration"
-      - "upgrade angular"
-      - "deprecations"
+    - arquitetura angular
+    - standalone components
+    - signals
+    - rxjs store
+    - ssr hydration
     tools:
-      - "file_search"
-      - "grep_search"
-      - "list_dir"
-      - "ask_questions"
-      - "run_subagent"
-      - "context-mode/ctx_search"
-      - "context-mode/ctx_execute"
-      - "context-mode/ctx_batch_execute"
-      - "context-mode/ctx_execute_file"
-      - "context-mode/ctx_index"
+    - read_file
+    - file_search
+    - grep_search
+    - list_dir
+    - ask_questions
+    - context-mode/ctx_search
+    - context-mode/ctx_execute_file
     skills:
-      - "angular-frontend-patterns"
-      - "angular-performance-patterns"
-      - "specialist-hybrid-advisory-implementation-patterns"
-      - "agent-contracts"
-      - "context-mode"
-
-  angular-feature-developer:
-    id: "angular-feature-developer"
-    model: "Claude Sonnet 5"
-    role: "implementer"
-    domain: "Desenvolvimento de features novas, componentes standalone e gerenciamento de estado reativo"
-    description: "Desenvolvedor de features: cria componentes standalone, NgRx Signal Stores, services e diretivas sob workflow Test-Last (Implementation-First com testes posteriores)."
+    - angular-frontend-patterns
+    - architecture-decision-records
+    - context-mode
+    - handoff-governance
+    - agent-contracts
+    model: Claude Sonnet 5.5
+  angular-developer:
+    id: angular-developer
+    role: implementation
+    test_paradigm: Test-Last / Implementation-First
+    unit_test_exemption: isento de autoria e execução de testes unitários; handoff
+      mandatório para angular-test-engineer
+    description: 'Especialista consolidador de engenharia de frontend Angular: implementação
+      de features standalone, gerenciamento de estado (Signals/RxJS), estilização
+      com Design System (Tailwind/SCSS, zero hex inline) e correção cirúrgica de bugs
+      de renderização/UI.'
     keywords:
-      - "feature angular"
-      - "componente standalone"
-      - "signal store"
-      - "signals"
-      - "service angular"
-      - "test-last angular"
-      - "implementation-first"
+    - feature angular
+    - componente standalone
+    - signals
+    - rxjs stream
+    - formulário reativo
+    - bugfix angular
+    - expressionchanged
+    - estilização angular
+    - design system angular
     tools:
-      - "file_search"
-      - "grep_search"
-      - "list_dir"
-      - "ask_questions"
-      - "run_subagent"
-      - "get_errors"
-      - "run_in_terminal"
-      - "context-mode/ctx_execute"
-      - "context-mode/ctx_search"
-      - "context-mode/ctx_batch_execute"
-      - "context-mode/ctx_index"
-      - "context-mode/ctx_execute_file"
-      - "playwright/browser_snapshot"
-      - "playwright/browser_navigate"
-      - "playwright/browser_click"
-      - "playwright/browser_type"
-      - "playwright/browser_wait_for"
-      - "playwright/browser_console_messages"
-      - "playwright/browser_network_requests"
-      - "playwright/browser_tabs"
-      - "playwright/browser_close"
+    - file_search
+    - grep_search
+    - list_dir
+    - ask_questions
+    - run_subagent
+    - get_errors
+    - run_in_terminal
+    - context-mode/ctx_execute
+    - context-mode/ctx_search
+    - context-mode/ctx_batch_execute
+    - context-mode/ctx_index
+    - context-mode/ctx_execute_file
+    - playwright/browser_snapshot
+    - playwright/browser_navigate
+    - playwright/browser_click
+    - playwright/browser_type
+    - playwright/browser_wait_for
+    - playwright/browser_console_messages
+    - playwright/browser_network_requests
+    - playwright/browser_tabs
+    - playwright/browser_close
+    - playwright/browser_take_screenshot
+    - playwright/browser_resize
     skills:
-      - "angular-implementation-patterns"
-      - "frontend-componentization-patterns"
-      - "test-implementation-angular-vitest"
-      - "terminal-governance"
-      - "context-mode"
-      - "efficient-batch-code-modification"
-      - "playwright-mcp"
-
-  angular-bug-fixer:
-    id: "angular-bug-fixer"
-    model: "Claude Sonnet 5"
-    role: "fixer"
-    domain: "Correções cirúrgicas de bugs e runtime errors em produção"
-    description: "Especialista em resolução rápida de bugs: corrige runtime errors, ExpressionChanged..., memory leaks e falhas de reatividade com diff mínimo."
+    - angular-frontend-patterns
+    - angular-implementation-patterns
+    - design-system-component-contracts
+    - frontend-componentization-patterns
+    - frontend-visual-feedback-loop
+    - efficient-batch-code-modification
+    - context-mode
+    - handoff-governance
+    - agent-contracts
+    - code-tracing
+    - terminal-governance
+    - playwright-mcp
+    model: Claude Sonnet 5.5
+  angular-test-engineer:
+    id: angular-test-engineer
+    role: testing
+    description: 'Especialista consolidador de testes e qualidade para Angular: testes
+      unitários (Jasmine/Jest/Vitest), testes de componentes/TestBed, automação E2E
+      (Playwright/Cypress) e autocorreção de suítes com retry cap estrito (R-053).'
     keywords:
-      - "bug angular"
-      - "fix angular"
-      - "runtime error angular"
-      - "expressionchanged"
-      - "memory leak angular"
-      - "corrigir erro angular"
+    - teste unitario angular
+    - testbed
+    - spectator
+    - teste componente angular
+    - teste e2e angular
+    - playwright angular
+    - cypress angular
+    - corrigir teste angular
+    - test fixer angular
     tools:
-      - "file_search"
-      - "grep_search"
-      - "list_dir"
-      - "ask_questions"
-      - "run_subagent"
-      - "get_errors"
-      - "run_in_terminal"
-      - "context-mode/ctx_execute"
-      - "context-mode/ctx_search"
-      - "context-mode/ctx_batch_execute"
-      - "context-mode/ctx_execute_file"
-      - "context-mode/ctx_index"
-      - "playwright/browser_snapshot"
-      - "playwright/browser_navigate"
-      - "playwright/browser_navigate_back"
-      - "playwright/browser_click"
-      - "playwright/browser_type"
-      - "playwright/browser_hover"
-      - "playwright/browser_select_option"
-      - "playwright/browser_press_key"
-      - "playwright/browser_fill_form"
-      - "playwright/browser_file_upload"
-      - "playwright/browser_handle_dialog"
-      - "playwright/browser_wait_for"
-      - "playwright/browser_tabs"
-      - "playwright/browser_close"
-      - "playwright/browser_console_messages"
-      - "playwright/browser_network_requests"
-      - "playwright/browser_take_screenshot"
-      - "playwright/browser_resize"
+    - file_search
+    - grep_search
+    - list_dir
+    - ask_questions
+    - run_subagent
+    - get_errors
+    - run_in_terminal
+    - context-mode/ctx_execute
+    - context-mode/ctx_search
+    - context-mode/ctx_batch_execute
+    - context-mode/ctx_index
+    - context-mode/ctx_execute_file
+    - playwright/browser_snapshot
+    - playwright/browser_navigate
+    - playwright/browser_click
+    - playwright/browser_type
+    - playwright/browser_wait_for
+    - playwright/browser_console_messages
+    - playwright/browser_network_requests
+    - playwright/browser_tabs
+    - playwright/browser_close
+    - playwright/browser_take_screenshot
+    - playwright/browser_resize
     skills:
-      - "code-tracing"
-      - "angular-implementation-patterns"
-      - "test-implementation-angular-vitest"
-      - "terminal-governance"
-      - "context-mode"
-      - "efficient-batch-code-modification"
-      - "playwright-mcp"
-
-  angular-ui-stylist:
-    id: "angular-ui-stylist"
-    model: "Gemini 3.8 Flash"
-    role: "stylist"
-    domain: "Templates HTML5, SCSS modular, layout responsivo e acessibilidade WCAG"
-    description: "Especialista de apresentação: refatora templates com Control Flow (@if/@for), implementa SCSS modular (:host), layout responsivo mobile-first e conformidade WCAG 2.2 AA (estritamente visual, isento de criar ou rodar testes unitários)."
-    keywords:
-      - "scss angular"
-      - "css angular"
-      - "template angular"
-      - "control flow"
-      - "layout responsivo"
-      - "breakpoints"
-      - "a11y angular"
-      - "wcag"
-    tools:
-      - "file_search"
-      - "grep_search"
-      - "list_dir"
-      - "ask_questions"
-      - "run_subagent"
-      - "get_errors"
-      - "run_in_terminal"
-      - "context-mode/ctx_execute"
-      - "context-mode/ctx_search"
-      - "context-mode/ctx_batch_execute"
-      - "context-mode/ctx_execute_file"
-      - "context-mode/ctx_index"
-      - "playwright/browser_snapshot"
-      - "playwright/browser_navigate"
-      - "playwright/browser_resize"
-      - "playwright/browser_take_screenshot"
-      - "playwright/browser_console_messages"
-      - "playwright/browser_tabs"
-      - "playwright/browser_close"
-    skills:
-      - "angular-responsive-ui-patterns"
-      - "design-system-component-contracts"
-      - "frontend-componentization-patterns"
-      - "terminal-governance"
-      - "context-mode"
-      - "efficient-batch-code-modification"
-      - "playwright-mcp"
-
-  angular-unit-test-writer:
-    id: "angular-unit-test-writer"
-    model: "Gemini 3.8 Flash"
-    role: "tester"
-    domain: "Testes unitários de regras de negócio, services, stores e signals com mocks isolados"
-    description: "Escreve testes unitários de alta velocidade sem DOM para services, pipes, utilitários e NgRx Signal Stores com vi.fn() e spies."
-    keywords:
-      - "unit test angular"
-      - "teste unitario angular"
-      - "mock service angular"
-      - "testar store"
-      - "testar signal"
-    tools:
-      - "file_search"
-      - "grep_search"
-      - "list_dir"
-      - "ask_questions"
-      - "run_subagent"
-      - "get_errors"
-      - "run_in_terminal"
-      - "context-mode/ctx_execute"
-      - "context-mode/ctx_search"
-      - "context-mode/ctx_batch_execute"
-      - "context-mode/ctx_execute_file"
-      - "context-mode/ctx_index"
-    skills:
-      - "test-implementation-angular-vitest"
-      - "test-implementation-frontend"
-      - "terminal-governance"
-      - "context-mode"
-      - "efficient-batch-code-modification"
-
-  angular-component-test-writer:
-    id: "angular-component-test-writer"
-    model: "Gemini 3.8 Flash"
-    role: "tester"
-    domain: "Testes de componentes com TestBed, ComponentFixture e CDK Component Harnesses"
-    description: "Escreve testes de componentes com renderização, bindings de template, eventos de usuário e desacoplamento via Component Harnesses."
-    keywords:
-      - "component test angular"
-      - "testbed"
-      - "fixture detectchanges"
-      - "component harness"
-      - "testbedharnessenvironment"
-    tools:
-      - "file_search"
-      - "grep_search"
-      - "list_dir"
-      - "ask_questions"
-      - "run_subagent"
-      - "get_errors"
-      - "run_in_terminal"
-      - "context-mode/ctx_execute"
-      - "context-mode/ctx_search"
-      - "context-mode/ctx_batch_execute"
-      - "context-mode/ctx_execute_file"
-      - "context-mode/ctx_index"
-      - "playwright/browser_snapshot"
-      - "playwright/browser_navigate"
-      - "playwright/browser_click"
-      - "playwright/browser_type"
-      - "playwright/browser_wait_for"
-      - "playwright/browser_console_messages"
-      - "playwright/browser_network_requests"
-      - "playwright/browser_tabs"
-      - "playwright/browser_close"
-    skills:
-      - "test-implementation-angular-vitest"
-      - "test-implementation-angular-jasmine"
-      - "terminal-governance"
-      - "context-mode"
-      - "efficient-batch-code-modification"
-      - "playwright-mcp"
-
-  angular-test-fixer:
-    id: "angular-test-fixer"
-    model: "Claude Sonnet 5"
-    role: "fixer"
-    domain: "Diagnóstico e autocorreção de logs de falha de runners (Vitest, Karma, Jest)"
-    description: "Diagnostica e corrige testes quebrados por timing assíncrono, zoneless, flushEffects(), erros de mocks desatualizados ou dependências de TestBed."
-    keywords:
-      - "fix teste angular"
-      - "teste falhando angular"
-      - "whenstable"
-      - "flusheffects"
-      - "broken spec angular"
-    max_iteracoes: 3
-    escalonamento: "Após 3 tentativas sem sucesso, retornar ao @agent-router via ask_questions (motivo: 'loop_limite_atingido') — nunca repetir indefinidamente"
-    tools:
-      - "file_search"
-      - "grep_search"
-      - "list_dir"
-      - "ask_questions"
-      - "run_subagent"
-      - "get_errors"
-      - "run_in_terminal"
-      - "context-mode/ctx_execute"
-      - "context-mode/ctx_search"
-      - "context-mode/ctx_batch_execute"
-      - "context-mode/ctx_execute_file"
-      - "context-mode/ctx_index"
-    skills:
-      - "test-implementation-angular-vitest"
-      - "structured-intake-patterns"
-      - "terminal-governance"
-      - "context-mode"
-      - "efficient-batch-code-modification"
-
-  angular-e2e-writer:
-    id: "angular-e2e-writer"
-    model: "Gemini 3.8 Flash"
-    role: "tester"
-    domain: "Testes ponta a ponta (E2E) com Playwright e Cypress em aplicações Angular"
-    description: "Escreve suítes E2E de jornadas completas no browser, adotando seletores estáveis (data-testid), Page Objects e asserções web-first."
-    keywords:
-      - "e2e angular"
-      - "playwright angular"
-      - "cypress angular"
-      - "teste ponta a ponta"
-      - "jornada do usuario"
-    tools:
-      - "file_search"
-      - "grep_search"
-      - "list_dir"
-      - "ask_questions"
-      - "run_subagent"
-      - "get_errors"
-      - "run_in_terminal"
-      - "context-mode/ctx_execute"
-      - "context-mode/ctx_search"
-      - "context-mode/ctx_batch_execute"
-      - "context-mode/ctx_execute_file"
-      - "context-mode/ctx_index"
-      - "playwright/browser_snapshot"
-      - "playwright/browser_navigate"
-      - "playwright/browser_navigate_back"
-      - "playwright/browser_click"
-      - "playwright/browser_type"
-      - "playwright/browser_hover"
-      - "playwright/browser_select_option"
-      - "playwright/browser_press_key"
-      - "playwright/browser_fill_form"
-      - "playwright/browser_file_upload"
-      - "playwright/browser_handle_dialog"
-      - "playwright/browser_wait_for"
-      - "playwright/browser_tabs"
-      - "playwright/browser_close"
-      - "playwright/browser_console_messages"
-      - "playwright/browser_network_requests"
-      - "playwright/browser_take_screenshot"
-      - "playwright/browser_resize"
-    skills:
-      - "test-implementation-angular-vitest"
-      - "test-implementation-frontend"
-      - "terminal-governance"
-      - "context-mode"
-      - "efficient-batch-code-modification"
-      - "playwright-mcp"
+    - test-implementation-frontend
+    - test-coverage-governance
+    - code-tracing
+    - efficient-batch-code-modification
+    - context-mode
+    - handoff-governance
+    - agent-contracts
+    - terminal-governance
+    - playwright-mcp
+    model: Claude Sonnet 5.5

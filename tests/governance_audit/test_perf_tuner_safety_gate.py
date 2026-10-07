@@ -24,7 +24,8 @@ PERF_TUNER_STACKS = ["ejb", "spring-boot", "spring-reactive", "python", "struts"
 
 
 def resolve_perf_tuner_file(stack: str) -> Path:
-    """Resolve o arquivo perf-tuner da stack backend."""
+    if stack in ("spring-boot", "spring-reactive", "ejb", "struts", "python"):
+        return AGENTS_BACKEND_DIR / stack / f"{stack}-developer.agent.md"
     return AGENTS_BACKEND_DIR / stack / f"{stack}-perf-tuner.agent.md"
 
 

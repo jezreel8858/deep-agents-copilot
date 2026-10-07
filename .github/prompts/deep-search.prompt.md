@@ -7,7 +7,7 @@ description: >-
   citação de fonte. Perfil read-only — não implementa código nem sugere
   refatoração/análise crítica de impacto.
 agent: 'agent'
-model: "Claude Sonnet 5"
+model: "Claude Sonnet 5.5"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'run_in_terminal', 'tavily/tavily_search', 'tavily/tavily_extract', 'tavily/tavily_crawl', 'tavily/tavily_map', 'tavily/tavily_research', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_fetch_and_index', 'context-mode/ctx_batch_execute']
 argument-hint: '[tema-ou-pergunta-de-pesquisa]'
 source_docs:

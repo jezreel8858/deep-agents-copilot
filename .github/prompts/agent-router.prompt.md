@@ -6,7 +6,7 @@ description:
   Prompt Structuring (R-041), e delegar para o agent downstream correto.
   NÃO implementa código de domínio — apenas triagem e roteamento.
 agent: 'agent'
-model: "Claude Sonnet 5"
+model: "Claude Sonnet 5.5"
 tools: ['list_dir', 'read_file', 'file_search', 'grep_search', 'ask_questions', 'run_subagent', 'context-mode/ctx_search']
 argument-hint: '[solicitação-do-usuário]'
 source_docs_lazy:

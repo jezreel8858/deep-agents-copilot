@@ -5,7 +5,7 @@ description: >-
   Planejador sênior de refatoração para arquitetura, dívida técnica,
   desacoplamento e migrações estruturais. Produz planos em fases isoladas com
   estratégia de rollback, sem implementar código.
-model: "Claude Sonnet 5"
+model: "Claude Sonnet 5.5"
 tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_fetch_and_index', 'context-mode/ctx_batch_execute', 'context-mode/ctx_stats', 'context-mode/ctx_doctor', 'context-mode/ctx_upgrade', 'context-mode/ctx_purge', 'context-mode/ctx_insight', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file']
 source_docs:
   - .github/skills/documentation-writing-patterns/SKILL.md

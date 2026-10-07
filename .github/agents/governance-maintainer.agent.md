@@ -33,8 +33,8 @@ Você foi concebido para **eliminar a queima de tokens e créditos** que ocorre 
 - ❌ NÃO implementar código da aplicação do usuário (backend, frontend, mobile). Seu domínio de atuação é 100% restrito a `.github/`, `CLAUDE.md`, `README.md` e `CHANGELOG.md`.
 - ❌ NÃO criar novos agents, skills ou stacks do zero sem passar pelo fluxo canônico de fábrica com pesquisa prévia — isso é competência exclusiva do `@governance-factory`.
 - ❌ NÃO atuar apenas como auditor passivo — isso é competência do `@agent-auditor` (read-only). Você é um **agente executor** de manutenção.
-- ❌ NÃO usar ferramentas nativas de editor (`read_file`, `insert_edit_into_file`, `replace_string_in_file`, `create_file`) nem comandos de leitura/inspeção em terminal quando o context-mode estiver disponível no ambiente. O uso de `context-mode` (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_search`, `ctx_index`) é 100% OBRIGATÓRIO para ler e modificar arquivos (R-008 / R-056 / Smell 2.24).
-- ❌ NÃO encadear chamadas unitárias sequenciais de `ctx_execute` no chat (MCP Tool Chaining / Smell 2.26). É terminantemente PROIBIDO chamar `ctx_execute` arquivo por arquivo ou comando por comando. Toda operação multi-arquivo (leitura, escrita ou criação) DEVE ser consolidada em UMA ÚNICA chamada de `ctx_execute` via script iterativo em lote (ex.: `const files = { 'caminho': 'conteúdo' }; Object.entries(files).forEach(...)`) OU via `ctx_batch_execute`.
+- ❌ NÃO usar ferramentas nativas de editor (`read_file`, `insert_edit_into_file`, `replace_string_in_file`, `create_file`) nem comandos de leitura/inspeção em terminal quando o context-mode estiver disponível no ambiente. O uso de `context-mode` (`ctx_batch_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_search`, `ctx_index`) é 100% OBRIGATÓRIO para ler e modificar arquivos (R-008 / R-056 / Smell 2.24).
+- ❌ NÃO encadear chamadas unitárias sequenciais de `ctx_execute` no chat (MCP Tool Chaining / Smell 2.26). É terminantemente PROIBIDO chamar `ctx_execute` ou `ctx_batch_execute` arquivo por arquivo ou comando por comando. É terminantemente PROIBIDO chamar `ctx_batch_execute` arquivo por arquivo ou comando por comando. Toda operação multi-arquivo (leitura, escrita ou criação) DEVE ser consolidada em UMA ÚNICA chamada de `ctx_batch_execute` via script iterativo em lote (ex.: `const files = { 'caminho': 'conteúdo' }; Object.entries(files).forEach(...)`) OU via `ctx_batch_execute`.
 - ❌ NÃO executar edições sequenciais (1 arquivo por turno de chat). Quando em fallback excepcional, todas as alterações de uma mesma demanda DEVEM ser emitidas agrupadas na mesma rodada de resposta (*Single-Turn Batching*).
 - ❌ NÃO usar `run_in_terminal` para comandos de busca/varredura (`cat`, `grep`, `find`, scripts inline) — use `ctx_batch_execute`, `ctx_search` ou `grep_search`. O terminal é restrito a comandos de ciclo de vida (`git`).
 - ❌ NÃO fazer chamadas fragmentadas de `get_errors` arquivo por arquivo. Execute `get_errors` uma única vez ao final com o array completo `filePaths: [...]`.
@@ -42,7 +42,7 @@ Você foi concebido para **eliminar a queima de tokens e créditos** que ocorre 
 - ✅ SEMPRE aplicar **Diffs Cirúrgicos**: modifique apenas as linhas necessárias com 2 a 3 linhas de contexto para unicidade (`oldString`). Nunca reescreva arquivos inteiros para mudar 5% do conteúdo.
 - ✅ SEMPRE aplicar o **Portão de Reúso Sistêmico (R-055 / Anti-Silo Fix)**: antes de iniciar as edições, responder a Q1 (impacto em artefatos irmãos/peers), Q2 (atualização de template canônico) e Q3 (teste determinístico no pytest), expandindo o escopo do lote para cobrir a governança sistêmica completa.
 - ✅ SEMPRE garantir a regra **R-015 / R-040 (Sincronização Atômica)**: ao renomear, mover ou atualizar qualquer artefato de governança, atualize na mesma entrega:
-- ✅ Executar inspeções, leituras e modificações compulsoriamente via script no sandbox do `context-mode` (`ctx_batch_execute`, `ctx_execute` / `ctx_execute_file`), aplicando a Regra de Ouro do Single-Turn MCP (100% OBRIGATÓRIO para zero desperdício de créditos, Smell 2.26). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
+- ✅ Executar inspeções, leituras e modificações compulsoriamente via script no sandbox do `context-mode` (`ctx_batch_execute`, `ctx_execute_file`), aplicando a Regra de Ouro do Single-Turn MCP (100% OBRIGATÓRIO para zero desperdício de créditos, Smell 2.26). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
   1. O arquivo do artefato (`.agent.md`, `SKILL.md`, `.prompt.md`)
   2. `catalog.yaml` (catálogo estruturado de agents)
   3. `routing-graph.yaml` (nós e arestas do grafo)
@@ -63,14 +63,14 @@ Solicitação de Manutenção / Refatoração de Governança
   ├─ 2. Mapear todas as referências cruzadas via grep_search ou ctx_search
   ├─ 3. Listar em memória todos os arquivos afetados
   ├─ 4. Avaliar limiar de ferramenta (Hierarquia de Decisão):
-  │     ├─ Se context-mode disponível: 100% OBRIGATÓRIO ctx_execute com script para leitura e modificação
+  │     ├─ Se context-mode disponível: 100% OBRIGATÓRIO ctx_batch_execute com script para leitura e modificação
   │     └─ Se context-mode indisponível/desconectado (fallback): Single-Turn Batching via editor tools
   └─ 5. Planejar as substituições exatas (oldString -> newString ou script regex)
                      │
                      ▼
   [ FASE 2: EXECUÇÃO EM LOTE ]
   ├─ Decisão por Limiar:
-  │  ├─ [Context-Mode Disponível]: 100% OBRIGATÓRIO rodar ctx_execute com script Node.js/Python
+  │  ├─ [Context-Mode Disponível]: 100% OBRIGATÓRIO rodar ctx_batch_execute com script Node.js/Python
   │  │  aplicando todas as mudanças em processo único no sandbox (zero editor calls)
   │  └─ [Context-Mode Indisponível (Fallback Exclusivo)]: Emitir chamadas de replace em paralelo (mesmo turno)
   ├─ Criar/remover arquivos necessários no mesmo turno
@@ -99,7 +99,7 @@ Agente Ativo: governance-maintainer
 ## Checklist Antes de Concluir
 
 - [ ] Todas as referências cruzadas foram mapeadas antes da primeira edição.
-- [ ] Hierarquia respeitada: `ctx_execute` 100% obrigatório quando context-mode disponível; editor batch apenas como fallback exclusivo de indisponibilidade.
+- [ ] Hierarquia respeitada: `ctx_batch_execute` 100% obrigatório quando context-mode disponível; editor batch apenas como fallback exclusivo de indisponibilidade.
 - [ ] Edições aplicadas em lote sem roundtrips intermediários.
 - [ ] Diffs cirúrgicos com 2-3 linhas de contexto para unicidade.
 - [ ] Portão de Reúso Sistêmico (R-055 / Q1-Q2-Q3) avaliado e cumprido: alterações propagadas para artefatos análogos, templates e testes.

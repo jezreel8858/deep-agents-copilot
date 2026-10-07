@@ -51,7 +51,7 @@ tools: []
 2. **Implementar a funcionalidade primeiro (Implementation-First)**: construir com **standalone components**, `ChangeDetectionStrategy.OnPush`, `inject()` e Signals.
 3. Aplicar convenções do adapter do projeto (`.github/instructions/<projeto>-frontend.instructions.md` ou `frontend.instructions.md` genérico) para naming, SCSS e organização.
 4. Validar compilação limpa via `get_errors` no(s) arquivo(s) editado(s).
-5. **Test-Last com Verification Gate Obrigatório**: após a estabilização da lógica/componente, escrever os testes unitários/componentes necessários (ou delegar aos especialistas de teste `@angular-unit-test-writer` / `@angular-component-test-writer`), eliminando o atrito de runners prematuros e mocks efêmeros durante a fase de prototipagem/desenvolvimento. Tarefas puramente de UI/estilização (`@angular-ui-stylist`) são **isentas** de criação/execução de testes unitários.
+5. **Test-Last com Verification Gate Obrigatório**: após a estabilização da lógica/componente, escrever os testes unitários/componentes necessários (ou delegar aos especialistas de teste `@angular-test-engineer` / `@angular-test-engineer`), eliminando o atrito de runners prematuros e mocks efêmeros durante a fase de prototipagem/desenvolvimento. Tarefas puramente de UI/estilização (`@angular-developer`) são **isentas** de criação/execução de testes unitários.
 6. Rodar suíte local com flags silenciosas e filtro de ruído quando da validação final do módulo.
 7. **Navegabilidade (Definition of Done)**: se a feature introduziu nova(s) rota(s), localizar o(s) componente(s) de shell de navegação do projeto (menu lateral, sidenav, tab-bar, breadcrumb) e registrar a nova entrada de acesso — uma rota sem ponto de entrada de navegação correspondente é considerada **incompleta**, mesmo com testes verdes e build íntegro.
 
@@ -79,8 +79,8 @@ tools: []
 
 ## Estratégia de Testes Frontend: Test-Last com Verification Gate Obrigatório
 
-- **Desacoplamento de UI vs Lógica**: Tarefas e agentes de UI/estilização pura (`@angular-ui-stylist`) são **ISENTOS** de criar ou rodar testes unitários (validação é visual via Visual Feedback Loop / DOM inspection, design tokens e acessibilidade).
-- **Test-Last Pragmático**: Componentes e services são implementados e estabilizados primeiro (`Implementation-First`); testes unitários e de integração são criados ao final pelos especialistas de teste (`@angular-unit-test-writer`), evitando context thrashing e reescrita de testes contra DOM instável.
+- **Desacoplamento de UI vs Lógica**: Tarefas e agentes de UI/estilização pura (`@angular-developer`) são **ISENTOS** de criar ou rodar testes unitários (validação é visual via Visual Feedback Loop / DOM inspection, design tokens e acessibilidade).
+- **Test-Last Pragmático**: Componentes e services são implementados e estabilizados primeiro (`Implementation-First`); testes unitários e de integração são criados ao final pelos especialistas de teste (`@angular-test-engineer`), evitando context thrashing e reescrita de testes contra DOM instável.
 - **Verification Gate**: Nenhuma entrega é submetida a PR sem suíte de regressão verde no quality gate final.
 - Runner: o já configurado no projeto (`ng test`, Vitest nativo em Angular 20+, ou Jasmine/Karma legado) — consultar `test-implementation-angular-vitest`/`test-implementation-angular-jasmine`.
 - Cobertura mínima do trecho alterado, não da suíte inteira (diff coverage).

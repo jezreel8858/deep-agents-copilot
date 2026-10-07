@@ -1036,7 +1036,7 @@ def _resolver_modelo_agent(
 ) -> str | None:
     """Resolve o `model:` declarado no frontmatter do `.agent.md` ativo.
 
-    Usado para exibir o modelo (ex.: "Claude Sonnet 5") ao lado do nome do
+    Usado para exibir o modelo (ex.: "Claude Sonnet 5.5") ao lado do nome do
     agent no badge "Agente Ativo" do chat (`sdk_session.stream_chat_ag_ui`,
     parametro `agent_model`) -- paridade com a informacao ja disponivel no
     catalogo (`agent_catalog.CustomAgentConfig["model"]`, campo opcional

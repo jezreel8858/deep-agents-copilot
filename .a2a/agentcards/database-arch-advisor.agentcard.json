@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "database-arch-advisor",
+  "name": "Database Arch Advisor",
+  "version": "1.0.0",
+  "description": "Especialista analítico read-only unificado: diagnostica planos de execução (EXPLAIN PLAN, DBMS_XPLAN, SET EXPLAIN/sqexplain.out), identifica full table scans/sequential scans, projeta índices e hints/diretivas, e orienta modelagem relacional sem alterar código sem aprovação.",
+  "domain": "Análise de Planos de Execução (Explain Plan, DBMS_XPLAN, sqexplain.out), Otimização de Consultas, Índices e Design de Schema em Oracle e Informix",
+  "role": "advisor",
+  "capabilities": [
+    "tuning oracle",
+    "tuning informix",
+    "explain plan",
+    "dbms_xplan",
+    "sqexplain.out",
+    "set explain",
+    "cbo oracle",
+    "otimizar query oracle",
+    "otimizar query informix",
+    "indice oracle",
+    "indice informix",
+    "full table scan",
+    "sequential scan"
+  ],
+  "skills": [
+    "agent-contracts",
+    "handoff-governance"
+  ],
+  "tools": [
+    "file_search",
+    "grep_search",
+    "list_dir",
+    "ask_questions",
+    "run_subagent",
+    "context-mode/ctx_search",
+    "context-mode/ctx_batch_execute",
+    "context-mode/ctx_index"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only"
+    ],
+    "least_privilege_level": "strict",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Claude Sonnet 5.5",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/backend/database/database-catalog.yaml",
+    "priority": 10,
+    "estimated_time_minutes": 15
+  }
+}

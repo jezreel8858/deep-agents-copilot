@@ -4,33 +4,28 @@
   "id": "spring-reactive-arch-advisor",
   "name": "Spring Reactive Arch Advisor",
   "version": "1.0.0",
-  "description": "Especialista analítico read-only: adequação reativa, dimensionamento de Netty event-loops, análise de gargalos em pipelines Reactor e mitigação de blocking calls.",
-  "domain": "Arquitetura Reativa, Spring WebFlux, Project Reactor e Dimensionamento de Netty",
+  "description": "Read-only advisor para arquitetura reativa Spring WebFlux, Reactor (Mono/Flux), R2DBC e fluxos assíncronos não-bloqueantes.",
+  "domain": "Engenharia de Software / Governança Multi-Agente",
   "role": "advisor",
   "capabilities": [
-    "auditoria reativa",
-    "arquitetura webflux",
-    "reactor",
-    "event loop",
-    "netty",
-    "r2dbc",
-    "backpressure"
+    "arquitetura spring reactive",
+    "webflux blueprint",
+    "mono flux design",
+    "r2dbc architecture",
+    "backpressure strategy"
   ],
   "skills": [
     "agent-contracts",
     "handoff-governance"
   ],
   "tools": [
+    "read_file",
     "file_search",
     "grep_search",
     "list_dir",
     "ask_questions",
-    "run_subagent",
     "context-mode/ctx_search",
-    "context-mode/ctx_execute",
-    "context-mode/ctx_batch_execute",
-    "context-mode/ctx_execute_file",
-    "context-mode/ctx_index"
+    "context-mode/ctx_execute_file"
   ],
   "security_profile": {
     "tool_zones": [
@@ -40,7 +35,7 @@
     "data_sensitivity": "internal"
   },
   "model_preferences": {
-    "recommended_model": "Claude Sonnet 5",
+    "recommended_model": "Claude Sonnet 5.5",
     "cost_tier": "1x"
   },
   "input_contract": {

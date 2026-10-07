@@ -6,7 +6,7 @@ description: >-
   Architectural Decision Records (ADRs) e políticas corporativas do projeto,
   identificando violações, decisões obsoletas e ausência de ADR para mudanças
   estruturais relevantes. Estritamente read-only — nunca implementa código.
-model: "Claude Sonnet 5"
+model: "Claude Sonnet 5.5"
 tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index']
 source_docs:
   - .github/skills/documentation-writing-patterns/SKILL.md

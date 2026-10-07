@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "informix-database-specialist",
+  "name": "Informix Database Specialist",
+  "version": "1.0.0",
+  "description": "Especialista executor unificado para IBM Informix: constrói e aplica migrações Flyway versionadas, dbspaces, fragmentação por expressão, lock mode row, e desenvolve Stored Procedures, Funções, Triggers e rotinas SPL (DEFINE, FOREACH, RETURN WITH RESUME, ON EXCEPTION) sob R-046.",
+  "domain": "Migrações DDL Flyway, Dbspaces, Fragmentação e Programação Procedural SPL em IBM Informix",
+  "role": "specialist",
+  "capabilities": [
+    "migracao informix",
+    "ddl informix",
+    "flyway informix",
+    "dbspace informix",
+    "fragmentacao informix",
+    "spl informix",
+    "stored procedure informix",
+    "procedure informix",
+    "function informix",
+    "trigger informix",
+    "foreach informix",
+    "on exception informix"
+  ],
+  "skills": [
+    "agent-contracts",
+    "handoff-governance"
+  ],
+  "tools": [
+    "file_search",
+    "grep_search",
+    "list_dir",
+    "ask_questions",
+    "run_subagent",
+    "get_errors",
+    "run_in_terminal",
+    "context-mode/ctx_execute",
+    "context-mode/ctx_search",
+    "context-mode/ctx_batch_execute",
+    "context-mode/ctx_index",
+    "context-mode/ctx_execute_file"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only",
+      "execution"
+    ],
+    "least_privilege_level": "elevated",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Claude Sonnet 5.5",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/backend/database/database-catalog.yaml",
+    "priority": 10,
+    "estimated_time_minutes": 15
+  }
+}

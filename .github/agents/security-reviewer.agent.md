@@ -6,7 +6,7 @@ description: >-
   ASVS 5.0, CVE em dependências, secrets expostos). Nunca corrige, apenas
   analisa e reporta; complementa code-review (dimensão genérica) com
   profundidade de security specialist. Read-only.
-model: "Claude Sonnet 5"
+model: "Claude Sonnet 5.5"
 tools: ['list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'context-mode/ctx_batch_execute', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_index']
 source_docs:
   - .github/skills/security-review-patterns/SKILL.md

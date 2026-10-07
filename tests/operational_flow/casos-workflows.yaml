@@ -26,34 +26,34 @@ cenarios:
         output_esperado:
           - "Hipótese de Causa Raiz"
           - "Plano Mínimo de Correção"
-        proximos_permitidos: ["spring-boot-router", "spring-boot-unit-test-writer"]
+        proximos_permitidos: ["spring-boot-router", "spring-boot-test-engineer"]
       - etapa: 2
         nome_etapa: "Red Test (Falha Reproduzida)"
-        agente: "spring-boot-unit-test-writer"
+        agente: "spring-boot-test-engineer"
         invariantes:
           proibir_mutacao: false
-          exigir_banner: "Agente Ativo: spring-boot-unit-test-writer"
+          exigir_banner: "Agente Ativo: spring-boot-test-engineer"
         output_esperado:
           - "@Test"
           - "deve_falhar"
-        proximos_permitidos: ["spring-boot-bug-fixer"]
+        proximos_permitidos: ["spring-boot-developer"]
       - etapa: 3
         nome_etapa: "Fix Cirúrgico (≤ 20 linhas)"
-        agente: "spring-boot-bug-fixer"
+        agente: "spring-boot-developer"
         invariantes:
           proibir_mutacao: false
-          exigir_banner: "Agente Ativo: spring-boot-bug-fixer"
+          exigir_banner: "Agente Ativo: spring-boot-developer"
           diff_max_linhas: 20
         output_esperado:
           - "Correção Aplicada"
           - "Diff Cirúrgico"
-        proximos_permitidos: ["spring-boot-unit-test-writer"]
+        proximos_permitidos: ["spring-boot-test-engineer"]
       - etapa: 4
         nome_etapa: "Green Test (Regressão Validada)"
-        agente: "spring-boot-unit-test-writer"
+        agente: "spring-boot-test-engineer"
         invariantes:
           proibir_mutacao: false
-          exigir_banner: "Agente Ativo: spring-boot-unit-test-writer"
+          exigir_banner: "Agente Ativo: spring-boot-test-engineer"
         output_esperado:
           - "BUILD SUCCESS"
           - "Tests run: 1, Failures: 0"
@@ -106,13 +106,13 @@ cenarios:
         output_esperado:
           - "Árvore Mikado"
           - "Safety Net (Golden Master)"
-        proximos_permitidos: ["spring-boot-router", "spring-boot-feature-developer"]
+        proximos_permitidos: ["spring-boot-router", "spring-boot-developer"]
       - etapa: 4
         nome_etapa: "Execução em Lote (Single-Turn Batching R-046)"
-        agente: "spring-boot-feature-developer"
+        agente: "spring-boot-developer"
         invariantes:
           proibir_mutacao: false
-          exigir_banner: "Agente Ativo: spring-boot-feature-developer"
+          exigir_banner: "Agente Ativo: spring-boot-developer"
         output_esperado:
           - "Alterações em Lote Concluídas"
         proximos_permitidos: ["business-rules-extractor"]
@@ -213,13 +213,13 @@ cenarios:
           exigir_banner: "Agente Ativo: test-strategy"
         output_esperado:
           - "Matriz de Cobertura de Riscos"
-        proximos_permitidos: ["angular-router", "angular-feature-developer"]
+        proximos_permitidos: ["angular-router", "angular-developer"]
       - etapa: 4
         nome_etapa: "Implementação TDD (Red -> Green -> Refactor)"
-        agente: "angular-feature-developer"
+        agente: "angular-developer"
         invariantes:
           proibir_mutacao: false
-          exigir_banner: "Agente Ativo: angular-feature-developer"
+          exigir_banner: "Agente Ativo: angular-developer"
         output_esperado:
           - "Código da Feature e Testes Passando"
         proximos_permitidos: ["security-reviewer", "code-review"]
@@ -301,23 +301,23 @@ cenarios:
           exigir_banner: "Agente Ativo: codegraph-engine"
         output_esperado:
           - "Mapeamento de Importações e Callers"
-        proximos_permitidos: ["angular-feature-developer", "spring-boot-feature-developer"]
+        proximos_permitidos: ["angular-developer", "spring-boot-developer"]
       - etapa: 3
         nome_etapa: "Bump de Manifesto & Sincronização de Lockfile"
-        agente: "angular-feature-developer"
+        agente: "angular-developer"
         invariantes:
           proibir_mutacao: false
-          exigir_banner: "Agente Ativo: angular-feature-developer"
+          exigir_banner: "Agente Ativo: angular-developer"
         output_esperado:
           - "package.json atualizado"
           - "Lockfile sincronizado"
-        proximos_permitidos: ["angular-bug-fixer"]
+        proximos_permitidos: ["angular-developer"]
       - etapa: 4
         nome_etapa: "Adaptação de Breaking Changes"
-        agente: "angular-bug-fixer"
+        agente: "angular-developer"
         invariantes:
           proibir_mutacao: false
-          exigir_banner: "Agente Ativo: angular-bug-fixer"
+          exigir_banner: "Agente Ativo: angular-developer"
         output_esperado:
           - "Assinatura de Método Atualizada"
           - "Compilação Limpa"
@@ -360,22 +360,22 @@ cenarios:
           exigir_banner: "Agente Ativo: tech-solution-architect"
         output_esperado:
           - "Plano de Migração em Fases Entregáveis"
-        proximos_permitidos: ["angular-feature-developer", "spring-boot-feature-developer"]
+        proximos_permitidos: ["angular-developer", "spring-boot-developer"]
       - etapa: 3
         nome_etapa: "Codemod & Transformação em Lote"
-        agente: "angular-feature-developer"
+        agente: "angular-developer"
         invariantes:
           proibir_mutacao: false
-          exigir_banner: "Agente Ativo: angular-feature-developer"
+          exigir_banner: "Agente Ativo: angular-developer"
         output_esperado:
           - "Transformação de Sintaxe Aplicada no Sandbox"
-        proximos_permitidos: ["angular-unit-test-writer"]
+        proximos_permitidos: ["angular-test-engineer"]
       - etapa: 4
         nome_etapa: "Refinamento & Paridade Funcional"
-        agente: "angular-unit-test-writer"
+        agente: "angular-test-engineer"
         invariantes:
           proibir_mutacao: false
-          exigir_banner: "Agente Ativo: angular-unit-test-writer"
+          exigir_banner: "Agente Ativo: angular-test-engineer"
         output_esperado:
           - "Testes de Paridade Verdes"
         proximos_permitidos: ["runtime-verifier"]
@@ -467,14 +467,14 @@ cenarios:
     cenario:
       turno_1:
         solicitacao: "Implementar endpoint REST para salvar escalas em Spring Boot"
-        agente_ativo: "spring-boot-feature-developer"
+        agente_ativo: "spring-boot-developer"
       turno_2:
         solicitacao: "Agora crie a tela de login com formulário reativo em Angular"
         comportamento_esperado:
           deriva_detectada: true
           motivo: "deriva_de_intencao"
           agente_destino: "agent-router"
-          banner_handoff: "Handoff: spring-boot-feature-developer → agent-router (motivo: deriva_de_intencao)"
+          banner_handoff: "Handoff: spring-boot-developer → agent-router (motivo: deriva_de_intencao)"
           novo_agente_delegado: "angular-router"
 
   - id: "WF-EDGE-CIRCUIT-BREAKER"

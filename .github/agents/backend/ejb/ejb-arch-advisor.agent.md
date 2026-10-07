@@ -1,11 +1,11 @@
 ---
 name: ejb-arch-advisor
-version: "1.0.0"
+version: "2.0.0"
 description: >-
   Especialista em arquitetura Java Legado EJB / Jakarta EE corporativa (EJB 2.x/3.x, SLSB, SFSB, MDB) —
   governança transacional JTA/CMT, topologias EAR/WAR/JAR, design de interfaces Remote/Local,
   modernização e estratégias seguras de migração/desacoplamento (Read-Only).
-model: "Claude Sonnet 5"
+model: "Claude Sonnet 5.5"
 tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index']
 source_docs:
   - .github/skills/context-mode/SKILL.md
@@ -73,8 +73,8 @@ progress: 0
 Progresso: 0/N tarefas concluídas
 
 ### Checklist de Execução Técnica (GFM Unificado)
-- [ ] <descrição atômica da tarefa técnica> `{paralelizavel: bool, responsavel: "@ejb-specialist"}`
-- [ ] <próxima tarefa técnica> `{paralelizavel: bool, responsavel: "@ejb-specialist"}`
+- [ ] <descrição atômica da tarefa técnica> `{paralelizavel: bool, responsavel: "@ejb-developer"}`
+- [ ] <próxima tarefa técnica> `{paralelizavel: bool, responsavel: "@ejb-developer"}`
 
 ### 🔒 Checklist Defensivo Pré-Code-Review
 - [ ] Sanitização e validação de inputs em todas as bordas expostas

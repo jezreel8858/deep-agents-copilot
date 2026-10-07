@@ -680,21 +680,13 @@ def test_smell_2_21_visual_blindness_and_ui_contracts_documented():
         fix_hint="Inclua o termo 'Cegueira Visual' na descrição do Smell 2.21 em governance-audit-patterns/SKILL.md.",
     )
 
-    # Valida presença do protocolo Canonical Sibling First no angular-feature-developer e angular-ui-stylist
-    afd_file = AGENTS_DIR / "frontend" / "angular" / "angular-feature-developer.agent.md"
-    assert afd_file.exists()
-    afd_content = afd_file.read_text(encoding="utf-8")
-    assert "Canonical Sibling" in afd_content, remediation(
-        "angular-feature-developer deve adotar Canonical Sibling First",
-        fix_hint="Adicione a menção ao protocolo 'Canonical Sibling First' em angular-feature-developer.agent.md.",
-    )
-
-    aus_file = AGENTS_DIR / "frontend" / "angular" / "angular-ui-stylist.agent.md"
-    assert aus_file.exists()
-    aus_content = aus_file.read_text(encoding="utf-8")
-    assert "Canonical Sibling" in aus_content, remediation(
-        "angular-ui-stylist deve adotar Canonical Sibling First",
-        fix_hint="Adicione a menção ao protocolo 'Canonical Sibling First' em angular-ui-stylist.agent.md.",
+    # Valida presença do protocolo Canonical Sibling First no angular-developer consolidado (Fase 2)
+    dev_file = AGENTS_DIR / "frontend" / "angular" / "angular-developer.agent.md"
+    assert dev_file.exists()
+    dev_content = dev_file.read_text(encoding="utf-8")
+    assert "Canonical Sibling" in dev_content, remediation(
+        "angular-developer deve adotar Canonical Sibling First",
+        fix_hint="Adicione a menção ao protocolo 'Canonical Sibling First' em angular-developer.agent.md.",
     )
 
 # ─────────────────────────────────────────────────────────────

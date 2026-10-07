@@ -393,7 +393,7 @@ canonicos:
       score_minimo: 0.85
       output_contains:
         - "Agente Ativo: angular-router"
-        - "angular-component-test-writer"
+        - "angular-test-engineer"
     critico: true
     threshold: 0.90
 
@@ -423,7 +423,7 @@ canonicos:
       score_minimo: 0.85
       output_contains:
         - "Agente Ativo: angular-router"
-        - "angular-ui-stylist"
+        - "angular-developer"
     critico: true
     threshold: 0.90
 
@@ -438,7 +438,7 @@ canonicos:
       score_minimo: 0.85
       output_contains:
         - "Agente Ativo: angular-router"
-        - "angular-feature-developer"
+        - "angular-developer"
     critico: true
     threshold: 0.90
 
@@ -453,7 +453,7 @@ canonicos:
       score_minimo: 0.85
       output_contains:
         - "Agente Ativo: angular-router"
-        - "angular-bug-fixer"
+        - "angular-developer"
     critico: true
     threshold: 0.90
 

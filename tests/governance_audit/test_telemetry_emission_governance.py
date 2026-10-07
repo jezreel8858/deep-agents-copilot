@@ -79,7 +79,7 @@ def test_agents_with_run_subagent_reference_handoff_governance():
         + "\nRemediação determinística: execute 'python tools/agent_source_docs_sync/sync_required_source_docs.py --apply'."
     )
 
-    assert report.total_scanned == 95, (
+    assert report.total_scanned == 62, (
         f"Esperado 95 agentes auditados no catálogo, obtido {report.total_scanned}."
     )
 

@@ -7,7 +7,7 @@ description: >-
   faltam em `.codegraphrc.json` até fechar todo gap identificado. Requer projetos já
   registrados via `/add-project-context`; nunca escreve em `catalog.yaml` (compartilhado).
 agent: 'agent'
-model: "Claude Sonnet 5"
+model: "Claude Sonnet 5.5"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'ask_questions', 'context-mode/ctx_search', 'context-mode/ctx_execute', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index']
 argument-hint: '[repositório-alvo]'
 source_docs:
@@ -207,7 +207,7 @@ Resultado final: <N> gaps fechados / <N> gaps remanescentes (com próximo passo 
 > acessível no momento da execução são reportados como gap remanescente, nunca ignorados
 > silenciosamente.
 >
-> **Escalonamento de modelo (R-021.1)**: este prompt é fixado em `Claude Sonnet 5` devido ao
+> **Escalonamento de modelo (R-021.1)**: este prompt é fixado em `Claude Sonnet 5.5` devido ao
 > fan-out não limitado a priori sobre todos os projetos registrados no ecossistema e à
 > necessidade de reconciliação analítica estrita entre duas fontes de evidência independentes
 > (contratos/código via FASE 1 e arestas reais do grafo via FASE 2) antes de declarar qualquer

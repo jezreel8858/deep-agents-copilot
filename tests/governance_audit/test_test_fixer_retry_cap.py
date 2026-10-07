@@ -25,9 +25,10 @@ ALL_TEST_FIXER_STACKS = ["ejb", "spring-boot", "spring-reactive", "python", "str
 
 
 def resolve_test_fixer_file(stack: str) -> Path:
-    """Resolve o arquivo test-fixer da stack (backend ou frontend)."""
     if stack == "angular":
-        return AGENTS_FRONTEND_DIR / "angular" / "angular-test-fixer.agent.md"
+        return AGENTS_FRONTEND_DIR / "angular" / "angular-test-engineer.agent.md"
+    if stack in ("spring-boot", "spring-reactive", "ejb", "struts", "python"):
+        return AGENTS_BACKEND_DIR / stack / f"{stack}-test-engineer.agent.md"
     return AGENTS_BACKEND_DIR / stack / f"{stack}-test-fixer.agent.md"
 
 
@@ -62,7 +63,7 @@ def test_test_fixer_classification_heuristic_and_bug_fixer_handoff(stack: str):
     )
 
     # Handoff formal para o bug-fixer da respectiva stack
-    expected_bug_fixer = f"{stack}-bug-fixer"
+    expected_bug_fixer = f"{stack}-developer" if stack in ("spring-boot", "spring-reactive", "angular", "ejb", "struts", "python") else f"{stack}-bug-fixer"
     has_handoff = bool(
         re.search(
             rf"handoff\s+para\s+[`@]*{re.escape(expected_bug_fixer)}",

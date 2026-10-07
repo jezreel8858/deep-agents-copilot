@@ -13,8 +13,8 @@ triggers:
   - "teste componente react"
 source_docs:
   - .github/skills/test-implementation-frontend/SKILL.md
-  - .github/agents/frontend/react/react-unit-test-writer.agent.md
-  - .github/agents/frontend/react/react-component-test-writer.agent.md
+  - .github/agents/frontend/react/react-test-engineer.agent.md
+  - .github/agents/frontend/react/react-test-engineer.agent.md
 source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md

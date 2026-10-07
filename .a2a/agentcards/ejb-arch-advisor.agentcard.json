@@ -12,10 +12,12 @@
     "auditoria ejb",
     "ejb 2.x",
     "ejb 3.x",
-    "migracao ejb",
+    "jta",
+    "cmt",
+    "bmt",
     "ear war jar",
-    "cmt bmt",
-    "transacao jta"
+    "modernizacao ejb",
+    "migracao ejb"
   ],
   "skills": [
     "agent-contracts",
@@ -28,9 +30,7 @@
     "ask_questions",
     "run_subagent",
     "context-mode/ctx_search",
-    "context-mode/ctx_execute",
     "context-mode/ctx_batch_execute",
-    "context-mode/ctx_execute_file",
     "context-mode/ctx_index"
   ],
   "security_profile": {
@@ -41,7 +41,7 @@
     "data_sensitivity": "internal"
   },
   "model_preferences": {
-    "recommended_model": "Claude Sonnet 5",
+    "recommended_model": "Claude Sonnet 5.5",
     "cost_tier": "1x"
   },
   "input_contract": {

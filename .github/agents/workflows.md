@@ -21,20 +21,20 @@ Conforme documentado no framework *Building Effective Agents* (Anthropic) e nas 
 
 Para permanecer agnóstico de stack (R-038), este documento referencia os executores táticos através de **papéis genéricos** (`specialist-bug-fixer`, `specialist-ui-stylist`, `specialist-unit-test-writer`, `specialist-component-test-writer`, `specialist-integration-test-writer`, `specialist-test-fixer`, `specialist-feature-developer`, `specialist-arch-advisor`). **Nenhum desses nomes existe literalmente no catálogo** — são aliases resolvidos em tempo de roteamento pelo *domain router* ativo (`@angular-router`, `@react-router`, `@spring-boot-router`, `@spring-reactive-router`, `@ejb-router`, `@struts-router`, `@database-router`, `@python-router`) para o agente concreto do seu sub-catálogo (`*-catalog.yaml`) que declara a tag `role:` correspondente.
 
-| Papel Genérico | Tag `role:` | Angular | Spring Boot | Spring Reactive | EJB |
-|---|---|---|---|---|---|
-| `specialist-bug-fixer` | `fixer` | `angular-bug-fixer` | `spring-boot-bug-fixer` | `spring-reactive-bug-fixer` | `ejb-bug-fixer` |
-| `specialist-ui-stylist` | `stylist` | `angular-ui-stylist` | _N/A (sem UI)_ | _N/A (sem UI)_ | _N/A (sem UI)_ |
-| `specialist-unit-test-writer` | `tester` (sem DOM/contexto de framework) | `angular-unit-test-writer` | `spring-boot-unit-test-writer` | `spring-reactive-unit-test-writer` | `ejb-unit-test-writer` |
-| `specialist-component-test-writer` | `tester` (com DOM/TestBed) | `angular-component-test-writer` | _N/A → usar `integration-test-writer`_ | _N/A → usar `integration-test-writer`_ | _N/A → usar `integration-test-writer`_ |
-| `specialist-integration-test-writer` | `tester` (com contexto de framework: Spring context/R2DBC/Testcontainers) | _N/A → usar `component-test-writer`_ | `spring-boot-integration-test-writer` | `spring-reactive-integration-test-writer` | `ejb-integration-test-writer` |
-| `specialist-test-fixer` | `fixer` (escopo teste) | `angular-test-fixer` | `spring-boot-test-fixer` | `spring-reactive-test-fixer` | `ejb-test-fixer` |
-| `specialist-feature-developer` | `implementer` | `angular-feature-developer` | `spring-boot-feature-developer` | `spring-reactive-feature-developer` | `ejb-feature-developer` |
-| `specialist-arch-advisor` | `advisory` | `angular-arch-advisor` | `spring-boot-arch-advisor` | `spring-reactive-arch-advisor` | `ejb-arch-advisor` |
+| Papel Genérico | Tag `role:` | Angular | Spring Boot | Spring Reactive | EJB | Struts |
+|---|---|---|---|---|---|---|
+| `specialist-bug-fixer` | `fixer` | `angular-developer` | `spring-boot-developer` | `spring-reactive-developer` | `ejb-developer` | `struts-developer` |
+| `specialist-ui-stylist` | `stylist` | `angular-developer` | _N/A (sem UI)_ | _N/A (sem UI)_ | _N/A (sem UI)_ | _N/A (sem UI)_ |
+| `specialist-unit-test-writer` | `tester` (sem DOM/contexto de framework) | `angular-test-engineer` | `spring-boot-test-engineer` | `spring-reactive-test-engineer` | `ejb-test-engineer` | `struts-test-engineer` |
+| `specialist-component-test-writer` | `tester` (com DOM/TestBed) | `angular-test-engineer` | _N/A → usar `test-engineer`_ | _N/A → usar `test-engineer`_ | _N/A → usar `test-engineer`_ | _N/A → usar `test-engineer`_ |
+| `specialist-integration-test-writer` | `tester` (com contexto de framework) | _N/A → usar `test-engineer`_ | `spring-boot-test-engineer` | `spring-reactive-test-engineer` | `ejb-test-engineer` | `struts-test-engineer` |
+| `specialist-test-fixer` | `fixer` (escopo teste) | `angular-test-engineer` | `spring-boot-test-engineer` | `spring-reactive-test-engineer` | `ejb-test-engineer` | `struts-test-engineer` |
+| `specialist-feature-developer` | `implementer` | `angular-developer` | `spring-boot-developer` | `spring-reactive-developer` | `ejb-developer` | `struts-developer` |
+| `specialist-arch-advisor` | `advisory` | `angular-arch-advisor` | `spring-boot-arch-advisor` | `spring-reactive-arch-advisor` | `ejb-arch-advisor` | `struts-arch-advisor` |
 
 **Regras de Resolução (obrigatórias):**
 1. **Proibido invocar `run_subagent` com o nome genérico literal** — `specialist-bug-fixer` NÃO é um `agentName` válido; o domain router SEMPRE resolve para o `id` concreto do seu sub-catálogo antes de despachar.
-2. **Match de `proximos_agentes_permitidos` em `politica_desvio: "strict"`**: quando a lista declarar um papel genérico, a validação de conformidade ocorre pela tag `role:` do agente concreto delegado (não pela string literal) — ex.: `angular-bug-fixer` satisfaz `specialist-bug-fixer` porque ambos compartilham `role: "fixer"` no domínio Angular ativo.
+2. **Match de `proximos_agentes_permitidos` em `politica_desvio: "strict"`**: quando a lista declarar um papel genérico, a validação de conformidade ocorre pela tag `role:` do agente concreto delegado (não pela string literal) — ex.: `angular-developer` satisfaz `specialist-bug-fixer` porque ambos compartilham `role: "fixer"` no domínio Angular ativo.
 3. **Banco de dados é exceção nomeada**: sub-rotinas de schema/DDL nunca usam papel genérico — referenciam sempre `@database-specialist` (agente único, cross-stack) por nome literal.
 4. **Stack não identificada**: se o `@bug-triage`/`@refactor-planner` não conseguir inferir a stack (nenhum domain router aplicável), o estado correspondente aciona `ask_questions` para confirmar a stack antes de resolver o papel genérico — nunca infere silenciosamente.
 
@@ -45,7 +45,7 @@ Para permanecer agnóstico de stack (R-038), este documento referencia os execut
 **Aplicação nos Workflows Canônicos**: Este padrão já está estruturalmente presente em `WORKFLOW-BUG-FIX` (Estado 2 = Gerador do Red Test; Estado 5 = Avaliador Cético via Quality Gate) e `WORKFLOW-FEATURE-DEVELOPMENT` (Estado 2 = negociação do contrato de aceitação; Estado 5 = Gerador da implementação; Estado 6 = Avaliador Cético via Gates de Segurança/UI/Code Review). Para tornar essa separação explícita e auditável:
 
 1. **Mini-Contrato de Aceitação Pré-Negociado (Sprint Contract)**: Antes de o Gerador produzir o artefato final, ele propõe por escrito os critérios objetivos de "concluído" (comportamento esperado, casos de borda cobertos, forma de verificação). O Avaliador revisa e aprova esse contrato **antes** da implementação — evitando que a definição de sucesso seja inventada retroativamente pelo próprio Gerador.
-2. **Rubrica de Corte Objetiva do Avaliador**: O Avaliador Cético (`runtime-verifier`, `code-review`, `security-reviewer`, `angular-ui-stylist` conforme o gate) julga contra critérios explícitos com limiar de corte (`threshold`), não contra impressão subjetiva. Qualquer critério abaixo do limiar reprova o artefato inteiro, mesmo que os demais critérios estejam excelentes (nenhuma média compensatória).
+2. **Rubrica de Corte Objetiva do Avaliador**: O Avaliador Cético (`runtime-verifier`, `code-review`, `security-reviewer`, `angular-developer` conforme o gate) julga contra critérios explícitos com limiar de corte (`threshold`), não contra impressão subjetiva. Qualquer critério abaixo do limiar reprova o artefato inteiro, mesmo que os demais critérios estejam excelentes (nenhuma média compensatória).
 3. **Independência de Avaliação**: O Avaliador nunca é a mesma invocação/contexto que gerou o artefato — mesmo quando o mesmo agent desempenha os dois papéis em momentos distintos do workflow (ex.: `specialist-feature-developer` gera; `@code-review` avalia), a avaliação ocorre em uma etapa e contexto discretos, com acesso às evidências de execução real (testes rodados, logs, diffs) e não apenas ao código-fonte estático.
 4. **Registro no `workflow_state`**: Todo workflow que aplica este padrão declara os campos `sprint_contract` (critérios negociados) e `avaliacao_cetica` (rubrica aplicada, nota por critério, veredito) — ver Typed State Bags de `WORKFLOW-BUG-FIX` § 3.1 e `WORKFLOW-FEATURE-DEVELOPMENT` § 3.4.
 

@@ -37,6 +37,7 @@ GATHER_ONLY_AGENTS = [
     "security-reviewer",
     "tech-solution-architect",
     "test-strategy",
+    "database-arch-advisor",
     "ejb-arch-advisor",
     "python-arch-advisor",
     "spring-boot-arch-advisor",

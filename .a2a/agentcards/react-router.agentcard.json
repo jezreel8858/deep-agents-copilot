@@ -4,7 +4,7 @@
   "id": "react-router",
   "name": "React Router",
   "version": "1.0.0",
-  "description": "Roteador de domínio React e supervisor hierárquico — recebe solicitações de frontend React do agent-router central e despacha para os 8 especialistas do catálogo React (arch-advisor, feature-developer, bug-fixer, ui-stylist, unit-test, component-test, test-fixer e e2e-writer).",
+  "description": "Roteador de domínio React e supervisor hierárquico — recebe solicitações de frontend React do agent-router central e despacha para os 3 especialistas do catálogo React (arch-advisor, developer e test-engineer).",
   "domain": "Supervisor hierarquico e roteador do dominio React",
   "role": "router",
   "capabilities": [
@@ -39,7 +39,7 @@
     "data_sensitivity": "internal"
   },
   "model_preferences": {
-    "recommended_model": "Claude Sonnet 5",
+    "recommended_model": "Claude Sonnet 5.5",
     "cost_tier": "1x"
   },
   "input_contract": {

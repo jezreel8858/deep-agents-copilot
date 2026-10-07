@@ -25,7 +25,8 @@ AGENTS_DIR = REPO_ROOT / ".github" / "agents"
 
 def find_e2e_writer_agents() -> list[str]:
     """
-    Descobre dinamicamente todos os agents cujo nome termine em '-e2e-writer'
+    Descobre dinamicamente todos os agents responsáveis por testes E2E
+    (agentes dedicados -e2e-writer ou test-engineers consolidados com escopo E2E)
     pesquisando no catalog.yaml, sub-catálogos locais (*-catalog.yaml) e arquivos .agent.md.
     """
     e2e_agents: set[str] = set()
@@ -57,6 +58,14 @@ def find_e2e_writer_agents() -> list[str]:
         agent_id = agent_file.name.replace(".agent.md", "")
         e2e_agents.add(agent_id)
 
+    # 4. Agentes frontend consolidados com capacidade E2E (Fase 1 e Fase 2)
+    for candidate in ["angular-test-engineer", "react-test-engineer"]:
+        cand_files = list(AGENTS_DIR.glob(f"**/{candidate}.agent.md"))
+        if cand_files:
+            text = cand_files[0].read_text(encoding="utf-8").lower()
+            if "e2e" in text or "playwright" in text:
+                e2e_agents.add(candidate)
+
     return sorted(list(e2e_agents))
 
 
@@ -72,9 +81,11 @@ def routing_graph_data() -> dict:
 
 
 def test_at_least_one_e2e_writer_discovered():
-    """Garante que pelo menos o angular-e2e-writer foi descoberto no ecossistema."""
-    assert len(E2E_AGENTS) > 0, "Nenhum agent terminando em '-e2e-writer' foi descoberto no catálogo"
-    assert "angular-e2e-writer" in E2E_AGENTS, "angular-e2e-writer DEVE estar presente no catálogo de agentes"
+    """Garante que pelo menos o angular-test-engineer (ou angular-e2e-writer) foi descoberto no ecossistema."""
+    assert len(E2E_AGENTS) > 0, "Nenhum agent com capacidade E2E foi descoberto no catálogo"
+    assert "angular-test-engineer" in E2E_AGENTS or "angular-e2e-writer" in E2E_AGENTS, (
+        "angular-test-engineer ou angular-e2e-writer DEVE estar presente no catálogo de agentes com capacidade E2E"
+    )
 
 
 @pytest.mark.parametrize("e2e_agent", E2E_AGENTS)
@@ -84,7 +95,7 @@ def test_e2e_writer_is_wired_in_routing_graph_workflows(routing_graph_data: dict
     cujo agent resolva para 'specialist-e2e-writer' (ou nome do agente) condicionada ao seu domain-router.
     """
     # Ex: 'angular-e2e-writer' -> domain_router: 'angular-router'
-    stack_prefix = e2e_agent.replace("-e2e-writer", "")
+    stack_prefix = e2e_agent.replace("-e2e-writer", "").replace("-test-engineer", "")
     domain_router = f"{stack_prefix}-router"
 
     workflows = routing_graph_data.get("workflows", [])

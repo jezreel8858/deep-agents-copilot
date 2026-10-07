@@ -5,7 +5,7 @@ description: >-
   Revisa código por performance especializada — Core Web Vitals (frontend),
   N+1 queries e profiling de latência (backend), otimização de query (banco).
   Nunca corrige, apenas analisa e reporta com evidência mensurável. Read-only.
-model: "Claude Sonnet 5"
+model: "Claude Sonnet 5.5"
 tools: ['list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_execute_file', 'context-mode/ctx_index']
 source_docs:
   - .github/skills/performance-engineering-patterns/SKILL.md

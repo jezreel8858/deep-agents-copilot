@@ -57,8 +57,8 @@ READONLY_ADVISORY_AGENTS = {
     "spring-boot-arch-advisor",
     "spring-reactive-arch-advisor",
     "ejb-arch-advisor",
-    "oracle-query-tuner",
-    "informix-query-tuner",
+    "database-arch-advisor",
+    "struts-arch-advisor",
 }
 
 
@@ -422,7 +422,7 @@ def test_workflow_technical_analysis_edge_scenarios_and_proposals(routing_graph)
     permitidos = etapa1.get("agents_permitidos", [])
     assert "angular-arch-advisor" in permitidos, "Workflow 3 deve permitir angular-arch-advisor"
     assert "spring-boot-arch-advisor" in permitidos, "Workflow 3 deve permitir spring-boot-arch-advisor"
-    assert "oracle-query-tuner" in permitidos, "Workflow 3 deve permitir query tuners"
+    assert "database-arch-advisor" in permitidos, "Workflow 3 deve permitir query tuners"
 
 def test_workflow_feature_development_edge_scenarios_and_state_bag(routing_graph):
     """Valida que WORKFLOW-FEATURE-DEVELOPMENT cobre particionamento de escopo (Fullstack/Back/Front),

@@ -6,7 +6,7 @@ description: >-
   referencial — Flyway/Liquibase/Alembic, planos de execução (EXPLAIN ANALYZE),
   idempotência de DDL e scripts de rollback. Perfil híbrido: analisa e implementa
   migrações/queries seguindo database.instructions.md e o adapter do projeto.
-model: "Claude Sonnet 5"
+model: "Claude Sonnet 5.5"
 tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index']
 source_docs:
   - .github/skills/efficient-batch-code-modification/SKILL.md

@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "spring-boot-test-engineer",
+  "name": "Spring Boot Test Engineer",
+  "version": "1.0.0",
+  "description": "Especialista mutativo de testes: implementa testes unitários isolados, testes de integração reais (@DataJpaTest, MockMvc, Testcontainers) e realiza diagnóstico e correção de suítes quebradas sob CAP RÍGIDO (R-053).",
+  "domain": "Garantia de Qualidade, Testes Unitários JUnit 5/Mockito, Testes de Integração Testcontainers e Autocorreção",
+  "role": "tester",
+  "capabilities": [
+    "testes spring boot",
+    "teste unitario spring",
+    "junit 5",
+    "mockito",
+    "teste integracao spring",
+    "testcontainers",
+    "datajpatest",
+    "mockmvc",
+    "corrigir teste spring",
+    "test fixer spring"
+  ],
+  "skills": [
+    "agent-contracts",
+    "handoff-governance"
+  ],
+  "tools": [
+    "file_search",
+    "grep_search",
+    "list_dir",
+    "ask_questions",
+    "run_subagent",
+    "get_errors",
+    "run_in_terminal",
+    "context-mode/ctx_execute",
+    "context-mode/ctx_search",
+    "context-mode/ctx_batch_execute",
+    "context-mode/ctx_index",
+    "context-mode/ctx_execute_file"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only",
+      "execution"
+    ],
+    "least_privilege_level": "elevated",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Claude Sonnet 5.5",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/backend/spring-boot/spring-boot-catalog.yaml",
+    "priority": 10,
+    "estimated_time_minutes": 15
+  }
+}

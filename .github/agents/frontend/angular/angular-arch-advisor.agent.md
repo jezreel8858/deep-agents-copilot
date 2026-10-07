@@ -5,7 +5,7 @@ description: >-
   Especialista em arquitetura Angular corporativa (v17+ e legadas) — standalone, signals,
   Module Federation/Microfrontends, SSR/hydration, governança de estado (NgRx/Signals),
   Clean Frontend Architecture e migrações estruturais de versão (Read-Only).
-model: "Claude Sonnet 5"
+model: "Claude Sonnet 5.5"
 tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index']
 source_docs:
   - .github/skills/context-mode/SKILL.md
@@ -71,8 +71,8 @@ progress: 0
 Progresso: 0/N tarefas concluídas
 
 ### Checklist de Execução Técnica (GFM Unificado)
-- [ ] <descrição atômica da tarefa técnica> `{paralelizavel: bool, responsavel: "@angular-feature-developer"}`
-- [ ] <próxima tarefa técnica> `{paralelizavel: bool, responsavel: "@angular-feature-developer"}`
+- [ ] <descrição atômica da tarefa técnica> `{paralelizavel: bool, responsavel: "@angular-developer"}`
+- [ ] <próxima tarefa técnica> `{paralelizavel: bool, responsavel: "@angular-developer"}`
 
 ### 🔒 Checklist Defensivo Pré-Code-Review
 - [ ] Sanitização e validação de inputs em todas as bordas expostas

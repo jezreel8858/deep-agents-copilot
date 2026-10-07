@@ -2000,7 +2000,7 @@ class TestStreamChatAgUiCreditsBadge:
                 permission_handler=lambda *_: True,
                 thread_id="thread-1",
                 run_id="run-1",
-                agent_model="Claude Sonnet 5",
+                agent_model="Claude Sonnet 5.5",
             )
         ]
 
@@ -2011,7 +2011,7 @@ class TestStreamChatAgUiCreditsBadge:
         )
         # agent_model (nome amigavel) tem precedencia sobre usage_model (id
         # tecnico da API) na exibicao -- mesma convencao do badge "Agente Ativo".
-        assert "Claude Sonnet 5 · 1.9 Credits" in texto_completo
+        assert "Claude Sonnet 5.5 · 1.9 Credits" in texto_completo
 
     async def test_nao_deve_exibir_badge_quando_sdk_nao_reporta_nenhum_uso(
         self, monkeypatch: pytest.MonkeyPatch
@@ -2038,7 +2038,7 @@ class TestStreamChatAgUiCreditsBadge:
                 permission_handler=lambda *_: True,
                 thread_id="thread-1",
                 run_id="run-1",
-                agent_model="Claude Sonnet 5",
+                agent_model="Claude Sonnet 5.5",
             )
         ]
 
@@ -2153,7 +2153,7 @@ class TestStreamChatAgUiContextWindowBadge:
                 permission_handler=lambda *_: True,
                 thread_id="thread-1",
                 run_id="run-1",
-                agent_model="Claude Sonnet 5",
+                agent_model="Claude Sonnet 5.5",
             )
         ]
 
@@ -2163,7 +2163,7 @@ class TestStreamChatAgUiContextWindowBadge:
             if isinstance(e, TextMessageContentEvent) and e.subagent_run_id is None
         )
         assert (
-            "*🧮 Claude Sonnet 5 · 1.9 Credits · 25% contexto (50.0k/200.0k tokens)*"
+            "*🧮 Claude Sonnet 5.5 · 1.9 Credits · 25% contexto (50.0k/200.0k tokens)*"
             in texto_completo
         )
 

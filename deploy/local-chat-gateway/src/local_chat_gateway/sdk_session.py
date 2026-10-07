@@ -1263,11 +1263,11 @@ async def stream_chat_ag_ui(
 
     Args:
         agent_model: Valor de `model:` do frontmatter do `.agent.md` ativo
-            (ex.: "Claude Sonnet 5"), resolvido pelo chamador via
+            (ex.: "Claude Sonnet 5.5"), resolvido pelo chamador via
             `routes._resolver_modelo_agent` a partir do catalogo
             (`agent_catalog.CustomAgentConfig["model"]`, campo opcional).
             Quando fornecido, e exibido ao lado do nome no badge "Agente
-            Ativo" (ex.: "Agente Ativo: agent-router · Claude Sonnet 5"),
+            Ativo" (ex.: "Agente Ativo: agent-router · Claude Sonnet 5.5"),
             paridade com a informacao ja declarada no `.md` para o usuario
             saber qual modelo esta atendendo o turno sem abrir o catalogo.
             Se `None` (agent sem `model:` no frontmatter, ou nao encontrado

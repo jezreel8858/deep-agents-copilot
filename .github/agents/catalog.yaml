@@ -3,7 +3,7 @@ domain: governanca-ai-generica
 agents:
   agent-router:
     id: agent-router
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 1
     version: 2.0.0
     domain: Orquestracao agent-first
@@ -91,7 +91,7 @@ agents:
     estimated_time_minutes: 5
   bug-triage:
     id: bug-triage
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 2
     domain: Triagem de bugs e regressao
     description: Classificar bugs, reproduzir erro, analisar blast radius e propor
@@ -151,7 +151,7 @@ agents:
     estimated_time_minutes: 25
   test-strategy:
     id: test-strategy
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 3
     domain: Estrategia de testes
     description: Planejar cobertura, cenarios e criterios de aceitacao por risco
@@ -196,7 +196,7 @@ agents:
     estimated_time_minutes: 25
   refactor-planner:
     id: refactor-planner
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 4
     version: 2.0.0
     domain: Planejamento e decomposição macro de refatoração
@@ -260,7 +260,7 @@ agents:
     estimated_time_minutes: 30
   deep-search:
     id: deep-search
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 7
     version: 1.0.0
     domain: Pesquisa interna e externa (Retriever/Researcher)
@@ -403,7 +403,7 @@ agents:
     estimated_time_minutes: 45
   agent-auditor:
     id: agent-auditor
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 8.4
     version: 1.2.0
     domain: Auditoria semantica de governanca do catalogo (meta-nivel, read-only)
@@ -460,7 +460,7 @@ agents:
     estimated_time_minutes: 30
   governance-factory:
     id: governance-factory
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 9
     version: 1.3.0
     domain: Governanca e autoria de artefatos e stacks (agent/skill/prompt/stack)
@@ -673,7 +673,7 @@ agents:
     estimated_time_minutes: 15
   database-specialist:
     id: database-specialist
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 5.5
     version: 1.0.0
     domain: Migracoes de schema, otimizacao de query e integridade referencial
@@ -723,7 +723,7 @@ agents:
     estimated_time_minutes: 35
   ddd-bounded-context-mapper:
     id: ddd-bounded-context-mapper
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 4.8
     version: 1.0.0
     domain: Mapeamento semantico de Bounded Contexts (DDD), dominios de negocio e
@@ -777,7 +777,7 @@ agents:
     estimated_time_minutes: 25
   adr-sentinel:
     id: adr-sentinel
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 4.7
     version: 1.0.0
     domain: Auditoria de conformidade arquitetural contra Architectural Decision Records
@@ -829,7 +829,7 @@ agents:
     estimated_time_minutes: 20
   repo-hygiene-auditor:
     id: repo-hygiene-auditor
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 4.8
     version: 1.0.0
     domain: Auditoria de higiene estrutural, documentação essencial e padrões de repositório
@@ -981,7 +981,7 @@ agents:
     version: 1.0.0
   business-rules-extractor:
     id: business-rules-extractor
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 5
     domain: Extracao e validacao de regras de negocio
     description: 'Extrair regras de negócio de qualquer código-fonte e documentá-las
@@ -1097,7 +1097,7 @@ agents:
     estimated_time_minutes: 30
   code-review:
     id: code-review
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 4.5
     domain: Revisao de codigo antes do merge (read-only, severidade)
     description: Revisa código (diff/PR) antes do merge por qualidade, segurança,
@@ -1200,7 +1200,7 @@ agents:
     estimated_time_minutes: 15
   compliance-guardrails:
     id: compliance-guardrails
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 4.65
     version: 1.0.0
     domain: Avaliacao de conformidade regulatoria de aplicacao (read-only)
@@ -1305,7 +1305,7 @@ agents:
     estimated_time_minutes: 30
   devops-engineer:
     id: devops-engineer
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 8.9
     version: 1.0.0
     domain: Revisao de artefatos DevOps (read-only)
@@ -1405,7 +1405,7 @@ agents:
     estimated_time_minutes: 25
   feature-planner:
     id: feature-planner
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 4.1
     version: 2.0.0
     domain: Decomposicao de feature nova em subtasks executaveis
@@ -1456,7 +1456,7 @@ agents:
     estimated_time_minutes: 20
   performance-agent:
     id: performance-agent
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 4.6
     version: 1.0.0
     domain: Revisao especializada de performance (read-only)
@@ -1511,7 +1511,7 @@ agents:
     estimated_time_minutes: 25
   requirements-analyst:
     id: requirements-analyst
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 4.8
     version: 2.1.0
     domain: Elicitacao e estruturacao de requisitos (prospectivo, pre-tecnico)
@@ -1570,7 +1570,7 @@ agents:
     estimated_time_minutes: 25
   security-reviewer:
     id: security-reviewer
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 4.55
     version: 1.0.0
     domain: Revisao especializada de seguranca de aplicacao (read-only)
@@ -1627,14 +1627,13 @@ agents:
     estimated_time_minutes: 25
   angular-router:
     id: angular-router
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 8.5
     version: 2.0.0
     domain: Supervisor hierarquico e roteador do dominio Angular
     description: Roteador de domínio Angular e supervisor hierárquico — recebe solicitações
-      de frontend Angular do agent-router central e despacha para os 8 especialistas
-      do catálogo Angular (arch-advisor, feature-developer, bug-fixer, ui-stylist,
-      unit-test, component-test, test-fixer e e2e-writer).
+      de frontend Angular do agent-router central e despacha para os 3 especialistas
+      consolidados do catálogo Angular (angular-arch-advisor, angular-developer e angular-test-engineer).
     keywords:
     - angular
     - angular router
@@ -1650,13 +1649,8 @@ agents:
     related_agents:
     - agent-router
     - angular-arch-advisor
-    - angular-feature-developer
-    - angular-bug-fixer
-    - angular-ui-stylist
-    - angular-unit-test-writer
-    - angular-component-test-writer
-    - angular-test-fixer
-    - angular-e2e-writer
+    - angular-developer
+    - angular-test-engineer
     tools:
     - read_file
     - file_search
@@ -1673,17 +1667,15 @@ agents:
     - .github/agents/frontend/angular/angular-router.agent.md
     - .github/agents/frontend/angular/angular-catalog.yaml
     estimated_time_minutes: 15
-  database-router:
   react-router:
     id: react-router
     version: 1.0.0
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 8.5
     domain: Supervisor hierarquico e roteador do dominio React
     description: Roteador de domínio React e supervisor hierárquico — recebe solicitações
-      de frontend React do agent-router central e despacha para os 8 especialistas
-      do catálogo React (arch-advisor, feature-developer, bug-fixer, ui-stylist,
-      unit-test, component-test, test-fixer e e2e-writer).
+      de frontend React do agent-router central e despacha para os 3 especialistas
+      do catálogo React (arch-advisor, developer e test-engineer).
     keywords:
     - react
     - react router
@@ -1700,13 +1692,8 @@ agents:
     related_agents:
     - agent-router
     - react-arch-advisor
-    - react-feature-developer
-    - react-bug-fixer
-    - react-ui-stylist
-    - react-unit-test-writer
-    - react-component-test-writer
-    - react-test-fixer
-    - react-e2e-writer
+    - react-developer
+    - react-test-engineer
     tools:
     - read_file
     - file_search
@@ -1726,11 +1713,11 @@ agents:
   database-router:
     id: database-router
     version: 2.0.0
-    model: Gemini 3.8 Flash
+    model: Claude Sonnet 5.5
     description: Roteador de domínio de Banco de Dados e supervisor hierárquico —
       recebe solicitações de banco (Oracle e Informix) do agent-router central e despacha
-      para os 6 especialistas do catálogo database (oracle-migration-dev, oracle-plsql-expert,
-      oracle-query-tuner, informix-migration-dev, informix-spl-expert e informix-query-tuner).
+      para os 3 especialistas do catálogo database (database-arch-advisor, oracle-database-specialist
+      e informix-database-specialist).
     tools:
     - read_file
     - file_search
@@ -1756,12 +1743,9 @@ agents:
     - .github/agents/backend/database/database-catalog.yaml
     related_agents:
     - agent-router
-    - oracle-migration-dev
-    - oracle-plsql-expert
-    - oracle-query-tuner
-    - informix-migration-dev
-    - informix-spl-expert
-    - informix-query-tuner
+    - database-arch-advisor
+    - oracle-database-specialist
+    - informix-database-specialist
     related_skills:
     - agent-contracts
     - handoff-governance
@@ -1772,7 +1756,7 @@ agents:
     estimated_time_minutes: 15
   ejb-router:
     id: ejb-router
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 8.9
     version: 2.0.0
     domain: Supervisor hierarquico e roteador do dominio Java Legado EJB
@@ -1798,12 +1782,8 @@ agents:
     related_agents:
     - agent-router
     - ejb-arch-advisor
-    - ejb-feature-developer
-    - ejb-bug-fixer
-    - ejb-perf-tuner
-    - ejb-unit-test-writer
-    - ejb-integration-test-writer
-    - ejb-test-fixer
+    - ejb-developer
+    - ejb-test-engineer
     tools:
     - read_file
     - file_search
@@ -1822,7 +1802,7 @@ agents:
     estimated_time_minutes: 15
   python-router:
     id: python-router
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 8.92
     version: 2.0.0
     domain: Supervisor hierarquico e roteador do dominio Python Backend
@@ -1873,14 +1853,13 @@ agents:
     estimated_time_minutes: 15
   spring-boot-router:
     id: spring-boot-router
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 8.7
     version: 2.0.0
     domain: Supervisor hierarquico e roteador do dominio Spring Boot
     description: Roteador de domínio Spring Boot e supervisor hierárquico — recebe
       solicitações de backend Java/Spring Boot do agent-router central e despacha
-      para os 7 especialistas do catálogo Spring Boot (arch-advisor, feature-developer,
-      bug-fixer, perf-tuner, unit-test-writer, integration-test-writer e test-fixer).
+      para os 3 especialistas do catálogo Spring Boot (arch-advisor, developer e test-engineer).
     keywords:
     - spring boot
     - spring boot router
@@ -1896,12 +1875,8 @@ agents:
     related_agents:
     - agent-router
     - spring-boot-arch-advisor
-    - spring-boot-feature-developer
-    - spring-boot-bug-fixer
-    - spring-boot-perf-tuner
-    - spring-boot-unit-test-writer
-    - spring-boot-integration-test-writer
-    - spring-boot-test-fixer
+    - spring-boot-developer
+    - spring-boot-test-engineer
     tools:
     - read_file
     - file_search
@@ -1920,14 +1895,14 @@ agents:
     estimated_time_minutes: 15
   spring-reactive-router:
     id: spring-reactive-router
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 8.8
     version: 2.0.0
     domain: Supervisor hierarquico e roteador do dominio Spring Reactive
     description: Roteador de domínio Spring Reactive e supervisor hierárquico — recebe
       solicitações de backend reativo (WebFlux/Reactor/R2DBC) do agent-router central
-      e despacha para os 7 especialistas reativos (arch-advisor, feature-developer,
-      bug-fixer, perf-tuner, unit-test-writer, integration-test-writer, test-fixer).
+      e despacha para os 3 especialistas
+      consolidados (spring-reactive-arch-advisor, spring-reactive-developer e spring-reactive-test-engineer).
     keywords:
     - spring webflux
     - spring reactive router
@@ -1942,12 +1917,8 @@ agents:
     related_agents:
     - agent-router
     - spring-reactive-arch-advisor
-    - spring-reactive-feature-developer
-    - spring-reactive-bug-fixer
-    - spring-reactive-perf-tuner
-    - spring-reactive-unit-test-writer
-    - spring-reactive-integration-test-writer
-    - spring-reactive-test-fixer
+    - spring-reactive-developer
+    - spring-reactive-test-engineer
     tools:
     - read_file
     - file_search
@@ -1967,7 +1938,7 @@ agents:
   struts-router:
     id: struts-router
     version: 2.0.0
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     description: Roteador de domínio Java Legado Struts e supervisor hierárquico —
       recebe solicitações de backend Struts legado (Struts 1.x/2.x, Actions, FormBeans,
       ActionServlet, Tiles) do agent-router central e despacha para os 7 especialistas
@@ -1998,12 +1969,8 @@ agents:
     related_agents:
     - agent-router
     - struts-arch-advisor
-    - struts-feature-developer
-    - struts-bug-fixer
-    - struts-perf-tuner
-    - struts-unit-test-writer
-    - struts-integration-test-writer
-    - struts-test-fixer
+    - struts-developer
+    - struts-test-engineer
     related_skills:
     - agent-contracts
     - handoff-governance
@@ -2021,9 +1988,8 @@ metadata:
     completa do ecossistema de A2A AgentCards em .a2a/agentcards/. | 2026-09-12 (48)
     — Criado ecossistema de domínio backend para Java Legado Struts em .github/agents/backend/struts/
     (type: stack): supervisor hierárquico struts-router + sub-catálogo struts-catalog.yaml
-    + 7 especialistas canônicos (struts-arch-advisor [Read-Only], struts-feature-developer
-    [Implementer], struts-bug-fixer [Fixer], struts-perf-tuner [Performance], struts-unit-test-writer
-    [Tester], struts-integration-test-writer [Tester], struts-test-fixer [Fixer]);
+    + 3 especialistas canônicos (struts-arch-advisor [Read-Only], struts-developer
+    [Implementer/Fixer/Performance], struts-test-engineer [Tester/Fixer]);
     realizada a quádrupla sincronização atômica global obrigatória (R-015) em catalog.yaml,
     routing-graph.yaml, agent-router.agent.md e README.md. Validado via pytest — 100%
     verde. | 2026-09-11 (47) — Saneamento de governança: descontinuados e removidos
@@ -2035,9 +2001,8 @@ metadata:
     CLAUDE.md e README.md. Validado via pytest — 100% verde sem pendências. | 2026-09-11
     (46) — Criado ecossistema de domínio backend para Python em .github/agents/backend/python/
     (type: stack): supervisor hierárquico python-router + sub-catálogo python-catalog.yaml
-    + 7 especialistas canônicos (python-arch-advisor [Read-Only], python-feature-developer
-    [Implementer], python-bug-fixer [Fixer], python-perf-tuner [Performance], python-unit-test-writer
-    [Tester], python-integration-test-writer [Tester], python-test-fixer [Fixer]);
+    + 3 especialistas canônicos da tríade consolidada (python-arch-advisor [Read-Only], python-developer
+    [Implementer], python-test-engineer [Tester]);
     realizada a quádrupla sincronização atômica global obrigatória (R-015) em catalog.yaml,
     routing-graph.yaml, agent-router.agent.md e README.md. Validado via get_errors
     e pytest — 0 erros. | 2026-09-06 (45) — Sincronização atômica SSOT entre .github/prompts/commit.prompt.md
@@ -2065,10 +2030,9 @@ metadata:
     pesquisa previa compulsoria via @deep-search de diretrizes, padroes e tooling
     (JUnit 4/5, Mockito POJO unit tests, OpenEJB/TomEE Embedded, Arquillian com ShrinkWrap,
     Testcontainers para banco legado, CMT/BMT, MDB, mitigacao de deadlocks JTA e vazamentos
-    de Stateful Beans); criado sub-catalogo ejb-catalog.yaml com os 7 especialistas
-    canônicos (ejb-arch-advisor [Read-Only], ejb-feature-developer [Implementer],
-    ejb-bug-fixer [Fixer], ejb-perf-tuner [Performance], ejb-unit-test-writer [Tester],
-    ejb-integration-test-writer [Tester], ejb-test-fixer [Fixer]); criado supervisor
+    de Stateful Beans); criado sub-catalogo ejb-catalog.yaml com os 3 especialistas
+    canônicos (ejb-arch-advisor [Read-Only], ejb-developer [Implementer/Fixer/Performance],
+    ejb-test-engineer [Tester/Fixer]); criado supervisor
     hierarquico ejb-router.agent.md com R-042, banner de visibilidade de fluxo e suporte
     ao Fluxo 2 TDD (@test-strategy); e realizada a quadrupla sincronizacao atomica
     global obrigatoria (R-015) em catalog.yaml, routing-graph.yaml, agent-router.agent.md

@@ -22,9 +22,10 @@ ALL_FEATURE_DEV_STACKS = ["ejb", "spring-boot", "spring-reactive", "python", "st
 
 
 def resolve_feature_developer_file(stack: str) -> Path:
-    """Resolve o arquivo feature-developer da stack (backend ou frontend)."""
     if stack == "angular":
-        return AGENTS_FRONTEND_DIR / "angular" / "angular-feature-developer.agent.md"
+        return AGENTS_FRONTEND_DIR / "angular" / "angular-developer.agent.md"
+    if stack in ("spring-boot", "spring-reactive", "ejb", "struts", "python"):
+        return AGENTS_BACKEND_DIR / stack / f"{stack}-developer.agent.md"
     return AGENTS_BACKEND_DIR / stack / f"{stack}-feature-developer.agent.md"
 
 
@@ -55,7 +56,7 @@ def test_feature_developer_has_test_authoring_prohibition_and_handoff(stack: str
 
     # (b) Handoff para unit-test-writer, integration-test-writer ou component-test-writer
     has_test_writer_handoff = bool(
-        re.search(r"unit-test-writer|integration-test-writer|component-test-writer", content, re.IGNORECASE)
+        re.search(r"unit-test-writer|integration-test-writer|component-test-writer|test-engineer", content, re.IGNORECASE)
     )
     assert has_test_writer_handoff, (
         f"{feat_dev_path.name} DEVE citar explicitamente handoff ou delegação para "

@@ -5,7 +5,7 @@ description: >-
   Auditor de governança em meta-nível para analisar smells e gaps no catálogo de
   agents/skills/prompts, validando templates canônicos, R-046/batching, especificações
   e alinhamento de perfil sem mutação direta, com recomendações e handoff para executores.
-model: "Claude Sonnet 5"
+model: "Claude Sonnet 5.5"
 tools: ['grep_search', 'file_search', 'list_dir', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index']
 source_docs:
   - .github/skills/context-mode/SKILL.md

@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "react-test-engineer",
+  "name": "React Test Engineer",
+  "version": "1.0.0",
+  "description": "Especialista mutativo de testes: projeta e implementa testes unitários isolados (Vitest), testes de renderização e acessibilidade de componentes (RTL), jornadas E2E (Playwright) e executa autocorreção de suítes quebradas sob CAP RÍGIDO (R-053).",
+  "domain": "Garantia de Qualidade Frontend, Vitest, React Testing Library, Playwright E2E e Autocorreção",
+  "role": "tester",
+  "capabilities": [
+    "testes react",
+    "vitest react",
+    "react testing library",
+    "rtl",
+    "playwright react",
+    "teste e2e react",
+    "corrigir teste react",
+    "test fixer react"
+  ],
+  "skills": [
+    "agent-contracts",
+    "handoff-governance"
+  ],
+  "tools": [
+    "file_search",
+    "grep_search",
+    "list_dir",
+    "ask_questions",
+    "run_subagent",
+    "get_errors",
+    "run_in_terminal",
+    "context-mode/ctx_execute",
+    "context-mode/ctx_search",
+    "context-mode/ctx_batch_execute",
+    "context-mode/ctx_index",
+    "context-mode/ctx_execute_file",
+    "playwright/browser_snapshot",
+    "playwright/browser_navigate",
+    "playwright/browser_navigate_back",
+    "playwright/browser_click",
+    "playwright/browser_type",
+    "playwright/browser_hover",
+    "playwright/browser_select_option",
+    "playwright/browser_press_key",
+    "playwright/browser_fill_form",
+    "playwright/browser_file_upload",
+    "playwright/browser_handle_dialog",
+    "playwright/browser_wait_for",
+    "playwright/browser_tabs",
+    "playwright/browser_close",
+    "playwright/browser_console_messages",
+    "playwright/browser_network_requests",
+    "playwright/browser_take_screenshot",
+    "playwright/browser_resize"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only",
+      "execution"
+    ],
+    "least_privilege_level": "elevated",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Claude Sonnet 5.5",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/frontend/react/react-catalog.yaml",
+    "priority": 10,
+    "estimated_time_minutes": 15
+  }
+}

@@ -7,7 +7,7 @@ description: >
   não quebram comportamento existente. Opera em dois modos: Extract (gerar
   documentação) e Validate (verificar código refatorado contra regras
   documentadas).
-model: "Claude Sonnet 5"
+model: "Claude Sonnet 5.5"
 tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'ask_questions', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
 source_docs:
   - .github/skills/business-rules-governance/SKILL.md

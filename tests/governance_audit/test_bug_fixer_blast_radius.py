@@ -24,9 +24,10 @@ ALL_BUG_FIXER_STACKS = ["ejb", "spring-boot", "spring-reactive", "python", "stru
 
 
 def resolve_bug_fixer_file(stack: str) -> Path:
-    """Resolve o arquivo bug-fixer da stack (backend ou frontend)."""
     if stack == "angular":
-        return AGENTS_FRONTEND_DIR / "angular" / "angular-bug-fixer.agent.md"
+        return AGENTS_FRONTEND_DIR / "angular" / "angular-developer.agent.md"
+    if stack in ("spring-boot", "spring-reactive", "ejb", "struts", "python"):
+        return AGENTS_BACKEND_DIR / stack / f"{stack}-developer.agent.md"
     return AGENTS_BACKEND_DIR / stack / f"{stack}-bug-fixer.agent.md"
 
 

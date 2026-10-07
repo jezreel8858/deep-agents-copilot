@@ -411,7 +411,7 @@ class TestTurnsTable:
             prompt="altere 5 linhas do README",
             response_text="Agente Ativo: bug-triage\n\nFeito.",
             agent_name="bug-triage",
-            agent_model="Claude Sonnet 5",
+            agent_model="Claude Sonnet 5.5",
             workflow="WORKFLOW-BUG-FIX",
             etapa=2,
             score_roteamento=0.93,

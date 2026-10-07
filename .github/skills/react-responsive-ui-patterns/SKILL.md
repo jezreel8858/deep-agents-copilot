@@ -11,7 +11,7 @@ triggers:
   - "acessibilidade react"
   - "wcag react"
 source_docs:
-  - .github/agents/frontend/react/react-ui-stylist.agent.md
+  - .github/agents/frontend/react/react-developer.agent.md
 source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md

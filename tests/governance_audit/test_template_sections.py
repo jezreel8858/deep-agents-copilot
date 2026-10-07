@@ -326,7 +326,7 @@ def test_homologation_gate_no_unhomologated_sections_in_agents():
     ] + [
         p for p in (AGENTS_DIR / "templates").glob("*.md")
     ]
-    assert len(all_agent_files) >= 70
+    assert len(all_agent_files) >= 66
 
     violations = []
     for agent_file in all_agent_files:

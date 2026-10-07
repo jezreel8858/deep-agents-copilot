@@ -177,7 +177,7 @@ def test_edge_scenario_intent_drift(casos_workflows):
     assert drift_case is not None, "Cenário de intent_drift deve existir"
 
     cenario = drift_case["cenario"]
-    assert cenario["turno_1"]["agente_ativo"] == "spring-boot-feature-developer"
+    assert cenario["turno_1"]["agente_ativo"] in ("spring-boot-feature-developer", "spring-boot-developer")
     esperado = cenario["turno_2"]["comportamento_esperado"]
     assert esperado["deriva_detectada"] is True
     assert esperado["motivo"] == "deriva_de_intencao"

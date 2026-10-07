@@ -5,7 +5,7 @@ description: >-
   Especialista em arquitetura Spring Reactive corporativa (Spring WebFlux / Project Reactor) —
   pipeline reativo não-bloqueante, backpressure, migração MVC vs WebFlux, isolamento de threads
   e governança reativa avançada (Read-Only).
-model: "Claude Sonnet 5"
+model: "Claude Sonnet 5.5"
 tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index']
 source_docs:
   - .github/skills/context-mode/SKILL.md
@@ -71,8 +71,8 @@ progress: 0
 Progresso: 0/N tarefas concluídas
 
 ### Checklist de Execução Técnica (GFM Unificado)
-- [ ] <descrição atômica da tarefa técnica> `{paralelizavel: bool, responsavel: "@spring-reactive-feature-developer"}`
-- [ ] <próxima tarefa técnica> `{paralelizavel: bool, responsavel: "@spring-reactive-feature-developer"}`
+- [ ] <descrição atômica da tarefa técnica> `{paralelizavel: bool, responsavel: "@spring-reactive-developer"}`
+- [ ] <próxima tarefa técnica> `{paralelizavel: bool, responsavel: "@spring-reactive-developer"}`
 
 ### 🔒 Checklist Defensivo Pré-Code-Review
 - [ ] Sanitização e validação de inputs em todas as bordas expostas

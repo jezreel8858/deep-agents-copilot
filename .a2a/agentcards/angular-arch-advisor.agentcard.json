@@ -4,35 +4,28 @@
   "id": "angular-arch-advisor",
   "name": "Angular Arch Advisor",
   "version": "1.0.0",
-  "description": "Especialista analítico read-only: diagnósticos arquiteturais, CWV (INP/LCP), SSR/hydration, @defer e planos de upgrade/migração Angular.",
-  "domain": "Arquitetura Angular, Standalone, Signals, SSR e Performance CWV",
+  "description": "Read-only advisor para arquitetura frontend Angular, design de Signals/RxJS, SSR/Hydration e governança corporativa.",
+  "domain": "Engenharia de Software / Governança Multi-Agente",
   "role": "advisor",
   "capabilities": [
-    "auditoria angular",
     "arquitetura angular",
-    "core web vitals",
-    "inp",
-    "lcp",
-    "ssr",
-    "hydration",
-    "upgrade angular",
-    "deprecations"
+    "standalone components",
+    "signals",
+    "rxjs store",
+    "ssr hydration"
   ],
   "skills": [
     "agent-contracts",
     "handoff-governance"
   ],
   "tools": [
+    "read_file",
     "file_search",
     "grep_search",
     "list_dir",
     "ask_questions",
-    "run_subagent",
     "context-mode/ctx_search",
-    "context-mode/ctx_execute",
-    "context-mode/ctx_batch_execute",
-    "context-mode/ctx_execute_file",
-    "context-mode/ctx_index"
+    "context-mode/ctx_execute_file"
   ],
   "security_profile": {
     "tool_zones": [
@@ -42,7 +35,7 @@
     "data_sensitivity": "internal"
   },
   "model_preferences": {
-    "recommended_model": "Claude Sonnet 5",
+    "recommended_model": "Claude Sonnet 5.5",
     "cost_tier": "1x"
   },
   "input_contract": {

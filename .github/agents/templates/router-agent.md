@@ -5,10 +5,10 @@ description: >-
   Roteador de domínio e supervisor hierárquico — recebe solicitações de <domínio/stack>
   e despacha determinística e compulsoriamente para os especialistas do catálogo local.
 # Modelo de Roteamento (R-021 e R-054):
-# Padrão: "Gemini 3.8 Flash". Routers operam sob R-054 (Zero Discovery, Zero Execution, Flat Delegation).
+# Padrão: "Claude Sonnet 5.5". Routers operam sob R-054 (Zero Discovery, Zero Execution, Flat Delegation).
 # É PROIBIDO fixar routers em tier premium ("Claude Opus") — a função de roteamento não realiza síntese
 # profunda e qualquer escalonamento deve ser PONTUAL no despacho downstream via sinal 🧠 (R-021).
-model: "Gemini 3.8 Flash"
+model: "Claude Sonnet 5.5"
 tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search']
 # Contrato Estrutural de Router (test_router_agents.py):
 # Supervisores hierárquicos possuem estrutura contratual fechada para roteamento determinístico.

@@ -4,8 +4,8 @@
   "id": "python-arch-advisor",
   "name": "Python Arch Advisor",
   "version": "1.0.0",
-  "description": "Especialista analítico read-only: arquitetura Python 3.11+, Clean Architecture, design de APIs REST/async, tipagem PEP 484/mypy strict, auditoria de dependências e estratégias de modernização.",
-  "domain": "Arquitetura Python Backend, Clean Architecture, FastAPI, Flask, Django, Pydantic, tipagem estrita e planos de modernização",
+  "description": "Especialista analítico read-only: arquitetura Python 3.11+, Clean Architecture, design de APIs REST/async, tipagem PEP 484/mypy strict, auditoria de dependências, mitigação de N+1 queries, profiling e estratégias de modernização.",
+  "domain": "Arquitetura Python Backend, Clean Architecture, FastAPI, Flask, Django, Pydantic, tipagem estrita, performance analítica e planos de modernização",
   "role": "advisor",
   "capabilities": [
     "arquitetura python",
@@ -15,7 +15,9 @@
     "flask",
     "clean architecture python",
     "mypy strict",
-    "design api python"
+    "design api python",
+    "performance analitica python",
+    "n+1 sqlalchemy"
   ],
   "skills": [
     "agent-contracts",
@@ -28,9 +30,7 @@
     "ask_questions",
     "run_subagent",
     "context-mode/ctx_search",
-    "context-mode/ctx_execute",
     "context-mode/ctx_batch_execute",
-    "context-mode/ctx_execute_file",
     "context-mode/ctx_index"
   ],
   "security_profile": {
@@ -41,7 +41,7 @@
     "data_sensitivity": "internal"
   },
   "model_preferences": {
-    "recommended_model": "Claude Sonnet 5",
+    "recommended_model": "Claude Sonnet 5.5",
     "cost_tier": "1x"
   },
   "input_contract": {

@@ -22,18 +22,12 @@ AGENTS_BACKEND_DIR = REPO_ROOT / ".github" / "agents" / "backend"
 AGENTS_FRONTEND_DIR = REPO_ROOT / ".github" / "agents" / "frontend"
 
 TEST_WRITER_TARGETS = [
-    ("ejb", "ejb-unit-test-writer.agent.md", AGENTS_BACKEND_DIR / "ejb"),
-    ("ejb", "ejb-integration-test-writer.agent.md", AGENTS_BACKEND_DIR / "ejb"),
-    ("spring-boot", "spring-boot-unit-test-writer.agent.md", AGENTS_BACKEND_DIR / "spring-boot"),
-    ("spring-boot", "spring-boot-integration-test-writer.agent.md", AGENTS_BACKEND_DIR / "spring-boot"),
-    ("spring-reactive", "spring-reactive-unit-test-writer.agent.md", AGENTS_BACKEND_DIR / "spring-reactive"),
-    ("spring-reactive", "spring-reactive-integration-test-writer.agent.md", AGENTS_BACKEND_DIR / "spring-reactive"),
-    ("python", "python-unit-test-writer.agent.md", AGENTS_BACKEND_DIR / "python"),
-    ("python", "python-integration-test-writer.agent.md", AGENTS_BACKEND_DIR / "python"),
-    ("struts", "struts-unit-test-writer.agent.md", AGENTS_BACKEND_DIR / "struts"),
-    ("struts", "struts-integration-test-writer.agent.md", AGENTS_BACKEND_DIR / "struts"),
-    ("angular", "angular-unit-test-writer.agent.md", AGENTS_FRONTEND_DIR / "angular"),
-    ("angular", "angular-component-test-writer.agent.md", AGENTS_FRONTEND_DIR / "angular"),
+    ("ejb", "ejb-test-engineer.agent.md", AGENTS_BACKEND_DIR / "ejb"),
+    ("spring-boot", "spring-boot-test-engineer.agent.md", AGENTS_BACKEND_DIR / "spring-boot"),
+    ("spring-reactive", "spring-reactive-test-engineer.agent.md", AGENTS_BACKEND_DIR / "spring-reactive"),
+    ("python", "python-test-engineer.agent.md", AGENTS_BACKEND_DIR / "python"),
+    ("struts", "struts-test-engineer.agent.md", AGENTS_BACKEND_DIR / "struts"),
+    ("angular", "angular-test-engineer.agent.md", AGENTS_FRONTEND_DIR / "angular"),
 ]
 
 

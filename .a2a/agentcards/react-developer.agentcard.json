@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "react-developer",
+  "name": "React Developer",
+  "version": "1.0.0",
+  "description": "Especialista mutativo core: constrói componentes acessíveis e hooks customizados, gerencia estado com TanStack Query e Zustand, aplica estilização Tailwind/CSS Modules e resolve bugs de renderização cirurgicamente sob metodologia Test-Last (isento de autoria de testes unitários).",
+  "domain": "Desenvolvimento de Telas, Componentes, Hooks, Estado, Estilização Tailwind e Correção de Bugs de UI",
+  "role": "implementer",
+  "capabilities": [
+    "feature react",
+    "componente react",
+    "hooks react",
+    "tanstack query",
+    "zustand",
+    "tailwind react",
+    "css modules",
+    "ui stylist react",
+    "layout responsivo",
+    "acessibilidade wcag",
+    "bug react",
+    "re-render"
+  ],
+  "skills": [
+    "agent-contracts",
+    "handoff-governance"
+  ],
+  "tools": [
+    "file_search",
+    "grep_search",
+    "list_dir",
+    "ask_questions",
+    "run_subagent",
+    "get_errors",
+    "run_in_terminal",
+    "context-mode/ctx_execute",
+    "context-mode/ctx_search",
+    "context-mode/ctx_batch_execute",
+    "context-mode/ctx_index",
+    "context-mode/ctx_execute_file",
+    "playwright/browser_snapshot",
+    "playwright/browser_navigate",
+    "playwright/browser_click",
+    "playwright/browser_type",
+    "playwright/browser_wait_for",
+    "playwright/browser_console_messages",
+    "playwright/browser_network_requests",
+    "playwright/browser_tabs",
+    "playwright/browser_close",
+    "playwright/browser_take_screenshot",
+    "playwright/browser_resize"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only",
+      "mutating",
+      "execution"
+    ],
+    "least_privilege_level": "elevated",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Claude Sonnet 5.5",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/frontend/react/react-catalog.yaml",
+    "priority": 10,
+    "estimated_time_minutes": 15
+  }
+}

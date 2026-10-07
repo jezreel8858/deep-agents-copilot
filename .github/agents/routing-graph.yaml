@@ -90,37 +90,37 @@ nos:
 
   - id: angular-router
     tipo: domain_router
-    descricao: "Supervisor hierárquico do domínio Angular — despacha para os 8 especialistas registrados em .github/agents/frontend/angular/angular-catalog.yaml"
+    descricao: "Supervisor hierárquico do domínio Angular — despacha para os 3 especialistas registrados em .github/agents/frontend/angular/angular-catalog.yaml"
 
 
   - id: react-router
     tipo: domain_router
-    descricao: "Supervisor hierárquico do domínio React — despacha para os 8 especialistas registrados em .github/agents/frontend/react/react-catalog.yaml"
+    descricao: "Supervisor hierárquico do domínio React — despacha para os 3 especialistas registrados em .github/agents/frontend/react/react-catalog.yaml"
 
 
   - id: spring-boot-router
     tipo: domain_router
-    descricao: "Supervisor hierárquico do domínio Spring Boot — despacha para os 7 especialistas registrados em .github/agents/backend/spring-boot/spring-boot-catalog.yaml"
+    descricao: "Supervisor hierárquico do domínio Spring Boot — despacha para os 3 especialistas registrados em .github/agents/backend/spring-boot/spring-boot-catalog.yaml"
 
   - id: spring-reactive-router
     tipo: domain_router
-    descricao: "Supervisor hierárquico do domínio Spring Reactive — despacha para os 7 especialistas registrados em .github/agents/backend/spring-reactive/spring-reactive-catalog.yaml"
+    descricao: "Supervisor hierárquico do domínio Spring Reactive — despacha para os 3 especialistas registrados em .github/agents/backend/spring-reactive/spring-reactive-catalog.yaml"
 
   - id: ejb-router
     tipo: domain_router
-    descricao: "Supervisor hierárquico do domínio Java Legado EJB — despacha para os 7 especialistas registrados em .github/agents/backend/ejb/ejb-catalog.yaml"
+    descricao: "Supervisor hierárquico do domínio Java Legado EJB — despacha para os 3 especialistas registrados em .github/agents/backend/ejb/ejb-catalog.yaml"
 
   - id: python-router
     tipo: domain_router
-    descricao: "Supervisor hierárquico do domínio Python Backend — despacha para os 7 especialistas registrados em .github/agents/backend/python/python-catalog.yaml"
+    descricao: "Supervisor hierárquico do domínio Python Backend — despacha para os 3 especialistas registrados em .github/agents/backend/python/python-catalog.yaml"
 
   - id: struts-router
     tipo: domain_router
-    descricao: "Supervisor hierárquico do domínio Java Legado Struts — despacha para os 7 especialistas registrados em .github/agents/backend/struts/struts-catalog.yaml"
+    descricao: "Supervisor hierárquico do domínio Java Legado Struts — despacha para os 3 especialistas registrados em .github/agents/backend/struts/struts-catalog.yaml"
 
   - id: database-router
     tipo: domain_router
-    descricao: "Supervisor hierárquico do domínio de Banco de Dados — despacha para os 6 especialistas Oracle e Informix registrados em .github/agents/backend/database/database-catalog.yaml"
+    descricao: "Supervisor hierárquico do domínio de Banco de Dados — despacha para os 3 especialistas registrados em .github/agents/backend/database/database-catalog.yaml"
 
   - id: security-reviewer
     tipo: downstream
@@ -339,8 +339,7 @@ workflows:
           - "spring-reactive-arch-advisor"
           - "ejb-arch-advisor"
           - "struts-arch-advisor"
-          - "oracle-query-tuner"
-          - "informix-query-tuner"
+          - "database-arch-advisor"
           - "devops-engineer"
           - "code-style-enforcer"
         suporte_fan_out: "handoff-governance/SKILL.md § 5.1 se [P] R-018 e 2+ categorias independentes"
@@ -394,19 +393,19 @@ workflows:
         agent: "specialist-unit-test-writer"
         padrao: "contract_first_tdd"
         protocolo: "efficient-batch-code-modification"
-        excecao_dominio_frontend: "Quando domain-router = angular-router, esta etapa (red) e a etapa 6 (green) sao COMPULSORIAMENTE invertidas por desenho: Angular adota Implementation-First/Test-Last (ver angular-feature-developer.agent.md / angular-router.agent.md). Nao e bug, e desvio intencional documentado (R-050)."
+        excecao_dominio_frontend: "Quando domain-router = angular-router, esta etapa (red) e a etapa 6 (green) sao COMPULSORIAMENTE invertidas por desenho: Angular adota Implementation-First/Test-Last (ver angular-developer.agent.md / angular-router.agent.md). Nao e bug, e desvio intencional documentado (R-050)."
       - etapa: 6
         nome: "green_implementation"
         agent: "specialist-feature-developer"
         padrao: "contract_first_tdd"
         protocolo: "efficient-batch-code-modification"
-        excecao_dominio_frontend: "Quando domain-router = angular-router, esta etapa executa PRIMEIRO (Implementation-First via @angular-feature-developer) e a etapa 5 (red/testes) ocorre a posteriori via handoff para @angular-unit-test-writer/@angular-component-test-writer. Ver nota na etapa 5 (R-050)."
+        excecao_dominio_frontend: "Quando domain-router = angular-router, esta etapa executa PRIMEIRO (Implementation-First via @angular-developer) e a etapa 5 (red/testes) ocorre a posteriori via handoff para @angular-test-engineer. Ver nota na etapa 5 (R-050)."
       - etapa: 7
         nome: "e2e_journey_validation"
         agent: "specialist-e2e-writer"
         aplicavel_quando: "domain-router = angular-router | react-router"
         condicional: true
-        nota: "Etapa opcional/condicional — aplicavel somente em stacks com especialista E2E dedicado no catalogo local (ex.: @angular-e2e-writer). Stacks sem E2E writer dedicado pulam esta etapa sem bloqueio."
+        nota: "Etapa opcional/condicional — aplicavel somente em stacks com especialista E2E dedicado no catalogo local (ex.: @angular-test-engineer). Stacks sem E2E writer dedicado pulam esta etapa sem bloqueio."
       - etapa: 8
         nome: "quality_gate_and_pr_preparation"
         agent: "code-review | pr-gatekeeper"
@@ -1183,7 +1182,7 @@ arestas:
         - "vitest react"
         - "react e2e"
         - "playwright react"
-      sinal_r006: "É qualquer solicitação do ecossistema React ou análise semântica de componentes/hooks/estado React? (despacha para o catálogo de 8 especialistas de frontend em .github/agents/frontend/react/react-catalog.yaml)"
+      sinal_r006: "É qualquer solicitação do ecossistema React ou análise semântica de componentes/hooks/estado React? (despacha para o catálogo de 3 especialistas de frontend em .github/agents/frontend/react/react-catalog.yaml)"
 
   # Supervisor e roteador de domínio Spring Boot (Hierarchical Sub-Router)
   - de: agent-router
@@ -1203,7 +1202,7 @@ arestas:
         - "jakarta persistence"
         - "hikaricp"
         - "junit 5"
-      sinal_r006: "É qualquer solicitação do ecossistema Spring Boot? (despacha para o catálogo de 7 especialistas backend em .github/agents/backend/spring-boot/spring-boot-catalog.yaml)"
+      sinal_r006: "É qualquer solicitação do ecossistema Spring Boot? (despacha para o catálogo de 3 especialistas backend em .github/agents/backend/spring-boot/spring-boot-catalog.yaml)"
 
   # Supervisor e roteador de domínio Spring Reactive (Hierarchical Sub-Router)
   - de: agent-router
@@ -1223,7 +1222,7 @@ arestas:
         - "stepverifier"
         - "webtestclient"
         - "blockhound"
-      sinal_r006: "É qualquer solicitação do ecossistema reativo WebFlux/Reactor? (despacha para o catálogo de 7 especialistas reativos em .github/agents/backend/spring-reactive/spring-reactive-catalog.yaml)"
+      sinal_r006: "É qualquer solicitação do ecossistema reativo WebFlux/Reactor? (despacha para o catálogo de 3 especialistas reativos em .github/agents/backend/spring-reactive/spring-reactive-catalog.yaml)"
 
   # Supervisor e roteador de domínio Java Legado EJB (Hierarchical Sub-Router)
   - de: agent-router
@@ -1245,7 +1244,7 @@ arestas:
         - "ear"
         - "openejb"
         - "arquillian"
-      sinal_r006: "É qualquer solicitação do ecossistema Java Legado EJB? (despacha para o catálogo de 7 especialistas backend em .github/agents/backend/ejb/ejb-catalog.yaml)"
+      sinal_r006: "É qualquer solicitação do ecossistema Java Legado EJB? (despacha para o catálogo de 3 especialistas backend em .github/agents/backend/ejb/ejb-catalog.yaml)"
 
   # Supervisor e roteador de domínio Python Backend (Hierarchical Sub-Router)
   - de: agent-router
@@ -1266,7 +1265,7 @@ arestas:
         - "asyncio"
         - "uvicorn"
         - "celery"
-      sinal_r006: "É qualquer solicitação do ecossistema Python Backend? (despacha para o catálogo de 7 especialistas backend em .github/agents/backend/python/python-catalog.yaml)"
+      sinal_r006: "É qualquer solicitação do ecossistema Python Backend? (despacha para o catálogo de 3 especialistas backend em .github/agents/backend/python/python-catalog.yaml)"
 
   # Supervisor e roteador de domínio Java Legado Struts (Hierarchical Sub-Router)
   - de: agent-router
@@ -1290,7 +1289,7 @@ arestas:
         - "struts.xml"
         - "valuestack"
         - "ognl"
-      sinal_r006: "É qualquer solicitação do ecossistema Java Legado Struts? (despacha para o catálogo de 7 especialistas backend em .github/agents/backend/struts/struts-catalog.yaml)"
+      sinal_r006: "É qualquer solicitação do ecossistema Java Legado Struts? (despacha para o catálogo de 3 especialistas backend em .github/agents/backend/struts/struts-catalog.yaml)"
 
   # Supervisor e roteador de domínio Banco de Dados (Hierarchical Sub-Router)
   - de: agent-router

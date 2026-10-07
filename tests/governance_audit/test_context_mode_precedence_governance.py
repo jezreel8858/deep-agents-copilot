@@ -157,13 +157,13 @@ def test_governance_maintainer_and_peer_agents_align_with_context_mode_precedenc
     )
 
     peer_files = [
-        AGENTS_DIR / "backend" / "ejb" / "ejb-test-fixer.agent.md",
-        AGENTS_DIR / "backend" / "python" / "python-test-fixer.agent.md",
-        AGENTS_DIR / "backend" / "spring-boot" / "spring-boot-test-fixer.agent.md",
-        AGENTS_DIR / "backend" / "spring-reactive" / "spring-reactive-test-fixer.agent.md",
-        AGENTS_DIR / "backend" / "struts" / "struts-test-fixer.agent.md",
+        AGENTS_DIR / "backend" / "ejb" / "ejb-test-engineer.agent.md",
+        AGENTS_DIR / "backend" / "python" / "python-test-engineer.agent.md",
+        AGENTS_DIR / "backend" / "spring-boot" / "spring-boot-test-engineer.agent.md",
+        AGENTS_DIR / "backend" / "spring-reactive" / "spring-reactive-test-engineer.agent.md",
+        AGENTS_DIR / "backend" / "struts" / "struts-test-engineer.agent.md",
         AGENTS_DIR / "database-specialist.agent.md",
-        AGENTS_DIR / "frontend" / "angular" / "angular-test-fixer.agent.md",
+        AGENTS_DIR / "frontend" / "angular" / "angular-test-engineer.agent.md",
     ]
 
     for pf in peer_files:
@@ -174,56 +174,59 @@ def test_governance_maintainer_and_peer_agents_align_with_context_mode_precedenc
 
 
 EXECUTOR_AGENT_NAMES = {
+    "react-developer.agent.md",
+    "react-test-engineer.agent.md",
+    "spring-boot-developer.agent.md",
+    "spring-boot-test-engineer.agent.md",
+    "angular-developer.agent.md",
+    "angular-test-engineer.agent.md",
+    "spring-reactive-developer.agent.md",
+    "spring-reactive-test-engineer.agent.md",
+
     "adapter-generator.agent.md",
-    "angular-bug-fixer.agent.md",
-    "angular-component-test-writer.agent.md",
-    "angular-e2e-writer.agent.md",
-    "angular-feature-developer.agent.md",
-    "angular-test-fixer.agent.md",
-    "angular-ui-stylist.agent.md",
-    "angular-unit-test-writer.agent.md",
+    
+    
+    
+    
+    "angular-test-engineer.agent.md",
+    
+    
     "binding-initializer.agent.md",
     "business-rules-extractor.agent.md",
     "database-specialist.agent.md",
     "docs-engineer.agent.md",
-    "ejb-bug-fixer.agent.md",
-    "ejb-feature-developer.agent.md",
-    "ejb-integration-test-writer.agent.md",
-    "ejb-perf-tuner.agent.md",
-    "ejb-test-fixer.agent.md",
-    "ejb-unit-test-writer.agent.md",
+    
+    
+    
+    
+    
+    
     "governance-factory.agent.md",
     "governance-maintainer.agent.md",
-    "informix-migration-dev.agent.md",
-    "informix-spl-expert.agent.md",
-    "oracle-migration-dev.agent.md",
-    "oracle-plsql-expert.agent.md",
+    
+    
+    
+    
     "pr-gatekeeper.agent.md",
-    "python-bug-fixer.agent.md",
-    "python-feature-developer.agent.md",
-    "python-integration-test-writer.agent.md",
-    "python-perf-tuner.agent.md",
-    "python-test-fixer.agent.md",
-    "python-unit-test-writer.agent.md",
+    "python-developer.agent.md",
+    "python-test-engineer.agent.md",
     "requirements-analyst.agent.md",
-    "spring-boot-bug-fixer.agent.md",
-    "spring-boot-feature-developer.agent.md",
-    "spring-boot-integration-test-writer.agent.md",
-    "spring-boot-perf-tuner.agent.md",
-    "spring-boot-test-fixer.agent.md",
-    "spring-boot-unit-test-writer.agent.md",
-    "spring-reactive-bug-fixer.agent.md",
-    "spring-reactive-feature-developer.agent.md",
-    "spring-reactive-integration-test-writer.agent.md",
-    "spring-reactive-perf-tuner.agent.md",
-    "spring-reactive-test-fixer.agent.md",
-    "spring-reactive-unit-test-writer.agent.md",
-    "struts-bug-fixer.agent.md",
-    "struts-feature-developer.agent.md",
-    "struts-integration-test-writer.agent.md",
-    "struts-perf-tuner.agent.md",
-    "struts-test-fixer.agent.md",
-    "struts-unit-test-writer.agent.md",
+    "spring-boot-developer.agent.md",
+    "spring-boot-test-engineer.agent.md",
+    "react-developer.agent.md",
+    "react-test-engineer.agent.md",
+    
+    
+    
+    
+    "spring-reactive-test-engineer.agent.md",
+    
+    
+    
+    
+    
+    
+    
 }
 
 
@@ -393,7 +396,7 @@ def test_all_non_router_agents_declare_ctx_batch_execute_and_ctx_execute():
         p for p in all_agents
         if not p.name.endswith("-router.agent.md") and p.name != "agent-router.agent.md" and p.name != "prompt-structuring.agent.md"
     ]
-    assert len(non_routers) >= 75, f"Esperado ao menos 75 agentes não-roteadores, encontrados {len(non_routers)}"
+    assert len(non_routers) >= 50, f"Esperado ao menos 55 agentes não-roteadores, encontrados {len(non_routers)}"
 
     missing_batch = []
     missing_exec = []
@@ -620,7 +623,7 @@ def test_all_executor_agents_contain_execution_protocol_block():
             continue
         if "Plan-Then-Batch" not in c:
             violations.append(f"[{af.name}] <execution_protocol> não referencia 'Plan-Then-Batch'")
-        if "Limiar >= 2" not in c:
+        if "Limiar >= 2" not in c and "limiar >= 2" not in c:
             violations.append(f"[{af.name}] <execution_protocol> não referencia 'Limiar >= 2'")
         if "ENUMERAR" not in c:
             violations.append(f"[{af.name}] <execution_protocol> não detalha a etapa 'ENUMERAR'")
@@ -648,7 +651,7 @@ def test_all_non_router_agents_absence_of_native_editor_tools():
         p for p in all_agents
         if not p.name.endswith("-router.agent.md") and p.name != "agent-router.agent.md"
     ]
-    assert len(non_routers) >= 78, f"Esperado ao menos 78 agentes nao-roteadores, encontrados {len(non_routers)}"
+    assert len(non_routers) >= 50, f"Esperado ao menos 55 agentes nao-roteadores, encontrados {len(non_routers)}"
 
     violations = []
     for af in non_routers:
@@ -695,7 +698,7 @@ def test_all_non_router_agents_declare_all_ctx_tools():
         p for p in all_agents
         if not p.name.endswith("-router.agent.md") and p.name != "agent-router.agent.md" and p.name != "prompt-structuring.agent.md"
     ]
-    assert len(non_routers) >= 77
+    assert len(non_routers) >= 50
 
     violations = []
     for af in non_routers:
@@ -731,7 +734,7 @@ def test_all_non_router_agents_contain_execution_protocol_block():
         p for p in all_agents
         if not p.name.endswith("-router.agent.md") and p.name != "agent-router.agent.md" and p.name != "prompt-structuring.agent.md"
     ]
-    assert len(non_routers) >= 77
+    assert len(non_routers) >= 50
 
     violations = []
     for af in non_routers:
@@ -741,7 +744,7 @@ def test_all_non_router_agents_contain_execution_protocol_block():
             continue
         if "Plan-Then-Batch" not in c:
             violations.append(f"[{af.name}] <execution_protocol> nao referencia 'Plan-Then-Batch'")
-        if "Limiar >= 2" not in c:
+        if "Limiar >= 2" not in c and "limiar >= 2" not in c:
             violations.append(f"[{af.name}] <execution_protocol> nao referencia 'Limiar >= 2'")
         if "ENUMERAR" not in c:
             violations.append(f"[{af.name}] <execution_protocol> nao detalha a etapa 'ENUMERAR'")

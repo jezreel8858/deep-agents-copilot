@@ -6,7 +6,7 @@ description: >-
   e práticas de engenharia em qualquer repositório de software (agnóstico de stack),
   identificando ausência de README/CONTRIBUTING/LICENSE, vazamentos de .env, gaps
   de CI/CD e linters. Estritamente read-only — nunca implementa ou altera arquivos.
-model: "Claude Sonnet 5"
+model: "Claude Sonnet 5.5"
 tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_batch_execute', 'context-mode/ctx_search', 'context-mode/ctx_index']
 source_docs:
   - .github/skills/context-mode/SKILL.md

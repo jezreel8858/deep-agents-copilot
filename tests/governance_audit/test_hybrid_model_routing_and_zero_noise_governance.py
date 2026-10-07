@@ -2,7 +2,7 @@
 test_hybrid_model_routing_and_zero_noise_governance.py — Quality Gate Determinístico de Modelo Híbrido e Política Zero-Noise.
 
 Valida as seguintes garantias de governança:
-(a) Qualquer agent com papel feature-developer, bug-fixer ou test-fixer DEVE utilizar o modelo "Claude Sonnet 5";
+(a) Qualquer agent com papel feature-developer, bug-fixer ou test-fixer DEVE utilizar o modelo "Claude Sonnet 5.5";
 (b) Qualquer agent com papel test-writer (unit/integration/component) DEVE utilizar o modelo "Gemini 3.8 Flash";
 (c) Todos os 30 agents executores DEVEM declarar '.github/skills/terminal-governance/SKILL.md' em source_docs;
 (d) Todos os 30 agents executores DEVEM citar expressamente 'Zero-Noise Test Policy (terminal-governance/SKILL.md §3.1)';
@@ -23,22 +23,15 @@ PROMOTED_ROLES = ("feature-developer", "bug-fixer", "test-fixer")
 TEST_WRITER_ROLES = ("unit-test-writer", "integration-test-writer", "component-test-writer")
 
 PROMOTED_AGENTS = [
-    "angular-feature-developer", "angular-bug-fixer", "angular-test-fixer",
-    "spring-boot-feature-developer", "spring-boot-bug-fixer", "spring-boot-test-fixer",
-    "spring-reactive-feature-developer", "spring-reactive-bug-fixer", "spring-reactive-test-fixer",
-    "ejb-feature-developer", "ejb-bug-fixer", "ejb-test-fixer",
-    "python-feature-developer", "python-bug-fixer", "python-test-fixer",
-    "struts-feature-developer", "struts-bug-fixer", "struts-test-fixer",
+    "angular-developer", "angular-test-engineer",
+    "spring-boot-developer", "spring-boot-test-engineer",
+    "spring-reactive-developer", "spring-reactive-test-engineer",
+    "ejb-developer", "ejb-test-engineer",
+    "struts-developer", "struts-test-engineer",
+    "python-developer", "python-test-engineer",
 ]
 
-TEST_WRITER_AGENTS = [
-    "angular-component-test-writer", "angular-unit-test-writer",
-    "spring-boot-integration-test-writer", "spring-boot-unit-test-writer",
-    "spring-reactive-integration-test-writer", "spring-reactive-unit-test-writer",
-    "ejb-integration-test-writer", "ejb-unit-test-writer",
-    "python-integration-test-writer", "python-unit-test-writer",
-    "struts-integration-test-writer", "struts-unit-test-writer",
-]
+TEST_WRITER_AGENTS: list[str] = []
 
 ALL_30_EXECUTORS = PROMOTED_AGENTS + TEST_WRITER_AGENTS
 
@@ -67,9 +60,9 @@ def get_executor_agent_files() -> list[Path]:
 
 
 def test_promoted_executor_agents_use_claude_sonnet_5():
-    """Valida (a): feature-developer, bug-fixer e test-fixer devem usar Claude Sonnet 5."""
+    """Valida (a): feature-developer, bug-fixer e test-fixer devem usar Claude Sonnet 5.5."""
     agent_files = get_executor_agent_files()
-    assert len(agent_files) == 30, f"Esperados 30 agents executores, encontrados {len(agent_files)}"
+    assert len(agent_files) == len(ALL_30_EXECUTORS), f"Esperados {len(ALL_30_EXECUTORS)} agents executores, encontrados {len(agent_files)}"
 
     for agent_file in agent_files:
         stem = agent_file.name.replace(".agent.md", "")
@@ -77,9 +70,9 @@ def test_promoted_executor_agents_use_claude_sonnet_5():
             content = agent_file.read_text(encoding="utf-8")
             fm = parse_frontmatter(content)
             model = fm.get("model")
-            assert model == "Claude Sonnet 5", remediation(
-                f"Agent '{stem}' possui model '{model}' no frontmatter, esperado 'Claude Sonnet 5'",
-                fix_hint=f"Edite {agent_file.relative_to(REPO_ROOT)} definindo model: \"Claude Sonnet 5\""
+            assert model == "Claude Sonnet 5.5", remediation(
+                f"Agent '{stem}' possui model '{model}' no frontmatter, esperado 'Claude Sonnet 5.5'",
+                fix_hint=f"Edite {agent_file.relative_to(REPO_ROOT)} definindo model: \"Claude Sonnet 5.5\""
             )
 
 
@@ -127,7 +120,7 @@ def test_all_30_executors_cite_zero_noise_test_policy_literal():
 
 
 def test_stack_catalogs_model_parity_for_promoted_agents():
-    """Valida paridade de catálogo: *-catalog.yaml deve refletir 'Claude Sonnet 5' para os 18 promovidos."""
+    """Valida paridade de catálogo: *-catalog.yaml deve refletir 'Claude Sonnet 5.5' para os 18 promovidos."""
     catalog_files = list(AGENTS_DIR.glob("**/*-catalog.yaml"))
     for cat in catalog_files:
         content = cat.read_text(encoding="utf-8")
@@ -136,9 +129,9 @@ def test_stack_catalogs_model_parity_for_promoted_agents():
         for agent_id, agent_info in agents_dict.items():
             if agent_id in PROMOTED_AGENTS:
                 model = agent_info.get("model")
-                assert model == "Claude Sonnet 5", remediation(
-                    f"Catálogo {cat.relative_to(REPO_ROOT)} declara model '{model}' para '{agent_id}', esperado 'Claude Sonnet 5'",
-                    fix_hint=f"Atualize a entrada de '{agent_id}' no catálogo {cat.relative_to(REPO_ROOT)} para model: 'Claude Sonnet 5'"
+                assert model == "Claude Sonnet 5.5", remediation(
+                    f"Catálogo {cat.relative_to(REPO_ROOT)} declara model '{model}' para '{agent_id}', esperado 'Claude Sonnet 5.5'",
+                    fix_hint=f"Atualize a entrada de '{agent_id}' no catálogo {cat.relative_to(REPO_ROOT)} para model: 'Claude Sonnet 5.5'"
                 )
 
 

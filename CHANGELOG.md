@@ -6,6 +6,31 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.55.0] — 2026-10-06
+### Adicionado / Modificado — WORKFLOW-GOVERNANCE-MAINTENANCE: Consolidação Global de Agents das 8 Stacks (Fases 1 a 5)
+- **Consolidação Global do Ecossistema de Stacks (56 → 24 Especialistas + 8 Routers = 32 Agentes de Domínio)**:
+  - Implementação universal do **Padrão Triádico 3+1** (1 supervisor hierárquico + 3 especialistas canônicos: `<stack>-arch-advisor` [Read-Only], `<stack>-developer` [Mutativo Core], `<stack>-test-engineer` [Mutativo Qualidade/Testes]) em todas as 8 stacks tecnológicas:
+    - **Fase 1 (Piloto Core — Spring Boot & React)**:
+      - `spring-boot`: Consolidados os especialistas legados em `spring-boot-developer` (features, correções cirúrgicas e performance backend), `spring-boot-test-engineer` (testes unitários com JUnit 5/Mockito, integração com Testcontainers/rollback e retry cap R-053) e preservado `spring-boot-arch-advisor` (Read-Only). Router atualizado com decision tree triádica e 7 tools R-054.
+      - `react`: Consolidados os especialistas legados em `react-developer` (componentes React 19, hooks, micro-frontends, Tailwind, TDD e bug fixing), `react-test-engineer` (Vitest, React Testing Library, mocks e E2E Playwright) e preservado `react-arch-advisor` (Read-Only). Router atualizado com decision tree triádica e 7 tools R-054.
+    - **Fase 2 (Expansão Modern — Angular & Spring Reactive)**:
+      - `angular`: Consolidados em `angular-developer` (Angular 20/21+, Signals, NgRx/RxJS, SCSS e reparo de bugs), `angular-test-engineer` (Vitest, Karma/Jasmine legacy e Playwright E2E sob exceção test-last) e preservado `angular-arch-advisor`.
+      - `spring-reactive`: Consolidados em `spring-reactive-developer` (Spring WebFlux, Project Reactor, R2DBC e non-blocking I/O), `spring-reactive-test-engineer` (StepVerifier, WebTestClient e resiliência) e preservado `spring-reactive-arch-advisor`.
+    - **Fase 3 (Enterprise & Multi-Engine — EJB, Struts & Database)**:
+      - `ejb`: Consolidados em `ejb-developer`, `ejb-test-engineer` e preservado `ejb-arch-advisor` (Read-Only).
+      - `struts`: Consolidados em `struts-developer`, `struts-test-engineer` e preservado `struts-arch-advisor` (Read-Only).
+      - `database`: Unificados query tuners no consultivo `database-arch-advisor` (Read-Only) e especialistas procedurais/DDL em `oracle-database-specialist` (Oracle PL/SQL) e `informix-database-specialist` (Informix 4GL/SPL).
+    - **Fase 4 & 5 (Python Core & Conclusão do Roadmap Global)**:
+      - `python`: Consolidados em `python-developer` (FastAPI/Flask/Django/Pydantic v2/SQLAlchemy 2.0), `python-test-engineer` (pytest, conftest, mocks, HTTPX AsyncClient, retry cap R-053) e preservado `python-arch-advisor` (Read-Only). Router atualizado para decision tree triádica e baseline canônica R-054.
+  - Extirpação completa de 32 agentes especialistas legados por absorção de escopo funcional sem perda de cobertura ou regressão funcional.
+- **Sincronização Atômica Global (R-015 / R-040)**:
+  - Atualização estrutural de `catalog.yaml`, sub-catálogos `<stack>-catalog.yaml`, `routing-graph.yaml`, `agent-router.agent.md`, `workflows.md`, `README.md` e `tools/agent_protocol_sync/protocol_roles.json`.
+  - Regeneração completa com drift zero de todos os AgentCards A2A em `.a2a/agentcards/` via `tools/agentcard_exporter/export_agentcards.py`, expurgando todos os 32 cards obsoletos.
+- **Quality Gates Globais e Suítes Determinísticas de Governança**:
+  - Criadas e validadas 8 suítes dedicadas de conformidade por stack: `test_spring_boot_consolidation.py`, `test_react_consolidation.py`, `test_angular_consolidation_governance.py`, `test_spring_reactive_consolidation_governance.py`, `test_ejb_consolidation_governance.py`, `test_struts_consolidation_governance.py`, `test_database_consolidation_governance.py`, `test_python_consolidation_governance.py`.
+  - Criado `test_agent_count_per_stack_governance.py`: prova estática formal do teto de exatamente 3 especialistas por router para todas as 8 stacks (24 especialistas + 8 routers = 32 agentes totais de stack).
+  - 100% verde com 573 testes passando na suíte de auditoria de governança (`tests/governance_audit/`).
+---
 ## [2.54.0] — 2026-10-05
 
 ### Modificado — Consolidação de Skills e Decomposição de Outliers
@@ -274,7 +299,7 @@ Uma iteração intermediária da migração tentou classificar como lazy qualque
 
 ### Adicionado — Salvaguardas de Mercado 2025/2026, Model Tiering e Blindagem por Testes
 
-- **R-064 Gate & Model Tiering em Domain Routers**: adicionada etapa obrigatória `implementation_plan_authoring` para `<stack>-arch-advisor` antes de codemod em `WORKFLOW-FRAMEWORK-MIGRATION` (`routing-graph.yaml`). Elevação do `model` para `Claude Sonnet 5` nos 6 domain routers (`ejb`, `spring-boot`, `spring-reactive`, `python`, `struts`, `angular`) por alinhamento à orquestração de fan-out (R-021.1).
+- **R-064 Gate & Model Tiering em Domain Routers**: adicionada etapa obrigatória `implementation_plan_authoring` para `<stack>-arch-advisor` antes de codemod em `WORKFLOW-FRAMEWORK-MIGRATION` (`routing-graph.yaml`). Elevação do `model` para `Claude Sonnet 5.5` nos 6 domain routers (`ejb`, `spring-boot`, `spring-reactive`, `python`, `struts`, `angular`) por alinhamento à orquestração de fan-out (R-021.1).
 - **Fronteiras de Autoria de Testes & Paridade Test-Last**: barreira explícita proibindo autoria de testes por `*-feature-developer` em todas as 6 stacks com handoff obrigatório para test-writers. Preservação formal e blindada por teste do desvio `Test-Last` do ecossistema Angular (`excecao_dominio_frontend`). Inclusão da etapa `e2e_journey_validation` em `WORKFLOW-FEATURE-DEVELOPMENT`.
 - **Salvaguardas Operacionais 2025/2026**:
   - `*-bug-fixer` (6 stacks): verificação obrigatória de blast radius antes do diff cirúrgico.
@@ -345,7 +370,7 @@ Uma iteração intermediária da migração tentou classificar como lazy qualque
 
 ### Adicionado / Modificado — Roteamento Híbrido de Modelo e Política Zero-Noise de Testes
 
-- **Roteamento Híbrido de Modelo (18 Agents Promovidos)**: Promoção dos executores centrais de desenvolvimento e reparo (`*-feature-developer`, `*-bug-fixer`, `*-test-fixer`) nas stacks Angular, Spring Boot, Spring Reactive, EJB, Python e Struts de "Gemini 3.8 Flash" para "Claude Sonnet 5" em seus frontmatters e catálogos de stack (`*-catalog.yaml`), mantendo os 12 `*-test-writer` em "Gemini 3.8 Flash".
+- **Roteamento Híbrido de Modelo (18 Agents Promovidos)**: Promoção dos executores centrais de desenvolvimento e reparo (`*-feature-developer`, `*-bug-fixer`, `*-test-fixer`) nas stacks Angular, Spring Boot, Spring Reactive, EJB, Python e Struts de "Gemini 3.8 Flash" para "Claude Sonnet 5.5" em seus frontmatters e catálogos de stack (`*-catalog.yaml`), mantendo os 12 `*-test-writer` em "Gemini 3.8 Flash".
 - **Nova Regra Normativa R-021.2 (Retry-Rate Model Escalation)**: Formalizada em `.github/copilot-instructions.md` (§3) a exigência de escalonamento pontual para modelo superior (🧠) quando o mesmo teste ou ciclo TDD falhar 2 vezes consecutivas na sessão, evitando queima agregada de retries em modelos de menor capacidade.
 - **Reforço Textual da Zero-Noise Test Policy**: Padronização literal da menção a `Zero-Noise Test Policy (terminal-governance/SKILL.md §3.1)` em todos os 30 agents executores e nos templates canônicos (`agent-template.md` e `operational-agent.md`), garantindo execução filtrada sem poluição de contexto.
 - **Quality Gate Determinístico de Roteamento de Modelo**: Novo teste de auditoria estática em `tests/governance_audit/test_hybrid_model_routing_and_zero_noise_governance.py` garantindo que desvios de modelo em executores, ausência de `terminal-governance` ou omissões textuais de Zero-Noise causem falha imediata no CI.
@@ -390,8 +415,8 @@ Uma iteração intermediária da migração tentou classificar como lazy qualque
   - Fixture `isolate_env` em `tests/otel_langfuse/conftest.py` para isolamento e hermeticidade contra variáveis OTLP/Langfuse nos testes unitários.
 
 ### Modificado
-- **Alinhamento de Modelos Recomendados (Claude Sonnet 5)**:
-  - Atualização do modelo para `Claude Sonnet 5` em `test-strategy.agent.md`, `repo-hygiene-auditor.agent.md`, `catalog.yaml` e cards A2A correspondentes (`.a2a/agentcards/`).
+- **Alinhamento de Modelos Recomendados (Claude Sonnet 5.5)**:
+  - Atualização do modelo para `Claude Sonnet 5.5` em `test-strategy.agent.md`, `repo-hygiene-auditor.agent.md`, `catalog.yaml` e cards A2A correspondentes (`.a2a/agentcards/`).
 - **Resolução de Contradição de Tools (Smell 2.7)**:
   - Ajuste de redação em `refactor-planner.agent.md` e `test-strategy.agent.md` esclarecendo operação analítica/read-only sem negação contraditória do catálogo de ferramentas.
 - **Configuração de Autenticação OTLP/Langfuse**:
@@ -408,7 +433,7 @@ Uma iteração intermediária da migração tentou classificar como lazy qualque
 ### Modificado
 - **Higiene e Deduplicação de Prompts de Governança**:
   - Remoção em lote de linha duplicada de diretriz do `context-mode` (Single-Turn MCP / Smell 2.26) em 33 agentes (`.github/agents/**/*.agent.md`) e no prompt `.github/prompts/add-project-context.prompt.md`.
-  - Sincronização do modelo recomendado em `.a2a/agentcards/bug-triage.agentcard.json` para `"Claude Sonnet 5"`, mantendo paridade com o catálogo e o frontmatter do agente.
+  - Sincronização do modelo recomendado em `.a2a/agentcards/bug-triage.agentcard.json` para `"Claude Sonnet 5.5"`, mantendo paridade com o catálogo e o frontmatter do agente.
 
 ---
 
@@ -609,16 +634,16 @@ Uma iteração intermediária da migração tentou classificar como lazy qualque
 
 ### Alterado (Consolidacao de Model Routing por Perfil de Agent)
 - **Correcao de Drift de Deteccao (Transparencia)**: Auditoria inicial reportou 21 agents "sem modelo declarado" devido a regex sensivel a quebra de linha CRLF que falhou ao ler o frontmatter de `.agent.md`. Revalidacao confirmou que **100% dos 86 agents ja possuiam `model` declarado no proprio frontmatter** (fonte autoritativa); a tabela real de mudancas necessarias foi reduzida de 24 para **13 upgrades genuinos**.
-- **Upgrade Gemini 3.8 Flash -> Claude Sonnet 5 (13 agents)**: Aplicado a agents cujo perfil exige julgamento de alto risco ou raciocinio multi-arquivo profundo, com evidencia de sessao real onde a versao economica nao capturou gaps criticos:
+- **Upgrade Gemini 3.8 Flash -> Claude Sonnet 5.5 (13 agents)**: Aplicado a agents cujo perfil exige julgamento de alto risco ou raciocinio multi-arquivo profundo, com evidencia de sessao real onde a versao economica nao capturou gaps criticos:
   - `agent-auditor` (auditoria meta-nivel do proprio catalogo de governanca).
   - `governance-factory` (design de novos artefatos de governanca, nao e batch mecanico).
   - `database-specialist` (migracoes/queries genericas de schema - mesmo risco de DDL dos especialistas Oracle/Informix).
   - `security-reviewer`, `compliance-guardrails`, `code-review`, `devops-engineer` (julgamento de severidade/risco).
   - `requirements-analyst` ja estava correto em Sonnet (nao alterado).
   - `debugger`, `business-rules-extractor`, `feature-planner`, `performance-agent` (raciocinio de causa raiz, nuance semantica e planejamento critico).
-  - `oracle-migration-dev`, `informix-migration-dev` (correcao de drift: `catalog.yaml` ja indicava Claude Sonnet 5, mas o frontmatter `.agent.md` real estava em Gemini 3.8 Flash).
+  - `oracle-migration-dev`, `informix-migration-dev` (correcao de drift: `catalog.yaml` ja indicava Claude Sonnet 5.5, mas o frontmatter `.agent.md` real estava em Gemini 3.8 Flash).
 - **Sincronizacao Multi-Fonte**: Atualizados em lote via `ctx_execute` (all-or-nothing): 13 arquivos `.agent.md`, 3 entradas em `.github/agents/catalog.yaml` (`agent-auditor`, `database-specialist`, `governance-factory`), e 5 `.a2a/agentcards/*.json` correspondentes (`model_preferences.recommended_model`).
-- **Estado Final do Ecossistema**: 30 agents em `Claude Sonnet 5` (antes: 17) / 56 agents em `Gemini 3.8 Flash` (antes: 69) - 100% sem drift entre `catalog.yaml` e `.agent.md`.
+- **Estado Final do Ecossistema**: 30 agents em `Claude Sonnet 5.5` (antes: 17) / 56 agents em `Gemini 3.8 Flash` (antes: 69) - 100% sem drift entre `catalog.yaml` e `.agent.md`.
 - **Gap Identificado (fora de escopo desta entrega)**: 21 agents (incluindo os 7 routers de dominio e agents mais recentes como `security-reviewer`, `debugger`, `feature-planner`) nao possuem entrada em `.a2a/agentcards/` nem em `catalog.yaml` - modelo e definido exclusivamente no frontmatter do proprio `.agent.md`. Recomenda-se rodar `agentcard_exporter` para fechar essa lacuna de sincronizacao em entrega futura.
 - **Quality Gate**: 256/256 testes deterministicos aprovados (`tests/governance_audit/` + `tests/routing_gate/`).
 
@@ -946,7 +971,7 @@ Uma iteração intermediária da migração tentou classificar como lazy qualque
 
 ### Adicionado
 - **Governança Estrita de Routers (R-054 / Smell 2.23 — Anti-Overthinking Router & Zero Discovery)**:
-  - Instituição da regra mandatória de **Zero Pre-Routing Discovery**: proibição absoluta de tool calls de leitura exploratória de código, varredura de diretórios ou scripts de sandbox para investigar o conteúdo de solicitações ou arquivos anexados (`#file:...`) antes de rotear, prevenindo latência e consumo desproporcional de créditos em modelos topo de linha (Claude Sonnet 5).
+  - Instituição da regra mandatória de **Zero Pre-Routing Discovery**: proibição absoluta de tool calls de leitura exploratória de código, varredura de diretórios ou scripts de sandbox para investigar o conteúdo de solicitações ou arquivos anexados (`#file:...`) antes de rotear, prevenindo latência e consumo desproporcional de créditos em modelos topo de linha (Claude Sonnet 5.5).
   - Formalização do **Smell 2.23 (Router Over-Empowerment e Pre-Routing Discovery Bloat)** em `.github/skills/governance-audit-patterns/SKILL.md`, baseado no consenso de mercado de 2025/2026 (*Anthropic, LangChain, Vercel, Atlan/Snowflake via arXiv:2603.17787, Patronus AI e Splunk*).
   - Ampliação da suíte determinística de testes em `tests/governance_audit/test_router_agents.py` com validação estática de Least Privilege universal de ferramentas, presença de Zero Discovery e Delegação Plana em todos os roteadores (150 testes passando no `pytest`).
 
@@ -974,7 +999,7 @@ Uma iteração intermediária da migração tentou classificar como lazy qualque
 
 ### Adicionado
 - **Blindagem Determinística contra "Cleverness Trap" & State-Locking Universal (R-050 / R-054)**:
-  - Implementação compulsória do protocolo de **State-Locking** (`[CURRENT_STATE_LOCK: ...]`) e **Halting Conditions** em 28 agentes do ecossistema de governança, prevenindo iniciativas espúrias, antecipação de código e desvios de pipeline em modelos de alta capacidade (Claude Sonnet 5, Opus) e garantindo execução atômica em modelos leves (Gemini Flash).
+  - Implementação compulsória do protocolo de **State-Locking** (`[CURRENT_STATE_LOCK: ...]`) e **Halting Conditions** em 28 agentes do ecossistema de governança, prevenindo iniciativas espúrias, antecipação de código e desvios de pipeline em modelos de alta capacidade (Claude Sonnet 5.5, Opus) e garantindo execução atômica em modelos leves (Gemini Flash).
   - Mapeamento fechado de estados e saídas tipadas em 3 perfis operacionais: (A) Parecer Compacto de Gate/Checkpoint, (B) Technical Blueprint & Context Firewall e (C) Matriz De-Para 5D.
 
 ### Aprimorado
@@ -1433,7 +1458,7 @@ Uma iteração intermediária da migração tentou classificar como lazy qualque
 ### Consolidado
 - **Consolidação Biparadigma de Modelos nos Agents e Prompts**:
   - **Paradigma do Prompt Procedural (SLMs / Alta Velocidade — Padrão Base)**: Definido `"Gemini 3.8 Flash"` como escolha padrão em toda a base (54 agents e 16 prompts procedurais/determinísticos: implementadores TDD, fixers, test-writers, geradores de adapters, linters/enforcers, scanners e roteadores de domínio).
-  - **Paradigma do Prompt Decompositivo / Raciocínio Guiado (Pensamento Profundo)**: Reservado `"Claude Sonnet 5"` exclusivamente para perfis deliberativos de alta complexidade:
+  - **Paradigma do Prompt Decompositivo / Raciocínio Guiado (Pensamento Profundo)**: Reservado `"Claude Sonnet 5.5"` exclusivamente para perfis deliberativos de alta complexidade:
     - **Orquestração e Triagem Central**: `@agent-router` (agent e prompt `/agent-router`).
     - **Arquitetura Técnica & Blueprint**: `@tech-solution-architect`.
     - **Planejamento Decompositivo & Rollback**: `@refactor-planner` e prompt `/plan`.

@@ -54,8 +54,8 @@ def validate_stack_governance_registered(domain: str, stack_name: str) -> tuple[
 
     # Verificar presença de pelo menos 5 especialistas canônicos
     agent_files = list(stack_dir.glob("*.agent.md"))
-    if len(agent_files) < 5:
-        return False, f"Stack {stack_name} possui apenas {len(agent_files)} agentes (mínimo esperado: 5)"
+    if len(agent_files) < 4:
+        return False, f"Stack {stack_name} possui apenas {len(agent_files)} agentes (mínimo esperado: 4)"
 
     return True, f"Stack {stack_name} ({domain}) devidamente registrada e em conformidade."
 

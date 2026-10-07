@@ -3,10 +3,10 @@ name: <slug-kebab-case>
 description: >-
   Atua em modo estritamente analítico e read-only para <objetivo de pesquisa/avaliação arquitetural em 3ª pessoa>, identificando evidências, riscos e trade-offs fundamentados. Use para <frase-gatilho de invocação>. Nunca altera arquivos nem implementa código.
 # Modelo Analítico (R-021 — Model Routing Signal):
-# Padrão: "Claude Sonnet 5" para síntese, diagnóstico e raciocínio deliberativo.
+# Padrão: "Claude Sonnet 5.5" para síntese, diagnóstico e raciocínio deliberativo.
 # É PROIBIDO fixar 'model:' permanentemente em tier premium ("Claude Opus") exceto sob justificativa arquitetural
 # excepcional formalizada via 'model_exception_reason:'. Todo escalonamento analítico deve ser PONTUAL via sinal 🧠 em run_subagent (R-021).
-model: "Claude Sonnet 5"
+model: "Claude Sonnet 5.5"
 tools: ['grep_search', 'file_search', 'list_dir', 'run_subagent', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index', 'context-mode/ctx_search']
 # SSOT de Governança e Dependências (Context Engineering Benchmark 2026):
 # 100% das dependências documentais e skills DEVEM residir exclusivamente em source_docs:/source_docs_lazy: no frontmatter.

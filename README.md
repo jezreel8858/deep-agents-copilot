@@ -407,7 +407,7 @@ flowchart TB
 - ✅ Visibilidade obrigatória: toda resposta abre com `Agente Ativo: <name>` e sinalização de handoff quando aplicável.
 
 ### Supervisores de Domínio e Especialistas por Stack
-- ✅ Supervisores hierárquicos (`angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `struts-router`, `python-router` e `database-router`) orquestram seus especialistas dedicados em análise (Advisory) e implementação tática, testing-first e diffs cirúrgicos.
+- ✅ Supervisores hierárquicos (`angular-router`, `spring-boot-router`, `react-router`, `spring-reactive-router`, `ejb-router`, `struts-router`, `python-router` e `database-router`) orquestram seus especialistas dedicados em análise (Advisory) e implementação tática, testing-first e diffs cirúrgicos.
 
 ---
 

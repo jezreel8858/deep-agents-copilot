@@ -15,7 +15,7 @@ handoff_payload:
   emissor:
     nome: "bug-triage"
     versao: "1.1.0"
-    modelo_llm: "Claude Sonnet 5"
+    modelo_llm: "Claude Sonnet 5.5"
     timestamp: "2026-09-10T12:00:00Z"
   workflow_tracking:
     workflow_id: "WORKFLOW-BUG-FIX"

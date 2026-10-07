@@ -7,7 +7,7 @@ description: >-
   invadidas, God Classes e candidatos a segregação de módulos/microserviços.
   Complementa o mapeamento estrutural determinístico do codegraph-engine
   com análise semântica de domínio. Estritamente read-only.
-model: "Claude Sonnet 5"
+model: "Claude Sonnet 5.5"
 tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_index', 'context-mode/ctx_execute', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute_file']
 source_docs:
   - .github/skills/refactoring-planning-patterns/SKILL.md

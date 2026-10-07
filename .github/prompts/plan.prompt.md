@@ -2,7 +2,7 @@
 name: plan
 description: Cria plano de implementação detalhado com análise de dependências, paralelismo e checklist de autonomia.
 agent: 'agent'
-model: "Claude Sonnet 5"
+model: "Claude Sonnet 5.5"
 tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file']
 argument-hint: '[descrição-da-feature | caminho-do-arquivo]'
 source_docs_lazy:

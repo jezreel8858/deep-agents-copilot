@@ -56,7 +56,7 @@ def test_arquivos_sem_ctx_tool_sao_excluidos_do_bloco():
     files_to_check.extend([p for p in sorted(agents_dir.glob("**/*.agent.md")) if "templates" not in p.parts])
     files_to_check.extend([p for p in sorted(prompts_dir.glob("**/*.prompt.md")) if "templates" not in p.parts])
 
-    assert len(files_to_check) > 100, f"Esperado > 100 arquivos para checagem, encontrado {len(files_to_check)}"
+    assert len(files_to_check) >= 84, f"Esperado >= 84 arquivos para checagem (após consolidação Fase 4/5), encontrado {len(files_to_check)}"
 
     violations: list[str] = []
     for fp in files_to_check:

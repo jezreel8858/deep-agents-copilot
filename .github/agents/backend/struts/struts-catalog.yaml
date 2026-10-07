@@ -1,13 +1,14 @@
-version: "1.0"
+version: "2.0"
 domain: "backend-struts"
 description: >-
-  Sub-catálogo hierárquico de agentes especializados em Java Legado Struts (Struts 1.x e Struts 2.x).
-  Isola a topologia de especialistas Struts do catálogo central global, evitando explosão de nós no agent-router e permitindo orquestração local por domínio.
+  Sub-catálogo hierárquico consolidado de agentes especializados em Java Legado Struts (Padrão Triádico 3+1).
+  Isola a topologia de especialistas Struts do catálogo central global, evitando explosão de nós
+  no agent-router e permitindo orquestração local por domínio com alinhamento à governança canônica.
 
 router:
   id: "struts-router"
   role: "supervisor"
-  description: "Roteador central do domínio Java Legado Struts — tria e despacha para os 7 especialistas backend"
+  description: "Roteador central do domínio Java Legado Struts — tria e despacha para os 3 especialistas backend (arch-advisor, developer e test-engineer)"
   tools:
     - "read_file"
     - "file_search"
@@ -24,7 +25,7 @@ router:
 agents:
   struts-arch-advisor:
     id: "struts-arch-advisor"
-    model: "Claude Sonnet 5"
+    model: "Claude Sonnet 5.5"
     role: "advisory"
     domain: "Arquitetura Java Legado Struts 1.x/2.x, ActionServlet, descritores XML, Tiles, OGNL e manutenibilidade arquitetural"
     description: "Especialista analítico read-only: arquitetura MVC Struts 1.x/2.x, struts-config.xml, struts.xml, Tiles, interceptors, segurança OGNL e governança de código legado."
@@ -33,223 +34,104 @@ agents:
       - "auditoria struts"
       - "struts 1"
       - "struts 2"
+      - "actionservlet"
       - "struts-config.xml"
-      - "struts.xml"
+      - "ognl"
       - "tiles"
-      - "manutenibilidade struts"
-      - "governanca struts"
+      - "modernizacao struts"
     tools:
-    - file_search
-    - grep_search
-    - list_dir
-    - ask_questions
-    - run_subagent
-    - context-mode/ctx_search
-    - context-mode/ctx_execute
-    - context-mode/ctx_batch_execute
-    - context-mode/ctx_execute_file
-    - context-mode/ctx_index
+      - file_search
+      - grep_search
+      - list_dir
+      - ask_questions
+      - run_subagent
+      - context-mode/ctx_search
+      - context-mode/ctx_batch_execute
+      - context-mode/ctx_index
     skills:
       - "java-jdk-backend-governance"
+      - "documentation-writing-patterns"
+      - "security-review-patterns"
       - "specialist-hybrid-advisory-implementation-patterns"
-      - "codegraph-optave-usage"
-      - "agent-contracts"
       - "context-mode"
+      - "handoff-governance"
+      - "agent-contracts"
 
-  struts-feature-developer:
-    id: "struts-feature-developer"
-    model: "Claude Sonnet 5"
-    role: "implementer"
-    domain: "Desenvolvimento de features em Java Legado Struts: Actions, ActionMapping, ActionForm, DynaActionForm, JSP Taglibs sob TDD estrito"
-    description: "Desenvolvedor de features Struts: implementa Actions, DispatchActions, FormBeans, mapeamentos XML e integrações de serviço sob TDD com JUnit 4/5 e Mockito."
+  struts-developer:
+    id: "struts-developer"
+    model: "Claude Sonnet 5.5"
+    role: "implementation"
+    domain: "Desenvolvimento de Produção Struts, Actions, FormBeans, Mapeamentos XML, Correção Cirúrgica de Bugs e Otimização de Performance"
+    description: "Especialista mutativo core: implementa Actions, DispatchActions, FormBeans (ActionForm/DynaActionForm), descritores XML, resolve bugs cirúrgicos (ActionForwards, ClassCastException, vazamentos de sessão) com diff mínimo e otimiza rendering Tiles/JSP e elimina session bloat."
     keywords:
       - "feature struts"
       - "action struts"
+      - "dispatchaction"
+      - "formbean"
       - "actionform"
       - "dynaactionform"
-      - "dispatchaction"
-      - "actionmapping"
-      - "tdd struts"
-      - "jsp struts taglib"
+      - "struts-config"
+      - "bugfix struts"
+      - "tuning struts"
+      - "session bloat"
+      - "tiles render"
     tools:
-    - file_search
-    - grep_search
-    - list_dir
-    - ask_questions
-    - run_subagent
-    - get_errors
-    - run_in_terminal
-    - context-mode/ctx_execute
-    - context-mode/ctx_search
-    - context-mode/ctx_batch_execute
-    - context-mode/ctx_index
-    - context-mode/ctx_execute_file
+      - file_search
+      - grep_search
+      - list_dir
+      - ask_questions
+      - run_subagent
+      - get_errors
+      - run_in_terminal
+      - context-mode/ctx_execute
+      - context-mode/ctx_search
+      - context-mode/ctx_batch_execute
+      - context-mode/ctx_index
+      - context-mode/ctx_execute_file
     skills:
       - "java-jdk-backend-governance"
-      - "terminal-governance"
-      - "context-mode"
-      - "efficient-batch-code-modification"
-
-  struts-bug-fixer:
-    id: "struts-bug-fixer"
-    model: "Claude Sonnet 5"
-    role: "fixer"
-    domain: "Correções cirúrgicas de falhas em Struts: ClassCastException em form-beans, forwards nulos, thread-safety em Actions, vazamentos de sessão"
-    description: "Especialista em resolução rápida de bugs Struts: corrige falhas de ActionForward, ClassCastException em ActionForm, loops de redirecionamento e concorrência com diff mínimo."
-    keywords:
-      - "bug struts"
-      - "fix struts"
-      - "actionforward nulo"
-      - "classcastexception formbean"
-      - "thread safety action"
-      - "session leak struts"
-      - "corrigir erro struts"
-    tools:
-      - "file_search"
-      - "grep_search"
-      - "list_dir"
-      - "ask_questions"
-      - "run_subagent"
-      - "get_errors"
-      - "run_in_terminal"
-      - "context-mode/ctx_execute"
-      - "context-mode/ctx_search"
-      - "context-mode/ctx_batch_execute"
-      - "context-mode/ctx_execute_file"
-      - "context-mode/ctx_index"
-    skills:
-      - "code-tracing"
-      - "terminal-governance"
-      - "context-mode"
-      - "efficient-batch-code-modification"
-
-  struts-perf-tuner:
-    id: "struts-perf-tuner"
-    model: "Gemini 3.8 Flash"
-    role: "performance"
-    domain: "Otimização de performance em Struts — eliminação de session bloat em ActionForms, tuning de Tiles/JSP e conexões JDBC DataSource"
-    description: "Especialista em performance Struts: mitiga session bloat por FormBeans acumulados, otimiza rendering de Tiles/JSP, afina DataSources JDBC e reduz overhead de I/O em multipart."
-    keywords:
-      - "performance struts"
-      - "session bloat"
-      - "tuning tiles"
-      - "datasource struts"
-      - "multipart request tuning"
-      - "otimizacao jsp legado"
-    tools:
-      - "file_search"
-      - "grep_search"
-      - "list_dir"
-      - "ask_questions"
-      - "run_subagent"
-      - "get_errors"
-      - "run_in_terminal"
-      - "context-mode/ctx_execute"
-      - "context-mode/ctx_search"
-      - "context-mode/ctx_batch_execute"
-      - "context-mode/ctx_execute_file"
-      - "context-mode/ctx_index"
-    skills:
       - "performance-engineering-patterns"
-      - "terminal-governance"
-      - "context-mode"
       - "efficient-batch-code-modification"
+      - "code-tracing"
+      - "context-mode"
+      - "handoff-governance"
+      - "agent-contracts"
+      - "terminal-governance"
 
-  struts-unit-test-writer:
-    id: "struts-unit-test-writer"
-    model: "Gemini 3.8 Flash"
-    role: "tester"
-    domain: "Testes unitários isolados de Actions e FormBeans Struts com Mockito e StrutsTestCase/JUnit sem container de servlet"
-    description: "Escreve testes unitários desacoplados para Struts: testa Actions como POJOs e com StrutsTestCase/Mockito mockando HttpServletRequest, Response e ActionMapping."
+  struts-test-engineer:
+    id: "struts-test-engineer"
+    model: "Claude Sonnet 5.5"
+    role: "quality-assurance"
+    domain: "Garantia de Qualidade, Testes Unitários StrutsTestCase/Mockito, Testes de Integração Tomcat/Jetty Emulado e Autocorreção sob R-053"
+    description: "Especialista mutativo de testes: implementa testes unitários isolados com Mockito e StrutsTestCase (Actions e FormBeans sem Servlet Container), testes de integração em contêiner emulado (Tomcat/Jetty, interceptors, Testcontainers) e realiza diagnóstico e autocorreção de testes com retry cap R-053."
     keywords:
+      - "testes struts"
       - "teste unitario struts"
       - "strutstestcase"
-      - "mock actionmapping"
-      - "mock actionform"
-      - "testar action sem servidor"
-      - "junit struts"
-    tools:
-      - "file_search"
-      - "grep_search"
-      - "list_dir"
-      - "ask_questions"
-      - "run_subagent"
-      - "get_errors"
-      - "run_in_terminal"
-      - "context-mode/ctx_execute"
-      - "context-mode/ctx_search"
-      - "context-mode/ctx_batch_execute"
-      - "context-mode/ctx_execute_file"
-      - "context-mode/ctx_index"
-    skills:
-      - "test-implementation-backend"
-      - "test-coverage-governance"
-      - "terminal-governance"
-      - "context-mode"
-      - "efficient-batch-code-modification"
-
-  struts-integration-test-writer:
-    id: "struts-integration-test-writer"
-    model: "Gemini 3.8 Flash"
-    role: "tester"
-    domain: "Testes de integração do ciclo completo de requisição Struts com container servlet emulado (Tomcat/Jetty embutido) e Testcontainers"
-    description: "Escreve testes de integração para Struts: valida ciclo ActionServlet, cadeia de interceptors/filtros, parsing de struts-config.xml e persistência via Testcontainers."
-    keywords:
+      - "mock servlet"
       - "teste integracao struts"
-      - "actionservlet test"
-      - "ciclo completo struts"
+      - "corrigir teste struts"
+      - "test fixer struts"
       - "testcontainers struts"
-      - "jetty embedded struts"
     tools:
-      - "file_search"
-      - "grep_search"
-      - "list_dir"
-      - "ask_questions"
-      - "run_subagent"
-      - "get_errors"
-      - "run_in_terminal"
-      - "context-mode/ctx_execute"
-      - "context-mode/ctx_search"
-      - "context-mode/ctx_batch_execute"
-      - "context-mode/ctx_execute_file"
-      - "context-mode/ctx_index"
+      - file_search
+      - grep_search
+      - list_dir
+      - ask_questions
+      - run_subagent
+      - get_errors
+      - run_in_terminal
+      - context-mode/ctx_execute
+      - context-mode/ctx_search
+      - context-mode/ctx_batch_execute
+      - context-mode/ctx_index
+      - context-mode/ctx_execute_file
     skills:
       - "test-implementation-backend"
       - "test-coverage-governance"
-      - "terminal-governance"
-      - "context-mode"
+      - "code-tracing"
       - "efficient-batch-code-modification"
-
-  struts-test-fixer:
-    id: "struts-test-fixer"
-    model: "Claude Sonnet 5"
-    role: "fixer"
-    domain: "Diagnóstico e reparo de suítes de teste Struts quebradas em builds legados Ant/Maven Surefire"
-    description: "Diagnostica e corrige falhas em testes de Struts legados: ActionForward inválido em assert, falhas de MockStrutsTestCase, classpath XML e regressões de build Ant/Maven."
-    keywords:
-      - "fix teste struts"
-      - "falha strutstestcase"
-      - "corrigir teste legado struts"
-      - "surefire struts error"
-      - "struts-config nao encontrado teste"
-    max_iteracoes: 3
-    escalonamento: "Após 3 tentativas sem sucesso, retornar ao @agent-router via ask_questions (motivo: 'loop_limite_atingido') — nunca repetir indefinidamente"
-    tools:
-      - "file_search"
-      - "grep_search"
-      - "list_dir"
-      - "ask_questions"
-      - "run_subagent"
-      - "get_errors"
-      - "run_in_terminal"
-      - "context-mode/ctx_execute"
-      - "context-mode/ctx_search"
-      - "context-mode/ctx_batch_execute"
-      - "context-mode/ctx_execute_file"
-      - "context-mode/ctx_index"
-    skills:
-      - "structured-intake-patterns"
-      - "terminal-governance"
       - "context-mode"
-      - "efficient-batch-code-modification"
-
+      - "handoff-governance"
+      - "agent-contracts"
+      - "terminal-governance"

@@ -5,7 +5,7 @@ description:
   Triar bugs e regressões com foco em reprodução, hipótese de causa raiz, análise
   proativa de blast radius e plano mínimo de correção sem implementar a solução.
   Genérico — agnóstico de sistema de rastreamento (Jira, GitHub Issues, Linear, CSV ou relato livre).
-model: "Claude Sonnet 5"
+model: "Claude Sonnet 5.5"
 tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'run_in_terminal', 'ask_questions', 'run_subagent', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
 source_docs:
   - .github/skills/structured-intake-patterns/SKILL.md
