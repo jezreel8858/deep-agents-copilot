@@ -33,7 +33,7 @@ APRENDIZADO ────────────────────┼─�
 
 - [**Guia de Primeiros Passos & Setup**](context/setup-context-mode-intellij.md): Configuração do ambiente integrado com JetBrains IntelliJ IDEA / PyCharm e ativação do `context-mode` MCP.
 - [**Guia Operacional do Motor de Grafo**](agent-context/codegraph-guia-uso.md): Tutorial prático de inicialização e consulta ao `@optave/codegraph` para análise estrutural de código sem IA.
-- [**Instruções Globais de Git Commit**](ai-copilot/global-git-commit-instructions.md): Tutorial sobre o formato padronizado Conventional Commits adotado pelos agentes.
+- [**Guia Rápido de Git Commits**](ai-copilot/global-git-commit-instructions.md): Referência rápida de Conventional Commits para desenvolvedores, alinhada à skill canônica git-governance.
 
 ---
 

@@ -16,6 +16,7 @@ source_docs:
   - .github/skills/efficient-batch-code-modification/SKILL.md
   - .github/skills/handoff-governance/SKILL.md
   - .github/skills/agent-contracts/SKILL.md
+  - .github/skills/design-pattern-selection-patterns/SKILL.md
 source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
@@ -71,6 +72,12 @@ progress: 0
 ---
 
 Progresso: 0/N tarefas concluídas
+
+### Decisão de Design Pattern (mini-ADR — design-pattern-selection-patterns)
+- Contexto: <problema/trade-off identificado que motivou avaliar um pattern>
+- Decisão: <pattern GoF/arquitetural escolhido, ou "Nenhum pattern necessário — solução direta suficiente">
+- Alternativas consideradas: <patterns descartados e motivo>
+- Consequências: <ganho vs custo de acoplamento/complexidade>
 
 ### Checklist de Execução Técnica (GFM Unificado)
 - [ ] <descrição atômica da tarefa técnica> `{paralelizavel: bool, responsavel: "@ejb-developer"}`

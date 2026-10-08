@@ -797,3 +797,140 @@ def test_r015_catalog_and_agent_model_parity():
         f"Violação de paridade de modelo R-015 detectada em {len(mismatches)} agent(s):\n" + "\n".join(mismatches),
         fix_hint="Sincronize o campo 'model:' entre catalog.yaml e o frontmatter do respectivo .agent.md.",
     )
+
+
+def test_smell_2_12_no_prompts_in_agent_source_docs():
+    """Smell 2.12 (SSOT Invertido): Garante que nenhum .agent.md liste arquivos .prompt.md
+    em 'source_docs' ou 'source_docs_lazy'. Prompts são atalhos operacionais e nunca
+    fonte de verdade normativa para agents."""
+    violations = []
+    for agent_file in get_all_agent_files():
+        c = agent_file.read_text(encoding="utf-8")
+        fm = parse_frontmatter(c)
+        docs = fm.get("source_docs") or []
+        docs_lazy = fm.get("source_docs_lazy") or []
+        all_docs = [str(d) for d in (docs + docs_lazy)]
+        for doc in all_docs:
+            if ".prompt.md" in doc or "/prompts/" in doc:
+                violations.append(f"[{agent_file.relative_to(REPO_ROOT)}] importa prompt em source_docs: {doc}")
+
+    sep = chr(10)
+    assert not violations, remediation(
+        f"Violação de Smell 2.12 (SSOT Invertido) detectada em {len(violations)} agent(s):" + sep + sep.join(violations),
+        fix_hint="Remova as referências a .prompt.md do frontmatter dos agents. Mova regras normativas para a SKILL.md correspondente.",
+    )
+
+
+def test_agent_tools_cover_body_context_mode_invocations():
+    """M10 (b): Garante que as ferramentas declaradas em 'tools:' no frontmatter de cada agent
+    cobrem as ferramentas context-mode invocadas operacionalmente no corpo (ex.: ctx_execute, ctx_execute_file).
+    Evita que um agent Gather-only instrua execução própria que não possui ou que um agent mutador
+    use ferramentas não declaradas."""
+    from tests.governance_audit.test_ctx_execute_capability_profile import GATHER_ONLY_AGENTS
+
+    gather_only_set = set(GATHER_ONLY_AGENTS)
+    violations = []
+
+    for agent_file in get_all_agent_files():
+        # Routers são estritamente supervisores sob R-054 (Zero Discovery) e não executam tarefas de arquivo
+        if agent_file.name.endswith("-router.agent.md") or agent_file.name == "agent-router.agent.md":
+            continue
+
+        content = agent_file.read_text(encoding="utf-8")
+        fm = parse_frontmatter(content)
+        raw_tools = fm.get("tools", [])
+        if isinstance(raw_tools, str):
+            raw_tools = [raw_tools]
+
+        declared = set()
+        for t in raw_tools:
+            declared.add(t)
+            if "/" in t:
+                declared.add(t.split("/", 1)[1])
+
+        parts = content.split("---", 2)
+        if len(parts) < 3:
+            continue
+        body = parts[2]
+
+        # Limpa o bloco padrão de execution_protocol
+        body_clean = body.split("<execution_protocol>")[0]
+        # Limpa linhas canônicas de proibição/regras transversais R-056 / Smell 2.26 / auditoria passiva
+        cleaned_lines = []
+        for line in body_clean.splitlines():
+            if any(k in line for k in ["R-008", "R-056", "Smell 2.24", "Smell 2.26", "Regra de Ouro", "Single-Turn MCP", "NÃO realizar discovery", "Validar enforcement"]):
+                continue
+            cleaned_lines.append(line)
+        body_clean = chr(10).join(cleaned_lines)
+
+        agent_id = agent_file.stem.replace(".agent", "")
+        # Se for Gather-only, não deve instruir execução própria via ctx_execute ou ctx_execute_file
+        if agent_id in gather_only_set:
+            if re.search(r'\bctx_execute\b', body_clean) or re.search(r'\bctx_execute_file\b', body_clean):
+                violations.append(f"[{agent_file.relative_to(REPO_ROOT)}] Agente Gather-only instrui ctx_execute/ctx_execute_file no fluxo próprio.")
+        else:
+            # Para outros agents, se usar no fluxo próprio, deve ter em declared
+            for tool in ["ctx_execute", "ctx_execute_file"]:
+                if re.search(r'\b' + tool + r'\b', body_clean) and tool not in declared:
+                    violations.append(f"[{agent_file.relative_to(REPO_ROOT)}] Menciona '{tool}' no corpo mas não declara em tools:.")
+
+    sep = chr(10)
+    assert not violations, remediation(
+        f"Violação de cobertura de ferramentas context-mode detectada em {len(violations)} agent(s):" + sep + sep.join(violations),
+        fix_hint="Alinhe as instruções do corpo do agent com as ferramentas ativamente declaradas no frontmatter.",
+    )
+
+
+def test_git_governance_references_integrity():
+    """M10 (c): Valida que todos os módulos em .github/skills/git-governance/references/
+    referenciados por git-governance/SKILL.md existem fisicamente e possuem conteúdo não-vazio."""
+    git_skill_path = SKILLS_DIR / "git-governance" / "SKILL.md"
+    assert git_skill_path.exists(), remediation("git-governance/SKILL.md não encontrado")
+
+    content = git_skill_path.read_text(encoding="utf-8")
+    ref_matches = set(re.findall(r'references/([a-zA-Z0-9_\-\.]+\.md)', content))
+    assert len(ref_matches) >= 3, remediation("Esperadas ao menos 3 referências modulares em git-governance/SKILL.md")
+
+    ref_dir = SKILLS_DIR / "git-governance" / "references"
+    assert ref_dir.exists() and ref_dir.is_dir(), remediation(".github/skills/git-governance/references/ deve existir como diretório")
+
+    missing = []
+    empty = []
+    for ref_file in ref_matches:
+        target = ref_dir / ref_file
+        if not target.exists():
+            missing.append(ref_file)
+        elif target.stat().st_size < 50:
+            empty.append(ref_file)
+
+    sep = chr(10)
+    assert not missing, remediation(
+        f"Módulos referenciados em git-governance/SKILL.md não encontrados em references/:" + sep + sep.join(missing),
+        fix_hint="Crie os arquivos em .github/skills/git-governance/references/ ou ajuste os links em SKILL.md.",
+    )
+    assert not empty, remediation(
+        f"Módulos vazios detectados em git-governance/references/:" + sep + sep.join(empty),
+        fix_hint="Preencha o conteúdo dos módulos com as convenções normativas de git.",
+    )
+
+
+def test_commit_prompt_not_normative_ssot():
+    """M10 (d): Garante que o prompt commit.prompt.md não se autodeclara 'SSOT Normativa'
+    (prevenção de Smell 2.12). A SSOT normativa reside na skill git-governance."""
+    prompt_path = PROMPTS_DIR / "commit.prompt.md"
+    assert prompt_path.exists(), remediation("commit.prompt.md não encontrado")
+    content = prompt_path.read_text(encoding="utf-8")
+
+    forbidden_patterns = [
+        re.compile(r'SSOT\s+normativa', re.IGNORECASE),
+        re.compile(r'normativa\s+SSOT', re.IGNORECASE),
+        re.compile(r'SSOT\s+única\s+de\s+convenções', re.IGNORECASE),
+    ]
+
+    for pattern in forbidden_patterns:
+        for line in content.splitlines():
+            if pattern.search(line) and "git-governance" not in line:
+                pytest.fail(remediation(
+                    f"[commit.prompt.md] Prompt se declara incorretamente como SSOT normativa na linha: '{line.strip()}'",
+                    fix_hint="Prompts são atalhos executores. Aponte a skill git-governance como a verdadeira SSOT.",
+                ))

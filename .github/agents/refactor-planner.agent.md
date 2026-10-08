@@ -20,6 +20,7 @@ source_docs:
   - .github/skills/handoff-governance/SKILL.md
   - .github/skills/agent-contracts/SKILL.md
   - .github/skills/code-tracing/SKILL.md
+  - .github/skills/design-pattern-selection-patterns/SKILL.md
 source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
@@ -100,6 +101,12 @@ Progresso: 0/N tarefas concluídas
 - **Alvo**: <módulo / classe / serviço>
 - **Blast Radius Estimado**: <N arquivos afetados> (via @codegraph-engine)
 - **Safety Net**: <Testes Unitários Existentes | Characterization Tests Planejados>
+
+### Decisão de Design Pattern no Seam de Extração (mini-ADR — design-pattern-selection-patterns)
+- Contexto: <acoplamento/responsabilidade que a camada de abstração do seam precisa resolver>
+- Decisão: <pattern GoF aplicado ao seam (ex.: Adapter para interface incompatível, Facade para simplificar acesso, Strategy para múltiplas implementações coexistindo, Factory Method para a criação do novo serviço extraído), ou "Nenhum pattern necessário — abstração direta suficiente">
+- Alternativas consideradas: <patterns descartados e motivo>
+- Consequências: <ganho de desacoplamento vs custo de indireção/complexidade>
 
 ### DAG de Tarefas Atômicas (Checklist GFM Unificado)
 - [ ] Tarefa 1: <Nome da Etapa> `{paralelizavel: false, responsavel: "<stack>-refactor-specialist"}`

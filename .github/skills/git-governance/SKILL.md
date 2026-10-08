@@ -1,6 +1,6 @@
 ---
 name: git-governance
-description: Convenções de git workflow, branch naming, commit standards e PR guidelines para projetos enterprise.
+description: Índice canônico (SSOT) de git workflow — branch naming, commits semânticos, PRs com matriz de risco e rollback, guardrail de segredos e changelog.
 tier: 2
 category: governance
 triggers:
@@ -10,7 +10,11 @@ triggers:
   - "git workflow"
   - "mensagem de commit"
   - "branch naming"
+  - "matriz de risco"
+  - "changelog"
 tools: []
+source_docs:
+  - docs/ai-copilot/global-git-commit-instructions.md
 source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
@@ -18,220 +22,76 @@ source_docs_lazy:
 
 # Git Governance
 
-## 0) Problema Resolvido & Princípios Fundamentais
+> **Progressive Disclosure**: Nível 1 = frontmatter; Nível 2 = este índice (regras curtas); Nível 3 = `references/` (carregar apenas o necessário via `ctx_execute_file`/`ctx_search`).
 
-> **Arquitetura da Skill (Anthropic Open Spec / Progressive Disclosure)**:
-> - **Nível 1 (Metadados)**: Frontmatter com `name`, `description` em 3ª pessoa, `tier: 2`, `category: governance` e triggers.
-> - **Nível 2 (Corpo Operacional)**: Este arquivo `SKILL.md` definindo branch naming, commits semânticos, PR guidelines e guardrails de atomicidade.
-> - **Nível 3 (Recursos Suplementares)**: Templates e regras globais em `docs/ai-copilot/`.
+Padroniza versionamento Git: histórico semântico, commits atômicos, PRs auditáveis e zero segredos. **SSOT única** consumida por `/commit` e `@pr-gatekeeper`.
 
-Esta skill padroniza o fluxo de versionamento Git em projetos enterprise, garantindo histórico semântico rastreável, atomicidade de entregas e prevenção contra vazamento de segredos ou commits autônomos por agentes de IA.
+## 1) Quando Usar
 
----
+- ✅ Nomear branches, redigir commits, PR (título/descrição/risco/rollback) e entradas de CHANGELOG.
+- ❌ Executar `git add/commit/push` de forma autônoma (R-031), resolver conflitos às cegas, substituir `@code-review`.
 
-## 1) Quando Usar vs Quando NÃO Usar
+## 2) Mapa de Referências (Nível 3)
 
-### ✅ Quando Usar
-- Ao nomear novas branches (`feature/`, `fix/`, `refactor/`, `chore/`).
-- Ao redigir mensagens de commit semântico conforme Conventional Commits e diretrizes globais.
-- Ao estruturar templates e descrições de Pull Request com matriz de risco.
-- No prompt `/commit` e no agent `@pr-gatekeeper`.
+| Necessidade | Arquivo |
+|---|---|
+| Formato A/B, tipos, atomicidade, trailers | [`references/commit-formats.md`](references/commit-formats.md) |
+| Template de PR + Plano de Rollback | [`references/pr-template.md`](references/pr-template.md) |
+| Critérios de risco e blast radius | [`references/risk-matrix.md`](references/risk-matrix.md) |
+| Defesa em camadas de segredos, regex | [`references/secrets-guardrail.md`](references/secrets-guardrail.md) |
+| Keep a Changelog + mapeamento semântico | [`references/changelog.md`](references/changelog.md) |
 
-### ❌ Quando NÃO Usar
-- Para execução autônoma de `git commit` ou `git push` (expressamente proibido por R-031).
-- Para resolver conflitos de merge às cegas sem inspeção humana.
-- Como substituto de revisão técnica de código (escopo de `@code-review`).
+## 3) Branch Naming
 
----
-
-## 2) Branch Naming Convention
-
-**Formato padrão:**
-
-```
-<tipo>/<jira-id>-<descricao-kebab>
-```
+Formato: `<tipo>/<jira-id>-<descricao-kebab>` (ex.: `docs/governance-simplificar-binding-initializer`).
 
 | Tipo | Uso |
-|------|-----|
-| `feat/` | Nova funcionalidade |
-| `fix/` | Correção de bug |
-| `refactor/` | Refatoração sem mudança de comportamento |
-| `test/` | Apenas testes |
-| `docs/` | Apenas documentação |
-| `chore/` | Build, deps, configuração |
+|---|---|
+| `feat/` `fix/` `refactor/` | Feature, bug, refatoração |
+| `test/` `docs/` `chore/` | Testes, documentação, build/deps |
 | `hotfix/` | Correção crítica em produção |
 
-**Exemplos:**
+Regras: kebab-case; ID Jira quando existir; ≤ 60 caracteres.
 
-```
-docs/governance-simplificar-binding-initializer
-```
+## 4) Regras Essenciais de Commit
 
-**Regras:**
-- Sempre kebab-case
-- ID Jira quando existir (`<PROJETO>-<numero>`)
-- Descrição em PT-BR ou EN (consistente no projeto)
-- Máximo 60 caracteres no total
+- `<tipo>(<escopo>): <resumo>` — imperativo PT-BR, sem ponto final, ≤ 72 colunas.
+- Um commit = uma intenção (teste do "e"). Detalhes: `references/commit-formats.md`.
 
----
+## 5) Pull Request
 
-## 2) Commit Convention (Conventional Commits)
+- Título em Conventional Commits; descrição conforme `references/pr-template.md`.
+- **Matriz de Risco** (`references/risk-matrix.md`) e **Plano de Rollback** obrigatórios.
+- Comandos de validação em inline code (anti-corrupção de cercas).
 
-Use `/commit` para gerar a mensagem automaticamente. Referência rápida:
+## 6) Segredos (R-010 / R-044)
 
-```
-<tipo>(<escopo>): <descrição>
+Camada 3 (agente) bloqueante antes de qualquer mensagem/PR; achado → parar, reportar `arquivo:linha`, exigir rotação. Catálogo e camadas 1-2: `references/secrets-guardrail.md`.
 
-[corpo opcional]
+## 7) Merge Strategy
 
-[trailers opcionais]
-```
+| Estratégia | Quando |
+|---|---|
+| Squash merge | Features pequenas (1-3 commits) |
+| Merge commit | Features grandes/releases |
+| Rebase | ❌ Evitar em branches compartilhadas |
 
-**Tipos:**
+## 8) Conflitos de Merge/Rebase
 
-| Tipo | Descrição |
-|------|-----------|
-| `feat` | Nova feature |
-| `fix` | Bug fix |
-| `refactor` | Refactor |
-| `test` | Testes |
-| `docs` | Documentação |
-| `chore` | Build/deps/config |
-| `perf` | Performance |
+Nunca `--abort` como fuga (só base errada ou pedido humano); diagnosticar hunk a hunk, preservar intenção de ambos os lados, sem refatorações acessórias, rodar checks antes de `--continue`; sem `git push --force` por agentes (R-031). Procedimento completo: `.github/skills/git-conflict-resolution-patterns/SKILL.md`.
 
-**Regras da mensagem:**
-- Imperativo, PT-BR: "adiciona", "corrige", "remove", "extrai"
-- Sem ponto final na primeira linha
-- ≤ 72 caracteres na primeira linha
-- Corpo separado por linha em branco
+## 9) Checklist Pré-PR
 
----
+- [ ] Branch conforme convenção; commits atômicos e semânticos
+- [ ] Testes passando; sem debug (`console.log`, `System.out.println`)
+- [ ] Guardrail de segredos limpo (R-010)
+- [ ] Matriz de Risco + Plano de Rollback preenchidos
+- [ ] CHANGELOG atualizado (`references/changelog.md`)
+- [ ] Nenhuma execução autônoma de `git commit`/`git push` (R-031)
 
-## 3) Pull Request Guidelines
-
-**Título do PR** deve seguir Conventional Commits:
-
-```
-feat(auth): adiciona autenticação por token JWT
-fix(entity): corrige NPE em PecaEntity ao buscar por ID nulo
-```
-
-**Template mínimo de PR:**
-
-> **Diretriz de Renderização Anti-Corrupção**: Na seção "Como testar", prefira comandos formatados como código inline (`pytest tests/modulo -v` ou `mvn test`) para evitar conflito de cercas aninhadas quando a descrição for encapsulada em blocos markdown de documentação ou PRs.
-
-```markdown
-## O que foi feito
-- <item 1>
-- <item 2>
-
-## Tipo de mudança
-- [ ] Bug fix
-- [ ] Nova feature
-- [ ] Refactor
-- [ ] Docs
-
-## Como testar
-1. Executar testes: `pytest tests/modulo -v`
-2. Validar comportamento funcional: <passo 2>
-
-## Checklist
-- [ ] Testes adicionados/atualizados
-- [ ] Documentação atualizada
-- [ ] Sem secrets expostos
-- [ ] CLAUDE.md consultado para convenções
-```
-
----
-
-## 4) Merge Strategy
-
-| Estratégia | Quando usar |
-|-----------|------------|
-| **Squash merge** | Features pequenas (1-3 commits) — mantém histórico limpo |
-| **Merge commit** | Features grandes ou releases — preserva contexto |
-| **Rebase** | ❌ Evitar em branches compartilhadas |
-
----
-
-## 5) Checklist Pré-PR
-
-- [ ] Branch nomeada conforme convenção?
-- [ ] Commits seguem Conventional Commits (use `/commit`)?
-- [ ] Testes passando?
-- [ ] Sem `console.log` / `System.out.println` de debug?
-- [ ] Sem credenciais expostas (R-010)?
-- [ ] Nenhuma execução autônoma de `git commit`/`git push` por agentes de IA (R-031)?
-- [ ] PR title segue o formato?
-- [ ] Descrição clara do que e por quê?
-
----
-
-## 6) Resolução de Merge/Rebase Conflict
-
-Inspirado no procedimento de resolução de conflitos de `mattpocock/skills/resolving-merge-conflicts`, o tratamento de divergências entre branches segue uma disciplina analítica estrita: conflitos representam decisões concorrentes e devem ser compreendidos antes de qualquer unificação.
-
-### Regra de Ouro: NUNCA Usar `--abort` como Fuga
-- **Proibição de Abandono Cego**: É terminantemente proibido executar `git merge --abort` ou `git rebase --abort` para fugir de conflitos sem antes diagnosticar os hunks divergentes.
-- **Exceção Válida**: O cancelamento (`--abort`) só é admitido quando se constata que a branch base incorreta foi selecionada para o rebase/merge ou por solicitação explícita do desenvolvedor humano.
-
-### Procedimento Determinístico Hunk-a-Hunk
-
-```
-1. Auditar Conflitos (git status)
-         ↓
-2. Rastrear Intent Original (ours vs theirs via git log/PR/issue)
-         ↓
-3. Resolver Hunk a Hunk (<<<<<<< / ======= / >>>>>>>)
-         ↓
-4. Executar Checks Automatizados (testes determinísticos / linters)
-         ↓
-5. Concluir & Avançar (git add + git rebase --continue)
-```
-
-1. **Auditar o Estado de Conflito**:
-   - Execute `git status` para listar todos os arquivos marcados como `both modified` ou `unmerged`.
-   - Isole os arquivos prioritários de configuração/contrato antes dos arquivos de implementação.
-
-2. **Rastrear o Intent Original de Ambos os Lados**:
-   - **Lado Local (`ours` / HEAD)**: Verifique o commit local que gerou a alteração para relembrar o propósito específico da sua branch.
-   - **Lado Entrante (`theirs` / upstream / branch base)**: Rastreie a intenção examinando os commits correspondentes:
-     ```sh
-     git log --oneline -5 --stat MERGE_HEAD
-     ```
-   - Consulte o PR ou Issue associada quando a intenção do código entrante não estiver clara no diff.
-
-3. **Resolver Hunk por Hunk com Foco Cirúrgico**:
-   - Abra cada arquivo conflitante e examine cada bloco de conflito:
-     ```text
-     <<<<<<< HEAD (suas alterações na branch atual)
-     const apiTimeout = 5000;
-     =======
-     const apiTimeout = 8000; // Ajustado para resiliência no upstream
-     >>>>>>> main
-     ```
-   - Preserve a intenção de ambos os lados sempre que viável (geralmente gerando um superset coerente).
-   - **Regra de Não-Contaminação**: NUNCA aproveite a resolução de conflito para introduzir refatorações acessórias, renomeações aleatórias ou estilizações estéticas fora de escopo.
-
-4. **Rodar Checks Automatizados Imediatamente**:
-   - Antes de dar continuidade, execute a suíte de testes determinísticos e os checks de tipo/linter para garantir que a resolução não introduziu quebras sutis:
-     ```sh
-     npm test || pytest || cargo test
-     ```
-   - Em caso de falha de teste ou compilação, ajuste a resolução antes de avançar.
-
-5. **Concluir a Etapa de Integração**:
-   - Adicione os arquivos resolvidos: `git add <caminho-do-arquivo>`.
-   - Prossiga com o fluxo: `git rebase --continue` (ou `git commit` no caso de merge workflow).
-   - Nenhuma execução autônoma de push forçado (`git push --force`) é permitida para agentes de IA (R-031).
-
----
-
-## 7) Referências
+## 10) Referências
 
 - Conventional Commits: https://www.conventionalcommits.org/
-- `/commit` prompt: `.github/prompts/commit.prompt.md`
-- Regras de segurança: `CLAUDE.md` R-010
-- Matt Pocock / AI Hero: *resolving-merge-conflicts skill* (https://github.com/mattpocock/skills)
-
+- Keep a Changelog 1.1: https://keepachangelog.com/en/1.1.0/
+- Regra 50/72: https://cbea.ms/git-commit/
+- Consumidores: `.github/prompts/commit.prompt.md`, `.github/agents/pr-gatekeeper.agent.md`

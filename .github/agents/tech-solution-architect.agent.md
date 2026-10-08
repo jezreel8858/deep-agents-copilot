@@ -23,6 +23,7 @@ source_docs:
   - .github/skills/agent-contracts/SKILL.md
   - .github/skills/code-tracing/SKILL.md
   - .github/skills/agent-evals-lab/SKILL.md
+  - .github/skills/design-pattern-selection-patterns/SKILL.md
 source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
@@ -160,6 +161,12 @@ Agente Ativo: tech-solution-architect
 
 ### Blueprint Técnico
 <Visão técnica consolidada, decisões de design e diagrama Mermaid de fluxo>
+
+### Decisão de Design Pattern (mini-ADR — design-pattern-selection-patterns)
+- Contexto: <trade-off arquitetural identificado no blueprint>
+- Decisão: <padrão arquitetural/GoF escolhido (ex.: CQRS, Event-Driven, Saga, Hexagonal, Circuit Breaker), ou "Nenhum pattern necessário — solução direta suficiente">
+- Alternativas consideradas: <padrões descartados e motivo>
+- Consequências: <ganho vs custo de acoplamento/complexidade/latência>
 
 ### Contratos e Interfaces (Spec-First)
 <Especificações OpenAPI v3 YAML / schemas Flyway DDL / contratos de eventos>

@@ -67,7 +67,7 @@ Prompts operacionais para workflow de execução no chat.
 | `/plan` | `.github/prompts/plan.prompt.md` | Cria plano de implementação detalhado com processo interativo |
 | `/implement` | `.github/prompts/implement.prompt.md` | Executa plano aprovado com checkpoints e pausas para verificação |
 | `/validate` | `.github/prompts/validate.prompt.md` | Valida implementação contra plano e identifica desvios |
-| `/commit` | `.github/prompts/commit.prompt.md` | ⭐ **(v1.2)** Gera mensagem de commit convencional (PT-BR, Conventional Commits) alinhada às diretrizes globais (`global-git-commit-instructions.md`), com guardrail de secrets, atomicidade e templates por complexidade (simples vs complexo). Nunca executa git. |
+| `/commit` | `.github/prompts/commit.prompt.md` | ⭐ **(v2.0)** Fluxo enxuto de 5 passos (segredos → inspeção → atomicidade → classificação → apresentação) que gera commit, título/descrição de PR (matriz de risco + plano de rollback) e entrada de CHANGELOG consumindo a SSOT `git-governance`. Nunca executa git. |
 | `/review` | `.github/prompts/review.prompt.md` | ⭐ **(v2.0)** Alias fino do agent `@code-review` — revisão de código por qualidade, convenções e impacto. Relatório compacto por severidade. |
 | `/craft-prompt` | `.github/prompts/craft-prompt.prompt.md` | ⭐ **(NEW)** Aciona o `WORKFLOW-PROMPT-SYNTHESIS` para refinar a solicitação, minerar caminhos reais e sintetizar o prompt canônico final em bloco `.md` para novo chat. |
 

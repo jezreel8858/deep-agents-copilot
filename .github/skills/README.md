@@ -35,6 +35,7 @@ Toda skill deve declarar no topo:
 | `tavily` | Tier 2 | Pesquisar documentação externa, changelog, versões e referências de terceiros |
 | `context-compact` | Tier 2 | Compactar contexto pós-leitura, remover ruído e gerar resumos executáveis |
 | `mermaid-diagrams` | Tier 2 | Criar diagramas Mermaid legíveis para documentação, ADRs e análises técnicas |
+| `design-pattern-selection-patterns` | Tier 2 | Decision Tree objetiva para selecionar/descartar design patterns (GoF, funcionais, arquiteturais, resiliência) em planejamento, com guardrails anti-overengineering e mini-ADR no Plano R-064 — exclusiva dos agents `*-arch-advisor` |
 | `agent-contracts` | Tier 1 | Padronizar contrato de entrada, saída e não-escopo de agents |
 | `handoff-governance` | Tier 1 | Definir critérios e payload mínimo de handoff entre agents |
 | `confidence-fallback-policy` | Tier 1 | Definir score de confiança e regras de fallback/escalonamento |
@@ -53,7 +54,7 @@ Toda skill deve declarar no topo:
 | **`test-coverage-governance`** | 🧪 **Tier 2** | Estratégia agnóstica de cobertura por risco, seams pré-acordados (testing-first + refactor fora do loop) e relatórios consolidados |
 | `project-scanner` | Tier 2 | Scanner automático de projetos para detecção de stack e convenções |
 | **`project-context-builder`** | 🏗️ **Tier 2** | Scanner automático de projetos, scaffolding guiado e suporte a Bounded Contexts (`CONTEXT-MAP.md`) |
-| `git-governance` | Tier 2 | Convenções de git workflow, branch naming, commit standards e PR guidelines |
+| `git-governance` | Tier 2 | SSOT modular (Progressive Disclosure) de git workflow: branch naming, commits A/B, PR com matriz de risco e rollback, guardrail de segredos em camadas e Keep a Changelog — `references/` com 5 módulos |
 | **`git-conflict-resolution-patterns`** | 🔀 **Tier 2** | ⭐ ***(NEW)*** Protocolo determinístico de 4 passos (diagnóstico, fontes primárias via `git --no-pager log`, resolução semântica hunk-a-hunk, validação por testes/linter) para resolver conflitos de merge/rebase preservando intenção original — base de `pr-gatekeeper` |
 | **`git-worktree-governance`** | 🌲 **Tier 2** | ⭐ ***(NEW)*** Diretrizes de ciclo de vida e isolamento para execução de agentes paralelos e explorações especulativas via Git Worktrees |
 | **`terminal-governance`** | 🔧 **Tier 1** | Boas práticas obrigatórias para uso de `run_in_terminal` — prevenção de poluição de contexto, truncamento de saída, não-interativo, lote, padrões proibidos e watchdog obrigatório (`timeout -k` / `Start-Job`+`Wait-Job`) para comando potencialmente bloqueante |

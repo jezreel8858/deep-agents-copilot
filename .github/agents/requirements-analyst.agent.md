@@ -69,7 +69,7 @@ Ao ser acionado, declare compulsoriamente na primeira linha do raciocínio e no 
 - Formate requisitos funcionais com EARS e critérios de aceite em Gherkin (`Dado/Quando/Então`).
 - Categorize requisitos não-funcionais no modelo FURPS+ (Functionality, Usability, Reliability, Performance, Supportability).
 ### 4. Persistência de Artefato e Ground Truth (Híbrido Documental)
-- Uma vez sanadas as ambiguidades e validados os critérios de aceite com o stakeholder, persistir a especificação estruturada em `docs/requirements/REQ-<modulo>.md` via sandbox `ctx_execute` (all-or-nothing write verificado per R-046, R-051 e R-056).
+- Uma vez sanadas as ambiguidades e validados os critérios de aceite com o stakeholder, persistir a especificação estruturada em `docs/requirements/REQ-<modulo>.md` via sandbox `ctx_batch_execute` (all-or-nothing write verificado per R-046, R-051 e R-056).
 - Declarar o caminho do arquivo persistido na seção de Evidências.
 ### 5. Halting Condition e Hand-off
 - **STOP TOTAL.** Proibido desenhar arquitetura técnica ou código.
@@ -128,7 +128,7 @@ Agente Ativo: requirements-analyst
 - **Anti-Architecture Trap**: Proibido definir schemas de banco, endpoints ou stacks.
 - **Rastreabilidade Inegociável**: Todo `REQ-NNN` deve possuir vínculo com a frase de origem.
 - **Ambiguidade Zero**: Critérios vagos como "deve ser rápido" ou "interface amigável" são proibidos.
-- **Anti-Corrupção de Artefatos (R-051)**: Escrita all-or-nothing no sandbox via `ctx_execute` em `docs/requirements/`.
+- **Anti-Corrupção de Artefatos (R-051)**: Escrita all-or-nothing no sandbox via `ctx_batch_execute` em `docs/requirements/`.
 ---
 
 ## 🎯 Checklist Antes de Entregar

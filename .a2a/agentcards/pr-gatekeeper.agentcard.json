@@ -3,8 +3,8 @@
   "protocol": "A2A/1.0.0",
   "id": "pr-gatekeeper",
   "name": "Pr Gatekeeper",
-  "version": "1.3.0",
-  "description": "Prepara submissao de PR pos-aprovacao do quality gate — sintetiza diff, aplica guardrail de segredos e template semantico SSOT (/commit), gera titulo e descricao de PR com matriz de risco e atualiza CHANGELOG.md. Nunca executa git add/commit/push (R-031).",
+  "version": "2.0.0",
+  "description": "Orquestra submissao de PR pos-aprovacao do quality gate — sintetiza diff, aplica guardrail de segredos, gera commit, titulo/descricao de PR (matriz de risco e plano de rollback) e CHANGELOG.md conforme a skill git-governance (SSOT). Nunca executa git add/commit/push (R-031).",
   "domain": "Preparacao de entrega (PR/commit/changelog)",
   "role": "gatekeeper",
   "capabilities": [
@@ -26,11 +26,9 @@
     "list_dir",
     "run_in_terminal",
     "context-mode/ctx_batch_execute",
-    "context-mode/ctx_execute",
     "ask_questions",
     "run_subagent",
     "context-mode/ctx_search",
-    "context-mode/ctx_execute_file",
     "context-mode/ctx_index"
   ],
   "security_profile": {

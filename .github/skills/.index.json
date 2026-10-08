@@ -3,7 +3,7 @@
   "domain": "governanca-ai-generica",
   "generated_at": "2026-09-26",
   "summary": {
-    "total_skills": 75
+    "total_skills": 76
   },
   "skills": [
     {
@@ -401,9 +401,17 @@
       "tier": 2,
       "category": "governance",
       "path": ".github/skills/git-governance/SKILL.md",
+      "references": [
+        "references/commit-formats.md",
+        "references/pr-template.md",
+        "references/risk-matrix.md",
+        "references/secrets-guardrail.md",
+        "references/changelog.md"
+      ],
       "related_agents": [
         "@docs-engineer",
-        "@refactor-planner"
+        "@refactor-planner",
+        "@pr-gatekeeper"
       ]
     },
     {
@@ -1206,6 +1214,24 @@
         "@react-component-test-writer",
         "@react-feature-developer",
         "@react-bug-fixer"
+      ]
+    },
+    {
+      "name": "design-pattern-selection-patterns",
+      "tier": 2,
+      "category": "governance",
+      "path": ".github/skills/design-pattern-selection-patterns/SKILL.md",
+      "description": "Decision Tree objetiva para selecionar ou descartar design patterns (GoF, funcionais, arquiteturais, resiliência) na fase de planejamento, com guardrails anti-overengineering e mini-ADR no Plano R-064 — uso exclusivo dos agents *-arch-advisor.",
+      "tools": [],
+      "related_agents": [
+        "@react-arch-advisor",
+        "@angular-arch-advisor",
+        "@struts-arch-advisor",
+        "@spring-reactive-arch-advisor",
+        "@python-arch-advisor",
+        "@spring-boot-arch-advisor",
+        "@ejb-arch-advisor",
+        "@database-arch-advisor"
       ]
     }
   ],

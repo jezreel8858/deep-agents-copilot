@@ -27,6 +27,9 @@ tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'run_subagent', 
 # 100% das dependências documentais e skills DEVEM residir exclusivamente em source_docs:/source_docs_lazy: no frontmatter.
 # É TERMINANTEMENTE PROIBIDO criar seções redundantes de herança, catálogo, skills ou pré-carregamento no corpo markdown.
 # O gate de testes determinístico (test_template_sections.py) bloqueia compulsoriamente seções não homologadas.
+# PREVENÇÃO DE SMELL 2.12 (SSOT Invertido): É TERMINANTEMENTE PROIBIDO listar arquivos '.prompt.md'
+# em source_docs/source_docs_lazy. Prompts são atalhos/interfaces de usuário; o conhecimento normativo
+# e padrões técnicos residem compulsoriamente em SKILL.md.
 # R-066 (Progressive Disclosure): CLAUDE.md e .github/copilot-instructions.md NUNCA vão em source_docs: (full-load) —
 # são documentos de alto fan-in (>300 linhas) consultados exclusivamente via context-mode/ctx_search sob demanda.
 # Use source_docs: apenas para docs <500 linhas (full-load seguro); source_docs_lazy: para CLAUDE.md/copilot-instructions.md/

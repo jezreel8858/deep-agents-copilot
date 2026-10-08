@@ -12,6 +12,8 @@ argument-hint: '[caminho-do-arquivo | contexto-opcional]'
 # 100% das dependências documentais e skills do prompt DEVEM residir exclusivamente em source_docs:/source_docs_lazy: no frontmatter.
 # É TERMINANTEMENTE PROIBIDO criar seções de pré-carregamento documental no corpo markdown
 # (ex.: seções de catálogo, herança ou pré-carregamento documental no corpo).
+# PREVENÇÃO DE SMELL 2.12 (SSOT Invertido): Prompts NUNCA devem se autodeclarar "SSOT Normativa".
+# A fonte única da verdade técnica reside compulsoriamente na SKILL.md referenciada em source_docs.
 # R-066 (Progressive Disclosure Compulsória): CLAUDE.md e .github/copilot-instructions.md são documentos de alto
 # fan-in (>300 linhas) — NUNCA em source_docs: (full-load); sempre em source_docs_lazy:, consultados
 # exclusivamente via context-mode/ctx_search sob demanda (nunca read_file integral).
