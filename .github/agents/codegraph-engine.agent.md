@@ -235,7 +235,10 @@ Próximo passo mínimo:
 | [`@angular-router`](frontend/angular/angular-router.agent.md) / [`@spring-boot-router`](backend/spring-boot/spring-boot-router.agent.md) / [`@spring-reactive-router`](backend/spring-reactive/spring-reactive-router.agent.md) | consumidor (perfil híbrido) precisa medir blast radius (`fn-impact`/`diff-impact`) antes de alterar símbolo compartilhado durante implementação | símbolo/arquivo alvo, comando desejado |
 | [`@governance-factory`](governance-factory.agent.md) | qualquer ajuste estrutural deste próprio agent (rename, nova ferramenta, etc.) | proposta de mudança + justificativa |
 | [`@deep-search`](deep-search.agent.md) | um dos gaps aceitos precisar de solução complementar futura (verificação de nova lib/abordagem) | gap específico, evidência de bloqueio real em uso |
+## ⚙️ Protocolo de Execução Obrigatório
+
 <execution_protocol>
+
 **Protocolo Plan-Then-Batch (Smell 2.26 / Smell 2.13 / R-059):**
 1. **ENUMERAR**: Antes de qualquer ação de modificação ou inspeção, liste internamente todos os arquivos e comandos necessários para a demanda completa (não apenas o próximo passo aparente).
 2. **CONSOLIDAR (Limiar >= 2)**: Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de `ctx_execute` por alvo no chat. Use compulsoriamente `ctx_batch_execute(commands, queries)` OU script iterativo consolidado em `ctx_execute`. No `@codegraph-engine`, qualquer inspeção de múltiplos arquivos para extração, mapeamento de símbolos ou análise comparativa DEVE usar compulsoriamente `ctx_batch_execute` ou script único de leitura em lote no sandbox antes de qualquer query de grafo, sendo expressamente proibido disparar N chamadas sequenciais de `ctx_execute`.
@@ -244,6 +247,7 @@ Próximo passo mínimo:
 5. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo. Turno 1: Warm Start + Batch Gather; Turno 2: Processamento aprofundado/Queries agregadas; Turno 3: Validação/Síntese. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index e entrega a resposta final ou solicita clarificação, vedando loops infinitos de O(N^2) tokens.
 6. **Warm Start Compulsório (Build-if-Missing) & Batch Querying (R-060)**: Antes de invocar queries de grafo (find_cycles, module_map, query), o agente DEVE verificar silenciosamente se .codegraph/graph.db existe; se ausente, executa codegraph build . no mesmo comando ou lote inicial (build-if-missing), nunca falhando para obrigar o LLM a raciocinar sobre o erro. Consultas a múltiplos símbolos devem usar batch_query ou query SQL consolidada via ctx_execute no SQLite, destilando o resultado na borda (Edge Truncation).
 7. **Emissão Obrigatória de Telemetria de Handoff (R-042 / handoff-governance § 2.4)**: a cada chamada real de `run_subagent`, emitir compulsoriamente um evento `telemetry_entry` (tag `[HANDOFF]`) via `ctx_index`, incluindo `session_id` (reaproveitado do `sessionStart` do hook `context-mode`) e `sequence_index` (ordenação determinística dentro da sessão).
+
 </execution_protocol>
 
 

@@ -1,42 +1,4 @@
-"""
-Sincroniza o bloco <execution_protocol> de todos os agents executores nao-roteadores
-e de todos os prompts (.github/prompts/*.prompt.md) a partir de uma fonte canonica unica.
-
-Motivacao (ver docs/plan/... ou CHANGELOG [2.33.3] / [2.52.2]):
-    O protocolo Plan-Then-Batch (R-059) + Teto de Tool Turns/Warm Start (R-060) estava
-    duplicado manualmente em 77 arquivos .agent.md. Edicoes manuais em lote (regex/batch)
-    causaram corrupcao de caracteres de controle reincidente. Este script formaliza o
-    mesmo padrao ja usado por tools/agentcard_exporter/export_agentcards.py: uma fonte
-    canonica unica gera/valida os artefatos derivados.
-
-    [2.52.2] Extensao: os 22 arquivos .github/prompts/*.prompt.md declaram
-    source_docs_lazy: (R-066) mas nao possuiam NENHUM bloco <execution_protocol> -
-    gap de discovery identico ao corrigido para agents em [2.52.1]. Prompts nao tem
-    distincao STANDARD/CUSTOM (todos recebem o mesmo bloco canonico, inserido ao final
-    do corpo do arquivo).
-
-    Elegibilidade Primaria por Tools (is_ctx_eligible):
-    Apenas artefatos que declaram ferramentas 'context-mode/ctx_*' em seu frontmatter
-    'tools:' sao elegiveis para receber o bloco <execution_protocol>. Arquivos sem ferramentas
-    context-mode NUNCA recebem o bloco (prevenindo instrucao morta em prompts/agents utilitarios).
-    Para agents, alem da elegibilidade por tools, respeita-se o mapeamento de protocol_roles.json.
-
-Fonte canonica:
-    tools/agent_protocol_sync/_execution-protocol-fragment.md
-    (contem o bloco STANDARD delimitado por marcadores HTML; unificado em
-    2026-09-23 apos constatar que a antiga divisao MUTATING/READONLY diferia
-    em apenas 3 palavras cosmeticas no item 3 - ver CHANGELOG [2.33.4])
-
-Mapa de papeis (apenas para .agent.md):
-    tools/agent_protocol_sync/protocol_roles.json
-    { "<agent-id>": "STANDARD" | "CUSTOM" }
-
-Uso:
-    python tools/agent_protocol_sync/sync_execution_protocol.py            # dry-run (mostra diffs)
-    python tools/agent_protocol_sync/sync_execution_protocol.py --apply    # aplica as correcoes
-    python tools/agent_protocol_sync/sync_execution_protocol.py --check    # exit code 1 se houver drift (uso em CI)
-"""
-
+# Sincronizacao de execution_protocol
 from __future__ import annotations
 
 import argparse
@@ -44,6 +6,7 @@ import json
 import re
 import sys
 from pathlib import Path
+
 try:
     import yaml
 except ImportError:
@@ -55,11 +18,33 @@ ROLES_PATH = Path(__file__).resolve().parent / "protocol_roles.json"
 AGENTS_DIR = REPO_ROOT / ".github" / "agents"
 PROMPTS_DIR = REPO_ROOT / ".github" / "prompts"
 
-BLOCK_RE = re.compile(r"<execution_protocol>([\s\S]*?)</execution_protocol>")
+BLOCK_RE = re.compile(
+    r"(?:^## ⚙️ Protocolo de Execução Obrigatório\s*\n+)?<execution_protocol>([\s\S]*?)</execution_protocol>",
+    re.MULTILINE,
+)
+
+
+def extract_frontmatter_dict(path: Path) -> dict:
+    text = path.read_text(encoding="utf-8")
+    if not text.startswith("---"):
+        return {}
+    parts = text.split("---", 2)
+    if len(parts) >= 3:
+        if yaml is not None:
+            try:
+                data = yaml.safe_load(parts[1])
+                if isinstance(data, dict):
+                    return data
+            except Exception:
+                pass
+        data: dict = {}
+        if re.search(r"^source_docs_lazy:", parts[1], re.MULTILINE):
+            data["source_docs_lazy"] = True
+        return data
+    return {}
 
 
 def extract_tools(path: Path) -> list[str]:
-    """Extrai a lista de ferramentas declaradas no frontmatter YAML do arquivo."""
     text = path.read_text(encoding="utf-8")
     if not text.startswith("---"):
         return []
@@ -85,7 +70,7 @@ def extract_tools(path: Path) -> list[str]:
                 m = re.match(r"^\s+-\s+(.*)$", line)
                 if m:
                     tools.append(m.group(1).strip().strip("'").strip('"'))
-            elif in_tools and (line.startswith(" ") or line.startswith("	")):
+            elif in_tools and (line.startswith(" ") or line.startswith("\t")):
                 continue
             elif in_tools:
                 in_tools = False
@@ -98,32 +83,48 @@ def extract_tools(path: Path) -> list[str]:
 
 
 def is_ctx_eligible(tools: list[str]) -> bool:
-    """Retorna True se qualquer item da lista tools comecar com 'context-mode/ctx_'."""
     return any(isinstance(t, str) and t.startswith("context-mode/ctx_") for t in tools)
 
 
 def remove_execution_protocol_block(text: str) -> str:
-    """Remove o bloco <execution_protocol>...</execution_protocol> preservando a formatacao."""
-    if "<execution_protocol>" not in text:
-        return text
-    if re.search(r"\n*<execution_protocol>[\s\S]*?</execution_protocol>\s*$", text):
-        return re.sub(r"\n*<execution_protocol>[\s\S]*?</execution_protocol>\s*$", "\n", text)
-    return re.sub(r"\n*<execution_protocol>[\s\S]*?</execution_protocol>\n*", "\n\n", text)
+    pattern_end = re.compile(
+        r"\n*(?:^## ⚙️ Protocolo de Execução Obrigatório\s*\n+)?<execution_protocol>[\s\S]*?</execution_protocol>\s*$",
+        re.MULTILINE,
+    )
+    if pattern_end.search(text):
+        return pattern_end.sub("\n", text)
+    pattern_mid = re.compile(
+        r"\n*(?:^## ⚙️ Protocolo de Execução Obrigatório\s*\n+)?<execution_protocol>[\s\S]*?</execution_protocol>\n*",
+        re.MULTILINE,
+    )
+    return pattern_mid.sub("\n\n", text)
 
 
-def load_canonical_blocks() -> dict[str, str]:
-    """Extrai o bloco STANDARD do arquivo de fragmento canonico."""
+def insert_execution_protocol_block(text: str, full_block: str) -> str:
+    router_match = re.search(r"\n*(##\s*(?:[^\w\s]\s*)?Retorno ao Router\b[^\n]*)", text)
+    if router_match:
+        idx = router_match.start()
+        before = text[:idx].rstrip()
+        after = text[idx:].lstrip("\n")
+        return f"{before}\n\n{full_block}\n\n{after}\n"
+    else:
+        before = text.rstrip()
+        return f"{before}\n\n{full_block}\n"
+
+
+def load_canonical_fragments() -> dict[str, str]:
     text = FRAGMENT_PATH.read_text(encoding="utf-8")
-    blocks: dict[str, str] = {}
-    for role in ("STANDARD",):
+    fragments: dict[str, str] = {}
+    sections = ("CORE", "CLAUSE_MUTATION", "CLAUSE_HANDOFF", "CLAUSE_LAZY_DOCS")
+    for sec in sections:
         pattern = re.compile(
-            rf"<!-- BEGIN:{role} -->\s*\n([\s\S]*?)\n<!-- END:{role} -->"
+            rf"<!-- BEGIN:{sec} -->\s*\n([\s\S]*?)\n<!-- END:{sec} -->"
         )
         m = pattern.search(text)
         if not m:
-            raise ValueError(f"Bloco canonico '{role}' nao encontrado em {FRAGMENT_PATH}")
-        blocks[role] = m.group(1).strip()
-    return blocks
+            raise ValueError(f"Fragmento canonico '{sec}' nao encontrado em {FRAGMENT_PATH}")
+        fragments[sec] = m.group(1).strip()
+    return fragments
 
 
 def load_role_map() -> dict[str, str]:
@@ -136,15 +137,41 @@ def find_agent_file(agent_id: str) -> Path | None:
 
 
 def get_prompt_files() -> list[Path]:
-    """Retorna todos os arquivos *.prompt.md sob .github/prompts/, excluindo templates/."""
     all_files = sorted(PROMPTS_DIR.glob("**/*.prompt.md"))
     return [p for p in all_files if "templates" not in p.parts]
 
 
-def sync_prompts(expected_block: str, apply: bool) -> tuple[list[str], list[str]]:
-    """Sincroniza o bloco STANDARD em todos os prompts. Prompts elegiveis
-    (com context-mode/ctx_* em tools:) recebem o bloco. Prompts nao-elegiveis
-    tem qualquer bloco <execution_protocol> residual removido."""
+def build_execution_protocol_block(path: Path, fragments: dict[str, str]) -> str:
+    tools = extract_tools(path)
+    fm_data = extract_frontmatter_dict(path)
+
+    has_mutation = (
+        any(t in tools for t in ["replace_string_in_file", "create_file", "insert_edit_into_file", "get_errors"])
+        or any(t in tools for t in ["context-mode/ctx_execute", "context-mode/ctx_execute_file"])
+    )
+    has_subagent = "run_subagent" in tools
+    has_lazy = bool(fm_data.get("source_docs_lazy"))
+
+    items = [fragments["CORE"]]
+    next_idx = 6
+
+    if has_mutation:
+        items.append(f"{next_idx}. {fragments['CLAUSE_MUTATION']}")
+        next_idx += 1
+
+    if has_subagent:
+        items.append(f"{next_idx}. {fragments['CLAUSE_HANDOFF']}")
+        next_idx += 1
+
+    if has_lazy:
+        items.append(f"{next_idx}. {fragments['CLAUSE_LAZY_DOCS']}")
+        next_idx += 1
+
+    body = "\n".join(items).strip()
+    return f"## ⚙️ Protocolo de Execução Obrigatório\n\n<execution_protocol>\n\n{body}\n\n</execution_protocol>"
+
+
+def sync_prompts(fragments: dict[str, str], apply: bool) -> tuple[list[str], list[str]]:
     drifted: list[str] = []
     updated: list[str] = []
 
@@ -155,7 +182,6 @@ def sync_prompts(expected_block: str, apply: bool) -> tuple[list[str], list[str]
         m = BLOCK_RE.search(text)
 
         if not eligible:
-            # Arquivo nao-elegivel: NUNCA deve conter o bloco
             if m is not None:
                 drifted.append(f"{pf.name} (remover: nao-elegivel por tools)")
                 if apply:
@@ -164,24 +190,24 @@ def sync_prompts(expected_block: str, apply: bool) -> tuple[list[str], list[str]
                     updated.append(pf.name)
             continue
 
-        # Arquivo elegivel: deve conter o bloco canonico
+        expected_block = build_execution_protocol_block(pf, fragments)
+
         if m is None:
             drifted.append(pf.name)
             if apply:
-                sep = "" if text.endswith("\n\n") else ("\n" if text.endswith("\n") else "\n\n")
-                new_text = f"{text}{sep}<execution_protocol>\n{expected_block}\n</execution_protocol>\n"
+                new_text = insert_execution_protocol_block(text, expected_block)
                 pf.write_text(new_text, encoding="utf-8")
                 updated.append(pf.name)
             continue
 
-        current_block = m.group(1).strip()
-        if current_block == expected_block:
-            continue  # em conformidade
+        current_full_block = m.group(0).strip()
+        if current_full_block == expected_block.strip():
+            continue
 
         drifted.append(pf.name)
         if apply:
             new_text = BLOCK_RE.sub(
-                lambda _: f"<execution_protocol>\n{expected_block}\n</execution_protocol>",
+                lambda _: expected_block,
                 text,
                 count=1,
             )
@@ -197,7 +223,7 @@ def main() -> int:
     parser.add_argument("--check", action="store_true", help="Modo CI: exit code 1 se houver drift, nao aplica nada.")
     args = parser.parse_args()
 
-    canonical = load_canonical_blocks()
+    fragments = load_canonical_fragments()
     role_map = load_role_map()
 
     drifted: list[str] = []
@@ -217,7 +243,6 @@ def main() -> int:
         m = BLOCK_RE.search(text)
 
         if not eligible:
-            # Regra: arquivos SEM ctx_* NUNCA recebem o bloco, mesmo que em role_map
             if m is not None:
                 drifted.append(f"{agent_id} (remover: nao-elegivel por tools)")
                 if args.apply:
@@ -230,35 +255,42 @@ def main() -> int:
             missing.append(agent_id)
             continue
 
-        current_block = m.group(1).strip()
+        current_inner_block = m.group(1).strip()
+        current_full_block = m.group(0).strip()
 
         if role == "CUSTOM":
-            # Agents pinados (ex.: codegraph-engine) mantem texto proprio.
-            # So validamos que a marca normativa R-060 ainda esta presente.
-            if "R-060" not in current_block:
+            if "R-060" not in current_inner_block:
                 custom_missing_r060.append(agent_id)
+            expected_custom = (
+                f"## ⚙️ Protocolo de Execução Obrigatório\n\n"
+                f"<execution_protocol>\n\n{current_inner_block}\n\n</execution_protocol>"
+            )
+            if current_full_block != expected_custom:
+                drifted.append(f"{agent_id} (atualizar: cabecalho H2 / formatacao CommonMark)")
+                if args.apply:
+                    new_text = BLOCK_RE.sub(
+                        lambda _: expected_custom,
+                        text,
+                        count=1,
+                    )
+                    af.write_text(new_text, encoding="utf-8")
+                    updated.append(agent_id)
             continue
 
-        if role not in canonical:
-            drifted.append(f"{agent_id} (papel desconhecido: {role})")
+        expected_block = build_execution_protocol_block(af, fragments)
+        if current_full_block == expected_block.strip():
             continue
-
-        expected_block = canonical[role]
-        if current_block == expected_block:
-            continue  # em conformidade
 
         drifted.append(agent_id)
         if args.apply:
             new_text = BLOCK_RE.sub(
-                lambda _: f"<execution_protocol>\n{expected_block}\n</execution_protocol>",
+                lambda _: expected_block,
                 text,
                 count=1,
             )
             af.write_text(new_text, encoding="utf-8")
             updated.append(agent_id)
 
-    # Validacao de agentes fora do role_map (ex.: routers, prompt-structuring):
-    # se algum contiver o bloco indevidamente, sinaliza drift para remocao
     for af in AGENTS_DIR.glob("**/*.agent.md"):
         if "templates" in af.parts:
             continue
@@ -291,9 +323,8 @@ def main() -> int:
         for c in custom_missing_r060:
             print(f"  - {c}")
 
-    # --- Prompts (.github/prompts/*.prompt.md) ---
     prompt_files = get_prompt_files()
-    prompts_drifted, prompts_updated = sync_prompts(canonical["STANDARD"], apply=args.apply)
+    prompts_drifted, prompts_updated = sync_prompts(fragments, apply=args.apply)
 
     print(f"\nPrompts mapeados: {len(prompt_files)}")
     print(f"Prompts com drift detectado: {len(prompts_drifted)}")

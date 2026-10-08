@@ -6,6 +6,22 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.56.0] — 2026-10-06
+### Adicionado / Modificado — GOVERNANCE-PROTOCOL-REFACTOR: Composição Dinâmica por Capabilities e Formatação H2 CommonMark do Execution Protocol (Opção C + Opção 3)
+- **Refatoração Estrutural do Protocolo de Execução (Opção C — Composição Dinâmica por Capabilities)**:
+  - Decomposição modular do fragmento canônico em cláusulas atômicas (`CORE`, `CLAUSE_MUTATION`, `CLAUSE_HANDOFF`, `CLAUSE_LAZY_DOCS`) em `tools/agent_protocol_sync/_execution-protocol-fragment.md`.
+  - Injeção contextual condicional em `tools/agent_protocol_sync/sync_execution_protocol.py` baseada nas capabilities de frontmatter de cada agent e prompt:
+    - `CLAUSE_MUTATION` (R-051 — Validação agrupada com `get_errors`): restrita a executores com ferramentas mutativas.
+    - `CLAUSE_HANDOFF` (R-042 — Telemetria de handoff): restrita a agentes com delegação hierárquica (`run_subagent`).
+    - `CLAUSE_LAZY_DOCS` (R-066 — Progressive disclosure): restrita a agentes com declaração explícita de `source_docs_lazy:`.
+- **Padronização Visual e Tipográfica (Opção 3 — Cabeçalho H2 + Tag XML)**:
+  - Adicionado cabeçalho CommonMark `## ⚙️ Protocolo de Execução Obrigatório` imediatamente antes da tag `<execution_protocol>`.
+  - Inserção padronizada antes da seção `## Retorno ao Router` com espaçamento estrito CommonMark.
+  - Sincronização automatizada e idempotente propagada para todos os agents e prompts elegíveis.
+- **Auditoria de Governança e Testes Automatizados**:
+  - Adicionado teste `test_execution_protocol_option3_h2_header_and_commonmark_formatting` e `test_dynamic_composition_by_capabilities` em `tests/governance_audit/test_sync_execution_protocol_invariants.py`.
+  - Drift check zerado e 100% de conformidade com a suíte de testes.
+
 ## [2.55.0] — 2026-10-06
 ### Adicionado / Modificado — WORKFLOW-GOVERNANCE-MAINTENANCE: Consolidação Global de Agents das 8 Stacks (Fases 1 a 5)
 - **Consolidação Global do Ecossistema de Stacks (56 → 24 Especialistas + 8 Routers = 32 Agentes de Domínio)**:
