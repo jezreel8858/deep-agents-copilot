@@ -323,8 +323,8 @@ Com esse bloco, qualquer especialista na cadeia sequencial sabe exatamente onde 
 
 ## 10. R-064 — Duplo Gate Documental de Planejamento e Implementação Universal
 
-> **Fonte de verdade normativa:** [`CLAUDE.md`](../../CLAUDE.md) § R-064 e [`.github/copilot-instructions.md`](../copilot-instructions.md) § 1.1 e § 2.  
-> **Diretórios canônicos:** [`docs/plans/`](../../docs/plans/README.md) e [`docs/implementation-plans/`](../../docs/implementation-plans/README.md).
+> **Fonte de verdade normativa:** [`CLAUDE.md`](../../../CLAUDE.md) § R-064 e [`.github/copilot-instructions.md`](../../copilot-instructions.md) § 1.1 e § 2.  
+> **Diretórios canônicos:** [`docs/plans/`](../../../docs/plans/README.md) e [`docs/implementation-plans/`](../../../docs/implementation-plans/README.md).
 
 ### 10.1 Princípio Operacional e Estrutura dos Gates
 

@@ -55,7 +55,7 @@ tools: []
 | **OWASP Agentic AI Security** | 2026.1 (dez/2025) | Riscos ASI01-ASI10 para sistemas de agents autônomos — **escopo do agent de IA em si**, não da aplicação revisada |
 
 ### 1.2 A Matriz Canônica de Segurança de Aplicação (AppSec Stack)
-O ecossistema implementa a cobertura em profundidade através de 6 pilares complementares (detalhes em [`docs/architecture/APPLICATION_SECURITY_GUIDE.md`](../../docs/architecture/APPLICATION_SECURITY_GUIDE.md)):
+O ecossistema implementa a cobertura em profundidade através de 6 pilares complementares (detalhes em [`docs/architecture/APPLICATION_SECURITY_GUIDE.md`](../../../docs/architecture/APPLICATION_SECURITY_GUIDE.md)):
 1. **SAST (Static Application Security Testing)**: Varredura de código-fonte proprietário (Shift-Left) via AST e *Taint Analysis* (Semgrep, SonarQube, CodeQL).
 2. **SCA (Software Composition Analysis) + Reachability**: Análise de dependências com verificação de alcançabilidade no grafo de chamadas (Trivy, Snyk, pip-audit, npm audit).
 3. **DAST (Dynamic Application Security Testing)**: Testes de caixa preta em runtime contra APIs e endpoints (OWASP ZAP, StackHawk).
