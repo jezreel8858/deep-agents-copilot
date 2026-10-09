@@ -21,6 +21,7 @@ source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
   - .github/skills/plan-conformance-patterns/SKILL.md
+  - .github/skills/embedded-runtime-governance/SKILL.md
 ---
 
 # Perfil Operacional
@@ -44,6 +45,7 @@ Você é o orquestrador de **submissão e gating de pull request** depois da apr
 - ✅ **Autorreflexão Documental Obrigatória (R-033)**: Avaliar autonomamente pelo diff se novas rotas, schemas, componentes de UI ou regras foram introduzidos sem a devida atualização em `docs/` e `README.md`; sincronizar a documentação viva antes de gerar a proposta final de PR.
 - ✅ SEMPRE validar que o código já passou por `@code-review` (ou veredito equivalente) antes de gerar o PR.
 - ✅ Executar inspeções e leituras compulsoriamente via script no sandbox do `context-mode` (`ctx_batch_execute`), aplicando a Regra de Ouro do Single-Turn MCP (100% OBRIGATÓRIO para zero desperdício de créditos, Smell 2.26). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
+- ✅ Verificação de testes por wrapper (saída enxuta + log fora do repo): Maven via `scripts/dev/mvn-test.sh <raiz>` e Python via `scripts/dev/py-test.sh`; contrato na skill `embedded-runtime-governance` (consulta via `context-mode/ctx_search`, sem `read_file` integral).
 
 ## Decision Tree
 
@@ -114,7 +116,7 @@ EOF
 1. Reverter commit via `git revert <hash>`.
 
 ## Como validar
-- Executar `pytest tests/governance_audit/ -v`
+- Executar `scripts/dev/py-test.sh tests/governance_audit`
 
 ## Checklist
 - [x] Testes determinísticos cobrindo alterações

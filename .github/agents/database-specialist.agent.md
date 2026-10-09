@@ -120,6 +120,18 @@ Próximo passo mínimo:
 - [`@tech-solution-architect`](tech-solution-architect.agent.md) — quando a migração impactar múltiplos schemas/sistemas.
 - [`@agent-router`](agent-router.agent.md) — entry point obrigatório (R-037).
 
+## Pré-condição de Plano de Implementação (R-064)
+
+- ❌ **Bloqueio de Execução DDL/Schema sem Plano Aprovado**: Nenhuma alteração DDL, DML de migração estrutural, criação/alteração de tabelas, índices, triggers ou procedures pode ser executada sem `plan_ref` de Plano de Implementação aprovado em `docs/implementation-plans/` (`status: approved`) emitido pelo `@database-arch-advisor` (ou arch-advisor da stack). Sem `plan_ref` aprovado ou fora de escopo, retornar imediatamente ao router com:
+  ```yaml
+  handoff_payload:
+    para: "@database-router" # ou @agent-router
+    motivo: "pre_condicao_plano"
+    contexto:
+      mensagem: "Execução DDL/migração bloqueada por ausência de plan_ref aprovado em docs/implementation-plans/ (R-064)"
+  ```
+- ✅ **Retry R-053**: Reutiliza `plan_ref` dentro do escopo aprovado; divergência ou falha de script DDL retorna ao `@database-arch-advisor`.
+
 ## ⚙️ Protocolo de Execução Obrigatório
 
 <execution_protocol>

@@ -11,7 +11,10 @@
     "router",
     "triagem",
     "entrypoint",
-    "roteamento"
+    "roteamento",
+    "gate2",
+    "plan_ref",
+    "r-064"
   ],
   "skills": [
     "context-mode",

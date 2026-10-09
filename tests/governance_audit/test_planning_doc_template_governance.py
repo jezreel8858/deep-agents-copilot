@@ -398,3 +398,64 @@ def test_plan_prompt_contains_defensive_sections_and_normalized_tags():
     assert '{paralelizavel: bool, responsavel: "<agent>"}' in prompt_content, (
         "plan.prompt.md deve especificar notação de tag '{paralelizavel: bool, responsavel: "<agent>"}'"
     )
+
+
+# ─────────────────────────────────────────────────────────────
+# Emenda D (D5) — nomenclatura de planos em docs/implementation-plans/
+# ─────────────────────────────────────────────────────────────
+
+PLANS_DIR = REPO_ROOT / "docs" / "implementation-plans"
+WORKFLOWS_DIR = AGENTS_DIR / "workflows"
+PLAN_NAME_PATTERN = re.compile(r"^\d{8}-[a-z0-9]+(-[a-z0-9]+)*\.md$")
+# Convenção de prefixo de workflow vigente a partir desta data (planos anteriores são legado e só seguem o regex).
+PLAN_WORKFLOW_PREFIX_SINCE = "20261008"
+
+
+def _plan_files() -> list[Path]:
+    return sorted(p for p in PLANS_DIR.glob("*.md") if p.name != "README.md")
+
+
+def _workflow_slugs() -> set[str]:
+    """Deriva slugs de workflow dos arquivos `workflow-<slug>.md` (sem hardcode)."""
+    return {p.stem.removeprefix("workflow-") for p in WORKFLOWS_DIR.glob("workflow-*.md")}
+
+
+def test_deve_seguir_padrao_de_nome_quando_plano_em_implementation_plans():
+    """D5: todo plano (exceto README.md) segue ^\\d{8}-[a-z0-9]+(-[a-z0-9]+)*\\.md$."""
+    plans = _plan_files()
+    assert plans, "docs/implementation-plans/ deve conter planos"
+    invalid = [p.name for p in plans if not PLAN_NAME_PATTERN.match(p.name)]
+    assert not invalid, f"Planos fora do padrão AAAAMMDD-slug.md: {invalid}"
+
+
+def test_deve_ter_prefixo_de_workflow_quando_plano_recente():
+    """D5: planos a partir de PLAN_WORKFLOW_PREFIX_SINCE iniciam o slug com um workflow existente (derivado de workflows/)."""
+    slugs = _workflow_slugs()
+    assert slugs, "slugs de workflow devem ser derivados de .github/agents/workflows/"
+    invalid = [
+        p.name
+        for p in _plan_files()
+        if p.name[:8] >= PLAN_WORKFLOW_PREFIX_SINCE
+        and not any(p.name[9:].startswith(slug + "-") for slug in slugs)
+    ]
+    assert not invalid, f"Planos recentes sem prefixo de workflow ({sorted(slugs)}): {invalid}"
+
+
+def test_deve_rejeitar_nome_quando_fora_do_padrao():
+    """D5: sanidade do regex — positivos e negativos (boundary de 8 dígitos, maiúsculas, hífen duplo)."""
+    ok = ["20261008-feature-development-x.md", "20261008-a.md"]
+    ruim = ["2026108-a.md", "202610080-a.md", "20261008-A.md", "20261008--a.md", "20261008-a-.md", "20261008-a_b.md", "20261008.md", "20261008-a.MD"]
+    assert all(PLAN_NAME_PATTERN.match(n) for n in ok)
+    assert not any(PLAN_NAME_PATTERN.match(n) for n in ruim)
+
+
+def test_nao_deve_conter_identificador_proibido_quando_nome_de_plano():
+    """D5: nenhum nome de plano contém identificador de projeto local (mensagem mascarada ID-LOCAL)."""
+    from tests.governance_audit.test_local_project_isolation import get_forbidden_project_identifiers
+
+    patterns = [
+        re.compile(rf"(?<![a-zA-Z0-9]){re.escape(t)}(?![a-zA-Z0-9])", re.IGNORECASE)
+        for t in get_forbidden_project_identifiers()
+    ]
+    leaks = [p.name for p in _plan_files() if any(pt.search(p.name) for pt in patterns)]
+    assert not leaks, f"{len(leaks)} nome(s) de plano contêm projeto local proibido (ID-LOCAL, R-038/R-044)"

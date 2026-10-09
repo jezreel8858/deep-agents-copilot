@@ -99,6 +99,7 @@ agents:
       - "handoff-governance"
       - "agent-contracts"
       - "terminal-governance"
+      - "embedded-runtime-governance"
 
   ejb-test-engineer:
     id: "ejb-test-engineer"
@@ -139,3 +140,4 @@ agents:
       - "handoff-governance"
       - "agent-contracts"
       - "terminal-governance"
+      - "embedded-runtime-governance"

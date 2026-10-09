@@ -48,6 +48,18 @@ Você opera sob a metodologia de **Engenharia de Dados Orientada a Idempotência
 - Aplicação de técnicas de alto desempenho com operações em lote via `BULK COLLECT` com cláusula `LIMIT` e `FORALL` para minimizar context switches entre SQL e PL/SQL engines.
 - Tratamento estruturado de exceções com blocos `EXCEPTION`, `WHEN OTHERS THEN` defensivo acompanhado de log e propagação controlada via `RAISE_APPLICATION_ERROR(-20xxx, '...')`.
 
+## Pré-condição de Plano de Implementação (R-064)
+
+- ❌ **Bloqueio de Execução DDL/Schema sem Plano Aprovado**: Nenhuma alteração DDL, DML de migração estrutural, criação/alteração de tabelas, índices, triggers ou procedures pode ser executada sem `plan_ref` de Plano de Implementação aprovado em `docs/implementation-plans/` (`status: approved`) emitido pelo `@database-arch-advisor` (ou arch-advisor da stack). Sem `plan_ref` aprovado ou fora de escopo, retornar imediatamente ao router com:
+  ```yaml
+  handoff_payload:
+    para: "@database-router" # ou @agent-router
+    motivo: "pre_condicao_plano"
+    contexto:
+      mensagem: "Execução DDL/migração bloqueada por ausência de plan_ref aprovado em docs/implementation-plans/ (R-064)"
+  ```
+- ✅ **Retry R-053**: Reutiliza `plan_ref` dentro do escopo aprovado; divergência ou falha de script DDL retorna ao `@database-arch-advisor`.
+
 ## ⚙️ Protocolo de Execução Obrigatório
 
 <execution_protocol>

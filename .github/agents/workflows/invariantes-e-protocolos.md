@@ -321,7 +321,7 @@ Com esse bloco, qualquer especialista na cadeia sequencial sabe exatamente onde 
 
 ---
 
-## 10. R-064 — Duplo Gate Documental de Planejamento e Implementação
+## 10. R-064 — Duplo Gate Documental de Planejamento e Implementação Universal
 
 > **Fonte de verdade normativa:** [`CLAUDE.md`](../../CLAUDE.md) § R-064 e [`.github/copilot-instructions.md`](../copilot-instructions.md) § 1.1 e § 2.  
 > **Diretórios canônicos:** [`docs/plans/`](../../docs/plans/README.md) e [`docs/implementation-plans/`](../../docs/implementation-plans/README.md).
@@ -337,16 +337,18 @@ Etapa Inicial (Elicitação / RCA / Escopo)
   [ GATE 1: PLANO DE PLANEJAMENTO ]
   ├─ Arquivo: docs/plans/<AAAAMMDD>-<workflow>-<identificador-curto>.md
   ├─ Autoria: Especialista analítico/triagem dono da Etapa 1/2
+  ├─ Insumo: Não autoriza alteração de código da aplicação
   ├─ Materialização: Orquestrador Raiz (Flat Delegation R-037/R-042)
   └─ Checkpoint: ask_questions obrigatório (Aprovar / Solicitar Ajustes)
                    │ (Aprovado pelo Usuário)
                    ▼
-  [ GATE 2: PLANO DE IMPLEMENTAÇÃO TÉCNICA ]
+  [ GATE 2: PLANO DE IMPLEMENTAÇÃO TÉCNICA (UNIVERSAL) ]
   ├─ Arquivo: docs/implementation-plans/<AAAAMMDD>-<workflow>-<identificador-curto>.md
   ├─ Autoria: <stack>-arch-advisor (domínio específico) ou especialista técnico do workflow
+  ├─ Tiers: Tier Full (complexo/alto risco) ou Tier Light (cirúrgico/≤20 linhas/1 arquivo)
   ├─ Materialização: Orquestrador Raiz
   └─ Checkpoint: ask_questions obrigatório (Aprovar / Solicitar Ajustes)
-                   │ (Aprovado pelo Usuário)
+                   │ (Aprovado pelo Usuário -> status: approved, gera plan_ref)
                    ▼
 Etapa de Execução / Mutação de Código (Batch Execution R-046 / R-059)
 ```
@@ -355,15 +357,73 @@ Etapa de Execução / Mutação de Código (Batch Execution R-046 / R-059)
 
 | Workflow Canônico | Gate 1: Plano de Planejamento (`docs/plans/`) | Gate 2: Plano de Implementação (`docs/implementation-plans/`) |
 |---|---|---|
-| **WORKFLOW-BUG-FIX** | `@bug-triage` (RCA, evidências e escopo) | `<stack>-arch-advisor` (ou analítico da stack) |
-| **WORKFLOW-REFACTORING** | `@refactor-planner` (diagnóstico e Mikado DAG) | `<stack>-arch-advisor` (detalhamento técnico de blast radius) |
+| **WORKFLOW-BUG-FIX** | `@bug-triage` (RCA, evidências e escopo como insumo em `docs/plans/`) | `<stack>-arch-advisor` (SEMPRE emite o plano em `docs/implementation-plans/`, podendo ser delta enxuto referenciando o plano do bug-triage) |
+| **WORKFLOW-REFACTORING** | `@refactor-planner` (diagnóstico e Mikado DAG) | `<stack>-arch-advisor` (detalhamento técnico de blast radius e allowlist de arquivos) |
 | **WORKFLOW-FEATURE-DEVELOPMENT** | `@requirements-analyst` / `@tech-solution-architect` | `<stack>-arch-advisor` (arquitetura e etapas técnicas) |
-| **WORKFLOW-GOVERNANCE-MAINTENANCE** | `@agent-auditor` / `@repo-hygiene-auditor` | Especialista analítico do lote (`@governance-maintainer`) |
-| **WORKFLOW-DEPENDENCY-VULNERABILITY** | Especialista de segurança / scan | Especialista analítico de dependências / `<stack>-arch-advisor` |
+| **WORKFLOW-GOVERNANCE-MAINTENANCE** | `@agent-auditor` / `@repo-hygiene-auditor` | Especialista analítico do lote (`@governance-maintainer` ou `@agent-auditor` — plano tipo `governance`) |
+| **WORKFLOW-DEPENDENCY-VULNERABILITY** | Especialista de segurança / scan (`@security-reviewer`) | `<stack>-arch-advisor` (estratégia técnica de adaptação de breaking changes) |
 | **WORKFLOW-FRAMEWORK-MIGRATION** | `@tech-solution-architect` (5D Assessment e De-Para) | `<stack>-arch-advisor` (estratégia técnica de paridade e codemod) |
 
 ### 10.3 Isenções e Regras de Exceção
 
-1. **Fast-Path Determinístico (R-041, Tier 1)**: Para correções pontuais, refatorações com alvo definido e análises diretas, o Plano de Planejamento (`docs/plans/`) pode ser dispensado, mas o **Plano de Implementação (`docs/implementation-plans/`) permanece 100% obrigatório** antes de tocar em código.
-2. **Workflows Read-Only**: `WORKFLOW-TECHNICAL-ANALYSIS`, `WORKFLOW-RELEASE-READINESS` e `WORKFLOW-PROMPT-SYNTHESIS` são isentos do Plano de Implementação (não realizam mutação de código na aplicação), podendo produzir apenas o Plano de Planejamento quando a profundidade analítica demandar alinhamento prévio.
-3. **Zero Discovery pelo Router (R-054)**: O `@agent-router` não gera, não persiste e não inspeciona planos; a materialização física dos arquivos gerados pelos agentes Read-Only é executada pelo Orquestrador Raiz.
+1. **Exceções Formais (Não exigem Plano do Arch-Advisor)**:
+   - **(a) Tarefas Testes-Only**: Autoria ou manutenção exclusiva de suítes de testes (`*-test-engineer` / `@test-strategy`) sem qualquer alteração em código de produção da aplicação. Opera estritamente sob o plano de testes / test-strategy aprovado.
+   - **(b) Documentação e Configuração Não Sensível**: Alterações restritas a arquivos Markdown (`docs/`, `*.md`), comentários de documentação ou configurações puramente declarativas, sem tocar em secrets, credenciais, pipelines de CI/CD, scripts de infraestrutura ou código de persistência/negócio.
+2. **NÃO São Exceções (Exigem Plano de Implementação R-064)**:
+   - **Hotfix**: Correções urgentes NÃO possuem isenção de plano; são classificadas estritamente em Tier `light` ou Tier `full` conforme os critérios técnicos da regra, gerando plano e exigindo aprovação humana.
+   - **Retry R-053**: Tentativas subsequentes de compilação ou execução dentro do escopo de plano já aprovado reutilizam o mesmo `plan_ref` (sem novo plano). Caso haja mudança de escopo de arquivos ou persistam mais de 2 falhas consecutivas, o fluxo interrompe a execução e retorna ao `<stack>-arch-advisor`.
+3. **Fast-Path Determinístico (R-041, Tier 1)**: Para correções pontuais, refatorações com alvo definido e análises diretas, o Plano de Planejamento (`docs/plans/`) pode ser dispensado, mas o **Plano de Implementação (`docs/implementation-plans/`) permanece 100% obrigatório** antes de tocar em código.
+4. **Workflows Read-Only**: `WORKFLOW-TECHNICAL-ANALYSIS`, `WORKFLOW-RELEASE-READINESS` e `WORKFLOW-PROMPT-SYNTHESIS` são isentos do Plano de Implementação (não realizam mutação de código na aplicação), podendo produzir apenas o Plano de Planejamento quando a profundidade analítica demandar alinhamento prévio.
+5. **Zero Discovery pelo Router (R-054)**: O `@agent-router` e os routers de stack não inspecionam o sistema de arquivos para descobrir planos; eles apenas propagam e exigem o parâmetro `plan_ref` e `status: approved` no payload de despacho downstream.
+
+### 10.4 Pré-condição de Codificação Universal (R-064) & Contrato do Plano
+
+Nenhum agente codificador (desenvolvedores `*-developer`, engenheiros de teste `*-test-engineer` quando alterando código de produção, especialistas de banco de dados `oracle-database-specialist`, `informix-database-specialist`, `database-specialist` ou qualquer codificador de workflows presentes e futuros) pode criar ou editar código sem `plan_ref` de plano de implementação aprovado em `docs/implementation-plans/` elaborado pelo `<stack>-arch-advisor` (ou fallback de governança) e aprovado por humano.
+
+1. **Pré-condição no Codificador (Linha de Guarda)**: Se um agente codificador receber despacho sem `plan_ref` com `status: approved` ou for solicitado a editar arquivo fora da allowlist do plano, deve compulsoriamente abortar a edição e retornar imediatamente ao router com:
+   ```yaml
+   handoff_payload:
+     para: "@<stack>-router" # ou @agent-router
+     motivo: "pre_condicao_plano"
+     contexto:
+       mensagem: "Execução de código bloqueada por ausência de plan_ref aprovado em docs/implementation-plans/ (R-064)"
+   ```
+2. **Contrato do Plano de Implementação (Frontmatter Canônico)**:
+   ```yaml
+   ---
+   status: approved # 'draft' antes do checkpoint, 'approved' após aprovação humana via ask_questions
+   tier: full | light | governance
+   plan_ref: docs/implementation-plans/<AAAAMMDD>-<workflow>-<identificador>.md
+   allowed_files:
+     - src/main/java/com/exemplo/Service.java
+     - src/main/resources/application.yml
+   rollback_plan:
+     estrategia: git_restore
+     arquivos_afetados: [...]
+   ---
+   ```
+3. **Pós-Fato (Plan Drift Detection)**: Após a execução, o `@code-review` e `@pr-gatekeeper` auditam o diff real contra `allowed_files` e escopo planejado via skill `plan-conformance-patterns`. Qualquer desvio ou adição de arquivo não previsto reabre compulsoriamente o Gate 2 para nova aprovação.
+
+### 10.5 Tiers de Plano de Implementação e Hotfix
+
+A autoria do Plano de Implementação pelo `<stack>-arch-advisor` divide-se em dois níveis técnicos determinísticos:
+
+1. **Tier `full` (Plano Completo)**:
+   - **Gatilhos**: >3 arquivos afetados, OU >1 camada arquitetural, OU migração/schema/DDL de banco de dados, OU autenticação/segurança/dados sensíveis, OU introdução de nova biblioteca/dependência, OU baixa confiança/complexidade alta.
+   - **Estrutura**: Documento estruturado em `docs/implementation-plans/` contendo análise de blast radius, decomposição de tarefas com granularidade micro-batch, dependências, matriz de risco, estratégia de rollback e allowlist de arquivos.
+2. **Tier `light` (Plano Mínimo / Fast Delta)**:
+   - **Gatilhos**: Diff cirúrgico descritível em 1 frase, ≤20 linhas modificadas, 1 único arquivo, 1 única camada, e ausência total dos gatilhos de Tier `full`.
+   - **Estrutura**: Documento conciso em `docs/implementation-plans/` (ou delta enxuto de 1 parágrafo referenciando o plano de triagem) AINDA elaborado pelo `<stack>-arch-advisor` (modo validar delta) com frontmatter canônico e submetido à aprovação humana via `ask_questions`.
+   - **Hotfix**: Correções emergenciais utilizam obrigatoriamente Tier `light` ou `full` segundo seus critérios técnicos — não há exceção sem plano para hotfix.
+
+### 10.6 Stacks sem Arch-Advisor e Fallback Fora de Stack
+
+1. **Codificadores Fora de Stack de Domínio**: Para manutenção de governança, documentação executável ou infraestrutura governada (`@governance-maintainer`, `@docs-engineer` etc.), o plano é de tipo `governance`, elaborado pelo `@agent-auditor` ou pelo próprio executor especialista, persistido em `docs/implementation-plans/` e aprovado por humano via `ask_questions`. O fluxo nunca é bloqueado por ausência de stack específica.
+2. **Stack sem Arch-Advisor Dedicado**: Caso uma stack tecnológica do projeto não possua ainda um `<stack>-arch-advisor` especializado no catálogo, adota-se o mesmo fallback explícito: o plano técnico é elaborado pelo especialista analítico disponível ou router de stack, validado por humano e persistido sob o contrato de `docs/implementation-plans/`.
+
+### 10.7 Invariante para Novos Workflows com Etapa de Código
+
+Qualquer novo workflow canônico ou customizado adicionado ao ecossistema que envolva mutação de arquivos de código de aplicação DEVE cumprir compulsoriamente:
+1. Declarar a etapa `implementation_plan_authoring` posicionada estritamente antes de qualquer etapa de codificação no `routing-graph.yaml`.
+2. Declarar a guarda `requires_plan: true` em cada etapa subsequente de edição de código.
+3. Conectar o checkpoint de aprovação humana via `ask_questions` antes de autorizar a entrega do `plan_ref` ao agente executor.

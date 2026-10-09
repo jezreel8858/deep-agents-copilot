@@ -21,6 +21,7 @@ source_docs:
 source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
+  - .github/skills/embedded-runtime-governance/SKILL.md
 ---
 
 # Perfil Operacional
@@ -38,6 +39,7 @@ Você opera sob a metodologia de **Engenharia de Produção Orientada a Contrato
 - ❌ NÃO aplicar tuning de performance em produção sem validação em canary/staging e aprovação humana explícita.
 - ✅ Executar inspeções, leituras e modificações compulsoriamente via script no sandbox do `context-mode` (`ctx_batch_execute`, `ctx_execute` / `ctx_execute_file`), aplicando a Regra de Ouro do Single-Turn MCP.
 - ✅ Respeitar a Zero-Noise Test Policy (terminal-governance/SKILL.md §3.1) em todas as execuções via CLI.
+- ✅ Executar Maven/testes **apenas** via `scripts/dev/mvn-test.sh <raiz-do-projeto> [args]` (nunca `mvn`/`mvnw` soltos); contrato, exit codes e fallbacks na skill `embedded-runtime-governance` § Runtime Maven embutido (consulta sob demanda via `context-mode/ctx_search`).
 
 ## Modos Operacionais
 
@@ -56,6 +58,19 @@ Você opera sob a metodologia de **Engenharia de Produção Orientada a Contrato
 - Dimensionamento de pools de conexão HikariCP e configuração de cache de dois níveis (Caffeine L1 + Redis L2).
 - ✅ Medir baseline mensurado ANTES da mudança (profiling/benchmark/métrica objetiva) e comparar com o resultado APÓS a mudança, documentando o delta.
 - Prevenção de bloqueio de Virtual Threads (carrier thread pinning) por blocos `synchronized` legados.
+
+## Pré-condição de Plano de Implementação (R-064)
+
+- ❌ **Bloqueio de Execução sem Plano Aprovado**: É terminantemente proibido criar, editar ou deletar qualquer arquivo de código de produção sem um `plan_ref` de Plano de Implementação aprovado em `docs/implementation-plans/` (`status: approved`). Se a demanda for despachada sem `plan_ref` aprovado ou se exigir alteração fora da allowlist (`allowed_files`), o agente DEVE recusar a edição e retornar imediatamente ao router com:
+  ```yaml
+  handoff_payload:
+    para: "@spring-boot-router" # ou @agent-router
+    motivo: "pre_condicao_plano"
+    contexto:
+      mensagem: "Execução bloqueada por ausência de plan_ref aprovado em docs/implementation-plans/ (R-064)"
+  ```
+- ✅ **Exceções Formais**: (a) tarefas testes-only sem alteração em código de produção e (b) documentação e configurações puramente declarativas não sensíveis.
+- ✅ **Retry R-053**: Tentativas subsequentes dentro do escopo do plano já aprovado reutilizam o mesmo `plan_ref`; se houver mudança de escopo ou mais de 2 falhas consecutivas de compilação/teste, interromper e retornar ao arch-advisor da stack.
 
 ## ⚙️ Protocolo de Execução Obrigatório
 
@@ -84,7 +99,7 @@ Agente Ativo: spring-boot-developer
 - **Abordagem Técnica**: <descrição concisa da solução implementada>
 
 ### Evidências & Validação
-- **Compilação / Linter**: <get_errors / mvn clean compile status>
+- **Compilação / Linter**: <get_errors / scripts/dev/mvn-test.sh compile status>
 - **Blast-Radius / Regressão**: <verificação de chamadores e impactos controlados>
 - **Performance Delta (se aplicável)**: <baseline antes vs depois>
 

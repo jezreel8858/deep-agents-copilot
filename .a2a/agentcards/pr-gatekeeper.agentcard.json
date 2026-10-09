@@ -18,7 +18,8 @@
     "git-governance",
     "agent-contracts",
     "terminal-governance",
-    "git-conflict-resolution-patterns"
+    "git-conflict-resolution-patterns",
+    "embedded-runtime-governance"
   ],
   "tools": [
     "grep_search",

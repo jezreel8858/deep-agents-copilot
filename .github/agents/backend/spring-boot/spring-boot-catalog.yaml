@@ -93,6 +93,7 @@ agents:
       - "handoff-governance"
       - "agent-contracts"
       - "terminal-governance"
+      - "embedded-runtime-governance"
 
   spring-boot-test-engineer:
     id: "spring-boot-test-engineer"
@@ -133,3 +134,4 @@ agents:
       - "handoff-governance"
       - "agent-contracts"
       - "terminal-governance"
+      - "embedded-runtime-governance"

@@ -238,18 +238,27 @@ workflows:
         pre_flight: "runtime-verifier (baseline check)"
         nota: "integration-test-writer obrigatorio quando o bug so reproduz com contexto de framework (Spring/R2DBC/Testcontainers); component-test-writer para DOM real (Angular)"
       - etapa: 3
+        nome: "implementation_plan_authoring"
+        agent: "specialist-arch-advisor"
+        resolvido_por: "domain-router-stack"
+        regra: "R-064"
+        entregavel: "docs/implementation-plans/<AAAAMMDD>-<wf>-<id>.md"
+        bloqueia_proxima_etapa: true
+        descricao: "Autoria do Plano de Implementacao pelo <stack>-arch-advisor antes de qualquer correcao de codigo (R-064)"
+      - etapa: 4
         nome: "surgical_bug_fix"
         agent: "specialist-bug-fixer | specialist-ui-stylist"
+        requires_plan: true
         sub_rotinas_permitidas: ["database-specialist"]
         pre_requisito_diff: "declaracao de blast_radius_estimado e rollback_plan antes de aplicar a correcao"
         security_checkpoint_condicional: "R-048.1 (tech-solution-architect + security-reviewer) obrigatorio se o diff tocar autenticacao/credenciais/identidade, antes de aplicar o fix"
-      - etapa: 4
+      - etapa: 5
         nome: "green_test_and_linter_validation"
         agent: "runtime-verifier | specialist-test-fixer"
         max_retries: 3
         mini_mutation_check: "mini mutation-check proporcional ao risco para erradicar falsos-verdes no teste de regressao"
         circuit_breaker: "runtime-verifier (declara_veredito_readonly, nunca reverte) -> specialist-bug-fixer|specialist-test-fixer (executa_revert_via_git conforme rollback_plan) -> ask_questions"
-      - etapa: 5
+      - etapa: 6
         nome: "quality_gate_and_pr"
         agent: "code-review | pr-gatekeeper"
         observacao_pos_fix: "criterios de canary e telemetria de observacao pos-fix obrigatorios para bugs criticos (P0/P1)"
@@ -296,11 +305,20 @@ workflows:
         checkpoint_aprovacao_condicional: "ask_questions se breaking_change|schema|blast_radius_grande; contextual/implicita (R-031) se escopo local"
         limite_escala_dag: 15
       - etapa: 4
+        nome: "implementation_plan_authoring"
+        agent: "specialist-arch-advisor"
+        resolvido_por: "domain-router-stack"
+        regra: "R-064"
+        entregavel: "docs/implementation-plans/<AAAAMMDD>-<wf>-<id>.md"
+        bloqueia_proxima_etapa: true
+        descricao: "Autoria do Plano de Implementacao pelo <stack>-arch-advisor antes de qualquer refatoracao em lote (R-064)"
+      - etapa: 5
         nome: "incremental_batch_execution"
         agent: "domain-router | specialist-feature-developer"
+        requires_plan: true
         protocolo: "efficient-batch-code-modification"
         gate_out_por_no: "compilacao_limpa + testes_verdes + diff_minimo"
-      - etapa: 5
+      - etapa: 6
         nome: "ground_truth_validation_and_review"
         agent: "business-rules-extractor"
         co_agentes: ["code-review"]
@@ -389,24 +407,33 @@ workflows:
         threshold_cobertura_por_risco: "test-coverage-governance/SKILL.md § 1 (90 critico | 80 integracao | 70 controller)"
         casos_borda_seguranca_obrigatorios: true
       - etapa: 5
+        nome: "implementation_plan_authoring"
+        agent: "specialist-arch-advisor"
+        resolvido_por: "domain-router-stack"
+        regra: "R-064"
+        entregavel: "docs/implementation-plans/<AAAAMMDD>-<wf>-<id>.md"
+        bloqueia_proxima_etapa: true
+        descricao: "Autoria do Plano de Implementacao pelo <stack>-arch-advisor antes de qualquer codificacao (R-064)"
+      - etapa: 6
         nome: "red_test_authoring"
         agent: "specialist-unit-test-writer"
         padrao: "contract_first_tdd"
         protocolo: "efficient-batch-code-modification"
         excecao_dominio_frontend: "Quando domain-router = angular-router, esta etapa (red) e a etapa 6 (green) sao COMPULSORIAMENTE invertidas por desenho: Angular adota Implementation-First/Test-Last (ver angular-developer.agent.md / angular-router.agent.md). Nao e bug, e desvio intencional documentado (R-050)."
-      - etapa: 6
+      - etapa: 7
         nome: "green_implementation"
         agent: "specialist-feature-developer"
+        requires_plan: true
         padrao: "contract_first_tdd"
         protocolo: "efficient-batch-code-modification"
         excecao_dominio_frontend: "Quando domain-router = angular-router, esta etapa executa PRIMEIRO (Implementation-First via @angular-developer) e a etapa 5 (red/testes) ocorre a posteriori via handoff para @angular-test-engineer. Ver nota na etapa 5 (R-050)."
-      - etapa: 7
+      - etapa: 8
         nome: "e2e_journey_validation"
         agent: "specialist-e2e-writer"
         aplicavel_quando: "domain-router = angular-router | react-router"
         condicional: true
         nota: "Etapa opcional/condicional — aplicavel somente em stacks com especialista E2E dedicado no catalogo local (ex.: @angular-test-engineer). Stacks sem E2E writer dedicado pulam esta etapa sem bloqueio."
-      - etapa: 8
+      - etapa: 9
         nome: "quality_gate_and_pr_preparation"
         agent: "code-review | pr-gatekeeper"
         sub_rotinas_permitidas: ["security-reviewer"]
@@ -436,8 +463,17 @@ workflows:
         nome: "human_approval_checkpoint"
         mecanismo: "ask_questions"
       - etapa: 3
+        nome: "implementation_plan_authoring"
+        agent: "governance-maintainer | agent-auditor"
+        resolvido_por: "governance-maintainer"
+        regra: "R-064"
+        entregavel: "docs/implementation-plans/<AAAAMMDD>-<wf>-<id>.md"
+        bloqueia_proxima_etapa: true
+        descricao: "Autoria do Plano de Implementacao tipo governance pelo specialist/auditor antes da execucao em lote (R-064)"
+      - etapa: 4
         nome: "governed_batch_execution"
         agents_permitidos: ["governance-maintainer", "governance-factory"]
+        requires_plan: true
         protocolo: "efficient-batch-code-modification"
         sincronizacao_quadrupla_r015: true
         sincronizacao_por_tipo:
@@ -445,7 +481,7 @@ workflows:
           skill: [".index.json", "skills/README.md", "source_docs_consumidores"]
           prompt: ["prompts/README.md"]
         max_tentativas_autofix: 3
-      - etapa: 4
+      - etapa: 5
         nome: "tier1_governance_quality_gate"
         validacao_automatizada: "pytest (smells, routing, isolation)"
         validacao_comportamental: "agent-evals-lab (60 casos casos-roteamento.yaml)"
@@ -476,16 +512,26 @@ workflows:
         agent: "codegraph-engine"
         sub_rotinas_permitidas: ["tech-solution-architect"]
       - etapa: 3
+        nome: "implementation_plan_authoring"
+        agent: "specialist-arch-advisor"
+        resolvido_por: "domain-router-stack"
+        regra: "R-064"
+        entregavel: "docs/implementation-plans/<AAAAMMDD>-<wf>-<id>.md"
+        bloqueia_proxima_etapa: true
+        descricao: "Autoria do Plano de Implementacao pelo <stack>-arch-advisor antes de qualquer bump ou adaptacao de codigo (R-064)"
+      - etapa: 4
         nome: "manifest_bump_and_lockfile_sync"
         agent: "domain-router | specialist-feature-developer"
+        requires_plan: true
         protocolo: "context-mode"
-      - etapa: 4
+      - etapa: 5
         nome: "breaking_change_adaptation_and_compilation"
         agent: "domain-router | specialist-bug-fixer"
+        requires_plan: true
         sub_rotinas_permitidas: ["specialist-test-fixer"]
         max_retries: 3
         circuit_breaker: "specialist-bug-fixer (executa_revert_manifesto) -> ask_questions"
-      - etapa: 5
+      - etapa: 6
         nome: "regression_verification_and_sca_gate"
         agent: "runtime-verifier | code-review | security-reviewer"
 
@@ -545,6 +591,7 @@ workflows:
       - etapa: 4
         nome: "codemod_and_batch_rewrite"
         agent: "domain-router-stack-destino | specialist-feature-developer"
+        requires_plan: true
         co_agentes: ["domain-router-stack-origem (consultivo, obrigatorio se cross-stack)", "codegraph-engine (obrigatorio, R-045 - blast radius por lote antes de cada micro-batch)"]
         protocolo: "efficient-batch-code-modification"
         nota: "execucao dos codemods estritamente orientada aos IDs da Matriz De-Para da fase ativa; domain-router-stack-origem permanece ativo validando paridade; codegraph-engine recalcula blast radius"
@@ -1147,6 +1194,9 @@ arestas:
         - "fluxo de escala"
         - "métodos do store cobrem campos do modelo"
         - "análise de aderência de store"
+        - "validação visual layout"
+        - "layout autenticado"
+        - "login playwright"
       sinal_r006: "É qualquer solicitação do ecossistema Angular ou análise semântica de modelos/stores/services Angular? (despacha para o catálogo de 8 especialistas de frontend em .github/agents/frontend/angular/angular-catalog.yaml)"
 
   # Supervisor e roteador de domínio React (Hierarchical Sub-Router)
@@ -1182,6 +1232,9 @@ arestas:
         - "vitest react"
         - "react e2e"
         - "playwright react"
+        - "validação visual layout"
+        - "layout autenticado"
+        - "login playwright"
       sinal_r006: "É qualquer solicitação do ecossistema React ou análise semântica de componentes/hooks/estado React? (despacha para o catálogo de 3 especialistas de frontend em .github/agents/frontend/react/react-catalog.yaml)"
 
   # Supervisor e roteador de domínio Spring Boot (Hierarchical Sub-Router)

@@ -21,6 +21,7 @@ source_docs:
 source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
+  - .github/skills/embedded-runtime-governance/SKILL.md
 ---
 
 # Perfil Operacional
@@ -42,6 +43,7 @@ Você opera preferencialmente sob o modelo **Claude Sonnet 5.5** para máxima pr
 - ✅ Medir e maximizar o mutation score / mutation testing (awareness explícita de testes de mutação com Pitest ou equivalentes).
 - ✅ Executar modificações e inspeções exclusivamente no sandbox do context-mode via script unificado.
 - ✅ Aplicar Diffs Cirúrgicos nos testes com 2 a 3 linhas de contexto para unicidade (`oldString`).
+- ✅ Executar Maven/testes **apenas** via `scripts/dev/mvn-test.sh <raiz-do-projeto> [args]` (nunca `mvn`/`mvnw` soltos); contrato, exit codes e fallbacks na skill `embedded-runtime-governance` § Runtime Maven embutido (consulta sob demanda via `context-mode/ctx_search`).
 
 ## Modos de Operação
 
@@ -59,6 +61,19 @@ Você opera preferencialmente sob o modelo **Claude Sonnet 5.5** para máxima pr
   - Se a falha for decorrente de bug real no código reativo de produção: formalizar handoff para `@spring-reactive-developer`, NÃO mascarar alterando o teste.
   - Se a falha decorrer de drift de contrato/mock desatualizado: aplicar a correção cirúrgica no arquivo de teste.
 - Teto de no máximo 2 tentativas antes de escalonar para `@bug-triage` ou devolver para `@spring-reactive-developer`.
+
+## Pré-condição de Plano de Implementação (R-064)
+
+- ✅ **Exceção Testes-Only**: Para criação e manutenção de testes unitários, de integração ou de componente sem alteração em código de produção da aplicação, a aprovação do plano de testes / test-strategy é suficiente, dispensando plano do arch-advisor.
+- ❌ **Bloqueio em Mutação de Código de Produção**: Caso a demanda exija mutação de código de produção (ex.: correção de código da aplicação em bugfix/test-fixer), aplica-se a exigência universal de `plan_ref` de Plano de Implementação aprovado em `docs/implementation-plans/` pelo arch-advisor da respectiva stack. Sem `plan_ref` aprovado, retornar imediatamente ao router com:
+  ```yaml
+  handoff_payload:
+    para: "@spring-reactive-router" # ou @agent-router
+    motivo: "pre_condicao_plano"
+    contexto:
+      mensagem: "Execução em código de produção bloqueada por ausência de plan_ref aprovado em docs/implementation-plans/ (R-064)"
+  ```
+- ✅ **Retry R-053**: Reutiliza `plan_ref` existente dentro do mesmo escopo; mais de 2 falhas consecutivas escalam conforme o circuit breaker.
 
 ## ⚙️ Protocolo de Execução Obrigatório
 

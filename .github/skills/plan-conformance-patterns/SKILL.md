@@ -60,7 +60,7 @@ Esta skill materializa, no momento do merge, a garantia de que o Duplo Gate Docu
 ### ❌ Quando NÃO Usar
 - Para auditar conformidade com Architectural Decision Records — delegar para `@adr-sentinel` (`docs/adr/*.md`).
 - Para planejar ou decompor uma refatoração estrutural antes da execução — usar `refactoring-planning-patterns`.
-- Quando o diff não possui nenhum Plano de Implementação Técnica associado (ex.: hotfix emergencial sem R-064 aplicável) — reportar a ausência do plano como lacuna, sem inventar escopo retroativo.
+- Quando o diff não possui nenhum Plano de Implementação Técnica associado (hotfix emergencial NÃO possui isenção: usa Tier light ou full sob R-064) — reportar a ausência do plano como bloqueio imediato antes de qualquer merge.
 
 ## 2) Diretrizes Operacionais e Processo Canônico — Protocolo de Verificação em 3 Níveis
 
@@ -83,6 +83,24 @@ Esta skill materializa, no momento do merge, a garantia de que o Duplo Gate Docu
 1. Produzir um resumo funcional objetivo do diff (o que o código efetivamente faz).
 2. Confrontar esse resumo contra o checklist GFM (`- [ ] <descrição>`) do documento de implementação aprovado.
 3. Tarefas implementadas sem item correspondente no checklist, ou itens do checklist sem implementação correspondente, são reportados conforme a severidade aplicável (§2).
+
+
+### Contrato do Plano de Implementação (Frontmatter Canônico)
+Todo documento em `docs/implementation-plans/*.md` possui contrato canônico:
+```yaml
+---
+status: approved # 'draft' antes do checkpoint, 'approved' após aprovação humana
+tier: full | light | governance
+plan_ref: docs/implementation-plans/<AAAAMMDD>-<workflow>-<identificador>.md
+allowed_files:
+  - <caminho/do/arquivo>
+rollback_plan:
+  estrategia: git_restore
+  arquivos_afetados: [...]
+---
+```
+
+> **Plan Drift Detection**: Se o diff real incluir arquivos ausentes em `allowed_files`, o Gate 2 é compulsoriamente reaberto e o merge bloqueado até nova aprovação humana explícita.
 
 ## 3) Padrões Canônicos com Exemplos Contrastantes — Classificação de Desvios de Escopo
 

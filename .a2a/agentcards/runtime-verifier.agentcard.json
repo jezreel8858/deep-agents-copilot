@@ -17,7 +17,8 @@
   ],
   "skills": [
     "terminal-governance",
-    "agent-contracts"
+    "agent-contracts",
+    "embedded-runtime-governance"
   ],
   "tools": [
     "list_dir",

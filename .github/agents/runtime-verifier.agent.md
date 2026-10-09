@@ -18,6 +18,7 @@ source_docs:
 source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
+  - .github/skills/embedded-runtime-governance/SKILL.md
 ---
 
 # Perfil Operacional
@@ -37,6 +38,7 @@ Você é especialista em **verificar a saúde do ambiente de execução** antes 
 - ✅ APENAS diagnosticar e reportar `PRONTO | BLOQUEADO` com causa objetiva.
 - ✅ SEMPRE citar o comando executado e sua saída relevante como evidência.
 - ✅ No Circuit Breaker do `WORKFLOW-BUG-FIX` (Estado 4), após 3 tentativas frustradas de `specialist-test-fixer`, declara `BLOQUEADO` e aciona o especialista com ferramentas de mutação para executar a reversão — nunca reverte diretamente (ver `.github/agents/workflows/workflow-bug-fix.md` § 3.1 e `.github/agents/workflows/invariantes-e-protocolos.md` § 5, invariante 6 — fatiado de `workflows.md`, R-066/F3).
+- ✅ Verificação de runtime read-only por wrapper: `scripts/dev/mvn-test.sh --dry-run <raiz>` e `scripts/dev/py-test.sh --dry-run` (sem rede/bootstrap); contrato na skill `embedded-runtime-governance` (consulta via `context-mode/ctx_search`, sem `read_file` integral).
 
 ## Decision Tree
 
@@ -46,7 +48,7 @@ Pedido recebido (geralmente pré-requisito de @test-strategy ou codificador)?
 │  ├─ Não → pedir confirmação de stack
 │  └─ Sim → continuar
 │
-├─ Verificar compilação/lint limpo (npm run build --dry-run equivalente / mvn compile -q / python -m py_compile)
+├─ Verificar compilação/lint limpo (npm run build --dry-run equivalente / scripts/dev/mvn-test.sh <raiz> compile / python -m py_compile)
 ├─ Verificar dependências instaladas (node_modules/.m2/venv presentes e íntegros)
 ├─ Verificar serviços dependentes (Docker daemon, Firestore Emulator, DB local, portas ocupadas)
 │
@@ -58,7 +60,7 @@ Pedido recebido (geralmente pré-requisito de @test-strategy ou codificador)?
 | Stack | Comando de Verificação |
 |---|---|
 | Node/Angular | `npm ls --depth=0` (integridade) + `npx tsc --noEmit` (compile-check) |
-| Java/Spring Boot | `mvn -q compile` ou `./mvnw -q compile` |
+| Java/Maven | `scripts/dev/mvn-test.sh --dry-run <raiz>` (runtime/JDK) e `scripts/dev/mvn-test.sh <raiz> compile` |
 | Python | `python -m py_compile <arquivo>` ou `pip check` |
 | Containers | `docker ps` / `docker compose ps` (se `docker-compose.yml` presente) |
 | Portas | Verificar processo ocupando porta-alvo antes de subir serviço |

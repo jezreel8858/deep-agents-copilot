@@ -14,6 +14,9 @@ agents:
     - triagem
     - entrypoint
     - roteamento
+    - gate2
+    - plan_ref
+    - r-064
     prerequisite_docs:
     - CLAUDE.md
     - .github/copilot-instructions.md
@@ -607,12 +610,14 @@ agents:
     related_skills:
     - terminal-governance
     - agent-contracts
+    - embedded-runtime-governance
     source_docs:
     - CLAUDE.md
     - .github/copilot-instructions.md
     - .github/agents/runtime-verifier.agent.md
     - .github/skills/terminal-governance/SKILL.md
     - .github/instructions/devops.instructions.md
+    - .github/skills/embedded-runtime-governance/SKILL.md
     estimated_time_minutes: 10
   pr-gatekeeper:
     id: pr-gatekeeper
@@ -657,6 +662,7 @@ agents:
     - agent-contracts
     - terminal-governance
     - git-conflict-resolution-patterns
+    - embedded-runtime-governance
     source_docs:
     - CLAUDE.md
     - .github/copilot-instructions.md
@@ -664,6 +670,7 @@ agents:
     - .github/skills/git-governance/SKILL.md
     - .github/skills/terminal-governance/SKILL.md
     - .github/skills/git-conflict-resolution-patterns/SKILL.md
+    - .github/skills/embedded-runtime-governance/SKILL.md
     estimated_time_minutes: 15
   database-specialist:
     id: database-specialist
@@ -1841,9 +1848,11 @@ agents:
     - agent-contracts
     - handoff-governance
     - context-mode
+    - embedded-runtime-governance
     source_docs:
     - .github/agents/backend/python/python-router.agent.md
     - .github/agents/backend/python/python-catalog.yaml
+    - .github/skills/embedded-runtime-governance/SKILL.md
     estimated_time_minutes: 15
   spring-boot-router:
     id: spring-boot-router
@@ -2146,7 +2155,7 @@ metadata:
     (1 caso gov-cs-001, agent_solicitante + prosa). CLAUDE.md: nota do R-042 (v2.0.0
     -> v2.1.0 dos specialists) + diagrama de fluxo secao 4. Higiene adicional nao
     relacionada ao rename mas encontrada durante a edicao de CLAUDE.md: removida 1
-    linha orfa com caminho absoluto de sistema de arquivos real (''teste D:/workspace/porto/projeto-real'',
+    linha orfa com caminho absoluto de sistema de arquivos real (''teste <workspace>/[PROJETO-EXEMPLO]'',
     aparentemente artefato de teste acidental) no final do arquivo — violava R-043
     (nunca caminho local real em arquivo de governanca compartilhado); usuario notificado
     no texto da resposta ao vivo, nao apenas neste changelog. Preservados intencionalmente
@@ -2408,7 +2417,7 @@ metadata:
     EJB''), identificado e corrigido gap estrutural: o motor so detectava cross-repo
     via REST (Angular apiUrl <-> Spring @RequestMapping), sem nenhuma nocao de contratos
     SOAP/JAX-WS. Investigacao real: server-side encontrado em [PROJETO-B]/[MODULO-WS]/.../ServicoExemploWeb.java
-    (classe @WebService), client-side (stub JAX-WS RI gerado) encontrado em [PROJETO-A]/.../websoma/obtervistoria/security/ServicoExemploWeb.java
+    (classe @WebService), client-side (stub JAX-WS RI gerado) encontrado em [PROJETO-A]/.../[MODULO-WS]/obtervistoria/...
     (interface @WebService) injetado em ServicoClienteExemploImpl. Implementado RF-025
     em motor-legado: deteccao de client stub (interface @WebService, operacoes via
     @RequestWrapper.localName) e implementacao server-side (classe @WebService, operacoes

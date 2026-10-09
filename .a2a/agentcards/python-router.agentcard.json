@@ -22,7 +22,8 @@
   "skills": [
     "agent-contracts",
     "handoff-governance",
-    "context-mode"
+    "context-mode",
+    "embedded-runtime-governance"
   ],
   "tools": [
     "read_file",

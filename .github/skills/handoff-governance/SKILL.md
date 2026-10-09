@@ -314,6 +314,11 @@ O aumento da complexidade de workflows multi-agente exige a transição formal d
 
 ---
 
+
+### 2.5) Governança de Retry e Reutilização de Plano (R-053 / R-064)
+- **Retry no mesmo escopo**: Tentativas subsequentes dentro do escopo de plano já aprovado reutilizam o mesmo `plan_ref` sem necessitar de novo plano ou novo checkpoint humano.
+- **Mudança de escopo ou falha persistente (>2 retries)**: Se a correção ou implementação demandar arquivos fora de `allowed_files` ou persistirem mais de 2 falhas consecutivas de teste/build, interromper compulsoriamente a execução e retornar ao `<stack>-arch-advisor` para reabertura do Gate 2.
+
 ## 3) Fluxos de Delegação Comuns
 
 ```

@@ -74,6 +74,7 @@ agents:
     - handoff-governance
     - agent-contracts
     - terminal-governance
+    - embedded-runtime-governance
     model: Claude Sonnet 5.5
   spring-reactive-test-engineer:
     id: spring-reactive-test-engineer
@@ -114,4 +115,5 @@ agents:
     - handoff-governance
     - agent-contracts
     - terminal-governance
+    - embedded-runtime-governance
     model: Claude Sonnet 5.5

@@ -20,6 +20,7 @@ source_docs:
 source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
+  - .github/skills/embedded-runtime-governance/SKILL.md
 ---
 
 # Perfil Operacional
@@ -39,6 +40,7 @@ Você opera sob a **Política Biparadigma de Modelos (R-021)**: utiliza Sonnet 5
 - ✅ Medir e maximizar o mutation score / mutation testing na estratégia de cobertura para evitar asserções vazias ou testes sem poder de detecção de falha.
 - ✅ Executar inspeções, leituras e modificações compulsoriamente via script no sandbox do `context-mode` (`ctx_batch_execute`, `ctx_execute` / `ctx_execute_file`), aplicando a Regra de Ouro do Single-Turn MCP.
 - ✅ Respeitar a Zero-Noise Test Policy (terminal-governance/SKILL.md §3.1).
+- ✅ Executar Maven/testes **apenas** via `scripts/dev/mvn-test.sh <raiz-do-projeto> [args]` (nunca `mvn`/`mvnw` soltos); contrato, exit codes e fallbacks na skill `embedded-runtime-governance` § Runtime Maven embutido (consulta sob demanda via `context-mode/ctx_search`).
 
 ## Modos Operacionais
 
@@ -53,6 +55,19 @@ Você opera sob a **Política Biparadigma de Modelos (R-021)**: utiliza Sonnet 5
 ### 3. Modo Autocorreção de Testes (`fix`)
 - Diagnóstico sistemático de falhas de build Maven/Gradle, problemas de concorrência ou flakiness.
 - Execução sob o teto estrito de no máximo 2 tentativas locais antes de escalonar formalmente para `@bug-triage` ou devolver para `@spring-boot-developer` se o problema residir no código de produção.
+
+## Pré-condição de Plano de Implementação (R-064)
+
+- ✅ **Exceção Testes-Only**: Para criação e manutenção de testes unitários, de integração ou de componente sem alteração em código de produção da aplicação, a aprovação do plano de testes / test-strategy é suficiente, dispensando plano do arch-advisor.
+- ❌ **Bloqueio em Mutação de Código de Produção**: Caso a demanda exija mutação de código de produção (ex.: correção de código da aplicação em bugfix/test-fixer), aplica-se a exigência universal de `plan_ref` de Plano de Implementação aprovado em `docs/implementation-plans/` pelo arch-advisor da respectiva stack. Sem `plan_ref` aprovado, retornar imediatamente ao router com:
+  ```yaml
+  handoff_payload:
+    para: "@spring-boot-router" # ou @agent-router
+    motivo: "pre_condicao_plano"
+    contexto:
+      mensagem: "Execução em código de produção bloqueada por ausência de plan_ref aprovado em docs/implementation-plans/ (R-064)"
+  ```
+- ✅ **Retry R-053**: Reutiliza `plan_ref` existente dentro do mesmo escopo; mais de 2 falhas consecutivas escalam conforme o circuit breaker.
 
 ## ⚙️ Protocolo de Execução Obrigatório
 
@@ -81,7 +96,7 @@ Agente Ativo: spring-boot-test-engineer
 - **Abordagem de Cobertura**: <cenários cobertos, boundary values e asserções aplicadas>
 
 ### Evidências de Execução
-- **Status da Suíte**: <mvn test / gradle test — Zero-Noise output>
+- **Status da Suíte**: <scripts/dev/mvn-test.sh test / gradle test — Zero-Noise output>
 - **Mutation Score & Assertions**: <validação de robustez dos testes>
 - **Tentativas Realizadas**: <iteração 1/2 ou 2/2 sob CAP RÍGIDO>
 

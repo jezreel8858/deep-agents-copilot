@@ -66,3 +66,20 @@ docs/ai-context/catalog.local.yaml
 .gemini/
 
 nul
+
+# ============================================
+# Playwright MCP & E2E Testing artifacts (auth, storage-state, traces, reports)
+# ============================================
+playwright/.auth/
+auth.json
+*storage-state*.json
+test-results/
+playwright-report/
+.playwright-mcp/
+playwright-traces/
+traces/
+*.bak
+
+# Runtime Maven embutido (cache do usuario; nunca versionar binarios)
+/assets/maven-mvnd-*/
+logs/dev/

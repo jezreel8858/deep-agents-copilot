@@ -114,6 +114,11 @@ Agente Ativo: <slug-kebab-case>
 
 ---
 
+## Pré-condição de Plano de Implementação (R-064)
+
+- ❌ **Bloqueio de Execução sem Plano Aprovado**: Agentes executores não podem editar código de produção sem `plan_ref` de Plano de Implementação aprovado em `docs/implementation-plans/` (`status: approved`). Sem `plan_ref` aprovado, retornar ao router com `motivo: "pre_condicao_plano"`.
+- ✅ **Exceções Formais**: tarefas testes-only e documentação/configuração não sensível.
+
 ## ⚙️ Protocolo de Execução Obrigatório
 
 <execution_protocol>

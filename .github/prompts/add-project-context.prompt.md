@@ -205,6 +205,11 @@ Não reexecutar o scanner — usar diretamente o `project_profile` já obtido vi
   extends: ["<adapter-sugerido-Q3>"]
   descrição: "<Q2>"
   adapter_local: ".github/instructions/local/<Q1>.instructions.md"
+  # Opcional para frontend com automação Playwright MCP (T14 / Plan frontend consolidation):
+  ui_url: "<http://localhost:porta-dev>"             # base dev URL via placeholder/env var
+  auth_strategy: "storage_state"                     # storage_state | user_data_dir | none
+  auth_env_var: "<PROJETO>_STORAGE_STATE_PATH"       # apenas o NOME da env var, nunca o valor
+  token_storage: "localStorage"                      # opcional: cookie | localStorage | sessionStorage | indexeddb (detectado pelo scanner)
   ```
 
 - **`<nome>.instructions.md`** em `./.github/instructions/local/` (SOMENTE se Q3 = "Criar novo adapter") — **delegado ao `adapter-generator`**, nunca gerado inline pelo Copilot:

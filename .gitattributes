@@ -1,0 +1,4 @@
+# EOL deterministico para scripts de runtime embutido
+*.sh text eol=lf
+*.cmd text eol=crlf
+scripts/dev/tools.lock text eol=lf

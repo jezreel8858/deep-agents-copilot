@@ -53,7 +53,10 @@ flowchart TD
 2. **Estado 2 — Modelagem e Checkpoint de Aprovação Humana**:
    - Apresentação objetiva dos achados ou especificações do novo artefato, incluindo a matriz de generalização sistêmica (artefatos alvo + peers + templates + testes).
    - *Estado 2b (Checkpoint Humano)*: Toda manutenção estrutural ou criação de stack exige autorização explícita via `ask_questions` antes de qualquer alteração física nos catálogos.
-3. **Estado 3 — Execução e Sincronização em Lote por Tipo de Artefato (R-015 / R-046)**:
+2c. **Gate 2 Mandatório — Plano de Implementação de Governança (R-064)**:
+   - *Autoria*: Plano tipo `governance` elaborado por `@governance-maintainer` ou `@agent-auditor` em `docs/implementation-plans/` delimitando o escopo de arquivos de governança.
+   - *Aprovação*: Aprovado no checkpoint humano (Estado 2b) antes de disparar a execução física.
+3. **Estado 3 — Execução e Sincronização em Lote por Tipo de Artefato (R-015 / R-046 — requires_plan: true)**:
    - O `@governance-maintainer` aplica as alterações em lote único (*Single-Turn Batching*) utilizando o `context-mode` MCP no sandbox para zero desperdício de tokens, atuando em conjunto com o `@docs-engineer` para atualização e consolidação formal de documentação técnica, manuais e guias de governança.
    - **Sincronização Atômica por Tipo (R-015 — gap corrigido)**: o conjunto de arquivos sincronizados depende do tipo de artefato, nunca uma lista fixa de 4 arquivos:
      - **Novo Agent**: `catalog.yaml` + `routing-graph.yaml` (nós/arestas) + **novo caso em `.github/agents/evals/casos-roteamento.yaml`** (exigência formal de R-040, antes omitida desta lista) + `agent-router.agent.md` (Decision Tree derivada) + `.github/agents/README.md`.

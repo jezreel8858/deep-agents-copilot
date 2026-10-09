@@ -1,11 +1,5 @@
 {
   "mcpServers": {
-    "jetbrains-idea": {
-      "url": "http://127.0.0.1:64342/sse",
-      "type": "sse",
-      "disabled": false,
-      "autoApprove": []
-    },
     "codegraph": {
       "command": "cmd.exe",
       "args": [

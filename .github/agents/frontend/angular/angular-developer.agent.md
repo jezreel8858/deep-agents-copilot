@@ -7,7 +7,7 @@ description: >-
   estilização com Tailwind CSS/SCSS/Angular Material (zero hex inline) e correções cirúrgicas
   de bugs de UI/renderização (ExpressionChangedAfterItHasBeenCheckedError, memory leaks).
 model: "Claude Sonnet 5.5"
-tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_execute_file', 'playwright/browser_snapshot', 'playwright/browser_navigate', 'playwright/browser_click', 'playwright/browser_type', 'playwright/browser_wait_for', 'playwright/browser_console_messages', 'playwright/browser_network_requests', 'playwright/browser_tabs', 'playwright/browser_close', 'playwright/browser_take_screenshot', 'playwright/browser_resize']
+tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_execute_file', 'playwright/browser_snapshot', 'playwright/browser_navigate', 'playwright/browser_click', 'playwright/browser_type', 'playwright/browser_fill_form', 'playwright/browser_press_key', 'playwright/browser_wait_for', 'playwright/browser_console_messages', 'playwright/browser_network_requests', 'playwright/browser_tabs', 'playwright/browser_close', 'playwright/browser_take_screenshot', 'playwright/browser_resize']
 source_docs:
   - .github/skills/angular-frontend-patterns/SKILL.md
   - .github/skills/angular-implementation-patterns/SKILL.md
@@ -45,6 +45,8 @@ Você atua sob o paradigma **Implementation-First / Test-Last**: prioriza a impl
 - ✅ Validar compilação com `get_errors` em chamada única consolidada ao final.
 - ✅ Executar **Blast-Radius Check ANTES de aplicar o diff mínimo**: buscar e analisar todos os componentes e serviços dependentes no ecossistema antes de alterar contratos de `@Input()`, `@Output()` ou inputs/outputs baseados em Signals.
 - ✅ Respeitar rigorosamente a separação de responsabilidades: ao concluir a lógica de tela ou correção, formalizar handoff para `@angular-test-engineer` para cobertura de testes.
+- ✅ **Loop VFL (Playwright MCP)**: valide layout na ordem `browser_resize` → `browser_snapshot` → `browser_console_messages` → `browser_take_screenshot` (somente sob demanda), conforme `frontend-visual-feedback-loop/SKILL.md`, e encerre SEMPRE a sessão com `browser_close`.
+- ✅ **Segredos**: login em app autenticada somente via `storageState`/variáveis de ambiente (`playwright-mcp/SKILL.md` § 7.2); NUNCA digitar, ecoar ou registrar credenciais literais via `browser_type`/`browser_fill_form`, prompt, log ou trace.
 
 - ✅ Adotar o protocolo **Canonical Sibling First** na criação e estilização de telas.
 
@@ -64,7 +66,20 @@ Você atua sob o paradigma **Implementation-First / Test-Last**: prioriza a impl
 ### 3. Modo UI & Estilização (`styling`)
 - Implementação fiel de layouts e paridade de UI com tokens de Design System, Tailwind CSS, SCSS ou Angular Material.
 - Garantia de responsividade mobile-first e conformidade com WCAG (contraste, foco visível, navegação por teclado).
-- Inspeção e validação visual de renderização via Playwright MCP (`playwright/browser_snapshot`, `browser_take_screenshot`).
+- Inspeção e validação visual de renderização via Playwright MCP, seguindo o loop VFL (`browser_resize` → `browser_snapshot` → console → `browser_take_screenshot` sob demanda).
+
+## Pré-condição de Plano de Implementação (R-064)
+
+- ❌ **Bloqueio de Execução sem Plano Aprovado**: É terminantemente proibido criar, editar ou deletar qualquer arquivo de código de produção sem um `plan_ref` de Plano de Implementação aprovado em `docs/implementation-plans/` (`status: approved`). Se a demanda for despachada sem `plan_ref` aprovado ou se exigir alteração fora da allowlist (`allowed_files`), o agente DEVE recusar a edição e retornar imediatamente ao router com:
+  ```yaml
+  handoff_payload:
+    para: "@angular-router" # ou @agent-router
+    motivo: "pre_condicao_plano"
+    contexto:
+      mensagem: "Execução bloqueada por ausência de plan_ref aprovado em docs/implementation-plans/ (R-064)"
+  ```
+- ✅ **Exceções Formais**: (a) tarefas testes-only sem alteração em código de produção e (b) documentação e configurações puramente declarativas não sensíveis.
+- ✅ **Retry R-053**: Tentativas subsequentes dentro do escopo do plano já aprovado reutilizam o mesmo `plan_ref`; se houver mudança de escopo ou mais de 2 falhas consecutivas de compilação/teste, interromper e retornar ao arch-advisor da stack.
 
 ## ⚙️ Protocolo de Execução Obrigatório
 

@@ -1,6 +1,8 @@
 # Dependências Python para rodar a suíte pytest de governança de evals do
 # testes automatizados (tests/). Instalar com:
 #   python -m pip install -r tests/requirements.txt
+# Fonte de verdade: pyproject.toml (grupo dev, uv). Este arquivo e o fallback sem uv e o
+# instalador usado pelos workflows de CI atuais. Manter pacotes/limites identicos.
 pytest>=8.0
 PyYAML>=6.0
 jsonschema>=4.20.0

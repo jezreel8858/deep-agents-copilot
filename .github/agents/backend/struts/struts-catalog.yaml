@@ -97,6 +97,7 @@ agents:
       - "handoff-governance"
       - "agent-contracts"
       - "terminal-governance"
+      - "embedded-runtime-governance"
 
   struts-test-engineer:
     id: "struts-test-engineer"
@@ -135,3 +136,4 @@ agents:
       - "handoff-governance"
       - "agent-contracts"
       - "terminal-governance"
+      - "embedded-runtime-governance"

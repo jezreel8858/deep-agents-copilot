@@ -20,6 +20,7 @@ router:
     - "agent-contracts"
     - "handoff-governance"
     - "context-mode"
+    - "embedded-runtime-governance"
 
 agents:
   python-arch-advisor:
@@ -55,6 +56,7 @@ agents:
       - "security-review-patterns"
       - "agent-contracts"
       - "context-mode"
+      - "embedded-runtime-governance"
 
   python-developer:
     id: "python-developer"
@@ -95,6 +97,7 @@ agents:
       - "context-mode"
       - "terminal-governance"
       - "agent-contracts"
+      - "embedded-runtime-governance"
 
   python-test-engineer:
     id: "python-test-engineer"
@@ -137,3 +140,4 @@ agents:
       - "context-mode"
       - "terminal-governance"
       - "agent-contracts"
+      - "embedded-runtime-governance"

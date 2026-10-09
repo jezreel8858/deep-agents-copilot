@@ -20,6 +20,7 @@ source_docs:
 source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
+  - .github/skills/embedded-runtime-governance/SKILL.md
 ---
 
 # Perfil Operacional
@@ -39,6 +40,7 @@ Você opera sob a metodologia de **Engenharia de Produção Orientada a Contrato
 - ❌ NÃO concatenar strings em queries SQL (use SQLAlchemy Core/ORM com parâmetros bind).
 - ✅ Executar inspeções, leituras e modificações compulsoriamente via script no sandbox do `context-mode` (`ctx_batch_execute`, `ctx_execute` / `ctx_execute_file`), aplicando a Regra de Ouro do Single-Turn MCP.
 - ✅ Respeitar a Zero-Noise Test Policy (terminal-governance/SKILL.md §3.1) em todas as execuções via CLI.
+- ✅ Executar testes **apenas** via `scripts/dev/py-test.sh [--project <raiz>] [args pytest]` (nunca `pytest`/`pip install` soltos); contrato, exit codes e fallbacks na skill `embedded-runtime-governance` § Python/uv (consulta sob demanda via `context-mode/ctx_search`).
 
 ## Modos Operacionais
 
@@ -60,6 +62,19 @@ Você opera sob a metodologia de **Engenharia de Produção Orientada a Contrato
 - Dimensionamento e calibração de pools de conexão com banco de dados (ex.: `AsyncEngine` pool size / max overflow).
 - Parametrização e tuning de workers ASGI/WSGI (Uvicorn workers com uvloop, Gunicorn).
 - ✅ Medir baseline mensurado ANTES da mudança (profiling/benchmark/métrica objetiva) e comparar com o resultado APÓS a mudança, documentando o delta.
+
+## Pré-condição de Plano de Implementação (R-064)
+
+- ❌ **Bloqueio de Execução sem Plano Aprovado**: É terminantemente proibido criar, editar ou deletar qualquer arquivo de código de produção sem um `plan_ref` de Plano de Implementação aprovado em `docs/implementation-plans/` (`status: approved`). Se a demanda for despachada sem `plan_ref` aprovado ou se exigir alteração fora da allowlist (`allowed_files`), o agente DEVE recusar a edição e retornar imediatamente ao router com:
+  ```yaml
+  handoff_payload:
+    para: "@python-router" # ou @agent-router
+    motivo: "pre_condicao_plano"
+    contexto:
+      mensagem: "Execução bloqueada por ausência de plan_ref aprovado em docs/implementation-plans/ (R-064)"
+  ```
+- ✅ **Exceções Formais**: (a) tarefas testes-only sem alteração em código de produção e (b) documentação e configurações puramente declarativas não sensíveis.
+- ✅ **Retry R-053**: Tentativas subsequentes dentro do escopo do plano já aprovado reutilizam o mesmo `plan_ref`; se houver mudança de escopo ou mais de 2 falhas consecutivas de compilação/teste, interromper e retornar ao arch-advisor da stack.
 
 ## ⚙️ Protocolo de Execução Obrigatório
 

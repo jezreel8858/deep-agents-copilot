@@ -19,7 +19,9 @@
     "layout responsivo",
     "acessibilidade wcag",
     "bug react",
-    "re-render"
+    "re-render",
+    "validação visual layout",
+    "visual feedback loop"
   ],
   "skills": [
     "agent-contracts",
@@ -42,6 +44,8 @@
     "playwright/browser_navigate",
     "playwright/browser_click",
     "playwright/browser_type",
+    "playwright/browser_fill_form",
+    "playwright/browser_press_key",
     "playwright/browser_wait_for",
     "playwright/browser_console_messages",
     "playwright/browser_network_requests",

@@ -41,7 +41,7 @@ O arquivo de configuração do Copilot deve ser ajustado para operar de forma **
       "command": "cmd.exe",
       "args": [
         "/c",
-        "cd /d D:\\workspace\\eco-sistema-app && D:\\Dev\\Programas\\node-v26.3.0-win-x64\\context-mode.cmd"
+        "cd /d <workspace>\\[PROJETO-EXEMPLO] && <caminho-node>\\context-mode.cmd"
       ],
       "env": {
         "SOURCE": "jetbrains-copilot",

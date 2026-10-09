@@ -29,7 +29,7 @@ Agent ativo de turno anterior? (R-042)
         └─ @prompt-structuring (R-041 — loop máx. 5 iterações) → retorno obrigatório a @agent-router
     ↓
 [Execução Sequencial no Workflow Canônico (R-050)]
-    (Planos em docs/plans/ e docs/implementation-plans/ com aprovação humana R-064)
+    (Planos em docs/plans/ e docs/implementation-plans/ com aprovação humana R-064, vide invariantes-e-protocolos.md § 10)
     ↓
 Turno seguinte muda de fase/escopo? (R-042)
     ├─ Sim -> agent ativo retorna a @agent-router (handoff de deriva)

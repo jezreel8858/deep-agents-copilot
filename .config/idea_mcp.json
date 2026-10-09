@@ -46,8 +46,10 @@
         "/c",
         "npx",
         "-y",
-        "@playwright/mcp@latest",
-        "--isolated"
+        "@playwright/mcp@0.0.83",
+        "--isolated",
+        "--storage-state=playwright/.auth/user.json",
+        "--output-dir=.playwright-mcp"
       ],
       "env": {},
       "disabled": false

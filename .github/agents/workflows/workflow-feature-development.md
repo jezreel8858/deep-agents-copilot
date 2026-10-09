@@ -57,6 +57,9 @@ flowchart TD
    - *Sub-rotina 3c (Decomposição de Tarefas com `@feature-planner`)*: Após aprovação do Blueprint Técnico, se a funcionalidade contiver 3 ou mais frentes de trabalho interdependentes (ex.: modelo/store + telas/diálogos + infra/push + testes), o `@feature-planner` decompõe o plano em subtasks sequenciais `[S]` e paralelas `[P]` com Definition of Done granular, evitando que o implementador improvise a ordem de execução.
    - *⚠️ Invariante de Blueprint e Decomposição Obrigatórios (R-058 / Smell 2.27)*: É terminantemente proibido pular o Estado 3 e despachar diretamente para domain routers ou especialistas de código quando a feature envolver novo schema, máquina de estados (3+ transições), concorrência ou infraestrutura/push. É expressamente vedado ao router listar lacunas de arquitetura e deixá-las para o implementador resolver no improviso.
 4. **Estado 4 — Estratégia de Testes por Risco (`@test-strategy`)**: Mapeia casos de borda, matriz de risco e cobertura recomendada (mínimo 80%) antes de codificar.
+4b. **Gate 2 Mandatório — Autoria do Plano de Implementação Técnica (R-064)**:
+   - *Autoria*: O `<stack>-arch-advisor` emite o Plano de Implementação em `docs/implementation-plans/` (Tier Full) com arquitetura técnica detalhada e allowlist de arquivos.
+   - *Aprovação*: Checkpoint obrigatório via `ask_questions` gerando `plan_ref` e `status: approved` antes de qualquer linha de código no Estado 5/6. Mapeia casos de borda, matriz de risco e cobertura recomendada (mínimo 80%) antes de codificar.
 5. **Estado 5 — Implementação Domain TDD & Paridade UI (`domain routers & specialists`)**:
    - Padrão **Contract-First**: o contrato OpenAPI / DTO é a SSOT.
    - **Backend**: Execução estrita TDD (Red -> Green -> Refactor) com diffs cirúrgicos em lote (R-046).

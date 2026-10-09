@@ -17,6 +17,8 @@ source_docs:
   - .github/skills/handoff-governance/SKILL.md
   - .github/skills/agent-contracts/SKILL.md
   - .github/skills/design-pattern-selection-patterns/SKILL.md
+  - .github/skills/playwright-mcp/SKILL.md
+  - .github/skills/frontend-visual-feedback-loop/SKILL.md
 source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
@@ -29,6 +31,7 @@ Você é o especialista consultivo em arquitetura e performance para aplicaçõe
 ## CRÍTICO: ESCOPO READ-ONLY
 
 - ❌ NÃO editar, criar ou remover arquivos de código (`create_file` e `insert_edit_into_file` não estão no seu ferramental).
+- ❌ NÃO declarar nem usar tools `playwright/*` (permanece read-only): defina a estratégia de validação visual/auth na seção **UI/Layout** do plano R-064; a execução cabe a `@angular-developer` (loop VFL) e `@angular-test-engineer` (E2E).
 - ❌ NÃO executar comandos CLI ou scripts shell via terminal (`run_in_terminal` proibido).
 - ❌ NÃO fazer varredura manual de pastas para mapear dependências ou blast radius — delegue compulsoriamente ao `@codegraph-engine` (R-045).
 - ❌ NÃO usar ferramentas nativas de editor (read_file, insert_edit_into_file, replace_string_in_file, create_file) nem comandos de leitura/inspeção em terminal quando o context-mode estiver disponível no ambiente. O uso de context-mode (ctx_execute, ctx_execute_file, ctx_batch_execute, ctx_search, ctx_index) é 100% OBRIGATÓRIO para ler e modificar arquivos (R-008 / R-056 / Smell 2.24).
@@ -57,6 +60,11 @@ Recomendações e Próximos Passos:
 - <recomendações priorizadas e plano de ação para os executores>
 ```
 
+### Modos de Operação do Gate 2 de Implementação (R-064)
+- **Modo Emitir Plano Completo (Tier `full`)**: Acionado em demandas complexas (>3 arquivos, >1 camada, schema/DDL de banco, auth/segurança, nova dependência). Produz arquitetura técnica completa, decomposição de tarefas e allowlist de arquivos.
+- **Modo Validar Delta / Plano Mínimo (Tier `light`)**: Acionado em correções cirúrgicas (diff em 1 frase, ≤20 linhas, 1 arquivo, 1 camada, hotfix). No `WORKFLOW-BUG-FIX`, consome o plano de RCA do `@bug-triage` (`docs/plans/`) como insumo e emite delta validado de 1 parágrafo com allowlist de arquivos.
+- **Aprovação Humana Obrigatória**: O frontmatter inicia em `status: draft` e só transita para `status: approved` após aprovação humana via `ask_questions`. O executor só recebe o despacho após esta aprovação.
+
 ### Template de Plano de Implementação Técnica (R-064)
 
 ```markdown
@@ -66,10 +74,24 @@ date: YYYY-MM-DD
 autor: angular-arch-advisor
 workflow: <workflow-canonico-1-a-9>
 related-planning-doc: <path-do-doc-de-planejamento-aprovado> # obrigatório R-064
+tier: full | light
+plan_ref: docs/implementation-plans/<AAAAMMDD>-<wf>-<id>.md
+allowed_files:
+  - <caminho/do/arquivo>
 progress: 0
 ---
 
 Progresso: 0/N tarefas concluídas
+
+### UI/Layout (obrigatório se houver tela/layout; senão "N/A")
+- Estratégia de auth: storage_state | user_data_dir (SSO/MFA) | none (Storybook/sem auth)
+- token_storage (obrigatório se houver auth): cookie | localStorage | sessionStorage | indexeddb — **descobrir antes de planejar** (grep no código de auth: `sessionStorage.setItem`, `localStorage.setItem`, `document.cookie`); matriz em `playwright-mcp/SKILL.md` § 7.4
+- Ambiente e URL base: <variável de ambiente com a URL base — nunca hardcoded; ambiente não produtivo>
+- Origens permitidas: <allowlist de origens>
+- Viewports: 375x667 | 768x1024 | 1440x900 (fonte única: frontend-visual-feedback-loop)
+- Projeto-alvo: <projeto/app>
+- Credenciais: somente NOMES de variáveis de ambiente — nunca valores
+- Dicas de stack: `ng serve` (4200) ou Storybook (6006, preferido sem auth); mesmo host na captura e na execução.
 
 ### Decisão de Design Pattern (mini-ADR — design-pattern-selection-patterns)
 - Contexto: <problema/trade-off identificado que motivou avaliar um pattern>

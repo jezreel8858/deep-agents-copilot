@@ -295,6 +295,19 @@ Prioridade: **P1 (Bloqueante — nunca percentual, qualquer reprodução literal
 
 ---
 
+### 2.10) Detecção de Local de Armazenamento do Token (`token_storage` — opcional, Emenda B)
+
+Prioridade: **P3** — somente frontend com autenticação. Detecta a **categoria** por grep, sem identificar projeto, chave ou valor do token.
+
+| Sinal (grep no código-fonte) | `token_storage` |
+|---|---|
+| `sessionStorage.setItem` | `sessionStorage` |
+| `localStorage.setItem`, `localStorageSync` | `localStorage` |
+| `document.cookie`, `withCredentials`, `Set-Cookie` | `cookie` |
+| `indexedDB.open` | `indexeddb` |
+
+Regra de saída: reportar apenas a categoria (múltiplos sinais → listar todos e pedir confirmação); nunca reproduzir nome de chave, valor ou caminho de arquivo identificável (R-010/R-044). Estratégia de auth derivada: `playwright-mcp/SKILL.md` § 7.4.
+
 ## 3) Resultado: Project Profile
 
 Consolidar scanner em um objeto estruturado (`project_profile`):
@@ -350,6 +363,12 @@ project_profile:
     coverage: true
     test_dir: "src/"
     coverage_threshold: 80
+  # Detecção de automação UI & Playwright MCP (T14 / R-043 / Plan frontend consolidation)
+  ui_automation:
+    ui_url: "http://localhost:<dev-port>"            # porta inferida de angular.json / package.json / vite.config
+    auth_strategy: "storage_state"                   # storage_state | user_data_dir | none
+    auth_env_var: "<PROJETO>_STORAGE_STATE_PATH"     # apenas o NOME da variável de ambiente, nunca o valor
+    token_storage: "localStorage"                    # opcional: cookie | localStorage | sessionStorage | indexeddb
   
   # Seção P3
   ci_cd:

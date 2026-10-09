@@ -55,6 +55,11 @@ Agente Ativo: database-arch-advisor
 - **Handoff Recomendado**: <@oracle-database-specialist para DDL/índices em Oracle | @informix-database-specialist para Informix>
 ```
 
+### Modos de Operação do Gate 2 de Implementação (R-064)
+- **Modo Emitir Plano Completo (Tier `full`)**: Acionado em demandas complexas (>3 arquivos, >1 camada, schema/DDL de banco, auth/segurança, nova dependência). Produz arquitetura técnica completa, decomposição de tarefas e allowlist de arquivos.
+- **Modo Validar Delta / Plano Mínimo (Tier `light`)**: Acionado em correções cirúrgicas (diff em 1 frase, ≤20 linhas, 1 arquivo, 1 camada, hotfix). No `WORKFLOW-BUG-FIX`, consome o plano de RCA do `@bug-triage` (`docs/plans/`) como insumo e emite delta validado de 1 parágrafo com allowlist de arquivos.
+- **Aprovação Humana Obrigatória**: O frontmatter inicia em `status: draft` e só transita para `status: approved` após aprovação humana via `ask_questions`. O executor só recebe o despacho após esta aprovação.
+
 ### Template de Plano de Implementação Técnica (R-064)
 
 ```markdown
@@ -64,6 +69,10 @@ date: YYYY-MM-DD
 autor: database-arch-advisor
 workflow: <workflow-canonico-1-a-9>
 related-planning-doc: <path-do-doc-de-planejamento-aprovado> # obrigatório R-064
+tier: full | light
+plan_ref: docs/implementation-plans/<AAAAMMDD>-<wf>-<id>.md
+allowed_files:
+  - <caminho/do/arquivo>
 progress: 0
 ---
 

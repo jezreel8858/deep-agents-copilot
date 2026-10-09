@@ -800,7 +800,7 @@ Phase 4 (Futuro)
 > Complementa o perfil **5️⃣ DEBUGGER / TESTER** e formaliza um padrão transversal de **tool inheritance** para
 > especialistas de frontend de automação de navegador (Angular/React e stacks futuras equivalentes), consolidado
 > a partir da criação da skill `.github/skills/playwright-mcp/SKILL.md` (servidor MCP `microsoft/playwright-mcp`,
-> `npx -y @playwright/mcp@latest`, configurado em `.config/idea_mcp.json`).
+> `npx -y @playwright/mcp@0.0.83`, configurado em `.config/idea_mcp.json`).
 
 ### Regra de Herança (R-055 Q2 — Portão de Reúso Sistêmico)
 

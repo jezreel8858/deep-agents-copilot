@@ -52,10 +52,25 @@ Você opera sob a **Política Biparadigma de Modelos (R-021)**: utiliza Claude S
 
 ### 3. Modo Testes End-to-End (`e2e`)
 - Playwright com Page Object Model (POM), asserções resilientes baseadas em `data-testid` ou atributos de acessibilidade e captura de traces em falhas.
+- Autenticação E2E/layout: projeto `setup` do Playwright gravando `storageState` (`playwright/.auth/*.json`, fora do versionamento) + MCP com `--isolated --storage-state=<arquivo>`; credenciais SOMENTE por variáveis de ambiente (nunca literais em prompt, `browser_type`/`browser_fill_form`, log, trace ou commit); `--user-data-dir` apenas para SSO/MFA e `--extension` proibido (`playwright-mcp/SKILL.md` § 7.2).
+- Referência de auth por local do token (cookie/localStorage/sessionStorage/backend): `.github/skills/playwright-mcp/references/auth-token-storage-patterns.md`.
 
 ### 4. Modo Autocorreção de Testes (`fix`)
 - Resolução de avisos `act()`, condições de corrida em chamadas assíncronas (`waitFor`) e mocks desatualizados do MSW/TanStack Query.
 - Teto estrito de no máximo 2 tentativas antes de escalar para `@bug-triage`.
+
+## Pré-condição de Plano de Implementação (R-064)
+
+- ✅ **Exceção Testes-Only**: Para criação e manutenção de testes unitários, de integração ou de componente sem alteração em código de produção da aplicação, a aprovação do plano de testes / test-strategy é suficiente, dispensando plano do arch-advisor.
+- ❌ **Bloqueio em Mutação de Código de Produção**: Caso a demanda exija mutação de código de produção (ex.: correção de código da aplicação em bugfix/test-fixer), aplica-se a exigência universal de `plan_ref` de Plano de Implementação aprovado em `docs/implementation-plans/` pelo arch-advisor da respectiva stack. Sem `plan_ref` aprovado, retornar imediatamente ao router com:
+  ```yaml
+  handoff_payload:
+    para: "@react-router" # ou @agent-router
+    motivo: "pre_condicao_plano"
+    contexto:
+      mensagem: "Execução em código de produção bloqueada por ausência de plan_ref aprovado em docs/implementation-plans/ (R-064)"
+  ```
+- ✅ **Retry R-053**: Reutiliza `plan_ref` existente dentro do mesmo escopo; mais de 2 falhas consecutivas escalam conforme o circuit breaker.
 
 ## ⚙️ Protocolo de Execução Obrigatório
 

@@ -1,9 +1,9 @@
 {
   "version": "1.0",
   "domain": "governanca-ai-generica",
-  "generated_at": "2026-09-26",
+  "generated_at": "2026-10-08",
   "summary": {
-    "total_skills": 76
+    "total_skills": 77
   },
   "skills": [
     {
@@ -369,6 +369,32 @@
       ]
     },
     {
+      "name": "embedded-runtime-governance",
+      "tier": 2,
+      "category": "tooling",
+      "path": ".github/skills/embedded-runtime-governance/SKILL.md",
+      "description": "Fonte única do contrato de runtime embutido (Maven via mvnd/mvnw e Python via uv): wrappers scripts/dev/mvn-test.sh e py-test.sh, variáveis DAC_*, exit codes, cascata, fallback, logs fora do repo e pendências humanas",
+      "tools": [
+        "run_in_terminal"
+      ],
+      "related_agents": [
+        "@spring-boot-developer",
+        "@spring-boot-test-engineer",
+        "@spring-reactive-developer",
+        "@spring-reactive-test-engineer",
+        "@ejb-developer",
+        "@ejb-test-engineer",
+        "@struts-developer",
+        "@struts-test-engineer",
+        "@python-developer",
+        "@python-test-engineer",
+        "@python-arch-advisor",
+        "@python-router",
+        "@runtime-verifier",
+        "@pr-gatekeeper"
+      ]
+    },
+    {
       "name": "frontend-componentization-patterns",
       "tier": 2,
       "category": "process",
@@ -390,8 +416,12 @@
         "context-mode"
       ],
       "related_agents": [
-        "@angular-ui-stylist",
-        "@angular-feature-developer",
+        "@angular-developer",
+        "@angular-test-engineer",
+        "@react-developer",
+        "@react-test-engineer",
+        "@angular-arch-advisor",
+        "@react-arch-advisor",
         "@code-review",
         "@tech-solution-architect"
       ]
@@ -1198,22 +1228,18 @@
       "name": "playwright-mcp",
       "tier": 1,
       "category": "tooling",
-      "description": "Diretrizes canônicas para uso do servidor MCP microsoft/playwright-mcp por agentes de frontend em automação de navegador via Accessibility Tree (browser_snapshot) — seletores semânticos, ciclo de vida de abas, inspeção de rede/console e guardrails de segurança (RCE, prompt injection, isolamento de sessão).",
+      "description": "Diretrizes canônicas para uso do servidor MCP microsoft/playwright-mcp (@playwright/mcp@0.0.83, versão fixa) por agentes de frontend em automação de navegador via Accessibility Tree (browser_snapshot) — seletores semânticos, ciclo de vida de abas, inspeção de rede/console, auth via storageState (--isolated), MCP vs CLI e guardrails de segurança (RCE, prompt injection, isolamento de sessão).",
       "path": ".github/skills/playwright-mcp/SKILL.md",
       "tools": [
         "playwright"
       ],
       "related_agents": [
-        "@angular-e2e-writer",
-        "@angular-ui-stylist",
-        "@angular-component-test-writer",
-        "@angular-feature-developer",
-        "@angular-bug-fixer",
-        "@react-e2e-writer",
-        "@react-ui-stylist",
-        "@react-component-test-writer",
-        "@react-feature-developer",
-        "@react-bug-fixer"
+        "@angular-developer",
+        "@angular-test-engineer",
+        "@react-developer",
+        "@react-test-engineer",
+        "@angular-arch-advisor",
+        "@react-arch-advisor"
       ]
     },
     {
@@ -1239,6 +1265,6 @@
     "total_agents": 35,
     "total_skills": 74,
     "last_updated": "2026-10-04",
-    "changelog": "2026-10-05 (42) — Importada/adaptada a skill harness-eval (Tier 2, quality; CC-BY-4.0, source_attribution: Tech Leads Club agent-skills) consolidando protocolo determinístico de avaliação de harness via 3 trilhas (Track A: regressão de instruções; Track B: calibração de prompts; Track C: auditoria dual-judge), com suporte N3 em references/ (PROTOCOL.md, judge-prompts.md, GLOSSARY.md, claims.schema.json). Atualizado skill-template.md com campos opcionais license/source_attribution/imported_from e orientação de conformidade de licença para skills importadas. Delimitada fronteira em harness-engineering-patterns/SKILL.md (Quando NÃO Usar) distinguindo diagnóstico heurístico contínuo de auditoria formal dual-judge. total_skills 73->74. | 2026-09-26 (41) — Criadas skills git-conflict-resolution-patterns (Tier 2, process; protocolo de 4 passos para resolução de conflito hunk-a-hunk, base de pr-gatekeeper) e socratic-grilling-patterns (Tier 2, process; árvore de decisão + Fronteira Ativa + protocolo Grill-with-Docs, base de requirements-analyst/tech-solution-architect/refactor-planner), no âmbito do Roadmap de Adoção de Ativos. Enriquecida refactoring-planning-patterns com anti-padrão Pass-Through Method e checklist de Deep Module/Seams. Criado template docs/agent-context/templates/stakeholder-questionnaire.md. Atualizados CLAUDE.md (R-029 gatilho wait-what) e agent-contracts/SKILL.md (§ 0.2). catalog.yaml vinculado (pr-gatekeeper, tech-solution-architect, refactor-planner). total_skills 64->66. | 2026-09-23 (40) — Criada skill harness-engineering-patterns (Tier 1, process) consolidando diagnóstico harness-vs-modelo, heurística de zona inteligente (~100k tokens), poda de instrução 'delete e observe', progressive disclosure e Ralph Loop; total_skills 54->55. | 2026-09-06 (39) — Regra R-046 e injeção compulsória da skill efficient-batch-code-modification em prompt-structuring e em todos os agents implementadores de código (frontend/angular, backend/spring-boot, backend/spring-reactive, backend/ejb e database-specialist). | 2026-09-06 (38) — Criado agent governance-maintainer (v1.0.0) especialista em manutenção atômica, refatoração estrutural e sincronização em lote de artefatos de governança via context-mode e efficient-batch-code-modification; total_agents 34->35. | 2026-09-06 (37) — Criada skill efficient-batch-code-modification (Tier 1, process) orientando dry-run prévio em memória, single-turn batching de tool calls e diffs cirúrgicos mínimos para eliminar re-submissão recursiva de contexto e mitigar consumo excessivo de créditos Copilot em alterações multi-arquivo; total_skills 53->54. | 2026-09-06 (36) — Evolução oficial do agent analysis-architect para tech-solution-architect (v2.1.0): elaboração de Technical Blueprint com contratos de API (OpenAPI), modelo de dados e divisão de tarefas particionada por stack ([BACKEND_TASKS], [FRONTEND_TASKS]) para viabilizar o padrão Context Firewall; total_agents mantido em 34. | 2026-09-03 (35) — Criada skill codegraph-optave-usage documentando @optave/codegraph (github.com/optave/ops-codegraph-tool) como motor único de substituição do script legado motor-legado consumido pelo agent codegraph-engine. Decisão de negócio do usuário: migração TOTAL (não híbrida), com aceite explícito de gaps sem equivalente (RabbitMQ, SOAP cross-repo, classificação de coupling, risco por sensibilidade de dado, viewer HTML interativo, resolução cross-repo REST) — documentados como aviso explícito na skill, não omitidos. Orientação CLI via run_in_terminal preferencial sobre MCP (34 tools expostas; se usado, habilitar apenas subconjunto mínimo por R-024). total_skills 52->53. | 2026-09-02 (34) — Revisão de pre-fetch/skills dos agents angular/spring-boot/spring-reactive: corrigidas 3 entradas duplicadas em .index.json (angular-frontend-patterns, spring-boot-backend-patterns, spring-reactive-webflux-patterns — cada uma tinha 2 blocos conflitantes, um deles com related_agents referenciando o agent obsoleto @impact-architect, fundido em @analysis-architect em 2026-08-31). Descrições unificadas com o frontmatter real do SKILL.md; related_agents deduplicado (união, sem @impact-architect). total_skills 55->52 entradas (nomes únicos inalterados, 52). total_agents corrigido 35->34 (sincronização pendente da fusão test-engineer/docs-engineer/governance-factory de 2026-09-02). | 2026-09-01 (14) — A pedido do usuário ('revise o levantamento feito pelo Haiku... crie todos os agents identificados'), criadas 5 novas skills após pesquisa web (Tavily: OWASP Top 10:2025/ASVS 5.0/Agentic AI Security 2026, Core Web Vitals/N+1 2026, SOC 2/GDPR/LGPD 2026, task decomposition 2026): security-review-patterns, performance-engineering-patterns, compliance-governance-patterns, task-decomposition-patterns, devops-agent-patterns — base de conhecimento para os 9 novos agents (security-reviewer, performance-agent, compliance-guardrails, feature-planner, devops-engineer, debugger, code-style-enforcer, refactor-executor). agent-memory-policy e code-tracing (já existentes) reaproveitados sem duplicação (R-003) para debugger respectivamente. total_skills 47->52 (corrigido de inconsistência histórica 45/49 para contagem real de pastas). total_agents 26->35. | 2026-09-01 (13) — Removida a skill dependency-graph-mapping (Tier 2) do índice: capacidades absorvidas pelo agent codegraph-engine, apos Gate de Paridade Funcional (RNF-012) validado 9/9 com evidencia de execucao real. total_skills 50->49. | 2026-08-31 (12) — Análise de gaps de mercado (docs/plan/categorizacao-agents-mercado.md §5) validada via pesquisa Tavily: Reflection puro e Fan-out/Parallelization NÃO justificam novo agent standalone (evita over-delegation/overengineering, R-011). Implementados como capacidades: (a) skill nova reflection-self-critique-patterns (Tier 2, process) consumida por docs-writer e test-implementation (self-reflection 1 round grounded antes de reportar sucesso); (b) capacidade 'Fan-out — Análise Paralela' adicionada diretamente a analysis-architect (Decision Tree + payload via handoff-governance), sem skill dedicada (1 único consumidor). total_skills 49->50. | 2026-08-31 (11) — Fase 3 do plano de otimização aplicada: removidos `research-router` e `impact-architect`; roteamento consolidado em `deep-search` (pesquisa interna/externa) e `analysis-architect` (impacto local tier B1 + cross-sistema). Atualizados `agent-router`, referências cruzadas no catálogo, README, routing-graph e casos de roteamento de forma atômica (R-015/R-040). — Criado agent requirements-analyst + skill requirements-engineering-patterns (ISO/IEC/IEEE 29148, EARS, INVEST, Gherkin/BDD, FURPS+, anti solution-jumping via Five Whys) consolidada de pesquisa de mercado. Perfil prospectivo (pedido ambíguo → requisito estruturado), distinto de business-rules-extractor (reverso: código → regra). Registrado em .index.json, README.md, agents/catalog.yaml, agents/README.md, routing-graph.yaml e casos-roteamento.yaml (R-015/R-040).\" | 2026-10-04 — Criada skill playwright-mcp (Tier 1, tooling): diretrizes de automação de navegador via Accessibility Tree (browser_snapshot) para microsoft/playwright-mcp, consumida pelos 10 agentes de frontend elegíveis (angular-e2e-writer, angular-ui-stylist, angular-component-test-writer, angular-feature-developer, angular-bug-fixer, react-e2e-writer, react-ui-stylist, react-component-test-writer, react-feature-developer, react-bug-fixer). Adicionada regra required_source_docs_rules.json (tools_contains: playwright/browser_snapshot -> source_docs playwright-mcp/SKILL.md) para herança automática em futuros agents de perfil equivalente (R-055 Q2)."
+    "changelog": "2026-10-08 (43) — Consolidação do MCP Playwright nos agents frontend (20261008-governance-maintenance-playwright-mcp-frontend-consolidation, T1-T13): playwright-mcp fixada em @playwright/mcp@0.0.83 (flags validadas na doc oficial; --save-trace inexistente), seções Auth e Ambiente (storageState + --isolated; SSO/MFA via --user-data-dir; --extension proibido; segredos só por env) e MCP vs CLI; frontend-visual-feedback-loop com ordem de ferramentas, fonte única de viewports/cleanup e references/mcp-loop-runbook.md; related_agents reconciliados (agents consolidados angular/react). | 2026-10-05 (42) — Importada/adaptada a skill harness-eval (Tier 2, quality; CC-BY-4.0, source_attribution: Tech Leads Club agent-skills) consolidando protocolo determinístico de avaliação de harness via 3 trilhas (Track A: regressão de instruções; Track B: calibração de prompts; Track C: auditoria dual-judge), com suporte N3 em references/ (PROTOCOL.md, judge-prompts.md, GLOSSARY.md, claims.schema.json). Atualizado skill-template.md com campos opcionais license/source_attribution/imported_from e orientação de conformidade de licença para skills importadas. Delimitada fronteira em harness-engineering-patterns/SKILL.md (Quando NÃO Usar) distinguindo diagnóstico heurístico contínuo de auditoria formal dual-judge. total_skills 73->74. | 2026-09-26 (41) — Criadas skills git-conflict-resolution-patterns (Tier 2, process; protocolo de 4 passos para resolução de conflito hunk-a-hunk, base de pr-gatekeeper) e socratic-grilling-patterns (Tier 2, process; árvore de decisão + Fronteira Ativa + protocolo Grill-with-Docs, base de requirements-analyst/tech-solution-architect/refactor-planner), no âmbito do Roadmap de Adoção de Ativos. Enriquecida refactoring-planning-patterns com anti-padrão Pass-Through Method e checklist de Deep Module/Seams. Criado template docs/agent-context/templates/stakeholder-questionnaire.md. Atualizados CLAUDE.md (R-029 gatilho wait-what) e agent-contracts/SKILL.md (§ 0.2). catalog.yaml vinculado (pr-gatekeeper, tech-solution-architect, refactor-planner). total_skills 64->66. | 2026-09-23 (40) — Criada skill harness-engineering-patterns (Tier 1, process) consolidando diagnóstico harness-vs-modelo, heurística de zona inteligente (~100k tokens), poda de instrução 'delete e observe', progressive disclosure e Ralph Loop; total_skills 54->55. | 2026-09-06 (39) — Regra R-046 e injeção compulsória da skill efficient-batch-code-modification em prompt-structuring e em todos os agents implementadores de código (frontend/angular, backend/spring-boot, backend/spring-reactive, backend/ejb e database-specialist). | 2026-09-06 (38) — Criado agent governance-maintainer (v1.0.0) especialista em manutenção atômica, refatoração estrutural e sincronização em lote de artefatos de governança via context-mode e efficient-batch-code-modification; total_agents 34->35. | 2026-09-06 (37) — Criada skill efficient-batch-code-modification (Tier 1, process) orientando dry-run prévio em memória, single-turn batching de tool calls e diffs cirúrgicos mínimos para eliminar re-submissão recursiva de contexto e mitigar consumo excessivo de créditos Copilot em alterações multi-arquivo; total_skills 53->54. | 2026-09-06 (36) — Evolução oficial do agent analysis-architect para tech-solution-architect (v2.1.0): elaboração de Technical Blueprint com contratos de API (OpenAPI), modelo de dados e divisão de tarefas particionada por stack ([BACKEND_TASKS], [FRONTEND_TASKS]) para viabilizar o padrão Context Firewall; total_agents mantido em 34. | 2026-09-03 (35) — Criada skill codegraph-optave-usage documentando @optave/codegraph (github.com/optave/ops-codegraph-tool) como motor único de substituição do script legado motor-legado consumido pelo agent codegraph-engine. Decisão de negócio do usuário: migração TOTAL (não híbrida), com aceite explícito de gaps sem equivalente (RabbitMQ, SOAP cross-repo, classificação de coupling, risco por sensibilidade de dado, viewer HTML interativo, resolução cross-repo REST) — documentados como aviso explícito na skill, não omitidos. Orientação CLI via run_in_terminal preferencial sobre MCP (34 tools expostas; se usado, habilitar apenas subconjunto mínimo por R-024). total_skills 52->53. | 2026-09-02 (34) — Revisão de pre-fetch/skills dos agents angular/spring-boot/spring-reactive: corrigidas 3 entradas duplicadas em .index.json (angular-frontend-patterns, spring-boot-backend-patterns, spring-reactive-webflux-patterns — cada uma tinha 2 blocos conflitantes, um deles com related_agents referenciando o agent obsoleto @impact-architect, fundido em @analysis-architect em 2026-08-31). Descrições unificadas com o frontmatter real do SKILL.md; related_agents deduplicado (união, sem @impact-architect). total_skills 55->52 entradas (nomes únicos inalterados, 52). total_agents corrigido 35->34 (sincronização pendente da fusão test-engineer/docs-engineer/governance-factory de 2026-09-02). | 2026-09-01 (14) — A pedido do usuário ('revise o levantamento feito pelo Haiku... crie todos os agents identificados'), criadas 5 novas skills após pesquisa web (Tavily: OWASP Top 10:2025/ASVS 5.0/Agentic AI Security 2026, Core Web Vitals/N+1 2026, SOC 2/GDPR/LGPD 2026, task decomposition 2026): security-review-patterns, performance-engineering-patterns, compliance-governance-patterns, task-decomposition-patterns, devops-agent-patterns — base de conhecimento para os 9 novos agents (security-reviewer, performance-agent, compliance-guardrails, feature-planner, devops-engineer, debugger, code-style-enforcer, refactor-executor). agent-memory-policy e code-tracing (já existentes) reaproveitados sem duplicação (R-003) para debugger respectivamente. total_skills 47->52 (corrigido de inconsistência histórica 45/49 para contagem real de pastas). total_agents 26->35. | 2026-09-01 (13) — Removida a skill dependency-graph-mapping (Tier 2) do índice: capacidades absorvidas pelo agent codegraph-engine, apos Gate de Paridade Funcional (RNF-012) validado 9/9 com evidencia de execucao real. total_skills 50->49. | 2026-08-31 (12) — Análise de gaps de mercado (docs/plan/categorizacao-agents-mercado.md §5) validada via pesquisa Tavily: Reflection puro e Fan-out/Parallelization NÃO justificam novo agent standalone (evita over-delegation/overengineering, R-011). Implementados como capacidades: (a) skill nova reflection-self-critique-patterns (Tier 2, process) consumida por docs-writer e test-implementation (self-reflection 1 round grounded antes de reportar sucesso); (b) capacidade 'Fan-out — Análise Paralela' adicionada diretamente a analysis-architect (Decision Tree + payload via handoff-governance), sem skill dedicada (1 único consumidor). total_skills 49->50. | 2026-08-31 (11) — Fase 3 do plano de otimização aplicada: removidos `research-router` e `impact-architect`; roteamento consolidado em `deep-search` (pesquisa interna/externa) e `analysis-architect` (impacto local tier B1 + cross-sistema). Atualizados `agent-router`, referências cruzadas no catálogo, README, routing-graph e casos de roteamento de forma atômica (R-015/R-040). — Criado agent requirements-analyst + skill requirements-engineering-patterns (ISO/IEC/IEEE 29148, EARS, INVEST, Gherkin/BDD, FURPS+, anti solution-jumping via Five Whys) consolidada de pesquisa de mercado. Perfil prospectivo (pedido ambíguo → requisito estruturado), distinto de business-rules-extractor (reverso: código → regra). Registrado em .index.json, README.md, agents/catalog.yaml, agents/README.md, routing-graph.yaml e casos-roteamento.yaml (R-015/R-040).\" | 2026-10-04 — Criada skill playwright-mcp (Tier 1, tooling): diretrizes de automação de navegador via Accessibility Tree (browser_snapshot) para microsoft/playwright-mcp, consumida pelos 10 agentes de frontend elegíveis (angular-e2e-writer, angular-ui-stylist, angular-component-test-writer, angular-feature-developer, angular-bug-fixer, react-e2e-writer, react-ui-stylist, react-component-test-writer, react-feature-developer, react-bug-fixer). Adicionada regra required_source_docs_rules.json (tools_contains: playwright/browser_snapshot -> source_docs playwright-mcp/SKILL.md) para herança automática em futuros agents de perfil equivalente (R-055 Q2)."
   }
 }

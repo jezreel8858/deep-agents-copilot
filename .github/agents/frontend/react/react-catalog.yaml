@@ -51,6 +51,8 @@ agents:
       - "react-frontend-patterns"
       - "react-performance-patterns"
       - "specialist-hybrid-advisory-implementation-patterns"
+      - "frontend-visual-feedback-loop"
+      - "playwright-mcp"
       - "agent-contracts"
       - "context-mode"
 
@@ -73,6 +75,8 @@ agents:
       - "acessibilidade wcag"
       - "bug react"
       - "re-render"
+      - "validação visual layout"
+      - "visual feedback loop"
     tools:
       - "file_search"
       - "grep_search"
@@ -90,6 +94,8 @@ agents:
       - "playwright/browser_navigate"
       - "playwright/browser_click"
       - "playwright/browser_type"
+      - "playwright/browser_fill_form"
+      - "playwright/browser_press_key"
       - "playwright/browser_wait_for"
       - "playwright/browser_console_messages"
       - "playwright/browser_network_requests"
@@ -126,6 +132,7 @@ agents:
       - "teste e2e react"
       - "corrigir teste react"
       - "test fixer react"
+      - "e2e autenticado storage state"
     tools:
       - "file_search"
       - "grep_search"

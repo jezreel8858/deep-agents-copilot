@@ -16,7 +16,8 @@
     "playwright angular",
     "cypress angular",
     "corrigir teste angular",
-    "test fixer angular"
+    "test fixer angular",
+    "e2e autenticado storage state"
   ],
   "skills": [
     "agent-contracts",
@@ -37,13 +38,20 @@
     "context-mode/ctx_execute_file",
     "playwright/browser_snapshot",
     "playwright/browser_navigate",
+    "playwright/browser_navigate_back",
     "playwright/browser_click",
     "playwright/browser_type",
+    "playwright/browser_hover",
+    "playwright/browser_select_option",
+    "playwright/browser_press_key",
+    "playwright/browser_fill_form",
+    "playwright/browser_file_upload",
+    "playwright/browser_handle_dialog",
     "playwright/browser_wait_for",
-    "playwright/browser_console_messages",
-    "playwright/browser_network_requests",
     "playwright/browser_tabs",
     "playwright/browser_close",
+    "playwright/browser_console_messages",
+    "playwright/browser_network_requests",
     "playwright/browser_take_screenshot",
     "playwright/browser_resize"
   ],
