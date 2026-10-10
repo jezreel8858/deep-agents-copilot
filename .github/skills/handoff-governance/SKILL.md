@@ -280,8 +280,6 @@ Quando o Circuit Breaker desarmar ou a cadeia abortar por erro irrecuperável du
     git --no-pager checkout -- <arquivos-alterados-na-etapa>
     ```
   - Nenhuma alteração incompleta, parcial ou quebrada deve permanecer no workspace sem aprovação expressa do usuário.
-- **Registro do Incidente**:
-  - O evento de desarme é registrado conforme o schema canônico `docs/schemas/workflow-incident.schema.json` para auditoria e retroalimentação da memória operacional.
 
 ---
 

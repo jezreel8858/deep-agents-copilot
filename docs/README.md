@@ -69,10 +69,8 @@ APRENDIZADO ────────────────────┼─�
 - **Schemas Canônicos de Validação (JSON Schema)**:
   - [`agentcard.schema.json`](schemas/agentcard.schema.json): Schema de especificação de identidade e capacidades de agentes (A2A Protocol / IETF Draft).
   - [`migration-ir.schema.json`](schemas/migration-ir.schema.json): Schema canônico da Representação Intermediária (Semantic IR) para migrações agnósticas de framework.
-  - [`workflow-incident.schema.json`](schemas/workflow-incident.schema.json): Schema de persistência estruturada de incidentes operacionais de workflows.
 - **Requisitos de Sistema (EARS / INVEST)**:
   - [`REQ-migration-engine.md`](requirements/REQ-migration-engine.md): Requisitos do motor agnóstico de migração (REQ-001 a REQ-009).
-  - [`REQ-workflow-incident-persistence.md`](requirements/REQ-workflow-incident-persistence.md): Requisitos de auditoria e persistência de incidentes.
 - **Histórico e Versionamento**:
   - [CHANGELOG.md](../CHANGELOG.md): Histórico completo de versões SemVer e entregas do ecossistema.
 
@@ -89,7 +87,6 @@ APRENDIZADO ────────────────────┼─�
 - **Planos e Decisões de Arquitetura (ADR / Blueprints)**:
   - [Plano do Motor Agnóstico de Migração](plan/plano-motor-migracao-agnostica.md): Blueprint técnico do motor IR-based com paridade funcional e redundância pós-migração.
   - [Taxonomia de Perfis de Agentes](plan/agent-profiles-taxonomy.md): Categorização de agentes segundo benchmarks de mercado (Anthropic, OpenAI, LangGraph).
-  - [Persistência de Incidentes de Workflows](plan/plano-persistencia-incidentes-workflows.md): Arquitetura de observabilidade e telemetria de falhas em tempo de execução.
 
 ---
 

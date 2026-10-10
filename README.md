@@ -55,7 +55,7 @@ Exemplos:
 Centraliza todo o conhecimento técnico em quatro quadrantes Diátaxis:
 - 🎓 **Tutoriais**: Primeiros passos, setup de ambiente e motor de grafo.
 - 🛠️ **Guias Práticos (How-To)**: Execução dos 8 workflows determinísticos, scanner de projetos e context-mode.
-- 📖 **Referência Técnica**: Catálogos de agentes/skills, regras normativas R-001..R-057 e Schemas JSON (AgentCard, Semantic IR, Incidentes).
+- 📖 **Referência Técnica**: Catálogos de agentes/skills, regras normativas R-001..R-057 e Schemas JSON (AgentCard, Semantic IR).
 - 💡 **Conceitos & Arquitetura**: [Guia de Arquitetura arc42](docs/architecture/ARCHITECTURE_AND_GOVERNANCE_GUIDE.md) e [Guia de Documentação em Governança de IA](docs/architecture/AI_GOVERNANCE_DOCUMENTATION_GUIDE.md) (alinhado a NIST AI RMF, ISO 42001 e OWASP Agentic AI).
 
 ---
@@ -115,10 +115,9 @@ deep-agents-copilot/
 │   ├── plan/                                    # Planos arquiteturais
 │   │   └── agent-profiles-taxonomy.md           # Taxonomia consolidada de agents de mercado
 │   ├── requirements/                            # Requisitos formais de sistema
-│   └── schemas/                                 # Schemas JSON canônicos (IR de migração, incidentes)
+│   └── schemas/                                 # Schemas JSON canônicos (IR de migração)
 │
 ├── tools/                                       # Ferramentas Utilitárias e Telemetria
-│   ├── incident_recorder/                       # ⭐ Motor de persistência de incidentes e aprendizado (SQLite + Supabase)
 │   ├── codegraph-visualizer/                    # Visualizador de grafos de código
 │   ├── context-insight-visualizer/              # Visualizador de insights de contexto
 │   └── otel-langfuse/                           # Coletor OpenTelemetry proxy para Langfuse Cloud (ver docs/context/setup-telemetry-copilot.md)

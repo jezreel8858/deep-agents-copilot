@@ -129,7 +129,6 @@ deep-agents-copilot/
 │   ├── plan/                                    # Blueprints de Arquitetura e Pesquisas
 │   │   ├── agent-profiles-taxonomy.md           # Taxonomia consolidada de agents de mercado
 │   │   ├── plano-motor-migracao-agnostica.md    # Blueprint do motor de migração baseado em IR
-│   │   └── plano-persistencia-incidentes-workflows.md # Blueprint de telemetria de incidentes
 │   │
 │   ├── agent-context/                           # Guias operacionais de ferramentas
 │   │   ├── codegraph-guia-uso.md                # Guia de uso do CodeGraph
@@ -145,15 +144,12 @@ deep-agents-copilot/
 │   │
 │   ├── requirements/                            # Requisitos formais do sistema (EARS / INVEST)
 │   │   ├── REQ-migration-engine.md              # Requisitos do motor de migração
-│   │   └── REQ-workflow-incident-persistence.md # Requisitos de persistência de incidentes
 │   │
 │   └── schemas/                                 # Schemas JSON canônicos
 │       ├── agentcard.schema.json                # Schema A2A Agent Card
 │       ├── migration-ir.schema.json             # Schema da Representação Intermediária (IR)
-│       └── workflow-incident.schema.json        # Schema de persistência de incidentes
 │
 ├── tools/                                       # Ferramentas Utilitárias e Telemetria
-│   ├── incident_recorder/                       # Motor de persistência de incidentes (SQLite + Supabase)
 │   ├── codegraph-visualizer/                    # Visualizador de grafos de código
 │   ├── context-insight-visualizer/              # Visualizador de insights de contexto
 │   └── otel-langfuse/                           # Coletor OpenTelemetry proxy para Langfuse Cloud
@@ -184,7 +180,7 @@ A pasta `docs/` organiza o conhecimento técnico e os artefatos de governança e
 | **`docs/context/`** | Configurações de setup de ambiente, integração com IDEs JetBrains e telemetria OTLP/Langfuse. | Setup de Ambiente |
 | **`docs/ai-copilot/`** | Guias transversais para agentes de IA (ex.: instruções globais de Conventional Commits). | Diretrizes de IA |
 | **`docs/requirements/`** | Especificações formais de requisitos de sistema baseadas em sintaxes EARS e critérios INVEST. | Requisitos Formais |
-| **`docs/schemas/`** | Schemas JSON canônicos de validação estrutural (`agentcard`, `migration-ir`, `workflow-incident`). | Schemas de Validação |
+| **`docs/schemas/`** | Schemas JSON canônicos de validação estrutural (`agentcard`, `migration-ir`). | Schemas de Validação |
 | **`docs/README.md`** | Portal central de documentação indexado conforme o framework internacional Diátaxis. | Portal Diátaxis |
 | **`docs/repo-map.md`** | Mapa do repositório para navegação determinística de arquivos (Zero Blind Searches). | SSOT de Localização |
 
