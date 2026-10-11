@@ -1,0 +1,120 @@
+schema_version: 1
+
+tier_map:
+  premium:
+    - tech-solution-architect
+    - debugger
+  orchestration:
+    - agent-router
+    - database-router
+    - ejb-router
+    - python-router
+    - spring-boot-router
+    - spring-reactive-router
+    - struts-router
+    - angular-router
+    - react-router
+    - templates/router-agent
+    - prompt:agent-router
+  standard:
+    - adr-sentinel
+    - agent-auditor
+    - database-arch-advisor
+    - informix-database-specialist
+    - oracle-database-specialist
+    - ejb-arch-advisor
+    - ejb-developer
+    - ejb-test-engineer
+    - python-arch-advisor
+    - python-developer
+    - python-test-engineer
+    - spring-boot-arch-advisor
+    - spring-boot-developer
+    - spring-boot-test-engineer
+    - spring-reactive-arch-advisor
+    - spring-reactive-developer
+    - spring-reactive-test-engineer
+    - struts-arch-advisor
+    - struts-developer
+    - struts-test-engineer
+    - bug-triage
+    - business-rules-extractor
+    - code-review
+    - compliance-guardrails
+    - database-specialist
+    - ddd-bounded-context-mapper
+    - deep-search
+    - devops-engineer
+    - feature-planner
+    - angular-arch-advisor
+    - angular-developer
+    - angular-test-engineer
+    - react-arch-advisor
+    - react-developer
+    - react-test-engineer
+    - governance-factory
+    - performance-agent
+    - refactor-planner
+    - repo-hygiene-auditor
+    - requirements-analyst
+    - security-reviewer
+    - test-strategy
+    - templates/research-agent
+    - prompt:connect-integration-graphs
+    - prompt:deep-search
+    - prompt:plan
+    - prompt:strategic-review
+  light:
+    - adapter-generator
+    - binding-initializer
+    - code-style-enforcer
+    - codegraph-engine
+    - docs-engineer
+    - governance-maintainer
+    - pr-gatekeeper
+    - prompt-structuring
+    - runtime-verifier
+    - templates/agent-template
+    - templates/operational-agent
+    - prompt:add-project-context
+    - prompt:commit
+    - prompt:craft-prompt
+    - prompt:ctx-checkpoint
+    - prompt:ctx-doctor
+    - prompt:ctx-insight
+    - prompt:ctx-resume
+    - prompt:ctx-start
+    - prompt:ctx-status
+    - prompt:del-project-context
+    - prompt:eval-workflows
+    - prompt:health
+    - prompt:implement
+    - prompt:init-context
+    - prompt:review
+    - prompt:templates/prompt-template
+    - prompt:validate
+    - prompt:visualize-graph
+
+profiles:
+  default:
+    description: "Configuração canônica espelhada nos frontmatters atuais do repositório."
+    tiers:
+      premium: Claude Opus 5.5
+      orchestration: Claude Sonnet 5.5
+      standard: Claude Sonnet 5.5
+      light: Gemini 3.8 Flash
+
+  balanceado:
+    extends: default
+    description: "Substitui Opus por Sonnet no tier premium; mantém orquestração, standard e light herdados do default."
+    quality_warning: "Arquitetura e debug profundo perdem raciocínio premium."
+    tiers:
+      premium: Claude Sonnet 5.5
+
+  economico:
+    extends: balanceado
+    description: "Rebaixa orquestração e standard para Claude Haiku 5.5; herda premium do balanceado e light do default."
+    quality_warning: "Roteamento, planos e código podem perder precisão; routers podem errar triagem."
+    tiers:
+      orchestration: Claude Haiku 5.5
+      standard: Claude Haiku 5.5

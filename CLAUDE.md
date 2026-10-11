@@ -109,6 +109,7 @@ O catálogo de agentes e a topologia de roteamento são geridos como dados estru
 - **Grafo Estruturado de Roteamento**: Vide [`.github/agents/routing-graph.yaml`](.github/agents/routing-graph.yaml) (nós, arestas, condições e políticas de transição).
 - **Índice Estruturado de Skills**: Vide [`.github/skills/.index.json`](.github/skills/.index.json).
 - **Casos de Teste de Roteamento**: Vide [`.github/agents/evals/casos-roteamento.yaml`](.github/agents/evals/casos-roteamento.yaml).
+- **Perfis de Modelo e Allowlist**: [`model-profiles.yaml`](model-profiles.yaml) e [`model-allowlist.yaml`](model-allowlist.yaml) (guia em [`docs/guides/model-profiles.md`](docs/guides/model-profiles.md)).
 - **Ferramentas de Automação Determinística**:
   - `tools/agent_protocol_sync/sync_execution_protocol.py` — Sincronização determinística do protocolo `<execution_protocol>` em lote (R-059/R-060).
   - `tools/agentcard_exporter/export_agentcards.py` — Validador e exportador de conformidade A2A AgentCard v1.0.0 (R-051).

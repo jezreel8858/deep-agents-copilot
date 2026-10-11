@@ -57,6 +57,10 @@ __pycache__/
 docs/ai-context/catalog.local.yaml
 .github/instructions/local/
 
+# Perfis de modelo locais e saídas efêmeras de gerador (model-profiles, R-043)
+model-profiles.local.yaml
+.model-profiles/
+
 # Estado efêmero do circuit breaker mecânico ctx-sequence-guard (PreToolUse hook)
 .github/hooks/.state/
 

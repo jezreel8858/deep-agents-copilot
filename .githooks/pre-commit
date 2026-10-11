@@ -19,8 +19,8 @@ blocked=0
 
 # 1) Nenhuma entrada de projeto pode ser adicionada a catálogos compartilhados.
 #    Marcador de fingerprint: "path_externo:" só existe em entradas de projeto.
-if git diff --cached --name-only | grep -qE '^(.github/agents/catalog.yaml|docs/ai-context/catalog.yaml)$'; then
-  if git diff --cached -- .github/agents/catalog.yaml docs/ai-context/catalog.yaml 2>/dev/null | grep -qE '^\+.*path_externo:'; then
+if git -c core.quotepath=off diff --cached --name-only | grep -E '^(.github/agents/catalog.yaml|docs/ai-context/catalog.yaml)$' >/dev/null 2>&1; then
+  if git diff --cached -- .github/agents/catalog.yaml docs/ai-context/catalog.yaml 2>/dev/null | grep -E '^\+.*path_externo:' >/dev/null 2>&1; then
     echo "❌ [R-043] Bloqueado: catálogo compartilhado não pode conter entrada de projeto (path_externo:)."
     echo "   → Projetos vivem em .github/projects.local.yaml (gitignored)."
     blocked=1
@@ -29,14 +29,14 @@ fi
 
 # 2) Nenhum arquivo sob .github/instructions/local/ pode ser commitado
 #    (adapters gerados por-projeto — sempre locais/gitignored).
-if git diff --cached --name-only | grep -qE '^\.github/instructions/local/'; then
+if git -c core.quotepath=off diff --cached --name-only | grep -E '^\.github/instructions/local/' >/dev/null 2>&1; then
   echo "❌ [R-043] Bloqueado: arquivo(s) staged sob .github/instructions/local/ (adapters locais, nunca commitados)."
   echo "   → Remova do stage: git restore --staged .github/instructions/local/*"
   blocked=1
 fi
 
 # 3) projects.local.yaml (instância real, não o .example) nunca pode ser commitado.
-if git diff --cached --name-only | grep -qE '^(\.github/projects\.local\.yaml|docs/ai-context/catalog\.local\.yaml)$'; then
+if git -c core.quotepath=off diff --cached --name-only | grep -E '^(\.github/projects\.local\.yaml|docs/ai-context/catalog\.local\.yaml)$' >/dev/null 2>&1; then
   echo "❌ [R-043] Bloqueado: .github/projects.local.yaml (overlay local real) nunca deve ser commitado."
   echo "   → Remova do stage: git restore --staged .github/projects.local.yaml"
   blocked=1
@@ -51,11 +51,11 @@ fi
 #    próprios arquivos de definição da regra R-044 e legitimamente contêm
 #    exemplos ilustrativos de caminho (ex.: "C:\\Users\\...", "D:\\workspace\\...")
 #    para explicar o que NÃO fazer — não são evidência real de projeto.
-staged_gov_files=$(git diff --cached --name-only | grep '^\.github/' | grep -v '^\.github/instructions/local/' || true)
+staged_gov_files=$(git -c core.quotepath=off diff --cached --name-only | grep '^\.github/' | grep -v '^\.github/instructions/local/' || true)
 if [ -n "$staged_gov_files" ]; then
   while IFS= read -r f; do
     [ -z "$f" ] && continue
-    if git diff --cached -- "$f" | grep -qE '^\+.*([A-Za-z]:\\(Users|workspace)|/home/[A-Za-z0-9_.-]+/|/Users/[A-Za-z0-9_.-]+/)'; then
+    if git diff --cached -- "$f" | grep -E '^\+.*([A-Za-z]:\\(Users|workspace)|/home/[A-Za-z0-9_.-]+/|/Users/[A-Za-z0-9_.-]+/)' >/dev/null 2>&1; then
       echo "❌ [R-044] Bloqueado: $f contém caminho de sistema de arquivos local absoluto (possível vazamento de evidência de projeto real)."
       echo "   → Genericize caminhos/nomes antes de commitar. Ver CLAUDE.md § R-044."
       blocked=1
@@ -99,7 +99,7 @@ if [ -n "$target_catalog" ]; then
       "$repo_root_norm"/*|"$repo_root_norm") continue ;;
     esac
 
-    if git diff --cached | grep -qiE "^\+.*$proj_id"; then
+    if git diff --cached | grep -iE "^\+.*$proj_id" >/dev/null 2>&1; then
       echo "❌ [R-044] Bloqueado: diff staged contém referência nominal ao projeto local '$proj_id'."
       echo "   → Genericize para [PROJETO-ALVO] ou [PROJETO-EXEMPLO]. Ver CLAUDE.md § R-044."
       blocked=1
@@ -122,7 +122,7 @@ fi
 #    ausente no staged e bloqueará o commit. Esse falso positivo em correções
 #    legítimas de duplicatas é uma limitação conhecida e aceita: o guard prioriza
 #    sempre a segurança estrita contra perda de histórico (safe by default).
-if git diff --cached --name-only | grep -qE '^CHANGELOG\.md$'; then
+if git -c core.quotepath=off diff --cached --name-only | grep -E '^CHANGELOG\.md$' >/dev/null 2>&1; then
   headers_head=$(git show HEAD:CHANGELOG.md 2>/dev/null | grep -E '^##\s+\[' | sort || true)
   headers_staged=$(git show :CHANGELOG.md 2>/dev/null | grep -E '^##\s+\[' | sort || true)
   if [ -n "$headers_head" ]; then
@@ -133,6 +133,54 @@ if git diff --cached --name-only | grep -qE '^CHANGELOG\.md$'; then
       echo "   → O CHANGELOG.md deve ser estritamente aditivo. Reversões de versões históricas são proibidas."
       blocked=1
     fi
+  fi
+fi
+
+# 7) Defesa contra vazamento de variantes de perfil de modelo (T-B3.4 / D4'):
+#    Bloqueia commits contendo variantes locais de model-profiles staged em .github/agents/
+#    ou .github/prompts/, garantindo que variantes nunca vazem para o repositório compartilhado.
+has_staged_agent_prompts=0
+first_agent_prompt=""
+if IFS= read -r -d '' first_agent_prompt < <(git -c core.quotepath=off diff --cached -z --name-only -- .github/agents .github/prompts 2>/dev/null); then
+  has_staged_agent_prompts=1
+elif [ -n "$first_agent_prompt" ]; then
+  has_staged_agent_prompts=1
+fi
+
+if [ "$has_staged_agent_prompts" -eq 1 ]; then
+  state_file=".model-profiles/state.json"
+  has_active_state=0
+  if [ -f "$state_file" ]; then
+    if grep -E '"phase"\s*:\s*"(applied|pending)"' "$state_file" >/dev/null 2>&1; then
+      has_active_state=1
+    fi
+  fi
+
+  staged_has_model_change=0
+  if git diff --cached -- .github/agents .github/prompts 2>/dev/null | grep -E '^\+[ ]*model:' >/dev/null 2>&1; then
+    staged_has_model_change=1
+  fi
+
+  has_profiles_manifest_staged=0
+  if git -c core.quotepath=off diff --cached --name-only | grep -E '^model-profiles\.yaml$' >/dev/null 2>&1; then
+    has_profiles_manifest_staged=1
+  fi
+
+  if [ "$has_active_state" -eq 1 ] && [ "$staged_has_model_change" -eq 1 ]; then
+    echo "❌ [T-B3.4] Bloqueado: perfil de modelo ativo detectado (.model-profiles/state.json) com alterações staged em 'model:'."
+    echo "   → Restaure o perfil default antes de commitar:"
+    echo "     python -m tools.model_profiles restore"
+    echo "   → Escape controlado (mudança canônica intencional): inclua model-profiles.yaml no mesmo commit."
+    echo "   → Ver: docs/guides/model-profiles.md"
+    blocked=1
+  elif [ "$staged_has_model_change" -eq 1 ] && [ "$has_profiles_manifest_staged" -eq 0 ]; then
+    echo "❌ [T-B3.4] Bloqueado: alteração na linha 'model:' em agents/prompts sem atualização correspondente em model-profiles.yaml."
+    echo "   → Se você aplicou um perfil local, restaure o default antes de commitar:"
+    echo "     python -m tools.model_profiles restore"
+    echo "   → Se a mudança for canônica/definitiva, inclua model-profiles.yaml no mesmo commit."
+    echo "   → Escape emergencial: git commit --no-verify"
+    echo "   → Ver: docs/guides/model-profiles.md"
+    blocked=1
   fi
 fi
 

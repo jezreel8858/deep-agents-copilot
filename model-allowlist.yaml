@@ -1,0 +1,107 @@
+schema_version: 1
+verified_at: "2026-10-10"          # frescor global; > 30 dias => aviso
+freshness_days: 30
+source: "jetbrains-model-picker-screenshot@2026-10-10; https://docs.github.com/copilot/reference/ai-models/supported-models"
+sources:
+  official: https://docs.github.com/copilot/reference/ai-models/supported-models
+  picker: jetbrains-model-picker-screenshot@2026-10-10
+models:
+  - name: Auto
+    provider: github
+    status: special
+    pinnable: false               # seletor da IDE; não pinável via frontmatter até validação T-B0.4
+    retirement_date: null
+    cost:
+      label: variable
+      unit: credits_per_1M_tokens
+      input: null
+      output: null
+      cache_read: null
+      cache_write: null
+    cost_rank: null
+
+  - name: Claude Haiku 5.5
+    provider: anthropic
+    status: ga
+    pinnable: true
+    retirement_date: null
+    cost:
+      label: low
+      unit: credits_per_1M_tokens
+      input: 10
+      output: 50
+      cache_read: 1
+      cache_write: 12
+    cost_rank: 1
+
+  - name: Gemini 3.8 Flash
+    provider: google
+    status: ga
+    pinnable: true
+    retirement_date: null
+    cost:
+      label: low
+      unit: credits_per_1M_tokens
+      input: 75
+      output: 375
+      cache_read: 7
+      cache_write: 0
+    cost_rank: 2
+
+  - name: Grok 4.7
+    provider: xai
+    status: ga
+    pinnable: true
+    retirement_date: null
+    cost:
+      label: medium
+      unit: credits_per_1M_tokens
+      input: 200
+      output: 600
+      cache_read: 50
+      cache_write: 0
+    cost_rank: 3
+
+  # Desempate determinístico (custos in/out idênticos entre Claude Sonnet 5.5 e GPT-6.1 Sol):
+  # Ordenação alfabética por name: Claude Sonnet 5.5 = rank 4, GPT-6.1 Sol = rank 5.
+  - name: Claude Sonnet 5.5
+    provider: anthropic
+    status: ga
+    pinnable: true
+    retirement_date: null
+    cost:
+      label: medium
+      unit: credits_per_1M_tokens
+      input: 300
+      output: 1500
+      cache_read: 30
+      cache_write: 375
+    cost_rank: 4
+
+  - name: GPT-6.1 Sol
+    provider: openai
+    status: ga
+    pinnable: true
+    retirement_date: null
+    cost:
+      label: medium
+      unit: credits_per_1M_tokens
+      input: 300
+      output: 1500
+      cache_read: 30
+      cache_write: 375
+    cost_rank: 5
+
+  - name: Claude Opus 5.5
+    provider: anthropic
+    status: ga
+    pinnable: true
+    retirement_date: null
+    cost:
+      label: high
+      unit: credits_per_1M_tokens
+      input: 500
+      output: 2500
+      cache_read: 50
+      cache_write: 625
+    cost_rank: 6

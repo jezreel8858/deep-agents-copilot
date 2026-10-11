@@ -170,6 +170,14 @@ Arquivos Locais (CLAUDE.md → copilot-instructions.md → adapters)
 
 ## Como Usar
 
+### Controle de Custo e Perfis de Modelos (model-profiles)
+Permite alternar localmente os modelos de LLM dos agents e prompts (`default`, `economico`, `balanceado` ou customizado em `model-profiles.local.yaml`), reduzindo consumo de tokens:
+- **Listar perfis:** `python -m tools.model_profiles list`
+- **Aplicar perfil local:** `python -m tools.model_profiles apply economico` (depois recarregue a janela/chat da IDE)
+- **Restaurar perfil default:** `python -m tools.model_profiles restore`
+- **Verificar integridade:** `python -m tools.model_profiles doctor`
+- Guia completo, limitações de IDE e fluxo Git seguro: [`docs/guides/model-profiles.md`](docs/guides/model-profiles.md).
+
 ### Para Desenvolvedores de IA (Copilot, Cursor, Claude Code)
 
 1. Carregue **`CLAUDE.md`** como fonte de verdade global
