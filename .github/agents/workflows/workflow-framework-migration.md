@@ -28,9 +28,9 @@ flowchart TD
 
     PlanPhasing --> PhaseGate{"<b>2b. Checkpoint Humano de Fases</b><br/>Aprovação obrigatória via ask_questions<br/>Exibe Dashboard Executivo da Matriz De-Para"}
     PhaseGate -- "Revisar" --> PlanPhasing
-    PhaseGate -- "Aprovado" --> BatchCodemod["<b>3. Codemod & Transformação em Lote com Anti-Omission</b><br/>Agente: domain-router-DESTINO (specialist-feature-developer)<br/>Co-agentes: domain-router-ORIGEM (oráculo consultivo) + @codegraph-engine<br/>Ação: Codemods e diffs cirúrgicos com validação de nós AST anti-omissão"]
+    PhaseGate -- "Aprovado" --> BatchCodemod["<b>3. Codemod & Transformação em Lote com Anti-Omission</b><br/>Agente: domain-router-DESTINO (<stack>-developer)<br/>Co-agentes: domain-router-ORIGEM (oráculo consultivo) + @codegraph-engine<br/>Ação: Codemods e diffs cirúrgicos com validação de nós AST anti-omissão"]
 
-    BatchCodemod --> ParityRefine["<b>4. Refinamento, Paridade Funcional & Resolução De-Para</b><br/>Agentes: domain-router-DESTINO + specialist-unit-test-writer<br/>Co-agentes: domain-router-ORIGEM + @business-rules-extractor + @codegraph-engine<br/>Ação: Dual-Verification Expandido (Golden Master 100% + De-Para 100% resolvido na fase + 0 ciclos)"]
+    BatchCodemod --> ParityRefine["<b>4. Refinamento, Paridade Funcional & Resolução De-Para</b><br/>Agentes: domain-router-DESTINO + <stack>-test-engineer<br/>Co-agentes: domain-router-ORIGEM + @business-rules-extractor + @codegraph-engine<br/>Ação: Dual-Verification Expandido (Golden Master 100% + De-Para 100% resolvido na fase + 0 ciclos)"]
 
     ParityRefine --> CheckPhaseItems{"Todos os IDs De-Para<br/>da fase estão [MIGRADO]<br/>ou [DESACOPLADO]?"}
     CheckPhaseItems -- "Não (Gaps Detectados)" --> BatchCodemod
@@ -125,11 +125,11 @@ Documentada em `docs/migrations/matriz-de-para-<alvo>.md` (ou incorporada ao blu
      - Total de Itens: <N> | ✅ Migrados: <N> (<%>)| ⏳ Pendentes: <N> (<%>) | ⚠️ Divergentes: <N> (<%>) | ℹ️ Desacoplados: <N> (<%>)
      ```
    - **Gate Anti-Continuação-Genérica (Invariante 11, § 5)**: Se o Dashboard listar qualquer item `⏳ PENDENTE` ou `⚠️ DIVERGENTE` (stubs, implementações parciais, itens não implementados), o Estado 2b NÃO é considerado satisfeito por uma resposta de continuação genérica do usuário (ex.: clique em sugestão "prossiga para implementar"). O `@tech-solution-architect` DEVE reapresentar cada item pendente com opções explícitas (`ask_questions`: "implementar nesta fase" | "reclassificar [DESACOPLADO] com justificativa" | "adiar para fase futura") e só then avançar para o Estado 3 com a decisão registrada em `de_para_status` por item. Ao retomar a execução, o domain-router-DESTINO que assumir a implementação (Estados 3/4) DEVE reemitir o banner `Agente Ativo: <domain-router-DESTINO>` antes da primeira mutação de arquivo (Invariante 12).
-5. **Estado 3 — Codemod & Transformação em Lote com Anti-Omission AST Validator (`domain-router-DESTINO` + `specialist-feature-developer`)**:
+5. **Estado 3 — Codemod & Transformação em Lote com Anti-Omission AST Validator (`domain-router-DESTINO` + `<stack>-developer`)**:
    - *Ação*: Execução dos codemods oficiais (`ng update`, OpenRewrite recipes) ou transformações cirúrgicas via sandbox `context-mode` (R-046) estritamente restritas aos IDs De-Para da fase ativa.
    - *Validação Anti-Omission*: Um validador no sandbox (`ctx_execute`) inspeciona o código transformado garantindo que nenhuma branch, exception handler ou persistência secundária mapeada na IR foi omitida. Em caso de omissão (*silent dropping*), o especialista é forçado a corrigir o micro-lote antes dos testes.
    - *Colaboração Contínua*: `domain-router-ORIGEM` permanece ativo como oráculo consultivo validando paridade regra a regra; `@codegraph-engine` recalcula blast radius antes de cada micro-lote.
-6. **Estado 4 — Refinamento, Paridade Funcional & Resolução De-Para (`domain-router-DESTINO` + `specialist-unit-test-writer`)**:
+6. **Estado 4 — Refinamento, Paridade Funcional & Resolução De-Para (`domain-router-DESTINO` + `<stack>-test-engineer`)**:
    - *Ação*: Ajuste idiomático da nova versão e execução de testes comprovando comportamento idêntico ao baseline.
    - *Gate de Dual-Verification Expandido*: exige **(1)** testes de caracterização (Golden Master) 100% verdes, **(2)** resolução de 100% dos IDs De-Para da fase corrente (zero `PENDENTE` ou `DIVERGENTE`), **(3)** confirmação do `domain-router-ORIGEM` + `@business-rules-extractor` (modo validate) de que nenhuma regra ou efeito colateral da fase foi perdido, e **(4)** `@codegraph-engine` confirmando zero ciclos ou dead-code novos.
    - Se aprovado, transiciona os itens da fase para `[✅ MIGRADO]` e avança para a próxima fase (loop até a última fase).

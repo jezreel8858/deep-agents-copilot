@@ -39,10 +39,10 @@ O supervisor hierárquico `spring-boot-router` é preservado integralmente com s
 - **`spring-boot-arch-advisor`** (*Preservado / Read-Only*):
   - Responsável por análise arquitetural (Clean Architecture, Hexagonal), upgrades Java LTS (JDK 21/25), observabilidade (Micrometer, OpenTelemetry), Virtual Threads e autoria exclusiva de Planos Técnicos e Blueprints R-064.2.
 - **`spring-boot-developer`** (*Novo Agente Consolidado / Mutativo*):
-  - Absorve `spring-boot-feature-developer`, `spring-boot-bug-fixer` e `spring-boot-perf-tuner`.
+  - Absorve `spring-boot-developer (antigo feature)`, `spring-boot-developer (antigo bugfix)` e `spring-boot-perf-tuner`.
   - Atua nos modos `feature`, `bugfix` e `perf`, desenvolvendo endpoints REST, services transacionais, DTOs Records, queries JPA e correções com diff cirúrgico.
 - **`spring-boot-test-engineer`** (*Novo Agente Consolidado / Mutativo*):
-  - Absorve `spring-boot-unit-test-writer`, `spring-boot-integration-test-writer` e `spring-boot-test-fixer`.
+  - Absorve `spring-boot-test-engineer (antigo unit)`, `spring-boot-integration-test-writer` e `spring-boot-test-engineer (antigo testfix)`.
   - Atua nos modos `unit`, `integration` (Testcontainers, MockMvc, DataJpaTest) e `fix` (autocorreção com limite estrito de 3 iterações sob R-053).
 
 ---
@@ -60,12 +60,12 @@ Todas as mutações no repositório seguem atomicidade estrita (`all-or-nothing`
 | `.github/agents/backend/spring-boot/spring-boot-catalog.yaml` | **Modificar** | Reestruturar sub-catálogo local para exatamente 3 especialistas + 1 router. |
 | `.github/agents/catalog.yaml` | **Modificar** | Atualizar nó `spring-boot-router` e remover 6 IDs legados do catálogo central. |
 | `.github/agents/routing-graph.yaml` | **Modificar** | Atualizar arestas e descrições do domínio backend Spring Boot. |
-| `.github/agents/backend/spring-boot/spring-boot-feature-developer.agent.md` | **Remover** | Especialista legado descontinuado (absorvido por `spring-boot-developer`). |
-| `.github/agents/backend/spring-boot/spring-boot-bug-fixer.agent.md` | **Remover** | Especialista legado descontinuado (absorvido por `spring-boot-developer`). |
+| `.github/agents/backend/spring-boot/spring-boot-developer (antigo feature).agent.md` | **Remover** | Especialista legado descontinuado (absorvido por `spring-boot-developer`). |
+| `.github/agents/backend/spring-boot/spring-boot-developer (antigo bugfix).agent.md` | **Remover** | Especialista legado descontinuado (absorvido por `spring-boot-developer`). |
 | `.github/agents/backend/spring-boot/spring-boot-perf-tuner.agent.md` | **Remover** | Especialista legado descontinuado (absorvido por `spring-boot-developer`). |
-| `.github/agents/backend/spring-boot/spring-boot-unit-test-writer.agent.md` | **Remover** | Especialista legado descontinuado (absorvido por `spring-boot-test-engineer`). |
+| `.github/agents/backend/spring-boot/spring-boot-test-engineer (antigo unit).agent.md` | **Remover** | Especialista legado descontinuado (absorvido por `spring-boot-test-engineer`). |
 | `.github/agents/backend/spring-boot/spring-boot-integration-test-writer.agent.md` | **Remover** | Especialista legado descontinuado (absorvido por `spring-boot-test-engineer`). |
-| `.github/agents/backend/spring-boot/spring-boot-test-fixer.agent.md` | **Remover** | Especialista legado descontinuado (absorvido por `spring-boot-test-engineer`). |
+| `.github/agents/backend/spring-boot/spring-boot-test-engineer (antigo testfix).agent.md` | **Remover** | Especialista legado descontinuado (absorvido por `spring-boot-test-engineer`). |
 | `tests/governance_audit/test_feature_developer_test_authoring_boundary.py` | **Modificar** | Adequar validação da barreira de testes para o novo identificador `spring-boot-developer`. |
 | `tests/governance_audit/test_spring_boot_consolidation.py` | **Criar** | Teste automatizado validando a invariante 3+1 e integridade referencial. |
 
@@ -78,12 +78,12 @@ A consolidação preserva 100% das heurísticas acumuladas no projeto, desacopla
 | Agente Anterior | Destino Consolidado | Modo de Operação | Heurísticas e Regras Críticas Absorvidas | Skills Ativas (Estáticas / Dinâmicas) | Conjunto Canônico de Ferramentas (Tools) |
 |---|---|---|---|---|---|
 | `spring-boot-arch-advisor` | `spring-boot-arch-advisor` | `advisory` (Preservado) | Perfil Read-Only mandatória; sem comandos de mutação de código; elaboração de Planos Técnicos R-064.2 e ADRs; conformidade Java 21+ e Virtual Threads. | `spring-boot-backend-patterns`, `specialist-hybrid-advisory-implementation-patterns`, `agent-contracts`, `context-mode` | file_search, grep_search, list_dir, ask_questions, run_subagent, context-mode/ctx_search, context-mode/ctx_batch_execute, context-mode/ctx_index |
-| `spring-boot-feature-developer` | `spring-boot-developer` | `feature` | TDD estrito (testing-first); DTOs Java Records; injeção por construtor via Lombok `@RequiredArgsConstructor` com `private final`; endpoints REST versionados `/v1/`; barreira de autoria de testes. | `spring-boot-implementation-patterns`, `efficient-batch-code-modification`, `terminal-governance`, `context-mode` | file_search, grep_search, list_dir, ask_questions, run_subagent, get_errors, run_in_terminal, context-mode/ctx_execute, context-mode/ctx_search, context-mode/ctx_batch_execute, context-mode/ctx_index, context-mode/ctx_execute_file |
-| `spring-boot-bug-fixer` | `spring-boot-developer` | `bugfix` | Root Cause Analysis (RCA); diagnóstico cirúrgico de `BusinessException`, `LazyInitializationException` e rollback indevido de transações; diff mínimo estrito. | `spring-boot-implementation-patterns`, `code-tracing`, `clean-architecture-patterns` (via R-066) | Mesmas ferramentas mutativas de `spring-boot-developer` |
+| `spring-boot-developer (antigo feature)` | `spring-boot-developer` | `feature` | TDD estrito (testing-first); DTOs Java Records; injeção por construtor via Lombok `@RequiredArgsConstructor` com `private final`; endpoints REST versionados `/v1/`; barreira de autoria de testes. | `spring-boot-implementation-patterns`, `efficient-batch-code-modification`, `terminal-governance`, `context-mode` | file_search, grep_search, list_dir, ask_questions, run_subagent, get_errors, run_in_terminal, context-mode/ctx_execute, context-mode/ctx_search, context-mode/ctx_batch_execute, context-mode/ctx_index, context-mode/ctx_execute_file |
+| `spring-boot-developer (antigo bugfix)` | `spring-boot-developer` | `bugfix` | Root Cause Analysis (RCA); diagnóstico cirúrgico de `BusinessException`, `LazyInitializationException` e rollback indevido de transações; diff mínimo estrito. | `spring-boot-implementation-patterns`, `code-tracing`, `clean-architecture-patterns` (via R-066) | Mesmas ferramentas mutativas de `spring-boot-developer` |
 | `spring-boot-perf-tuner` | `spring-boot-developer` | `perf` | Eliminação de N+1 via JPA EntityGraph e JOIN FETCH; tuning de pool HikariCP; otimização de Virtual Threads (não bloquear carrier thread); paginação de queries. | `spring-boot-performance-patterns`, `database-query-tuning-patterns` (via R-066) | Mesmas ferramentas mutativas de `spring-boot-developer` |
-| `spring-boot-unit-test-writer` | `spring-boot-test-engineer` | `unit` | JUnit 5 + Mockito BDD (`given/when/then`); cobertura de fluxos alternativos e exceptions de domínio; isolamento hermético de dependências externas. | `test-implementation-spring-boot`, `test-coverage-governance`, `context-mode` | file_search, grep_search, list_dir, ask_questions, run_subagent, get_errors, run_in_terminal, context-mode/ctx_execute, context-mode/ctx_search, context-mode/ctx_batch_execute, context-mode/ctx_index, context-mode/ctx_execute_file |
+| `spring-boot-test-engineer (antigo unit)` | `spring-boot-test-engineer` | `unit` | JUnit 5 + Mockito BDD (`given/when/then`); cobertura de fluxos alternativos e exceptions de domínio; isolamento hermético de dependências externas. | `test-implementation-spring-boot`, `test-coverage-governance`, `context-mode` | file_search, grep_search, list_dir, ask_questions, run_subagent, get_errors, run_in_terminal, context-mode/ctx_execute, context-mode/ctx_search, context-mode/ctx_batch_execute, context-mode/ctx_index, context-mode/ctx_execute_file |
 | `spring-boot-integration-test-writer` | `spring-boot-test-engineer` | `integration` | Testcontainers (PostgreSQL, Oracle, Kafka, LocalStack); `@DataJpaTest` e MockMvc com asserções estritas de JSONPath e HTTP status codes. | `test-implementation-spring-boot`, `testcontainers-patterns` (via R-066) | Mesmas ferramentas mutativas de `spring-boot-test-engineer` |
-| `spring-boot-test-fixer` | `spring-boot-test-engineer` | `fix` | Estabilização de testes instáveis (flaky tests); teto rígido de 3 ciclos de autocorreção sob R-053; escalonamento compulsório ao atingir o limite. | `test-implementation-spring-boot`, `code-tracing` (via R-066) | Mesmas ferramentas mutativas de `spring-boot-test-engineer` |
+| `spring-boot-test-engineer (antigo testfix)` | `spring-boot-test-engineer` | `fix` | Estabilização de testes instáveis (flaky tests); teto rígido de 3 ciclos de autocorreção sob R-053; escalonamento compulsório ao atingir o limite. | `test-implementation-spring-boot`, `code-tracing` (via R-066) | Mesmas ferramentas mutativas de `spring-boot-test-engineer` |
 
 ### 3.1 Preservação da Barreira de Responsabilidade de Testes
 Para evitar que o agente executor contamine a integridade das suítes de validação:
@@ -145,7 +145,7 @@ O tempo médio estimado de rollback é inferior a 15 segundos, restaurando integ
 
 ### 6.3 Atualização dos Agentes Preservados
 - [ ] Modificar `.github/agents/backend/spring-boot/spring-boot-arch-advisor.agent.md` atualizando a seção 'Quando Delegar' e regras de handoff.
-- [ ] Modificar `.github/agents/backend/spring-boot/spring-boot-router.agent.md` reduzindo a Árvore de Decisão para os 3 ramos canônicos (`arch-advisor`, `developer`, `test-engineer`) sob o Baseline R-054.
+- [ ] Modificar `.github/agents/backend/spring-boot/spring-boot-router.agent.md` reduzindo a Árvore de Decisão para os 3 ramos canônicos (`spring-boot-arch-advisor`, `spring-boot-developer`, `spring-boot-test-engineer`) sob o Baseline R-054.
 
 ### 6.4 Sincronização de Catálogos e Grafo Global
 - [ ] Modificar `.github/agents/backend/spring-boot/spring-boot-catalog.yaml` mantendo exatamente os 3 novos especialistas e 1 router.
@@ -153,12 +153,12 @@ O tempo médio estimado de rollback é inferior a 15 segundos, restaurando integ
 - [ ] Modificar `.github/agents/routing-graph.yaml` atualizando as arestas de entrada e saída do nó `spring-boot-router`.
 
 ### 6.5 Remoção Atômica dos Agentes Legados
-- [ ] Remover `.github/agents/backend/spring-boot/spring-boot-feature-developer.agent.md`.
-- [ ] Remover `.github/agents/backend/spring-boot/spring-boot-bug-fixer.agent.md`.
+- [ ] Remover `.github/agents/backend/spring-boot/spring-boot-developer (antigo feature).agent.md`.
+- [ ] Remover `.github/agents/backend/spring-boot/spring-boot-developer (antigo bugfix).agent.md`.
 - [ ] Remover `.github/agents/backend/spring-boot/spring-boot-perf-tuner.agent.md`.
-- [ ] Remover `.github/agents/backend/spring-boot/spring-boot-unit-test-writer.agent.md`.
+- [ ] Remover `.github/agents/backend/spring-boot/spring-boot-test-engineer (antigo unit).agent.md`.
 - [ ] Remover `.github/agents/backend/spring-boot/spring-boot-integration-test-writer.agent.md`.
-- [ ] Remover `.github/agents/backend/spring-boot/spring-boot-test-fixer.agent.md`.
+- [ ] Remover `.github/agents/backend/spring-boot/spring-boot-test-engineer (antigo testfix).agent.md`.
 
 ### 6.6 Testes e Quality Gates
 - [ ] Adaptar `tests/governance_audit/test_feature_developer_test_authoring_boundary.py` para validar `spring-boot-developer`.

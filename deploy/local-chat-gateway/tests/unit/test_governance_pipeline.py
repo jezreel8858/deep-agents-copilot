@@ -37,7 +37,7 @@ def _sessao(
     fase: Fase = Fase.EM_WORKFLOW,
     workflow: Workflow | None = Workflow.FEATURE_DEVELOPMENT,
     etapa: int = 1,
-    agente_ativo: str = "python-feature-developer",
+    agente_ativo: str = "python-developer",
 ) -> Sessao:
     return Sessao(fase=fase, workflow=workflow, etapa=etapa, agente_ativo=agente_ativo)
 
@@ -53,7 +53,7 @@ def test_preparar_turno_chama_rotear_quando_sessao_sem_workflow() -> None:
     grafo = MagicMock(name="grafo")
     tabela = MagicMock(name="tabela", catalogo=MagicMock(name="catalogo"))
     decisao_rota = DecisaoRota(
-        escolhido="python-feature-developer",
+        escolhido="python-developer",
         workflow=Workflow.FEATURE_DEVELOPMENT,
         nivel=NivelRouting.RULE_BASED,
         score=0.95,
@@ -76,7 +76,7 @@ def test_preparar_turno_chama_rotear_quando_sessao_sem_workflow() -> None:
     mock_detectar_deriva.assert_not_called()
     assert resultado.roteou_novamente is True
     assert resultado.workflow is Workflow.FEATURE_DEVELOPMENT
-    assert resultado.agente_escolhido == "python-feature-developer"
+    assert resultado.agente_escolhido == "python-developer"
 
 
 def test_preparar_turno_saudacao_permanece_no_router_sem_workflow() -> None:
@@ -172,7 +172,7 @@ def test_preparar_turno_out_of_domain_mid_workflow_preserva_fallback_prompt_stru
         fase=Fase.EM_WORKFLOW,
         workflow=Workflow.FEATURE_DEVELOPMENT,
         etapa=2,
-        agente_ativo="python-feature-developer",
+        agente_ativo="python-developer",
     )
     grafo = MagicMock(name="grafo")
     tabela = MagicMock(
@@ -209,7 +209,7 @@ def test_preparar_turno_out_of_domain_mid_workflow_preserva_fallback_prompt_stru
     assert resultado.workflow is _WORKFLOW_FALLBACK_AMBIGUO
     assert resultado.agente_escolhido == _AGENTE_FALLBACK_AMBIGUO
     assert resultado.nivel == "out_of_domain"
-    assert resultado.handoff_origem == "python-feature-developer"
+    assert resultado.handoff_origem == "python-developer"
     assert resultado.handoff_motivo is not None
 
 
@@ -228,7 +228,7 @@ def test_preparar_turno_out_of_domain_preserva_fallback_antigo_quando_grafo_nao_
         fase=Fase.EM_WORKFLOW,
         workflow=Workflow.FEATURE_DEVELOPMENT,
         etapa=2,
-        agente_ativo="python-feature-developer",
+        agente_ativo="python-developer",
     )
     grafo = MagicMock(name="grafo")
     tabela = MagicMock(name="tabela", catalogo=MagicMock(name="catalogo"), etapas={})
@@ -387,14 +387,14 @@ def test_montar_contexto_inclui_banner_e_persona() -> None:
     # Arrange
     leitor = _leitor_fake(
         {
-            "python-feature-developer.agent.md": "PERSONA-CONTEUDO",
+            "python-developer.agent.md": "PERSONA-CONTEUDO",
             "copilot-instructions.md": "NUCLEO-CONTEUDO",
         }
     )
 
     # Act
     resultado = governance_pipeline.montar_contexto(
-        "python-feature-developer",
+        "python-developer",
         Workflow.FEATURE_DEVELOPMENT,
         3,
         leitor_arquivo=leitor,
@@ -402,7 +402,7 @@ def test_montar_contexto_inclui_banner_e_persona() -> None:
 
     # Assert
     banner_esperado = (
-        "Agente Ativo: python-feature-developer\n"
+        "Agente Ativo: python-developer\n"
         "[WORKFLOW: WORKFLOW-FEATURE-DEVELOPMENT / ETAPA: 3]\n\n"
     )
     assert resultado.startswith(banner_esperado)
@@ -415,14 +415,14 @@ def test_montar_contexto_trunca_em_32kb_preservando_banner() -> None:
     persona_gigante = "X" * (40 * 1024)
     leitor = _leitor_fake(
         {
-            "python-feature-developer.agent.md": persona_gigante,
+            "python-developer.agent.md": persona_gigante,
             "copilot-instructions.md": "NUCLEO-CONTEUDO",
         }
     )
 
     # Act
     resultado = governance_pipeline.montar_contexto(
-        "python-feature-developer",
+        "python-developer",
         Workflow.FEATURE_DEVELOPMENT,
         1,
         leitor_arquivo=leitor,
@@ -430,7 +430,7 @@ def test_montar_contexto_trunca_em_32kb_preservando_banner() -> None:
 
     # Assert
     assert len(resultado.encode("utf-8")) <= 32 * 1024
-    assert resultado.startswith("Agente Ativo: python-feature-developer")
+    assert resultado.startswith("Agente Ativo: python-developer")
     assert "[... truncado por orcamento de contexto ...]" in resultado
 
 
@@ -538,7 +538,7 @@ def test_preparar_turno_expoe_nivel_score_quando_sessao_sem_workflow() -> None:
     grafo = MagicMock(name="grafo")
     tabela = MagicMock(name="tabela", catalogo=MagicMock(name="catalogo"))
     decisao_rota = DecisaoRota(
-        escolhido="python-feature-developer",
+        escolhido="python-developer",
         workflow=Workflow.FEATURE_DEVELOPMENT,
         nivel=NivelRouting.RULE_BASED,
         score=0.95,

@@ -4,7 +4,7 @@
   "id": "react-router",
   "name": "React Router",
   "version": "1.0.0",
-  "description": "Roteador de domínio React e supervisor hierárquico — recebe solicitações de frontend React do agent-router central e despacha para os 3 especialistas do catálogo React (arch-advisor, developer e test-engineer).",
+  "description": "Roteador de domínio React e supervisor hierárquico — recebe solicitações de frontend React do agent-router central e despacha para os 3 especialistas do catálogo React (react-arch-advisor, react-developer e react-test-engineer).",
   "domain": "Supervisor hierarquico e roteador do dominio React",
   "role": "router",
   "capabilities": [

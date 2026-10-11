@@ -380,21 +380,15 @@ A criação de um novo ecossistema de stack (ex.: EJB, React, Python FastAPI) se
 - Anti-sticky session: regra R-042 com retorno ao `@agent-router` em deriva de intenção.
 - Fluxo 2 TDD: consulta prévia ao `@test-strategy` para requisitos de teste complexos antes de acionar test-writers locais.
 
-### 11.4) Pacote Canônico de Especialistas
-- **Backend (ex.: EJB)**:
-  - `<stack>-arch-advisor` (Read-Only: arquitetura, migrações, dependências)
-  - `<stack>-feature-developer` (TDD: componentes, services, transações)
-  - `<stack>-bug-fixer` (Fixer: runtime errors, memory leaks, diff mínimo)
-  - `<stack>-perf-tuner` (Performance: pool, queries, concorrência, GC)
-  - `<stack>-unit-test-writer` (Testes unitários isolados com mocks)
-  - `<stack>-integration-test-writer` (Testes integrados com banco/container real)
-  - `<stack>-test-fixer` (Diagnóstico e correção de falhas em suítes de teste)
-- **Frontend (ex.: React, Angular, Vue)**:
-  - `<stack>-arch-advisor` (Read-Only: arquitetura, migrações, performance CWV)
-  - `<stack>-feature-developer` (Test-Last / Implementation-First: componentes, stores, lógica de domínio com testes posteriores)
-  - `<stack>-bug-fixer` (Fixer: runtime errors, memory leaks, diff mínimo sob Test-Last)
-  - `<stack>-ui-stylist` (Apresentação: HTML/CSS/SCSS modular, design tokens, layout responsivo — estritamente visual, **isento de criar ou executar testes unitários**)
-  - `<stack>-unit-test-writer`, `<stack>-component-test-writer`, `<stack>-test-fixer`, `<stack>-e2e-writer` (Especialistas dedicados de teste: cobrem testes unitários, de componente e E2E pós-estabilização sob o modelo Test-Last).
+### 11.4) Pacote Canônico de Especialistas (Tríade 3+1)
+- **Backend (ex.: Python, Spring Boot, Spring Reactive, EJB, Struts)**:
+  - `<stack>-arch-advisor` (Read-Only: arquitetura, migrações, dependências, R-064)
+  - `<stack>-developer` (Mutativo Core: novos endpoints, componentes, bugfixes cirúrgicos, performance)
+  - `<stack>-test-engineer` (Mutativo Qualidade: testes unitários, integração, autocorreção sob R-053)
+- **Frontend (ex.: Angular, React)**:
+  - `<stack>-arch-advisor` (Read-Only: arquitetura, migrações, performance CWV, R-064)
+  - `<stack>-developer` (Mutativo Core: componentes, stores, estilização com Design System, correções visuais e de runtime sob Test-Last)
+  - `<stack>-test-engineer` (Mutativo Qualidade: testes unitários, componentes, testes E2E Playwright, autocorreção)
 
 ### 11.5) Quádrupla Sincronização Global Obrigatória (R-015)
 Ao criar a stack, o `governance-factory` DEVE atualizar atomicamente:

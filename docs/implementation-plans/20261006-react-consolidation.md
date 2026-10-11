@@ -12,7 +12,7 @@
 ## 1. Resumo Executivo e Escopo da Consolidação
 
 ### 1.1 Contexto e Justificativa
-A auditoria de arquitetura de governança identificou severa dispersão funcional na stack `react`, que contava com 8 agentes especialistas mais 1 supervisor (`react-router`). Funções fortemente integradas na rotina de engenharia de frontend moderno — como criação de componentes, estilização via Tailwind/CSS Modules e resolução de re-renders indesejados — estavam particionadas entre `react-feature-developer`, `react-ui-stylist` e `react-bug-fixer`. Paralelamente, a camada de testes estava fragmentada em 4 agentes separados (`unit-test-writer`, `component-test-writer`, `e2e-writer`, `test-fixer`).
+A auditoria de arquitetura de governança identificou severa dispersão funcional na stack `react`, que contava com 8 agentes especialistas mais 1 supervisor (`react-router`). Funções fortemente integradas na rotina de engenharia de frontend moderno — como criação de componentes, estilização via Tailwind/CSS Modules e resolução de re-renders indesejados — estavam particionadas entre especialistas fragmentados legados. Paralelamente, a camada de testes estava fragmentada em 4 agentes legados separados.
 
 Este Plano de Implementação Técnica detalha a execução da **Fase 1 (Piloto Central)** para a stack `react`, reduzindo o catálogo de 8 especialistas para **3 agentes canônicos** estruturados sob o **Padrão Triádico**:
 1. `react-arch-advisor` (Read-Only)
@@ -39,10 +39,10 @@ O supervisor `react-router` é integralmente preservado, retendo suas 7 ferramen
 - **`react-arch-advisor`** (*Preservado / Read-Only*):
   - Responsável por análise arquitetural (React 19+, Server Components vs Client Components), React Compiler, design de estado global (TanStack Query / Zustand), auditoria de Core Web Vitals (INP, LCP, CLS) e autoria exclusiva de Planos Técnicos R-064.2.
 - **`react-developer`** (*Novo Agente Consolidado / Mutativo*):
-  - Absorve `react-feature-developer`, `react-bug-fixer` e `react-ui-stylist`.
+  - Absorve `react-developer (antigo feature)`, `react-developer (antigo bugfix)` e `react-developer (antigo visual)`.
   - Atua nos modos `feature`, `bugfix` e `styling`, construindo componentes acessíveis, custom hooks, gerenciamento de estado e estilização responsiva sob metodologia Test-Last.
 - **`react-test-engineer`** (*Novo Agente Consolidado / Mutativo*):
-  - Absorve `react-unit-test-writer`, `react-component-test-writer`, `react-e2e-writer` e `react-test-fixer`.
+  - Absorve `react-test-engineer (antigo unit)`, `react-test-engineer (antigo component)`, `react-test-engineer (antigo e2e)` e `react-test-engineer (antigo testfix)`.
   - Atua nos modos `unit` (Vitest), `component` (React Testing Library), `e2e` (Playwright) e `fix` (autocorreção de testes flaky com teto R-053).
 
 ---
@@ -60,13 +60,13 @@ Todas as mutações seguem o princípio de atomicidade estrita (`all-or-nothing`
 | `.github/agents/frontend/react/react-catalog.yaml` | **Modificar** | Reestruturar sub-catálogo local para exatamente 3 especialistas + 1 router. |
 | `.github/agents/catalog.yaml` | **Modificar** | Atualizar nó `react-router` e remover 7 IDs legados do catálogo global. |
 | `.github/agents/routing-graph.yaml` | **Modificar** | Atualizar nós, arestas e keywords do ecossistema React. |
-| `.github/agents/frontend/react/react-feature-developer.agent.md` | **Remover** | Especialista legado descontinuado (absorvido por `react-developer`). |
-| `.github/agents/frontend/react/react-bug-fixer.agent.md` | **Remover** | Especialista legado descontinuado (absorvido por `react-developer`). |
-| `.github/agents/frontend/react/react-ui-stylist.agent.md` | **Remover** | Especialista legado descontinuado (absorvido por `react-developer`). |
-| `.github/agents/frontend/react/react-unit-test-writer.agent.md` | **Remover** | Especialista legado descontinuado (absorvido por `react-test-engineer`). |
-| `.github/agents/frontend/react/react-component-test-writer.agent.md` | **Remover** | Especialista legado descontinuado (absorvido por `react-test-engineer`). |
-| `.github/agents/frontend/react/react-e2e-writer.agent.md` | **Remover** | Especialista legado descontinuado (absorvido por `react-test-engineer`). |
-| `.github/agents/frontend/react/react-test-fixer.agent.md` | **Remover** | Especialista legado descontinuado (absorvido por `react-test-engineer`). |
+| `.github/agents/frontend/react/react-developer (antigo feature).agent.md` | **Remover** | Especialista legado descontinuado (absorvido por `react-developer`). |
+| `.github/agents/frontend/react/react-developer (antigo bugfix).agent.md` | **Remover** | Especialista legado descontinuado (absorvido por `react-developer`). |
+| `.github/agents/frontend/react/react-developer (antigo visual).agent.md` | **Remover** | Especialista legado descontinuado (absorvido por `react-developer`). |
+| `.github/agents/frontend/react/react-test-engineer (antigo unit).agent.md` | **Remover** | Especialista legado descontinuado (absorvido por `react-test-engineer`). |
+| `.github/agents/frontend/react/react-test-engineer (antigo component).agent.md` | **Remover** | Especialista legado descontinuado (absorvido por `react-test-engineer`). |
+| `.github/agents/frontend/react/react-test-engineer (antigo e2e).agent.md` | **Remover** | Especialista legado descontinuado (absorvido por `react-test-engineer`). |
+| `.github/agents/frontend/react/react-test-engineer (antigo testfix).agent.md` | **Remover** | Especialista legado descontinuado (absorvido por `react-test-engineer`). |
 | `tests/governance_audit/test_frontend_test_last_governance.py` | **Modificar** | Atualizar asserções de Test-Last e isenção de testes para `react-developer`. |
 | `tests/governance_audit/test_react_consolidation.py` | **Criar** | Teste automatizado validando a topologia 3+1 e integridade referencial. |
 
@@ -79,13 +79,13 @@ A consolidação absorve integralmente as atribuições dos 8 especialistas orig
 | Agente Anterior | Destino Consolidado | Modo de Operação | Heurísticas e Regras Críticas Absorvidas | Skills Ativas (Estáticas / Dinâmicas) | Conjunto Canônico de Ferramentas (Tools) |
 |---|---|---|---|---|---|
 | `react-arch-advisor` | `react-arch-advisor` | `advisory` (Preservado) | Perfil Read-Only mandatória; sem ferramentas de escrita de código; análise de CWV (INP/LCP/CLS); Server vs Client Components; TanStack Query e Zustand; autoria de Planos R-064.2. | `react-frontend-patterns`, `react-performance-patterns`, `specialist-hybrid-advisory-implementation-patterns`, `context-mode` | file_search, grep_search, list_dir, ask_questions, run_subagent, context-mode/ctx_search, context-mode/ctx_batch_execute, context-mode/ctx_index |
-| `react-feature-developer` | `react-developer` | `feature` | Tipagem TypeScript estrita; metodologia Test-Last em UI; separação de server-state (TanStack Query) e client-state (Zustand); custom hooks focados em responsabilidade única. | `react-implementation-patterns`, `efficient-batch-code-modification`, `terminal-governance`, `context-mode`, `frontend-visual-feedback-loop` | file_search, grep_search, list_dir, ask_questions, run_subagent, get_errors, run_in_terminal, context-mode/ctx_execute, context-mode/ctx_search, context-mode/ctx_batch_execute, context-mode/ctx_index, context-mode/ctx_execute_file, Playwright (inspeção) |
-| `react-bug-fixer` | `react-developer` | `bugfix` | Diagnóstico de re-render storms; correção de memory leaks em subscriptions de hooks; validação do array de dependências de `useEffect`; diff cirúrgico com zero refatoração colateral. | `react-implementation-patterns`, `code-tracing` (via R-066) | Mesmas ferramentas mutativas de `react-developer` |
-| `react-ui-stylist` | `react-developer` | `styling` | Design tokens semânticos; mobile-first responsivo; Tailwind CSS / CSS Modules; acessibilidade WCAG 2.1 AA (contraste, foco visível, rótulos ARIA); loops visuais via snapshots. | `react-responsive-ui-patterns`, `frontend-visual-feedback-loop` (via R-066) | Mesmas ferramentas mutativas de `react-developer` + Playwright para screenshots e inspeção de layout |
-| `react-unit-test-writer` | `react-test-engineer` | `unit` | Vitest para testes isolados de hooks (`renderHook`), reducers puros e funções de transformação de dados; sem dependência do DOM real. | `test-implementation-react-vitest`, `test-coverage-governance`, `context-mode` | file_search, grep_search, list_dir, ask_questions, run_subagent, get_errors, run_in_terminal, context-mode/ctx_execute, context-mode/ctx_search, context-mode/ctx_batch_execute, context-mode/ctx_index, context-mode/ctx_execute_file |
-| `react-component-test-writer` | `react-test-engineer` | `component` | React Testing Library (RTL); queries orientadas a acessibilidade (`getByRole`, `findByLabelText`); mock de providers (QueryClientProvider, ThemeProvider); user-event para disparos reais. | `test-implementation-react-vitest`, `frontend-visual-feedback-loop` | Mesmas ferramentas mutativas de `react-test-engineer` + Playwright |
-| `react-e2e-writer` | `react-test-engineer` | `e2e` | Playwright com Page Object Model (POM); testes de jornada do usuário; gravação de trace e vídeo sob falha; asserções determinísticas de navegação e rede. | `playwright-mcp`, `test-implementation-frontend` | Mesmas ferramentas mutativas de `react-test-engineer` + suite Playwright completa |
-| `react-test-fixer` | `react-test-engineer` | `fix` | Estabilização de testes flaky de frontend; tratamento de concorrência e timers assíncronos (`waitFor`, `act`); teto de 3 iterações sob R-053 com escalonamento formal. | `test-implementation-react-vitest`, `code-tracing` (via R-066) | Mesmas ferramentas mutativas de `react-test-engineer` |
+| `react-developer (antigo feature)` | `react-developer` | `feature` | Tipagem TypeScript estrita; metodologia Test-Last em UI; separação de server-state (TanStack Query) e client-state (Zustand); custom hooks focados em responsabilidade única. | `react-implementation-patterns`, `efficient-batch-code-modification`, `terminal-governance`, `context-mode`, `frontend-visual-feedback-loop` | file_search, grep_search, list_dir, ask_questions, run_subagent, get_errors, run_in_terminal, context-mode/ctx_execute, context-mode/ctx_search, context-mode/ctx_batch_execute, context-mode/ctx_index, context-mode/ctx_execute_file, Playwright (inspeção) |
+| `react-developer (antigo bugfix)` | `react-developer` | `bugfix` | Diagnóstico de re-render storms; correção de memory leaks em subscriptions de hooks; validação do array de dependências de `useEffect`; diff cirúrgico com zero refatoração colateral. | `react-implementation-patterns`, `code-tracing` (via R-066) | Mesmas ferramentas mutativas de `react-developer` |
+| `react-developer (antigo visual)` | `react-developer` | `styling` | Design tokens semânticos; mobile-first responsivo; Tailwind CSS / CSS Modules; acessibilidade WCAG 2.1 AA (contraste, foco visível, rótulos ARIA); loops visuais via snapshots. | `react-responsive-ui-patterns`, `frontend-visual-feedback-loop` (via R-066) | Mesmas ferramentas mutativas de `react-developer` + Playwright para screenshots e inspeção de layout |
+| `react-test-engineer (antigo unit)` | `react-test-engineer` | `unit` | Vitest para testes isolados de hooks (`renderHook`), reducers puros e funções de transformação de dados; sem dependência do DOM real. | `test-implementation-react-vitest`, `test-coverage-governance`, `context-mode` | file_search, grep_search, list_dir, ask_questions, run_subagent, get_errors, run_in_terminal, context-mode/ctx_execute, context-mode/ctx_search, context-mode/ctx_batch_execute, context-mode/ctx_index, context-mode/ctx_execute_file |
+| `react-test-engineer (antigo component)` | `react-test-engineer` | `component` | React Testing Library (RTL); queries orientadas a acessibilidade (`getByRole`, `findByLabelText`); mock de providers (QueryClientProvider, ThemeProvider); user-event para disparos reais. | `test-implementation-react-vitest`, `frontend-visual-feedback-loop` | Mesmas ferramentas mutativas de `react-test-engineer` + Playwright |
+| `react-test-engineer (antigo e2e)` | `react-test-engineer` | `e2e` | Playwright com Page Object Model (POM); testes de jornada do usuário; gravação de trace e vídeo sob falha; asserções determinísticas de navegação e rede. | `playwright-mcp`, `test-implementation-frontend` | Mesmas ferramentas mutativas de `react-test-engineer` + suite Playwright completa |
+| `react-test-engineer (antigo testfix)` | `react-test-engineer` | `fix` | Estabilização de testes flaky de frontend; tratamento de concorrência e timers assíncronos (`waitFor`, `act`); teto de 3 iterações sob R-053 com escalonamento formal. | `test-implementation-react-vitest`, `code-tracing` (via R-066) | Mesmas ferramentas mutativas de `react-test-engineer` |
 
 ### 3.1 Preservação da Barreira Test-Last e Isenção de Testes no Frontend
 A fusão do papel de estilização visual no `react-developer` exige conformidade com as diretrizes consolidadas de frontend:
@@ -147,7 +147,7 @@ O rollback atômico restaura o repositório em menos de 15 segundos sem deixar n
 
 ### 6.3 Atualização dos Agentes Preservados
 - [ ] Modificar `.github/agents/frontend/react/react-arch-advisor.agent.md` atualizando a seção 'Quando Delegar' e regras de handoff.
-- [ ] Modificar `.github/agents/frontend/react/react-router.agent.md` reduzindo a Árvore de Decisão para os 3 ramos canônicos (`arch-advisor`, `developer`, `test-engineer`) sob o Baseline R-054.
+- [ ] Modificar `.github/agents/frontend/react/react-router.agent.md` reduzindo a Árvore de Decisão para os 3 ramos canônicos (`react-arch-advisor`, `react-developer`, `react-test-engineer`) sob o Baseline R-054.
 
 ### 6.4 Sincronização de Catálogos e Grafo Global
 - [ ] Modificar `.github/agents/frontend/react/react-catalog.yaml` registrando exatamente os 3 especialistas e 1 router.
@@ -155,13 +155,13 @@ O rollback atômico restaura o repositório em menos de 15 segundos sem deixar n
 - [ ] Modificar `.github/agents/routing-graph.yaml` atualizando as arestas e keywords do domínio `react-router`.
 
 ### 6.5 Remoção Atômica dos Agentes Legados
-- [ ] Remover `.github/agents/frontend/react/react-feature-developer.agent.md`.
-- [ ] Remover `.github/agents/frontend/react/react-bug-fixer.agent.md`.
-- [ ] Remover `.github/agents/frontend/react/react-ui-stylist.agent.md`.
-- [ ] Remover `.github/agents/frontend/react/react-unit-test-writer.agent.md`.
-- [ ] Remover `.github/agents/frontend/react/react-component-test-writer.agent.md`.
-- [ ] Remover `.github/agents/frontend/react/react-e2e-writer.agent.md`.
-- [ ] Remover `.github/agents/frontend/react/react-test-fixer.agent.md`.
+- [ ] Remover `.github/agents/frontend/react/react-developer (antigo feature).agent.md`.
+- [ ] Remover `.github/agents/frontend/react/react-developer (antigo bugfix).agent.md`.
+- [ ] Remover `.github/agents/frontend/react/react-developer (antigo visual).agent.md`.
+- [ ] Remover `.github/agents/frontend/react/react-test-engineer (antigo unit).agent.md`.
+- [ ] Remover `.github/agents/frontend/react/react-test-engineer (antigo component).agent.md`.
+- [ ] Remover `.github/agents/frontend/react/react-test-engineer (antigo e2e).agent.md`.
+- [ ] Remover `.github/agents/frontend/react/react-test-engineer (antigo testfix).agent.md`.
 
 ### 6.6 Testes e Quality Gates
 - [ ] Atualizar `tests/governance_audit/test_frontend_test_last_governance.py` para validar `react-developer`.

@@ -8,7 +8,7 @@ Garante que:
    - blueprint / Sprint Contract do tech-solution-architect ou <stack>-arch-advisor (WORKFLOW-FEATURE-DEVELOPMENT)
    - Matriz De-Para / Symbol Exhaustion Gate (WORKFLOW-FRAMEWORK-MIGRATION)
 3. Os 3 avaliadores céticos canônicos (code-review.agent.md, adr-sentinel.agent.md, security-reviewer.agent.md)
-   mantêm isolamento estrito contra especialistas de implementação nominal (@<stack>-bug-fixer, @<stack>-feature-developer),
+   mantêm isolamento estrito contra especialistas de implementação nominal (@<stack>-developer),
    preservando o padrão-ouro de roteamento via domain-router / tech-solution-architect.
 """
 from __future__ import annotations
@@ -94,7 +94,7 @@ def test_skeptical_evaluators_isolate_from_stack_specialists(evaluator_file: str
     delegation_text = match.group(1)
 
     nominal_stack_pattern = re.compile(
-        r"@(?:[a-z0-9-]+)-(?:bug-fixer|feature-developer|code-generator)\b",
+        r"@(?:[a-z0-9-]+)-(?:developer|code-generator)\b",
         re.IGNORECASE
     )
     matches = nominal_stack_pattern.findall(delegation_text)

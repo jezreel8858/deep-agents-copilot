@@ -25,7 +25,7 @@ flowchart TD
     NonRepro --> EndNonRepro(["🟡 Pausado — Aguardando Evidência/Decisão"])
     CheckRepro -- "Sim" --> CheckFlaky{"Classificação da Falha"}
 
-    CheckFlaky -- "Flaky (Intermitência/Race Condition)" --> FlakyIsolate["<b>Isolamento de Concorrência/Ambiente</b><br/>Agente: @debugger / specialist-unit-test-writer<br/>Ação: Isola poluição de estado, timing e concorrência"]
+    CheckFlaky -- "Flaky (Intermitência/Race Condition)" --> FlakyIsolate["<b>Isolamento de Concorrência/Ambiente</b><br/>Agente: @debugger / <stack>-test-engineer<br/>Ação: Isola poluição de estado, timing e concorrência"]
     CheckFlaky -- "Regressão Real" --> CheckDiag{"Causa raiz<br/>multi-camada?"}
     FlakyIsolate --> CheckDiag
 
@@ -34,12 +34,12 @@ flowchart TD
     Diagnosis --> CheckKind
 
     CheckKind -- "Lógica / Runtime / Exception (sem contexto de framework)" --> BaselineLogic["<b>Pré-voo de Teste</b><br/>Agente: runtime-verifier<br/>Ação: Confirma suíte vizinha limpa"]
-    BaselineLogic --> RedTest["<b>2. Red Test (TDD)</b><br/>Agente: specialist-unit-test-writer<br/>Ação: Teste automatizado que falha comprovando o bug"]
+    BaselineLogic --> RedTest["<b>2. Red Test (TDD)</b><br/>Agente: <stack>-test-engineer<br/>Ação: Teste automatizado que falha comprovando o bug"]
 
     CheckKind -- "Runtime só reproduz com contexto de framework (Spring/R2DBC/DOM)" --> BaselineCtx["<b>Pré-voo de Teste</b><br/>Agente: runtime-verifier<br/>Ação: Confirma suíte vizinha limpa"]
-    BaselineCtx --> RedTestCtx["<b>2. Red Test com Contexto (TDD)</b><br/>Agente: specialist-component-test-writer (Angular) / specialist-integration-test-writer (backend/reactive/EJB)<br/>Ação: Teste com TestBed/@SpringBootTest/Testcontainers que falha comprovando o bug"]
+    BaselineCtx --> RedTestCtx["<b>2. Red Test com Contexto (TDD)</b><br/>Agente: <stack>-test-engineer (Angular / backend / reactive / EJB)<br/>Ação: Teste com TestBed/@SpringBootTest/Testcontainers que falha comprovando o bug"]
 
-    CheckKind -- "Layout / CSS / Visual" --> LayoutSpec["<b>2. Layout Spec & WCAG</b><br/>Agente: specialist-ui-stylist / component-test<br/>Ação: Spec de classes/DOM e checagem de tokens"]
+    CheckKind -- "Layout / CSS / Visual" --> LayoutSpec["<b>2. Layout Spec & WCAG</b><br/>Agente: <stack>-developer / <stack>-test-engineer<br/>Ação: Spec de classes/DOM e checagem de tokens"]
 
     RedTest & RedTestCtx & LayoutSpec --> CheckDB{"Exige ajuste<br/>de Schema/DDL?"}
     CheckDB -- "Sim" --> DBMigration["<b>3a. Migração DDL Idempotente</b><br/>Agente: @database-specialist<br/>Ação: Script Flyway/DDL idempotente"]
@@ -47,16 +47,16 @@ flowchart TD
     DBMigration --> CheckAuth
 
     CheckAuth -- "Sim" --> SecGate["<b>3c. Security Checkpoint (R-048.1)</b><br/>Agente: @tech-solution-architect + @security-reviewer<br/>Ação: Valida viabilidade e superfície de risco ANTES do diff"]
-    CheckAuth -- "Não" --> BlastRollbackCheck["<b>Declaração de Blast Radius & Rollback Plan</b><br/>Agente: specialist-bug-fixer<br/>Ação: Quantifica callers/módulos e define estratégia de rollback"]
+    CheckAuth -- "Não" --> BlastRollbackCheck["<b>Declaração de Blast Radius & Rollback Plan</b><br/>Agente: <stack>-developer<br/>Ação: Quantifica callers/módulos e define estratégia de rollback"]
     SecGate --> BlastRollbackCheck
 
-    BlastRollbackCheck --> Fix["<b>3. Correção Cirúrgica Mínima</b><br/>Agente: specialist-bug-fixer / ui-stylist<br/>Ação: Diff cirúrgico mínimo (R-002 e R-046)"]
+    BlastRollbackCheck --> Fix["<b>3. Correção Cirúrgica Mínima</b><br/>Agente: specialist-developer<br/>Ação: Diff cirúrgico mínimo (R-002 e R-046)"]
 
-    Fix --> GreenTest["<b>4. Green Test, Linter & Mini Mutation-Check</b><br/>Agente: runtime-verifier / test-fixer<br/>Ação: Suíte verde + mini mutation-check proporcional ao risco"]
+    Fix --> GreenTest["<b>4. Green Test, Linter & Mini Mutation-Check</b><br/>Agente: runtime-verifier / specialist-test-engineer<br/>Ação: Suíte verde + mini mutation-check proporcional ao risco"]
 
     GreenTest --> CheckPass{"Testes passaram<br/>e mutantes eliminados (máx 3x)?"}
     CheckPass -- "Sim" --> QualityGate["<b>5. Quality Gate & Observação Pós-Fix</b><br/>Agente: @code-review + @code-style-enforcer / @pr-gatekeeper<br/>Ação: Validação de segurança/diff, estilo/lint, autorreflexão e canary para bugs críticos"]
-    CheckPass -- "Não (Falha Persistente)" --> CircuitBreaker["<b>4b. Circuit Breaker & Rollback</b><br/>Agente: runtime-verifier (DECLARA veredito, read-only)<br/>Ação: Aciona specialist-bug-fixer/test-fixer para reversão atômica via rollback_plan + Escalation (ask_questions)"]
+    CheckPass -- "Não (Falha Persistente)" --> CircuitBreaker["<b>4b. Circuit Breaker & Rollback</b><br/>Agente: runtime-verifier (DECLARA veredito, read-only)<br/>Ação: Aciona specialist-developer/specialist-test-engineer para reversão atômica via rollback_plan + Escalation (ask_questions)"]
 
     QualityGate --> EndBug(["✅ Concluído com Sucesso"])
     CircuitBreaker --> EndFail(["🛑 Interrompido com Reversão Segura"])
@@ -74,16 +74,16 @@ flowchart TD
    - *Sub-rotina 1c (Circuit Breaker de Reprodução)*: O Repro Gate tem **teto de 2 tentativas**. Se após 2 rodadas a reprodução determinística ainda falhar, o `@bug-triage` PARA de repetir o ciclo e aciona `ask_questions` com 3 opções objetivas: **(A)** prosseguir para o Estado 2 com a hipótese de maior confiança disponível, registrando o risco assumido no `workflow_state`; **(B)** pausar o workflow aguardando evidência adicional (log/observabilidade) do solicitante; **(C)** encerrar a triagem classificando `status_reproducao: "nao_reproduzivel"` e registrar achados parciais para backlog. Este é um estado terminal distinto (🟡 Pausado), não um retorno silencioso ao loop.
 2. **Estado 2 — Caracterização e Reprodução Automatizada (Papel: Gerador do Red Test — § 1.4)**:
    - *Sprint Contract*: Antes de escrever o teste, o especialista declara por escrito o comportamento esperado pós-fix e os casos de borda que o Red Test deve cobrir (`sprint_contract` no `workflow_state`) — este mini-contrato é o que o Avaliador Cético (Estado 5) usará como rubrica de corte, evitando que o critério de "concluído" seja inventado retroativamente.
-   - *Cenário A (Lógica / Runtime / Regra, sem dependência de contexto de framework)*: `specialist-unit-test-writer` cria teste automatizado isolado que falha comprovando o defeito. Antes disso, um pré-voo de baseline confirma que o ambiente de teste executa limpo nos testes vizinhos para evitar falsos positivos de flaky tests pré-existentes.
-   - *Cenário B (Runtime que só reproduz com contexto de framework)*: Quando o bug exige DOM real (`specialist-component-test-writer`, Angular) ou contexto de aplicação (`specialist-integration-test-writer` com `@SpringBootTest`/`@WebMvcTest`/`@DataJpaTest`/Testcontainers/R2DBC em backend, reactive ou EJB) para reproduzir — ex.: `LazyInitializationException`, rollback transacional incorreto, falha de filtro de segurança — o teste de regressão DEVE usar o contexto de framework em vez de um mock isolado que mascararia o sintoma real. Ver § 1.3 para a tabela completa de resolução por stack.
-   - *Cenário C (Layout / CSS / Estilo / Responsividade / Smell 2.21)*: `specialist-ui-stylist` e `specialist-component-test-writer` mapeiam a falha visual através do ciclo VFL (`frontend-visual-feedback-loop`), identificando quebras de hierarquia em relação ao componente irmão canônico, ausência de classes utilitárias de diálogo (`.app-dialog-content`, `.form-grid`), textos literais de ícones vazando e cores hexadecimais arbitrárias. Geram teste de componente com asserção estrita de DOM/AOM ou especificação de layout multi-viewport (375px/768px/1440px).
+   - *Cenário A (Lógica / Runtime / Regra, sem dependência de contexto de framework)*: `<stack>-test-engineer` cria teste automatizado isolado que falha comprovando o defeito. Antes disso, um pré-voo de baseline confirma que o ambiente de teste executa limpo nos testes vizinhos para evitar falsos positivos de flaky tests pré-existentes.
+   - *Cenário B (Runtime que só reproduz com contexto de framework)*: Quando o bug exige DOM real (`<stack>-test-engineer`, frontend) ou contexto de aplicação (`<stack>-test-engineer` com `@SpringBootTest`/`@WebMvcTest`/`@DataJpaTest`/Testcontainers/R2DBC em backend, reactive ou EJB) para reproduzir — ex.: `LazyInitializationException`, rollback transacional incorreto, falha de filtro de segurança — o teste de regressão DEVE usar o contexto de framework em vez de um mock isolado que mascararia o sintoma real. Ver § 1.3 para a tabela completa de resolução por stack.
+   - *Cenário C (Layout / CSS / Estilo / Responsividade / Smell 2.21)*: `<stack>-developer` e `<stack>-test-engineer` mapeiam a falha visual através do ciclo VFL (`frontend-visual-feedback-loop`), identificando quebras de hierarquia em relação ao componente irmão canônico, ausência de classes utilitárias de diálogo (`.app-dialog-content`, `.form-grid`), textos literais de ícones vazando e cores hexadecimais arbitrárias. Geram teste de componente com asserção estrita de DOM/AOM ou especificação de layout multi-viewport (375px/768px/1440px).
 2b. **Gate 2 Mandatório — Autoria do Plano de Implementação Técnica (R-064)**:
    - *Autoria*: O `<stack>-arch-advisor` (resolvido dinamicamente pelo router da stack) emite compulsoriamente o Plano de Implementação em `docs/implementation-plans/` (Tier Full ou Light) consumindo o RCA de `docs/plans/` como insumo.
    - *Aprovação*: Checkpoint obrigatório via `ask_questions` (status: approved) gerando `plan_ref` e allowlist de arquivos. É expressamente vedado ao especialista iniciar o Estado 3 sem `plan_ref` aprovado.
-3. **Estado 3 — Correção Cirúrgica Mínima (`specialist-bug-fixer` ou `specialist-ui-stylist` — requires_plan: true)**:
+3. **Estado 3 — Correção Cirúrgica Mínima (`<stack>-developer` — requires_plan: true)**:
    - *Entrada*: Arquivo alvo e teste falhando ou layout spec.
    - *Pré-requisito Mandatório: Blast Radius Estimado & Rollback Plan*: Antes de emitir o primeiro diff cirúrgico, o especialista DEVE declarar no `workflow_state`: **(a)** `blast_radius_estimado` (contagem de callers diretos e módulos dependentes via consulta determinística ao grafo quando multi-camada) e **(b)** `rollback_plan` (estratégia de restauração atômica, pontos de restauração e lista de arquivos reversíveis em caso de escalonamento/circuit breaker).
-   - *Roteamento Especializado por Tipo de Defeito*: Falhas de runtime/lógica/reatividade são corrigidas por `specialist-bug-fixer`; **defeitos de layout, SCSS, alinhamento de diálogos, ícones ou responsividade são atribuídos compulsoriamente a `specialist-ui-stylist`**, aplicando estritamente variáveis de tema (zero hex inline) e classes utilitárias canônicas.
+   - *Roteamento Especializado por Tipo de Defeito*: Falhas de runtime, lógica, reatividade, layout, SCSS ou responsividade são corrigidas por `<stack>-developer`, aplicando estritamente variáveis de tema (zero hex inline) e classes utilitárias canônicas.
    - *Sub-rotina 3a (Dependência de Banco/DDL)*: Se a falha envolver truncamento de dados, coluna ausente ou constraint de banco, o `@database-specialist` gera previamente o script de migração DDL idempotente antes de tocar no código de aplicação.
    - *Sub-rotina 3c (Security Checkpoint — R-048.1)*: Se a correção tocar autenticação, credenciais, provedores de identidade ou sessão/token, o Estado 3 aciona compulsoriamente o gate de segurança já declarado em `routing-graph.yaml` (`@tech-solution-architect` + `@security-reviewer`, quando disponível) **ANTES** de aplicar o diff — tratamento equivalente ao de mudanças sensíveis de persistência/banco. Proibido implementar o fix de autenticação sem declarar este checkpoint no handoff.
    - *Saída*: Diff cirúrgico mínimo (2 a 3 linhas de contexto), sem alterar código não relacionado (R-002 e R-046).
@@ -91,9 +91,9 @@ flowchart TD
    - *Entrada*: Código alterado e suíte de testes.
    - *Saída*: Confirmação de 100% dos testes passando e `get_errors` limpo em lote único (R-046).
    - *Mini Mutation-Check Proporcional ao Risco (Anti Falso-Verde)*: Para eliminar o risco crítico de falsos-verdes (onde o teste de regressão passa mesmo na presença do bug, por asserção frágil ou tautológica), o especialista executor aplica um **mini mutation-check cirúrgico** proporcional ao risco: injeta de 1 a 3 mutantes sintéticos pontuais na linha alterada (ex.: invertendo a condição de guarda booleana ou revertendo temporariamente a correção). O teste de regressão criado no Estado 2 DEVE obrigatoriamente falhar ao rodar contra o código mutado (100% de mutantes eliminados). Se o teste continuar verde diante do mutante, o teste é classificado como falso-positivo / frágil e a aprovação é bloqueada até o teste ser corrigido e robustecido.
-   - *Verificação Estrita para Bugs de Layout*: Para defeitos visuais, a validação do Estado 4 exige aprovação dupla: testes de componente verdes E re-inspeção visual/AOM (`frontend-visual-feedback-loop`), confirmando eliminação de texto literal de ícones, preservação de dimensões elásticas e ausência de hex inline antes de liberar para o Quality Gate. Se quebrar, aciona `specialist-test-fixer` ou `specialist-ui-stylist` (máx. 3 iterações).
-   - **Nota de precedência**: quando `specialist-test-fixer` esgota seu próprio teto interno, o escalonamento genérico do sub-catálogo ("retornar ao `@agent-router`") é **substituído**, dentro de um `WORKFLOW-BUG-FIX` ativo, pelo protocolo formal do Estado 4b abaixo — a regra de workflow tem precedência sobre o comportamento default do catálogo de domínio (R-050 > comportamento genérico).
-   - *Estado 4b — Circuit Breaker & Rollback (contrato corrigido)*: Se após 3 tentativas os testes não passarem, o `runtime-verifier` — **estritamente read-only, nunca executa mutação** — apenas DECLARA o veredito de bloqueio (`PRONTO | BLOQUEADO` conforme seu próprio contrato) e aciona via `run_subagent` o `specialist-bug-fixer`/`specialist-test-fixer` ativo para executar a reversão atômica estritamente orientada ao `rollback_plan` previamente declarado (`git checkout -- <arquivos>` / `git restore`). **Jamais o `runtime-verifier` reverte diretamente** — isso violaria seu próprio contrato read-only (mesma classe de agent validada em `test_readonly_advisory_agents_do_not_contain_mutation_tools`). Após confirmação da reversão, o especialista escala para intervenção humana via `ask_questions`.
+   - *Verificação Estrita para Bugs de Layout*: Para defeitos visuais, a validação do Estado 4 exige aprovação dupla: testes de componente verdes E re-inspeção visual/AOM (`frontend-visual-feedback-loop`), confirmando eliminação de texto literal de ícones, preservação de dimensões elásticas e ausência de hex inline antes de liberar para o Quality Gate. Se quebrar, aciona `<stack>-test-engineer` ou `<stack>-developer` (máx. 3 iterações).
+   - **Nota de precedência**: quando `<stack>-test-engineer` esgota seu próprio teto interno, o escalonamento genérico do sub-catálogo ("retornar ao `@agent-router`") é **substituído**, dentro de um `WORKFLOW-BUG-FIX` ativo, pelo protocolo formal do Estado 4b abaixo — a regra de workflow tem precedência sobre o comportamento default do catálogo de domínio (R-050 > comportamento genérico).
+   - *Estado 4b — Circuit Breaker & Rollback (contrato corrigido)*: Se após 3 tentativas os testes não passarem, o `runtime-verifier` — **estritamente read-only, nunca executa mutação** — apenas DECLARA o veredito de bloqueio (`PRONTO | BLOQUEADO` conforme seu próprio contrato) e aciona via `run_subagent` o `<stack>-developer`/`<stack>-test-engineer` ativo para executar a reversão atômica estritamente orientada ao `rollback_plan` previamente declarado (`git checkout -- <arquivos>` / `git restore`). **Jamais o `runtime-verifier` reverte diretamente** — isso violaria seu próprio contrato read-only (mesma classe de agent validada em `test_readonly_advisory_agents_do_not_contain_mutation_tools`). Após confirmação da reversão, o especialista escala para intervenção humana via `ask_questions`.
 5. **Estado 5 — Quality Gate, Autorreflexão & Observação Pós-Fix / Canary (`@code-review` + `@code-style-enforcer` / `@pr-gatekeeper` — Papel: Avaliador Cético — § 1.4)**:
    - *Entrada*: Diff final e evidências de teste.
    - *Co-Verificação Analítica de Estilo*: O `@code-style-enforcer` atua ao lado do `@code-review` como co-verificador analítico de qualidade estática (aderência estrita a guias de estilo, convenções idiomáticas e higiene de linter), garantindo que a correção cirúrgica não introduza regressão de formatação nem dívida cosmética.
@@ -143,7 +143,7 @@ workflow_state:
     arquivo: "<caminho/arquivo.spec.ext>"
     nome_teste: "deve <comportamento> quando <cenário>"
     comando_execucao: "<comando de teste>"
-    exige_contexto_framework: false  # true -> usar specialist-integration/component-test-writer
+    exige_contexto_framework: false  # true -> usar specialist-test-engineer com contexto de integração
   status_red_test: "confirmado_falha | layout_spec_validado"
   status_reproducao: "confirmada | nao_reproduzivel | aguardando_evidencia"
   tentativas_reproducao: 1  # teto: 2 (Sub-rotina 1c)

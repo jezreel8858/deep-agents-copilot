@@ -65,8 +65,8 @@ Quando a solicitação for vinculada a um dos **5 Workflows Canônicos** (`WORKF
 ```markdown
 ### 🗺️ Pipeline de Execução: WORKFLOW-BUG-FIX (5 etapas)
 - [✅] **Etapa 1: Triagem & Causa Raiz** → `@bug-triage` *(Concluído: causa raiz isolada)*
-- [▶] **Etapa 2: Red Test de Caracterização** → `specialist-unit-test-writer` *(Em Andamento: criando teste falhando)*
-- [⏳] **Etapa 3: Correção Cirúrgica Mínima** → `specialist-bug-fixer` *(Pendente)*
+- [▶] **Etapa 2: Red Test de Caracterização** → `<stack>-test-engineer` *(Em Andamento: criando teste falhando)*
+- [⏳] **Etapa 3: Correção Cirúrgica Mínima** → `<stack>-developer` *(Pendente)*
 - [⏳] **Etapa 4: Validação Green Test & Linter** → `runtime-verifier` *(Pendente)*
 - [⏳] **Etapa 5: Quality Gate & Resumo** → `@code-review` / `@pr-gatekeeper` *(Pendente)*
 ```

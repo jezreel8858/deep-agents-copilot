@@ -47,15 +47,15 @@ Consolidar os especialistas de cada stack em exatamente **3 papéis arquetípico
 
 | Papel Consolidado | Perfil de Acesso | Absorve (Papéis Legados) | Responsabilidade Nuclear |
 |---|---|---|---|
-| **`<stack>-arch-advisor`** | Read-Only | arch-advisor, query-tuner (banco), perf-advisor | Raciocínio arquitetural, blueprints técnicos (R-064.2), design de schema e revisão não-destrutiva. |
-| **`<stack>-developer`** | Mutativo | feature-developer, bug-fixer, perf-tuner, ui-stylist, ddl-migration, plsql/spl expert | Implementação completa de código de produção, correções de bugs, refatoração de performance e DDL. |
-| **`<stack>-test-engineer`** | Mutativo | unit-test-writer, integration-test-writer, component-test-writer, e2e-writer, test-fixer | Garantia de qualidade determinística (unitários, integração, E2E) e correção iterativa de testes (retry cap R-021). |
+| **`<stack>-arch-advisor`** | Read-Only | arquitetura, query-tuner (banco), perf-advisor | Raciocínio arquitetural, blueprints técnicos (R-064.2), design de schema e revisão não-destrutiva. |
+| **`<stack>-developer`** | Mutativo | implementação, correção de bugs, tuning de performance, estilização de UI, ddl-migration, plsql/spl expert | Implementação completa de código de produção, correções de bugs, refatoração de performance e DDL. |
+| **`<stack>-test-engineer`** | Mutativo | testes unitários, testes de integração, testes de componentes, E2E, autocorreção de testes | Garantia de qualidade determinística (unitários, integração, E2E) e correção iterativa de testes (retry cap R-021). |
 
 ---
 
 ### 2.1 Decisão Técnica Adotada
 
-Adota-se a **Opção C** de forma integral para todas as 8 stacks do projeto. A transição garante a preservação do Duplo Gate Documental (R-064), onde o `arch-advisor` atua obrigatoriamente no planejamento técnico antes que o `developer` ou `test-engineer` realizem modificações no código.
+Adota-se a **Opção C** de forma integral para todas as 8 stacks do projeto. A transição garante a preservação do Duplo Gate Documental (R-064), onde o `<stack>-arch-advisor` atua obrigatoriamente no planejamento técnico antes que o `<stack>-developer` ou `<stack>-test-engineer` realizem modificações no código.
 
 ---
 
@@ -67,50 +67,50 @@ A consolidação de cada uma das 8 stacks de domínio é estruturada conforme o 
 - **Routers**: `spring-boot-router` (preservado com Baseline R-054 e Decision Tree simplificada de 3 branches).
 - **Consolidação (7 → 3 especialistas)**:
   - `spring-boot-arch-advisor` (preservado como autor exclusivo de Planos de Implementação Técnica e Blueprints R-064.2; read-only).
-  - `spring-boot-developer` (novo consolidador mutativo: absorve `spring-boot-feature-developer`, `spring-boot-bug-fixer` e `spring-boot-perf-tuner`).
-  - `spring-boot-test-engineer` (novo consolidador mutativo: absorve `spring-boot-unit-test-writer`, `spring-boot-integration-test-writer` e `spring-boot-test-fixer`).
+  - `spring-boot-developer` (novo consolidador mutativo: absorve `spring-boot-developer (antigo feature)`, `spring-boot-developer (antigo bugfix)` e `spring-boot-perf-tuner`).
+  - `spring-boot-test-engineer` (novo consolidador mutativo: absorve `spring-boot-test-engineer (antigo unit)`, `spring-boot-integration-test-writer` e `spring-boot-test-engineer (antigo testfix)`).
 
 #### 2. Stack: `react` (Frontend)
 - **Routers**: `react-router` (preservado com Baseline R-054 e Decision Tree simplificada de 3 branches).
 - **Consolidação (8 → 3 especialistas)**:
   - `react-arch-advisor` (preservado para análise arquitetural, SSR/RSC, design de estado global e contratos; read-only).
-  - `react-developer` (novo consolidador mutativo: absorve `react-feature-developer`, `react-bug-fixer` e `react-ui-stylist`).
-  - `react-test-engineer` (novo consolidador mutativo: absorve `react-unit-test-writer`, `react-component-test-writer`, `react-e2e-writer` e `react-test-fixer`).
+  - `react-developer` (novo consolidador mutativo: absorve `react-developer (antigo feature)`, `react-developer (antigo bugfix)` e `react-developer (antigo visual)`).
+  - `react-test-engineer` (novo consolidador mutativo: absorve `react-test-engineer (antigo unit)`, `react-test-engineer (antigo component)`, `react-test-engineer (antigo e2e)` e `react-test-engineer (antigo testfix)`).
 
 #### 3. Stack: `angular` (Frontend)
 - **Routers**: `angular-router` (preservado com Baseline R-054 e Decision Tree simplificada de 3 branches).
 - **Consolidação (8 → 3 especialistas)**:
   - `angular-arch-advisor` (preservado para arquitetura modular/standalone, Signals, RxJS e governança corporativa; read-only).
-  - `angular-developer` (novo consolidador mutativo: absorve `angular-feature-developer`, `angular-bug-fixer` e `angular-ui-stylist`).
-  - `angular-test-engineer` (novo consolidador mutativo: absorve `angular-unit-test-writer`, `angular-component-test-writer`, `angular-e2e-writer` e `angular-test-fixer`).
+  - `angular-developer` (novo consolidador mutativo: absorve `angular-developer (antigo feature)`, `angular-developer (antigo bugfix)` e `angular-developer (antigo visual)`).
+  - `angular-test-engineer` (novo consolidador mutativo: absorve `angular-test-engineer (antigo unit)`, `angular-test-engineer (antigo component)`, `angular-test-engineer (antigo e2e)` e `angular-test-engineer (antigo testfix)`).
 
 #### 4. Stack: `spring-reactive` (Backend Reativo)
 - **Routers**: `spring-reactive-router` (preservado com Baseline R-054 e Decision Tree simplificada de 3 branches).
 - **Consolidação (7 → 3 especialistas)**:
   - `spring-reactive-arch-advisor` (preservado para blueprints de fluxos não-bloqueantes, backpressure, R2DBC e WebFlux; read-only).
-  - `spring-reactive-developer` (novo consolidador mutativo: absorve `spring-reactive-feature-developer`, `spring-reactive-bug-fixer` e `spring-reactive-perf-tuner`).
-  - `spring-reactive-test-engineer` (novo consolidador mutativo: absorve `spring-reactive-unit-test-writer`, `spring-reactive-integration-test-writer` [StepVerifier] e `spring-reactive-test-fixer`).
+  - `spring-reactive-developer` (novo consolidador mutativo: absorve `spring-reactive-developer (antigo feature)`, `spring-reactive-developer (antigo bugfix)` e `spring-reactive-perf-tuner`).
+  - `spring-reactive-test-engineer` (novo consolidador mutativo: absorve `spring-reactive-test-engineer (antigo unit)`, `spring-reactive-integration-test-writer` [StepVerifier] e `spring-reactive-test-engineer (antigo testfix)`).
 
 #### 5. Stack: `ejb` (Backend Legado Enterprise)
 - **Routers**: `ejb-router` (preservado com Baseline R-054 e Decision Tree simplificada de 3 branches).
 - **Consolidação (7 → 3 especialistas)**:
   - `ejb-arch-advisor` (preservado para arquitetura JEE, transações distribuídas JTA, estratégias de modernização e CDI; read-only).
-  - `ejb-developer` (novo consolidador mutativo: absorve `ejb-feature-developer`, `ejb-bug-fixer` e `ejb-perf-tuner`).
-  - `ejb-test-engineer` (novo consolidador mutativo: absorve `ejb-unit-test-writer`, `ejb-integration-test-writer` [Arquillian/OpenEJB] e `ejb-test-fixer`).
+  - `ejb-developer` (novo consolidador mutativo: absorve `ejb-developer (antigo feature)`, `ejb-developer (antigo bugfix)` e `ejb-perf-tuner`).
+  - `ejb-test-engineer` (novo consolidador mutativo: absorve `ejb-test-engineer (antigo unit)`, `ejb-integration-test-writer` [Arquillian/OpenEJB] e `ejb-test-engineer (antigo testfix)`).
 
 #### 6. Stack: `struts` (Backend Legado MVC)
 - **Routers**: `struts-router` (preservado com Baseline R-054 e Decision Tree simplificada de 3 branches).
 - **Consolidação (7 → 3 especialistas)**:
   - `struts-arch-advisor` (preservado para mitigação de vulnerabilidades OGNL, interceptors, blueprints de migração e arquitetura de Actions; read-only).
-  - `struts-developer` (novo consolidador mutativo: absorve `struts-feature-developer`, `struts-bug-fixer` e `struts-perf-tuner`).
-  - `struts-test-engineer` (novo consolidador mutativo: absorve `struts-unit-test-writer`, `struts-integration-test-writer` [StrutsTestCase] e `struts-test-fixer`).
+  - `struts-developer` (novo consolidador mutativo: absorve `struts-developer (antigo feature)`, `struts-developer (antigo bugfix)` e `struts-perf-tuner`).
+  - `struts-test-engineer` (novo consolidador mutativo: absorve `struts-test-engineer (antigo unit)`, `struts-integration-test-writer` [StrutsTestCase] e `struts-test-engineer (antigo testfix)`).
 
 #### 7. Stack: `python` (Backend / Data Services)
 - **Routers**: `python-router` (preservado com Baseline R-054 e Decision Tree simplificada de 3 branches).
 - **Consolidação (7 → 3 especialistas)**:
   - `python-arch-advisor` (preservado para arquitetura assíncrona FastAPI/asyncio, tipagem estática Pydantic e microsserviços; read-only).
-  - `python-developer` (novo consolidador mutativo: absorve `python-feature-developer`, `python-bug-fixer` e `python-perf-tuner`).
-  - `python-test-engineer` (novo consolidador mutativo: absorve `python-unit-test-writer`, `python-integration-test-writer` [pytest/pytest-asyncio] e `python-test-fixer`).
+  - `python-developer` (novo consolidador mutativo: absorve `python-developer (antigo feature)`, `python-developer (antigo bugfix)` e `python-perf-tuner`).
+  - `python-test-engineer` (novo consolidador mutativo: absorve `python-test-engineer (antigo unit)`, `python-integration-test-writer` [pytest/pytest-asyncio] e `python-test-engineer (antigo testfix)`).
 
 #### 8. Stack: `database` (Persistência e Motores Relacionais Heterogêneos)
 - **Routers**: `database-router` (preservado com Baseline R-054 e Decision Tree simplificada de 3 branches por escopo operacional).
@@ -148,7 +148,7 @@ A consolidação assegura rigidez matemática na arquitetura: exatamente 3 espec
    - *Proposta*: 2 agentes por stack (`advisor-developer` + `test-engineer`).
    - *Motivo do Descarte*: Viola frontalmente a segregação de funções (Least Privilege) e anula o Duplo Gate Documental R-064 (um agente não pode emitir blueprint e implementar na mesma sessão sem segregação de contexto).
 3. **Rejeitada: Fusão de Developer e Test-Engineer**:
-   - *Proposta*: 2 agentes por stack (`arch-advisor` + `full-engineer`).
+   - *Proposta*: 2 agentes por stack (`<stack>-arch-advisor` + `full-engineer`).
    - *Motivo do Descarte*: Desrespeita a barreira mandatória de independência de testes e o princípio Test-Last no Frontend (`test_frontend_test_last_governance.py`). Desenvolvedor e testador com o mesmo contexto geram testes tautológicos.
 4. **Rejeitada: Divisão da Stack Database em 2 Stacks Autônomas (`oracle-router` e `informix-router`)**:
    - *Proposta*: Criar stacks separadas por motor de banco de dados.
@@ -181,15 +181,15 @@ Sob a regra **R-066 (Progressive Disclosure)**, os agentes consolidados mantêm 
 
 | Papel Eliminado | Stack | Conhecimento Técnico Absorvido | Destino no Agente Consolidado | Skill Reutilizável Associada (`.github/skills/`) |
 |---|---|---|---|---|
-| `*-perf-tuner` | Backend (Spring, Reactive, EJB, Struts, Python) | Profiling, otimização de queries, memory leaks, concurrency locks, connection pooling | Modo `performance` dentro do `<stack>-developer` (com análise prévia do arch-advisor) | `<stack>-performance-patterns/SKILL.md` |
-| `*-bug-fixer` | Todas | Diagnóstico de causa-raiz (RCA), patch mínimo cirúrgico, preservação de regressão | Modo `bugfix` dentro do `<stack>-developer` | `clean-architecture-patterns/SKILL.md` e guidelines de RCA |
-| `*-feature-developer` | Todas | Implementação idiomática, Clean Architecture, injeção de dependência, contratos de API | Modo `feature` dentro do `<stack>-developer` | `<stack>-idiomatic-patterns/SKILL.md` |
-| `*-ui-stylist` | Frontend (`react`, `angular`) | Design tokens, CSS Modules, Tailwind/Sass, acessibilidade WCAG, layout responsivo | Modo `styling` dentro do `<stack>-developer` (sem quebra de test boundary) | `<stack>-responsive-ui-patterns/SKILL.md` |
-| `*-unit-test-writer` | Todas | Mocking, fixtures isoladas, asserções de invariantes, cobertura de ramos | Módulo `unit` dentro do `<stack>-test-engineer` | `unit-test-patterns/SKILL.md` |
+| `*-perf-tuner` | Backend (Spring, Reactive, EJB, Struts, Python) | Profiling, otimização de queries, memory leaks, concurrency locks, connection pooling | Modo `performance` dentro do `<stack>-developer` (com análise prévia do <stack>-arch-advisor) | `<stack>-performance-patterns/SKILL.md` |
+| Papel Legado Bugfix | Todas | Diagnóstico de causa-raiz (RCA), patch mínimo cirúrgico, preservação de regressão | Modo `bugfix` dentro do `<stack>-developer` | `clean-architecture-patterns/SKILL.md` e guidelines de RCA |
+| Papel Legado Feature | Todas | Implementação idiomática, Clean Architecture, injeção de dependência, contratos de API | Modo `feature` dentro do `<stack>-developer` | `<stack>-idiomatic-patterns/SKILL.md` |
+| Papel Legado UI | Frontend (`react`, `angular`) | Design tokens, CSS Modules, Tailwind/Sass, acessibilidade WCAG, layout responsivo | Modo `styling` dentro do `<stack>-developer` (sem quebra de test boundary) | `<stack>-responsive-ui-patterns/SKILL.md` |
+| Papel Legado Unit Test | Todas | Mocking, fixtures isoladas, asserções de invariantes, cobertura de ramos | Módulo `unit` dentro do `<stack>-test-engineer` | `unit-test-patterns/SKILL.md` |
 | `*-integration-test-writer` | Backend | Containers de teste (Testcontainers), transações, web clients, mocks parciais | Módulo `integration` dentro do `<stack>-test-engineer` | `<stack>-integration-test-patterns/SKILL.md` |
-| `*-component-test-writer` | Frontend | Testing Library, renderização isolada de componentes, user events, asserções de acessibilidade | Módulo `component` dentro do `<stack>-test-engineer` | `<stack>-component-test-patterns/SKILL.md` |
-| `*-e2e-writer` | Frontend | Cypress, Playwright, page objects, interceptação de rede, fluxos ponta-a-ponta | Módulo `e2e` dentro do `<stack>-test-engineer` | `e2e-automation-patterns/SKILL.md` |
-| `*-test-fixer` | Todas | Análise determinística de stacktraces de falha, fixação de asserções, retry cap restrito (3 rounds) | Modo `test-fixer` dentro do `<stack>-test-engineer` | `test-failure-analysis-patterns/SKILL.md` |
+| Papel Legado Component Test | Frontend | Testing Library, renderização isolada de componentes, user events, asserções de acessibilidade | Módulo `component` dentro do `<stack>-test-engineer` | `<stack>-component-test-patterns/SKILL.md` |
+| Papel Legado E2E | Frontend | Cypress, Playwright, page objects, interceptação de rede, fluxos ponta-a-ponta | Módulo `e2e` dentro do `<stack>-test-engineer` | `e2e-automation-patterns/SKILL.md` |
+| Papel Legado Test Fix | Todas | Análise determinística de stacktraces de falha, fixação de asserções, retry cap restrito (3 rounds) | Modo autocorreção dentro do `<stack>-test-engineer` | `test-failure-analysis-patterns/SKILL.md` |
 | `*-query-tuner` (Oracle e Informix) | Database | Análise de EXPLAIN PLAN, estatísticas de tabelas, índices B-Tree e Bitmap, joins otimizados | Absorvido pelo `database-arch-advisor` (read-only) | `database-query-tuning-patterns/SKILL.md` |
 | `oracle-migration-dev` + `oracle-plsql-expert` | Database | DDL idempotente, Liquibase/Flyway, packages, procedures, triggers, tipos compostos PL/SQL | Absorvido pelo `oracle-database-specialist` | `oracle-plsql-patterns/SKILL.md` e `database-migration-patterns/SKILL.md` |
 | `informix-migration-dev` + `informix-spl-expert` | Database | DDL engine Informix, dbspaces, constraints, sintaxe SPL, procedures e triggers relacionais | Absorvido pelo `informix-database-specialist` | `informix-spl-patterns/SKILL.md` e `database-migration-patterns/SKILL.md` |
@@ -339,7 +339,7 @@ Fase 1: Piloto Central ──────> Fase 2: Expansão Modern ────
 
 A execução de todas as fases vincula-se de modo inegociável aos seguintes invariantes:
 
-1. **R-064 (Duplo Gate Documental)**: É expressamente proibido que agentes mutativos (`developer` ou `test-engineer`) iniciem modificações sem o parecer ou blueprint prévio aprovado pelo `arch-advisor` correspondente.
+1. **R-064 (Duplo Gate Documental)**: É expressamente proibido que agentes mutativos (`developer` ou `test-engineer`) iniciem modificações sem o parecer ou blueprint prévio aprovado pelo `<stack>-arch-advisor` correspondente.
 2. **R-066 (Progressive Disclosure & Context Budget)**: Prompts de agentes não devem ultrapassar orçamentos estritos de contexto. Conhecimentos especializados detalhados devem ser consumidos via `source_docs_lazy:`.
 3. **R-046 (Single Responsibility & Coesão de Papel)**: A trindade (Arquiteto Read-Only / Desenvolvedor Mutativo de Aplicação / Engenheiro de Testes QA) é o limite mínimo indivisível de especialização.
 4. **R-055 / R-054 (Baseline de Ferramentas e Router Contracts)**: Routers locais preservam seu baseline estrito de 7 ferramentas canônicas e contrato intacto com o `@agent-router` central.
@@ -362,8 +362,8 @@ A execução de todas as fases vincula-se de modo inegociável aos seguintes inv
 
 Em conformidade com a Fase 4 (Consolidação da stack Python) e a Fase 5 (Quality Gate Geral e Sincronização Atômica):
 1. **Stack Python consolidada no padrão Triádico 3+1**:
-   - `python-developer`: unifica feature-developer e bug-fixer (FastAPI, Flask, Django, Pydantic, SQLAlchemy, RCA e diffs mínimos).
-   - `python-test-engineer`: unifica unit-test-writer, integration-test-writer e test-fixer (pytest, TestClient/AsyncClient, Testcontainers, retry cap R-053).
+   - `python-developer`: unifica desenvolvimento de features e correção de bugs (FastAPI, Flask, Django, Pydantic, SQLAlchemy, RCA e diffs mínimos).
+   - `python-test-engineer`: unifica testes unitários, testes de integração e autocorreção de testes (pytest, TestClient/AsyncClient, Testcontainers, retry cap R-053).
    - `python-arch-advisor`: Read-Only, absorvendo profiling, mitigação de N+1 queries, tuning de event loop asyncio e tipagem PEP 484/mypy strict.
    - `python-router`: Decision Tree triádica, 7 tools R-054 canônicas.
    - Extirpação completa dos 6 especialistas legados.

@@ -15,7 +15,7 @@ AGENT_GLOBS = [
     "backend/spring-reactive/spring-reactive-{developer,test-engineer}",
     "backend/ejb/ejb-{developer,test-engineer}",
     "backend/struts/struts-{developer,test-engineer}",
-    "backend/python/python-{arch-advisor,developer,router,test-engineer}",
+    "backend/python/python-arch-advisor", "backend/python/python-developer", "backend/python/python-router", "backend/python/python-test-engineer",
     "pr-gatekeeper",
     "runtime-verifier",
 ]

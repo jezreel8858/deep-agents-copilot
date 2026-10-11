@@ -5,7 +5,7 @@ frontend (Angular + React). plan_ref: docs/implementation-plans/20261008-governa
 Garante:
 1. Paridade das tools `playwright/*` entre Angular e React (developer = 13, test-engineer = 18) e
    sincronia agent.md x sub-catálogo x AgentCard.
-2. arch-advisors e routers permanecem sem tools `playwright/*`; arch-advisors referenciam playwright-mcp e VFL
+2. <stack>-arch-advisors e routers permanecem sem tools `playwright/*`; arch-advisors referenciam playwright-mcp e VFL
    e o template de plano possui a seção UI/Layout.
 3. developers/test-engineers referenciam playwright-mcp e VFL em source_docs (paridade angular/react).
 4. Ausência de tag flutuante `@latest` (skills e config do servidor) e versão fixa na skill.
@@ -40,7 +40,10 @@ PINNED_VERSION = re.compile(r"@playwright/mcp@\d+\.\d+\.\d+")
 
 
 def _agent_path(stack: str, role: str) -> Path:
-    return FRONTEND_DIR / stack / f"{stack}-{role}.agent.md"
+    if role == "advisor":
+        return FRONTEND_DIR / stack / f"{stack}-arch-advisor.agent.md"
+    agent_name = role if role.startswith(f"{stack}-") else f"{stack}-{role}"
+    return FRONTEND_DIR / stack / f"{agent_name}.agent.md"
 
 
 def _frontmatter(path: Path) -> dict:
@@ -97,30 +100,30 @@ def test_developer_tools_are_subset_of_test_engineer_tools():
 def test_agent_catalog_and_agentcard_playwright_tools_in_sync(stack: str, role: str):
     agent = _playwright_tools(stack, role)
     assert agent == _catalog_tools(stack, role), remediation(
-        f"[{stack}-{role}] tools playwright/* divergem entre agent.md e {stack}-catalog.yaml",
+        f"[{stack}-{role_suffix}] tools playwright/* divergem entre agent.md e {stack}-catalog.yaml",
         fix_hint=f"sincronizar {stack}-catalog.yaml com o frontmatter de {stack}-{role}.agent.md.",
     )
     assert agent == _card_tools(stack, role), remediation(
-        f"[{stack}-{role}] tools playwright/* divergem entre agent.md e AgentCard",
+        f"[{stack}-{role_suffix}] tools playwright/* divergem entre agent.md e AgentCard",
         fix_hint="executar: python tools/agentcard_exporter/export_agentcards.py --apply",
     )
 
 
 @pytest.mark.parametrize("stack", STACKS)
-@pytest.mark.parametrize("role", ["arch-advisor", "router"])
-def test_advisors_and_routers_have_no_playwright_tools(stack: str, role: str):
-    tools = _frontmatter(_agent_path(stack, role)).get("tools", [])
+@pytest.mark.parametrize("role_suffix", ["advisor", "router"])
+def test_advisors_and_routers_have_no_playwright_tools(stack: str, role_suffix: str):
+    tools = _frontmatter(_agent_path(stack, role_suffix)).get("tools", [])
     offending = [t for t in tools if t.startswith("playwright/")]
     assert not offending, remediation(
         f"[{stack}-{role}] não deve declarar tools playwright/*: {offending}",
-        fix_hint="remover as tools playwright/* (arch-advisor é read-only; router segue baseline R-054).",
+        fix_hint="remover as tools playwright/* (<stack>-arch-advisor é read-only; router segue baseline R-054).",
     )
 
 
 @pytest.mark.parametrize("stack", STACKS)
-@pytest.mark.parametrize("role", ["arch-advisor", "developer", "test-engineer"])
-def test_source_docs_reference_playwright_and_vfl(stack: str, role: str):
-    docs = _frontmatter(_agent_path(stack, role)).get("source_docs", [])
+@pytest.mark.parametrize("role_suffix", ["advisor", "developer", "test-engineer"])
+def test_source_docs_reference_playwright_and_vfl(stack: str, role_suffix: str):
+    docs = _frontmatter(_agent_path(stack, role_suffix)).get("source_docs", [])
     for required in (PLAYWRIGHT_SKILL, VFL_SKILL):
         assert required in docs, remediation(
             f"[{stack}-{role}] source_docs sem {required}",
@@ -130,7 +133,7 @@ def test_source_docs_reference_playwright_and_vfl(stack: str, role: str):
 
 @pytest.mark.parametrize("stack", STACKS)
 def test_arch_advisor_plan_template_has_ui_layout_section(stack: str):
-    content = _agent_path(stack, "arch-advisor").read_text(encoding="utf-8")
+    content = _agent_path(stack, "advisor").read_text(encoding="utf-8")
     assert "### UI/Layout" in content, remediation(
         f"[{stack}-arch-advisor] template de plano sem a seção UI/Layout",
         fix_hint="adicionar '### UI/Layout' (auth strategy, ambiente, origens, viewports, projeto-alvo) ao template R-064.",
@@ -142,7 +145,7 @@ def test_router_rules_mention_ui_layout_flow():
         content = _agent_path(stack, "router").read_text(encoding="utf-8")
         assert "UI/Layout" in content, remediation(
             f"[{stack}-router] sem regra UI/Layout",
-            fix_hint="adicionar a regra UI/Layout (arch-advisor -> developer/test-engineer) ao CRÍTICO e à Decision Tree.",
+            fix_hint="adicionar a regra UI/Layout (<stack>-arch-advisor -> <stack>-developer/<stack>-test-engineer) ao CRÍTICO e à Decision Tree.",
         )
 
 
@@ -184,8 +187,8 @@ def test_governance_artifacts_have_no_literal_secrets():
     ]
     files += sorted((SKILLS_DIR / "frontend-visual-feedback-loop" / "references").glob("**/*.md"))
     for stack in STACKS:
-        for role in ("arch-advisor", "developer", "test-engineer", "router"):
-            files.append(_agent_path(stack, role))
+        for role_suffix in ("advisor", "developer", "test-engineer", "router"):
+            files.append(_agent_path(stack, role_suffix))
     for path in files:
         for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
             assert not SECRET_LITERAL.search(line), remediation(
@@ -243,7 +246,7 @@ def test_playwright_skill_cites_token_storage_matrix_and_reference_exists():
 
 @pytest.mark.parametrize("stack", STACKS)
 def test_arch_advisor_ui_layout_requires_token_storage(stack: str):
-    content = _agent_path(stack, "arch-advisor").read_text(encoding="utf-8")
+    content = _agent_path(stack, "advisor").read_text(encoding="utf-8")
     assert "token_storage" in content, remediation(
         f"[{stack}-arch-advisor] seção UI/Layout sem o campo token_storage",
         fix_hint="adicionar 'token_storage: cookie | localStorage | sessionStorage | indexeddb' na seção UI/Layout.",

@@ -1,9 +1,9 @@
 # Plano de Implementacao — Bugfix: Tools MCP/IDE nao expostas na sessao headless do SDK
 
-> Status: `PRONTO PARA EXECUCAO POR @python-bug-fixer — AGUARDANDO APROVACAO FINAL DO USUARIO (gate R-064, Etapa 3)`
+> Status: `PRONTO PARA EXECUCAO POR @python-developer — AGUARDANDO APROVACAO FINAL DO USUARIO (gate R-064, Etapa 3)`
 > Autorado por: `@python-arch-advisor` (Etapa 3 — Plano de Implementacao)
 > Baseado em: `docs/plans/20261002-bugfix-mcp-tools-headless-sdk.md` (Plano de Planejamento aprovado, RC1 + RC2 + Security Checkpoint)
-> Modo: Advisory — nenhum arquivo de codigo foi alterado por este agente. Blueprint cirurgico para handoff a `@python-bug-fixer`.
+> Modo: Advisory — nenhum arquivo de codigo foi alterado por este agente. Blueprint cirurgico para handoff a `@python-developer`.
 
 ---
 
@@ -13,7 +13,7 @@
 - `sdk_session.py`: 2 call-sites de `client.create_session(...)` confirmados (`on_permission_request=...` + demais kwargs), nenhum com `mcp_servers=`.
 - `config.py`: `Settings(BaseSettings)` via `pydantic-settings`, `env_file=".env"`, padrao de `Field(default=..., alias="ENV_VAR")` ja estabelecido — nova estrutura de MCP servers deve seguir o MESMO padrao (sem introduzir biblioteca nova).
 - `permission_policy.py`: ja possui `PermissionPolicyStub`, `tool_call_nao_escrita_e_segura`, `comando_terminal_e_seguro`, `READ_ONLY_TOOL_PREFIXES`, `_CHAVES_PARAM_COMANDO` — ponto de extensao natural para a allowlist por agent.
-- Levantamento real de `.github/agents/**/*.agent.md`: agents `*-arch-advisor` (ex.: `python-arch-advisor`, `react-arch-advisor`, `ejb-arch-advisor`, `spring-boot-arch-advisor`, `spring-reactive-arch-advisor`, `struts-arch-advisor`, `angular-arch-advisor`) e `agent-router`/`governance-maintainer` mencionam `run_in_terminal` no corpo (tipicamente para PROIBI-LO) mas **NAO** declaram `terminal-governance` em `source_docs:` — confirma que a regra de allowlist (checar os DOIS sinais: tool declarada E skill vinculada) exclui corretamente esses agents consultivos read-only. Agents `*-bug-fixer`, `*-feature-developer`, `*-test-fixer`, `*-perf-tuner`, `*-integration-test-writer`, `*-unit-test-writer`, `pr-gatekeeper`, `debugger`, `code-review`, `security-reviewer`, `codegraph-engine`, `database-specialist`, `deep-search`, `governance-factory`, `performance-agent`, `runtime-verifier`, `bug-triage`, `workflows`, `code-style-enforcer` possuem AMBOS os sinais.
+- Levantamento real de `.github/agents/**/*.agent.md`: agents `<stack>-arch-advisor` (ex.: `python-arch-advisor`, `react-arch-advisor`, `ejb-arch-advisor`, `spring-boot-arch-advisor`, `spring-reactive-arch-advisor`, `struts-arch-advisor`, `angular-arch-advisor`) e `agent-router`/`governance-maintainer` mencionam `run_in_terminal` no corpo (tipicamente para PROIBI-LO) mas **NAO** declaram `terminal-governance` em `source_docs:` — confirma que a regra de allowlist (checar os DOIS sinais: tool declarada E skill vinculada) exclui corretamente esses agents consultivos read-only. Agents `*-developer`, `*-developer`, `*-test-engineer`, `*-perf-tuner`, `*-integration-test-writer`, `*-test-engineer`, `pr-gatekeeper`, `debugger`, `code-review`, `security-reviewer`, `codegraph-engine`, `database-specialist`, `deep-search`, `governance-factory`, `performance-agent`, `runtime-verifier`, `bug-triage`, `workflows`, `code-style-enforcer` possuem AMBOS os sinais.
 - Suite de testes existente (`deploy/local-chat-gateway/tests/`): 21 arquivos, destaques relevantes a este bugfix: `unit/test_agent_catalog.py`, `unit/test_sdk_session.py`, `unit/test_config.py`, `unit/test_permission_policy.py`.
 
 ---
@@ -79,7 +79,7 @@
 +         equivalente `terminal-governance`), confirmando que o agent segue
 +         a allowlist de comandos seguros documentada (R-049).
 +
-+    Agents puramente consultivos (`*-arch-advisor`, `agent-router`,
++    Agents puramente consultivos (`<stack>-arch-advisor`, `agent-router`,
 +    `governance-maintainer`) mencionam `run_in_terminal` apenas para
 +    PROIBI-LO no corpo do prompt e NAO vinculam `terminal-governance` em
 +    `source_docs:` — ficam corretamente FORA da allowlist.
@@ -191,7 +191,7 @@
 **Observacoes de injecao de dependencia (Clean Architecture)**:
 - `construir_mcp_servers(settings)` e uma FUNCAO PURA (settings -> dict), testavel isoladamente sem subir o `CopilotClient` real — evita acoplar o teste de configuracao ao SDK.
 - `get_settings()` ja e o ponto unico de override em testes (factory existente, reaproveitado — nao duplicar).
-- Preferir passar `settings: Settings` explicitamente como parametro de `stream_chat`/`stream_chat_ag_ui` (DI por funcao, paridade com `working_directory` ja recebido por parametro) em vez de chamar `get_settings()` direto dentro da funcao de streaming, se o padrao atual do arquivo ja injetar `Settings` via FastAPI `Depends` nas rotas — **validar isso no codigo real antes de implementar** (`@python-bug-fixer` deve confirmar se `stream_chat` ja recebe `settings` como argumento; se sim, propagar `settings.mcp_servers_config`, nao chamar `get_settings()` internamente).
+- Preferir passar `settings: Settings` explicitamente como parametro de `stream_chat`/`stream_chat_ag_ui` (DI por funcao, paridade com `working_directory` ja recebido por parametro) em vez de chamar `get_settings()` direto dentro da funcao de streaming, se o padrao atual do arquivo ja injetar `Settings` via FastAPI `Depends` nas rotas — **validar isso no codigo real antes de implementar** (`@python-developer` deve confirmar se `stream_chat` ja recebe `settings` como argumento; se sim, propagar `settings.mcp_servers_config`, nao chamar `get_settings()` internamente).
 
 ### 1.3 Novo modulo `mcp_servers_catalog.py` + extensao de `config.py`
 
@@ -323,7 +323,7 @@ def construir_mcp_servers(settings: Settings) -> dict[str, dict[str, Any]]:
     return servidores
 ```
 
-> **ATENCAO — a confirmar por `@python-bug-fixer` antes de codificar**: o
+> **ATENCAO — a confirmar por `@python-developer` antes de codificar**: o
 > formato EXATO de `MCPServerConfig` (chaves `type`/`command`/`args`/`env`
 > para stdio; `type`/`url`/`headers` para HTTP) deve ser validado por
 > introspeccao real da wheel `github_copilot_sdk==1.0.16` (mesma
@@ -384,7 +384,7 @@ def construir_mcp_servers(settings: Settings) -> dict[str, dict[str, Any]]:
 ```
 
 > Nota: este e um ponto de integracao PROPOSTO para discussao com
-> `@python-bug-fixer`; a logica exata de "o que torna uma chamada
+> `@python-developer`; a logica exata de "o que torna uma chamada
 > `ctx_execute`/`ctx_execute_file` segura" (ex.: comandos de escrita de
 > arquivo via `ctx_execute_file` sao, por definicao, ESCRITA e devem cair no
 > fluxo de `WriteDecision`/checkpoint humano, nao no fluxo read-only) precisa
@@ -411,7 +411,7 @@ def construir_mcp_servers(settings: Settings) -> dict[str, dict[str, Any]]:
 | T6 | `test_traduzir_tools_nega_bash_so_com_tool_sem_skill` | `tools: [run_in_terminal]` mas SEM vinculo a skill -> omitido (prova que o 1o sinal sozinho nao basta) |
 | T7 | `test_traduzir_tools_nega_bash_so_com_skill_sem_tool_declarada` | `source_docs` vincula skill mas `tools` nao lista `run_in_terminal` -> omitido (prova que o 2o sinal sozinho nao basta) |
 | T8 | `test_traduzir_tools_preserva_nome_mcp_sem_alias` | `["mcp_context-mode_ctx_execute"]` -> permanece inalterado (nao ha match no dict de alias) |
-| T9 (caracterizacao, agents reais) | `test_descobrir_custom_agents_python_bug_fixer_recebe_bash` | usando o `.agent.md` REAL de `python-bug-fixer` (tem ambos sinais), `descobrir_custom_agents` retorna `tools` contendo `"bash"` |
+| T9 (caracterizacao, agents reais) | `test_descobrir_custom_agents_python_bug_fixer_recebe_bash` | usando o `.agent.md` REAL de `python-developer` (tem ambos sinais), `descobrir_custom_agents` retorna `tools` contendo `"bash"` |
 | T10 (caracterizacao, agents reais) | `test_descobrir_custom_agents_python_arch_advisor_nao_recebe_bash` | usando o `.agent.md` REAL de `python-arch-advisor` (so tem 1o sinal, sem skill), `tools` resultante NAO contem `"bash"`/`"powershell"`/`"shell"` |
 
 ### 2.2 `tests/unit/test_sdk_session.py` (RC2)
@@ -450,12 +450,12 @@ def construir_mcp_servers(settings: Settings) -> dict[str, dict[str, Any]]:
 
 ### 2.6 Regressao obrigatoria
 
-- `@python-bug-fixer` DEVE rodar a suite completa (`pytest deploy/local-chat-gateway/tests/ -v`) apos CADA diff do §1 aplicado incrementalmente (nao apenas no final) — ordem recomendada: 1.1 -> roda T1-T10 + regressao total; 1.3+1.2 -> roda T11-T21 + regressao total; 1.4 -> roda T22-T24 + regressao total.
-- Criterio de aceite: contagem final de testes passando = `232 (baseline) + 24 (novos T1-T24) = 256`, zero regressoes nos 232 originais. Se o baseline real divergir de 232/233 no momento da execucao (`@python-bug-fixer` deve confirmar com `pytest --collect-only -q` antes de comecar), ajustar a aritmetica mas manter "zero regressoes" como gate inegociavel.
+- `@python-developer` DEVE rodar a suite completa (`pytest deploy/local-chat-gateway/tests/ -v`) apos CADA diff do §1 aplicado incrementalmente (nao apenas no final) — ordem recomendada: 1.1 -> roda T1-T10 + regressao total; 1.3+1.2 -> roda T11-T21 + regressao total; 1.4 -> roda T22-T24 + regressao total.
+- Criterio de aceite: contagem final de testes passando = `232 (baseline) + 24 (novos T1-T24) = 256`, zero regressoes nos 232 originais. Se o baseline real divergir de 232/233 no momento da execucao (`@python-developer` deve confirmar com `pytest --collect-only -q` antes de comecar), ajustar a aritmetica mas manter "zero regressoes" como gate inegociavel.
 
 ---
 
-## 3. Subtasks Executaveis por `@python-bug-fixer`
+## 3. Subtasks Executaveis por `@python-developer`
 
 - `[S]` T-01 — Confirmar por introspeccao real da wheel `github_copilot_sdk==1.0.16` (`python -c "import copilot, inspect; ..."`, mesma metodologia RT-01..RT-05 ja documentada em `sdk_session.py`) a assinatura EXATA de `MCPServerConfig`/`create_session(mcp_servers=...)` — formato stdio (`command`/`args`/`env`) e HTTP (`url`/`headers`), antes de escrever qualquer diff de `mcp_servers_catalog.py`. **Bloqueante para T-04/T-05.**
 - `[S]` T-02 — Escrever T1-T10 (`test_agent_catalog.py`, Red) e confirmar falha pelo motivo correto (import/assert de chave ausente, nao erro de sintaxe).
@@ -470,7 +470,7 @@ def construir_mcp_servers(settings: Settings) -> dict[str, dict[str, Any]]:
 - `[S]` T-11 — Atualizar `.env.example` com as novas variaveis (`MCP_CONTEXT_MODE_ENABLED`, `MCP_CONTEXT_MODE_COMMAND`, `MCP_CONTEXT_MODE_ARGS`, `MCP_TAVILY_ENABLED`, `TAVILY_API_KEY` [referenciar, nao criar, se ja existir no `.env` do gateway], `MCP_CODEGRAPH_ENABLED`, `MCP_CODEGRAPH_COMMAND`, `MCP_CODEGRAPH_ARGS`) com comentarios explicando a lista fechada e o fail-closed de Tavily sem key.
 - `[S]` T-12 — Atualizar `BLUEPRINT_LOCAL_CHAT_GATEWAY.md` (se existir secao de configuracao/MCP) refletindo a nova capacidade, citando RC1/RC2 e este plano como referencia historica (mesmo padrao de comentarios "Bug real corrigido em..." ja usado nos 4 arquivos).
 
-Legenda: `[S]` = sequencial (depende do anterior); `[P]` = pode ser paralelizado com outra tarefa `[P]` do MESMO bloco TDD se `@python-bug-fixer` operar com sub-agentes adicionais, mas NUNCA paralelizar Red e Green do mesmo bloco (quebra o ciclo TDD).
+Legenda: `[S]` = sequencial (depende do anterior); `[P]` = pode ser paralelizado com outra tarefa `[P]` do MESMO bloco TDD se `@python-developer` operar com sub-agentes adicionais, mas NUNCA paralelizar Red e Green do mesmo bloco (quebra o ciclo TDD).
 
 ---
 
@@ -479,11 +479,11 @@ Legenda: `[S]` = sequencial (depende do anterior); `[P]` = pode ser paralelizado
 | # | Risco | Mitigacao proposta |
 |---|---|---|
 | R7 | Formato real de `MCPServerConfig` no SDK pode divergir da forma generica assumida em `mcp_servers_catalog.py` (pseudo-diff) | T-01 bloqueante (introspeccao real ANTES de codificar) — nao assumir forma de outros MCP clients (Claude Desktop/VS Code) sem confirmar na wheel instalada |
-| R8 | `stream_chat`/`stream_chat_ag_ui` podem nao receber `Settings` via DI atualmente, forcando `get_settings()` global dentro da funcao (acoplamento oculto) | `@python-bug-fixer` deve verificar o padrao real antes de T-07 e, se necessario, propagar `settings` como parametro explicito (favorece testabilidade e Clean Architecture) |
+| R8 | `stream_chat`/`stream_chat_ag_ui` podem nao receber `Settings` via DI atualmente, forcando `get_settings()` global dentro da funcao (acoplamento oculto) | `@python-developer` deve verificar o padrao real antes de T-07 e, se necessario, propagar `settings` como parametro explicito (favorece testabilidade e Clean Architecture) |
 | R9 | Allowlist de shell por `source_docs` pode falsos-negativos se algum agent vincular a skill com string ligeiramente diferente (ex.: caminho relativo vs. absoluto) | `_agent_autorizado_para_shell_nativo` usa `in` (substring match) no nome da skill, nao igualdade exata de path — tolerante a variacoes de caminho, testado em T5-T7 |
 
 ---
 
 ## 5. Pergunta de Aprovacao Final (gate R-064, Etapa 3 -> Etapa 4)
 
-Este plano de implementacao esta pronto para handoff a `@python-bug-fixer` executar o ciclo TDD completo (T-01 a T-12). Nenhum codigo foi alterado por este agente (modo Advisory, 100% leitura via context-mode).
+Este plano de implementacao esta pronto para handoff a `@python-developer` executar o ciclo TDD completo (T-01 a T-12). Nenhum codigo foi alterado por este agente (modo Advisory, 100% leitura via context-mode).

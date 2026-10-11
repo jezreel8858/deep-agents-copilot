@@ -6,7 +6,7 @@ description: >-
   projeta e implementa testes unitários (JUnit 5, Mockito BDD), testes de integração
   com Testcontainers (@SpringBootTest, @DataJpaTest, MockMvc) e realiza diagnóstico
   e autocorreção de suítes de testes quebradas com retry cap estrito (R-053).
-model: "Claude Sonnet 5.5"
+model: "Grok 4.7"
 tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_execute_file']
 source_docs:
   - .github/skills/test-implementation-spring-boot/SKILL.md
@@ -58,8 +58,8 @@ Você opera sob a **Política Biparadigma de Modelos (R-021)**: utiliza Sonnet 5
 
 ## Pré-condição de Plano de Implementação (R-064)
 
-- ✅ **Exceção Testes-Only**: Para criação e manutenção de testes unitários, de integração ou de componente sem alteração em código de produção da aplicação, a aprovação do plano de testes / test-strategy é suficiente, dispensando plano do arch-advisor.
-- ❌ **Bloqueio em Mutação de Código de Produção**: Caso a demanda exija mutação de código de produção (ex.: correção de código da aplicação em bugfix/test-fixer), aplica-se a exigência universal de `plan_ref` de Plano de Implementação aprovado em `docs/implementation-plans/` pelo arch-advisor da respectiva stack. Sem `plan_ref` aprovado, retornar imediatamente ao router com:
+- ✅ **Exceção Testes-Only**: Para criação e manutenção de testes unitários, de integração ou de componente sem alteração em código de produção da aplicação, a aprovação do plano de testes / test-strategy é suficiente, dispensando plano do spring-boot-arch-advisor.
+- ❌ **Bloqueio em Mutação de Código de Produção**: Caso a demanda exija mutação de código de produção (ex.: correção de código da aplicação em bugfix pelo spring-boot-developer ou spring-boot-test-engineer), aplica-se a exigência universal de `plan_ref` de Plano de Implementação aprovado em `docs/implementation-plans/` pelo spring-boot-arch-advisor da respectiva stack. Sem `plan_ref` aprovado, retornar imediatamente ao router com:
   ```yaml
   handoff_payload:
     para: "@spring-boot-router" # ou @agent-router

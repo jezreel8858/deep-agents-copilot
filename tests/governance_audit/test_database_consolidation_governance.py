@@ -62,7 +62,7 @@ def test_database_directory_file_count_and_composition():
     current_files = {p.name for p in DB_DIR.iterdir() if p.is_file()}
     assert current_files == EXPECTED_FILES, remediation(
         f"Composição inesperada no diretório Database: {current_files ^ EXPECTED_FILES}",
-        fix_hint="Certifique-se de manter apenas router, arch-advisor, oracle-specialist, informix-specialist e catalog.yaml."
+        fix_hint="Certifique-se de manter apenas database-router, database-arch-advisor, oracle-database-specialist, informix-database-specialist e catalog.yaml."
     )
     # Garante que não há subpastas residuais oracle/ ou informix/
     subdirs = [p.name for p in DB_DIR.iterdir() if p.is_dir()]

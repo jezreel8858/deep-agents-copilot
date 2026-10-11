@@ -1,12 +1,12 @@
 """
 test_feature_developer_test_authoring_boundary.py — Validação determinística da barreira
-de responsabilidade de autoria de testes para feature-developers de backend e frontend.
+de responsabilidade de autoria de testes para desenvolvedores (<stack>-developer).
 
 Quality Gate que garante:
-1. Os <stack>-feature-developer.agent.md contêm cláusula restritiva explícita (❌)
+1. Os <stack>-developer.agent.md contêm cláusula restritiva explícita (❌)
    proibindo a autoria de classes/arquivos de teste unitário ou de integração/componente.
-2. Os <stack>-feature-developer.agent.md contêm diretriz obrigatória de handoff para
-   unit-test-writer, integration-test-writer ou component-test-writer da respectiva stack.
+2. Os <stack>-developer.agent.md contêm diretriz obrigatória de handoff para
+   <stack>-test-engineer da respectiva stack.
 """
 from __future__ import annotations
 
@@ -26,15 +26,15 @@ def resolve_feature_developer_file(stack: str) -> Path:
         return AGENTS_FRONTEND_DIR / "angular" / "angular-developer.agent.md"
     if stack in ("spring-boot", "spring-reactive", "ejb", "struts", "python"):
         return AGENTS_BACKEND_DIR / stack / f"{stack}-developer.agent.md"
-    return AGENTS_BACKEND_DIR / stack / f"{stack}-feature-developer.agent.md"
+    return AGENTS_BACKEND_DIR / stack / f"{stack}-developer.agent.md"
 
 
 @pytest.mark.parametrize("stack", ALL_FEATURE_DEV_STACKS)
 def test_feature_developer_has_test_authoring_prohibition_and_handoff(stack: str):
     """
-    Valida que o <stack>-feature-developer.agent.md:
+    Valida que o <stack>-developer.agent.md:
     (a) proíbe autoria/geração de testes unitários, integração ou componente (marcador ❌);
-    (b) formaliza handoff para unit-test-writer, integration-test-writer ou component-test-writer.
+    (b) formaliza handoff para <stack>-test-engineer.
     """
     feat_dev_path = resolve_feature_developer_file(stack)
     assert feat_dev_path.exists(), f"Arquivo não encontrado: {feat_dev_path}"
@@ -54,11 +54,11 @@ def test_feature_developer_has_test_authoring_prohibition_and_handoff(stack: str
         f"de testes unitários, de integração ou de componentes."
     )
 
-    # (b) Handoff para unit-test-writer, integration-test-writer ou component-test-writer
+    # (b) Handoff para <stack>-test-engineer
     has_test_writer_handoff = bool(
-        re.search(r"unit-test-writer|integration-test-writer|component-test-writer|test-engineer", content, re.IGNORECASE)
+        re.search(r"test-engineer", content, re.IGNORECASE)
     )
     assert has_test_writer_handoff, (
         f"{feat_dev_path.name} DEVE citar explicitamente handoff ou delegação para "
-        f"unit-test-writer, integration-test-writer ou component-test-writer da respectiva stack."
+        f"<stack>-test-engineer da respectiva stack."
     )

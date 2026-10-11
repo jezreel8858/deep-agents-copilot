@@ -33,8 +33,8 @@ _CATALOGO = Catalogo(
     agentes=frozenset(
         {
             "agent-router", "agent-auditor", "security-reviewer",
-            "python-feature-developer", "angular-feature-developer",
-            "spring-boot-feature-developer", "code-review", "pr-gatekeeper",
+            "python-developer", "angular-developer",
+            "spring-boot-developer", "code-review", "pr-gatekeeper",
         }
     )
 )
@@ -44,7 +44,7 @@ def _sessao(
     fase: Fase = Fase.EM_WORKFLOW,
     workflow: Workflow | None = Workflow.FEATURE_DEVELOPMENT,
     etapa: int = 1,
-    agente_ativo: str = "python-feature-developer",
+    agente_ativo: str = "python-developer",
 ) -> Sessao:
     return Sessao(
         fase=fase,
@@ -86,7 +86,7 @@ class TestTC03IntentDriftTrigger:
     def test_deve_disparar_deriva_motivo2_quando_stack_fora_de_competencia(self) -> None:
         """Agente especializado em Python recebendo pedido para Angular/Spring Boot gera deriva."""
         # Arrange
-        sessao = _sessao(agente_ativo="python-feature-developer")
+        sessao = _sessao(agente_ativo="python-developer")
         turno = Turno(texto="Na verdade, migre esse componente para Angular com Spring Boot.")
 
         # Act
@@ -99,7 +99,7 @@ class TestTC03IntentDriftTrigger:
     def test_nao_deve_disparar_deriva_motivo2_quando_mesma_stack_do_agente(self) -> None:
         """Instruções que mencionam a stack de competência do agente ativo não geram deriva."""
         # Arrange
-        sessao = _sessao(agente_ativo="python-feature-developer")
+        sessao = _sessao(agente_ativo="python-developer")
         turno = Turno(texto="Ajuste o schema Pydantic e o repositório SQLAlchemy em Python.")
 
         # Act
@@ -137,7 +137,7 @@ class TestTC03IntentDriftTrigger:
     def test_deve_disparar_deriva_motivo4_quando_bypass_explicito_do_agent_router(self) -> None:
         """Menção direta para invocar especialista sem passar pelo router gera deriva."""
         # Arrange
-        sessao = _sessao(agente_ativo="python-feature-developer")
+        sessao = _sessao(agente_ativo="python-developer")
         turno = Turno(texto="Chame direto o @security-reviewer, sem passar pelo router.")
 
         # Act
@@ -163,7 +163,7 @@ class TestTC03IntentDriftTrigger:
     def test_nao_deve_disparar_deriva_motivo4_quando_mencao_ao_proprio_agent_router(self) -> None:
         """Perguntar ou mencionar o próprio @agent-router não é bypass."""
         # Arrange
-        sessao = _sessao(agente_ativo="python-feature-developer")
+        sessao = _sessao(agente_ativo="python-developer")
         turno = Turno(texto="Confirma se o @agent-router já despachou esse fluxo?")
 
         # Act
@@ -187,7 +187,7 @@ class TestTC03IntentDriftTrigger:
     ) -> None:
         """Refinamentos normais durante a execução da tarefa ativa não configuram deriva."""
         # Arrange
-        sessao = _sessao(agente_ativo="python-feature-developer")
+        sessao = _sessao(agente_ativo="python-developer")
         turno = Turno(texto=texto_continuidade)
 
         # Act

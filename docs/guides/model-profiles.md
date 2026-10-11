@@ -7,7 +7,10 @@ Este guia orienta desenvolvedores sobre como alternar o consumo de modelos LLM e
 ## 1. Visão Geral e Conceitos
 
 - **Fonte Canônica Única:** `model-profiles.yaml` define os tiers e os perfis pré-definidos versionados no repositório.
-- **Overlay Local (R-043):** `model-profiles.local.yaml` (gitignored) permite definir perfis personalizados sem poluir o repositório compartilhado.
+- **Overlay Local (R-043):** `model-profiles.local.yaml` (gitignored) permite definir perfis personalizados sem poluir o repositório compartilhado. Arquivo ausente não é erro: valem só os perfis built-in de `model-profiles.yaml`.
+- **Mesclagem:** se o arquivo local existir, a seção `profiles` é mesclada aos built-in. Precedência de resolução (D2): `agents` / `prompts` > `tiers` > `extends` > `default`.
+- **Limites do overlay:** um perfil local não pode repetir o nome de um built-in; `tier_map` local não pode criar nem mover chaves (o mapa canônico permanece só em `model-profiles.yaml`). `apply` aplica as mesmas regras dos built-in: allowlist/`pinnable`, hierarquia de custo D6, chave `prompt:<nome>` e recusa de path traversal.
+- **Marcação:** `list` e `status` identificam perfis vindos do arquivo local com o sufixo `(local)`.
 - **In-Place Seguro (Decisão D4'):** As variantes são aplicadas diretamente no clone local, alterando **exclusivamente a linha `model:`** no frontmatter dos arquivos alvo. O corpo, instruções e metadados de governança permanecem intactos.
 - **Allowlist Governada:** Todo modelo deve constar em `model-allowlist.yaml` com status `pinnable: true`. Modelos com mais de 30 dias de verificação emitem alertas de frescor.
 
@@ -30,10 +33,10 @@ Este guia orienta desenvolvedores sobre como alternar o consumo de modelos LLM e
 O gerador opera via CLI em módulo Python:
 
 ```bash
-# 1. Listar perfis disponíveis (built-in e locais)
+# 1. Listar perfis disponíveis (built-in e locais; locais saem com sufixo (local))
 python -m tools.model_profiles list
 
-# 2. Verificar status atual do repositório (perfil ativo, alvos modificados, drift)
+# 2. Verificar status atual (perfil ativo, (local) se o ativo for overlay, drift)
 python -m tools.model_profiles status
 
 # 3. Aplicar um perfil no clone local
@@ -43,7 +46,9 @@ python -m tools.model_profiles apply economico
 # 4. Restaurar o perfil padrão canônico (default)
 python -m tools.model_profiles restore
 
-# 5. Inicializar arquivo de perfil local (cria model-profiles.local.yaml a partir do exemplo)
+# 5. Inicializar overlay local: copia model-profiles.local.yaml.example para
+#    model-profiles.local.yaml sem sobrescrever arquivo já existente.
+#    Também garante o diretório .model-profiles/ (estado) ignorado pelo git.
 python -m tools.model_profiles init
 
 # 6. Diagnóstico de integridade, lock, hooks e permissões

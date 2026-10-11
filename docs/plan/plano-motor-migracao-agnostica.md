@@ -40,10 +40,10 @@ flowchart TD
     end
 
     subgraph Target["4. Stacks de Destino (Especialistas de Domínio Moderno)"]
-        SpringBoot[".github/agents/backend/spring-boot/<br/>@spring-boot-feature-developer"]
-        SpringReactive[".github/agents/backend/spring-reactive/<br/>@spring-reactive-feature-developer"]
-        Python[".github/agents/backend/python/<br/>@python-feature-developer"]
-        Angular[".github/agents/frontend/angular/<br/>@angular-feature-developer"]
+        SpringBoot[".github/agents/backend/spring-boot/<br/>@spring-boot-developer"]
+        SpringReactive[".github/agents/backend/spring-reactive/<br/>@spring-reactive-developer"]
+        Python[".github/agents/backend/python/<br/>@python-developer"]
+        Angular[".github/agents/frontend/angular/<br/>@angular-developer"]
     end
 
     Struts & EJB & OtherLegacy -->|Extração Semântica & AST| IRSchema & RulesMatrix & GoldenMaster
@@ -161,11 +161,11 @@ O motor de migração opera através de 6 fases estritas e determinísticas, ger
 | Fase | Nome da Fase | Agente Responsável | Critério de Entrada | Critério de Saída / Gate |
 |---|---|---|---|---|
 | **Fase 0** | **Pre-Flight Stack Governance Check** | `@tech-solution-architect` | Solicitação de migração recebida | Ambas as stacks (origem e destino) possuem `.github/agents/<camada>/<stack>/` completo com supervisor, catalog e 7 especialistas |
-| **Fase 1** | **Characterization & Rule Extraction** | `source-stack-arch-advisor` + `@business-rules-extractor` | Pré-voo aprovado | Vetores Golden Master gerados e matriz de regras documentada em `docs/business-rules/` |
-| **Fase 2** | **Semantic IR Generation** | `source-stack-arch-advisor` | Fase 1 concluída | Arquivo `migration-ir.json` gerado e 100% válido contra o JSON Schema canônico |
-| **Fase 3a** | **Target Project Bootstrapping (Human-in-the-Loop)** | `target-stack-feature-developer` | IR validada & projeto alvo novo | Decisões de build/runtime (Maven vs Gradle, Java LTS) confirmadas pelo usuário via `ask_questions` e esqueleto base inicializado |
-| **Fase 3b** | **Idiomatic Code Emission** | `target-stack-feature-developer` | Projeto alvo inicializado/existente | Código moderno implementado sob TDD a partir da IR, com diffs cirúrgicos em lote (R-046) e zero menção a classes legadas |
-| **Fase 4** | **Dual-Verification Parity Gate** | `target-stack-test-fixer` + `@runtime-verifier` | Código emitido | 100% dos testes Golden Master passando verdes e 100% das regras comprovadas por asserções |
+| **Fase 1** | **Characterization & Rule Extraction** | `<source-stack>-arch-advisor` + `@business-rules-extractor` | Pré-voo aprovado | Vetores Golden Master gerados e matriz de regras documentada em `docs/business-rules/` |
+| **Fase 2** | **Semantic IR Generation** | `<source-stack>-arch-advisor` | Fase 1 concluída | Arquivo `migration-ir.json` gerado e 100% válido contra o JSON Schema canônico |
+| **Fase 3a** | **Target Project Bootstrapping (Human-in-the-Loop)** | `target-stack-developer` | IR validada & projeto alvo novo | Decisões de build/runtime (Maven vs Gradle, Java LTS) confirmadas pelo usuário via `ask_questions` e esqueleto base inicializado |
+| **Fase 3b** | **Idiomatic Code Emission** | `target-stack-developer` | Projeto alvo inicializado/existente | Código moderno implementado sob TDD a partir da IR, com diffs cirúrgicos em lote (R-046) e zero menção a classes legadas |
+| **Fase 4** | **Dual-Verification Parity Gate** | `target-stack-test-engineer` + `@runtime-verifier` | Código emitido | 100% dos testes Golden Master passando verdes e 100% das regras comprovadas por asserções |
 | **Fase 5** | **Baseline Quality Gate & PR Readiness** | `@code-review` + `@security-reviewer` + `@pr-gatekeeper` | Paridade comprovada | Build limpo, zero vulnerabilidades OWASP, changelog e PR estruturado preliminar |
 | **Fase 6** | **Post-Migration Verification & Redundancy Gate** | `@code-review` + `@test-strategy` + `@business-rules-extractor` + `@runtime-verifier` | Fase 5 aprovada | Tríplice redundância aprovada: zero órfãos no Reverse Orphan Audit, 100% mutantes eliminados no Mutation Parity e zero discrepâncias no Differential Shadow Replay. Emissão de Certificado de Paridade Total |
 
@@ -174,7 +174,7 @@ O motor de migração opera através de 6 fases estritas e determinísticas, ger
 Quando o destino da migração for um novo repositório ou módulo autônomo (Cenário Green-Field), o motor de migração suspende a emissão direta de código de domínio e aciona a sub-rotina interativa de inicialização:
 
 1. **Consulta Obrigatória via `ask_questions` (R-027 / RNF-005):**
-   O especialista da stack de destino (`target-stack-feature-developer`) submete as decisões estruturais ao desenvolvedor:
+   O especialista da stack de destino (`target-stack-developer`) submete as decisões estruturais ao desenvolvedor:
    - **Ferramenta de Build:** Ex.: `Maven (pom.xml)` vs `Gradle (Kotlin DSL / Groovy)` para Spring Boot; `npm` vs `pnpm` vs `yarn` para Angular; `uv` vs `poetry` vs `pip` para Python.
    - **Versão LTS de Runtime:** Ex.: `Java 21 LTS` vs `Java 25 LTS`; `Node 20 LTS` vs `Node 22 LTS`; `Python 3.11` vs `Python 3.12`.
    - **Formato de Packaging:** Ex.: `Jar (Cloud-native)` vs `War (Traditional Application Server)`.
@@ -188,7 +188,7 @@ Quando o destino da migração for um novo repositório ou módulo autônomo (Ce
 ### Circuit Breakers e Proteções de Rollback (R-050.2)
 1. **Breaker de Governança (Fase 0):** Se a stack de origem ou destino não estiver no projeto, a migração é **imediatamente suspensa**, acionando `@governance-factory` para criar a stack faltante.
 2. **Breaker de Schema (Fase 2):** Se a IR falhar na validação do JSON Schema, o avanço para a stack de destino é bloqueado; o especialista da stack de origem corrige a extração.
-3. **Breaker de Paridade (Fase 4):** Se um teste Golden Master falhar ou um comportamento divergir, a migração **não pode avançar para PR**. É disparada a sub-rotina de correção cirúrgica pelo `target-stack-test-fixer`. Máximo de 3 iterações antes de escalonamento humano via `ask_questions`.
+3. **Breaker de Paridade (Fase 4):** Se um teste Golden Master falhar ou um comportamento divergir, a migração **não pode avançar para PR**. É disparada a sub-rotina de correção cirúrgica pelo `target-stack-test-engineer`. Máximo de 3 iterações antes de escalonamento humano via `ask_questions`.
 
 ---
 
@@ -215,10 +215,10 @@ Ao final, emite-se formalmente o **Certificado de Paridade Total & Cutover Autor
 3. **`SRC-03` (Golden Master Extractor)**: Integrar geração automatizada de fixtures de testes de caracterização a partir do código legado.
 
 ### [TARGET_STACK_TASKS] — Geradores de Código Idiomático Moderno
-1. **`TGT-01` (Spring Boot)**: Capacitar `@spring-boot-feature-developer` para ler a IR e gerar Controllers REST (`@RestController`), Records DTO, Services (`@Service`) e Entities JPA idiomáticas.
-2. **`TGT-02` (Spring Reactive)**: Capacitar `@spring-reactive-feature-developer` para gerar rotas funcionais WebFlux (`RouterFunction`) e fluxos reativos (`Mono`/`Flux`) a partir da IR.
-3. **`TGT-03` (Python)**: Capacitar `@python-feature-developer` para gerar endpoints FastAPI, schemas Pydantic e modelos SQLAlchemy a partir da IR.
-4. **`TGT-04` (Angular)**: Capacitar `@angular-feature-developer` para gerar componentes standalone, rotas e Signal Stores a partir de entrypoints frontend da IR.
+1. **`TGT-01` (Spring Boot)**: Capacitar `@spring-boot-developer` para ler a IR e gerar Controllers REST (`@RestController`), Records DTO, Services (`@Service`) e Entities JPA idiomáticas.
+2. **`TGT-02` (Spring Reactive)**: Capacitar `@spring-reactive-developer` para gerar rotas funcionais WebFlux (`RouterFunction`) e fluxos reativos (`Mono`/`Flux`) a partir da IR.
+3. **`TGT-03` (Python)**: Capacitar `@python-developer` para gerar endpoints FastAPI, schemas Pydantic e modelos SQLAlchemy a partir da IR.
+4. **`TGT-04` (Angular)**: Capacitar `@angular-developer` para gerar componentes standalone, rotas e Signal Stores a partir de entrypoints frontend da IR.
 
 ---
 

@@ -94,7 +94,7 @@ agents:
     - code-tracing
     - terminal-governance
     - playwright-mcp
-    model: Claude Sonnet 5.5
+    model: Grok 4.7
   angular-test-engineer:
     id: angular-test-engineer
     role: testing
@@ -154,4 +154,4 @@ agents:
     - agent-contracts
     - terminal-governance
     - playwright-mcp
-    model: Claude Sonnet 5.5
+    model: Grok 4.7

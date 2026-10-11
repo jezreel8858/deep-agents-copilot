@@ -80,7 +80,7 @@ Abaixo, a relação completa e aprovada dos 26 agentes classificados como "Gathe
 Todos os demais agentes do catálogo de governança retêm suas capacidades completas de `ctx_execute` e `ctx_execute_file`, enquadrando-se categoricamente nos critérios (a), (b) ou (c):
 - **Executores de Governança e Fábrica**: `governance-maintainer` (codegen e manutenção em lote multi-arquivo), `governance-factory` (síntese de artefatos).
 - **Mapeadores de Domínio e Grafo**: `codegraph-engine` (construção de grafos de nós e arestas), `ddd-bounded-context-mapper` (descoberta de agregados e limites de contexto), `business-rules-extractor` (extração algorítmica).
-- **Desenvolvedores e Reparadores de Código (Mutadores)**: todos os especialistas `*-feature-developer`, `*-bug-fixer`, `*-test-writer`, `*-test-fixer`, `*-perf-tuner`, `*-ui-stylist`, `*-e2e-writer`, `*-migration-dev`, `adapter-generator`, `binding-initializer`.
+- **Desenvolvedores e Reparadores de Código (Mutadores)**: todos os especialistas `*-developer`, `*-test-engineer`, `*-perf-tuner`, `*-migration-dev`, `adapter-generator`, `binding-initializer`.
 
 ---
 

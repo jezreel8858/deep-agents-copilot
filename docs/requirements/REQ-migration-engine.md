@@ -106,7 +106,7 @@ Se durante a execução da Dual-Verification houver divergência de paridade fun
     Dado que a nova stack retornou payload diferente do baseline Golden Master para o mesmo estímulo
     Quando o Quality Gate avalia a suíte de testes
     Então o avanço da migração deve ser bloqueado
-    E um relatório detalhado de divergência semântica deve ser emitido para correção pelo test-fixer/feature-developer.
+    E um relatório detalhado de divergência semântica deve ser emitido para correção pelo <stack>-test-engineer/<stack>-developer.
   ```
 
 ### REQ-007 [EARS - Guiado por Estado]: Bootstrapping Interativo de Novo Projeto com Human-in-the-Loop
@@ -118,7 +118,7 @@ Enquanto o destino da migração for um projeto novo (green-field) ou novo módu
   Cenário: Confirmação interativa de build tool e runtime para novo projeto Spring Boot
     Dado que a migração tem como destino um novo projeto Spring Boot que ainda não existe no workspace
     Quando a fase de inicialização do projeto alvo é iniciada
-    Então o especialista da stack (@spring-boot-feature-developer) não deve gerar o projeto unilateralmente
+    Então o especialista da stack (@spring-boot-developer) não deve gerar o projeto unilateralmente
     E deve acionar ask_questions solicitando que o usuário selecione entre Maven e Gradle, e a versão LTS de Java (21 vs 25)
     E o esqueleto base oficial só deve ser criado após a resposta explícita do usuário.
 
@@ -183,7 +183,7 @@ O motor de migração não deve tolerar migrações cegas. Toda migração deve 
 Qualquer stack de tecnologia suportada deve estar em estrita conformidade com os padrões de arquitetura de governança do repositório:
 - Estrutura isolada em `.github/agents/<camada>/<stack>/`
 - Supervisor hierárquico com R-042 (Anti Sticky-Session) e banner de visibilidade de fluxo
-- Sub-catálogo local `<stack>-catalog.yaml` com 7 especialistas canônicos (arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer, test-fixer)
+- Sub-catálogo local `<stack>-catalog.yaml` com a tríade canônica (<stack>-arch-advisor, <stack>-developer, <stack>-test-engineer)
 - Sincronização quádrupla atômica global (R-015) em `catalog.yaml`, `routing-graph.yaml`, `agent-router.agent.md` e `README.md`.
 - **Prioridade:** Must Have
 

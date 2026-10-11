@@ -3,8 +3,7 @@ test_test_writer_mutation_awareness.py — Validação determinística de sensib
 a mutação e valores de fronteira em especialistas test-writer de todas as stacks.
 
 Quality Gate que garante:
-1. Todos os especialistas test-writer (unit-test-writer, integration-test-writer,
-   component-test-writer) dos 6 stacks contêm menção a "boundary" / "valores de fronteira"
+1. Todos os especialistas test-engineer dos 6 stacks contêm menção a "boundary" / "valores de fronteira"
    ou "casos de borda".
 2. Todos os test-writers mencionam "mutation score" ou "mutation testing" na diretriz
    de critério de aceite / cobertura qualitativa.

@@ -6,7 +6,7 @@ description: >-
   implementa endpoints funcionais e reativos, fluxos assíncronos não-bloqueantes (Mono/Flux),
   repositórios R2DBC reativos, diagnóstico e correção cirúrgica de bugs reativos (bloqueio de event loop, memory leaks)
   e otimização de performance/concorrência com safety gates rigorosos.
-model: "Claude Sonnet 5.5"
+model: "Grok 4.7"
 tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_execute_file']
 source_docs:
   - .github/skills/spring-reactive-implementation-patterns/SKILL.md
@@ -77,7 +77,7 @@ Você atua sob o padrão de **Engenharia Defensiva Reativa e Orientada a Fluxos 
       mensagem: "Execução bloqueada por ausência de plan_ref aprovado em docs/implementation-plans/ (R-064)"
   ```
 - ✅ **Exceções Formais**: (a) tarefas testes-only sem alteração em código de produção e (b) documentação e configurações puramente declarativas não sensíveis.
-- ✅ **Retry R-053**: Tentativas subsequentes dentro do escopo do plano já aprovado reutilizam o mesmo `plan_ref`; se houver mudança de escopo ou mais de 2 falhas consecutivas de compilação/teste, interromper e retornar ao arch-advisor da stack.
+- ✅ **Retry R-053**: Tentativas subsequentes dentro do escopo do plano já aprovado reutilizam o mesmo `plan_ref`; se houver mudança de escopo ou mais de 2 falhas consecutivas de compilação/teste, interromper e retornar ao spring-reactive-arch-advisor da stack.
 
 ## ⚙️ Protocolo de Execução Obrigatório
 

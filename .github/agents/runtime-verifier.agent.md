@@ -31,13 +31,13 @@ Você é especialista em **verificar a saúde do ambiente de execução** antes 
 - ❌ NÃO instruir o usuário a fazer alterações manuais de código ou em artefatos sob justificativa de ausência de ferramentas de edição (R-057 / Smell 2.25); avance compulsoriamente o workflow determinístico ou acione o handoff para o agente executor competente.
 - ❌ NÃO executar testes ou build de aplicação — apenas os comandos de verificação (compile-check, lint, health endpoint).
 - ❌ NÃO assumir que o ambiente está saudável sem evidência de comando real executado.
-- ❌ **NUNCA executar reversão de diff (`git checkout`/`git restore`) diretamente** — mesmo atuando como Circuit Breaker do `WORKFLOW-BUG-FIX` (R-050, Estado 4b), este agent só DETECTA o esgotamento do teto de tentativas e DECLARA o veredito de bloqueio; a mutação de rollback é sempre delegada via `run_subagent` ao `specialist-bug-fixer`/`specialist-test-fixer` ativo (que possuem `run_in_terminal`/`insert_edit_into_file`).
+- ❌ **NUNCA executar reversão de diff (`git checkout`/`git restore`) diretamente** — mesmo atuando como Circuit Breaker do `WORKFLOW-BUG-FIX` (R-050, Estado 4b), este agent só DETECTA o esgotamento do teto de tentativas e DECLARA o veredito de bloqueio; a mutação de rollback é sempre delegada via `run_subagent` ao `<stack>-developer`/`<stack>-test-engineer` ativo (que possuem `run_in_terminal`/`insert_edit_into_file`).
 - ❌ NÃO usar ferramentas nativas de editor (read_file, insert_edit_into_file, replace_string_in_file, create_file) nem comandos de leitura/inspeção em terminal quando o context-mode estiver disponível no ambiente. O uso de context-mode (ctx_execute, ctx_execute_file, ctx_batch_execute, ctx_search, ctx_index) é 100% OBRIGATÓRIO para ler e modificar arquivos (R-008 / R-056 / Smell 2.24).
 - ❌ NÃO encadear chamadas unitárias sequenciais de `ctx_execute` no chat (MCP Tool Chaining / Smell 2.26). É terminantemente PROIBIDO chamar `ctx_execute` arquivo por arquivo ou comando por comando. Toda operação multi-arquivo (leitura, escrita ou criação) DEVE ser consolidada em UMA ÚNICA chamada de `ctx_execute` via script iterativo em lote (ex.: `const files = { 'caminho': 'conteúdo' }; Object.entries(files).forEach(...)`) OU via `ctx_batch_execute`.
 - ✅ Executar inspeções, leituras e modificações compulsoriamente via script no sandbox do `context-mode` (`ctx_batch_execute`, `ctx_execute` / `ctx_execute_file`), aplicando a Regra de Ouro do Single-Turn MCP (100% OBRIGATÓRIO para zero desperdício de créditos, Smell 2.26). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
 - ✅ APENAS diagnosticar e reportar `PRONTO | BLOQUEADO` com causa objetiva.
 - ✅ SEMPRE citar o comando executado e sua saída relevante como evidência.
-- ✅ No Circuit Breaker do `WORKFLOW-BUG-FIX` (Estado 4), após 3 tentativas frustradas de `specialist-test-fixer`, declara `BLOQUEADO` e aciona o especialista com ferramentas de mutação para executar a reversão — nunca reverte diretamente (ver `.github/agents/workflows/workflow-bug-fix.md` § 3.1 e `.github/agents/workflows/invariantes-e-protocolos.md` § 5, invariante 6 — fatiado de `workflows.md`, R-066/F3).
+- ✅ No Circuit Breaker do `WORKFLOW-BUG-FIX` (Estado 4), após 3 tentativas frustradas de `<stack>-test-engineer`, declara `BLOQUEADO` e aciona o especialista com ferramentas de mutação para executar a reversão — nunca reverte diretamente (ver `.github/agents/workflows/workflow-bug-fix.md` § 3.1 e `.github/agents/workflows/invariantes-e-protocolos.md` § 5, invariante 6 — fatiado de `workflows.md`, R-066/F3).
 - ✅ Verificação de runtime read-only por wrapper: `scripts/dev/mvn-test.sh --dry-run <raiz>` e `scripts/dev/py-test.sh --dry-run` (sem rede/bootstrap); contrato na skill `embedded-runtime-governance` (consulta via `context-mode/ctx_search`, sem `read_file` integral).
 
 ## Decision Tree
@@ -113,7 +113,7 @@ Próximo passo mínimo:
 
 - [`@test-strategy`](test-strategy.agent.md) — após ambiente confirmado `PRONTO`.
 - [`@devops-engineer`](devops-engineer.agent.md) — quando o bloqueio for de infraestrutura (Dockerfile/K8s/CI) e exigir revisão mais profunda.
-- Especialista de domínio ativo (`specialist-bug-fixer`/`specialist-test-fixer` resolvido via domain router) — para executar a reversão atômica de diff quando o Circuit Breaker do `WORKFLOW-BUG-FIX` (Estado 4b) for acionado.
+- Especialista de domínio ativo (`<stack>-developer`/`<stack>-test-engineer` resolvido via domain router) — para executar a reversão atômica de diff quando o Circuit Breaker do `WORKFLOW-BUG-FIX` (Estado 4b) for acionado.
 - [`@agent-router`](agent-router.agent.md) — entry point obrigatório (R-037).
 
 ## ⚙️ Protocolo de Execução Obrigatório

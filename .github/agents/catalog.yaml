@@ -1676,7 +1676,7 @@ agents:
     domain: Supervisor hierarquico e roteador do dominio React
     description: Roteador de domínio React e supervisor hierárquico — recebe solicitações
       de frontend React do agent-router central e despacha para os 3 especialistas
-      do catálogo React (arch-advisor, developer e test-engineer).
+      do catálogo React (react-arch-advisor, react-developer e react-test-engineer).
     keywords:
     - react
     - react router
@@ -1763,8 +1763,7 @@ agents:
     domain: Supervisor hierarquico e roteador do dominio Java Legado EJB
     description: Roteador de domínio Java Legado EJB e supervisor hierárquico — recebe
       solicitações de backend EJB legado (EJB 2.x/3.x, JTA, MDB, EAR/WAR/JAR) do agent-router
-      central e despacha para os 7 especialistas do catálogo EJB (arch-advisor, feature-developer,
-      bug-fixer, perf-tuner, unit-test-writer, integration-test-writer e test-fixer).
+      central e despacha para os 3 especialistas do catálogo EJB (ejb-arch-advisor, ejb-developer e ejb-test-engineer).
     keywords:
     - ejb
     - ejb router
@@ -1810,8 +1809,7 @@ agents:
     description: Roteador de domínio Python Backend e supervisor hierárquico — recebe
       solicitações de backend Python (FastAPI, Flask, Django, Pydantic, SQLAlchemy,
       pytest) do agent-router central e despacha para os 7 especialistas do catálogo
-      Python (arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer,
-      integration-test-writer e test-fixer).
+      Python (python-arch-advisor, python-developer e python-test-engineer).
     keywords:
     - python
     - python router
@@ -1830,12 +1828,8 @@ agents:
     related_agents:
     - agent-router
     - python-arch-advisor
-    - python-feature-developer
-    - python-bug-fixer
-    - python-perf-tuner
-    - python-unit-test-writer
-    - python-integration-test-writer
-    - python-test-fixer
+    - python-developer
+    - python-test-engineer
     tools:
     - read_file
     - file_search
@@ -1862,7 +1856,7 @@ agents:
     domain: Supervisor hierarquico e roteador do dominio Spring Boot
     description: Roteador de domínio Spring Boot e supervisor hierárquico — recebe
       solicitações de backend Java/Spring Boot do agent-router central e despacha
-      para os 3 especialistas do catálogo Spring Boot (arch-advisor, developer e test-engineer).
+      para os 3 especialistas do catálogo Spring Boot (spring-boot-arch-advisor, spring-boot-developer e spring-boot-test-engineer).
     keywords:
     - spring boot
     - spring boot router
@@ -1945,8 +1939,7 @@ agents:
     description: Roteador de domínio Java Legado Struts e supervisor hierárquico —
       recebe solicitações de backend Struts legado (Struts 1.x/2.x, Actions, FormBeans,
       ActionServlet, Tiles) do agent-router central e despacha para os 7 especialistas
-      do catálogo Struts (arch-advisor, feature-developer, bug-fixer, perf-tuner,
-      unit-test-writer, integration-test-writer e test-fixer).
+      do catálogo Struts (struts-arch-advisor, struts-developer e struts-test-engineer).
     tools:
     - read_file
     - file_search

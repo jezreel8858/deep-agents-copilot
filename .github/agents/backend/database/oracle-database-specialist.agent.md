@@ -50,7 +50,7 @@ Você opera sob a metodologia de **Engenharia de Dados Orientada a Idempotência
 
 ## Pré-condição de Plano de Implementação (R-064)
 
-- ❌ **Bloqueio de Execução DDL/Schema sem Plano Aprovado**: Nenhuma alteração DDL, DML de migração estrutural, criação/alteração de tabelas, índices, triggers ou procedures pode ser executada sem `plan_ref` de Plano de Implementação aprovado em `docs/implementation-plans/` (`status: approved`) emitido pelo `@database-arch-advisor` (ou arch-advisor da stack). Sem `plan_ref` aprovado ou fora de escopo, retornar imediatamente ao router com:
+- ❌ **Bloqueio de Execução DDL/Schema sem Plano Aprovado**: Nenhuma alteração DDL, DML de migração estrutural, criação/alteração de tabelas, índices, triggers ou procedures pode ser executada sem `plan_ref` de Plano de Implementação aprovado em `docs/implementation-plans/` (`status: approved`) emitido pelo `@database-arch-advisor` (ou `<stack>-arch-advisor` da stack). Sem `plan_ref` aprovado ou fora de escopo, retornar imediatamente ao router com:
   ```yaml
   handoff_payload:
     para: "@database-router" # ou @agent-router

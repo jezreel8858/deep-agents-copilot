@@ -8,7 +8,7 @@ description: >-
 router:
   id: "struts-router"
   role: "supervisor"
-  description: "Roteador central do domínio Java Legado Struts — tria e despacha para os 3 especialistas backend (arch-advisor, developer e test-engineer)"
+  description: "Roteador central do domínio Java Legado Struts — tria e despacha para os 3 especialistas backend (struts-arch-advisor, struts-developer e struts-test-engineer)"
   tools:
     - "read_file"
     - "file_search"
@@ -59,7 +59,7 @@ agents:
 
   struts-developer:
     id: "struts-developer"
-    model: "Claude Sonnet 5.5"
+    model: Grok 4.7
     role: "implementation"
     domain: "Desenvolvimento de Produção Struts, Actions, FormBeans, Mapeamentos XML, Correção Cirúrgica de Bugs e Otimização de Performance"
     description: "Especialista mutativo core: implementa Actions, DispatchActions, FormBeans (ActionForm/DynaActionForm), descritores XML, resolve bugs cirúrgicos (ActionForwards, ClassCastException, vazamentos de sessão) com diff mínimo e otimiza rendering Tiles/JSP e elimina session bloat."
@@ -101,7 +101,7 @@ agents:
 
   struts-test-engineer:
     id: "struts-test-engineer"
-    model: "Claude Sonnet 5.5"
+    model: Grok 4.7
     role: "quality-assurance"
     domain: "Garantia de Qualidade, Testes Unitários StrutsTestCase/Mockito, Testes de Integração Tomcat/Jetty Emulado e Autocorreção sob R-053"
     description: "Especialista mutativo de testes: implementa testes unitários isolados com Mockito e StrutsTestCase (Actions e FormBeans sem Servlet Container), testes de integração em contêiner emulado (Tomcat/Jetty, interceptors, Testcontainers) e realiza diagnóstico e autocorreção de testes com retry cap R-053."

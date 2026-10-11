@@ -69,7 +69,7 @@ class TestStateMachineIdempotency:
             origem="usuario",
             tipo=TipoEvento.AVANCO_ETAPA,
             etapa_solicitada=2,
-            agente_solicitado="specialist-unit-test-writer",
+            agente_solicitado="<stack>-test-engineer",
         )
 
         # Act
@@ -91,7 +91,7 @@ class TestStateMachineIdempotency:
             fase=Fase.EM_WORKFLOW,
             workflow=Workflow.BUG_FIX,
             etapa=3,
-            agente_ativo="specialist-bug-fixer",
+            agente_ativo="<stack>-developer",
             aprovacoes=frozenset({"2"}),
         )
         evento_deriva = Evento(origem="drift-detector", tipo=TipoEvento.DERIVA_DETECTADA)

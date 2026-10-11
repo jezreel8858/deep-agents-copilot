@@ -5,7 +5,7 @@ da stack Java Legado EJB (Padrão Triádico 3+1 — Fase 3 do Plano de Governan�
 Quality Gate que garante:
 1. Topologia estrita: o diretório .github/agents/backend/ejb/ contém exatamente
    os 4 agentes (1 supervisor + 3 especialistas) e 1 sub-catálogo.
-2. Eliminação completa dos 6 especialistas legados (zero dangling legacy agents).
+2. Eliminação completa dos especialistas legados (zero dangling legacy agents).
 3. Sub-catálogo ejb-catalog.yaml consolidado com 3 especialistas.
 4. Decision Tree de 3 branches em ejb-router.agent.md preservando baseline R-054.
 5. Contratos de fronteira em ejb-developer (proibição de testes unitários, blast-radius check,
@@ -37,14 +37,7 @@ EXPECTED_FILES = {
     "ejb-catalog.yaml"
 }
 
-LEGACY_AGENTS = [
-    "ejb-feature-developer.agent.md",
-    "ejb-bug-fixer.agent.md",
-    "ejb-perf-tuner.agent.md",
-    "ejb-unit-test-writer.agent.md",
-    "ejb-integration-test-writer.agent.md",
-    "ejb-test-fixer.agent.md"
-]
+# Apenas os 5 arquivos canônicos da tríade devem existir
 
 R054_CANONICAL_ROUTER_TOOLS = {
     "read_file",
@@ -63,16 +56,10 @@ def test_ejb_directory_file_count_and_composition():
     current_files = {p.name for p in EJB_DIR.iterdir() if p.is_file()}
     assert current_files == EXPECTED_FILES, remediation(
         f"Composição inesperada no diretório EJB: {current_files ^ EXPECTED_FILES}",
-        fix_hint="Certifique-se de manter apenas router, arch-advisor, developer, test-engineer e catalog.yaml."
+        fix_hint="Certifique-se de manter apenas ejb-router, ejb-arch-advisor, ejb-developer, ejb-test-engineer e catalog.yaml."
     )
 
 
-@pytest.mark.parametrize("legacy_file", LEGACY_AGENTS)
-def test_ejb_legacy_agents_are_removed(legacy_file: str):
-    """Valida que nenhum especialista legado remanesce no diretório."""
-    assert not (EJB_DIR / legacy_file).exists(), (
-        f"Agente legado {legacy_file} ainda existe em {EJB_DIR} — deve ser removido na consolidação."
-    )
 
 
 def test_ejb_catalog_triadic_structure():

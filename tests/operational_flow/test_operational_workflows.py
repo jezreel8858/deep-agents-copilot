@@ -340,7 +340,7 @@ def test_workflow_bug_fix_edge_scenarios_and_state_bag(routing_graph):
     assert "observacao_pos_fix" in wf1, "Workflow 1 deve declarar observacao_pos_fix"
 
     estados = wf1.get("estados", [])
-    assert any("ui-stylist" in e.get("agent", "") for e in estados), "Workflow 1 deve incluir ui-stylist para layout"
+    assert any("<stack>-developer" in e.get("agent", "") for e in estados), "Workflow 1 deve incluir <stack>-developer para layout"
     assert any("database-specialist" in str(e.get("sub_rotinas_permitidas", [])) for e in estados), "Workflow 1 deve suportar database-specialist"
     
     etapa1 = next((e for e in estados if e["etapa"] == 1), {})
@@ -348,7 +348,7 @@ def test_workflow_bug_fix_edge_scenarios_and_state_bag(routing_graph):
     assert "classificacao_defeito" in etapa1, "Etapa 1 deve definir classificacao_defeito"
 
     etapa_plan = next((e for e in estados if e.get("nome") == "implementation_plan_authoring"), {})
-    assert "specialist-arch-advisor" in etapa_plan.get("agent", "")
+    assert "<stack>-arch-advisor" in etapa_plan.get("agent", "")
     assert etapa_plan.get("regra") == "R-064"
 
     etapa_fix = next((e for e in estados if e.get("nome") == "surgical_bug_fix"), {})

@@ -4,7 +4,7 @@
   "id": "python-router",
   "name": "Python Router",
   "version": "2.0.0",
-  "description": "Roteador de domínio Python Backend e supervisor hierárquico — recebe solicitações de backend Python (FastAPI, Flask, Django, Pydantic, SQLAlchemy, pytest) do agent-router central e despacha para os 7 especialistas do catálogo Python (arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer e test-fixer).",
+  "description": "Roteador de domínio Python Backend e supervisor hierárquico — recebe solicitações de backend Python (FastAPI, Flask, Django, Pydantic, SQLAlchemy, pytest) do agent-router central e despacha para os 3 especialistas do catálogo Python (python-arch-advisor, python-developer e python-test-engineer).",
   "domain": "Supervisor hierarquico e roteador do dominio Python Backend",
   "role": "router",
   "capabilities": [

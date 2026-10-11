@@ -82,7 +82,7 @@ Identifique o workflow ativo e o estado específico de invocação. Declare comp
 
 | Estado (`CURRENT_STATE_LOCK`) | Workflow & Etapa Canônica | Ações Permitidas | Saída Permitida | Halting Condition (Parada Obrigatória) |
 |---|---|---|---|---|
-| **`WF1_SECURITY_CHECKPOINT`** | `WORKFLOW-BUG-FIX`<br>Sub-rotina 3c | Avaliar impacto de segurança e viabilidade em correções de auth/tokens/credenciais junto ao `@security-reviewer`. | Formato A (Parecer Compacto: Veredito + Superfície de Risco). | **STOP TOTAL.** Proibido desenhar nova feature ou alterar código. Retorno imediato ao `specialist-bug-fixer`. |
+| **`WF1_SECURITY_CHECKPOINT`** | `WORKFLOW-BUG-FIX`<br>Sub-rotina 3c | Avaliar impacto de segurança e viabilidade em correções de auth/tokens/credenciais junto ao `@security-reviewer`. | Formato A (Parecer Compacto: Veredito + Superfície de Risco). | **STOP TOTAL.** Proibido desenhar nova feature ou alterar código. Retorno imediato ao `<stack>-developer`. |
 | **`WF2_CONTRACT_DEPRECATION`** | `WORKFLOW-REFACTORING`<br>Sub-rotina 2a | Desenhar transição suave de contratos públicos multi-módulo (Branch by Abstraction, Parallel Run, `@Deprecated`). | Formato A (Estratégia de Abstração + Matriz de Consumidores). | **STOP TOTAL.** Proibido modificar código em disco. Retorno imediato ao `@refactor-planner`. |
 | **`WF3_TECH_ANALYSIS`** | `WORKFLOW-TECHNICAL-ANALYSIS`<br>Estados 1 a 3 | Mapear arquitetura via `@codegraph-engine`, avaliar restrições técnicas e formular trade-offs estruturados. | Formato B (Relatório Técnico com opções `[PROPOSTA-1..N]` para Fast-Chaining R-050.1). | **STOP TOTAL.** Zero mutações. Conclusão analítica com recomendação clara via `ask_questions` ou `@agent-router`. |
 | **`WF4_BLUEPRINT_SPEC`** | `WORKFLOW-FEATURE-DEVELOPMENT`<br>Estado 3 | Especificar contratos OpenAPI v3, schemas Flyway DDL e particionar tarefas com Context Firewall (`[BACKEND_TASKS]` / `[FRONTEND_TASKS]`). | Formato B (Technical Blueprint Canônico). | **STOP TOTAL.** Proibido gerar código executável. Despacho aos Domain Routers via `@agent-router`. |
@@ -181,8 +181,8 @@ Agente Ativo: tech-solution-architect
 ### Context Firewall — Divisão de Tarefas por Stack
 
 #### [BACKEND_TASKS]
-1. `<Tarefa backend 1>` — Especialista: `@<stack>-feature-developer`
-2. `<Tarefa backend 2>` — Especialista: `@<stack>-feature-developer`
+1. `<Tarefa backend 1>` — Especialista: `@<stack>-developer`
+2. `<Tarefa backend 2>` — Especialista: `@<stack>-developer`
 
 #### [FRONTEND_TASKS]
 1. `<Tarefa frontend 1>` — Especialista: `@angular-developer`

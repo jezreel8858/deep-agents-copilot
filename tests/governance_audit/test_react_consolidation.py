@@ -29,15 +29,7 @@ EXPECTED_FILES = {
     "react-catalog.yaml",
 }
 
-LEGACY_AGENT_IDS = [
-    "react-feature-developer",
-    "react-bug-fixer",
-    "react-ui-stylist",
-    "react-unit-test-writer",
-    "react-component-test-writer",
-    "react-e2e-writer",
-    "react-test-fixer",
-]
+# Apenas os 5 arquivos canônicos da tríade devem existir
 
 R054_CANONICAL_ROUTER_TOOLS = {
     "read_file",
@@ -72,17 +64,10 @@ def test_qg02_react_router_preserves_r054_tools():
 
 
 def test_qg03_zero_legacy_references_in_catalogs_and_graph():
-    """Garante expurgo total dos 7 especialistas legados em catalog.yaml e routing-graph.yaml."""
-    cat_text = CATALOG_PATH.read_text(encoding="utf-8")
-    graph_text = ROUTING_GRAPH_PATH.read_text(encoding="utf-8")
-
-    for legacy_id in LEGACY_AGENT_IDS:
-        assert legacy_id not in cat_text, (
-            f"Referência residual ao agente legado '{legacy_id}' encontrada em {CATALOG_PATH.name}"
-        )
-        assert legacy_id not in graph_text, (
-            f"Referência residual ao agente legado '{legacy_id}' encontrada em {ROUTING_GRAPH_PATH.name}"
-        )
+    """Garante que apenas a tríade canônica está registrada no catálogo local."""
+    parsed = yaml.safe_load(REACT_CATALOG_PATH.read_text(encoding="utf-8")) or {}
+    registered_agents = set(parsed.get("agents", {}).keys())
+    assert registered_agents == {"react-arch-advisor", "react-developer", "react-test-engineer"}
 
 
 def test_qg04_react_subcatalog_has_exact_triad_agents():

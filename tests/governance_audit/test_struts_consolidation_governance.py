@@ -5,7 +5,7 @@ da stack Java Legado Struts (Padrão Triádico 3+1 — Fase 3 do Plano de Govern
 Quality Gate que garante:
 1. Topologia estrita: o diretório .github/agents/backend/struts/ contém exatamente
    os 4 agentes (1 supervisor + 3 especialistas) e 1 sub-catálogo.
-2. Eliminação completa dos 6 especialistas legados (zero dangling legacy agents).
+2. Eliminação completa dos especialistas legados (zero dangling legacy agents).
 3. Sub-catálogo struts-catalog.yaml consolidado com 3 especialistas.
 4. Decision Tree de 3 branches em struts-router.agent.md preservando baseline R-054.
 5. Contratos de fronteira em struts-developer (proibição de testes unitários, blast-radius check,
@@ -37,14 +37,7 @@ EXPECTED_FILES = {
     "struts-catalog.yaml"
 }
 
-LEGACY_AGENTS = [
-    "struts-feature-developer.agent.md",
-    "struts-bug-fixer.agent.md",
-    "struts-perf-tuner.agent.md",
-    "struts-unit-test-writer.agent.md",
-    "struts-integration-test-writer.agent.md",
-    "struts-test-fixer.agent.md"
-]
+# Apenas os 5 arquivos canônicos da tríade devem existir
 
 R054_CANONICAL_ROUTER_TOOLS = {
     "read_file",
@@ -63,16 +56,10 @@ def test_struts_directory_file_count_and_composition():
     current_files = {p.name for p in STRUTS_DIR.iterdir() if p.is_file()}
     assert current_files == EXPECTED_FILES, remediation(
         f"Composição inesperada no diretório Struts: {current_files ^ EXPECTED_FILES}",
-        fix_hint="Certifique-se de manter apenas router, arch-advisor, developer, test-engineer e catalog.yaml."
+        fix_hint="Certifique-se de manter apenas struts-router, struts-arch-advisor, struts-developer, struts-test-engineer e catalog.yaml."
     )
 
 
-@pytest.mark.parametrize("legacy_file", LEGACY_AGENTS)
-def test_struts_legacy_agents_are_removed(legacy_file: str):
-    """Valida que nenhum especialista legado remanesce no diretório."""
-    assert not (STRUTS_DIR / legacy_file).exists(), (
-        f"Agente legado {legacy_file} ainda existe em {STRUTS_DIR} — deve ser removido na consolidação."
-    )
 
 
 def test_struts_catalog_triadic_structure():

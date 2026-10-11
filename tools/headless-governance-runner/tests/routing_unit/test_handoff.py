@@ -21,7 +21,7 @@ def _payload_minimo_v1_0() -> dict[str, Any]:
     """Payload v1.0 mínimo — apenas os 6 campos estritamente obrigatórios."""
     return {
         "versao": "1.0",
-        "para": "python-feature-developer",
+        "para": "python-developer",
         "motivo": "Implementar subtask 6 conforme plano de decomposição.",
         "emissor": {"nome": "python-router"},
         "contexto": {
@@ -43,7 +43,7 @@ def _payload_completo_v1_3() -> dict[str, Any]:
     }
     payload["roteamento_grafo"] = {
         "current_node": "python-router",
-        "next_node": "python-feature-developer",
+        "next_node": "python-developer",
         "shared_memory_keys": ["plano_decomposicao"],
     }
     payload["origem_contexto"] = {
@@ -57,7 +57,7 @@ def _payload_completo_v1_3() -> dict[str, Any]:
         "etapa_atual": 3,
         "total_etapas": 7,
         "nome_etapa": "implementacao_tdd",
-        "proximos_agentes_permitidos": ["python-feature-developer"],
+        "proximos_agentes_permitidos": ["python-developer"],
         "politica_desvio": "strict",
         "projeto_alvo": {
             "id": "governance-core",
@@ -88,7 +88,7 @@ def _payload_completo_v1_3() -> dict[str, Any]:
 
 def test_payload_minimo_v1_0_e_aceito() -> None:
     resultado = validar_handoff(_payload_minimo_v1_0())
-    assert resultado["para"] == "python-feature-developer"
+    assert resultado["para"] == "python-developer"
 
 
 def test_payload_completo_v1_3_consistente_e_aceito() -> None:

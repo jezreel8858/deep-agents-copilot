@@ -41,7 +41,7 @@ workflows:
         agent: "bug-triage"
       - etapa: 2
         nome: "implementation"
-        agent: "domain-router | specialist-bug-fixer"
+        agent: "domain-router | <stack>-developer"
         checkpoint_humano: "ask_questions"
       - etapa: 3
         nome: "review"

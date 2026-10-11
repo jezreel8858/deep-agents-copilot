@@ -139,7 +139,7 @@ def _instalar_copilot_falso(
     tool_name_esperado: str = "read_file",
     tipo_permission_request: str = "custom_tool",
     caminho_escrita: str = "/workspaces/app/main.py",
-    subagent_agent_name: str = "python-bug-fixer",
+    subagent_agent_name: str = "python-developer",
     subagent_display_name: str = "Python Bug Fixer",
     subagent_falha: bool = False,
     subagent_erro: str = "falha simulada",
@@ -601,7 +601,7 @@ class TestStreamChat:
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """`agent_display_name` pode vir vazio -- deve cair para `agent_name`
-        (identificador tecnico, ex.: `python-bug-fixer`) em vez de exibir
+        (identificador tecnico, ex.: `python-developer`) em vez de exibir
         string vazia."""
         from local_chat_gateway.api.schemas import ChatMessage
 
@@ -609,7 +609,7 @@ class TestStreamChat:
             monkeypatch,
             eventos_disparados=[],
             tool_name_esperado="run_subagent",
-            subagent_agent_name="python-bug-fixer",
+            subagent_agent_name="python-developer",
             subagent_display_name="",
         )
 
@@ -624,7 +624,7 @@ class TestStreamChat:
         ]
 
         conteudo_inicio = chunks[2].choices[0].delta.content or ""
-        assert "python-bug-fixer" in conteudo_inicio
+        assert "python-developer" in conteudo_inicio
 
     async def test_deve_exibir_erro_quando_subagent_falha(
         self, monkeypatch: pytest.MonkeyPatch
@@ -639,7 +639,7 @@ class TestStreamChat:
             monkeypatch,
             eventos_disparados=[],
             tool_name_esperado="run_subagent",
-            subagent_agent_name="python-feature-developer",
+            subagent_agent_name="python-test-engineer",
             subagent_display_name="",
             subagent_falha=True,
             subagent_erro="timeout apos 120s",
@@ -657,7 +657,7 @@ class TestStreamChat:
 
         conteudo_fim = chunks[3].choices[0].delta.content or ""
         assert "Subagent falhou" in conteudo_fim
-        assert "python-feature-developer" in conteudo_fim
+        assert "python-test-engineer" in conteudo_fim
         assert "timeout apos 120s" in conteudo_fim
 
     async def test_deve_usar_workspaces_como_working_directory_padrao(
@@ -1021,7 +1021,7 @@ class TestStreamChat:
 
         catalogo_fake = [
             {
-                "name": "python-bug-fixer",
+                "name": "python-developer",
                 "description": "Especialista em bugs Python",
                 "prompt": "Voce e especialista em bugs Python.",
                 "infer": True,

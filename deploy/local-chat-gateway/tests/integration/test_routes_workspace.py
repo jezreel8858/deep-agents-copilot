@@ -80,7 +80,7 @@ def test_list_workspace_agents_retorna_catalogo_descoberto_no_lifespan(
         # para isolar o teste da descoberta real de `.github/agents/`.
         app.state.custom_agents = [
             {
-                "name": "python-bug-fixer",
+                "name": "python-developer",
                 "display_name": "Python Bug Fixer",
                 "description": "Corrige bugs em Python.",
             },
@@ -92,7 +92,7 @@ def test_list_workspace_agents_retorna_catalogo_descoberto_no_lifespan(
     payload = response.json()
     assert payload["agents"] == [
         {
-            "name": "python-bug-fixer",
+            "name": "python-developer",
             "display_name": "Python Bug Fixer",
             "description": "Corrige bugs em Python.",
         }

@@ -627,7 +627,7 @@ async def stream_chat(
 
     def _nome_exibicao_subagent(dado: Any) -> str:
         """Prioriza `agent_display_name` (rotulo amigavel); cai para
-        `agent_name` (identificador tecnico, ex.: `python-bug-fixer`) se o
+        `agent_name` (identificador tecnico, ex.: `python-developer`) se o
         display name vier vazio -- ambos confirmados como `str`
         obrigatorios em `SubagentStartedData`/`SubagentCompletedData`/
         `SubagentFailedData` (RT-03)."""

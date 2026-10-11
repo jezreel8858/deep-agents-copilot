@@ -148,7 +148,7 @@ ARCH_ADVISOR_AGENTS = [
 
 @pytest.mark.parametrize("agent_name", ARCH_ADVISOR_AGENTS)
 def test_arch_advisors_reference_security_review_patterns(agent_name: str):
-    """5. Os 7 specialist-arch-advisors referenciam 'security-review-patterns' em source_docs: (R-046 / R-051)."""
+    """5. Os 7 <stack>-arch-advisors referenciam 'security-review-patterns' em source_docs: (R-046 / R-051)."""
     path = _find_agent_file(agent_name)
     agent_content = path.read_text(encoding="utf-8")
     fm, _ = _parse_frontmatter(agent_content)
@@ -236,7 +236,7 @@ ARCH_ADVISOR_AGENTS = [
 
 @pytest.mark.parametrize("agent_name", ARCH_ADVISOR_AGENTS)
 def test_arch_advisors_reference_security_review_patterns(agent_name: str):
-    """5. Os 7 specialist-arch-advisors referenciam 'security-review-patterns' em source_docs: (R-046 / R-051)."""
+    """5. Os 7 <stack>-arch-advisors referenciam 'security-review-patterns' em source_docs: (R-046 / R-051)."""
     path = _find_agent_file(agent_name)
     agent_content = path.read_text(encoding="utf-8")
     fm, _ = _parse_frontmatter(agent_content)
@@ -324,7 +324,7 @@ ARCH_ADVISOR_AGENTS = [
 
 @pytest.mark.parametrize("agent_name", ARCH_ADVISOR_AGENTS)
 def test_arch_advisors_reference_security_review_patterns(agent_name: str):
-    """5. Os 7 specialist-arch-advisors referenciam 'security-review-patterns' em source_docs: (R-046 / R-051)."""
+    """5. Os 7 <stack>-arch-advisors referenciam 'security-review-patterns' em source_docs: (R-046 / R-051)."""
     path = _find_agent_file(agent_name)
     agent_content = path.read_text(encoding="utf-8")
     fm, _ = _parse_frontmatter(agent_content)

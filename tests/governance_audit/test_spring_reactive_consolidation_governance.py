@@ -5,7 +5,7 @@ da stack Spring Reactive (Padrão Triádico 3+1 — Fase 2 do Plano de Governan�
 Quality Gate que garante:
 1. Topologia estrita: o diretório .github/agents/backend/spring-reactive/ contém exatamente
    os 4 agentes (1 supervisor + 3 especialistas) e 1 sub-catálogo.
-2. Eliminação completa dos 6 especialistas legados (zero dangling legacy agents).
+2. Eliminação completa dos especialistas legados (zero dangling legacy agents).
 3. Sub-catálogo spring-reactive-catalog.yaml consolidado com 3 especialistas.
 4. Decision Tree de 3 branches em spring-reactive-router.agent.md preservando baseline R-054.
 5. Contratos de fronteira em spring-reactive-developer (proibição de chamadas bloqueantes no Event Loop,
@@ -37,14 +37,7 @@ EXPECTED_FILES = {
     "spring-reactive-catalog.yaml"
 }
 
-LEGACY_AGENTS = [
-    "spring-reactive-feature-developer.agent.md",
-    "spring-reactive-bug-fixer.agent.md",
-    "spring-reactive-perf-tuner.agent.md",
-    "spring-reactive-unit-test-writer.agent.md",
-    "spring-reactive-integration-test-writer.agent.md",
-    "spring-reactive-test-fixer.agent.md"
-]
+# Apenas os 5 arquivos canônicos da tríade devem existir
 
 
 def test_spring_reactive_directory_file_count_and_composition():
@@ -53,16 +46,10 @@ def test_spring_reactive_directory_file_count_and_composition():
     current_files = {p.name for p in SR_DIR.iterdir() if p.is_file()}
     assert current_files == EXPECTED_FILES, remediation(
         f"Composição inesperada no diretório Spring Reactive: {current_files ^ EXPECTED_FILES}",
-        fix_hint="Certifique-se de manter apenas router, arch-advisor, developer, test-engineer e catalog.yaml."
+        fix_hint="Certifique-se de manter apenas spring-reactive-router, spring-reactive-arch-advisor, spring-reactive-developer, spring-reactive-test-engineer e catalog.yaml."
     )
 
 
-@pytest.mark.parametrize("legacy_file", LEGACY_AGENTS)
-def test_spring_reactive_legacy_agents_are_removed(legacy_file: str):
-    """Valida que nenhum especialista legado remanesce no diretório."""
-    assert not (SR_DIR / legacy_file).exists(), (
-        f"Agente legado {legacy_file} ainda existe em {SR_DIR} — deve ser removido na consolidação."
-    )
 
 
 def test_spring_reactive_catalog_triadic_structure():

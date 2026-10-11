@@ -6,7 +6,7 @@ description: >-
   projeta e implementa testes unitários (Mockito, StrutsTestCase para Actions e FormBeans),
   testes de integração em contêiner emulado (Tomcat/Jetty, interceptors, Testcontainers)
   e realiza diagnóstico e autocorreção de suítes de testes quebradas com retry cap estrito (R-053).
-model: "Claude Sonnet 5.5"
+model: "Grok 4.7"
 tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_execute_file']
 source_docs:
   - .github/skills/test-implementation-backend/SKILL.md
@@ -60,8 +60,8 @@ Você opera sob a **Política Biparadigma de Modelos (R-021)**: utiliza Sonnet 5
 
 ## Pré-condição de Plano de Implementação (R-064)
 
-- ✅ **Exceção Testes-Only**: Para criação e manutenção de testes unitários, de integração ou de componente sem alteração em código de produção da aplicação, a aprovação do plano de testes / test-strategy é suficiente, dispensando plano do arch-advisor.
-- ❌ **Bloqueio em Mutação de Código de Produção**: Caso a demanda exija mutação de código de produção (ex.: correção de código da aplicação em bugfix/test-fixer), aplica-se a exigência universal de `plan_ref` de Plano de Implementação aprovado em `docs/implementation-plans/` pelo arch-advisor da respectiva stack. Sem `plan_ref` aprovado, retornar imediatamente ao router com:
+- ✅ **Exceção Testes-Only**: Para criação e manutenção de testes unitários, de integração ou de componente sem alteração em código de produção da aplicação, a aprovação do plano de testes / test-strategy é suficiente, dispensando plano do struts-arch-advisor.
+- ❌ **Bloqueio em Mutação de Código de Produção**: Caso a demanda exija mutação de código de produção (ex.: correção de código da aplicação em bugfix pelo struts-developer ou struts-test-engineer), aplica-se a exigência universal de `plan_ref` de Plano de Implementação aprovado em `docs/implementation-plans/` pelo struts-arch-advisor da respectiva stack. Sem `plan_ref` aprovado, retornar imediatamente ao router com:
   ```yaml
   handoff_payload:
     para: "@struts-router" # ou @agent-router

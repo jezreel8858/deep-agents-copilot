@@ -176,8 +176,8 @@ Estrutura um ecossistema tecnológico completo em sua própria pasta, com isolam
    - **Gate de Validação**: Conformidade verificada pela suíte `tests/governance_audit/test_router_agents.py`.
 
 4. **Pacote Canônico de Especialistas (.agent.md)**:
-   - **Backend**: `arch-advisor`, `feature-developer`, `bug-fixer`, `perf-tuner`, `unit-test-writer`, `integration-test-writer`, `test-fixer`.
-   - **Frontend (Padrão Test-Last & Isenção de UI)**: `arch-advisor`, `feature-developer` (Test-Last / Implementation-First), `bug-fixer` (Test-Last cirúrgico), `ui-stylist` (estritamente visual, **isento de criar ou executar testes unitários**), `unit-test-writer`, `component-test-writer`, `test-fixer`, `e2e-writer`.
+   - **Backend**: `<stack>-arch-advisor`, `<stack>-developer`, `<stack>-test-engineer`.
+   - **Frontend (Padrão Test-Last & Isenção de UI)**: `<stack>-arch-advisor`, `<stack>-developer` (Test-Last / Implementation-First, estilização com Design System e correção de bugs), `<stack>-test-engineer` (testes unitários, de componentes, E2E e autocorreção).
 
 5. **Integração Atômica Global (R-015 — obrigatória na mesma entrega)**:
    - **`.github/agents/catalog.yaml`**: Adicionar APENAS a entrada do `<stack>-router`, mantendo a raiz enxuta.

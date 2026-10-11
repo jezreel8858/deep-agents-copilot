@@ -37,7 +37,7 @@ def main() -> None:
         logger.info("Trace criado: trace_id=%s", trace.trace_id)
 
         with client.start_agent_span(
-            agent_name="python-feature-developer",
+            agent_name="python-developer",
             description="Implementacao do cliente de tracing",
             provider_name="anthropic",
             conversation_id="session-test-py-001",

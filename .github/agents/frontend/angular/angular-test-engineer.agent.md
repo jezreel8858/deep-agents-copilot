@@ -6,7 +6,7 @@ description: >-
   testes unitários (Jasmine/Jest/Vitest), testes de componentes (TestBed, Spectator, Angular Testing Library),
   testes E2E (Playwright/Cypress) e realiza diagnóstico e autocorreção de suítes de testes quebradas
   com retry cap estrito (R-053).
-model: "Claude Sonnet 5.5"
+model: "Grok 4.7"
 tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_execute_file', 'playwright/browser_snapshot', 'playwright/browser_navigate', 'playwright/browser_navigate_back', 'playwright/browser_click', 'playwright/browser_type', 'playwright/browser_hover', 'playwright/browser_select_option', 'playwright/browser_press_key', 'playwright/browser_fill_form', 'playwright/browser_file_upload', 'playwright/browser_handle_dialog', 'playwright/browser_wait_for', 'playwright/browser_tabs', 'playwright/browser_close', 'playwright/browser_console_messages', 'playwright/browser_network_requests', 'playwright/browser_take_screenshot', 'playwright/browser_resize']
 source_docs:
   - .github/skills/test-implementation-frontend/SKILL.md
@@ -66,8 +66,8 @@ Você opera sob o modelo **Claude Sonnet 5.5** para máxima precisão de asserç
 
 ## Pré-condição de Plano de Implementação (R-064)
 
-- ✅ **Exceção Testes-Only**: Para criação e manutenção de testes unitários, de integração ou de componente sem alteração em código de produção da aplicação, a aprovação do plano de testes / test-strategy é suficiente, dispensando plano do arch-advisor.
-- ❌ **Bloqueio em Mutação de Código de Produção**: Caso a demanda exija mutação de código de produção (ex.: correção de código da aplicação em bugfix/test-fixer), aplica-se a exigência universal de `plan_ref` de Plano de Implementação aprovado em `docs/implementation-plans/` pelo arch-advisor da respectiva stack. Sem `plan_ref` aprovado, retornar imediatamente ao router com:
+- ✅ **Exceção Testes-Only**: Para criação e manutenção de testes unitários, de integração ou de componente sem alteração em código de produção da aplicação, a aprovação do plano de testes / test-strategy é suficiente, dispensando plano do angular-arch-advisor.
+- ❌ **Bloqueio em Mutação de Código de Produção**: Caso a demanda exija mutação de código de produção (ex.: correção de código da aplicação em bugfix pelo angular-developer ou angular-test-engineer), aplica-se a exigência universal de `plan_ref` de Plano de Implementação aprovado em `docs/implementation-plans/` pelo angular-arch-advisor da respectiva stack. Sem `plan_ref` aprovado, retornar imediatamente ao router com:
   ```yaml
   handoff_payload:
     para: "@angular-router" # ou @agent-router

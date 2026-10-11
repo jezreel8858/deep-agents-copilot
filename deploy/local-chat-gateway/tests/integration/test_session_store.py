@@ -203,13 +203,13 @@ def test_atualizar_estado_governanca_round_trip(tmp_db_path: Path) -> None:
     store = SessionStore(tmp_db_path)
     store.create_session("s-estado")
 
-    aprovacoes = {"fase_atual": True, "revisor": "python-feature-developer"}
+    aprovacoes = {"fase_atual": True, "revisor": "python-developer"}
     store.atualizar_estado_governanca(
         "s-estado",
         "aguardando_aprovacao",
         "WORKFLOW-FEATURE-DEVELOPMENT",
         5,
-        "python-feature-developer",
+        "python-developer",
         aprovacoes,
     )
 
@@ -218,7 +218,7 @@ def test_atualizar_estado_governanca_round_trip(tmp_db_path: Path) -> None:
     assert record.fase == "aguardando_aprovacao"
     assert record.workflow == "WORKFLOW-FEATURE-DEVELOPMENT"
     assert record.etapa == 5
-    assert record.agente_ativo == "python-feature-developer"
+    assert record.agente_ativo == "python-developer"
     assert record.aprovacoes == aprovacoes
 
 
@@ -346,7 +346,7 @@ def test_create_session_em_sessao_expirada_reseta_campos_de_governanca(
         "em_workflow",
         "WORKFLOW-FEATURE-DEVELOPMENT",
         3,
-        "python-feature-developer",
+        "python-developer",
         {"2": True},
     )
 

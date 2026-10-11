@@ -5,7 +5,7 @@ da stack Angular (Padrão Triádico 3+1 — Fase 2 do Plano de Governança).
 Quality Gate que garante:
 1. Topologia estrita: o diretório .github/agents/frontend/angular/ contém exatamente
    os 4 agentes (1 supervisor + 3 especialistas) e 1 sub-catálogo.
-2. Eliminação completa dos 7 especialistas legados (zero dangling legacy agents).
+2. Eliminação completa dos especialistas legados (zero dangling legacy agents).
 3. Sub-catálogo angular-catalog.yaml consolidado com 3 especialistas, governança Test-Last e isenção de UI.
 4. Decision Tree de 3 branches em angular-router.agent.md preservando baseline R-054.
 5. Contratos de fronteira em angular-developer (proibição de testes unitários, blast-radius, zero hex inline).
@@ -35,15 +35,7 @@ EXPECTED_FILES = {
     "angular-catalog.yaml"
 }
 
-LEGACY_AGENTS = [
-    "angular-feature-developer.agent.md",
-    "angular-bug-fixer.agent.md",
-    "angular-ui-stylist.agent.md",
-    "angular-unit-test-writer.agent.md",
-    "angular-component-test-writer.agent.md",
-    "angular-e2e-writer.agent.md",
-    "angular-test-fixer.agent.md"
-]
+# Apenas os 5 arquivos canônicos da tríade devem existir (zero resíduos de especialistas extintos)
 
 
 def test_angular_directory_file_count_and_composition():
@@ -52,16 +44,10 @@ def test_angular_directory_file_count_and_composition():
     current_files = {p.name for p in ANG_DIR.iterdir() if p.is_file()}
     assert current_files == EXPECTED_FILES, remediation(
         f"Composição inesperada no diretório Angular: {current_files ^ EXPECTED_FILES}",
-        fix_hint="Certifique-se de manter apenas router, arch-advisor, developer, test-engineer e catalog.yaml."
+        fix_hint="Certifique-se de manter apenas angular-router, angular-arch-advisor, angular-developer, angular-test-engineer e catalog.yaml."
     )
 
 
-@pytest.mark.parametrize("legacy_file", LEGACY_AGENTS)
-def test_angular_legacy_agents_are_removed(legacy_file: str):
-    """Valida que nenhum especialista legado remanesce no diretório."""
-    assert not (ANG_DIR / legacy_file).exists(), (
-        f"Agente legado {legacy_file} ainda existe em {ANG_DIR} — deve ser removido na consolidação."
-    )
 
 
 def test_angular_catalog_triadic_structure():

@@ -24,13 +24,13 @@ Objetivo: Validar isoladamente o motor de roteamento (`routing/`), cobrir exaust
 
 | # | Subtask | P/S | Responsável | Depende de | Definition of Done (DoD) | Status |
 |---|---------|:---:|-------------|------------|--------------------------|:---:|
-| 1 | Scaffolding `tools/headless-governance-runner/{routing,runner,reporters,telemetry}/` + `tests/routing_unit/` | [S] | @python-router → @python-feature-developer | nenhuma | Estrutura de pastas idêntica à §5.2 do Blueprint; `pytest --collect-only` roda sem erro de importação. | ✅ |
-| 2 | `graph_loader.py` — parser `routing-graph.yaml` + `routing-graph.schema.json` | [S] | @python-feature-developer | 1 | Carrega os 37 nós e 42 arestas sem exceção; valida contra schema JSON; falha explicitamente em YAML inválido. | ✅ |
-| 3 | `state_machine.py` — 9 workflows canônicos + guard clauses (R-050) | [S] | @python-feature-developer | 2 | Todas as transições dos 9 workflows mapeadas; transição ilegal levanta exceção tipada. | ✅ |
-| 4 | `drift.py` — detecção de deriva de intenção (R-042) | [P] | @python-feature-developer | 3 | Zero falso-negativo nos fixtures canônicos de sticky-session simulada. | ✅ |
-| 5 | `router.py` — roteamento rule-based + política de cascata (0.9/0.7/0.5/0.0) | [P] | @python-feature-developer | 3 | Reproduz fixture canon-001 byte-a-byte; thresholds aplicados corretamente. | ✅ |
-| 6 | `handoff.py` — contrato de payload entre agentes | [P] | @python-feature-developer | 3 | Payload validado contra `handoff-governance/SKILL.md`; rejeita payload malformado. | ✅ |
-| 7 | Convergência Eixo 2 + smoke test local | [S] | @python-feature-developer | 4, 5, 6 | Pacote `routing/` importável; smoke test end-to-end (sem SDK) passa localmente. | ✅ |
+| 1 | Scaffolding `tools/headless-governance-runner/{routing,runner,reporters,telemetry}/` + `tests/routing_unit/` | [S] | @python-router → @python-developer | nenhuma | Estrutura de pastas idêntica à §5.2 do Blueprint; `pytest --collect-only` roda sem erro de importação. | ✅ |
+| 2 | `graph_loader.py` — parser `routing-graph.yaml` + `routing-graph.schema.json` | [S] | @python-developer | 1 | Carrega os 37 nós e 42 arestas sem exceção; valida contra schema JSON; falha explicitamente em YAML inválido. | ✅ |
+| 3 | `state_machine.py` — 9 workflows canônicos + guard clauses (R-050) | [S] | @python-developer | 2 | Todas as transições dos 9 workflows mapeadas; transição ilegal levanta exceção tipada. | ✅ |
+| 4 | `drift.py` — detecção de deriva de intenção (R-042) | [P] | @python-developer | 3 | Zero falso-negativo nos fixtures canônicos de sticky-session simulada. | ✅ |
+| 5 | `router.py` — roteamento rule-based + política de cascata (0.9/0.7/0.5/0.0) | [P] | @python-developer | 3 | Reproduz fixture canon-001 byte-a-byte; thresholds aplicados corretamente. | ✅ |
+| 6 | `handoff.py` — contrato de payload entre agentes | [P] | @python-developer | 3 | Payload validado contra `handoff-governance/SKILL.md`; rejeita payload malformado. | ✅ |
+| 7 | Convergência Eixo 2 + smoke test local | [S] | @python-developer | 4, 5, 6 | Pacote `routing/` importável; smoke test end-to-end (sem SDK) passa localmente. | ✅ |
 
 > *Nota de Paralelismo*: As subtasks 4, 5 e 6 operam em paralelo ([P]) por atuarem em arquivos distintos e isolados, sem estado mutável compartilhado.
 
@@ -40,17 +40,17 @@ Objetivo: Validar isoladamente o motor de roteamento (`routing/`), cobrir exaust
 
 | # | Subtask | P/S | Responsável | Depende de | Nível | Definition of Done (DoD) | Status |
 |---|---------|:---:|-------------|------------|:-----:|--------------------------|:------:|
-| 8 | `test_TC01_direct_match.py` | [P] | @python-unit-test-writer | 7 | N1 | Cobre caso isolado; `pytest tests/routing_unit -k TC01` verde; zero rede/zero SDK real. | ✅ |
-| 9 | `test_TC02_cascade_thresholds.py` | [P] | @python-unit-test-writer | 7 | N1 | Cobre thresholds da cascata; passa isolado; zero rede/zero SDK real. | ✅ |
-| 10 | `test_TC03_intent_drift_trigger.py` | [P] | @python-unit-test-writer | 7 | N1 | Valida disparo de deriva de intenção (R-042); passa isolado; zero rede. | ✅ |
-| 11 | `test_TC04_fallback_cascade.py` | [P] | @python-unit-test-writer | 7 | N1 | Valida caminho completo de fallback; passa isolado; zero rede. | ✅ |
-| 12 | `test_TC05_state_machine_valid_transitions.py` | [P] | @python-unit-test-writer | 7 | N1 | Valida transições lícitas dos 9 workflows; passa isolado. | ✅ |
-| 13 | `test_TC06_state_machine_illegal_transition.py` | [P] | @python-unit-test-writer | 7 | N1 | Valida bloqueio estrito de transições ilegais com exceção tipada. | ✅ |
-| 14 | `test_TC07_graph_schema_validation.py` | [P] | @python-unit-test-writer | 7, 21 | N1/N2 | Validação contra JSON schema; cobertura estrita de anomalias sintáticas. | ✅ |
-| 15 | `test_graph_consistency_cross_ref.py` | [P] | @python-unit-test-writer | 7 | N1 | Valida consistência de nós e referências cruzadas no grafo. | ✅ |
-| 16 | `test_state_machine_idempotency.py` | [P] | @python-unit-test-writer | 7 | N1 | Garante idempotência de execução e despacho na máquina de estados. | ✅ |
-| 17 | `test_TC08_cache_hit_ratio.py` | [P] | @python-unit-test-writer | 7 | N1 | Valida métricas e taxa de acerto de cache de roteamento. | ✅ |
-| 18 | Consolidação N1 — Suíte completa 100% verde | [S] | @python-unit-test-writer (QA) | 8-17 | N1 | Suíte completa 100% verde; zero flakiness comprovado em 10 execuções consecutivas. | ✅ |
+| 8 | `test_TC01_direct_match.py` | [P] | @python-test-engineer | 7 | N1 | Cobre caso isolado; `pytest tests/routing_unit -k TC01` verde; zero rede/zero SDK real. | ✅ |
+| 9 | `test_TC02_cascade_thresholds.py` | [P] | @python-test-engineer | 7 | N1 | Cobre thresholds da cascata; passa isolado; zero rede/zero SDK real. | ✅ |
+| 10 | `test_TC03_intent_drift_trigger.py` | [P] | @python-test-engineer | 7 | N1 | Valida disparo de deriva de intenção (R-042); passa isolado; zero rede. | ✅ |
+| 11 | `test_TC04_fallback_cascade.py` | [P] | @python-test-engineer | 7 | N1 | Valida caminho completo de fallback; passa isolado; zero rede. | ✅ |
+| 12 | `test_TC05_state_machine_valid_transitions.py` | [P] | @python-test-engineer | 7 | N1 | Valida transições lícitas dos 9 workflows; passa isolado. | ✅ |
+| 13 | `test_TC06_state_machine_illegal_transition.py` | [P] | @python-test-engineer | 7 | N1 | Valida bloqueio estrito de transições ilegais com exceção tipada. | ✅ |
+| 14 | `test_TC07_graph_schema_validation.py` | [P] | @python-test-engineer | 7, 21 | N1/N2 | Validação contra JSON schema; cobertura estrita de anomalias sintáticas. | ✅ |
+| 15 | `test_graph_consistency_cross_ref.py` | [P] | @python-test-engineer | 7 | N1 | Valida consistência de nós e referências cruzadas no grafo. | ✅ |
+| 16 | `test_state_machine_idempotency.py` | [P] | @python-test-engineer | 7 | N1 | Garante idempotência de execução e despacho na máquina de estados. | ✅ |
+| 17 | `test_TC08_cache_hit_ratio.py` | [P] | @python-test-engineer | 7 | N1 | Valida métricas e taxa de acerto de cache de roteamento. | ✅ |
+| 18 | Consolidação N1 — Suíte completa 100% verde | [S] | @python-test-engineer (QA) | 8-17 | N1 | Suíte completa 100% verde; zero flakiness comprovado em 10 execuções consecutivas. | ✅ |
 
 > ✅ **Bloco B (Eixo 3) concluído**: subtasks 8-18 finalizadas — suíte canônica de testes unitários N1 consolidada em 10 arquivos (`test_TC01` a `test_TC08` + 2 testes de gap e `test_smoke_end_to_end.py`), 100% verde com zero flakiness validado em 10 execuções consecutivas.
 
@@ -58,7 +58,7 @@ Objetivo: Validar isoladamente o motor de roteamento (`routing/`), cobrir exaust
 
 | # | Subtask | P/S | Responsável | Depende de | Nível | Definition of Done (DoD) |
 |---|---------|:---:|-------------|------------|:-----:|--------------------------|
-| 19 | Runner mínimo `runner/` — caso `agent-auditor` (read-only), invoca `routing/` | [S] | @python-feature-developer | 7 | N2 | Executa localmente contra PR fixture; saída conforme §5.4; conclusão sempre `neutral`. | ✅ |
+| 19 | Runner mínimo `runner/` — caso `agent-auditor` (read-only), invoca `routing/` | [S] | @python-developer | 7 | N2 | Executa localmente contra PR fixture; saída conforme §5.4; conclusão sempre `neutral`. | ✅ |
 | 20 | `test_TC09_token_expiration_mock.py` | [P] | @python-integration-test-writer | 19 | N2 | Mock de expiração de token em tempo de execução validado. | ✅ |
 | 21 | `test_TC10_exception_exit_code.py` | [P] | @python-integration-test-writer | 19 | N2 | Mapeamento estrito de códigos de saída sob exceção não tratada. | ✅ |
 | 22 | `test_TC11_prompt_injection_sanitization.py` | [P] | @python-integration-test-writer | 19 | N2 | Sanitização e neutralização de payloads com injeção de prompt. | ✅ |
@@ -81,16 +81,16 @@ Objetivo: Expandir o runner com o segundo workflow (`code-review`), instrumentar
 
 | # | Subtask | P/S | Responsável | Depende de | Definition of Done (DoD) |
 |---|---------|:---:|-------------|------------|--------------------------|
-| 28 | Expandir runner com 2º caso de uso: `code-review` | [S] | @python-feature-developer | 27 | Runner suporta simultaneamente `agent-auditor` e `code-review` sem qualquer regressão. |
+| 28 | Expandir runner com 2º caso de uso: `code-review` | [S] | @python-developer | 27 | Runner suporta simultaneamente `agent-auditor` e `code-review` sem qualquer regressão. |
 | 29 | Workflow `governance-code-review.yml` (push) | [S] | @devops-router | 28 | Dispara em eventos de push; gera Checks API equivalente com feedback estruturado. |
 | 30 | Testes N2 adicionais (`code-review`) | [P] | @python-integration-test-writer | 28 | Cobre falhas controladas de mock do SDK Copilot e chamadas CLI `gh`. |
 | 31 | Testes N3 de contrato de handoff (`code-review`) | [P] | @python-integration-test-writer | 28 | Payload de handoff estritamente validado contra o contrato de governança. |
 | 32 | Integrar `tests/routing_unit/` completo (N1+N2+N3) em `routing-quality-gate.yml` | [S] | @devops-router | 30, 31 | Todos os níveis de teste executam no pipeline de CI sem requerer novo toolchain. |
-| 33 | Instrumentar spans `deep_agents.*` (OTel) via `telemetry/` | [S] | @python-feature-developer | 27 | Spans OTel exportados com sucesso e verificados no dashboard Langfuse. |
-| 34 | Convergência com `workflow_eval_simulator.py` e blast radius | [S] | @python-feature-developer | 28, 33 | Zero regressão comprovada em simuladores e nós consumidores (resultado COMPATIBLE). |
+| 33 | Instrumentar spans `deep_agents.*` (OTel) via `telemetry/` | [S] | @python-developer | 27 | Spans OTel exportados com sucesso e verificados no dashboard Langfuse. |
+| 34 | Convergência com `workflow_eval_simulator.py` e blast radius | [S] | @python-developer | 28, 33 | Zero regressão comprovada em simuladores e nós consumidores (resultado COMPATIBLE). |
 | 35 | Gate soft na branch protection | [S] | @devops-router | 32 | `routing_unit` obrigatório no PR; auditoria semântica LLM não bloqueante. |
 | 36 | Medir cobertura ≥95% + taxa de falso-positivo <10% | [S] | QA governança | 34, 35 | Métricas coletadas em regime real e consolidadas em relatório formal. |
-| 37 | Mutation testing nos 4 módulos críticos (kill rate ≥80%) | [P] | @python-unit-test-writer | 27 | Relatório de mutação gerado com taxa de eliminação (kill rate) ≥80%. |
+| 37 | Mutation testing nos 4 módulos críticos (kill rate ≥80%) | [P] | @python-test-engineer | 27 | Relatório de mutação gerado com taxa de eliminação (kill rate) ≥80%. |
 | 38 | Execução E2E em sandbox real (≥1 execução completa) | [P] | QA governança | 26 | Execução ponta a ponta concluída com sucesso em ambiente real, com logs auditados. |
 
 ### 3.1 Gate de Promoção Piloto → Produção
@@ -107,9 +107,9 @@ Objetivo: Habilitar o terceiro caso de uso (`repo-hygiene-auditor`), automação
 
 | # | Subtask | P/S | Responsável | Depende de | Definition of Done (DoD) |
 |---|---------|:---:|-------------|------------|--------------------------|
-| 40 | Expandir runner com 3º caso de uso: `repo-hygiene-auditor` | [S] | @python-feature-developer | 39 | Runner suporta os 3 casos de uso canônicos de governança sem regressões. |
+| 40 | Expandir runner com 3º caso de uso: `repo-hygiene-auditor` | [S] | @python-developer | 39 | Runner suporta os 3 casos de uso canônicos de governança sem regressões. |
 | 41 | Workflow `governance-hygiene-schedule.yml` (schedule semanal) | [S] | @devops-router | 40 | Disparo semanal automatizado gerando relatório consolidado de higiene. |
-| 42 | Dashboard de custo de requisições premium + alerta de teto em 80% | [S] | @python-feature-developer / observability | 33 | Dashboard apresenta total semanal de tokens/custo; alerta dispara ao atingir 80% da quota. |
+| 42 | Dashboard de custo de requisições premium + alerta de teto em 80% | [S] | @python-developer / observability | 33 | Dashboard apresenta total semanal de tokens/custo; alerta dispara ao atingir 80% da quota. |
 | 43 | Gate hard na branch protection (bloqueia merge exclusivamente em achados `critical`) | [S] | @devops-router | 41, 42 | Bloqueia efetivamente o merge de PRs que apresentem apontamentos com severidade `critical`. |
 | 44 | Runbook de rollback operacional | [S] | @docs-engineer | 43 | Documento técnico `.md` contendo passos de reversão manual testados e validados. |
 | 45 | Operação contínua estável por 4 semanas + orçamento sob controle | [S] | QA governança | 43 | Log de 4 semanas sem incidentes de infraestrutura; consumo medido estritamente abaixo do teto orçamentário. |
@@ -151,4 +151,4 @@ O fluxo de dependências causais entre as 46 subtasks é reproduzido a seguir:
 ## 7. Próximo Passo Mínimo
 
 Aguardar aprovação humana explícita para início da **Subtask 1** (Scaffolding), cuja execução será delegada via handoff:
-`@agent-router` → `@python-router` → `@python-feature-developer`.
+`@agent-router` → `@python-router` → `@python-developer`.

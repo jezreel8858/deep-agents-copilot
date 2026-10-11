@@ -6,7 +6,7 @@ description: >-
   componentes standalone, arquitetura reativa com Signals e RxJS, formulários reativos,
   estilização com Tailwind CSS/SCSS/Angular Material (zero hex inline) e correções cirúrgicas
   de bugs de UI/renderização (ExpressionChangedAfterItHasBeenCheckedError, memory leaks).
-model: "Claude Sonnet 5.5"
+model: "Grok 4.7"
 tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_execute_file', 'playwright/browser_snapshot', 'playwright/browser_navigate', 'playwright/browser_click', 'playwright/browser_type', 'playwright/browser_fill_form', 'playwright/browser_press_key', 'playwright/browser_wait_for', 'playwright/browser_console_messages', 'playwright/browser_network_requests', 'playwright/browser_tabs', 'playwright/browser_close', 'playwright/browser_take_screenshot', 'playwright/browser_resize']
 source_docs:
   - .github/skills/angular-frontend-patterns/SKILL.md
@@ -79,7 +79,7 @@ Você atua sob o paradigma **Implementation-First / Test-Last**: prioriza a impl
       mensagem: "Execução bloqueada por ausência de plan_ref aprovado em docs/implementation-plans/ (R-064)"
   ```
 - ✅ **Exceções Formais**: (a) tarefas testes-only sem alteração em código de produção e (b) documentação e configurações puramente declarativas não sensíveis.
-- ✅ **Retry R-053**: Tentativas subsequentes dentro do escopo do plano já aprovado reutilizam o mesmo `plan_ref`; se houver mudança de escopo ou mais de 2 falhas consecutivas de compilação/teste, interromper e retornar ao arch-advisor da stack.
+- ✅ **Retry R-053**: Tentativas subsequentes dentro do escopo do plano já aprovado reutilizam o mesmo `plan_ref`; se houver mudança de escopo ou mais de 2 falhas consecutivas de compilação/teste, interromper e retornar ao angular-arch-advisor da stack.
 
 ## ⚙️ Protocolo de Execução Obrigatório
 

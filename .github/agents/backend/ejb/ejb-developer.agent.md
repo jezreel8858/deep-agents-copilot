@@ -6,7 +6,7 @@ description: >-
   novas features (Session Beans SLSB/SFSB, MDB, JPA legada/EntityManager, transações JTA/CMT),
   executa diagnósticos e correções cirúrgicas de bugs (RCA, diff mínimo) e aplica
   otimizações de performance (tuning de pool de EJBs, DataSources JNDI e eliminação de transações longas).
-model: "Claude Sonnet 5.5"
+model: "Grok 4.7"
 tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_execute_file']
 source_docs:
   - .github/skills/java-jdk-backend-governance/SKILL.md
@@ -70,7 +70,7 @@ Você opera sob a metodologia de **Engenharia de Produção Orientada a Contrato
       mensagem: "Execução bloqueada por ausência de plan_ref aprovado em docs/implementation-plans/ (R-064)"
   ```
 - ✅ **Exceções Formais**: (a) tarefas testes-only sem alteração em código de produção e (b) documentação e configurações puramente declarativas não sensíveis.
-- ✅ **Retry R-053**: Tentativas subsequentes dentro do escopo do plano já aprovado reutilizam o mesmo `plan_ref`; se houver mudança de escopo ou mais de 2 falhas consecutivas de compilação/teste, interromper e retornar ao arch-advisor da stack.
+- ✅ **Retry R-053**: Tentativas subsequentes dentro do escopo do plano já aprovado reutilizam o mesmo `plan_ref`; se houver mudança de escopo ou mais de 2 falhas consecutivas de compilação/teste, interromper e retornar ao ejb-arch-advisor da stack.
 
 ## ⚙️ Protocolo de Execução Obrigatório
 

@@ -810,11 +810,11 @@ e referencia compulsoriamente `.github/skills/playwright-mcp/SKILL.md` em `sourc
 
 | Perfil | Tier de Tooling | Ferramentas `playwright/*` |
 |---|---|---|
-| `*-e2e-writer` | **FULL** (18 tools) | Navegação, interação completa (click/type/fill_form/drag/hover/select_option/press_key/file_upload/handle_dialog), espera, abas, rede, console, screenshot, resize |
-| `*-bug-fixer` | **FULL** (18 tools) | Idêntico ao `e2e-writer` — reprodução fiel de bugs requer o mesmo poder de interação e introspecção |
-| `*-feature-developer` | **COMPONENT** (9 tools) | Navegação, clique, digitação, espera, console, rede, abas — validação visual/funcional pós-implementação |
-| `*-component-test-writer` | **COMPONENT** (9 tools) | Idêntico ao `feature-developer` — validação de componente renderizado em browser real |
-| `*-ui-stylist` | **INSPECT** (7 tools, read-only) | Navegação, resize, screenshot, console, abas — **sem** tools de interação/mutação (mantém a isenção estrita de testes do papel) |
+| `*-test-engineer (E2E)` | **FULL** (18 tools) | Navegação, interação completa (click/type/fill_form/drag/hover/select_option/press_key/file_upload/handle_dialog), espera, abas, rede, console, screenshot, resize |
+| `*-developer` | **FULL** (18 tools) | Idêntico ao `test-engineer` — reprodução fiel de bugs requer o mesmo poder de interação e introspecção |
+| `*-developer (Feature)` | **COMPONENT** (9 tools) | Navegação, clique, digitação, espera, console, rede, abas — validação visual/funcional pós-implementação |
+| `*-test-engineer` | **COMPONENT** (9 tools) | Idêntico ao `developer` — validação de componente renderizado em browser real |
+| `*-developer (UI/Estilo)` | **INSPECT** (7 tools, read-only) | Navegação, resize, screenshot, console, abas — **sem** tools de interação/mutação (mantém a isenção estrita de testes do papel) |
 
 Esta herança é **determinística e auto-validada**, não dependendo de memória do agente criador: a regra
 `playwright_mcp_requires_skill_doc` em `tools/agent_source_docs_sync/required_source_docs_rules.json` injeta

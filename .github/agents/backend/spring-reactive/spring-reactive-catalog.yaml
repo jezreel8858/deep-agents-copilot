@@ -75,7 +75,7 @@ agents:
     - agent-contracts
     - terminal-governance
     - embedded-runtime-governance
-    model: Claude Sonnet 5.5
+    model: Grok 4.7
   spring-reactive-test-engineer:
     id: spring-reactive-test-engineer
     role: testing
@@ -116,4 +116,4 @@ agents:
     - agent-contracts
     - terminal-governance
     - embedded-runtime-governance
-    model: Claude Sonnet 5.5
+    model: Grok 4.7

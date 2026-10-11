@@ -155,7 +155,7 @@ def _agent_autorizado_para_shell_nativo(frontmatter: dict[str, Any]) -> bool:
       2. `source_docs:` referencia a skill `terminal-governance`
          (R-049).
 
-    Agents puramente consultivos (`*-arch-advisor`, `agent-router`,
+    Agents puramente consultivos (`<stack>-arch-advisor`, `agent-router`,
     `governance-maintainer`) mencionam `run_in_terminal` apenas para
     PROIBI-LO no corpo do prompt e NAO vinculam `terminal-governance` em
     `source_docs:` -- ficam corretamente FORA da allowlist.

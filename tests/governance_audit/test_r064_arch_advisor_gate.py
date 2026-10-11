@@ -1,6 +1,6 @@
 """
 test_r064_arch_advisor_gate.py — Validação determinística do gate de Plano de Implementação R-064
-e prioridade do specialist-arch-advisor antes de qualquer codificação/mutação de código.
+e prioridade do <stack>-arch-advisor antes de qualquer codificação/mutação de código.
 
 Quality Gate que garante:
 1. Todo workflow canônico em routing-graph.yaml que envolve mutação de código possui etapa
@@ -82,7 +82,7 @@ def routing_graph_data():
 @pytest.mark.parametrize("stack", ALL_DOMAIN_STACKS)
 def test_workflow_framework_migration_arch_advisor_precedes_codemod(routing_graph_data, stack: str):
     """
-    Garante que no WORKFLOW-FRAMEWORK-MIGRATION existe uma etapa de arch-advisor
+    Garante que no WORKFLOW-FRAMEWORK-MIGRATION existe uma etapa de <stack>-arch-advisor
     posicionada ANTES de qualquer etapa de codemod/rewrite.
     Angular, React e Database não participam diretamente do WORKFLOW-FRAMEWORK-MIGRATION backend-to-backend (R-064).
     """
@@ -105,8 +105,8 @@ def test_workflow_framework_migration_arch_advisor_precedes_codemod(routing_grap
         resolvido_field = str(estado.get("resolvido_por", "")).lower()
 
         is_arch_advisor = (
-            "arch-advisor" in agent_field
-            or "arch-advisor" in resolvido_field
+            "-arch-advisor" in agent_field
+            or "-arch-advisor" in resolvido_field
             or "implementation_plan" in nome_field
         )
         is_codemod = (
@@ -121,10 +121,10 @@ def test_workflow_framework_migration_arch_advisor_precedes_codemod(routing_grap
         if is_codemod and codemod_index == -1:
             codemod_index = idx
 
-    assert arch_advisor_index != -1, "Etapa com specialist-arch-advisor não foi encontrada no WORKFLOW-FRAMEWORK-MIGRATION"
+    assert arch_advisor_index != -1, "Etapa com <stack>-arch-advisor não foi encontrada no WORKFLOW-FRAMEWORK-MIGRATION"
     assert codemod_index != -1, "Etapa de codemod/rewrite não foi encontrada no WORKFLOW-FRAMEWORK-MIGRATION"
     assert arch_advisor_index < codemod_index, (
-        f"A etapa de arch-advisor (índice {arch_advisor_index}) DEVE anteceder "
+        f"A etapa de <stack>-arch-advisor (índice {arch_advisor_index}) DEVE anteceder "
         f"a etapa de codemod/rewrite (índice {codemod_index}) conforme R-064"
     )
 
@@ -141,7 +141,7 @@ def test_router_decision_tree_enforces_r064_arch_advisor_gate(stack: str):
     content = router_file.read_text(encoding="utf-8")
 
     assert "R-064" in content, f"{router_file.name} DEVE citar explicitamente a regra R-064"
-    assert "arch-advisor" in content, f"{router_file.name} DEVE referenciar arch-advisor na árvore de decisão"
+    assert "-arch-advisor" in content, f"{router_file.name} DEVE referenciar <stack>-arch-advisor na árvore de decisão"
     assert ("developer" in content or "specialist" in content), (
         f"{router_file.name} DEVE referenciar developer ou specialist na árvore de decisão"
     )

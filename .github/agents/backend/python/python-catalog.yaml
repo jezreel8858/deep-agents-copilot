@@ -2,7 +2,7 @@ version: "3.0"
 domain: "backend-python"
 description: >-
   Sub-catálogo hierárquico consolidado de agentes especializados em Python Backend (FastAPI, Flask, Django, Pydantic, SQLAlchemy, pytest).
-  Estruturado no Padrão Triádico 3+1 (1 supervisor hierárquico + 3 especialistas consolidados: arch-advisor, developer e test-engineer).
+  Estruturado no Padrão Triádico 3+1 (1 supervisor hierárquico + 3 especialistas consolidados: python-arch-advisor, python-developer e python-test-engineer).
 
 router:
   id: "python-router"
@@ -60,7 +60,7 @@ agents:
 
   python-developer:
     id: "python-developer"
-    model: "Claude Sonnet 5.5"
+    model: Grok 4.7
     role: "implementer"
     domain: "Desenvolvimento de features, correção cirúrgica de bugs e otimização de performance para Python Backend (FastAPI, Flask, Django, Pydantic, SQLAlchemy, asyncio)"
     description: "Especialista consolidador mutativo: constrói endpoints REST, schemas Pydantic, repositórios SQLAlchemy e services sob TDD estrito; diagnostica e resolve runtime errors (TypeError, AttributeError, deadlocks) com diffs mínimos; e otimiza event loop e pools de conexão."
@@ -101,7 +101,7 @@ agents:
 
   python-test-engineer:
     id: "python-test-engineer"
-    model: "Claude Sonnet 5.5"
+    model: Grok 4.7
     role: "tester"
     domain: "Engenharia de testes e qualidade para Python Backend: testes unitários (pytest), testes de integração (TestClient, Testcontainers) e reparo de suítes de testes quebradas"
     description: "Especialista consolidador de testes: constrói testes unitários puros isolados com fixtures e mocks estritos; implementa testes de integração com TestClient e Testcontainers; e diagnostica e corrige falhas na suíte de testes com retry cap estrito sob R-053."

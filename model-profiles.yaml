@@ -103,6 +103,21 @@ profiles:
       orchestration: Claude Sonnet 5.5
       standard: Claude Sonnet 5.5
       light: Gemini 3.8 Flash
+    agents:
+      ejb-developer: Grok 4.7
+      ejb-test-engineer: Grok 4.7
+      python-developer: Grok 4.7
+      python-test-engineer: Grok 4.7
+      spring-boot-developer: Grok 4.7
+      spring-boot-test-engineer: Grok 4.7
+      spring-reactive-developer: Grok 4.7
+      spring-reactive-test-engineer: Grok 4.7
+      struts-developer: Grok 4.7
+      struts-test-engineer: Grok 4.7
+      angular-developer: Grok 4.7
+      angular-test-engineer: Grok 4.7
+      react-developer: Grok 4.7
+      react-test-engineer: Grok 4.7
 
   balanceado:
     extends: default
@@ -118,3 +133,19 @@ profiles:
     tiers:
       orchestration: Claude Haiku 5.5
       standard: Claude Haiku 5.5
+    agents:
+      ejb-developer: Claude Haiku 5.5
+      ejb-test-engineer: Claude Haiku 5.5
+      python-developer: Claude Haiku 5.5
+      python-test-engineer: Claude Haiku 5.5
+      spring-boot-developer: Claude Haiku 5.5
+      spring-boot-test-engineer: Claude Haiku 5.5
+      spring-reactive-developer: Claude Haiku 5.5
+      spring-reactive-test-engineer: Claude Haiku 5.5
+      struts-developer: Claude Haiku 5.5
+      struts-test-engineer: Claude Haiku 5.5
+      angular-developer: Claude Haiku 5.5
+      angular-test-engineer: Claude Haiku 5.5
+      react-developer: Claude Haiku 5.5
+      react-test-engineer: Claude Haiku 5.5
+

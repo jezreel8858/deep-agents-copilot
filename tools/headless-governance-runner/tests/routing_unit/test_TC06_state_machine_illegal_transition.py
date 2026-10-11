@@ -43,7 +43,7 @@ class TestTC06StateMachineIllegalTransition:
             origem="usuario",
             tipo=TipoEvento.AVANCO_ETAPA,
             etapa_solicitada=3,
-            agente_solicitado="specialist-bug-fixer",
+            agente_solicitado="<stack>-developer",
         )
 
         # Act & Assert
@@ -59,7 +59,7 @@ class TestTC06StateMachineIllegalTransition:
             fase=Fase.EM_WORKFLOW,
             workflow=Workflow.BUG_FIX,
             etapa=2,
-            agente_ativo="specialist-unit-test-writer",
+            agente_ativo="<stack>-test-engineer",
         )
         evento = Evento(
             origem="usuario",

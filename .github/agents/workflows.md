@@ -17,24 +17,19 @@ Conforme documentado no framework *Building Effective Agents* (Anthropic) e nas 
 - **Agents (Sistemas Exploratórios)**: Sistemas onde o modelo decide dinamicamente a próxima ferramenta em loop aberto. Indicados para tarefas amplas de pesquisa ou problemas com espaço de busca desconhecido.
 - **Fast-Path Determinístico**: Gatilhos explícitos de erro, refatoração estrutural ou diagnóstico técnico bypassam etapas genéricas de estruturação de prompt e ingressam imediatamente no workflow correspondente.
 
-### 1.3 Convenção de Nomenclatura: Resolução de Papéis Genéricos (`specialist-<papel>`)
+### 1.3 Convenção de Nomenclatura: Resolução da Tríade Canônica (`<stack>-*`)
 
-Para permanecer agnóstico de stack (R-038), este documento referencia os executores táticos através de **papéis genéricos** (`specialist-bug-fixer`, `specialist-ui-stylist`, `specialist-unit-test-writer`, `specialist-component-test-writer`, `specialist-integration-test-writer`, `specialist-test-fixer`, `specialist-feature-developer`, `specialist-arch-advisor`). **Nenhum desses nomes existe literalmente no catálogo** — são aliases resolvidos em tempo de roteamento pelo *domain router* ativo (`@angular-router`, `@react-router`, `@spring-boot-router`, `@spring-reactive-router`, `@ejb-router`, `@struts-router`, `@database-router`, `@python-router`) para o agente concreto do seu sub-catálogo (`*-catalog.yaml`) que declara a tag `role:` correspondente.
+Para permanecer agnóstico de stack (R-038), os workflows canônicos referenciam os executores táticos através dos papéis consolidados da **tríade canônica** (`<stack>-arch-advisor`, `<stack>-developer`, `<stack>-test-engineer`). Cada domínio resolve esses papéis para o agente concreto do seu sub-catálogo (`*-catalog.yaml`):
 
-| Papel Genérico | Tag `role:` | Angular | Spring Boot | Spring Reactive | EJB | Struts |
-|---|---|---|---|---|---|---|
-| `specialist-bug-fixer` | `fixer` | `angular-developer` | `spring-boot-developer` | `spring-reactive-developer` | `ejb-developer` | `struts-developer` |
-| `specialist-ui-stylist` | `stylist` | `angular-developer` | _N/A (sem UI)_ | _N/A (sem UI)_ | _N/A (sem UI)_ | _N/A (sem UI)_ |
-| `specialist-unit-test-writer` | `tester` (sem DOM/contexto de framework) | `angular-test-engineer` | `spring-boot-test-engineer` | `spring-reactive-test-engineer` | `ejb-test-engineer` | `struts-test-engineer` |
-| `specialist-component-test-writer` | `tester` (com DOM/TestBed) | `angular-test-engineer` | _N/A → usar `test-engineer`_ | _N/A → usar `test-engineer`_ | _N/A → usar `test-engineer`_ | _N/A → usar `test-engineer`_ |
-| `specialist-integration-test-writer` | `tester` (com contexto de framework) | _N/A → usar `test-engineer`_ | `spring-boot-test-engineer` | `spring-reactive-test-engineer` | `ejb-test-engineer` | `struts-test-engineer` |
-| `specialist-test-fixer` | `fixer` (escopo teste) | `angular-test-engineer` | `spring-boot-test-engineer` | `spring-reactive-test-engineer` | `ejb-test-engineer` | `struts-test-engineer` |
-| `specialist-feature-developer` | `implementer` | `angular-developer` | `spring-boot-developer` | `spring-reactive-developer` | `ejb-developer` | `struts-developer` |
-| `specialist-arch-advisor` | `advisory` | `angular-arch-advisor` | `spring-boot-arch-advisor` | `spring-reactive-arch-advisor` | `ejb-arch-advisor` | `struts-arch-advisor` |
+| Papel Canônico | Angular | React | Spring Boot | Spring Reactive | EJB | Struts | Python |
+|---|---|---|---|---|---|---|---|
+| `<stack>-arch-advisor` | `angular-arch-advisor` | `react-arch-advisor` | `spring-boot-arch-advisor` | `spring-reactive-arch-advisor` | `ejb-arch-advisor` | `struts-arch-advisor` | `python-arch-advisor` |
+| `<stack>-developer` | `angular-developer` | `react-developer` | `spring-boot-developer` | `spring-reactive-developer` | `ejb-developer` | `struts-developer` | `python-developer` |
+| `<stack>-test-engineer` | `angular-test-engineer` | `react-test-engineer` | `spring-boot-test-engineer` | `spring-reactive-test-engineer` | `ejb-test-engineer` | `struts-test-engineer` | `python-test-engineer` |
 
 **Regras de Resolução (obrigatórias):**
-1. **Proibido invocar `run_subagent` com o nome genérico literal** — `specialist-bug-fixer` NÃO é um `agentName` válido; o domain router SEMPRE resolve para o `id` concreto do seu sub-catálogo antes de despachar.
-2. **Match de `proximos_agentes_permitidos` em `politica_desvio: "strict"`**: quando a lista declarar um papel genérico, a validação de conformidade ocorre pela tag `role:` do agente concreto delegado (não pela string literal) — ex.: `angular-developer` satisfaz `specialist-bug-fixer` porque ambos compartilham `role: "fixer"` no domínio Angular ativo.
+1. **Proibido invocar `run_subagent` com tokens genéricos não cadastrados** — o domain router SEMPRE resolve para o `id` concreto do seu sub-catálogo antes de despachar.
+2. **Match de `proximos_agentes_permitidos` em `politica_desvio: "strict"`**: a validação de conformidade ocorre pelo agente concreto da tríade delegado.
 3. **Banco de dados é exceção nomeada**: sub-rotinas de schema/DDL nunca usam papel genérico — referenciam sempre `@database-specialist` (agente único, cross-stack) por nome literal.
 4. **Stack não identificada**: se o `@bug-triage`/`@refactor-planner` não conseguir inferir a stack (nenhum domain router aplicável), o estado correspondente aciona `ask_questions` para confirmar a stack antes de resolver o papel genérico — nunca infere silenciosamente.
 
@@ -46,7 +41,7 @@ Para permanecer agnóstico de stack (R-038), este documento referencia os execut
 
 1. **Mini-Contrato de Aceitação Pré-Negociado (Sprint Contract)**: Antes de o Gerador produzir o artefato final, ele propõe por escrito os critérios objetivos de "concluído" (comportamento esperado, casos de borda cobertos, forma de verificação). O Avaliador revisa e aprova esse contrato **antes** da implementação — evitando que a definição de sucesso seja inventada retroativamente pelo próprio Gerador.
 2. **Rubrica de Corte Objetiva do Avaliador**: O Avaliador Cético (`runtime-verifier`, `code-review`, `security-reviewer`, `angular-developer` conforme o gate) julga contra critérios explícitos com limiar de corte (`threshold`), não contra impressão subjetiva. Qualquer critério abaixo do limiar reprova o artefato inteiro, mesmo que os demais critérios estejam excelentes (nenhuma média compensatória).
-3. **Independência de Avaliação**: O Avaliador nunca é a mesma invocação/contexto que gerou o artefato — mesmo quando o mesmo agent desempenha os dois papéis em momentos distintos do workflow (ex.: `specialist-feature-developer` gera; `@code-review` avalia), a avaliação ocorre em uma etapa e contexto discretos, com acesso às evidências de execução real (testes rodados, logs, diffs) e não apenas ao código-fonte estático.
+3. **Independência de Avaliação**: O Avaliador nunca é a mesma invocação/contexto que gerou o artefato — mesmo quando o mesmo agent desempenha os dois papéis em momentos distintos do workflow (ex.: `<stack>-developer` gera; `@code-review` avalia), a avaliação ocorre em uma etapa e contexto discretos, com acesso às evidências de execução real (testes rodados, logs, diffs) e não apenas ao código-fonte estático.
 4. **Registro no `workflow_state`**: Todo workflow que aplica este padrão declara os campos `sprint_contract` (critérios negociados) e `avaliacao_cetica` (rubrica aplicada, nota por critério, veredito) — ver Typed State Bags de `WORKFLOW-BUG-FIX` § 3.1 e `WORKFLOW-FEATURE-DEVELOPMENT` § 3.4.
 
 ### 1.5 Loop de Revisão de Qualidade (Quality Review Loop)
@@ -59,7 +54,7 @@ Para evitar sobreposição e ambiguidade operacional, o ecossistema distingue ri
 | Mecanismo | Escopo / Problema Resolvido | Ator Responsável | Ação ao Atingir Limite |
 | :--- | :--- | :--- | :--- |
 | **§ 1.4 Gerador–Avaliador Cético** | **Quem avalia**: separação estrita de papéis para eliminar auto-complacência (*self-grading leniency*). | Avaliador Cético independente (`@code-review`, `@security-reviewer`, etc.). | Reprovação objetiva via rubrica com limiar de corte (*threshold*). |
-| **§ 8 / R-050.2 Circuit Breaker** | **Falha funcional/teste**: quebra de build, testes vermelhos ou violação de regras invariantes. | `specialist-test-fixer` / Especialista de Stack. | Reversão do workspace (Rollback State) e escalonamento humano via `ask_questions`. |
+| **§ 8 / R-050.2 Circuit Breaker** | **Falha funcional/teste**: quebra de build, testes vermelhos ou violação de regras invariantes. | `<stack>-test-engineer` / Especialista de Stack. | Reversão do workspace (Rollback State) e escalonamento humano via `ask_questions`. |
 | **§ 1.5 Loop de Revisão de Qualidade** | **Qualidade e estilo pós-avaliação**: refinamento de achados NÃO-bloqueantes (nomenclatura, edge cases, legibilidade, linting). | Gerador revisa; mesmo Avaliador Cético reavalia. | Parada no teto de 3 iterações e escalonamento via `ask_questions` com achados residuais. |
 
 ```mermaid
@@ -88,7 +83,7 @@ flowchart TD
 
 **Regras Normativas do Mecanismo**:
 
-1. **Gatilho**: O Avaliador Cético (§ 1.4) reprova o artefato por achados de qualidade **não-bloqueantes** (ex.: legibilidade, convenções de estilo, cobertura de casos de borda adicionais, documentação interna ou modularização). **R-065 (Guard de Severidade Arquitetural no Loop de Qualidade)**: Achados bloqueantes de segurança (OWASP Top 10, CVEs críticas), violações funcionais de regra de negócio, violação de Contract Testing/API pública (WORKFLOW-REFACTORING), violação de blueprint/Sprint Contract do `tech-solution-architect` ou `<stack>-arch-advisor` (WORKFLOW-FEATURE-DEVELOPMENT) e quebra de Matriz De-Para/Symbol Exhaustion Gate (WORKFLOW-FRAMEWORK-MIGRATION) NÃO entram neste loop — seguem imediatamente os fluxos de rollback (§ 8) ou retornam ao `<stack>-arch-advisor`/`tech-solution-architect` via domain-router, nunca diretamente a especialista de implementação nominal (ex.: `<stack>-bug-fixer`, `<stack>-feature-developer`).
+1. **Gatilho**: O Avaliador Cético (§ 1.4) reprova o artefato por achados de qualidade **não-bloqueantes** (ex.: legibilidade, convenções de estilo, cobertura de casos de borda adicionais, documentação interna ou modularização). **R-065 (Guard de Severidade Arquitetural no Loop de Qualidade)**: Achados bloqueantes de segurança (OWASP Top 10, CVEs críticas), violações funcionais de regra de negócio, violação de Contract Testing/API pública (WORKFLOW-REFACTORING), violação de blueprint/Sprint Contract do `tech-solution-architect` ou `<stack>-arch-advisor` (WORKFLOW-FEATURE-DEVELOPMENT) e quebra de Matriz De-Para/Symbol Exhaustion Gate (WORKFLOW-FRAMEWORK-MIGRATION) NÃO entram neste loop — seguem imediatamente os fluxos de rollback (§ 8) ou retornam ao `<stack>-arch-advisor`/`tech-solution-architect` via domain-router, nunca diretamente a especialista de implementação nominal (ex.: `<stack>-developer`).
 2. **Ciclo de Refinamento com Mesmo Avaliador**: O Gerador original recebe o feedback estruturado do Avaliador Cético, aplica as correções cirúrgicas e submete o artefato revisado compulsoriamente para o **mesmo Avaliador** que emitiu o parecer (preservando o histórico da rubrica e evitando discrepâncias entre avaliadores distintos).
 3. **Teto Rígido de 3 Iterações (R-055 / Anti-Silo Reuse)**: O loop é estritamente limitado ao teto de **3 iterações** (idêntico ao limiar do Circuit Breaker R-050.2, reaproveitado deliberadamente para coerência e integridade da governança). É vedado qualquer loop aberto ou indeterminado.
 4. **Critério de Corte Objetivo**: A reavaliação utiliza a mesma rubrica com limiar de corte (`threshold`) pré-estabelecida no Estado de avaliação (§ 1.4) — qualquer critério abaixo do corte mantém a reprovação, sendo terminantemente proibida média compensatória.

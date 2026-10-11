@@ -4,7 +4,7 @@
   "id": "ejb-router",
   "name": "Ejb Router",
   "version": "2.0.0",
-  "description": "Roteador de domínio Java Legado EJB e supervisor hierárquico — recebe solicitações de backend EJB legado (EJB 2.x/3.x, JTA, MDB, EAR/WAR/JAR) do agent-router central e despacha para os 7 especialistas do catálogo EJB (arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer, integration-test-writer e test-fixer).",
+  "description": "Roteador de domínio Java Legado EJB e supervisor hierárquico — recebe solicitações de backend EJB legado (EJB 2.x/3.x, JTA, MDB, EAR/WAR/JAR) do agent-router central e despacha para os 3 especialistas do catálogo EJB (ejb-arch-advisor, ejb-developer e ejb-test-engineer).",
   "domain": "Supervisor hierarquico e roteador do dominio Java Legado EJB",
   "role": "router",
   "capabilities": [

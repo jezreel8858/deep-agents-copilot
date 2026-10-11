@@ -31,6 +31,8 @@ cli.py
         phase e [ALLOWLIST_STALE]. list: um perfil por linha (marca o ativo com `*` ou `ativo`).
         init: cria `.model-profiles/` e, se nao ignorado, acrescenta a entrada em
         `.git/info/exclude` (idempotente; nunca edita arquivos versionados).
+        Se `model-profiles.local.yaml.example` existir, copia para
+        `model-profiles.local.yaml` sem sobrescrever.
         doctor: diagnostico (allowlist, frescor, D6 de TODOS os perfis, skip-worktree, core.hooksPath,
         journal orfao, lock obsoleto); `--repair` conclui/reverte journal orfao e remove lock stale.
 writer.py   (InPlaceWriter - R1/R5)

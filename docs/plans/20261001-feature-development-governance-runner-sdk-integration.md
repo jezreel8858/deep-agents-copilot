@@ -154,7 +154,7 @@ flowchart TD
 ## 8. Context Firewall — divisão preliminar (detalhada no Plano de Implementação)
 
 ### [BACKEND_TASKS]
-1. Settings + lifespan: paths de grafo/schema, carga de `Grafo`/`TabelaTransicao`/`Catalogo` — `@python-feature-developer` (via domain router Python)
+1. Settings + lifespan: paths de grafo/schema, carga de `Grafo`/`TabelaTransicao`/`Catalogo` — `@python-developer` (via domain router Python)
 2. `governance_pipeline.py` (health check, preparar_turno, montar_contexto) — composição pura sobre `governance.py`
 3. `session_store`: campos aditivos de `Sessao`
 4. `sdk_session.stream_chat`: `system_message` keyword-only opcional

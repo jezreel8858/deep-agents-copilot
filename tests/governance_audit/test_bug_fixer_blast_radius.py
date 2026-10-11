@@ -1,9 +1,9 @@
 """
 test_bug_fixer_blast_radius.py — Validação determinística do blast-radius check prévio
-em especialistas bug-fixer de todas as stacks.
+em desenvolvedores (<stack>-developer) de todas as stacks.
 
 Quality Gate que garante:
-1. Todos os 6 <stack>-bug-fixer.agent.md formalizam cláusula/etapa de verificação de
+1. Todos os desenvolvedores (<stack>-developer.agent.md) formalizam cláusula/etapa de verificação de
    "blast-radius" ou análise de "chamadores/dependentes".
 2. A cláusula estipula explicitamente que essa verificação deve ocorrer ANTES de qualquer
    menção a "diff mínimo" ou aplicação cirúrgica de correção (ordem textual relativa).
@@ -28,21 +28,21 @@ def resolve_bug_fixer_file(stack: str) -> Path:
         return AGENTS_FRONTEND_DIR / "angular" / "angular-developer.agent.md"
     if stack in ("spring-boot", "spring-reactive", "ejb", "struts", "python"):
         return AGENTS_BACKEND_DIR / stack / f"{stack}-developer.agent.md"
-    return AGENTS_BACKEND_DIR / stack / f"{stack}-bug-fixer.agent.md"
+    return AGENTS_BACKEND_DIR / stack / f"{stack}-developer.agent.md"
 
 
 @pytest.mark.parametrize("stack", ALL_BUG_FIXER_STACKS)
 def test_bug_fixer_blast_radius_precedes_diff_application(stack: str):
     """
-    Valida que o <stack>-bug-fixer.agent.md:
+    Valida que o <stack>-developer.agent.md:
     (a) Contém diretriz mencionando blast-radius ou chamadores/dependentes;
     (b) A menção de blast-radius/chamadores ocorre ANTES da aplicação de diff mínimo
         na cláusula (ordem textual relativa e precedência explícita via 'ANTES de').
     """
     bf_path = resolve_bug_fixer_file(stack)
     assert bf_path.exists(), remediation(
-        f"Arquivo do bug-fixer não encontrado: {bf_path}",
-        fix_hint=f"Verifique a existência do agente {stack}-bug-fixer.agent.md."
+        f"Arquivo do developer não encontrado: {bf_path}",
+        fix_hint=f"Verifique a existência do agente {stack}-developer.agent.md."
     )
 
     content = bf_path.read_text(encoding="utf-8")

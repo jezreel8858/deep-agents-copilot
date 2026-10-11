@@ -20,7 +20,7 @@ tools: []
 
 # Design Pattern Selection Patterns
 
-Skill **puramente analítica/decisória**, consumida pelos agents `*-arch-advisor` (read-only). Opera apenas na fase de planejamento (equivalente a *Design Doc Review*): valida a necessidade e a escolha de pattern ANTES de qualquer código. Nunca prescreve edição de arquivo nem implementação.
+Skill **puramente analítica/decisória**, consumida pelos agents `<stack>-arch-advisor` (read-only). Opera apenas na fase de planejamento (equivalente a *Design Doc Review*): valida a necessidade e a escolha de pattern ANTES de qualquer código. Nunca prescreve edição de arquivo nem implementação.
 
 ## 1) Quando Usar
 
@@ -30,7 +30,7 @@ Skill **puramente analítica/decisória**, consumida pelos agents `*-arch-adviso
 - Um pedido já nomeia um pattern ("use Factory/CQRS") e é preciso validar a necessidade antes de aceitar.
 
 **Não use quando:**
-- A tarefa é implementar, editar código ou corrigir bug (escopo de `*-developer` / `*-bug-fixer`).
+- A tarefa é implementar, editar código ou corrigir bug (escopo de `*-developer`).
 - Auditar código existente por oportunidade de pattern (modo *Code Review* — fora de escopo desta skill).
 - A mudança é trivial (renomear, ajustar texto, config) e não envolve decisão estrutural.
 - A decisão é puramente de documentação ou governança de artefatos.

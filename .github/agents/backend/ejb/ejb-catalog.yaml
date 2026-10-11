@@ -8,7 +8,7 @@ description: >-
 router:
   id: "ejb-router"
   role: "supervisor"
-  description: "Roteador central do domínio Java Legado EJB — tria e despacha para os 3 especialistas backend (arch-advisor, developer e test-engineer)"
+  description: "Roteador central do domínio Java Legado EJB — tria e despacha para os 3 especialistas backend (ejb-arch-advisor, ejb-developer e ejb-test-engineer)"
   tools:
     - "read_file"
     - "file_search"
@@ -60,7 +60,7 @@ agents:
 
   ejb-developer:
     id: "ejb-developer"
-    model: "Claude Sonnet 5.5"
+    model: Grok 4.7
     role: "implementation"
     domain: "Desenvolvimento de Produção EJB, Session Beans SLSB/SFSB, MDB, JPA Legada, Resolução Cirúrgica de Bugs e Tuning de Performance"
     description: "Especialista mutativo core: constrói Stateless e Stateful Session Beans, MDBs, serviços com JPA legada/EntityManager, transações JTA/CMT, resolve bugs cirúrgicos (TransactionRolledbackException, deadlocks, JNDI) com diff mínimo e executa tuning de pool e eliminação de transações longas."
@@ -103,7 +103,7 @@ agents:
 
   ejb-test-engineer:
     id: "ejb-test-engineer"
-    model: "Claude Sonnet 5.5"
+    model: Grok 4.7
     role: "quality-assurance"
     domain: "Garantia de Qualidade, Testes Unitários POJO/Mockito, Testes de Integração TomEE/OpenEJB/Arquillian e Autocorreção sob R-053"
     description: "Especialista mutativo de testes: implementa testes unitários isolados sem Application Server (EJBs como POJOs), testes de integração em containers embutidos (OpenEJB, TomEE, Arquillian ShrinkWrap, Testcontainers) e realiza diagnóstico e autocorreção de testes com retry cap R-053."

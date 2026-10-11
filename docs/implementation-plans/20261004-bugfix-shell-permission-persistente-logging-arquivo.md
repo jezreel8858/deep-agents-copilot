@@ -304,7 +304,7 @@
 
 ---
 
-## 3. Subtasks Executáveis por `@python-bug-fixer`
+## 3. Subtasks Executáveis por `@python-developer`
 
 - `[S]` T-01 — Confirmar se `tests/unit/test_dev_watch_port_check.py` (ou cobertura equivalente de `dev_watch.py`) já existe; se não, planejar o arquivo novo. **Bloqueante para T-02.**
 - `[S]` T-02 — Escrever T14-T16 (Red), confirmar falha pelo motivo correto (função `_porta_ocupada` ainda não existe).
@@ -344,5 +344,5 @@ Legenda: `[S]` = sequencial (depende do anterior); `[P]` = pode ser paralelizado
 
 ## 6. Handoff
 
-`python-arch-advisor` → `@python-bug-fixer` (motivo: plano de implementação aprovado no gate R-064 pelo usuário; próxima etapa do WORKFLOW-BUG-FIX exige escrita de código/testes, fora do escopo read-only deste agente).
+`python-arch-advisor` → `@python-developer` (motivo: plano de implementação aprovado no gate R-064 pelo usuário; próxima etapa do WORKFLOW-BUG-FIX exige escrita de código/testes, fora do escopo read-only deste agente).
 

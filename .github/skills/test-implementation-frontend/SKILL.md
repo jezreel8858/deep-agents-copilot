@@ -105,7 +105,7 @@ Date/Time      →     Mock de data fixa para determinismo
 | Componentes puramente visuais | Isento de testes unitários (validação visual/VFL) | ◯ Baixa |
 
 ### Metodologia de Execução: Test-Last com Verification Gate
-Em ambientes frontend com agentes de IA, o workflow canônico adota **Test-Last (Implementation-First)**: componentes, stores e lógica são estabilizados e validados estaticamente primeiro (`get_errors`), sendo a escrita de testes unitários executada ao final pelos especialistas de teste. Agentes e tarefas focados puramente em UI/estilização (`ui-stylist`) são **isentos** de criar ou rodar testes unitários, validando apenas contratos visuais, design tokens e acessibilidade.
+Em ambientes frontend com agentes de IA, o workflow canônico adota **Test-Last (Implementation-First)**: componentes, stores e lógica são estabilizados e validados estaticamente primeiro (`get_errors`), sendo a escrita de testes unitários executada ao final pelos especialistas de teste. Tarefas focadas puramente em UI/estilização no frontend (`<stack>-developer`) são **isentas** de criar ou rodar testes unitários, validando apenas contratos visuais, design tokens e acessibilidade.
 
 ## 4) Integration Tests — Conceitos
 

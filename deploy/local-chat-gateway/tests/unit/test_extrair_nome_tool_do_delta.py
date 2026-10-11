@@ -34,13 +34,13 @@ def test_deve_retornar_none_quando_delta_e_apenas_evento_de_conclusao() -> None:
 
 
 def test_deve_extrair_nome_real_do_subagent_quando_marcador_presente() -> None:
-    """Confirma extracao do NOME REAL do agent (`python-bug-fixer`), nao
+    """Confirma extracao do NOME REAL do agent (`python-developer`), nao
     apenas o literal `run_subagent` -- ganho concreto do RT-03 em relacao
     a implementacao anterior (que so sabia dizer "houve uma delegacao")."""
-    delta = "\n> \U0001f9ed **Subagent invocado:** `python-bug-fixer` (iniciando)\n"
+    delta = "\n> \U0001f9ed **Subagent invocado:** `python-developer` (iniciando)\n"
     assert (
         _extrair_nome_tool_do_delta(delta)
-        == f"{_PREFIXO_TELEMETRIA_SUBAGENT}python-bug-fixer"
+        == f"{_PREFIXO_TELEMETRIA_SUBAGENT}python-developer"
     )
     assert _PREFIXO_TELEMETRIA_SUBAGENT == "subagent:"
 
@@ -50,12 +50,12 @@ def test_marcador_de_subagent_tem_precedencia_sobre_padrao_generico() -> None:
     marcador de subagent deve ser priorizado (evita falso-negativo caso
     a mensagem venha acompanhada de outro texto)."""
     delta = (
-        "\n> \U0001f9ed **Subagent invocado:** `python-feature-developer` (iniciando)\n"
+        "\n> \U0001f9ed **Subagent invocado:** `python-test-engineer` (iniciando)\n"
         "\n> \U0001f527 tool: nao deveria ser lido (iniciando)\n"
     )
     assert (
         _extrair_nome_tool_do_delta(delta)
-        == f"{_PREFIXO_TELEMETRIA_SUBAGENT}python-feature-developer"
+        == f"{_PREFIXO_TELEMETRIA_SUBAGENT}python-test-engineer"
     )
 
 

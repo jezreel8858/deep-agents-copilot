@@ -54,7 +54,7 @@ Todo documento pertence a **exatamente um** dos 4 quadrantes — nunca misturar 
 
 ## 2.1) Documentos de Planejamento de Workflow (Plan/Blueprint/Spec/Implementation Plan)
 
-Documentos produzidos pelos agentes de planejamento (`tech-solution-architect`, `refactor-planner`, `requirements-analyst`, `feature-planner`, `business-rules-extractor`, `*-arch-advisor`) pertencem a **uma de duas categorias**, análogas ao fluxo `spec.md → plan.md → tasks.md` do GitHub Spec Kit. Nunca misturar as duas no mesmo arquivo.
+Documentos produzidos pelos agentes de planejamento (`tech-solution-architect`, `refactor-planner`, `requirements-analyst`, `feature-planner`, `business-rules-extractor`, `<stack>-arch-advisor`) pertencem a **uma de duas categorias**, análogas ao fluxo `spec.md → plan.md → tasks.md` do GitHub Spec Kit. Nunca misturar as duas no mesmo arquivo.
 
 ### Categoria A — Documento de PLANEJAMENTO (prosa/escopo/decisão)
 
@@ -97,8 +97,8 @@ Checklist GFM obrigatório (formato único, GFM puro `[ ]`/`[x]` — substitui c
 ```markdown
 Progresso: 3/12 tarefas concluídas
 
-- [ ] <descrição atômica e rastreável da tarefa> `{paralelizavel: true, responsavel: "<stack>-bug-fixer"}`
-- [x] <tarefa já concluída> `{paralelizavel: false, responsavel: "feature-developer"}`
+- [ ] <descrição atômica e rastreável da tarefa> `{paralelizavel: true, responsavel: "<stack>-developer"}`
+- [x] <tarefa já concluída> `{paralelizavel: false, responsavel: "<stack>-developer"}`
 ```
 
 Regras do checklist:
@@ -156,8 +156,8 @@ reversibility: T2
 
 Progresso: 0/3 tarefas concluídas
 
-- [ ] Extrair `AuthService` para interface `{paralelizavel: false, responsavel: "spring-boot-feature-developer"}`
-- [ ] Atualizar testes unitários `{paralelizavel: true, responsavel: "spring-boot-unit-test-writer"}`
+- [ ] Extrair `AuthService` para interface `{paralelizavel: false, responsavel: "spring-boot-developer"}`
+- [ ] Atualizar testes unitários `{paralelizavel: true, responsavel: "spring-boot-test-engineer"}`
 
 ## 🔒 Checklist Defensivo Pré-Code-Review
 - [ ] Sanitização e validação de inputs em todas as fronteiras de entrada

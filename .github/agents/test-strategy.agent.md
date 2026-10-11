@@ -64,7 +64,7 @@ Ao ser acionado, declare compulsoriamente na primeira linha do raciocínio e no 
 - Se houver rota nova, inclua teste de navegabilidade no shell do projeto (menu/sidenav/tabs).
 ### 4. Halting Condition e Emissão de Saída
 - **STOP TOTAL.** Proibido gerar arquivos de teste executáveis.
-- Handoff para os Domain Routers ou test-writers especializados (`*-unit-test-writer`, `*-integration-test-writer`, `*-component-test-writer`).
+- Handoff para os Domain Routers ou test-engineers especializados (`*-test-engineer`).
 ---
 ## 🤝 Contrato Operacional e Formato de Saída
 ```markdown

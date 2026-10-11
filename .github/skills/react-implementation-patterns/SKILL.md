@@ -44,7 +44,7 @@ tools: []
 - [ ] Server state exclusivamente via TanStack Query; client state exclusivamente via Zustand.
 - [ ] Componentes reaproveitam contratos reais de `shared/`/design system (Canonical Sibling First).
 - [ ] `get_errors` limpo antes de reportar conclusão.
-- [ ] Handoff para `@react-unit-test-writer`/`@react-component-test-writer` ao final da fase green.
+- [ ] Handoff para `@react-test-engineer` ao final da fase green.
 
 ## Referências
 

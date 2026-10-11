@@ -263,7 +263,7 @@ Todo agent acionado como subagente via `run_subagent` DEVE executar uma verifica
 - **Retry Budget por Etapa**: `MAX_RETRIES_PER_STEP = 2`.
 - **Transição de Estados (`CLOSED` → `OPEN`)**:
   - `CLOSED` (Normal): O fluxo prossegue normalmente entre os agentes da máquina de estados do workflow.
-  - `OPEN` (Disparado): Se um agente executor (ex.: `bug-fixer`, `test-fixer`, `feature-developer`) falhar por 2 vezes consecutivas na mesma etapa de execução (ex.: testes continuam falhando após 2 tentativas cirúrgicas de fix), o Circuit Breaker é compulsoriamente desarmado (`state: OPEN`).
+  - `OPEN` (Disparado): Se um agente executor (ex.: `<stack>-developer`, `<stack>-test-engineer`) falhar por 2 vezes consecutivas na mesma etapa de execução (ex.: testes continuam falhando após 2 tentativas cirúrgicas de fix), o Circuit Breaker é compulsoriamente desarmado (`state: OPEN`).
   - **Ação Imediata**: O agente suspende imediatamente qualquer nova tentativa autônoma de alteração de código e escala o caso para decisão humana via `ask_questions` (R-047/R-027), acompanhado do diagnóstico da falha, evitando queima descontrolada de créditos e poluição do histórico de commits.
 
 #### 4. Protocolo de Rollback Atômico de Workspace em Disparo de Circuit Breaker

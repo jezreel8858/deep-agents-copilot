@@ -113,7 +113,7 @@ def test_record_fase_invalida_cai_para_router_e_tambem_zera_workflow() -> None:
         fase="fase-inexistente-corrompida",
         workflow="WORKFLOW-FEATURE-DEVELOPMENT",
         etapa=3,
-        agente_ativo="python-feature-developer",
+        agente_ativo="python-developer",
         aprovacoes=None,
     )
 

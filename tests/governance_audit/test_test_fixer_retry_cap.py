@@ -1,12 +1,12 @@
 """
 test_test_fixer_retry_cap.py — Validação determinística da heurística de classificação
-e teto numérico de tentativas (retry cap) em especialistas test-fixer.
+e teto numérico de tentativas (retry cap) em especialistas test-engineer.
 
 Quality Gate que garante:
-1. Todos os 6 <stack>-test-fixer.agent.md contêm a heurística de classificação binária:
-   "bug real na aplicação" (com handoff para <stack>-bug-fixer) vs.
+1. Todos os engenheiros de teste (<stack>-test-engineer.agent.md) contêm a heurística de classificação binária:
+   "bug real na aplicação" (com handoff para <stack>-developer) vs.
    "drift de implementação/flakiness" (corrigir o teste).
-2. Todos os 6 <stack>-test-fixer.agent.md contêm cláusula restritiva explícita (❌)
+2. Todos os <stack>-test-engineer.agent.md contêm cláusula restritiva explícita (❌)
    com cap numérico explícito (máximo 2 tentativas) antes de escalar para @bug-triage.
 """
 from __future__ import annotations
@@ -29,19 +29,19 @@ def resolve_test_fixer_file(stack: str) -> Path:
         return AGENTS_FRONTEND_DIR / "angular" / "angular-test-engineer.agent.md"
     if stack in ("spring-boot", "spring-reactive", "ejb", "struts", "python"):
         return AGENTS_BACKEND_DIR / stack / f"{stack}-test-engineer.agent.md"
-    return AGENTS_BACKEND_DIR / stack / f"{stack}-test-fixer.agent.md"
+    return AGENTS_BACKEND_DIR / stack / f"{stack}-test-engineer.agent.md"
 
 
 @pytest.mark.parametrize("stack", ALL_TEST_FIXER_STACKS)
 def test_test_fixer_classification_heuristic_and_bug_fixer_handoff(stack: str):
     """
-    Valida que o <stack>-test-fixer.agent.md possui a heurística de classificação binária
-    (bug real vs drift/flakiness) e formaliza handoff para o bug-fixer da stack.
+    Valida que o <stack>-test-engineer.agent.md possui a heurística de classificação binária
+    (bug real vs drift/flakiness) e formaliza handoff para o developer da stack.
     """
     tf_path = resolve_test_fixer_file(stack)
     assert tf_path.exists(), remediation(
-        f"Arquivo do test-fixer não encontrado: {tf_path}",
-        fix_hint=f"Verifique a existência do agente {stack}-test-fixer.agent.md."
+        f"Arquivo do test-engineer não encontrado: {tf_path}",
+        fix_hint=f"Verifique a existência do agente {stack}-test-engineer.agent.md."
     )
 
     content = tf_path.read_text(encoding="utf-8")
@@ -62,8 +62,8 @@ def test_test_fixer_classification_heuristic_and_bug_fixer_handoff(stack: str):
         ),
     )
 
-    # Handoff formal para o bug-fixer da respectiva stack
-    expected_bug_fixer = f"{stack}-developer" if stack in ("spring-boot", "spring-reactive", "angular", "ejb", "struts", "python") else f"{stack}-bug-fixer"
+    # Handoff formal para o developer da respectiva stack
+    expected_bug_fixer = f"{stack}-developer"
     has_handoff = bool(
         re.search(
             rf"handoff\s+para\s+[`@]*{re.escape(expected_bug_fixer)}",
@@ -80,13 +80,13 @@ def test_test_fixer_classification_heuristic_and_bug_fixer_handoff(stack: str):
 @pytest.mark.parametrize("stack", ALL_TEST_FIXER_STACKS)
 def test_test_fixer_retry_cap_and_escalation(stack: str):
     """
-    Valida que o <stack>-test-fixer.agent.md possui cap numérico explícito (2 tentativas)
+    Valida que o <stack>-test-engineer.agent.md possui cap numérico explícito (2 tentativas)
     e regra de escalada (handoff para @bug-triage com ask_questions).
     """
     tf_path = resolve_test_fixer_file(stack)
     assert tf_path.exists(), remediation(
-        f"Arquivo do test-fixer não encontrado: {tf_path}",
-        fix_hint=f"Verifique a existência do agente {stack}-test-fixer.agent.md."
+        f"Arquivo do test-engineer não encontrado: {tf_path}",
+        fix_hint=f"Verifique a existência do agente {stack}-test-engineer.agent.md."
     )
 
     content = tf_path.read_text(encoding="utf-8")

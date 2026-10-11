@@ -50,7 +50,7 @@ canonicos:
   critico: true
   threshold: 0.9
 - id: canon-004
-  descricao: Testes quebrados com relatório em Spring Boot (spring-boot-router -> test-fixer)
+  descricao: Testes quebrados com relatório em Spring Boot (spring-boot-router -> spring-boot-test-engineer)
   input:
     solicitacao: 'Estes 3 testes estão falhando: UserServiceTest, OrderTest, PaymentTest — veja o relatório anexo'
     contexto_disponivel: relatório de falhas presente
@@ -375,7 +375,7 @@ canonicos:
   critico: true
   threshold: 0.9
 - id: canon-032
-  descricao: Auditoria arquitetural e otimização de Core Web Vitals Angular roteada para angular-router (arch-advisor)
+  descricao: Auditoria arquitetural e otimização de Core Web Vitals Angular roteada para angular-router (angular-arch-advisor)
   input:
     solicitacao: Fazer auditoria de performance e diagnóstico de INP/LCP nas rotas Angular sem alterar código
   expected:
@@ -389,7 +389,7 @@ canonicos:
   critico: true
   threshold: 0.9
 - id: canon-033
-  descricao: Estilização SCSS, layout responsivo mobile-first e acessibilidade WCAG roteados para angular-router (ui-stylist)
+  descricao: Estilização SCSS, layout responsivo mobile-first e acessibilidade WCAG roteados para angular-router (angular-developer)
   input:
     solicitacao: Ajustar SCSS e acessibilidade WCAG 2.2 no componente de navegação para telas mobile
   expected:
@@ -403,7 +403,7 @@ canonicos:
   critico: true
   threshold: 0.9
 - id: canon-034
-  descricao: Implementação de nova feature standalone com NgRx Signal Store via TDD roteada para angular-router (feature-developer)
+  descricao: Implementação de nova feature standalone com NgRx Signal Store via TDD roteada para angular-router (angular-developer)
   input:
     solicitacao: Criar componente standalone de filtro com NgRx Signal Store e testes unitários prévios
   expected:
@@ -417,7 +417,7 @@ canonicos:
   critico: true
   threshold: 0.9
 - id: canon-035
-  descricao: Correção cirúrgica de runtime error Angular com diff mínimo roteada para angular-router (bug-fixer)
+  descricao: Correção cirúrgica de runtime error Angular com diff mínimo roteada para angular-router (angular-developer)
   input:
     solicitacao: Corrigir ExpressionChangedAfterItHasBeenCheckedError na linha 42 do EscalaDetailComponent
   expected:
@@ -431,7 +431,7 @@ canonicos:
   critico: true
   threshold: 0.9
 - id: canon-037
-  descricao: Implementação de nova feature React com TanStack Query/Zustand sob TDD roteada para react-router (feature-developer)
+  descricao: Implementação de nova feature React com TanStack Query/Zustand sob TDD roteada para react-router (react-developer)
   input:
     solicitacao: Criar componente React com hook customizado, TanStack Query e testes unitários prévios (TDD)
   expected:
@@ -441,7 +441,7 @@ canonicos:
     score_minimo: 0.85
     output_contains:
     - 'Agente Ativo: react-router'
-    - react-feature-developer
+    - react-developer
   critico: true
   threshold: 0.9
 - id: canon-036
@@ -604,7 +604,7 @@ canonicos:
   critico: true
   threshold: 0.9
 - id: canon-047
-  descricao: Bug-fix sem plano de implementação aprovado → desvio para arch-advisor da stack (R-064 Gate 2)
+  descricao: Bug-fix sem plano de implementação aprovado → desvio para <stack>-arch-advisor da stack (R-064 Gate 2)
   input:
     solicitacao: Corrigir NullPointerException em OrderService.java:120 — bug triado mas sem plano de implementação aprovado
     contexto_disponivel: RCA concluído, plan_ref ausente
@@ -622,7 +622,7 @@ canonicos:
   critico: true
   threshold: 0.9
 - id: canon-048
-  descricao: Hotfix pontual com diff de 1 linha (Tier Light) → plano mínimo via arch-advisor (R-064)
+  descricao: Hotfix pontual com diff de 1 linha (Tier Light) → plano mínimo via <stack>-arch-advisor (R-064)
   input:
     solicitacao: 'Hotfix emergencial: corrigir typo em chave de configuração no ApplicationConfig.java (1 linha, 1 arquivo)'
   expected:
@@ -653,7 +653,7 @@ canonicos:
   critico: true
   threshold: 0.9
 - id: canon-050
-  descricao: Manutenção de governança fora de stack com arch-advisor (Fallback Governance R-064)
+  descricao: Manutenção de governança fora de stack com <stack>-arch-advisor (Fallback Governance R-064)
   input:
     solicitacao: Atualizar catálogos e regras de governança em .github/
   expected:
@@ -1039,7 +1039,7 @@ regressao:
   threshold: 0.9
 - id: canon-048
   descricao: Análise semântica de aderência e paridade entre modelos, persistência e métodos de Store Angular roteada para
-    angular-router (arch-advisor)
+    angular-router (angular-arch-advisor)
   input:
     solicitacao: Analisar simultaneamente os modelos, métodos de persistência e métodos do store da feature de escala no meu-app-angular.
       Listar se os métodos do store cobrem todos os campos do modelo com resumo comparativo direto.
@@ -1171,7 +1171,7 @@ regressao:
     - domain-router-DESTINO
     - codegraph-engine
   nao_deve:
-    comportamento: renderizar o bloco Pipeline de Execucao do Workflow apenas com @spring-boot-router/@spring-boot-feature-developer,
+    comportamento: renderizar o bloco Pipeline de Execucao do Workflow apenas com @spring-boot-router/@spring-boot-developer,
       sem nenhuma mencao ao @ejb-router OU sem nenhuma mencao a @codegraph-engine nas etapas 3 a 5
   critico: true
   threshold: 1.0

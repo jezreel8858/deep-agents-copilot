@@ -59,7 +59,7 @@ Progresso: 0/16 tarefas concluidas
 ## 1. Contexto e escopo
 - Skills `playwright-mcp` e `frontend-visual-feedback-loop` (VFL) sao compartilhadas por Angular e React; toda mudanca exige paridade entre stacks.
 - Escopo: auth login/senha para validacao de layout, ordem de ferramentas, flags, versao fixada, roteamento UI/layout, workflow dedicado, governanca (sync + testes).
-- Fora de escopo: alterar codigo de aplicacoes-alvo, instalar Playwright nos projetos, tools playwright/* nos arch-advisors (permanecem read-only).
+- Fora de escopo: alterar codigo de aplicacoes-alvo, instalar Playwright nos projetos, tools playwright/* nos <stack>-arch-advisors (permanecem read-only).
 - Evidencia: os 29 arquivos da allowlist existem (verificado); referencias a `playwright` ja presentes em catalog/routing-graph/agents developer e test-engineer/agentcards/idea_mcp/rules.json. Arquivos novos: workflow-ui-layout.md, references/ do VFL, teste de governanca.
 - Nota: `.github/instructions/local/{<projeto>,...}.instructions.md` citam playwright, mas sao locais/gitignored e ficam FORA da allowlist (somente leitura como insumo).
 
@@ -69,7 +69,7 @@ Progresso: 0/16 tarefas concluidas
 - Decisao 2 (auth): usuario de teste dedicado + projeto `setup` do Playwright gravando `storageState` (playwright/.auth/*.json) + MCP com `--isolated --storage-state=<arquivo>`. SSO/MFA: `--user-data-dir` com perfil dedicado. `--extension` = alto risco, proibido por padrao. Segredos somente via variaveis de ambiente (nunca prompt, log, trace ou commit). `auth.json`, storage-state e traces no .gitignore. Flags/sintaxe VALIDAR na doc oficial do @playwright/mcp antes de escrever (tarefa T1).
 - Decisao 3 (versao): fixar `@playwright/mcp@<x.y.z>` (sem `@latest`), versao escolhida na T1 e replicada em skill e idea_mcp.json; teste proibe `@latest`.
 - Decisao 4 (ordem VFL): `browser_resize` -> `browser_snapshot` (padrao) -> console -> `browser_take_screenshot` apenas sob demanda; reconciliar com `--caps vision`. Fonte unica de viewports/cleanup (VFL), demais skills apenas referenciam.
-- Decisao 5 (papeis): arch-advisor define estrategia e emite plano (secao UI/Layout), sem tools playwright/*; developer/test-engineer executam.
+- Decisao 5 (papeis): <stack>-arch-advisor define estrategia e emite plano (secao UI/Layout), sem tools playwright/*; <stack>-developer/<stack>-test-engineer executam.
 - Alternativas descartadas: `--extension` (superficie de ataque); credenciais no prompt/arquivo versionado; dar tools playwright/* aos advisors (viola read-only); `@latest` (nao reprodutivel).
 - Consequencias: ganho em seguranca/reprodutibilidade/paridade; custo: mais arquivos sincronizados e manutencao de versao fixada.
 
@@ -88,12 +88,12 @@ Onda 5: T17 validacao final.
 - [x] T4 `angular-arch-advisor` e `react-arch-advisor`: source_docs += playwright-mcp e VFL; sem tools playwright/*; template de plano ganha secao "UI/Layout" (auth strategy, ambiente, origens permitidas, viewports, projeto-alvo). `{paralelizavel: true, responsavel: "@governance-factory"}`
 - [x] T5 `angular-developer` e `react-developer`: citar loop VFL, `browser_close`, regra de segredos; alinhar tools playwright/*. `{paralelizavel: true, responsavel: "@governance-factory"}`
 - [x] T6 `angular-test-engineer` e `react-test-engineer`: Angular ganha VFL em source_docs; alinhar angular-test-engineer ao react-test-engineer (18 tools, H3); corpo: projeto setup + storageState + segredos por env. `{paralelizavel: true, responsavel: "@governance-factory"}`
-- [x] T7 `angular-router` e `react-router`: regra UI/layout (arch-advisor -> developer/test-engineer); sincronizar `routing-graph.yaml`, `angular-catalog.yaml`, `react-catalog.yaml`, `catalog.yaml`. `{paralelizavel: true, responsavel: "@governance-factory"}`
+- [x] T7 `angular-router` e `react-router`: regra UI/layout (<stack>-arch-advisor -> <stack>-developer/<stack>-test-engineer); sincronizar `routing-graph.yaml`, `angular-catalog.yaml`, `react-catalog.yaml`, `catalog.yaml`. `{paralelizavel: true, responsavel: "@governance-factory"}`
 - [x] T8 Sincronizar `.a2a/agentcards/{angular,react}-{developer,test-engineer}.agentcard.json` com as mudancas de tools/skills (T5, T6). `{paralelizavel: true, responsavel: "@governance-factory"}`
 - [x] T9 Criar `workflows/workflow-ui-layout.md` e indexar em `workflows.md`; deve respeitar `test_catalog_agents_referenced_in_canonical_workflows` e invariantes (R-064, aprovacao humana). `{paralelizavel: false, responsavel: "@governance-factory"}`
-- [x] T10 `required_source_docs_rules.json`: regras de source_docs (arch-advisors, developers, test-engineers com playwright-mcp/VFL, paridade angular/react). `{paralelizavel: false, responsavel: "@governance-factory"}`
+- [x] T10 `required_source_docs_rules.json`: regras de source_docs (<stack>-arch-advisors, developers, test-engineers com playwright-mcp/VFL, paridade angular/react). `{paralelizavel: false, responsavel: "@governance-factory"}`
 - [x] T11 Rodar sync tools de `tools/agent_source_docs_sync` (modo check e depois aplicar) e regenerar `.github/skills/.index.json` pelo gerador oficial (nunca editar a mao). `{paralelizavel: false, responsavel: "@governance-factory"}`
-- [x] T12 Criar `tests/governance_audit/test_playwright_mcp_frontend_governance.py`: paridade tools `playwright/*` angular/react, paridade source_docs, arch-advisors sem `playwright/*`, ausencia de `@latest` (skill e idea_mcp), segredos so por env (sem valores literais). `{paralelizavel: false, responsavel: "@governance-factory"}`
+- [x] T12 Criar `tests/governance_audit/test_playwright_mcp_frontend_governance.py`: paridade tools `playwright/*` angular/react, paridade source_docs, <stack>-arch-advisors sem `playwright/*`, ausencia de `@latest` (skill e idea_mcp), segredos so por env (sem valores literais). `{paralelizavel: false, responsavel: "@governance-factory"}`
 - [x] T13 Changelog/README de skills se exigidos por `test_changelog_integrity`; ajustar contagens se algum teste de governanca quebrar. `{paralelizavel: false, responsavel: "@governance-factory"}`
 - [x] T14 `.github/projects.local.yaml` (gitignored): `ui_url`, `auth_strategy` (storage_state|user_data_dir|none), nome do env var (so o NOME, nunca o valor); alvo unico [PROJETO-ALVO] (H2; outro-projeto fora do escopo); ajustar `prompts/add-project-context.prompt.md` e `skills/project-scanner/SKILL.md` para coletar esses campos. `{paralelizavel: true, responsavel: "@governance-maintainer"}`
 - [x] T15 `.gitignore`: `playwright/.auth/`, `auth.json`, `*storage-state*.json`, `test-results/`, `playwright-report/` (confirmar com `git check-ignore`). `{paralelizavel: true, responsavel: "@governance-maintainer"}`
@@ -149,7 +149,7 @@ Status: aprovado por humano em 2026-10-08 via ask_questions (H1–H6).
 |---|---|---|---|
 | developer | 13 (11 + browser_fill_form + browser_press_key) | 13 (idem) | paridade; extras para formularios/teclado |
 | test-engineer | 18 | 18 | Angular alinhado ao React (H3) |
-| arch-advisor | consultivo | consultivo | paridade |
+| <stack>-arch-advisor | consultivo | consultivo | paridade |
 | router | sem tools playwright | sem tools playwright | paridade |
 
 ### 8.2 Parecer do react-arch-advisor (incorporado)

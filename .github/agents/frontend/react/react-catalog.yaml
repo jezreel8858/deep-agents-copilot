@@ -8,7 +8,7 @@ description: >-
 router:
   id: "react-router"
   role: "supervisor"
-  description: "Roteador central do domínio React — tria e despacha para os 3 especialistas de frontend (arch-advisor, developer e test-engineer)"
+  description: "Roteador central do domínio React — tria e despacha para os 3 especialistas de frontend (react-arch-advisor, react-developer e react-test-engineer)"
   tools:
     - "read_file"
     - "file_search"
@@ -58,7 +58,7 @@ agents:
 
   react-developer:
     id: "react-developer"
-    model: "Claude Sonnet 5.5"
+    model: Grok 4.7
     role: "implementation"
     domain: "Desenvolvimento de Telas, Componentes, Hooks, Estado, Estilização Tailwind e Correção de Bugs de UI"
     description: "Especialista mutativo core: constrói componentes acessíveis e hooks customizados, gerencia estado com TanStack Query e Zustand, aplica estilização Tailwind/CSS Modules e resolve bugs de renderização cirurgicamente sob metodologia Test-Last (isento de autoria de testes unitários)."
@@ -119,7 +119,7 @@ agents:
 
   react-test-engineer:
     id: "react-test-engineer"
-    model: "Claude Sonnet 5.5"
+    model: Grok 4.7
     role: "quality-assurance"
     domain: "Garantia de Qualidade Frontend, Vitest, React Testing Library, Playwright E2E e Autocorreção"
     description: "Especialista mutativo de testes: projeta e implementa testes unitários isolados (Vitest), testes de renderização e acessibilidade de componentes (RTL), jornadas E2E (Playwright) e executa autocorreção de suítes quebradas sob CAP RÍGIDO (R-053)."

@@ -8,7 +8,7 @@
 - **Fase do gateway**: Fase 5 (sucede Fase 3 = SDK real; Fase 4 = telemetria/governança multi-turno — já materializada em `test_governance_phase4.py`)
 - **Status de execução**: ✅ **CONCLUÍDA (2026-10-01)** — PR-1 a PR-8 implementados e mergeados sob TDD estrito. 355 testes verdes agregados (192 gateway + 163 headless-governance-runner). Ver Seção 8 (Fechamento Final) para evidências objetivas, gaps encontrados e corrigidos durante a execução (Addendums 1-9, todos validados ponta a ponta com Docker + requisições reais).
 
-> **Escopo deste documento**: apenas planejamento de implementação (ordem TDD, matriz de riscos de código, plano de ajuste de `__all__`, plano de fail-fast, sequenciamento de PRs, critérios de pronto). **Nenhum código de aplicação é escrito aqui** — autoria de código/testes reais é responsabilidade do `@python-feature-developer` em handoff subsequente, mediante aprovação humana deste plano.
+> **Escopo deste documento**: apenas planejamento de implementação (ordem TDD, matriz de riscos de código, plano de ajuste de `__all__`, plano de fail-fast, sequenciamento de PRs, critérios de pronto). **Nenhum código de aplicação é escrito aqui** — autoria de código/testes reais é responsabilidade do `@python-developer` em handoff subsequente, mediante aprovação humana deste plano.
 
 ---
 
@@ -51,7 +51,7 @@ Total de testes pré-existentes no diretório `deploy/local-chat-gateway/`: **89
 
 ## 2. Ordem de implementação sob TDD estrito (red → green → refactor)
 
-Princípio geral: **cada item abaixo é um ciclo TDD completo e isolado** (um commit/PR por item, ver Seção 5). Nenhum item avança para "green" sem o item anterior estar mergeado e a suíte completa (124 testes + novos) verde. Testes são sempre escritos por `@test-strategy`/`@python-feature-developer` nesta fase subsequente — aqui apenas se define a sequência e o oráculo de cada etapa.
+Princípio geral: **cada item abaixo é um ciclo TDD completo e isolado** (um commit/PR por item, ver Seção 5). Nenhum item avança para "green" sem o item anterior estar mergeado e a suíte completa (124 testes + novos) verde. Testes são sempre escritos por `@test-strategy`/`@python-developer` nesta fase subsequente — aqui apenas se define a sequência e o oráculo de cada etapa.
 
 ### T0 — Baseline de regressão (pré-requisito, não é código novo)
 - **Red/Green**: N/A — é uma verificação, não um teste novo.
@@ -163,7 +163,7 @@ Princípio geral: **cada item abaixo é um ciclo TDD completo e isolado** (um co
    ```
 5. **Runbook de deploy** (ação fora deste documento, mas a ser referenciada no CHANGELOG/README do gateway): checagem de validade do grafo/schema deve rodar em pipeline **CI**, antes do deploy, como gate preventivo adicional (reduz a chance de descobrir o problema apenas em produção).
 
-### Teste que comprova a falha de startup (especificação do oráculo, a ser escrito por `@python-feature-developer`)
+### Teste que comprova a falha de startup (especificação do oráculo, a ser escrito por `@python-developer`)
 - **Nome sugerido**: `test_create_app_fail_fast_grafo_invalido` em `deploy/local-chat-gateway/tests/integration/test_governance_phase5.py`.
 - **Arranjo**: fixture de YAML de grafo propositalmente inválido (ex.: nó referenciado em aresta mas ausente em `nos`, ou campo obrigatório do schema ausente) + `Settings` de teste apontando `governance_graph_path` para esse arquivo.
 - **Ato**: chamar `create_app(settings)` (ou o helper que executa o `lifespan` de forma síncrona em teste, conforme padrão do FastAPI `TestClient`/`asgi-lifespan`).

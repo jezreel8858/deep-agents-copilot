@@ -35,7 +35,7 @@ Toda skill deve declarar no topo:
 | `tavily` | Tier 2 | Pesquisar documentação externa, changelog, versões e referências de terceiros |
 | `context-compact` | Tier 2 | Compactar contexto pós-leitura, remover ruído e gerar resumos executáveis |
 | `mermaid-diagrams` | Tier 2 | Criar diagramas Mermaid legíveis para documentação, ADRs e análises técnicas |
-| `design-pattern-selection-patterns` | Tier 2 | Decision Tree objetiva para selecionar/descartar design patterns (GoF, funcionais, arquiteturais, resiliência) em planejamento, com guardrails anti-overengineering e mini-ADR no Plano R-064 — exclusiva dos agents `*-arch-advisor` |
+| `design-pattern-selection-patterns` | Tier 2 | Decision Tree objetiva para selecionar/descartar design patterns (GoF, funcionais, arquiteturais, resiliência) em planejamento, com guardrails anti-overengineering e mini-ADR no Plano R-064 — exclusiva dos agents `<stack>-arch-advisor` |
 | `agent-contracts` | Tier 1 | Padronizar contrato de entrada, saída e não-escopo de agents |
 | `handoff-governance` | Tier 1 | Definir critérios e payload mínimo de handoff entre agents |
 | `confidence-fallback-policy` | Tier 1 | Definir score de confiança e regras de fallback/escalonamento |

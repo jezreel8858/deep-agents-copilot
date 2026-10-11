@@ -4,7 +4,7 @@ description: >-
   <Descrição concisa em 3ª pessoa, ≤ 400 caracteres. Explica O QUÊ o agente faz, QUANDO deve ser invocado (frase-gatilho) e principal limite negativo.>
 # Seleção de Modelo (governance-factory-patterns/SKILL.md §9 e R-021):
 # - "Gemini 3.8 Flash" -> Perfil Procedural / Operacional / SLM de alta velocidade (padrão para executores leves e test-writers)
-# - "Claude Sonnet 5.5"  -> Perfil Decompositivo / Deliberativo / Raciocínio Guiado (arquitetura, planejamento, feature-developers, bug-fixers, test-fixers)
+# - "Claude Sonnet 5.5"  -> Perfil Decompositivo / Deliberativo / Raciocínio Guiado (arquitetura, planejamento, desenvolvedores [*-developer], engenheiros de teste [*-test-engineer])
 # NOTA DE GOVERNANÇA (R-021 — Model Routing Signal):
 # É PROIBIDO fixar 'model:' permanentemente em tier premium ("Claude Opus" ou equivalente de tier máximo) para papéis de
 # execução contínua/genérica. O escalonamento é sempre PONTUAL (por chamada/tarefa via sinal 🧠 em run_subagent), nunca permanente.
@@ -15,10 +15,9 @@ model: "Gemini 3.8 Flash"
 # Operacional: ['read_file', 'insert_edit_into_file', 'create_file', 'grep_search', 'file_search', 'list_dir', 'get_errors', 'run_subagent']
 # Read-Only / Analítico: ['read_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'mcp_context-mode_ctx_search']
 # Herança de Tooling playwright-mcp (R-055 Q2 — Anti-Silo Fix):
-# Agents de frontend com perfil *-e2e-writer, *-ui-stylist, *-component-test-writer, *-feature-developer ou
-# *-bug-fixer (Angular/React e stacks futuras equivalentes) DEVEM incluir as tools 'playwright/browser_*'
+# Agents de frontend com perfil *-developer ou *-test-engineer (Angular/React e stacks futuras equivalentes) DEVEM incluir as tools 'playwright/browser_*'
 # (servidor MCP microsoft/playwright-mcp, ver .config/idea_mcp.json) conforme o tier de privilégio do papel
-# (INSPECT: ui-stylist / COMPONENT: component-test-writer e feature-developer / FULL: e2e-writer e bug-fixer)
+# (INSPECT / COMPONENT / FULL: <stack>-developer e <stack>-test-engineer)
 # e referenciar compulsoriamente '.github/skills/playwright-mcp/SKILL.md' em source_docs:. Esta herança é
 # formalizada deterministicamente em tools/agent_source_docs_sync/required_source_docs_rules.json
 # (regra 'playwright_mcp_requires_skill_doc') e detalhada em docs/plan/agent-profiles-taxonomy.md (Addendum).
@@ -171,7 +170,7 @@ Retorne IMEDIATAMENTE para `@agent-router` caso a solicitação fuja do escopo d
 - Evitar mutações em arquivos compartilhados sem necessidade comprovada.
 
 ### Anti-padrões a Evitar
-- Ao criar/revisar agent com perfil de bug-fixer, perf-tuner ou test-fixer: é COMPULSÓRIO incluir (1) Blast-Radius Check (buscar chamadores/dependentes) ANTES de aplicar o diff mínimo; (2) para perf-tuner, baseline mensurado ANTES/DEPOIS da mudança + gate de aprovação humana (`ask_questions`) para mudanças de performance irrevogáveis em produção (canary/staging); (3) para test-fixer, heurística de classificação bug-real-vs-drift e CAP RÍGIDO de no máximo 2 tentativas de correção antes de escalar para `@bug-triage` — omissão destas 3 salvaguardas é gap sistêmico recorrente (R-055 Q2, auditoria `@agent-auditor`).
+- Ao criar/revisar agent com perfil de implementação/correção (<stack>-developer) ou teste (<stack>-test-engineer): é COMPULSÓRIO incluir (1) Blast-Radius Check (buscar chamadores/dependentes) ANTES de aplicar o diff mínimo; (2) para perf-tuner, baseline mensurado ANTES/DEPOIS da mudança + gate de aprovação humana (`ask_questions`) para mudanças de performance irrevogáveis em produção (canary/staging); (3) para autocorreção de testes (<stack>-test-engineer), heurística de classificação bug-real-vs-drift e CAP RÍGIDO de no máximo 2 tentativas de correção antes de escalar para `@bug-triage` — omissão destas 3 salvaguardas é gap sistêmico recorrente (R-055 Q2, auditoria `@agent-auditor`).
 | Anti-padrão | Impacto | Prática Correta |
 |---|---|---|
 | Assumir requisitos ocultos | Retrabalho e quebra de contratos | Solicitar clarificação ou ater-se ao explícito |

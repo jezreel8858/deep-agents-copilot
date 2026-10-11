@@ -2,7 +2,7 @@
 test_hybrid_model_routing_and_zero_noise_governance.py — Quality Gate Determinístico de Modelo Híbrido e Política Zero-Noise.
 
 Valida as seguintes garantias de governança:
-(a) Qualquer agent com papel feature-developer, bug-fixer ou test-fixer DEVE utilizar o modelo "Claude Sonnet 5.5";
+(a) Todos os 14 agents developers e test-engineers das stacks DEVEM utilizar o modelo "Grok 4.7";
 (b) Qualquer agent com papel test-writer (unit/integration/component) DEVE utilizar o modelo "Gemini 3.8 Flash";
 (c) Todos os 30 agents executores DEVEM declarar '.github/skills/terminal-governance/SKILL.md' em source_docs;
 (d) Todos os 30 agents executores DEVEM citar expressamente 'Zero-Noise Test Policy (terminal-governance/SKILL.md §3.1)';
@@ -19,8 +19,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 AGENTS_DIR = REPO_ROOT / ".github" / "agents"
 COPILOT_INSTRUCTIONS = REPO_ROOT / ".github" / "copilot-instructions.md"
 
-PROMOTED_ROLES = ("feature-developer", "bug-fixer", "test-fixer")
-TEST_WRITER_ROLES = ("unit-test-writer", "integration-test-writer", "component-test-writer")
+PROMOTED_ROLES = ("developer", "test-engineer")
 
 PROMOTED_AGENTS = [
     "angular-developer", "angular-test-engineer",
@@ -29,6 +28,7 @@ PROMOTED_AGENTS = [
     "ejb-developer", "ejb-test-engineer",
     "struts-developer", "struts-test-engineer",
     "python-developer", "python-test-engineer",
+    "react-developer", "react-test-engineer",
 ]
 
 TEST_WRITER_AGENTS: list[str] = []
@@ -60,7 +60,7 @@ def get_executor_agent_files() -> list[Path]:
 
 
 def test_promoted_executor_agents_use_claude_sonnet_5():
-    """Valida (a): feature-developer, bug-fixer e test-fixer devem usar Claude Sonnet 5.5."""
+    """Valida (a): developers e test-engineers das stacks devem usar Grok 4.7."""
     agent_files = get_executor_agent_files()
     assert len(agent_files) == len(ALL_30_EXECUTORS), f"Esperados {len(ALL_30_EXECUTORS)} agents executores, encontrados {len(agent_files)}"
 
@@ -70,9 +70,9 @@ def test_promoted_executor_agents_use_claude_sonnet_5():
             content = agent_file.read_text(encoding="utf-8")
             fm = parse_frontmatter(content)
             model = fm.get("model")
-            assert model == "Claude Sonnet 5.5", remediation(
-                f"Agent '{stem}' possui model '{model}' no frontmatter, esperado 'Claude Sonnet 5.5'",
-                fix_hint=f"Edite {agent_file.relative_to(REPO_ROOT)} definindo model: \"Claude Sonnet 5.5\""
+            assert model == "Grok 4.7", remediation(
+                f"Agent '{stem}' possui model '{model}' no frontmatter, esperado 'Grok 4.7'",
+                fix_hint=f"Edite {agent_file.relative_to(REPO_ROOT)} definindo model: \"Grok 4.7\""
             )
 
 
@@ -129,9 +129,9 @@ def test_stack_catalogs_model_parity_for_promoted_agents():
         for agent_id, agent_info in agents_dict.items():
             if agent_id in PROMOTED_AGENTS:
                 model = agent_info.get("model")
-                assert model == "Claude Sonnet 5.5", remediation(
-                    f"Catálogo {cat.relative_to(REPO_ROOT)} declara model '{model}' para '{agent_id}', esperado 'Claude Sonnet 5.5'",
-                    fix_hint=f"Atualize a entrada de '{agent_id}' no catálogo {cat.relative_to(REPO_ROOT)} para model: 'Claude Sonnet 5.5'"
+                assert model == "Grok 4.7", remediation(
+                    f"Catálogo {cat.relative_to(REPO_ROOT)} declara model '{model}' para '{agent_id}', esperado 'Grok 4.7'",
+                    fix_hint=f"Atualize a entrada de '{agent_id}' no catálogo {cat.relative_to(REPO_ROOT)} para model: 'Grok 4.7'"
                 )
 
 
