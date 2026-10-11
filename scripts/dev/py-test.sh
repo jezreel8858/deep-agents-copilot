@@ -117,10 +117,13 @@ CMD=()
 if [ "$RUNNER" = uv ]; then
   CMD=("$UV_BIN" run --locked --project "$(native "$DAC_HOME")" --directory "$(native "$TARGET")" pytest -q --tb=short)
 else
-  "$PY_BIN" -c 'import sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)' 2>/dev/null \
-    || dac_die 12 "python ausente ou < 3.11"
-  "$PY_BIN" -c 'import pytest, yaml, jsonschema' 2>/dev/null \
-    || dac_die 12 "dependencias ausentes; execute: python -m pip install -r tests/requirements.txt"
+  # Se dry-run, pular validações de dependências
+  if [ "$DRY" = 0 ]; then
+    "$PY_BIN" -c 'import sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)' 2>/dev/null \
+      || dac_die 12 "python ausente ou < 3.11"
+    "$PY_BIN" -c 'import pytest, yaml, jsonschema' 2>/dev/null \
+      || dac_die 12 "dependencias ausentes; execute: python -m pip install -r tests/requirements.txt"
+  fi
   dac_log "[FALLBACK] sem uv; usando python -m pytest (sem lock)"
   CMD=("$PY_BIN" -m pytest -q --tb=short)
 fi

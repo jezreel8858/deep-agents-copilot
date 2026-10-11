@@ -4,6 +4,7 @@
 # Fonte de verdade: pyproject.toml (grupo dev, uv). Este arquivo e o fallback sem uv e o
 # instalador usado pelos workflows de CI atuais. Manter pacotes/limites identicos.
 pytest>=8.0
+pytest-xdist>=3.0
 PyYAML>=6.0
 jsonschema>=4.20.0
 
