@@ -23,15 +23,68 @@ pytest tests/
 
 ## 📊 Benchmarks de Performance
 
-| Modo | Tempo | Speedup |
-|------|-------|---------|
-| **Sequencial** (sem paralelismo) | ~7-10s | 1x |
-| **Paralelo** (`-n auto`, 2 CPUs) | ~3-4s | **2.5x** 🚀 |
-| **Paralelo** (`-n auto`, 4 CPUs) | ~2s | **4x** 🚀 |
+| Modo | Tempo | Speed-up | Observações |
+|------|-------|---------|---|
+| **Sequencial** (`-n 0`) | ~165-170s | 1x | Baseline |
+| **`-n auto`** (2 CPUs) | ~165s | ~1x | Padrão (auto-detecta) |
+| **`-n 2`** | ~130-145s | ~1.1x | Bom balanço |
+| **`-n 4`** | ~128s | ~1.3x | **Mais rápido, mas com mais I/O contention** ⚠️ |
+
+### Trade-off: Velocidade vs Warnings
+- **`-n auto` (padrão)**: Seguro, sem warnings, mas mais lento no Windows
+- **`-n 4`**: ~3-5% mais rápido, mas alguns testes I/O-bound excedem orçamento (warnings de 3-5s)
+- **`-n 2`**: Bom balanço entre velocidade e estabilidade
 
 ---
 
-## 🔧 Opções de Execução
+## 🪟 Performance no Windows (Git + I/O Lento)
+
+No Windows, Git e operações de I/O em disco são **significativamente mais lentos** do que em Linux/Mac.
+
+### ⚠️ Observações Importantes
+- Testes com I/O pesado (criação de repositórios Git em `tmp_path`) sofrem contenção de disco com múltiplos workers
+- Fixtures `scope="session"` que constroem repositórios Git só rodam uma vez (gargalo inicial)
+- Overhead de inter-processo entre workers em Windows é maior que em Linux
+
+### 📊 Benchmarks Realistas (Windows)
+
+| Modo | Tempo | Observações |
+|------|-------|---|
+| **Sequencial** (`-n 0`) | ~160s | Baseline |
+| **`-n auto` (2 CPUs)** | ~130-140s | **Padrão recomendado** ✅ |
+| **`-n 4`** | ~128s | Ligeiramente mais rápido, mas margem pequena |
+| **`-n auto --dist loadscope`** | ~160s+ | Menos eficiente em Windows |
+
+## 🎯 Recomendações por Cenário
+
+### Desenvolvimento Local (Windows)
+```bash
+# Padrão seguro (auto)
+pytest tests/
+
+# Se quiser mais velocidade, aceitar warnings
+pytest tests/ -n 4
+
+# Bom balanço
+pytest tests/ -n 2
+```
+
+### CI/CD (GitHub Actions / Windows)
+```bash
+# Use menos workers para evitar timeouts
+pytest tests/ -n 2 -v --tb=short
+```
+
+### Diagnóstico / Debug
+```bash
+# Modo sequencial para baseline
+pytest tests/ -n 0 -v
+
+# Ver duração individual dos testes
+pytest tests/ -n auto --durations=20
+```
+
+---
 
 ### Padrão (com paralelismo automático)
 ```bash
@@ -61,7 +114,10 @@ pytest tests/ -p no:xdist
 
 ### Opções avançadas
 ```bash
-# Usar distribuição de escopo (agrupa testes por arquivo)
+# Usar menos workers (útil em Windows com contenção)
+pytest tests/ -n 2
+
+# Usar distribuição por escopo (pode ser mais lento em Windows)
 pytest tests/ -n auto --dist loadscope
 
 # Com relatório de distribuição
@@ -142,12 +198,14 @@ created: 4/4 workers
 
 ## 🛠️ CI/CD Integration
 
-O arquivo `.github/workflows/routing-quality-gate.yml` já foi configurado para usar paralelismo:
+O arquivo `.github/workflows/routing-quality-gate.yml` está configurado para usar paralelismo automático:
 
 ```yaml
 - name: Run pytest suite
   run: pytest tests/ -n auto -v --tb=short
 ```
+
+**Nota**: No Windows (como `windows-latest` em GitHub Actions), considere usar `-n 2` se houver timeout excessivo devido a contenção de disco.
 
 ---
 
@@ -159,6 +217,25 @@ O arquivo `.github/workflows/routing-quality-gate.yml` já foi configurado para 
 ---
 
 ## ❓ Troubleshooting
+
+### "Testes lentos mesmo com paralelismo (Windows)"
+No Windows, I/O e Git são lentos. Tente:
+```bash
+# Usar menos workers para reduzir contenção
+pytest tests/ -n 2
+
+# Ou modo sequencial para baseline
+pytest tests/ -n 0
+
+# Ver quais testes estão demorando
+pytest tests/ -n auto -v --durations=10
+```
+
+### "Warnings: teste excedeu orçamento de 5s"
+Isso é esperado para testes I/O-bound no Windows (especialmente `tests/model_profiles`).
+O aviso é informativo e não falha o teste. Considere:
+- Usar `-n 2` em vez de `-n auto`
+- Aumentar orçamento em conftest.py se necessário
 
 ### "xdist not found"
 ```bash
@@ -179,7 +256,8 @@ pytest tests/ -n auto --co -q | head -5
 
 ### Performance não melhorou
 - Verificar número de CPUs: `python -c "import os; print(os.cpu_count())"`
+- Em Windows, tentar `-n 2` em vez de `-n auto`
 - Usar modo verbose: `pytest tests/ -n auto -v`
-- Considerar distribuição por escopo: `pytest tests/ -n auto --dist loadscope`
+- Verificar duração dos testes: `pytest tests/ -n auto --durations=10`
 
 

@@ -37,12 +37,16 @@ def _real_repo_untouched():
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_call(item):
-    """Orcamento leve (sem plugin): avisa (nao falha) se um teste passar de 3 s."""
+    """Orcamento leve (sem plugin): avisa (nao falha) se um teste passar de 5 s.
+    
+    Nota: Windows + Git sao lentos, especialmente com tmp_path e paralelismo.
+    Aumentado de 3s para 5s para acomodar I/O em disco com xdist.
+    """
     start = time.perf_counter()
     yield
     elapsed = time.perf_counter() - start
-    if elapsed > 3.0:
-        warnings.warn(f"{item.nodeid} excedeu o orcamento de 3 s ({elapsed:.1f} s)", stacklevel=1)
+    if elapsed > 5.0:
+        warnings.warn(f"{item.nodeid} excedeu o orcamento de 5 s ({elapsed:.1f} s)", stacklevel=1)
 @pytest.fixture(scope="session", autouse=True)
 def _isolated_git_env():
     with pytest.MonkeyPatch.context() as mp:
