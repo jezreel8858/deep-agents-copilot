@@ -19,24 +19,8 @@ tier_map:
   standard:
     - adr-sentinel
     - agent-auditor
-    - database-arch-advisor
     - informix-database-specialist
     - oracle-database-specialist
-    - ejb-arch-advisor
-    - ejb-developer
-    - ejb-test-engineer
-    - python-arch-advisor
-    - python-developer
-    - python-test-engineer
-    - spring-boot-arch-advisor
-    - spring-boot-developer
-    - spring-boot-test-engineer
-    - spring-reactive-arch-advisor
-    - spring-reactive-developer
-    - spring-reactive-test-engineer
-    - struts-arch-advisor
-    - struts-developer
-    - struts-test-engineer
     - bug-triage
     - business-rules-extractor
     - code-review
@@ -46,12 +30,6 @@ tier_map:
     - deep-search
     - devops-engineer
     - feature-planner
-    - angular-arch-advisor
-    - angular-developer
-    - angular-test-engineer
-    - react-arch-advisor
-    - react-developer
-    - react-test-engineer
     - governance-factory
     - performance-agent
     - refactor-planner
@@ -94,6 +72,11 @@ tier_map:
     - prompt:templates/prompt-template
     - prompt:validate
     - prompt:visualize-graph
+  stack-arch:
+    - "*-arch-advisor"
+  stack-squad:
+    - "*-developer"
+    - "*-test-engineer"
 
 profiles:
   default:
@@ -103,21 +86,8 @@ profiles:
       orchestration: Claude Sonnet 5.5
       standard: Claude Sonnet 5.5
       light: Gemini 3.8 Flash
-    agents:
-      ejb-developer: Grok 4.7
-      ejb-test-engineer: Grok 4.7
-      python-developer: Grok 4.7
-      python-test-engineer: Grok 4.7
-      spring-boot-developer: Grok 4.7
-      spring-boot-test-engineer: Grok 4.7
-      spring-reactive-developer: Grok 4.7
-      spring-reactive-test-engineer: Grok 4.7
-      struts-developer: Grok 4.7
-      struts-test-engineer: Grok 4.7
-      angular-developer: Grok 4.7
-      angular-test-engineer: Grok 4.7
-      react-developer: Grok 4.7
-      react-test-engineer: Grok 4.7
+      stack-arch: Claude Sonnet 5.5
+      stack-squad: Grok 4.7
 
   balanceado:
     extends: default
@@ -128,24 +98,10 @@ profiles:
 
   economico:
     extends: balanceado
-    description: "Rebaixa orquestração e standard para Claude Haiku 5.5; herda premium do balanceado e light do default."
+    description: "Rebaixa orquestração para Gemini 3.8 Flash e standard para Claude Haiku 5.5; herda premium do balanceado e light do default."
     quality_warning: "Roteamento, planos e código podem perder precisão; routers podem errar triagem."
     tiers:
-      orchestration: Claude Haiku 5.5
+      orchestration: Gemini 3.8 Flash
       standard: Claude Haiku 5.5
-    agents:
-      ejb-developer: Claude Haiku 5.5
-      ejb-test-engineer: Claude Haiku 5.5
-      python-developer: Claude Haiku 5.5
-      python-test-engineer: Claude Haiku 5.5
-      spring-boot-developer: Claude Haiku 5.5
-      spring-boot-test-engineer: Claude Haiku 5.5
-      spring-reactive-developer: Claude Haiku 5.5
-      spring-reactive-test-engineer: Claude Haiku 5.5
-      struts-developer: Claude Haiku 5.5
-      struts-test-engineer: Claude Haiku 5.5
-      angular-developer: Claude Haiku 5.5
-      angular-test-engineer: Claude Haiku 5.5
-      react-developer: Claude Haiku 5.5
-      react-test-engineer: Claude Haiku 5.5
-
+      stack-arch: Gemini 3.8 Flash
+      stack-squad: Claude Haiku 5.5

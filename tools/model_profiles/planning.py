@@ -1,6 +1,8 @@
 """Contexto e modelos de dados de planejamento (apply/doctor)."""
 from __future__ import annotations
 
+import fnmatch
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -48,8 +50,43 @@ def _load_edges(repo: Path) -> list[tuple[str, str]]:
     return hierarchy.load_edges(graph) if graph.exists() else []
 
 
-def _flat_tier_map(tier_map: dict[str, Any]) -> dict[str, str]:
-    return {str(key): str(tier) for tier, keys in tier_map.items() for key in keys or []}
+def resolve_tier_for_key(key: str, tier_map: dict[str, Any]) -> str | None:
+    """Resolve o tier de um agent/prompt suportando correspondência exata, wildcards (glob) e regex."""
+    if not isinstance(tier_map, dict):
+        return None
+
+    # 1. Busca por correspondência exata (maior prioridade)
+    for tier, keys in tier_map.items():
+        if keys and key in keys:
+            return str(tier)
+
+    # 2. Busca por Padrões Wildcard (ex: "*-arch-advisor") ou Regex
+    for tier, keys in tier_map.items():
+        for pattern in keys or []:
+            pattern_str = str(pattern)
+
+            # Match via Wildcard/Glob (ex: *-arch-advisor)
+            if fnmatch.fnmatch(key, pattern_str):
+                return str(tier)
+
+            # Match via Regex (ex: ^.*-arch-advisor$)
+            try:
+                if re.search(pattern_str, key):
+                    return str(tier)
+            except re.error:
+                continue
+
+    return None
+
+
+def build_key_to_tier_map(known_keys: set[str], tier_map: dict[str, Any]) -> dict[str, str]:
+    """Resolve dinamicamente o tier para cada chave conhecida no repositório."""
+    resolved_map = {}
+    for key in known_keys:
+        tier = resolve_tier_for_key(key, tier_map)
+        if tier:
+            resolved_map[key] = tier
+    return resolved_map
 
 
 def _reject_local_tier_map(builtin: Any, local_tm: Any) -> None:
@@ -59,16 +96,17 @@ def _reject_local_tier_map(builtin: Any, local_tm: Any) -> None:
     if not isinstance(local_tm, dict) or not isinstance(builtin, dict):
         raise RefusalError("tier_map local deve ser um mapeamento", "TIER_MAP")
     targets.validate_keys(local_tm)
-    known = _flat_tier_map(builtin)
+
     for tier, keys in local_tm.items():
         if str(tier) not in builtin:
             raise RefusalError(f"tier_map local nao pode definir tier novo '{tier}'", "TIER_MAP")
         for key in keys or []:
             key_s = str(key)
-            if key_s not in known:
+            resolved_builtin_tier = resolve_tier_for_key(key_s, builtin)
+            if resolved_builtin_tier is None:
                 raise RefusalError(
                     f"tier_map local nao pode definir chave nova '{key_s}'", "TIER_MAP")
-            if known[key_s] != str(tier):
+            if resolved_builtin_tier != str(tier):
                 raise RefusalError(
                     f"tier_map local nao pode mover a chave '{key_s}'", "TIER_MAP")
 
@@ -102,7 +140,10 @@ def load_merged(repo: Path) -> tuple[dict[str, Any], frozenset[str]]:
     cfg = config.load_yaml(repo / PROFILES_FILE)
     tier_map = cfg.get("tier_map") or {}
     targets.validate_keys(tier_map)
-    key_to_tier = _flat_tier_map(tier_map if isinstance(tier_map, dict) else {})
+
+    discovered_keys = targets.discover_all_keys(repo)
+    key_to_tier = build_key_to_tier_map(discovered_keys, tier_map if isinstance(tier_map, dict) else {})
+
     builtin = cfg.get("profiles") or {}
     if not isinstance(builtin, dict):
         raise RefusalError("profiles built-in deve ser um mapeamento", "CONFIG")
@@ -127,7 +168,17 @@ def load_merged(repo: Path) -> tuple[dict[str, Any], frozenset[str]]:
 
 def load_context(repo: Path) -> Context:
     cfg, local_names = load_merged(repo)
-    key_to_tier = _flat_tier_map(cfg.get("tier_map") or {})
-    return Context(repo, cfg, allowlist.load(repo / ALLOWLIST_FILE),
-                   targets.discover(repo, key_to_tier), _load_edges(repo), key_to_tier,
-                   local_names)
+    tier_map = cfg.get("tier_map") or {}
+
+    discovered_keys = targets.discover_all_keys(repo)
+    key_to_tier = build_key_to_tier_map(discovered_keys, tier_map)
+
+    return Context(
+        repo=repo,
+        cfg=cfg,
+        allow=allowlist.load(repo / ALLOWLIST_FILE),
+        targets=targets.discover(repo, key_to_tier),
+        edges=_load_edges(repo),
+        key_to_tier=key_to_tier,
+        local_names=local_names,
+    )

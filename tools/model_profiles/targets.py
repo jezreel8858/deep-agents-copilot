@@ -101,6 +101,17 @@ def _load_target(repo: Path, path: Path, agents: Path, prompts: Path,
     return Target(key, path.relative_to(repo).as_posix(), path, data, model, exception)
 
 
+def discover_all_keys(repo: Path) -> set[str]:
+    """Descobre todas as chaves canónicas de ficheiros existentes no repositório."""
+    agents, prompts = repo / AGENTS_REL, repo / PROMPTS_REL
+    keys: set[str] = set()
+    for base, pattern in ((agents, "*.agent.md"), (prompts, "*.prompt.md")):
+        for path in sorted(base.rglob(pattern)) if base.is_dir() else []:
+            ensure_confined(repo, path)
+            keys.add(resolver.get_canonical_key(path, agents, prompts))
+    return keys
+
+
 def discover(repo: Path, key_to_tier: dict[str, str]) -> list[Target]:
     agents, prompts = repo / AGENTS_REL, repo / PROMPTS_REL
     found: list[Target] = []
