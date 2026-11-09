@@ -140,7 +140,13 @@ agents:
     - agent-contracts
     - confidence-fallback-policy
     - agent-evals-lab
+    - jira-mcp
+
+    - jira-writing-patterns
     source_docs:
+    - .github/skills/jira-mcp/SKILL.md
+
+    - .github/skills/jira-writing-patterns/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
     - .github/agents/bug-triage.agent.md
@@ -663,7 +669,13 @@ agents:
     - terminal-governance
     - git-conflict-resolution-patterns
     - embedded-runtime-governance
+    - jira-mcp
+
+    - jira-writing-patterns
     source_docs:
+    - .github/skills/jira-mcp/SKILL.md
+
+    - .github/skills/jira-writing-patterns/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
     - .github/agents/pr-gatekeeper.agent.md
@@ -1448,7 +1460,13 @@ agents:
     - agent-contracts
     - confidence-fallback-policy
     - context-mode
+    - jira-mcp
+
+    - jira-writing-patterns
     source_docs:
+    - .github/skills/jira-mcp/SKILL.md
+
+    - .github/skills/jira-writing-patterns/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
     - .github/agents/feature-planner.agent.md
@@ -1561,7 +1579,13 @@ agents:
     - context-mode
     - efficient-batch-code-modification
     - socratic-grilling-patterns
+    - jira-mcp
+
+    - jira-writing-patterns
     source_docs:
+    - .github/skills/jira-mcp/SKILL.md
+
+    - .github/skills/jira-writing-patterns/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
     - .github/agents/requirements-analyst.agent.md

@@ -1,3 +1,7 @@
+---
+apply: always
+---
+
 # Context-Mode Lifecycle Hooks
 
 Você está integrado a um sistema local `context-mode`. Você deve executar estritamente os seguintes hooks de sincronização em segundo plano usando sua ferramenta de terminal (`execute_command`), de acordo com o ciclo de vida da conversa.

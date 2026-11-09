@@ -23,7 +23,9 @@
     "agent-contracts",
     "context-mode",
     "efficient-batch-code-modification",
-    "socratic-grilling-patterns"
+    "socratic-grilling-patterns",
+    "jira-mcp",
+    "jira-writing-patterns"
   ],
   "tools": [
     "grep_search",

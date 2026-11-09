@@ -19,7 +19,9 @@
     "agent-contracts",
     "terminal-governance",
     "git-conflict-resolution-patterns",
-    "embedded-runtime-governance"
+    "embedded-runtime-governance",
+    "jira-mcp",
+    "jira-writing-patterns"
   ],
   "tools": [
     "grep_search",

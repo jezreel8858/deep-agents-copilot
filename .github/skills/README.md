@@ -47,6 +47,8 @@ Toda skill deve declarar no topo:
 | **`test-implementation-backend`** | ⭐ **Tier 2** | Padrões **genéricos** de testes backend (agnóstico de framework — pirâmide, AAA, mocks) |
 | **`test-implementation-spring-boot`** | ⭐ **Tier 2** | Padrões **específicos** JUnit 5 + Mockito + JaCoCo para Spring Boot |
 | **`test-implementation-frontend`** | ⭐ **Tier 2** | Padrões **genéricos** de testes frontend (agnóstico de framework — componentes, E2E) |
+| **`jira-mcp`** | 🛠️ **Tier 2** | Integração segura com Jira via servidor MCP `sooperset/mcp-atlassian` (`uvx`) — Least-Tools por perfil, JQL enxuta, `context-mode` e guardrails contra prompt injection (ASI01) |
+| **`jira-writing-patterns`** | 📝 **Tier 2** | Estrutura, redação e formatação de issues Jira (Epic/Story/Task/Subtask/Bug) — templates por tipo, Gherkin, INVEST, DoR/DoD e formatação Cloud (ADF) vs Server/DC; complementa `jira-mcp` |
 | **`playwright-mcp`** | 🧠 **Tier 1** | Automação de navegador real via Accessibility Tree (`browser_snapshot`) para o servidor MCP `microsoft/playwright-mcp` — seletores semânticos, ciclo de vida de abas, inspeção de rede/console e guardrails de segurança (RCE, prompt injection) |
 | **`test-implementation-angular-jasmine`** | ⭐ **Tier 2** | Padrões **específicos** Jasmine/Karma + Playwright para Angular 21 (legado/migração) |
 | **`test-implementation-angular-vitest`** | ⭐ **Tier 2** | Padrões **específicos** Vitest 3+ + @angular/build:unit-test para Angular 20/21+ (oficial/novo padrão) |

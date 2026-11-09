@@ -18,7 +18,9 @@
     "task-decomposition-patterns",
     "agent-contracts",
     "confidence-fallback-policy",
-    "context-mode"
+    "context-mode",
+    "jira-mcp",
+    "jira-writing-patterns"
   ],
   "tools": [
     "grep_search",

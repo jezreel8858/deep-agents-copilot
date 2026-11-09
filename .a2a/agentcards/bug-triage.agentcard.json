@@ -24,7 +24,9 @@
     "efficient-batch-code-modification",
     "agent-contracts",
     "confidence-fallback-policy",
-    "agent-evals-lab"
+    "agent-evals-lab",
+    "jira-mcp",
+    "jira-writing-patterns"
   ],
   "tools": [
     "grep_search",
