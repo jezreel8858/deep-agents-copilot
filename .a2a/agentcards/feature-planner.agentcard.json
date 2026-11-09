@@ -32,7 +32,13 @@
     "context-mode/ctx_execute",
     "context-mode/ctx_batch_execute",
     "context-mode/ctx_execute_file",
-    "context-mode/ctx_index"
+    "context-mode/ctx_index",
+    "mcp-atlassian/jira_get_issue",
+    "mcp-atlassian/jira_search",
+    "mcp-atlassian/jira_create_issue",
+    "mcp-atlassian/jira_update_issue",
+    "mcp-atlassian/jira_add_comment",
+    "mcp-atlassian/jira_transition_issue"
   ],
   "security_profile": {
     "tool_zones": [

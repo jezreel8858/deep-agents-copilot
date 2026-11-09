@@ -7,7 +7,7 @@ description: >-
   precisas com critérios de aceitação e regras de negócio antes do planejamento técnico,
   materializando-as em docs/requirements/REQ-<modulo>.md como ground truth.
 model: "Claude Sonnet 5.5"
-tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'ask_questions', 'run_subagent', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
+tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'ask_questions', 'run_subagent', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'mcp-atlassian/jira_get_issue', 'mcp-atlassian/jira_search']
 source_docs:
   - .github/skills/requirements-engineering-patterns/SKILL.md
   - .github/skills/structured-intake-patterns/SKILL.md
@@ -20,7 +20,6 @@ source_docs:
   - .github/skills/handoff-governance/SKILL.md
   - .github/skills/agent-contracts/SKILL.md
   - .github/skills/jira-mcp/SKILL.md
-
   - .github/skills/jira-writing-patterns/SKILL.md
 source_docs_lazy:
   - CLAUDE.md

@@ -32,7 +32,11 @@
     "ask_questions",
     "run_subagent",
     "context-mode/ctx_search",
-    "context-mode/ctx_index"
+    "context-mode/ctx_index",
+    "mcp-atlassian/jira_get_issue",
+    "mcp-atlassian/jira_search",
+    "mcp-atlassian/jira_add_comment",
+    "mcp-atlassian/jira_transition_issue"
   ],
   "security_profile": {
     "tool_zones": [

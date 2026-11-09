@@ -36,11 +36,11 @@
     "run_in_terminal",
     "ask_questions",
     "run_subagent",
-    "context-mode/ctx_execute",
-    "context-mode/ctx_execute_file",
     "context-mode/ctx_index",
     "context-mode/ctx_search",
-    "context-mode/ctx_batch_execute"
+    "context-mode/ctx_batch_execute",
+    "mcp-atlassian/jira_get_issue",
+    "mcp-atlassian/jira_search"
   ],
   "security_profile": {
     "tool_zones": [

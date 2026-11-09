@@ -8,7 +8,7 @@ description: >-
   especializados. Distinto de refactor-planner (foco em risco/rollback de
   código existente).
 model: "Claude Sonnet 5.5"
-tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index']
+tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'mcp-atlassian/jira_get_issue', 'mcp-atlassian/jira_search', 'mcp-atlassian/jira_create_issue', 'mcp-atlassian/jira_update_issue', 'mcp-atlassian/jira_add_comment', 'mcp-atlassian/jira_transition_issue']
 source_docs:
   - .github/skills/documentation-writing-patterns/SKILL.md
   - .github/skills/security-review-patterns/SKILL.md
@@ -19,7 +19,6 @@ source_docs:
   - .github/skills/handoff-governance/SKILL.md
   - .github/skills/agent-contracts/SKILL.md
   - .github/skills/jira-mcp/SKILL.md
-
   - .github/skills/jira-writing-patterns/SKILL.md
 source_docs_lazy:
   - CLAUDE.md

@@ -124,11 +124,11 @@ agents:
     - run_in_terminal
     - ask_questions
     - run_subagent
-    - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
     - context-mode/ctx_index
     - context-mode/ctx_search
     - context-mode/ctx_batch_execute
+    - mcp-atlassian/jira_get_issue
+    - mcp-atlassian/jira_search
     related_skills:
     - context-mode
     - terminal-governance
@@ -145,7 +145,6 @@ agents:
     - jira-writing-patterns
     source_docs:
     - .github/skills/jira-mcp/SKILL.md
-
     - .github/skills/jira-writing-patterns/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
@@ -663,6 +662,10 @@ agents:
     - run_subagent
     - context-mode/ctx_search
     - context-mode/ctx_index
+    - mcp-atlassian/jira_get_issue
+    - mcp-atlassian/jira_search
+    - mcp-atlassian/jira_add_comment
+    - mcp-atlassian/jira_transition_issue
     related_skills:
     - git-governance
     - agent-contracts
@@ -670,11 +673,9 @@ agents:
     - git-conflict-resolution-patterns
     - embedded-runtime-governance
     - jira-mcp
-
     - jira-writing-patterns
     source_docs:
     - .github/skills/jira-mcp/SKILL.md
-
     - .github/skills/jira-writing-patterns/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
@@ -1030,11 +1031,11 @@ agents:
     - get_errors
     - ask_questions
     - run_subagent
-    - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
     - context-mode/ctx_index
     - context-mode/ctx_search
     - context-mode/ctx_batch_execute
+    - mcp-atlassian/jira_get_issue
+    - mcp-atlassian/jira_search
     related_skills:
     - business-rules-governance
     - code-tracing
@@ -1455,17 +1456,21 @@ agents:
     - context-mode/ctx_batch_execute
     - context-mode/ctx_execute_file
     - context-mode/ctx_index
+    - mcp-atlassian/jira_get_issue
+    - mcp-atlassian/jira_search
+    - mcp-atlassian/jira_create_issue
+    - mcp-atlassian/jira_update_issue
+    - mcp-atlassian/jira_add_comment
+    - mcp-atlassian/jira_transition_issue
     related_skills:
     - task-decomposition-patterns
     - agent-contracts
     - confidence-fallback-policy
     - context-mode
     - jira-mcp
-
     - jira-writing-patterns
     source_docs:
     - .github/skills/jira-mcp/SKILL.md
-
     - .github/skills/jira-writing-patterns/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
@@ -1571,6 +1576,8 @@ agents:
     - context-mode/ctx_index
     - context-mode/ctx_search
     - context-mode/ctx_batch_execute
+    - mcp-atlassian/jira_get_issue
+    - mcp-atlassian/jira_search
     related_skills:
     - requirements-engineering-patterns
     - structured-intake-patterns
@@ -1580,11 +1587,9 @@ agents:
     - efficient-batch-code-modification
     - socratic-grilling-patterns
     - jira-mcp
-
     - jira-writing-patterns
     source_docs:
     - .github/skills/jira-mcp/SKILL.md
-
     - .github/skills/jira-writing-patterns/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
