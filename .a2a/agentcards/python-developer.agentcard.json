@@ -49,7 +49,7 @@
     "data_sensitivity": "internal"
   },
   "model_preferences": {
-    "recommended_model": "Claude Sonnet 5.5",
+    "recommended_model": "Grok 4.7",
     "cost_tier": "1x"
   },
   "input_contract": {
