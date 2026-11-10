@@ -26,6 +26,7 @@ from tests.governance_audit._helpers import (
     load_profiles,
     safe_load_yaml_unique,
 )
+from tools.model_profiles.planning import build_key_to_tier_map
 from tools.model_profiles.resolver import (
     get_canonical_key,
     get_tier_for_key,
@@ -44,6 +45,7 @@ PROMPTS_DIR = REPO_ROOT / ".github" / "prompts"
 
 def test_tier_map_covers_100_percent_without_duplicates():
     """Valida que tier_map cobre exatamente 100% dos arquivos com model: sem nenhuma duplicidade."""
+    import fnmatch
     data = load_profiles(REPO_ROOT)
     assert "tier_map" in data, "tier_map deve existir em model-profiles.yaml"
     tier_map = data["tier_map"]
@@ -51,25 +53,32 @@ def test_tier_map_covers_100_percent_without_duplicates():
     repo_files = collect_repo_frontmatter_files(REPO_ROOT)
     repo_keys = set(repo_files.keys())
 
-    # Verifica duplicidade no tier_map
+    # Verifica duplicidade de declaração no tier_map
     seen_keys: dict[str, str] = {}
     for tier_name, items in tier_map.items():
         assert isinstance(items, list), f"Tier '{tier_name}' deve ser uma lista de chaves"
         for item in items:
-            assert item not in seen_keys, f"Chave '{item}' duplicada: presente em '{seen_keys[item]}' e '{tier_name}'"
+            assert item not in seen_keys, f"Chave/padrão '{item}' duplicada: presente em '{seen_keys[item]}' e '{tier_name}'"
             seen_keys[item] = tier_name
 
-    tier_map_keys = set(seen_keys.keys())
+    key_to_tier = build_key_to_tier_map(repo_keys, tier_map)
+    missing_in_tier_map = repo_keys - set(key_to_tier.keys())
 
-    # Diferença nos dois sentidos
-    missing_in_tier_map = repo_keys - tier_map_keys
-    unknown_in_tier_map = tier_map_keys - repo_keys
+    matched_patterns = set()
+    for key in repo_keys:
+        for tier_name, items in tier_map.items():
+            for pat in items:
+                pat_str = str(pat)
+                if pat_str == key or fnmatch.fnmatch(key, pat_str):
+                    matched_patterns.add(pat)
+
+    unmatched_in_tier_map = set(seen_keys.keys()) - matched_patterns
 
     msg = []
     if missing_in_tier_map:
         msg.append(f"Arquivos com model: ausentes do tier_map ({len(missing_in_tier_map)}): {sorted(missing_in_tier_map)}")
-    if unknown_in_tier_map:
-        msg.append(f"Chaves no tier_map sem arquivo correspondente ({len(unknown_in_tier_map)}): {sorted(unknown_in_tier_map)}")
+    if unmatched_in_tier_map:
+        msg.append(f"Chaves/padrões no tier_map sem arquivo correspondente ({len(unmatched_in_tier_map)}): {sorted(unmatched_in_tier_map)}")
 
     assert not msg, "\n".join(msg)
 
@@ -80,13 +89,9 @@ def test_default_profile_parity_with_frontmatters():
     tier_map = data["tier_map"]
     profiles = data["profiles"]
 
-    key_to_tier = {}
-    for tier_name, items in tier_map.items():
-        for item in items:
-            key_to_tier[item] = tier_name
-
     resolved_default = resolve_profile("default", profiles)
     repo_files = collect_repo_frontmatter_files(REPO_ROOT)
+    key_to_tier = build_key_to_tier_map(set(repo_files.keys()), tier_map)
 
     mismatches = []
     for key, (file_path, actual_model) in repo_files.items():
@@ -105,20 +110,26 @@ def test_default_profile_parity_with_frontmatters():
 
 
 def test_economico_profile_downgrades_orchestration_and_standard_to_haiku():
-    """Valida que o perfil 'economico' rebaixa orchestration e standard para Claude Haiku 5.5 conforme IA-4 e D6."""
+    """Valida que o perfil 'economico' rebaixa orchestration para Gemini 3.8 Flash e tiers operacionais para Claude Haiku 5.5."""
     data = load_profiles(REPO_ROOT)
     profiles = data["profiles"]
     resolved_economico = resolve_profile("economico", profiles)
 
-    assert resolved_economico["tiers"]["orchestration"] == "Claude Haiku 5.5", (
-        f"orchestration em economico deve ser 'Claude Haiku 5.5', obteve: {resolved_economico['tiers']['orchestration']}"
+    assert resolved_economico["tiers"]["orchestration"] == "Gemini 3.8 Flash", (
+        f"orchestration em economico deve ser 'Gemini 3.8 Flash', obteve: {resolved_economico['tiers']['orchestration']}"
     )
     assert resolved_economico["tiers"]["standard"] == "Claude Haiku 5.5", (
         f"standard em economico deve ser 'Claude Haiku 5.5', obteve: {resolved_economico['tiers']['standard']}"
     )
-    # Herança do balanceado (premium) e default (light)
-    assert resolved_economico["tiers"]["premium"] == "Claude Sonnet 5.5"
-    assert resolved_economico["tiers"]["light"] == "Gemini 3.8 Flash"
+    assert resolved_economico["tiers"]["light"] == "Claude Haiku 5.5", (
+        f"light em economico deve ser 'Claude Haiku 5.5', obteve: {resolved_economico['tiers']['light']}"
+    )
+    assert resolved_economico["tiers"]["utility"] == "Claude Haiku 5.5", (
+        f"utility em economico deve ser 'Claude Haiku 5.5', obteve: {resolved_economico['tiers']['utility']}"
+    )
+    assert resolved_economico["tiers"]["stack-arch"] == "Gemini 3.8 Flash"
+    assert resolved_economico["tiers"]["stack-squad"] == "Claude Haiku 5.5"
+    assert resolved_economico["tiers"]["premium"] == "Claude Sonnet 5.5" 
 
 
 def test_all_resolved_profiles_cover_all_tier_map_tiers():

@@ -9,7 +9,7 @@ description: >-
 # É PROIBIDO fixar 'model:' permanentemente em tier premium ("Claude Opus" ou equivalente de tier máximo) para papéis de
 # execução contínua/genérica. O escalonamento é sempre PONTUAL (por chamada/tarefa via sinal 🧠 em run_subagent), nunca permanente.
 # Exceções estritas de catálogo requerem 'model_exception_reason:' formalizado (ex.: debugger, tech-solution-architect).
-model: "Gemini 3.8 Flash"
+model: "Gemini 4 Argon"
 # Tools: Princípio de menor privilégio. run_subagent é OBRIGATÓRIO por R-042.
 # Se run_in_terminal for declarado em tools, é OBRIGATÓRIO incluir .github/skills/terminal-governance/SKILL.md em source_docs (R-049).
 # Operacional: ['read_file', 'insert_edit_into_file', 'create_file', 'grep_search', 'file_search', 'list_dir', 'get_errors', 'run_subagent']

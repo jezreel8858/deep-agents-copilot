@@ -5,7 +5,7 @@ description:
   segurança, convenções, impacto e testes. Gera relatório por severidade.
   NÃO executa alterações.
 agent: 'agent'
-model: "Gemini 3.8 Flash"
+model: "Gemini 4 Argon"
 tools: ['read_file', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch_execute', 'context-mode/ctx_search']
 argument-hint: '[caminho-do-arquivo | diff]'
 source_docs:

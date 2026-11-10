@@ -53,7 +53,7 @@ agents:
     estimated_time_minutes: 15
   prompt-structuring:
     id: prompt-structuring
-    model: Gemini 3.8 Flash
+    model: Gemini 4 Argon
     priority: 1.5
     version: 2.0.0
     domain: Refinamento estrutural de prompt (passo mandatorio)
@@ -523,7 +523,7 @@ agents:
     estimated_time_minutes: 30
   governance-maintainer:
     id: governance-maintainer
-    model: Gemini 3.8 Flash
+    model: Gemini 4 Argon
     priority: 8.9
     version: 1.0.0
     domain: Manutenção atômica, refatoração e sincronização em lote da governanca
@@ -579,7 +579,7 @@ agents:
     estimated_time_minutes: 20
   runtime-verifier:
     id: runtime-verifier
-    model: Gemini 3.8 Flash
+    model: Gemini 4 Argon
     priority: 3.2
     version: 1.0.0
     domain: Verificacao de saude do ambiente de execucao (build/sandbox)
@@ -626,7 +626,7 @@ agents:
     estimated_time_minutes: 10
   pr-gatekeeper:
     id: pr-gatekeeper
-    model: Gemini 3.8 Flash
+    model: Gemini 4 Argon
     priority: 4.5
     version: 2.0.0
     domain: Preparacao de entrega (PR/commit/changelog)
@@ -896,7 +896,7 @@ agents:
     estimated_time_minutes: 15
   adapter-generator:
     id: adapter-generator
-    model: Gemini 3.8 Flash
+    model: Gemini 4 Argon
     priority: 10.7
     domain: Geracao automatica de adapters
     description: Gera automaticamente adapters por-projeto em `.github/instructions/local/`
@@ -945,7 +945,7 @@ agents:
     version: 1.0.0
   binding-initializer:
     id: binding-initializer
-    model: Gemini 3.8 Flash
+    model: Gemini 4 Argon
     priority: 10.5
     domain: Inicializacao de binding context
     description: Agente operacional de inicialização de binding context. Detecta ausência
@@ -1051,7 +1051,7 @@ agents:
     version: 1.1.0
   codegraph-engine:
     id: codegraph-engine
-    model: Gemini 3.8 Flash
+    model: Gemini 4 Argon
     priority: 4.95
     version: 4.1.1
     domain: Grafo de conhecimento de codigo-fonte (imports, chamadas, blast radius,
@@ -1165,7 +1165,7 @@ agents:
     version: 1.0.0
   code-style-enforcer:
     id: code-style-enforcer
-    model: Gemini 3.8 Flash
+    model: Gemini 4 Argon
     priority: 4.52
     version: 1.0.0
     domain: Verificacao de aderencia a convencoes de estilo (read-only)
@@ -1369,7 +1369,7 @@ agents:
     estimated_time_minutes: 25
   docs-engineer:
     id: docs-engineer
-    model: Gemini 3.8 Flash
+    model: Gemini 4 Argon
     priority: 6.5
     version: 1.0.0
     domain: Ciclo de vida de documentacao tecnica (autoria + curadoria)

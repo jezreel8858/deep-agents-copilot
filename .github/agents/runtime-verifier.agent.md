@@ -6,7 +6,7 @@ description: >-
   codificadores — build limpo, dependências instaladas, portas/serviços
   dependentes (Docker/emulador/DB local) disponíveis, cache não corrompido.
   Read-only por definição: nunca corrige, apenas diagnostica e reporta bloqueio.
-model: "Gemini 3.8 Flash"
+model: "Gemini 4 Argon"
 tools: ['list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_batch_execute', 'context-mode/ctx_search', 'context-mode/ctx_index']
 source_docs:
   - .github/skills/git-governance/SKILL.md

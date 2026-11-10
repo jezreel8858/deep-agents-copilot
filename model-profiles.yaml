@@ -16,6 +16,7 @@ tier_map:
     - react-router
     - templates/router-agent
     - prompt:agent-router
+    - prompt:implement
   standard:
     - adr-sentinel
     - agent-auditor
@@ -54,9 +55,13 @@ tier_map:
     - runtime-verifier
     - templates/agent-template
     - templates/operational-agent
+    - prompt:craft-prompt
+    - prompt:eval-workflows
+    - prompt:review
+    - prompt:validate
+  utility:
     - prompt:add-project-context
     - prompt:commit
-    - prompt:craft-prompt
     - prompt:ctx-checkpoint
     - prompt:ctx-doctor
     - prompt:ctx-insight
@@ -64,13 +69,9 @@ tier_map:
     - prompt:ctx-start
     - prompt:ctx-status
     - prompt:del-project-context
-    - prompt:eval-workflows
     - prompt:health
-    - prompt:implement
     - prompt:init-context
-    - prompt:review
     - prompt:templates/prompt-template
-    - prompt:validate
     - prompt:visualize-graph
   stack-arch:
     - "*-arch-advisor"
@@ -79,29 +80,41 @@ tier_map:
     - "*-test-engineer"
 
 profiles:
-  default:
+  defaultt:
     description: "Configuração canônica espelhada nos frontmatters atuais do repositório."
     tiers:
       premium: Claude Opus 5.5
       orchestration: Claude Sonnet 5.5
       standard: Claude Sonnet 5.5
-      light: Gemini 3.8 Flash
+      light: Gemini 4 Argon
+      utility: Gemini 3.8 Flash
       stack-arch: Claude Sonnet 5.5
-      stack-squad: Grok 4.7
+      stack-squad: Gemini 4 Argon
 
   balanceado:
     extends: default
-    description: "Substitui Opus por Sonnet no tier premium; mantém orquestração, standard e light herdados do default."
+    description: "Substitui Opus por Sonnet no tier premium; otimiza stack-arch e revisores selecionados com Gemini 4 Argon."
     quality_warning: "Arquitetura e debug profundo perdem raciocínio premium."
     tiers:
       premium: Claude Sonnet 5.5
+      stack-arch: Gemini 4 Argon
+    agents:
+      security-reviewer: Gemini 4 Argon
+      code-review: Gemini 4 Argon
+      bug-triage: Gemini 4 Argon
 
   economico:
     extends: balanceado
-    description: "Rebaixa orquestração para Gemini 3.8 Flash e standard para Claude Haiku 5.5; herda premium do balanceado e light do default."
+    description: "Rebaixa orquestração para Gemini 3.8 Flash e demais tiers operacionais para Claude Haiku 5.5; preserva D6."
     quality_warning: "Roteamento, planos e código podem perder precisão; routers podem errar triagem."
     tiers:
       orchestration: Gemini 3.8 Flash
       standard: Claude Haiku 5.5
+      light: Claude Haiku 5.5
+      utility: Claude Haiku 5.5
       stack-arch: Gemini 3.8 Flash
       stack-squad: Claude Haiku 5.5
+    agents:
+      security-reviewer: Claude Haiku 5.5
+      code-review: Claude Haiku 5.5
+      bug-triage: Claude Haiku 5.5

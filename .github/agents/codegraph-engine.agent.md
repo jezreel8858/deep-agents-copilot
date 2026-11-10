@@ -7,7 +7,7 @@ description: >-
   puramente determinístico — nunca invoca LLM. Motor único: lib externa
   `@optave/codegraph` via MCP Server enxuto (Least-Tools) para consultas
   e CLI local para build/indexação.
-model: "Gemini 3.8 Flash"
+model: "Gemini 4 Argon"
 tools: ['run_subagent', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_search', 'codegraph/query', 'codegraph/module_map', 'codegraph/fn_impact', 'codegraph/find_cycles', 'codegraph/context']
 source_docs:
   - .github/skills/codegraph-optave-usage/SKILL.md

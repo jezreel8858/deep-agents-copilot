@@ -5,7 +5,7 @@ description: >-
   Gera automaticamente adapters por-projeto em `.github/instructions/local/`
   (gitignored, R-043) via scanner read-only de stack e arquitetura. Opera em
   modos scan, generate-one e batch, integrando-se a `/add-project-context`.
-model: "Gemini 3.8 Flash"
+model: "Gemini 4 Argon"
 tools: ['file_search', 'list_dir', 'get_errors', 'grep_search', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
 source_docs:
   - .github/skills/context-mode/SKILL.md

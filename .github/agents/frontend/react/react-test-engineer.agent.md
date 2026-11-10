@@ -5,7 +5,7 @@ description: >-
   Especialista consolidador de engenharia de testes e qualidade para React —
   projeta e implementa testes unitários (Vitest), testes de componentes (React Testing Library),
   testes de ponta a ponta (Playwright) e executa autocorreção de testes quebrados sob CAP RÍGIDO (R-053).
-model: "Grok 4.7"
+model: "Gemini 4 Argon"
 tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_execute_file', 'playwright/browser_snapshot', 'playwright/browser_navigate', 'playwright/browser_navigate_back', 'playwright/browser_click', 'playwright/browser_type', 'playwright/browser_hover', 'playwright/browser_select_option', 'playwright/browser_press_key', 'playwright/browser_fill_form', 'playwright/browser_file_upload', 'playwright/browser_handle_dialog', 'playwright/browser_wait_for', 'playwright/browser_tabs', 'playwright/browser_close', 'playwright/browser_console_messages', 'playwright/browser_network_requests', 'playwright/browser_take_screenshot', 'playwright/browser_resize']
 source_docs:
   - .github/skills/test-implementation-react-vitest/SKILL.md

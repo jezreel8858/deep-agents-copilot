@@ -6,7 +6,7 @@ description:
   `catalog.yaml` e `binding.md` via Health Check (R-034), coleta o nome do
   ecossistema via `ask_questions` (1 pergunta) e gera o esqueleto dos artefatos.
   Projetos são adicionados depois via `/add-project-context`.
-model: "Gemini 3.8 Flash"
+model: "Gemini 4 Argon"
 tools: ['ask_questions', 'context-mode/ctx_execute', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index']
 source_docs:
   - .github/skills/project-context-builder/SKILL.md

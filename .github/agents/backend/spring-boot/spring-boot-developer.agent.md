@@ -6,7 +6,7 @@ description: >-
   novas features (REST, services transacionais, Jakarta Persistence, DTOs Records),
   executa diagnósticos e correções cirúrgicas de bugs (RCA, diff mínimo) e aplica
   otimizações de performance (eliminação de N+1 com EntityGraph, tuning de HikariCP, cache).
-model: "Grok 4.7"
+model: "Gemini 4 Argon"
 tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_execute_file']
 source_docs:
   - .github/skills/spring-boot-implementation-patterns/SKILL.md

@@ -6,7 +6,7 @@ description: >-
 # Padrão: "Gemini 3.8 Flash" (ou "Claude Sonnet 5.5" para tarefas deliberativas de código).
 # É PROIBIDO fixar 'model:' permanentemente em tier premium (ex.: "Claude Opus") para executores contínuos.
 # Escalonamento de modelo é estritamente PONTUAL (via sinal 🧠 em run_subagent conforme R-021), nunca permanente no catálogo.
-model: "Gemini 3.8 Flash"
+model: "Gemini 4 Argon"
 tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_search']
 # SSOT de Governança e Dependências (Context Engineering Benchmark 2026):
 # 100% das dependências documentais e skills DEVEM residir exclusivamente em source_docs:/source_docs_lazy: no frontmatter.

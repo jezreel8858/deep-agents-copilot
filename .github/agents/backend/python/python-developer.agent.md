@@ -6,7 +6,7 @@ description: >-
   novas features (FastAPI, Flask, Django, Pydantic, SQLAlchemy, endpoints REST, services desacoplados sob TDD estrito),
   executa diagnósticos e correções cirúrgicas de runtime errors (RCA, diff mínimo ≤ 20 linhas) e aplica
   otimizações de performance (eliminação de bloqueios de event loop asyncio, tuning de pools de conexão e mitigação de N+1 queries).
-model: "Grok 4.7"
+model: "Gemini 4 Argon"
 tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_execute_file']
 source_docs:
   - .github/instructions/python-backend.instructions.md

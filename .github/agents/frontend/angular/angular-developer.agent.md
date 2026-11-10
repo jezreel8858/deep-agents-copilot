@@ -6,7 +6,7 @@ description: >-
   componentes standalone, arquitetura reativa com Signals e RxJS, formulários reativos,
   estilização com Tailwind CSS/SCSS/Angular Material (zero hex inline) e correções cirúrgicas
   de bugs de UI/renderização (ExpressionChangedAfterItHasBeenCheckedError, memory leaks).
-model: "Grok 4.7"
+model: "Gemini 4 Argon"
 tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_execute_file', 'playwright/browser_snapshot', 'playwright/browser_navigate', 'playwright/browser_click', 'playwright/browser_type', 'playwright/browser_fill_form', 'playwright/browser_press_key', 'playwright/browser_wait_for', 'playwright/browser_console_messages', 'playwright/browser_network_requests', 'playwright/browser_tabs', 'playwright/browser_close', 'playwright/browser_take_screenshot', 'playwright/browser_resize']
 source_docs:
   - .github/skills/angular-frontend-patterns/SKILL.md

@@ -2,7 +2,7 @@
 name: implement
 description: Executa plano aprovado fase a fase, marcando `- [x]` ao concluir e registrando checkpoints obrigatórios.
 agent: 'agent'
-model: "Gemini 3.8 Flash"
+model: "Claude Sonnet 5.5"
 tools: ['read_file', 'insert_edit_into_file', 'create_file', 'grep_search', 'file_search', 'get_errors', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file']
 argument-hint: '[caminho-do-plano | descrição-da-fase]'
 source_docs:

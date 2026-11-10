@@ -6,7 +6,7 @@ description: >-
   de stack do projeto (ESLint/Checkstyle/Pylint/Prettier). Nunca corrige,
   apenas identifica violações de convenção documentada. Complementa
   code-review (dimensão "convenções" genérica) com verificação sistemática.
-model: "Gemini 3.8 Flash"
+model: "Gemini 4 Argon"
 tools: ['list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'context-mode/ctx_batch_execute', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_index']
 source_docs:
   - .github/skills/code-review-patterns/SKILL.md
