@@ -57,7 +57,10 @@
     },
     "mcp-atlassian": {
       "command": "uvx",
-      "args": ["-q", "mcp-atlassian"],
+      "args": [
+        "-q",
+        "mcp-atlassian"
+      ],
       "env": {
         "JIRA_URL": "https://your-company.atlassian.net",
         "JIRA_USERNAME": "your.email@company.com",
@@ -65,6 +68,20 @@
         "CONFLUENCE_URL": "https://your-company.atlassian.net/wiki",
         "CONFLUENCE_USERNAME": "your.email@company.com",
         "CONFLUENCE_API_TOKEN": "your_api_token"
+      }
+    },
+    "figma": {
+      "command": "uvx",
+      "args": [
+        "-q",
+        "--offline",
+        "--with",
+        "mcp==1.30.0",
+        "mcp-figma==0.0.2"
+      ],
+      "env": {
+        "FIGMA_ACCESS_TOKEN": "SEU_TOKEN_AQUI",
+        "SSL_CERT_FILE": "SEU_PATH_CERTIFICADO_PEM"
       }
     }
   }

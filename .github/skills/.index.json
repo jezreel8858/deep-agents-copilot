@@ -1292,7 +1292,7 @@
       "tier": 2,
       "category": "tooling",
       "path": ".github/skills/figma-mcp/SKILL.md",
-      "description": "Diretrizes canônicas para uso do Figma Dev Mode MCP Server oficial (Remote Server https://mcp.figma.com/mcp) por agentes de IA: autenticação OAuth 2.0 sem segredos versionados, matriz Least-Noise por tool, segregação Least-Tools por perfil, protocolo progressivo de 3 passos com context-mode e mitigação de indirect prompt injection (ASI01).",
+      "description": "Diretrizes canônicas para uso do servidor MCP Figma (mcp-figma==0.0.2 via uvx no IDE, com suporte opcional ao Remote Server) por agentes de IA: configuração sem segredos versionados, matriz de decisão das 10 tools reais, segregação Least-Tools, protocolo progressivo em 3 passos com context-mode e mitigação de indirect prompt injection.",
       "tools": [
         "context-mode",
         "figma"
@@ -1304,6 +1304,17 @@
         "@react-arch-advisor",
         "@requirements-analyst",
         "@tech-solution-architect"
+      ],
+      "triggers": [
+        "figma mcp",
+        "mcp-figma",
+        "ler design do figma",
+        "get_file_nodes",
+        "get_component_sets",
+        "extrair tokens do figma",
+        "export_image figma",
+        "read figma node",
+        "get_styles figma"
       ]
     },
     {
@@ -1311,7 +1322,7 @@
       "tier": 2,
       "category": "frontend",
       "path": ".github/skills/figma-design-to-code-patterns/SKILL.md",
-      "description": "Diretrizes e padrões canônicos de Design-to-Code para traduzir especificações do Figma em UI Angular ou React: mapeamento de Design Tokens (zero hex inline), reuso de componentes compartilhados via Code Connect, conversão de Auto Layout em Flexbox/Grid responsivo, APIs tipadas de variantes e estados/acessibilidade WCAG 2.2 AA.",
+      "description": "Diretrizes e padrões canônicos de Design-to-Code para traduzir especificações do Figma (get_file_nodes, get_styles, get_component_sets, export_image, get_comments) em UI Angular ou React: mapeamento de tokens (zero hex inline), reuso de shared/, Auto Layout para Flexbox/CSS Grid responsivo, variantes para Props/Inputs e WCAG 2.2 AA.",
       "tools": [],
       "related_agents": [
         "@angular-developer",

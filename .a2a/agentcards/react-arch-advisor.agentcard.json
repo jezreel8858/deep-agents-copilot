@@ -29,7 +29,12 @@
     "run_subagent",
     "context-mode/ctx_search",
     "context-mode/ctx_batch_execute",
-    "context-mode/ctx_index"
+    "context-mode/ctx_index",
+    "figma/get_file_nodes",
+    "figma/export_image",
+    "figma/get_styles",
+    "figma/get_component_sets",
+    "figma/get_comments"
   ],
   "security_profile": {
     "tool_zones": [

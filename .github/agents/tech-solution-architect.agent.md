@@ -7,7 +7,7 @@ description: >-
   seções isoladas ([BACKEND_TASKS], [FRONTEND_TASKS]) com metodologia B1/B2/B3.
 model: "Claude Opus 5.5"
 model_exception_reason: "R-021: Papel de arquitetura complexa, viabilidade técnica e decomposição deliberativa (§9 governance-factory-patterns)"
-tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_fetch_and_index', 'context-mode/ctx_batch_execute', 'context-mode/ctx_stats', 'context-mode/ctx_doctor', 'context-mode/ctx_upgrade', 'context-mode/ctx_purge', 'context-mode/ctx_insight']
+tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_fetch_and_index', 'context-mode/ctx_batch_execute', 'context-mode/ctx_stats', 'context-mode/ctx_doctor', 'context-mode/ctx_upgrade', 'context-mode/ctx_purge', 'context-mode/ctx_insight', 'figma/get_file_nodes', 'figma/export_image', 'figma/get_styles', 'figma/get_component_sets', 'figma/get_comments']
 source_docs:
   - .github/skills/documentation-writing-patterns/SKILL.md
   - .github/skills/security-review-patterns/SKILL.md
@@ -270,7 +270,7 @@ Para garantir que o modelo Claude Sonnet 5.5 não tome iniciativas espúrias ou 
 - **Persistência formal de Architecture Decision Records (ADRs)** → `@docs-engineer`.
 - **Migrações de schema e tuning de banco (Oracle/Informix)** → `@database-router` (fallback `@database-specialist`).
 - **Implementação física de código** → Retorno ao `@agent-router` para despacho aos Domain Routers (`spring-boot-router`, `angular-router`, `ejb-router`, `database-router`).
-- **Inspeção Figma & Contratos UI (`figma-mcp` + `figma-design-to-code-patterns`)**: no Remote Server (`https://mcp.figma.com/mcp`), usar protocolo Read-Only em 3 passos (`get_metadata` → `get_variable_defs`/`get_code_connect_map` → `get_design_context` por `node-id` via `context-mode`, mitigando Indirect Prompt Injection) para definir em `[FRONTEND_TASKS]` mapeamento de Design Tokens (zero hex inline), reuso Code Connect/`shared/`, Auto Layout → Flex/Grid e estados WCAG 2.2 AA.
+- **Inspeção Figma & Contratos UI (`figma-mcp` + `figma-design-to-code-patterns`)**: no servidor `figma` (`mcp-figma==0.0.2` via `uvx`), usar protocolo Read-Only em 3 passos (`get_file_nodes` cirúrgico por `file_key`/`node_ids` → `get_styles`/`get_component_sets` → `export_image`/`get_comments` via `context-mode`, mitigando Indirect Prompt Injection) para definir em `[FRONTEND_TASKS]` mapeamento de Design Tokens (zero hex inline), reuso de `shared/`, Auto Layout → Flex/Grid e estados WCAG 2.2 AA.
 ---
 ## ⚙️ Protocolo de Execução Obrigatório
 
