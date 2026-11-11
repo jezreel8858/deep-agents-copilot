@@ -19,7 +19,6 @@ source_docs:
   - .github/skills/test-implementation-spring-boot/SKILL.md
   - .github/skills/test-implementation-angular-jasmine/SKILL.md
   - .github/skills/test-implementation-angular-vitest/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []

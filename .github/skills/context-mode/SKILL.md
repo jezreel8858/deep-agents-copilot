@@ -30,7 +30,7 @@ tools:
   - "context-mode/ctx_upgrade"
   - "context-mode/ctx_purge"
   - "context-mode/ctx_insight"
-source_docs_lazy:
+source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---

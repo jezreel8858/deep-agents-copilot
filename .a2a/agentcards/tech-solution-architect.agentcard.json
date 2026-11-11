@@ -38,7 +38,9 @@
     "task-decomposition-patterns",
     "mermaid-diagrams",
     "code-tracing",
-    "socratic-grilling-patterns"
+    "socratic-grilling-patterns",
+    "figma-mcp",
+    "figma-design-to-code-patterns"
   ],
   "tools": [
     "grep_search",

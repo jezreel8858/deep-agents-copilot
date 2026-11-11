@@ -25,7 +25,9 @@
     "efficient-batch-code-modification",
     "socratic-grilling-patterns",
     "jira-mcp",
-    "jira-writing-patterns"
+    "jira-writing-patterns",
+    "figma-mcp",
+    "figma-design-to-code-patterns"
   ],
   "tools": [
     "grep_search",

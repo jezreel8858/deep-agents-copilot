@@ -14,10 +14,10 @@ argument-hint: '[caminho-do-arquivo | contexto-opcional]'
 # (ex.: seções de catálogo, herança ou pré-carregamento documental no corpo).
 # PREVENÇÃO DE SMELL 2.12 (SSOT Invertido): Prompts NUNCA devem se autodeclarar "SSOT Normativa".
 # A fonte única da verdade técnica reside compulsoriamente na SKILL.md referenciada em source_docs.
-# R-066 (Progressive Disclosure Compulsória): CLAUDE.md e .github/copilot-instructions.md são documentos de alto
-# fan-in (>300 linhas) — NUNCA em source_docs: (full-load); sempre em source_docs_lazy:, consultados
-# exclusivamente via context-mode/ctx_search sob demanda (nunca read_file integral).
-source_docs_lazy:
+# R-066 (Progressive Disclosure): docs <= 300 linhas residem em source_docs: (full-load); apenas documentos
+# volumosos (> 300 linhas) vão em source_docs_lazy: (consulta exclusiva via context-mode/ctx_search sob demanda —
+# ver tools/agent_source_docs_sync/sync_lazy_source_docs.py).
+source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---

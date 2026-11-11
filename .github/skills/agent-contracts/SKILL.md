@@ -14,7 +14,7 @@ triggers:
   - "não-escopo"
   - "padronizar agent"
   - "interface agent"
-source_docs_lazy:
+source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []

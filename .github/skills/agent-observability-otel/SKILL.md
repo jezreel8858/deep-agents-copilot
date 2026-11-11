@@ -18,7 +18,7 @@ triggers:
   - "langfuse"
   - "rastreabilidade agent"
   - "mcp tool tracing"
-source_docs_lazy:
+source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []

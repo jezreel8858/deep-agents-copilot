@@ -16,12 +16,11 @@ triggers:
   - "testes de integração"
   - "mocks backend"
   - "cobertura backend"
-source_docs_lazy:
+source_docs:
+  - .github/skills/test-coverage-governance/SKILL.md
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
-source_docs:
-  - .github/skills/test-coverage-governance/SKILL.md
 ---
 
 # Test Implementation — Backend (Genérico)

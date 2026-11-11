@@ -53,6 +53,8 @@ agents:
       - "specialist-hybrid-advisory-implementation-patterns"
       - "frontend-visual-feedback-loop"
       - "playwright-mcp"
+      - "figma-mcp"
+      - "figma-design-to-code-patterns"
       - "agent-contracts"
       - "context-mode"
 
@@ -116,6 +118,8 @@ agents:
       - "code-tracing"
       - "terminal-governance"
       - "playwright-mcp"
+      - "figma-mcp"
+      - "figma-design-to-code-patterns"
 
   react-test-engineer:
     id: "react-test-engineer"

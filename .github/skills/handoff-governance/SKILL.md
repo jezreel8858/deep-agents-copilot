@@ -13,12 +13,11 @@ triggers:
   - "roteamento downstream"
   - "transferir tarefa"
   - "agent delegation"
-source_docs_lazy:
+source_docs:
+  - .github/agents/catalog.yaml
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
-source_docs:
-  - .github/agents/catalog.yaml
 ---
 
 # Handoff Governance

@@ -28,7 +28,6 @@ source_docs:
   - .github/agents/pr-gatekeeper.agent.md
   - .github/agents/codegraph-engine.agent.md
   - docs/implementation-plans/README.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
   - .github/skills/task-decomposition-patterns/SKILL.md

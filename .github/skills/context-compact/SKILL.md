@@ -19,7 +19,6 @@ tools: ["context-mode"]
 source_docs:
   - .github/instructions/README.md
   - .github/skills/context-mode/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---

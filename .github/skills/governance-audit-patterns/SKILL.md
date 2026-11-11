@@ -37,7 +37,6 @@ source_docs:
   - .github/skills/efficient-batch-code-modification/SKILL.md
   - .github/skills/agent-contracts/SKILL.md
   - .github/skills/governance-factory-patterns/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []

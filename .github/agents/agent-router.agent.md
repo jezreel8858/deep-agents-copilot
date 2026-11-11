@@ -15,7 +15,6 @@ source_docs:
   - .github/skills/agent-contracts/SKILL.md
   - .github/skills/handoff-governance/SKILL.md
   - .github/skills/agent-evals-lab/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
   - .github/agents/workflows.md

@@ -17,7 +17,6 @@ source_docs:
   - .github/agents/backend/spring-boot/spring-boot-router.agent.md
   - .github/skills/spring-boot-backend-patterns/SKILL.md
   - .github/instructions/spring-boot-backend.instructions.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []

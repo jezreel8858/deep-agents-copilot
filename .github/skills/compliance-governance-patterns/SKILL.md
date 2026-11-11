@@ -25,7 +25,6 @@ triggers:
 source_docs:
   - .github/skills/agent-safety-guardrails/SKILL.md
   - .github/skills/security-review-patterns/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []

@@ -32,7 +32,7 @@ triggers:
   - "cascata de subagent"
 tools:
   - "run_in_terminal"
-source_docs_lazy:
+source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---

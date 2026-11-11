@@ -29,7 +29,6 @@ source_docs:
   - .github/skills/context-mode/SKILL.md
   - .github/skills/prompt-engineering-patterns/SKILL.md
   - .github/skills/agent-evals-lab/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []

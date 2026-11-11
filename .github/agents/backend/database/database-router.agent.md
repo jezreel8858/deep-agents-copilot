@@ -7,13 +7,12 @@ description: >-
   (database-arch-advisor, oracle-database-specialist e informix-database-specialist).
 model: "Claude Sonnet 5.5"
 tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search']
-source_docs_lazy:
-  - CLAUDE.md
-  - .github/copilot-instructions.md
 source_docs:
   - .github/skills/handoff-governance/SKILL.md
   - .github/skills/agent-contracts/SKILL.md
   - .github/skills/context-mode/SKILL.md
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 ---
 
 # Perfil Operacional

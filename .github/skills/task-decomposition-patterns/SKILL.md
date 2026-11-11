@@ -23,7 +23,6 @@ triggers:
   - "grounding factual do plano"
 source_docs:
   - .github/agents/codegraph-engine.agent.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []

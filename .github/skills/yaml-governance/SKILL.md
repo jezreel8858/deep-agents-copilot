@@ -15,7 +15,7 @@ triggers:
   - "values.yaml"
   - "config.yaml"
   - "yaml-language-server"
-source_docs_lazy:
+source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []

@@ -13,7 +13,6 @@ triggers:
   - "backpressure"
 source_docs:
   - .github/agents/backend/spring-reactive/spring-reactive-router.agent.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []

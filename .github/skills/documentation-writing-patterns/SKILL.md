@@ -14,7 +14,7 @@ triggers:
   - "documentar decisão técnica"
   - "gerar arquivo .md de documentação"
 tools: []
-source_docs_lazy:
+source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---

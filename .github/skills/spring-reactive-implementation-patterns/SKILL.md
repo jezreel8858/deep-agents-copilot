@@ -16,7 +16,6 @@ triggers:
 source_docs:
   - .github/agents/backend/spring-reactive/spring-reactive-router.agent.md
   - .github/skills/spring-reactive-webflux-patterns/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []

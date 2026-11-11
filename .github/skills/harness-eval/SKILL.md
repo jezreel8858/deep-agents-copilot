@@ -19,13 +19,12 @@ triggers:
   - "quando executar testes de regressão de instruções ou calibração de harness"
   - "quando auditar fidelidade de execução contra claims e critérios de aceitação"
 source_docs:
-  - ".github/skills/harness-eval/references/GLOSSARY.md"
-source_docs_lazy:
-  - ".github/skills/harness-eval/references/claims.schema.json"
-  - ".github/skills/harness-eval/references/PROTOCOL.md"
-  - ".github/skills/harness-eval/references/judge-prompts.md"
-  - "CLAUDE.md"
-  - ".github/copilot-instructions.md"
+  - .github/skills/harness-eval/references/GLOSSARY.md
+  - .github/skills/harness-eval/references/claims.schema.json
+  - .github/skills/harness-eval/references/PROTOCOL.md
+  - .github/skills/harness-eval/references/judge-prompts.md
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 tools: []
 ---
 

@@ -22,7 +22,6 @@ source_docs:
   - .github/instructions/README.md
   - .github/agents/adapter-generator.agent.md
   - .github/prompts/add-project-context.prompt.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools:

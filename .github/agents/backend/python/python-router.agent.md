@@ -11,7 +11,6 @@ source_docs:
   - .github/skills/context-mode/SKILL.md
   - .github/skills/handoff-governance/SKILL.md
   - .github/skills/agent-contracts/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
   - .github/skills/embedded-runtime-governance/SKILL.md

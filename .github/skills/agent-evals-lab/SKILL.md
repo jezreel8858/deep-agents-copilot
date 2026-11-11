@@ -17,7 +17,7 @@ triggers:
   - "regressão roteamento"
   - "benchmark agent"
   - "ci evals"
-source_docs_lazy:
+source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []

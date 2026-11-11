@@ -16,7 +16,7 @@ triggers:
   - "descricao de bug jira"
   - "subtask jira"
   - "formatar descricao jira"
-source_docs_lazy:
+source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---

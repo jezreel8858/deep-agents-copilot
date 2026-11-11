@@ -12,13 +12,12 @@ tools: ['grep_search', 'file_search', 'list_dir', 'run_subagent', 'context-mode/
 # 100% das dependências documentais e skills DEVEM residir exclusivamente em source_docs:/source_docs_lazy: no frontmatter.
 # É TERMINANTEMENTE PROIBIDO criar seções redundantes de herança, catálogo, skills ou pré-carregamento no corpo markdown.
 # O gate de testes determinístico (test_template_sections.py) bloqueia compulsoriamente seções não homologadas.
-# R-066 (Progressive Disclosure): CLAUDE.md/copilot-instructions.md NUNCA em source_docs: (full-load) — vão em
-# source_docs_lazy: (docs >300 linhas, consulta exclusiva via context-mode/ctx_search sob demanda).
+# R-066 (Progressive Disclosure): docs <= 300 linhas residem em source_docs: (full-load); docs > 300 linhas vão em
+# source_docs_lazy: (consulta exclusiva via context-mode/ctx_search sob demanda).
 source_docs:
   - .github/skills/<skill-principal>/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
   - .github/skills/context-mode/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---

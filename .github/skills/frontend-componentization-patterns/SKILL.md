@@ -14,7 +14,6 @@ triggers:
 source_docs:
   - .github/skills/test-implementation-frontend/SKILL.md
   - .github/skills/frontend-visual-feedback-loop/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []

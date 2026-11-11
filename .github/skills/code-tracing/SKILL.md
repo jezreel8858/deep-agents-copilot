@@ -28,7 +28,7 @@ tools:
   - "file_search"
   - "read_file"
   - "run_in_terminal"
-source_docs_lazy:
+source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---

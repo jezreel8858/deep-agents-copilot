@@ -3,7 +3,7 @@
   "domain": "governanca-ai-generica",
   "generated_at": "2026-10-08",
   "summary": {
-    "total_skills": 79
+    "total_skills": 81
   },
   "skills": [
     {
@@ -1285,6 +1285,41 @@
         "@bug-triage",
         "@feature-planner",
         "@pr-gatekeeper"
+      ]
+    },
+    {
+      "name": "figma-mcp",
+      "tier": 2,
+      "category": "tooling",
+      "path": ".github/skills/figma-mcp/SKILL.md",
+      "description": "Diretrizes canônicas para uso do Figma Dev Mode MCP Server oficial (Remote Server https://mcp.figma.com/mcp) por agentes de IA: autenticação OAuth 2.0 sem segredos versionados, matriz Least-Noise por tool, segregação Least-Tools por perfil, protocolo progressivo de 3 passos com context-mode e mitigação de indirect prompt injection (ASI01).",
+      "tools": [
+        "context-mode",
+        "figma"
+      ],
+      "related_agents": [
+        "@angular-developer",
+        "@react-developer",
+        "@angular-arch-advisor",
+        "@react-arch-advisor",
+        "@requirements-analyst",
+        "@tech-solution-architect"
+      ]
+    },
+    {
+      "name": "figma-design-to-code-patterns",
+      "tier": 2,
+      "category": "frontend",
+      "path": ".github/skills/figma-design-to-code-patterns/SKILL.md",
+      "description": "Diretrizes e padrões canônicos de Design-to-Code para traduzir especificações do Figma em UI Angular ou React: mapeamento de Design Tokens (zero hex inline), reuso de componentes compartilhados via Code Connect, conversão de Auto Layout em Flexbox/Grid responsivo, APIs tipadas de variantes e estados/acessibilidade WCAG 2.2 AA.",
+      "tools": [],
+      "related_agents": [
+        "@angular-developer",
+        "@react-developer",
+        "@angular-arch-advisor",
+        "@react-arch-advisor",
+        "@requirements-analyst",
+        "@tech-solution-architect"
       ]
     }
   ],

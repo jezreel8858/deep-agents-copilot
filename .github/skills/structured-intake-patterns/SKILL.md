@@ -18,7 +18,6 @@ source_docs:
   - .github/agents/requirements-analyst.agent.md
   - .github/agents/bug-triage.agent.md
   - .github/agents/business-rules-extractor.agent.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: ['ask_questions']

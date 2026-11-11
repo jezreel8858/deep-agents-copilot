@@ -17,7 +17,7 @@ triggers:
   - "criar issue jira"
   - "transicionar issue"
   - "ler ticket jira"
-source_docs_lazy:
+source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---

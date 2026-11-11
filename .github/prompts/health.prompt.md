@@ -12,7 +12,6 @@ source_docs:
   - .github/instructions/README.md
   - .github/projects.local.yaml.example
   - .github/skills/terminal-governance/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---

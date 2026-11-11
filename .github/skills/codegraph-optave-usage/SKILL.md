@@ -15,7 +15,7 @@ triggers:
   - "impacto de mudanca"
   - "dead code"
   - "call graph"
-source_docs_lazy:
+source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---

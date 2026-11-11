@@ -24,7 +24,7 @@ triggers:
   - "noise budget"
   - "código gerado por IA com ruído"
 tools: []
-source_docs_lazy:
+source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---

@@ -25,7 +25,7 @@ tools:
   - "file_search"
   - "create_file"
   - "insert_edit_into_file"
-source_docs_lazy:
+source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---

@@ -25,7 +25,6 @@ source_docs:
   - .github/skills/documentation-writing-patterns/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
   - .github/skills/governance-audit-patterns/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []

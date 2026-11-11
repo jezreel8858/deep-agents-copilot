@@ -26,7 +26,6 @@ source_docs:
   - .github/skills/agent-observability-otel/SKILL.md
   - .github/prompts/ctx-checkpoint.prompt.md
   - .github/skills/terminal-governance/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []

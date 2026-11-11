@@ -20,7 +20,6 @@ triggers:
 source_docs:
   - .github/skills/performance-engineering-patterns/SKILL.md
   - .github/agents/backend/spring-boot/spring-boot-router.agent.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []

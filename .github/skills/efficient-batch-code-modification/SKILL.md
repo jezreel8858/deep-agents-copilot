@@ -30,7 +30,7 @@ tools:
   - "context-mode/ctx_execute"
   - "context-mode/ctx_execute_file"
   - "context-mode/ctx_batch_execute"
-source_docs_lazy:
+source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---

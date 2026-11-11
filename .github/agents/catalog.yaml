@@ -397,7 +397,11 @@ agents:
     - mermaid-diagrams
     - code-tracing
     - socratic-grilling-patterns
+    - figma-mcp
+    - figma-design-to-code-patterns
     source_docs:
+    - .github/skills/figma-mcp/SKILL.md
+    - .github/skills/figma-design-to-code-patterns/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
     - .github/agents/tech-solution-architect.agent.md
@@ -1588,9 +1592,13 @@ agents:
     - socratic-grilling-patterns
     - jira-mcp
     - jira-writing-patterns
+    - figma-mcp
+    - figma-design-to-code-patterns
     source_docs:
     - .github/skills/jira-mcp/SKILL.md
     - .github/skills/jira-writing-patterns/SKILL.md
+    - .github/skills/figma-mcp/SKILL.md
+    - .github/skills/figma-design-to-code-patterns/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
     - .github/agents/requirements-analyst.agent.md

@@ -19,7 +19,6 @@ triggers:
   - "checklist de criação"
 source_docs:
   - .github/agents/governance-factory.agent.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []

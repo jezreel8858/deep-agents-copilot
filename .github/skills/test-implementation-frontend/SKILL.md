@@ -16,12 +16,11 @@ triggers:
   - "e2e test"
   - "testes de interface"
   - "cobertura frontend"
-source_docs_lazy:
+source_docs:
+  - .github/skills/test-coverage-governance/SKILL.md
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
-source_docs:
-  - .github/skills/test-coverage-governance/SKILL.md
 ---
 
 # Test Implementation — Frontend (Genérico)

@@ -19,7 +19,6 @@ triggers:
   - "deployment strategy"
 source_docs:
   - .github/instructions/devops.instructions.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []

@@ -16,7 +16,7 @@ triggers:
   - "testar e2e com mcp"
   - "inspecionar rede no browser"
   - "acessibility tree"
-source_docs_lazy:
+source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---

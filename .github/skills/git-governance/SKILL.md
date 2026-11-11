@@ -15,7 +15,6 @@ triggers:
 tools: []
 source_docs:
   - docs/ai-copilot/global-git-commit-instructions.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---

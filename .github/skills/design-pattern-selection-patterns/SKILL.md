@@ -5,16 +5,15 @@ tier: 2
 category: governance
 triggers: ["seleção de design pattern", "mini-ADR", "decision tree de patterns", "golden hammer", "premature pattern", "nenhum pattern necessário", "trade-offs arquiteturais"]
 source_docs:
-  - ".github/skills/refactoring-planning-patterns/SKILL.md"
-  - ".github/skills/integration-contract-analysis/SKILL.md"
-  - ".github/skills/documentation-writing-patterns/SKILL.md"
-  - ".github/skills/specialist-hybrid-advisory-implementation-patterns/SKILL.md"
-  - ".github/skills/mermaid-diagrams/SKILL.md"
-  - ".github/skills/agent-contracts/SKILL.md"
-  - ".github/agents/adr-sentinel.agent.md"
-source_docs_lazy:
-  - "CLAUDE.md"
-  - ".github/copilot-instructions.md"
+  - .github/skills/refactoring-planning-patterns/SKILL.md
+  - .github/skills/integration-contract-analysis/SKILL.md
+  - .github/skills/documentation-writing-patterns/SKILL.md
+  - .github/skills/specialist-hybrid-advisory-implementation-patterns/SKILL.md
+  - .github/skills/mermaid-diagrams/SKILL.md
+  - .github/skills/agent-contracts/SKILL.md
+  - .github/agents/adr-sentinel.agent.md
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 tools: []
 ---
 

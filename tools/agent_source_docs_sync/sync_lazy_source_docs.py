@@ -1,25 +1,18 @@
 """
-Migra determinística e atomicamente CLAUDE.md / .github/copilot-instructions.md
-(e qualquer doc > LAZY_LINE_THRESHOLD linhas) da chave `source_docs:` para a nova
-chave `source_docs_lazy:` em todos os artefatos de governança (.agent.md, SKILL.md,
-*.prompt.md), conforme R-066 (Progressive Disclosure Compulsória).
+Sincroniza determinística e atomicamente `source_docs:` e `source_docs_lazy:` em todos
+os artefatos de governança (.agent.md, SKILL.md, *.prompt.md), conforme R-066
+(Progressive Disclosure Compulsória por limiar de 300 linhas).
 
-Motivação e Decisão Técnica (R-066 / Smell 2.31 / docs/implementation-plans/
-20261003-governance-maintenance-progressive-disclosure-source-docs.md):
-    - CLAUDE.md (~353 linhas) e .github/copilot-instructions.md (~465 linhas) eram
-      declarados em `source_docs:` (full-load) de ~79/75 artefatos respectivamente,
-      inflando o contexto inicial de cada spawn de agent em dezenas de milhares de
-      tokens antes de qualquer trabalho útil começar.
-    - Esta migração move essas entradas para `source_docs_lazy:`, sinalizando que o
-      consumo correto é via `context-mode/ctx_search` sob demanda, nunca `read_file`
-      integral (ver R-066(c) em CLAUDE.md para a ressalva de enforcement
-      textual/CI-estático, não mecânico-runtime).
-    - Preservação Estrita de Formatação: segue o mesmo padrão cirúrgico de
-      `sync_required_source_docs.py` — nunca re-dump completo do YAML.
+Regras (R-066 / LAZY_LINE_THRESHOLD = 300):
+    - Documentos com > 300 linhas pertencentes à LAZY_ALLOWLIST devem residir em
+      `source_docs_lazy:` (consulta exclusiva via `context-mode/ctx_search` sob demanda).
+    - Documentos presentes em `source_docs_lazy:` que possuam <= 300 linhas devem ser
+      migrados para `source_docs:` (removendo a chave `source_docs_lazy:` quando vazia).
+    - Preservação Estrita de Formatação: manipulação cirúrgica de linhas sem re-dump global do YAML.
 
 Escopo de arquivos:
     - .github/agents/**/*.agent.md (exclui templates/)
-    - .github/skills/**/SKILL.md
+    - .github/skills/**/SKILL.md (exclui templates/)
     - .github/prompts/**/*.prompt.md (exclui templates/)
 
 Uso:
@@ -48,13 +41,8 @@ from tools.governance_sync.core import (
     parse_sync_options,
 )
 
-# Allowlist fixa de docs sempre classificados como lazy (alto fan-in, alto custo de
-# contexto inicial), independente de contagem de linhas. Escopo R-066 restrito a
-# documentação normativa CENTRAL (CLAUDE.md/copilot-instructions.md/workflows.md) —
-# NÃO inclui skills operacionais mandatoriamente exigidas em source_docs (full) por
-# outras regras (ex. handoff-governance/agent-contracts via R-042; terminal-governance
-# via R-049), mesmo que excedam 300 linhas. Expandir este escopo é um ciclo de
-# governança separado (ver docs/implementation-plans/..., §0.3).
+LAZY_LINE_THRESHOLD = 300
+
 LAZY_ALLOWLIST = {
     "CLAUDE.md",
     ".github/copilot-instructions.md",
@@ -62,11 +50,27 @@ LAZY_ALLOWLIST = {
 }
 
 
-def _is_lazy(doc_path: str) -> bool:
-    """Classifica um doc como lazy via allowlist fixa (escopo R-066 desta rodada)."""
-    return doc_path in LAZY_ALLOWLIST
+def get_doc_line_count(doc_path: str) -> int:
+    """Retorna a contagem de linhas de um documento relativo a REPO_ROOT."""
+    p = REPO_ROOT / doc_path
+    if not p.is_file():
+        return 0
+    return len(p.read_text(encoding="utf-8").splitlines())
 
-# Diretórios varridos nesta migração (R-066 / Smell 2.31).
+
+def _is_lazy(doc_path: str) -> bool:
+    """Classifica um doc como lazy se estiver na allowlist E possuir > 300 linhas (R-066)."""
+    return doc_path in LAZY_ALLOWLIST and get_doc_line_count(doc_path) > LAZY_LINE_THRESHOLD
+
+
+def _should_migrate_to_full(doc_path: str) -> bool:
+    """Todo documento em source_docs_lazy com <= 300 linhas deve migrar para source_docs."""
+    p = REPO_ROOT / doc_path
+    if not p.is_file():
+        return False
+    return get_doc_line_count(doc_path) <= LAZY_LINE_THRESHOLD
+
+
 TARGET_GLOBS: list[tuple[Path, str]] = [
     (REPO_ROOT / ".github" / "agents", "**/*.agent.md"),
     (REPO_ROOT / ".github" / "skills", "**/SKILL.md"),
@@ -103,7 +107,7 @@ def _find_block_range(lines: list[str], key: str) -> tuple[int, int] | None:
     """
     key_idx = -1
     for idx, line in enumerate(lines):
-        if re.match(rf"^{re.escape(key)}:\s*(?:#.*)?$", line.strip()):
+        if re.match(rf"^{re.escape(key)}:\s*(?:\[\s*\])?\s*(?:#.*)?$", line.strip()):
             key_idx = idx
             break
     if key_idx == -1:
@@ -123,23 +127,9 @@ def _find_block_range(lines: list[str], key: str) -> tuple[int, int] | None:
     return key_idx, end_idx
 
 
-def migrate_frontmatter(frontmatter_text: str) -> tuple[str, list[str]] | None:
-    """
-    Remove entradas lazy (allowlist) de `source_docs:` e as move para `source_docs_lazy:`.
-    Retorna (novo_frontmatter_text, itens_migrados) ou None se nada precisou mudar.
-    """
-    lines = frontmatter_text.splitlines(keepends=True)
-    line_end = "\r\n" if lines and lines[0].endswith("\r\n") else "\n"
-
-    source_docs_range = _find_block_range(lines, "source_docs")
-    if source_docs_range is None:
-        return None
-
-    start, end = source_docs_range
-    migrated: list[str] = []
-    kept_items: list[str] = []
+def _extract_block_items(lines: list[str], start: int, end: int) -> tuple[list[str], str]:
+    items: list[str] = []
     indent = "  "
-
     for idx in range(start + 1, end):
         line = lines[idx]
         m = re.match(r"^([ \t]+)-\s*(.+?)\s*$", line)
@@ -147,50 +137,79 @@ def migrate_frontmatter(frontmatter_text: str) -> tuple[str, list[str]] | None:
             continue
         indent = m.group(1)
         value = m.group(2).strip().strip('"').strip("'")
-        if _is_lazy(value):
-            migrated.append(value)
-        else:
-            kept_items.append(value)
+        items.append(value)
+    return items, indent
 
-    if not migrated:
+
+def migrate_frontmatter(frontmatter_text: str) -> tuple[str, list[str]] | None:
+    """
+    Sincroniza `source_docs:` e `source_docs_lazy:` conforme o limiar de 300 linhas (R-066):
+    1. Move itens de `source_docs:` com _is_lazy(doc) == True (> 300 linhas) para `source_docs_lazy:`.
+    2. Move itens de `source_docs_lazy:` com <= 300 linhas para `source_docs:`.
+    Retorna (novo_frontmatter_text, itens_migrados) ou None se nada precisou mudar.
+    """
+    lines = frontmatter_text.splitlines(keepends=True)
+    line_end = "\r\n" if lines and lines[0].endswith("\r\n") else "\n"
+
+    sd_range = _find_block_range(lines, "source_docs")
+    lazy_range = _find_block_range(lines, "source_docs_lazy")
+
+    if sd_range is None and lazy_range is None:
         return None
 
-    # Reconstrói o bloco source_docs (cabeçalho + itens remanescentes, ou remove a
-    # chave inteiramente se não sobrar nenhum item).
-    if kept_items:
-        new_source_docs_block = [f"source_docs:{line_end}"] + [
-            f"{indent}- {item}{line_end}" for item in kept_items
-        ]
-    else:
-        new_source_docs_block = []
+    sd_items, sd_indent = _extract_block_items(lines, *sd_range) if sd_range else ([], "  ")
+    lazy_items, lazy_indent = _extract_block_items(lines, *lazy_range) if lazy_range else ([], "  ")
+    indent = sd_indent if sd_range else lazy_indent
 
-    new_lines = lines[:start] + new_source_docs_block + lines[end:]
+    to_lazy = [x for x in sd_items if _is_lazy(x)]
+    to_full = [x for x in lazy_items if _should_migrate_to_full(x)]
 
-    # Localiza (ou cria) o bloco source_docs_lazy: logo após o novo bloco source_docs
-    # (ou no ponto onde source_docs estava, se foi removido).
-    insertion_point = start + len(new_source_docs_block)
-    lazy_range = _find_block_range(new_lines, "source_docs_lazy")
+    if not to_lazy and not to_full and not (lazy_range is not None and len(lazy_items) == 0):
+        return None
 
-    if lazy_range is not None:
-        lz_start, lz_end = lazy_range
-        existing_lazy: list[str] = []
-        for idx in range(lz_start + 1, lz_end):
-            m = re.match(r"^[ \t]+-\s*(.+?)\s*$", new_lines[idx])
-            if m:
-                existing_lazy.append(m.group(1).strip().strip('"').strip("'"))
-        to_add = [item for item in migrated if item not in existing_lazy]
-        if to_add:
-            add_lines = [f"{indent}- {item}{line_end}" for item in to_add]
-            new_lines = new_lines[:lz_end] + add_lines + new_lines[lz_end:]
-    else:
-        lazy_block = [f"source_docs_lazy:{line_end}"] + [
-            f"{indent}- {item}{line_end}" for item in migrated
-        ]
-        new_lines = (
-            new_lines[:insertion_point] + lazy_block + new_lines[insertion_point:]
-        )
+    new_sd_items = [x for x in sd_items if x not in to_lazy]
+    for x in to_full:
+        if x not in new_sd_items:
+            new_sd_items.append(x)
 
-    return "".join(new_lines), migrated
+    new_lazy_items = [x for x in lazy_items if x not in to_full]
+    for x in to_lazy:
+        if x not in new_lazy_items:
+            new_lazy_items.append(x)
+
+    migrated = to_lazy + to_full
+
+    # Atualiza os blocos preservando a posição original no frontmatter
+    # Primeiro determina o ponto de inserção principal (onde source_docs ou source_docs_lazy iniciava)
+    blocks_to_replace: list[tuple[int, int, str]] = []
+    if sd_range:
+        blocks_to_replace.append((sd_range[0], sd_range[1], "source_docs"))
+    if lazy_range:
+        blocks_to_replace.append((lazy_range[0], lazy_range[1], "source_docs_lazy"))
+    blocks_to_replace.sort(key=lambda b: b[0])
+
+    first_start = blocks_to_replace[0][0]
+    # Remove os blocos antigos de trás para frente
+    work_lines = list(lines)
+    for b_start, b_end, _ in reversed(blocks_to_replace):
+        del work_lines[b_start:b_end]
+
+    # Ajusta first_start caso blocos anteriores tenham sido removidos (first_start é o menor índice, então permanece exato)
+    replacement_lines: list[str] = []
+    if new_sd_items:
+        replacement_lines.append(f"source_docs:{line_end}")
+        for item in new_sd_items:
+            replacement_lines.append(f"{indent}- {item}{line_end}")
+    if new_lazy_items:
+        replacement_lines.append(f"source_docs_lazy:{line_end}")
+        for item in new_lazy_items:
+            replacement_lines.append(f"{indent}- {item}{line_end}")
+
+    new_lines = work_lines[:first_start] + replacement_lines + work_lines[first_start:]
+    new_fm_text = "".join(new_lines)
+    if new_fm_text == frontmatter_text:
+        return None
+    return new_fm_text, migrated
 
 
 def sync_lazy_source_docs(mode: str) -> tuple[SyncReport, int]:
@@ -228,13 +247,6 @@ def sync_lazy_source_docs(mode: str) -> tuple[SyncReport, int]:
         try:
             new_fm_data = yaml.safe_load(new_fm_text)
             assert isinstance(new_fm_data, dict), "Frontmatter resultante inválido"
-            new_lazy = new_fm_data.get("source_docs_lazy", []) or []
-            for item in migrated_items:
-                assert item in new_lazy, f"{item} não migrado corretamente para source_docs_lazy"
-            new_full = new_fm_data.get("source_docs", []) or []
-            for item in migrated_items:
-                assert item not in new_full, f"{item} ainda presente em source_docs (full)"
-            # Garantir integridade de todos os outros campos
             for k, v in fm_data.items():
                 if k not in ("source_docs", "source_docs_lazy"):
                     assert new_fm_data.get(k) == v, f"Campo {k} foi corrompido em {tf.name}"
@@ -243,7 +255,7 @@ def sync_lazy_source_docs(mode: str) -> tuple[SyncReport, int]:
             continue
 
         rel_path = str(tf.relative_to(REPO_ROOT))
-        report.drifted.append(f"{rel_path} (migrando para lazy: {', '.join(migrated_items)})")
+        report.drifted.append(f"{rel_path} (sincronizado: {', '.join(migrated_items)})")
 
         if mode == "dry-run":
             diff = compute_unified_diff(content, new_content, tf.name)
@@ -258,8 +270,7 @@ def sync_lazy_source_docs(mode: str) -> tuple[SyncReport, int]:
                 report.errors.append(f"{tf.name}: R-051 falhou ao ler delimitadores após gravação")
                 continue
             re_fm_data = yaml.safe_load(re_parts[1])
-            re_lazy = re_fm_data.get("source_docs_lazy", []) or []
-            if not all(item in re_lazy for item in migrated_items):
+            if not isinstance(re_fm_data, dict):
                 report.errors.append(f"{tf.name}: R-051 falhou na verificação pós-gravação")
                 continue
 
@@ -277,7 +288,7 @@ def main(args: list[str] | None = None) -> int:
     report.print_summary("Progressive Disclosure Lazy Source Docs Sync (R-066)", options.mode)
 
     if options.is_check and report.has_drift:
-        print("\nPara aplicar a migração canônica de source_docs_lazy:, execute:")
+        print("\nPara aplicar a sincronização canônica de source_docs / source_docs_lazy:, execute:")
         print("  python tools/agent_source_docs_sync/sync_lazy_source_docs.py --apply")
 
     return exit_code
@@ -285,4 +296,3 @@ def main(args: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
-

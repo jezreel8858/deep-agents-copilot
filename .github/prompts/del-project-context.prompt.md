@@ -12,7 +12,6 @@ argument-hint: '<nome-do-projeto>'
 source_docs:
   - .github/projects.local.yaml.example
   - .github/instructions/README.md
-source_docs_lazy:
   - CLAUDE.md
 ---
 

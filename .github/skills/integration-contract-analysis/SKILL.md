@@ -21,7 +21,6 @@ tools:
   - context-mode/ctx_execute
 source_docs:
   - .github/agents/tech-solution-architect.agent.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---

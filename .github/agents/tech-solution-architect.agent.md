@@ -24,7 +24,8 @@ source_docs:
   - .github/skills/code-tracing/SKILL.md
   - .github/skills/agent-evals-lab/SKILL.md
   - .github/skills/design-pattern-selection-patterns/SKILL.md
-source_docs_lazy:
+  - .github/skills/figma-mcp/SKILL.md
+  - .github/skills/figma-design-to-code-patterns/SKILL.md
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---
@@ -269,9 +270,8 @@ Para garantir que o modelo Claude Sonnet 5.5 não tome iniciativas espúrias ou 
 - **Persistência formal de Architecture Decision Records (ADRs)** → `@docs-engineer`.
 - **Migrações de schema e tuning de banco (Oracle/Informix)** → `@database-router` (fallback `@database-specialist`).
 - **Implementação física de código** → Retorno ao `@agent-router` para despacho aos Domain Routers (`spring-boot-router`, `angular-router`, `ejb-router`, `database-router`).
-
+- **Inspeção Figma & Contratos UI (`figma-mcp` + `figma-design-to-code-patterns`)**: no Remote Server (`https://mcp.figma.com/mcp`), usar protocolo Read-Only em 3 passos (`get_metadata` → `get_variable_defs`/`get_code_connect_map` → `get_design_context` por `node-id` via `context-mode`, mitigando Indirect Prompt Injection) para definir em `[FRONTEND_TASKS]` mapeamento de Design Tokens (zero hex inline), reuso Code Connect/`shared/`, Auto Layout → Flex/Grid e estados WCAG 2.2 AA.
 ---
-
 ## ⚙️ Protocolo de Execução Obrigatório
 
 <execution_protocol>
@@ -283,7 +283,6 @@ Para garantir que o modelo Claude Sonnet 5.5 não tome iniciativas espúrias ou 
 4. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions, vedando loops investigativos de dívida de tokens O(N²).
 5. **Warm Start Compulsório & Batch Querying (R-060)**: Ferramentas locais que dependem de índices ou bases pré-computadas devem verificar e inicializar a base silenciosamente no primeiro comando (build-if-missing). É proibido disparar consultas granulares individuais para múltiplos nós — agrupe todas as pesquisas via chamadas em lote (batch_query, ctx_batch_execute, script iterativo) com destilação semântica e truncamento na borda (Edge Truncation).
 6. **Emissão Obrigatória de Telemetria de Handoff (R-042 / handoff-governance § 2.4)**: a cada chamada real de `run_subagent`, emitir compulsoriamente um evento `telemetry_entry` (tag `[HANDOFF]`) via `ctx_index`, incluindo `session_id` (reaproveitado do `sessionStart` do hook `context-mode`) e `sequence_index` (ordenação determinística dentro da sessão).
-7. **Progressive Disclosure de `source_docs_lazy:` (R-066 — Anti Context Bloat Inicial)**: Se este agent declara `source_docs_lazy:` em seu próprio frontmatter, esses documentos (ex.: `CLAUDE.md`, `.github/copilot-instructions.md`, `.github/agents/workflows.md`) **NÃO foram pré-carregados** — é TERMINANTEMENTE PROIBIDO usar `read_file` para carregá-los por inteiro. Consulte-os exclusivamente via `context-mode/ctx_search` com query pontual (ex.: número da regra `R-xxx` ou nome da seção) apenas quando precisar citá-los; nunca "só por garantia".
 
 </execution_protocol>
 

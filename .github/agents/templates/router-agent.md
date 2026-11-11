@@ -18,12 +18,11 @@ tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 
 # Todo novo domain router DEVE ser integrado às enumerações de .github/agents/workflows.md
 # (ex.: § 1.3, § 3.3, § 5, § 8) bem como em catalog.yaml, routing-graph.yaml, agent-router.agent.md
 # e nos casos de teste de roteamento (evals/casos-roteamento.yaml - R-015 / R-040).
-# R-066 (Progressive Disclosure): CLAUDE.md/copilot-instructions.md NUNCA em source_docs: (full-load) — vão em
-# source_docs_lazy: (docs >300 linhas, consulta exclusiva via context-mode/ctx_search sob demanda).
+# R-066 (Progressive Disclosure): docs <= 300 linhas residem em source_docs: (full-load); docs > 300 linhas vão em
+# source_docs_lazy: (consulta exclusiva via context-mode/ctx_search sob demanda).
 source_docs:
   - .github/skills/agent-contracts/SKILL.md
   - .github/skills/handoff-governance/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---

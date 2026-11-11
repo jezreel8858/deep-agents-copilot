@@ -25,7 +25,6 @@ triggers:
 source_docs:
   - .github/skills/code-review-patterns/SKILL.md
   - .github/skills/sonarqube-governance/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []

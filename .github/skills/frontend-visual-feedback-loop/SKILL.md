@@ -19,7 +19,6 @@ source_docs:
   - .github/skills/frontend-componentization-patterns/SKILL.md
   - .github/skills/design-system-component-contracts/SKILL.md
   - .github/skills/playwright-mcp/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []

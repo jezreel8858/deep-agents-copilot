@@ -19,7 +19,6 @@ triggers:
   - "rollback de refatoração"
 source_docs:
   - .github/agents/refactor-planner.agent.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []

@@ -32,6 +32,8 @@ agents:
     - agent-contracts
     - frontend-visual-feedback-loop
     - playwright-mcp
+    - figma-mcp
+    - figma-design-to-code-patterns
     model: Claude Sonnet 5.5
   angular-developer:
     id: angular-developer
@@ -94,6 +96,8 @@ agents:
     - code-tracing
     - terminal-governance
     - playwright-mcp
+    - figma-mcp
+    - figma-design-to-code-patterns
     model: Grok 4.7
   angular-test-engineer:
     id: angular-test-engineer

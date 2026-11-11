@@ -16,7 +16,7 @@ triggers:
   - "cve vulnerabilidade"
   - "best practices externas"
   - "docs atualizadas"
-source_docs_lazy:
+source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools:
