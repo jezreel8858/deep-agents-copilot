@@ -6,7 +6,7 @@ description: >-
   desacoplamento e migrações estruturais. Produz planos em fases isoladas com
   estratégia de rollback, sem implementar código.
 model: "Claude Sonnet 5.5"
-tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_fetch_and_index', 'context-mode/ctx_batch_execute', 'context-mode/ctx_stats', 'context-mode/ctx_doctor', 'context-mode/ctx_upgrade', 'context-mode/ctx_purge', 'context-mode/ctx_insight', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file']
+tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_fetch_and_index', 'context-mode/ctx_batch_execute', 'context-mode/ctx_stats', 'context-mode/ctx_doctor', 'context-mode/ctx_upgrade', 'context-mode/ctx_purge', 'context-mode/ctx_insight', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'mcp-atlassian/jira_get_issue', 'mcp-atlassian/jira_search']
 source_docs:
   - .github/skills/documentation-writing-patterns/SKILL.md
   - .github/skills/security-review-patterns/SKILL.md
@@ -21,6 +21,7 @@ source_docs:
   - .github/skills/agent-contracts/SKILL.md
   - .github/skills/code-tracing/SKILL.md
   - .github/skills/design-pattern-selection-patterns/SKILL.md
+  - .github/skills/jira-mcp/SKILL.md
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---
@@ -39,6 +40,7 @@ Você é especialista em planejamento e decomposição macro de refatoração ar
 - Exige compulsoriamente Safety Net (testes unitários existentes ou Characterization Tests / Golden Master).
 - Consulta compulsoriamente o `@codegraph-engine` via `run_subagent` para calcular fan-in, fan-out, ciclos e blast radius.
 - Desenha estratégias formais de transição e contingência (Mikado Method, Branch by Abstraction, Strangler Fig, Expand & Contract).
+- Utiliza `jira_get_issue` e `jira_search` (`jira-mcp`) de forma **estritamente read-only** (Least-Tools R-024) para ingerir contexto de cards Jira informados pelo usuário, mantendo escrita no Jira 100% proibida (delegar a `@feature-planner`).
 
 ### ❌ O que este agente NUNCA faz (Não-Escopo)
 - ❌ NÃO instruir o usuário a fazer alterações manuais de código ou em artefatos sob justificativa de ausência de ferramentas de edição (R-057 / Smell 2.25); avance compulsoriamente o workflow determinístico ou acione o handoff para o agente executor competente.

@@ -26,7 +26,7 @@ source_docs:
 
 > **Nível 1 (Metadados)**: frontmatter. **Nível 2 (Corpo)**: este arquivo. Sem `scripts/`; redação/templates de cards vivem em `jira-writing-patterns`; consultar a Tools Reference oficial do vendor sob demanda via `@deep-search`.
 
-Formaliza o uso do servidor MCP externo `sooperset/mcp-atlassian` (padrão de mercado) pelos agents `@requirements-analyst`, `@bug-triage`, `@feature-planner` e `@pr-gatekeeper`, complementando `agent-safety-guardrails/SKILL.md` (OWASP ASI01) e `context-mode/SKILL.md` (R-008). Agnóstico de empresa (R-038): somente placeholders genéricos.
+Formaliza o uso do servidor MCP externo `sooperset/mcp-atlassian` (padrão de mercado) pelos 7 agents oficiais (`@requirements-analyst`, `@bug-triage`, `@business-rules-extractor`, `@tech-solution-architect`, `@refactor-planner`, `@feature-planner` e `@pr-gatekeeper`), complementando `agent-safety-guardrails/SKILL.md` (OWASP ASI01) e `context-mode/SKILL.md` (R-008). Agnóstico de empresa (R-038): somente placeholders genéricos.
 
 ## 1) Quando Usar
 
@@ -71,14 +71,16 @@ Fixar versão (reprodutibilidade, como `playwright-mcp`). Última release observ
 - Nomes `ENABLED_TOOLS`/`TOOLSETS`/`JIRA_SSL_VERIFY` constam da configuração do vendor, mas confirmar com `uvx mcp-atlassian==0.23.1 --help` na primeira adoção.
 - Toolsets opt-in (ex.: `TOOLSETS=default,jira_agile` para boards/sprints) e toolset `legacy` (depreciado): não habilitar sem justificativa. Nomes de tools devem ser validados contra a Tools Reference vigente do vendor antes de fixar `ENABLED_TOOLS`.
 
-## 3) Segregação Least-Tools por Perfil (R-024)
+## 3) Segregação Least-Tools por Perfil de Agente (R-024)
 
-| Perfil | Agents | `READ_ONLY_MODE` | `ENABLED_TOOLS` (allowlist) |
+| Perfil | Agents (7 Consumidores Oficiais) | `READ_ONLY_MODE` | `ENABLED_TOOLS` (allowlist) |
 |---|---|---|---|
-| **Analítico / Read-Only** | `@requirements-analyst`, `@bug-triage` | `true` | `jira_get_issue`, `jira_search`, `jira_get_project_issues`, `jira_get_transitions`; boards/sprints (`jira_get_agile_boards`, `jira_get_sprint_issues`) apenas com `jira_agile` |
-| **Planejamento / Gatekeeper** | `@feature-planner`, `@pr-gatekeeper` | `false` somente no perfil de escrita | leitura acima + `jira_create_issue`, `jira_update_issue`, `jira_add_comment`, `jira_transition_issue` — **sempre com HITL prévio** |
+| **Analítico / Arquitetura / Read-only** | `@requirements-analyst`, `@bug-triage`, `@business-rules-extractor`, `@tech-solution-architect`, `@refactor-planner` | `true` | `jira_get_issue`, `jira_search` (`jira_get_project_issues`, `jira_get_transitions`; boards/sprints apenas com `jira_agile`) |
+| **Planejamento (Leitura + Escrita Completa c/ HITL + Prévia de Cards `.md`)** | `@feature-planner` | `false` (com HITL obrigatório) | `jira_get_issue`, `jira_search`, `jira_create_issue`, `jira_update_issue`, `jira_add_comment`, `jira_transition_issue` — **exclusivo para escrita de issues e prévia de cards `.md`, sempre com HITL prévio** |
+| **Gatekeeper de PR (Leitura + Comentário/Transição c/ HITL)** | `@pr-gatekeeper` | `false` (restrito a comentário/transição c/ HITL) | `jira_get_issue`, `jira_search`, `jira_add_comment`, `jira_transition_issue` — **sempre com HITL prévio** |
 
-- Perfis analíticos **nunca** recebem tools de escrita (também vale R-057: não terceirizar ao usuário a edição manual por falta de ferramenta — registrar a lacuna e fazer handoff).
+- **Proibição Estrita fora da Matriz (R-024 / R-054)**: `@docs-engineer`, `@prompt-structuring`, `<stack>-developer` e `<stack>-router` **NÃO possuem** tools do Jira (`mcp-atlassian/jira_*`).
+- Perfis analíticos/arquitetura **nunca** recebem tools de escrita (também vale R-057: não terceirizar ao usuário a edição manual por falta de ferramenta — registrar a lacuna e fazer handoff).
 - `jira_search` (JQL) é preferível a `jira_get_project_issues` para buscas amplas.
 - Antes de `jira_transition_issue`, consultar `jira_get_transitions` e usar apenas transições válidas.
 

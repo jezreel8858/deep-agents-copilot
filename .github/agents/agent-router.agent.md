@@ -260,6 +260,21 @@ Pedido recebido (já refinado por @prompt-structuring ou via Fast-Path)?
    \- Não -> fazer 1 pergunta objetiva de clarificação
 ```
 
+### Matriz Estática de Capabilities Jira-MCP (Capability Gate — R-024 / R-054)
+
+- **Leitura (`jira_get_issue`, `jira_search`)**: `@requirements-analyst`, `@bug-triage`, `@business-rules-extractor`, `@tech-solution-architect`, `@refactor-planner`, `@feature-planner`, `@pr-gatekeeper`.
+- **Escrita de Issues (`jira_create_issue`, `jira_update_issue`) + Prévia de Cards Jira em `.md`**: **exclusivamente** `@feature-planner` (com HITL obrigatório).
+- **Comentário e Transição (`jira_add_comment`, `jira_transition_issue`)**: `@feature-planner` e `@pr-gatekeeper` (com HITL obrigatório).
+- **Regra Invariante (Proibição de Roteamento Cego para Jira)**: Quando o pedido contiver chave Jira (`[A-Z][A-Z0-9]+-\d+`) ou intenção explícita de ler/criar/atualizar/transicionar/gerar prévia de card Jira, o `@agent-router` NUNCA deve delegar no 1º hop para um agent fora da Matriz Jira-MCP (como `@docs-engineer`, `@prompt-structuring`, `<stack>-router` ou `<stack>-developer`).
+- **Mapeamento Determinístico por Caso de Uso Jira**:
+  1. Investigar bug / incidente com card Jira (`PROJ-123`) → `@bug-triage` (`WORKFLOW-BUG-FIX` Etapa 1).
+  2. Elicitar requisitos / analisar Épico ou Story Jira (`PROJ-123`) ou pedido "implemente o card PROJ-123" (Feature) → `@requirements-analyst` (`WORKFLOW-FEATURE-DEVELOPMENT` Etapa 1, bypassando `@prompt-structuring` quando houver chave de card Jira).
+  3. Decompor feature em tasks/subtasks, gerar prévia de cards Jira em `.md` (ex.: `*-previa-cards-jira.md`) ou criar/atualizar cards no Jira → `@feature-planner` (NUNCA `@docs-engineer`).
+  4. Extrair/validar regras de negócio cruzando código com card Jira → `@business-rules-extractor`.
+  5. Blueprint técnico / análise arquitetural de card Jira (`PROJ-123`) → `@tech-solution-architect` (`WORKFLOW-TECHNICAL-ANALYSIS` Etapa 1).
+  6. Plano de refatoração a partir de card Jira (`PROJ-123`) → `@refactor-planner` (`WORKFLOW-REFACTORING` Etapa 1).
+  7. Comentar link de PR / transicionar card Jira no fechamento → `@pr-gatekeeper`.
+
 ## Padrões Obrigatórios
 
 1. Frontmatter com `name`, `version`, `description`, `tools`.

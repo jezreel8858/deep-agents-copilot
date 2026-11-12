@@ -97,8 +97,8 @@ agents:
     model: Claude Sonnet 5.5
     priority: 2
     domain: Triagem de bugs e regressao
-    description: Classificar bugs, reproduzir erro, analisar blast radius e propor
-      plano minimo de correcao
+    description: Classificar bugs, reproduzir erro, analisar blast radius e propor plano
+      minimo de correcao
     keywords:
     - bug
     - regressao
@@ -141,11 +141,8 @@ agents:
     - confidence-fallback-policy
     - agent-evals-lab
     - jira-mcp
-
-    - jira-writing-patterns
     source_docs:
     - .github/skills/jira-mcp/SKILL.md
-    - .github/skills/jira-writing-patterns/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
     - .github/agents/bug-triage.agent.md
@@ -239,8 +236,6 @@ agents:
     - list_dir
     - ask_questions
     - run_subagent
-    - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
     - context-mode/ctx_index
     - context-mode/ctx_search
     - context-mode/ctx_fetch_and_index
@@ -250,6 +245,10 @@ agents:
     - context-mode/ctx_upgrade
     - context-mode/ctx_purge
     - context-mode/ctx_insight
+    - context-mode/ctx_execute
+    - context-mode/ctx_execute_file
+    - mcp-atlassian/jira_get_issue
+    - mcp-atlassian/jira_search
     related_skills:
     - refactoring-planning-patterns
     - context-mode
@@ -260,11 +259,22 @@ agents:
     - integration-contract-analysis
     - socratic-grilling-patterns
     source_docs:
+    - .github/skills/documentation-writing-patterns/SKILL.md
+    - .github/skills/security-review-patterns/SKILL.md
+    - .github/skills/refactoring-planning-patterns/SKILL.md
+    - .github/skills/task-decomposition-patterns/SKILL.md
+    - .github/skills/business-rules-governance/SKILL.md
+    - .github/skills/context-mode/SKILL.md
+    - .github/skills/integration-contract-analysis/SKILL.md
+    - .github/skills/efficient-batch-code-modification/SKILL.md
+    - .github/skills/socratic-grilling-patterns/SKILL.md
+    - .github/skills/handoff-governance/SKILL.md
+    - .github/skills/agent-contracts/SKILL.md
+    - .github/skills/code-tracing/SKILL.md
+    - .github/skills/design-pattern-selection-patterns/SKILL.md
+    - .github/skills/jira-mcp/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
-    - .github/agents/refactor-planner.agent.md
-    - .github/skills/refactoring-planning-patterns/SKILL.md
-    - .github/skills/socratic-grilling-patterns/SKILL.md
     estimated_time_minutes: 30
   deep-search:
     id: deep-search
@@ -334,11 +344,10 @@ agents:
     model: Claude Opus 5.5
     priority: 8
     version: 2.2.0
-    domain: Arquitetura técnica, blueprint, contratos de integração e divisão por
-      stack
+    domain: Arquitetura técnica, blueprint, contratos de integração e divisão por stack
     description: 'Arquiteto de solução técnica: viabilidade, blueprint técnico, contratos
-      de API (OpenAPI/AsyncAPI/gRPC), modelo de dados e divisão macro do trabalho
-      em seções isoladas ([BACKEND_TASKS], [FRONTEND_TASKS]) com metodologia B1/B2/B3.'
+      de API (OpenAPI/AsyncAPI/gRPC), modelo de dados e divisão macro do trabalho em
+      seções isoladas ([BACKEND_TASKS], [FRONTEND_TASKS]) com metodologia B1/B2/B3.'
     keywords:
     - blueprint técnico
     - tech solution architect
@@ -375,8 +384,6 @@ agents:
     - list_dir
     - ask_questions
     - run_subagent
-    - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
     - context-mode/ctx_index
     - context-mode/ctx_search
     - context-mode/ctx_fetch_and_index
@@ -391,6 +398,8 @@ agents:
     - figma/get_styles
     - figma/get_component_sets
     - figma/get_comments
+    - mcp-atlassian/jira_get_issue
+    - mcp-atlassian/jira_search
     related_skills:
     - context-mode
     - agent-contracts
@@ -405,18 +414,26 @@ agents:
     - figma-mcp
     - figma-design-to-code-patterns
     source_docs:
+    - .github/skills/documentation-writing-patterns/SKILL.md
+    - .github/skills/security-review-patterns/SKILL.md
+    - .github/skills/context-mode/SKILL.md
+    - .github/skills/integration-contract-analysis/SKILL.md
+    - .github/skills/mermaid-diagrams/SKILL.md
+    - .github/skills/task-decomposition-patterns/SKILL.md
+    - .github/skills/efficient-batch-code-modification/SKILL.md
+    - .github/skills/harness-engineering-patterns/SKILL.md
+    - .github/skills/requirements-engineering-patterns/SKILL.md
+    - .github/skills/socratic-grilling-patterns/SKILL.md
+    - .github/skills/handoff-governance/SKILL.md
+    - .github/skills/agent-contracts/SKILL.md
+    - .github/skills/code-tracing/SKILL.md
+    - .github/skills/agent-evals-lab/SKILL.md
+    - .github/skills/design-pattern-selection-patterns/SKILL.md
     - .github/skills/figma-mcp/SKILL.md
     - .github/skills/figma-design-to-code-patterns/SKILL.md
+    - .github/skills/jira-mcp/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
-    - .github/agents/tech-solution-architect.agent.md
-    - .github/agents/README.md
-    - .github/instructions/README.md
-    - .github/skills/README.md
-    - .github/skills/integration-contract-analysis/SKILL.md
-    - .github/skills/task-decomposition-patterns/SKILL.md
-    - .github/skills/mermaid-diagrams/SKILL.md
-    - .github/skills/socratic-grilling-patterns/SKILL.md
     estimated_time_minutes: 45
   agent-auditor:
     id: agent-auditor
@@ -640,9 +657,9 @@ agents:
     version: 2.0.0
     domain: Preparacao de entrega (PR/commit/changelog)
     description: Orquestra submissao de PR pos-aprovacao do quality gate — sintetiza
-      diff, aplica guardrail de segredos, gera commit, titulo/descricao de PR
-      (matriz de risco e plano de rollback) e CHANGELOG.md conforme a skill
-      git-governance (SSOT). Nunca executa git add/commit/push (R-031).
+      diff, aplica guardrail de segredos, gera commit, titulo/descricao de PR (matriz
+      de risco e plano de rollback) e CHANGELOG.md conforme a skill git-governance (SSOT).
+      Nunca executa git add/commit/push (R-031).
     keywords:
     - pull request
     - commit semantico
@@ -684,14 +701,19 @@ agents:
     - jira-mcp
     - jira-writing-patterns
     source_docs:
+    - .github/skills/git-governance/SKILL.md
+    - .github/skills/git-conflict-resolution-patterns/SKILL.md
+    - .github/skills/efficient-batch-code-modification/SKILL.md
+    - .github/skills/context-mode/SKILL.md
+    - .github/projects.local.yaml
+    - .github/skills/handoff-governance/SKILL.md
+    - .github/skills/agent-contracts/SKILL.md
+    - .github/skills/terminal-governance/SKILL.md
     - .github/skills/jira-mcp/SKILL.md
     - .github/skills/jira-writing-patterns/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
-    - .github/agents/pr-gatekeeper.agent.md
-    - .github/skills/git-governance/SKILL.md
-    - .github/skills/terminal-governance/SKILL.md
-    - .github/skills/git-conflict-resolution-patterns/SKILL.md
+    - .github/skills/plan-conformance-patterns/SKILL.md
     - .github/skills/embedded-runtime-governance/SKILL.md
     estimated_time_minutes: 15
   database-specialist:
@@ -1040,6 +1062,8 @@ agents:
     - get_errors
     - ask_questions
     - run_subagent
+    - context-mode/ctx_execute
+    - context-mode/ctx_execute_file
     - context-mode/ctx_index
     - context-mode/ctx_search
     - context-mode/ctx_batch_execute
@@ -1051,11 +1075,18 @@ agents:
     - mermaid-diagrams
     - context-mode
     source_docs:
+    - .github/skills/business-rules-governance/SKILL.md
+    - .github/skills/documentation-writing-patterns/SKILL.md
+    - .github/skills/mermaid-diagrams/SKILL.md
+    - .github/skills/structured-intake-patterns/SKILL.md
+    - .github/skills/context-mode/SKILL.md
+    - .github/skills/efficient-batch-code-modification/SKILL.md
+    - .github/skills/handoff-governance/SKILL.md
+    - .github/skills/agent-contracts/SKILL.md
+    - .github/skills/code-tracing/SKILL.md
+    - .github/skills/jira-mcp/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
-    - .github/agents/business-rules-extractor.agent.md
-    - .github/skills/business-rules-governance/SKILL.md
-    - .github/skills/code-tracing/SKILL.md
     estimated_time_minutes: 60
     version: 1.1.0
   codegraph-engine:
@@ -1404,7 +1435,6 @@ agents:
     - business-rules-extractor
     - governance-factory
     tools:
-    - context-mode/ctx_execute
     - grep_search
     - file_search
     - list_dir
@@ -1413,7 +1443,6 @@ agents:
     - run_subagent
     - context-mode/ctx_search
     - context-mode/ctx_batch_execute
-    - context-mode/ctx_execute_file
     - context-mode/ctx_index
     related_skills:
     - documentation-writing-patterns
@@ -1421,10 +1450,16 @@ agents:
     - agent-contracts
     - reflection-self-critique-patterns
     source_docs:
+    - .github/skills/documentation-writing-patterns/SKILL.md
+    - .github/skills/mermaid-diagrams/SKILL.md
+    - .github/skills/efficient-batch-code-modification/SKILL.md
+    - .github/skills/context-mode/SKILL.md
+    - .github/skills/reflection-self-critique-patterns/SKILL.md
+    - docs/agent-context/templates/CONTEXT.template.md
+    - .github/skills/handoff-governance/SKILL.md
+    - .github/skills/agent-contracts/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
-    - .github/agents/docs-engineer.agent.md
-    - .github/skills/documentation-writing-patterns/SKILL.md
     estimated_time_minutes: 25
   feature-planner:
     id: feature-planner
@@ -1432,9 +1467,9 @@ agents:
     priority: 4.1
     version: 2.0.0
     domain: Decomposicao de feature nova em subtasks executaveis
-    description: Decompõe requisitos de feature nova (não refatoração) em subtasks
-      executáveis com dependências mapeadas, paralelização e critério de pronto objetivo.
-      Nunca implementa código; retorna plano estruturado para delegação a agents especializados.
+    description: Decompõe requisitos de feature nova (não refatoração) em subtasks executáveis
+      com dependências mapeadas, paralelização e critério de pronto objetivo. Nunca
+      implementa código; retorna plano estruturado para delegação a agents especializados.
       Distinto de refactor-planner (foco em risco/rollback de código existente).
     keywords:
     - decompor tarefa
@@ -1461,9 +1496,7 @@ agents:
     - ask_questions
     - run_subagent
     - context-mode/ctx_search
-    - context-mode/ctx_execute
     - context-mode/ctx_batch_execute
-    - context-mode/ctx_execute_file
     - context-mode/ctx_index
     - mcp-atlassian/jira_get_issue
     - mcp-atlassian/jira_search
@@ -1479,13 +1512,18 @@ agents:
     - jira-mcp
     - jira-writing-patterns
     source_docs:
+    - .github/skills/documentation-writing-patterns/SKILL.md
+    - .github/skills/security-review-patterns/SKILL.md
+    - .github/skills/task-decomposition-patterns/SKILL.md
+    - .github/skills/requirements-engineering-patterns/SKILL.md
+    - .github/skills/context-mode/SKILL.md
+    - .github/skills/efficient-batch-code-modification/SKILL.md
+    - .github/skills/handoff-governance/SKILL.md
+    - .github/skills/agent-contracts/SKILL.md
     - .github/skills/jira-mcp/SKILL.md
     - .github/skills/jira-writing-patterns/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
-    - .github/agents/feature-planner.agent.md
-    - .github/skills/task-decomposition-patterns/SKILL.md
-    - .github/skills/context-mode/SKILL.md
     estimated_time_minutes: 20
   performance-agent:
     id: performance-agent
@@ -1551,8 +1589,7 @@ agents:
     description: Especialista em elicitação, refinamento e estruturação de requisitos
       de negócio e técnicos a partir de pedidos ambíguos. Converte intenção em especificações
       precisas com critérios de aceitação e regras de negócio antes do planejamento
-      técnico, materializando-as em docs/requirements/REQ-<modulo>.md como ground
-      truth.
+      técnico, materializando-as em docs/requirements/REQ-<modulo>.md como ground truth.
     keywords:
     - levantar requisitos
     - requisito ambiguo
@@ -1580,18 +1617,16 @@ agents:
     - get_errors
     - ask_questions
     - run_subagent
-    - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
     - context-mode/ctx_index
     - context-mode/ctx_search
     - context-mode/ctx_batch_execute
-    - mcp-atlassian/jira_get_issue
-    - mcp-atlassian/jira_search
     - figma/get_file_nodes
     - figma/export_image
     - figma/get_styles
     - figma/get_component_sets
     - figma/get_comments
+    - mcp-atlassian/jira_get_issue
+    - mcp-atlassian/jira_search
     related_skills:
     - requirements-engineering-patterns
     - structured-intake-patterns
@@ -1605,16 +1640,21 @@ agents:
     - figma-mcp
     - figma-design-to-code-patterns
     source_docs:
+    - .github/skills/requirements-engineering-patterns/SKILL.md
+    - .github/skills/structured-intake-patterns/SKILL.md
+    - .github/skills/documentation-writing-patterns/SKILL.md
+    - .github/skills/security-review-patterns/SKILL.md
+    - .github/skills/context-mode/SKILL.md
+    - .github/skills/efficient-batch-code-modification/SKILL.md
+    - .github/skills/socratic-grilling-patterns/SKILL.md
+    - docs/agent-context/templates/stakeholder-questionnaire.md
+    - .github/skills/handoff-governance/SKILL.md
+    - .github/skills/agent-contracts/SKILL.md
     - .github/skills/jira-mcp/SKILL.md
-    - .github/skills/jira-writing-patterns/SKILL.md
     - .github/skills/figma-mcp/SKILL.md
     - .github/skills/figma-design-to-code-patterns/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
-    - .github/agents/requirements-analyst.agent.md
-    - .github/skills/requirements-engineering-patterns/SKILL.md
-    - .github/skills/socratic-grilling-patterns/SKILL.md
-    - docs/agent-context/templates/stakeholder-questionnaire.md
     estimated_time_minutes: 25
   security-reviewer:
     id: security-reviewer

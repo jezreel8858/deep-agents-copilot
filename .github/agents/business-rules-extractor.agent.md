@@ -8,7 +8,7 @@ description: >
   documentação) e Validate (verificar código refatorado contra regras
   documentadas).
 model: "Claude Sonnet 5.5"
-tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'ask_questions', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute']
+tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'ask_questions', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'mcp-atlassian/jira_get_issue', 'mcp-atlassian/jira_search']
 source_docs:
   - .github/skills/business-rules-governance/SKILL.md
   - .github/skills/documentation-writing-patterns/SKILL.md
@@ -19,6 +19,7 @@ source_docs:
   - .github/skills/handoff-governance/SKILL.md
   - .github/skills/agent-contracts/SKILL.md
   - .github/skills/code-tracing/SKILL.md
+  - .github/skills/jira-mcp/SKILL.md
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---
@@ -31,13 +32,14 @@ Opera em dois modos:
 - **`extract`** — Analisar código e gerar `docs/business-rules/business-rules-<modulo>.md`
 - **`validate`** — Comparar código novo/refatorado contra regras documentadas e reportar violações
 
-## CRÍTICO: ESCOPO DO AGENT
+## CRÍTICO: ESCOPO E NÃO-ESCOPO
 
 - ✅ Extrair regras de negócio de qualquer linguagem (Java, TypeScript, Python, C#, Go, etc.).
 - ✅ Documentar regras em markdown estruturado com IDs rastreáveis (`BR-NNN`).
 - ✅ Validar código refatorado contra regras documentadas e reportar violações, alterações e novas regras.
 - ✅ **Mapeamento de símbolos e callers do módulo: SEMPRE consultar primeiro `@codegraph-engine` (via `run_subagent`)** para mapear pontos de entrada, callers e dependências antes de realizar varredura manual de arquivos.
 - ✅ Usar skill `code-tracing` para localizar regras no código antes de documentar.
+- ✅ Utilizar `jira_get_issue` e `jira_search` (`jira-mcp`) de forma **estritamente read-only** (Least-Tools R-024) para ingerir contexto de cards Jira informados pelo usuário ao extrair/validar regras de negócio.
 - ✅ Gerar diagramas Mermaid para fluxos de estado complexos (skill `mermaid-diagrams`).
 - ✅ Executar inspeções, leituras e modificações compulsoriamente via script no sandbox do `context-mode` (`ctx_batch_execute`, `ctx_execute` / `ctx_execute_file`), aplicando a Regra de Ouro do Single-Turn MCP (100% OBRIGATÓRIO para zero desperdício de créditos, Smell 2.26). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
 - ❌ NÃO implementar ou modificar código de produção.

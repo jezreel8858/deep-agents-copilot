@@ -27,7 +27,7 @@ Ser o **único ponto de entrada** para construção e consulta do grafo de conhe
 
 O motor `@optave/codegraph` fornece parsing via AST real (motor nativo) para 34 linguagens, dataflow analysis + CFG + interprocedural dataflow, CI gate nativo (`codegraph check`), dead-code detection, complexity metrics, community detection e co-change analysis. Uso da lib documentado na skill [`codegraph-optave-usage`](../skills/codegraph-optave-usage/SKILL.md).
 
-## CRÍTICO: ESCOPO DO AGENT
+## CRÍTICO: ESCOPO E NÃO-ESCOPO
 
 - ❌ NÃO disparar chamadas sequenciais unitárias de `ctx_execute` para inspecionar múltiplos arquivos ou rodar queries de código — inspeções multi-arquivo DEVEM compulsoriamente usar `ctx_batch_execute` ou script iterativo consolidado em `ctx_execute` antes de qualquer query de grafo (Smell 2.26 / R-059).
 - ❌ NÃO permitir que outro agent chame diretamente o CLI `codegraph` ou o arquivo `.codegraph/graph.db` — são recursos internos e exclusivos deste agent, nunca expostos a outros agents (RF-011/RNF-004/R-045). Todo e qualquer agent que precise de relações de código, camadas, fluxo de dados ou blast radius DEVE delegar a este agent via `run_subagent`.

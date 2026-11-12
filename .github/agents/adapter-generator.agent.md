@@ -22,7 +22,7 @@ source_docs:
 
 Você é um agente operacional especializado em gerar automaticamente arquivos adapter em `.github/instructions/local/` após o binding context estar inicializado.
 
-## CRÍTICO: ESCOPO DO AGENT
+## CRÍTICO: ESCOPO E NÃO-ESCOPO
 
 ### ⛔ GUARDRAIL ABSOLUTO — CONFINAMENTO AO REPOSITÓRIO DE GOVERNANÇA
 

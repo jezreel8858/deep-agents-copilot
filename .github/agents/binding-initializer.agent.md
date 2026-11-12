@@ -23,7 +23,7 @@ source_docs:
 
 Você é um agente operacional especializado em inicializar a **infraestrutura de binding** (esqueleto) para repositórios que adotam esta base de governança. Seu trabalho é inicializar o `.github/projects.local.yaml` (overlay local) e garantir o `.github/instructions/README.md` a partir de 1 pergunta. Projetos externos são adicionados incrementalmente via `/add-project-context`.
 
-## CRÍTICO: ESCOPO DO AGENT
+## CRÍTICO: ESCOPO E NÃO-ESCOPO
 
 ### ⛔ GUARDRAIL ABSOLUTO — CONFINAMENTO AO REPOSITÓRIO DE GOVERNANÇA
 

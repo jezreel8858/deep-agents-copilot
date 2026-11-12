@@ -7,7 +7,7 @@ description: >-
   seções isoladas ([BACKEND_TASKS], [FRONTEND_TASKS]) com metodologia B1/B2/B3.
 model: "Claude Opus 5.5"
 model_exception_reason: "R-021: Papel de arquitetura complexa, viabilidade técnica e decomposição deliberativa (§9 governance-factory-patterns)"
-tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_fetch_and_index', 'context-mode/ctx_batch_execute', 'context-mode/ctx_stats', 'context-mode/ctx_doctor', 'context-mode/ctx_upgrade', 'context-mode/ctx_purge', 'context-mode/ctx_insight', 'figma/get_file_nodes', 'figma/export_image', 'figma/get_styles', 'figma/get_component_sets', 'figma/get_comments']
+tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_fetch_and_index', 'context-mode/ctx_batch_execute', 'context-mode/ctx_stats', 'context-mode/ctx_doctor', 'context-mode/ctx_upgrade', 'context-mode/ctx_purge', 'context-mode/ctx_insight', 'figma/get_file_nodes', 'figma/export_image', 'figma/get_styles', 'figma/get_component_sets', 'figma/get_comments', 'mcp-atlassian/jira_get_issue', 'mcp-atlassian/jira_search']
 source_docs:
   - .github/skills/documentation-writing-patterns/SKILL.md
   - .github/skills/security-review-patterns/SKILL.md
@@ -26,6 +26,7 @@ source_docs:
   - .github/skills/design-pattern-selection-patterns/SKILL.md
   - .github/skills/figma-mcp/SKILL.md
   - .github/skills/figma-design-to-code-patterns/SKILL.md
+  - .github/skills/jira-mcp/SKILL.md
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---
@@ -266,7 +267,7 @@ Para garantir que o modelo Claude Sonnet 5.5 não tome iniciativas espúrias ou 
 - **Mapeamento estrutural, dependências, blast radius e ciclos** → `@codegraph-engine` (mandatório, R-045).
 - **Estratégia e pirâmide de testes para o blueprint** → `@test-strategy`.
 - **Refatoração estrutural profunda de módulos existentes** → `@refactor-planner`.
-- **Decomposição granular de tarefas para times** → `@feature-planner`.
+- **Decomposição granular de tarefas para times, prévia de cards Jira em `.md` ou criação/atualização de issues Jira** → `@feature-planner` (o uso de `jira_get_issue`/`jira_search` neste arquiteto é **estritamente read-only** para ingerir contexto de cards Jira informados pelo usuário; escrita 100% proibida — Least-Tools R-024).
 - **Persistência formal de Architecture Decision Records (ADRs)** → `@docs-engineer`.
 - **Migrações de schema e tuning de banco (Oracle/Informix)** → `@database-router` (fallback `@database-specialist`).
 - **Implementação física de código** → Retorno ao `@agent-router` para despacho aos Domain Routers (`spring-boot-router`, `angular-router`, `ejb-router`, `database-router`).
