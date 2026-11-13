@@ -7,6 +7,12 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 ---
 
 ## [2.56.0] — 2026-10-06
+
+### Adicionado (Política Anti-Timeout, Runtime Preferencial JavaScript e Circuit Breaker Fail-Fast no Context-Mode)
+- **Runtime Obrigatório `language: "javascript"` (`fs`/`path` nativos) no `ctx_execute`**: instituída a obrigatoriedade do runtime JavaScript nativo no `ctx_execute` para leitura, inspeção, parsing e mutação em lote de arquivos, proibindo `language: "python"`, `python -c` e subshells aninhados para I/O a fim de eliminar bloqueios e timeouts causados pela interceptação de `python.exe` pelo Windows Defender (`MsMpEng.exe` / AMSI).
+- **Higiene de Comandos em `ctx_batch_execute`**: exigência de comandos shell leves, atômicos e com escopo de diretório restrito, vedando `python -c` inline em lote e varreduras recursivas irrestritas na raiz do workspace.
+- **Circuit Breaker Fail-Fast de Timeout (Máx. 1 Retry com Troca de Estratégia)**: tolerância zero para repetição da mesma chamada/runtime após timeout (`ETIMEDOUT`, `timed out`, `taskkill`); permitido no máximo 1 retry mediante troca obrigatória de estratégia (migração para `language: "javascript"` puro com `fs` ou redução do lote), abrindo o Circuit Breaker no 2º timeout com relato via Compact Error Reporting (R-020).
+- **Propagação Determinística e Testes de Auditoria**: atualização de `tools/agent_protocol_sync/_execution-protocol-fragment.md`, `tools/agent_protocol_sync/sync_execution_protocol.py` (preservando `CLAUSE_BATCH_OR_EXEC`, `CLAUSE_EXEC_ONLY` e `CLAUSE_GATHER_ONLY` sem vazamento da literal `ctx_execute` nos 27 `GATHER_ONLY_AGENTS`), `docs/agent-context/templates/agent-template.md`, sincronização dos 52 agents e 21 prompts e novos testes em `tests/governance_audit/`.
 ### Adicionado / Modificado — GOVERNANCE-PROTOCOL-REFACTOR: Composição Dinâmica por Capabilities e Formatação H2 CommonMark do Execution Protocol (Opção C + Opção 3)
 - **Refatoração Estrutural do Protocolo de Execução (Opção C — Composição Dinâmica por Capabilities)**:
   - Decomposição modular do fragmento canônico em cláusulas atômicas (`CORE`, `CLAUSE_MUTATION`, `CLAUSE_HANDOFF`, `CLAUSE_LAZY_DOCS`) em `tools/agent_protocol_sync/_execution-protocol-fragment.md`.

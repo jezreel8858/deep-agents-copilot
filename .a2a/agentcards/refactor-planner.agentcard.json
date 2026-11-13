@@ -32,8 +32,6 @@
     "list_dir",
     "ask_questions",
     "run_subagent",
-    "context-mode/ctx_execute",
-    "context-mode/ctx_execute_file",
     "context-mode/ctx_index",
     "context-mode/ctx_search",
     "context-mode/ctx_fetch_and_index",
@@ -42,7 +40,11 @@
     "context-mode/ctx_doctor",
     "context-mode/ctx_upgrade",
     "context-mode/ctx_purge",
-    "context-mode/ctx_insight"
+    "context-mode/ctx_insight",
+    "context-mode/ctx_execute",
+    "context-mode/ctx_execute_file",
+    "mcp-atlassian/jira_get_issue",
+    "mcp-atlassian/jira_search"
   ],
   "security_profile": {
     "tool_zones": [

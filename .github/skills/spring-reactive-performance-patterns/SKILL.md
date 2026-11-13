@@ -1,10 +1,6 @@
 ---
 name: spring-reactive-performance-patterns
-description: >-
-  Diretrizes enterprise de engenharia de performance para Spring WebFlux e Project Reactor:
-  proteção do event-loop do Netty com BlockHound, controle de concorrência e prefetch
-  em flatMap, estratégias de backpressure (limitRate, buffer overflow, drop seguro),
-  tuning de memória Netty (PooledByteBufAllocator) e dimensionamento de r2dbc-pool.
+description: "Define diretrizes e padrões para diretrizes enterprise de engenharia de performance para Spring WebFlux e Project Reactor: proteção do event-loop do Netty com BlockHound, controle de concorrência e prefetch em flatMap, estratégias de backpressure (limitRate, buffer overflow, drop seguro), tuning de memória Netty (PooledByteBufAllocator) e dimensionamento de r2dbc-pool. Use quando atuar em performance webflux, performance reactor, bloqueio event loop. Não use para tarefas fora do escopo de spring-reactive-performance-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: quality
 triggers:
@@ -30,6 +26,10 @@ tools: []
 > **Relação com Padrões Universais**: Esta skill especializa as diretrizes arquiteturais e thresholds de performance definidos em [.github/skills/performance-engineering-patterns/SKILL.md](../performance-engineering-patterns/SKILL.md) para o ecossistema Spring WebFlux / Project Reactor (Event-Loop, backpressure, Netty). Consulte a skill genérica para métricas globais (Core Web Vitals thresholds, SLA/SLO, pirâmide de diagnóstico).
 
 > Base de conhecimento especializada em **engenharia de performance reativa e não-bloqueante** para aplicações Spring WebFlux e Project Reactor. Utilizada pelo `@spring-reactive-engineer` em modo Advisory (auditoria de capacidade, backpressure, diagnóstico de saturação) e Implementação (aplicação direta de fluxos otimizados sem bloqueio).
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `spring-reactive-performance-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando Usar
 

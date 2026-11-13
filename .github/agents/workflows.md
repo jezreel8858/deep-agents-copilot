@@ -131,7 +131,7 @@ flowchart TD
 | `WORKFLOW-REFACTORING` | `⚡ Sim` | `1. Ground Truth -> 2. Blast Radius & Contratos -> 3. Plano Mikado -> [Plano de Implementação R-064] -> 4. Execução em Lote -> [5. Validação & Quality Review Loop (§ 1.5)]` |
 | `WORKFLOW-TECHNICAL-ANALYSIS` | `⚡ Sim` | `1. Despacho Especialista -> 2. Coleta Read-Only -> 3. Síntese Técnica & Propostas` |
 | `WORKFLOW-FEATURE-DEVELOPMENT` | `❌ Não (R-041)` | `1. Prompt Structuring -> 2. Requisitos -> 3. Blueprint -> 4. Estratégia Testes -> [Plano de Implementação R-064] -> 5. TDD -> [6. Duplo Gate & Quality Review Loop (§ 1.5)]` |
-| `WORKFLOW-GOVERNANCE-MAINTENANCE` | `⚡ Sim` | `1. Diagnóstico/Pesquisa -> 2. Checkpoint Humano -> [Plano de Governança R-064] -> 3. Execução em Lote -> [4. Quality Gate & Quality Review Loop (§ 1.5)]` |
+| `WORKFLOW-GOVERNANCE-MAINTENANCE` | `⚡ Sim` | `1. Diagnóstico (@agent-auditor) -> 2. Materialização Física do Plano R-064 em docs/plans/governance/ (@docs-engineer / @governance-maintainer, status: DRAFT) -> 3. Checkpoint Humano R-064 (ask_questions sobre plan_ref) -> 4. Execução em Lote (@governance-maintainer / @governance-factory, status: APPROVED) -> [5. QG (@agent-auditor)]` |
 | `WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION` | `⚡ Sim` | `1. Triagem SCA -> 2. Blast Radius -> [Plano de Implementação R-064] -> 3. Bump & Lockfile -> 4. Adaptação Breaking -> [5. Quality Gate SCA & Quality Review Loop (§ 1.5)]` |
 | `WORKFLOW-FRAMEWORK-MIGRATION` | `⚡ Sim` | `1. 5D & Símbolos -> 2. Blueprint & De-Para -> 3. Plano de Implementação R-064 -> 4. Codemod Lote -> 5. Paridade Dual -> 6. Baseline Gate -> [7. Redundancy Gate & Quality Review Loop (§ 1.5)]` |
 | `WORKFLOW-RELEASE-READINESS` | `⚡ Sim` | `1. Contratos OpenAPI -> 2. Rollout DDL -> 3. Segredos & Higiene -> 4. Changelog & SemVer -> 5. Veredito Go/No-Go` |
@@ -160,7 +160,7 @@ Análise Técnica, Diagnóstico e Auditoria Especializada.
 Nova Feature e Evolução Funcional E2E.
 
 ### 3.5 [`WORKFLOW-GOVERNANCE-MAINTENANCE`](workflows/workflow-governance-maintenance.md)
-Governança e Manutenção do Ecossistema.
+Governança e Manutenção do Ecossistema: `1. Diagnóstico (@agent-auditor) -> 2. Materialização Física do Plano R-064 em docs/plans/governance/ (@docs-engineer / @governance-maintainer, status: DRAFT) -> 3. Checkpoint Humano R-064 (ask_questions sobre plan_ref) -> 4. Execução em Lote (@governance-maintainer / @governance-factory, status: APPROVED) -> [5. QG (@agent-auditor)]`.
 
 ### 3.6 [`WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION`](workflows/workflow-dependency-vulnerability-remediation.md)
 Remediação de Vulnerabilidades, CVEs e Atualização de Dependências.
@@ -195,3 +195,5 @@ Conteúdo movido para [`workflows/invariantes-e-protocolos.md`](workflows/invari
 > referenciados acima residem em `source_docs_lazy:` e são consultados exclusivamente
 > via `context-mode/ctx_search` sob demanda pelo workflow ativo — nunca via `read_file`
 > integral de todos os workflows de uma vez.
+
+> **Árvore Universal R-064**: Subpastas tipadas canônicas de `docs/plans/<tipo>/`: `docs/plans/feature/`, `docs/plans/refactor/`, `docs/plans/architecture/`, `docs/plans/implementation/`, `docs/plans/test-strategy/`, `docs/plans/bug-triage/`, `docs/plans/requirements/` e `docs/plans/governance/`. O campo `author` registra sempre o `@<agente-planejador>` autor intelectual real (100% Read-Only), a persistência física ocorre via handoff para `@docs-engineer` / `@governance-maintainer`, `@tech-solution-architect` é proibido de materializar documentos no `WORKFLOW-BUG-FIX`, e todo plano exige `plan_type`, `allowed_files`, `status: APPROVED` e `approved: true`.

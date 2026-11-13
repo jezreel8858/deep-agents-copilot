@@ -1,11 +1,6 @@
 ---
 name: jira-writing-patterns
-description: >-
-  Boas práticas para estruturar, redigir e formatar issues Jira (Epic, Story, Task, Subtask, Bug) de forma agnóstica
-  ao canal (MCP, API ou manual): templates com seções obrigatórias por tipo, critérios de aceite Gherkin, INVEST,
-  DoR/DoD e formatação rica (código, tabelas, expand, status, diagramas) compatível com Jira Cloud (ADF) e
-  Server/Data Center (wiki markup). Use ao criar, refinar ou revisar o texto de cards. Não use para acesso/autenticação
-  MCP (ver jira-mcp) nem para documentação em Confluence/Markdown de repositório.
+description: "Define diretrizes e padrões para boas práticas para estruturar, redigir e formatar issues Jira (Epic, Story, Task, Subtask, Bug) de forma agnóstica ao canal (MCP, API ou manual): templates com seções obrigatórias por tipo, critérios de aceite Gherkin, INVEST, DoR/DoD e formatação rica (código, tabelas, expand, status, diagramas) compatível com Jira Cloud (ADF) e Server/Data Center (wiki markup). Use ao criar, refinar ou revisar o texto de cards. Não use para acesso/autenticação MCP (ver jira-mcp) nem para documentação em Confluence/Markdown de repositório. Use quando atuar em escrever card jira, template de epico, user story jira."
 tier: 2
 category: documentation
 triggers:
@@ -24,6 +19,14 @@ source_docs:
 # Jira Writing Patterns — Estrutura e Formatação de Cards
 
 > **Nível 1**: frontmatter. **Nível 2**: este arquivo. Acesso técnico (auth, tools, JQL, HITL) fica em `jira-mcp/SKILL.md` (SRP). Agnóstico de empresa (R-038): apenas `PROJ-123`.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `jira-writing-patterns` ou quando outra skill específica cobrir integralmente o escopo.
+
+## Diretrizes e Padrões Canônicos
+
+- Seguir estritamente as regras, invariantes e fluxos descritos nas seções abaixo.
 
 ## 1) Quando Usar
 

@@ -1,7 +1,6 @@
 ---
 name: figma-mcp
-description: >-
-  Fornece diretrizes canônicas para uso do servidor MCP Figma (`mcp-figma==0.0.2` via `uvx` no IDE, com suporte opcional ao Remote Server oficial) por agentes de IA: configuração determinística com variáveis de ambiente sem segredos versionados, matriz de decisão das 10 tools reais (`get_file_nodes`, `export_image`, `get_styles`, `get_component_sets`, `get_comments`, `get_file_versions`, `get_team_projects`, `get_project_files`, `get_file`, `create_comment`), segregação Least-Tools por perfil, protocolo progressivo em 3 passos com `context-mode` e mitigação de indirect prompt injection. Use quando precisar inspecionar nós (`get_file_nodes`), estilos, component sets, comentários ou imagens do Figma via MCP. Não use para traduzir design em código (ver `figma-design-to-code-patterns`), para full-file fetch (`get_file`) sem filtro nem para mutação (`create_comment`) sem HITL.
+description: "Fornece diretrizes canônicas para uso do servidor MCP Figma (`mcp-figma==0.0.2` via `uvx` no IDE, com suporte opcional ao Remote Server oficial) por agentes de IA: configuração determinística com variáveis de ambiente sem segredos versionados, matriz de decisão das 10 tools reais (`get_file_nodes`, `export_image`, `get_styles`, `get_component_sets`, `get_comments`, `get_file_versions`, `get_team_projects`, `get_project_files`, `get_file`, `create_comment`), segregação Least-Tools por perfil, protocolo progressivo em 3 passos com `context-mode` e mitigação de indirect prompt injection. Use quando precisar inspecionar nós (`get_file_nodes`), estilos, component sets, comentários ou imagens do Figma via MCP. Não use para traduzir design em código (ver `figma-design-to-code-patterns`), para full-file fetch (`get_file`) sem filtro nem para mutação (`create_comment`) sem HITL."
 tier: 2
 category: tooling
 triggers:
@@ -20,6 +19,10 @@ source_docs:
 ---
 
 # Figma MCP — Integração Segura e Determinística (`mcp-figma==0.0.2`)
+
+## Quando Usar
+
+- Ativação em cenários de figma mcp, mcp-figma, ler design do figma.
 
 ## 0) Problema Resolvido & Princípios Fundamentais
 

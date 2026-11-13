@@ -1,9 +1,6 @@
 ---
 name: test-implementation-frontend
-description: 
-  Padrões genéricos e agnósticos para implementação de testes em qualquer projeto
-  frontend, independente de framework. Define contratos, tipos de teste e estratégias
-  de cobertura aplicáveis a qualquer stack client-side.
+description: "Define diretrizes e padrões para padrões genéricos e agnósticos para implementação de testes em qualquer projeto frontend, independente de framework. Define contratos, tipos de teste e estratégias de cobertura aplicáveis a qualquer stack client-side. Use quando atuar em testar frontend, testes de componente, component test. Não use para tarefas fora do escopo de test-implementation-frontend ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: testing
 triggers:
@@ -34,6 +31,14 @@ tools: []
 >
 > **Quando usar esta skill**: ao definir estratégia de testes, revisar cobertura
 > ou trabalhar em projeto com stack de frontend ainda não catalogada.
+
+## Quando Usar
+
+- Ativação em cenários de testar frontend, testes de componente, component test.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `test-implementation-frontend` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## 1) Tipos de Teste — Frontend
 

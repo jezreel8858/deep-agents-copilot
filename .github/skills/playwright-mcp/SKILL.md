@@ -1,12 +1,6 @@
 ---
 name: playwright-mcp
-description: >-
-  Fornece diretrizes canônicas para uso do servidor MCP `microsoft/playwright-mcp` (`npx -y @playwright/mcp@0.0.83`)
-  por agentes de IA de frontend em automação de navegador real orientada a Accessibility Tree (`browser_snapshot`),
-  cobrindo seletores semânticos por role/nome, ciclo de vida de abas, inspeção de rede/console e guardrails de
-  segurança (RCE, prompt injection, isolamento de sessão). Use quando escrever/depurar testes E2E, validar
-  componentes em browser real ou inspecionar fidelidade visual/acessibilidade via navegador. Não use para testes
-  unitários sem DOM real, nem para executar `browser_run_code_unsafe` sem revisão humana explícita.
+description: "Fornece diretrizes canônicas para uso do servidor MCP `microsoft/playwright-mcp` (`npx -y @playwright/mcp@0.0.83`) por agentes de IA de frontend em automação de navegador real orientada a Accessibility Tree (`browser_snapshot`), cobrindo seletores semânticos por role/nome, ciclo de vida de abas, inspeção de rede/console e guardrails de segurança (RCE, prompt injection, isolamento de sessão). Use quando escrever/depurar testes E2E, validar componentes em browser real ou inspecionar fidelidade visual/acessibilidade via navegador. Não use para testes unitários sem DOM real, nem para executar `browser_run_code_unsafe` sem revisão humana explícita."
 tier: 1
 category: tooling
 triggers:
@@ -22,6 +16,14 @@ source_docs:
 ---
 
 # Playwright MCP — Automação de Navegador via Accessibility Tree
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `playwright-mcp` ou quando outra skill específica cobrir integralmente o escopo.
+
+## Diretrizes e Padrões Canônicos
+
+- Seguir estritamente as regras, invariantes e fluxos descritos nas seções abaixo.
 
 ## 0) Problema Resolvido & Princípios Fundamentais
 

@@ -1,6 +1,6 @@
 ---
 name: embedded-runtime-governance
-description: Fonte única do contrato de runtime embutido (Maven via mvnd/mvnw e Python via uv) — scripts/dev/mvn-test.sh e py-test.sh, variáveis DAC_*, exit codes, cascata de resolução, fallback, logs fora do repo e pendências humanas.
+description: "Define diretrizes e padrões para fonte única do contrato de runtime embutido (Maven via mvnd/mvnw e Python via uv) — scripts/dev/mvn-test.sh e py-test.sh, variáveis DAC_*, exit codes, cascata de resolução, fallback, logs fora do repo e pendências humanas. Use quando atuar em executar testes maven, mvn-test.sh, py-test.sh. Não use para tarefas fora do escopo de embedded-runtime-governance ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: tooling
 triggers:
@@ -23,6 +23,14 @@ source_docs:
 # Embedded Runtime Governance
 
 > **Progressive Disclosure**: Nível 1 = frontmatter; Nível 2 = este índice; Nível 3 = `references/` (carregar só o necessário via `ctx_search`/`ctx_execute_file`). **SSOT**: agents apenas apontam para esta skill (1–2 linhas) e nunca copiam o conteúdo.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `embedded-runtime-governance` ou quando outra skill específica cobrir integralmente o escopo.
+
+## Diretrizes e Padrões Canônicos
+
+- Seguir estritamente as regras, invariantes e fluxos descritos nas seções abaixo.
 
 ## 1) Quando Usar
 

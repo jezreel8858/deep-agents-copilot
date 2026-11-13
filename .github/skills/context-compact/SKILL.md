@@ -1,9 +1,6 @@
 ---
 name: context-compact
-description: >
-  Boas práticas para compactar contexto pós-leitura em ambientes multi-projeto.
-  Use quando o material bruto já foi lido e precisa virar um resumo executivo,
-  enxuto e executável para outro agent.
+description: "Define diretrizes e padrões para boas práticas para compactar contexto pós-leitura em ambientes multi-projeto. Use quando o material bruto já foi lido e precisa virar um resumo executivo, enxuto e executável para outro agent. Não use para tarefas fora do escopo de context-compact ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: process
 triggers:
@@ -26,6 +23,10 @@ source_docs:
 # context-compact — Compactação de contexto pós-leitura
 
 Esta skill transforma leituras extensas, diffs, logs e notas dispersas em um resumo de alta densidade para execução posterior.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `context-compact` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## 1) Objetivo
 
@@ -118,3 +119,7 @@ Esta skill transforma leituras extensas, diffs, logs e notas dispersas em um res
 
 - Context Engineering (Sourcegraph, 2026): https://sourcegraph.com/blog/context-engineering
 - Long-context strategies (2026): https://zylos.ai/research/2026-01-19-llm-context-management
+
+## Checklist de Conformidade
+
+- [ ] Diretrizes, contratos e restrições de escopo de `context-compact` verificados e atendidos.

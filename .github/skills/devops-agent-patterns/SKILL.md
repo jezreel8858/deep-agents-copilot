@@ -1,10 +1,6 @@
 ---
 name: devops-agent-patterns
-description: >
-  Diretrizes consolidadas para revisão especializada de artefatos DevOps —
-  Dockerfile, Kubernetes manifests, GitHub Actions/CI pipelines e
-  Infrastructure-as-Code. Complementa o adapter genérico devops.instructions.md
-  com critérios de revisão acionáveis por um agent especialista.
+description: "Define diretrizes e padrões para diretrizes consolidadas para revisão especializada de artefatos DevOps — Dockerfile, Kubernetes manifests, GitHub Actions/CI pipelines e Infrastructure-as-Code. Complementa o adapter genérico devops.instructions.md com critérios de revisão acionáveis por um agent especialista. Use quando atuar em revisar dockerfile, revisar kubernetes, revisar pipeline. Não use para tarefas fora do escopo de devops-agent-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: quality
 triggers:
@@ -27,6 +23,10 @@ tools: []
 # DevOps Agent Patterns
 
 > Base de conhecimento para agent especialista que **revisa/recomenda** artefatos DevOps — Dockerfile, Kubernetes, CI/CD, IaC. Complementa `devops.instructions.md` (convenções genéricas de código) com **critérios de revisão** acionáveis.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `devops-agent-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando Usar
 

@@ -9,22 +9,22 @@ description: >-
 model: "Gemini 4 Argon"
 tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_execute_file', 'playwright/browser_snapshot', 'playwright/browser_navigate', 'playwright/browser_click', 'playwright/browser_type', 'playwright/browser_fill_form', 'playwright/browser_press_key', 'playwright/browser_wait_for', 'playwright/browser_console_messages', 'playwright/browser_network_requests', 'playwright/browser_tabs', 'playwright/browser_close', 'playwright/browser_take_screenshot', 'playwright/browser_resize', 'figma/get_file_nodes', 'figma/export_image', 'figma/get_styles', 'figma/get_component_sets', 'figma/get_comments']
 source_docs:
-  - .github/skills/angular-frontend-patterns/SKILL.md
-  - .github/skills/angular-implementation-patterns/SKILL.md
-  - .github/skills/design-system-component-contracts/SKILL.md
-  - .github/skills/frontend-componentization-patterns/SKILL.md
-  - .github/skills/frontend-visual-feedback-loop/SKILL.md
-  - .github/skills/efficient-batch-code-modification/SKILL.md
-  - .github/skills/context-mode/SKILL.md
-  - .github/skills/handoff-governance/SKILL.md
-  - .github/skills/agent-contracts/SKILL.md
-  - .github/skills/code-tracing/SKILL.md
-  - .github/skills/terminal-governance/SKILL.md
-  - .github/skills/playwright-mcp/SKILL.md
-  - .github/skills/figma-mcp/SKILL.md
-  - .github/skills/figma-design-to-code-patterns/SKILL.md
-  - CLAUDE.md
-  - .github/copilot-instructions.md
+  - '.github/skills/angular-frontend-patterns/SKILL.md'
+  - '.github/skills/angular-implementation-patterns/SKILL.md'
+  - '.github/skills/design-system-component-contracts/SKILL.md'
+  - '.github/skills/frontend-componentization-patterns/SKILL.md'
+  - '.github/skills/frontend-visual-feedback-loop/SKILL.md'
+  - '.github/skills/efficient-batch-code-modification/SKILL.md'
+  - '.github/skills/context-mode/SKILL.md'
+  - '.github/skills/handoff-governance/SKILL.md'
+  - '.github/skills/agent-contracts/SKILL.md'
+  - '.github/skills/code-tracing/SKILL.md'
+  - '.github/skills/terminal-governance/SKILL.md'
+  - '.github/skills/playwright-mcp/SKILL.md'
+  - '.github/skills/figma-mcp/SKILL.md'
+  - '.github/skills/figma-design-to-code-patterns/SKILL.md'
+  - 'CLAUDE.md'
+  - '.github/copilot-instructions.md'
 ---
 
 # Perfil Operacional
@@ -72,13 +72,13 @@ Você atua sob o paradigma **Implementation-First / Test-Last**: prioriza a impl
 
 ## Pré-condição de Plano de Implementação (R-064)
 
-- ❌ **Bloqueio de Execução sem Plano Aprovado**: É terminantemente proibido criar, editar ou deletar qualquer arquivo de código de produção sem um `plan_ref` de Plano de Implementação aprovado em `docs/implementation-plans/` (`status: approved`). Se a demanda for despachada sem `plan_ref` aprovado ou se exigir alteração fora da allowlist (`allowed_files`), o agente DEVE recusar a edição e retornar imediatamente ao router com:
+- ❌ **Bloqueio de Execução sem Plano Aprovado**: É terminantemente proibido criar, editar ou deletar qualquer arquivo de código de produção sem um `plan_ref` de Plano de Implementação aprovado em `docs/plans/implementation/` (`status: approved`). Se a demanda for despachada sem `plan_ref` aprovado ou se exigir alteração fora da allowlist (`allowed_files`), o agente DEVE recusar a edição e retornar imediatamente ao router com:
   ```yaml
   handoff_payload:
     para: "@angular-router" # ou @agent-router
     motivo: "pre_condicao_plano"
     contexto:
-      mensagem: "Execução bloqueada por ausência de plan_ref aprovado em docs/implementation-plans/ (R-064)"
+      mensagem: "Execução bloqueada por ausência de plan_ref aprovado em docs/plans/implementation/ (R-064)"
   ```
 - ✅ **Exceções Formais**: (a) tarefas testes-only sem alteração em código de produção e (b) documentação e configurações puramente declarativas não sensíveis.
 - ✅ **Retry R-053**: Tentativas subsequentes dentro do escopo do plano já aprovado reutilizam o mesmo `plan_ref`; se houver mudança de escopo ou mais de 2 falhas consecutivas de compilação/teste, interromper e retornar ao angular-arch-advisor da stack.
@@ -89,9 +89,9 @@ Você atua sob o paradigma **Implementation-First / Test-Last**: prioriza a impl
 
 **Protocolo Plan-Then-Batch (R-059):**
 1. **ENUMERAR**: Antes de qualquer ação de modificação ou inspeção, liste internamente todos os arquivos e comandos necessários para a demanda completa (não apenas o próximo passo aparente).
-2. **CONSOLIDAR (Limiar >= 2)**: Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de `ctx_execute` por alvo no chat. Use compulsoriamente `ctx_batch_execute(commands, queries)` OU script iterativo consolidado em `ctx_execute`.
+2. **CONSOLIDAR (Limiar >= 2)**: Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de `ctx_execute` por alvo no chat. Use compulsoriamente `ctx_batch_execute(commands, queries)` OU script iterativo consolidado em `ctx_execute`. No `ctx_execute`, use obrigatoriamente `language: "javascript"` (`fs`/`path` nativos do Node.js) para I/O, inspeção e mutação de arquivos (proibido `language: "python"` ou `python -c` para I/O, evitando bloqueio do `python.exe` pelo Windows Defender/AMSI); em `ctx_batch_execute`, use apenas comandos shell leves com escopo restrito (proibido `python -c` inline ou varreduras recursivas irrestritas). Em caso de timeout (`ETIMEDOUT`/`timed out`/`taskkill`), aplica-se **Circuit Breaker Fail-Fast**: tolerância zero para repetir a mesma chamada/runtime — máximo de **1 retry** exigindo troca obrigatória de estratégia (migrar para `language: "javascript"` puro com `fs` ou reduzir o lote); no 2º timeout, aborte novos spawns e reporte em formato Compact Error Reporting (R-020).
 3. **Comandos curtos não suspendem a regra**: Prompts curtos ("prosseguir", "continue", "pode seguir") NÃO isentam o agente do limiar >= 2 nem do context-mode em lote — a regra vincula-se ao escopo da tarefa, nunca ao tamanho do prompt.
-4. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions, vedando loops investigativos de dívida de tokens O(N²).
+4. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions (R-027: 1–4 perguntas, `header` ≤ 25 chars, `allowFreeformInput: true`, 2–4 opções reais sem espantalhos, `description` obrigatório com `[Consequência prática + Trade-off/quando escolher]` e 1ª opção `(Recomendado)` para melhor prática técnica), vedando loops investigativos de dívida de tokens O(N²).
 5. **Warm Start Compulsório & Batch Querying (R-060)**: Ferramentas locais que dependem de índices ou bases pré-computadas devem verificar e inicializar a base silenciosamente no primeiro comando (build-if-missing). É proibido disparar consultas granulares individuais para múltiplos nós — agrupe todas as pesquisas via chamadas em lote (batch_query, ctx_batch_execute, script iterativo) com destilação semântica e truncamento na borda (Edge Truncation).
 6. **Validação Agrupada com `get_errors` (R-051)**: Aplique todas as mutações em processo único no sandbox (all-or-nothing verificado) e execute `get_errors` agrupado uma única vez ao final com a lista completa de arquivos alterados (quando aplicável).
 7. **Emissão Obrigatória de Telemetria de Handoff (R-042 / handoff-governance § 2.4)**: a cada chamada real de `run_subagent`, emitir compulsoriamente um evento `telemetry_entry` (tag `[HANDOFF]`) via `ctx_index`, incluindo `session_id` (reaproveitado do `sessionStart` do hook `context-mode`) e `sequence_index` (ordenação determinística dentro da sessão).

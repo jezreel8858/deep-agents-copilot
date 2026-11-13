@@ -1,12 +1,6 @@
 ---
 name: code-review-patterns
-description: >-
-  Diretrizes de mercado para revisão de código automatizada por IA — taxonomia
-  de severidade, dimensões de análise, critérios de bloqueio de merge,
-  anti-padrões de review (review fatigue, falso-positivo, revisão fora do
-  diff), Convergence Contract (rodadas 1-3 anti ping-pong), Noise Budget
-  quantificado (teto de 5 nits), Evidence-First/pesquisa obrigatória e
-  heurística anti-AI Slop.
+description: "Define diretrizes e padrões para diretrizes de mercado para revisão de código automatizada por IA — taxonomia de severidade, dimensões de análise, critérios de bloqueio de merge, anti-padrões de review (review fatigue, falso-positivo, revisão fora do diff), Convergence Contract (rodadas 1-3 anti ping-pong), Noise Budget quantificado (teto de 5 nits), Evidence-First/pesquisa obrigatória e heurística anti-AI Slop. Use quando atuar em revisar código, code review, revisão antes do merge. Não use para tarefas fora do escopo de code-review-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: quality
 license: "CC-BY-4.0"
@@ -32,6 +26,10 @@ source_docs:
 # Code Review Patterns
 
 > Base de conhecimento para agents/prompts que revisam código (diff/PR) antes do merge — nunca corrigem, apenas analisam e reportam.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `code-review-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando Usar
 

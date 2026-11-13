@@ -127,3 +127,17 @@ ctx search "BusinessException validar"
 - Artigo do autor: <https://mksg.lu/blog/context-mode>
 - Guia BetterStack: <https://betterstack.com/community/guides/ai/context-mode-mcp>
 - Discussão HN: <https://news.ycombinator.com/item?id=47193064>
+
+### Política Anti-Timeout, Runtime Preferencial JavaScript (`fs` nativo) e Circuit Breaker Fail-Fast (`ctx_execute` / `ctx_batch_execute`)
+
+1. **Runtime Obrigatório `language: "javascript"` no `ctx_execute` (Anti-Defender/AMSI Hang)**:
+   - No Windows, a invocação de `python.exe` (`language: "python"` ou `python -c`) ou cadeias pesadas de subshells a partir do processo Node.js do servidor MCP `context-mode` sofre interceptação síncrona pelo Windows Defender (`MsMpEng.exe` / Behavior Monitoring / AMSI), causando bloqueios severos de I/O e timeouts (`ETIMEDOUT` / `taskkill /F /T`).
+   - Portanto, `language: "javascript"` (com módulos nativos `fs` e `path` do Node.js) é o **runtime obrigatório** no `ctx_execute` para leitura, inspeção, busca, parsing JSON/texto e modificação em lote de arquivos.
+   - É **terminantemente proibido** invocar `language: "python"`, `python -c` ou subshells aninhados para I/O de arquivos. (A execução de binários Python via `child_process` é restrita exclusivamente a ferramentas CLI do ecossistema, como `pytest` ou scripts de sincronização canônicos, nunca para ler/editar arquivos).
+2. **Higiene de Comandos em `ctx_batch_execute`**:
+   - Os comandos shell em `ctx_batch_execute` devem ser leves, atômicos e com escopo de diretório estritamente restrito.
+   - É **proibido** disparar `python -c` inline em lote ou varreduras recursivas irrestritas na raiz do workspace sem filtro de pasta/extensão (evitando estourar o orçamento de tempo do batch).
+3. **Política Fail-Fast & Circuit Breaker de Timeout (Máx. 1 Retry com Troca de Estratégia)**:
+   - Em caso de erro de timeout (`ETIMEDOUT`, `timed out`, `taskkill`) em `ctx_execute` ou `ctx_batch_execute`, o agente tem **tolerância zero para repetir a mesma chamada/runtime**.
+   - É permitido no **máximo 1 retry**, contanto que haja **troca obrigatória de estratégia** (migrar de `python`/`shell` para `language: "javascript"` puro com `fs` nativo, ou dividir o lote em comandos menores/escopo restrito).
+   - Se ocorrer um **2º timeout**, o **Circuit Breaker Fail-Fast** abre imediatamente: o agente deve abortar novas tentativas de spawn, registrar a evidência e acionar o fallback canônico ou reportar o bloqueio em formato Compact Error Reporting (R-020).

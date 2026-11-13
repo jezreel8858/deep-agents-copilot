@@ -1,8 +1,6 @@
 ---
 name: design-system-component-contracts
-description: >-
-  Diretrizes enterprise para definir e evoluir contratos de componentes em design systems,
-  com governança de breaking change, compatibilidade retroativa, acessibilidade e semver.
+description: "Define diretrizes e padrões para diretrizes enterprise para definir e evoluir contratos de componentes em design systems, com governança de breaking change, compatibilidade retroativa, acessibilidade e semver. Use quando atuar em contrato de componente, design tokens e variantes, breaking change em biblioteca UI. Não use para tarefas fora do escopo de design-system-component-contracts ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: governance
 triggers:
@@ -19,6 +17,10 @@ tools: []
 ---
 
 # Design System Component Contracts
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `design-system-component-contracts` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando usar
 

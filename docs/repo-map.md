@@ -50,7 +50,7 @@ Quando for estritamente necessário buscar por padrão:
 | **Catálogo Textual de Skills** | `.github/skills/README.md` |
 | **Índice Completo de Prompts** | `.github/prompts/README.md` |
 | **Planos de Planejamento por Workflow (R-064)** | `docs/plans/` |
-| **Planos de Implementação Técnica (R-064)** | `docs/implementation-plans/` |
+| **Planos de Implementação Técnica (R-064)** | `docs/plans/implementation/` |
 | **Portal Unificado de Documentação (Diátaxis)** | `docs/README.md` |
 | **Mapa Estrutural do Repositório** | `docs/repo-map.md` |
 
@@ -127,8 +127,8 @@ deep-agents-copilot/
 │   │   └── EVALS_TEST_STRATEGY.md               # Estratégia de testes para evals de IA
 │   │
 │   ├── plan/                                    # Blueprints de Arquitetura e Pesquisas
-│   │   ├── agent-profiles-taxonomy.md           # Taxonomia consolidada de agents de mercado
-│   │   ├── plano-motor-migracao-agnostica.md    # Blueprint do motor de migração baseado em IR
+│   │   ├── 20260830-090000-agent-profiles-taxonomy.md           # Taxonomia consolidada de agents de mercado
+│   │   ├── 20260830-090300-plano-motor-migracao-agnostica.md    # Blueprint do motor de migração baseado em IR
 │   │
 │   ├── agent-context/                           # Guias operacionais de ferramentas
 │   │   ├── codegraph-guia-uso.md                # Guia de uso do CodeGraph
@@ -143,7 +143,7 @@ deep-agents-copilot/
 │   │   └── global-git-commit-instructions.md    # Convenções de Conventional Commits
 │   │
 │   ├── requirements/                            # Requisitos formais do sistema (EARS / INVEST)
-│   │   ├── REQ-migration-engine.md              # Requisitos do motor de migração
+│   │   ├── 20260830-090000-migration-engine.md              # Requisitos do motor de migração
 │   │
 │   └── schemas/                                 # Schemas JSON canônicos
 │       ├── agentcard.schema.json                # Schema A2A Agent Card
@@ -172,14 +172,14 @@ A pasta `docs/` organiza o conhecimento técnico e os artefatos de governança e
 
 | Diretório / Arquivo | Finalidade e Descrição | Convenção / Regra |
 |---|---|---|
-| **`docs/plans/`** | **Planos de Planejamento por workflow (R-064)**. Registra a análise funcional, objetivos, blast radius e estratégia do workflow. | Convenção: `<AAAAMMDD>-<workflow>-<identificador-curto>.md` |
-| **`docs/implementation-plans/`** | **Planos de Implementação técnica por workflow (R-064)**. Autorados por `<stack>-arch-advisor` com contratos de métodos, diffs cirúrgicos e comandos de teste. | Convenção: `<AAAAMMDD>-<workflow>-<identificador-curto>.md` |
+| **`docs/plans/`** | **Planos de Planejamento por workflow (R-064)**. Registra a análise funcional, objetivos, blast radius e estratégia do workflow. | Convenção: `<AAAAMMDD-HHMMSS>-<workflow>-<identificador-curto>.md` |
+| **`docs/plans/implementation/`** | **Planos de Implementação técnica por workflow (R-064)**. Autorados por `<stack>-arch-advisor` com contratos de métodos, diffs cirúrgicos e comandos de teste. | Convenção: `<AAAAMMDD-HHMMSS>-<workflow>-<identificador-curto>.md` |
 | **`docs/architecture/`** | Guias canônicos de arquitetura técnica (`ARCHITECTURE_AND_GOVERNANCE_GUIDE.md` em formato arc42, AppSec, observabilidade). | Governança Global arc42 / NIST |
-| **`docs/plan/`** | Blueprints arquiteturais, estudos de mercado (`agent-profiles-taxonomy.md`) e planos de componentes centrais do sistema. | Blueprints / ADRs |
+| **`docs/plans/`** | Blueprints arquiteturais, estudos de mercado (`20260830-090000-agent-profiles-taxonomy.md`) e planos de componentes centrais do sistema. | Blueprints / ADRs |
 | **`docs/agent-context/`** | Guias operacionais e manuais de ferramentas do ecossistema (`codegraph`, `context-mode`, templates de contexto). | Documentação Operacional |
 | **`docs/context/`** | Configurações de setup de ambiente, integração com IDEs JetBrains e telemetria OTLP/Langfuse. | Setup de Ambiente |
 | **`docs/ai-copilot/`** | Guias transversais para agentes de IA (ex.: instruções globais de Conventional Commits). | Diretrizes de IA |
-| **`docs/requirements/`** | Especificações formais de requisitos de sistema baseadas em sintaxes EARS e critérios INVEST. | Requisitos Formais |
+| **`docs/plans/requirements/`** | Especificações formais de requisitos de sistema baseadas em sintaxes EARS e critérios INVEST. | Requisitos Formais |
 | **`docs/schemas/`** | Schemas JSON canônicos de validação estrutural (`agentcard`, `migration-ir`). | Schemas de Validação |
 | **`docs/README.md`** | Portal central de documentação indexado conforme o framework internacional Diátaxis. | Portal Diátaxis |
 | **`docs/repo-map.md`** | Mapa do repositório para navegação determinística de arquivos (Zero Blind Searches). | SSOT de Localização |
@@ -190,6 +190,6 @@ A pasta `docs/` organiza o conhecimento técnico e os artefatos de governança e
 
 | Data | Versão | Modificações Principais |
 |---|---|---|
-| **2026-09-27** | **v2.42.0** | Inclusão das pastas `docs/plans/` e `docs/implementation-plans/` para fechamento de gap da regra **R-064** (Duplo Gate Documental de Planejamento e Implementação). Atualização da árvore física e do Quick File Finder. |
+| **2026-09-27** | **v2.42.0** | Inclusão das pastas `docs/plans/` e `docs/plans/implementation/` para fechamento de gap da regra **R-064** (Duplo Gate Documental de Planejamento e Implementação). Atualização da árvore física e do Quick File Finder. |
 | **2026-09-11** | **v2.6.0** | Consolidação arquitetural em `.github/`, extinção de catálogos redundantes e unificação do catálogo de agents em `.github/agents/catalog.yaml`. |
 | **2026-09-10** | **v2.5.0** | Publicação inicial do Repo Map como infraestrutura canônica de navegação determinística para agentes de IA (Zero Blind Searches). |

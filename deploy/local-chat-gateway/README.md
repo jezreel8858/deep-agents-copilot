@@ -1,7 +1,7 @@
 # Deep Agents Gateway (MVP)
 Gateway OpenAI-compatible local para o Copilot SDK, com governanca aplicada em
 codigo (nao um proxy passivo). Ver `docs/architecture/BLUEPRINT_LOCAL_CHAT_GATEWAY.md`
-e `docs/implementation-plans/20260929-feature-development-local-chat-gateway-mvp.md`.
+e `docs/plans/implementation/20260929-feature-development-local-chat-gateway-mvp.md`.
 ## Rodar localmente fora do Docker (dev watch com bootstrap automatico)
 ```
 python dev_watch.py

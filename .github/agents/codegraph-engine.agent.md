@@ -10,15 +10,15 @@ description: >-
 model: "Gemini 4 Argon"
 tools: ['run_subagent', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_search', 'codegraph/query', 'codegraph/module_map', 'codegraph/fn_impact', 'codegraph/find_cycles', 'codegraph/context']
 source_docs:
-  - .github/skills/codegraph-optave-usage/SKILL.md
-  - .github/skills/integration-contract-analysis/SKILL.md
-  - .github/skills/context-mode/SKILL.md
-  - .github/skills/efficient-batch-code-modification/SKILL.md
-  - .github/skills/handoff-governance/SKILL.md
-  - .github/skills/agent-contracts/SKILL.md
-  - .github/skills/terminal-governance/SKILL.md
-  - CLAUDE.md
-  - .github/copilot-instructions.md
+  - '.github/skills/codegraph-optave-usage/SKILL.md'
+  - '.github/skills/integration-contract-analysis/SKILL.md'
+  - '.github/skills/context-mode/SKILL.md'
+  - '.github/skills/efficient-batch-code-modification/SKILL.md'
+  - '.github/skills/handoff-governance/SKILL.md'
+  - '.github/skills/agent-contracts/SKILL.md'
+  - '.github/skills/terminal-governance/SKILL.md'
+  - 'CLAUDE.md'
+  - '.github/copilot-instructions.md'
 ---
 
 # Perfil Operacional

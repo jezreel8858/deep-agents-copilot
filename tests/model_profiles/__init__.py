@@ -6,7 +6,7 @@ template `applied` (apply 1x/sessao), `dead_pid()` cacheado, 1 spawn por commit 
 Testes acima de 3 s geram um aviso (nao falham) via conftest. Comando recomendado:
     python -m pytest -q --tb=short -p no:cacheprovider tests/model_profiles --durations=10
 Testes (TDD, estado red) do gerador de perfis de modelos - Emenda E1 / D4' do plano
-docs/implementation-plans/20261010-feature-development-model-profiles-allowlist.md (secao 14).
+docs/plans/implementation/20261010-090000-feature-development-model-profiles-allowlist.md (secao 14).
 
 CONTRATO DE API/CLI ESPERADO (tools/model_profiles/, reusando resolver.py sem duplicar logica)
 ================================================================================================

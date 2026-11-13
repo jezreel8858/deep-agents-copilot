@@ -1,11 +1,6 @@
 ---
 name: task-decomposition-patterns
-description: >
-  Padrões consolidados de decomposição de tarefas complexas em subtasks —
-  decomposição sequencial/hierárquica/paralela, granularidade ideal (2-3 níveis),
-  rastreamento de dependências e validação antes de execução. Base para
-  planejamento genérico de features (distinto de refactor-planner, que é
-  específico para refatoração de código existente).
+description: "Define diretrizes e padrões para padrões consolidados de decomposição de tarefas complexas em subtasks — decomposição sequencial/hierárquica/paralela, granularidade ideal (2-3 níveis), rastreamento de dependências e validação antes de execução. Base para planejamento genérico de features (distinto de refactor-planner, que é específico para refatoração de código existente). Use quando atuar em decompor tarefa, quebrar em subtarefas, task decomposition. Não use para tarefas fora do escopo de task-decomposition-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: process
 triggers:
@@ -31,6 +26,10 @@ tools: []
 # Task Decomposition Patterns
 
 > Base de conhecimento para agents que decompõem requisitos/features complexas em subtasks executáveis — distinto de `refactor-planner` (específico para refatoração de código existente com foco em risco/rollback).
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `task-decomposition-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando Usar
 
@@ -153,6 +152,14 @@ Toda subtask gerada que referencie símbolos, dependências ou contratos de cód
 - <lista objetiva>
 ```
 
+## 5.1) Contrato de Plano R-064 — `feature` e `architecture`
+
+- **`plan_type: feature`** → `docs/plans/feature/` (decomposição de feature por `@feature-planner`).
+- **`plan_type: architecture`** → `docs/plans/architecture/` (blueprint macro de `@tech-solution-architect` e `<stack>-arch-advisor`).
+- Frontmatter YAML comum R-064 obrigatório (`status`, `approved`, `author`, `plan_type`, `created_at`, `related-planning-doc`, `allowed_files`).
+- Planejador/advisor **100% Read-Only**: emite o plano no template; `@docs-engineer` materializa o `.md` no step de persistência.
+- Template completo: `references/plan-template-feature.md`.
+
 ## 6) Anti-Padrões
 
 - ❌ Decompor além de 3 níveis sem necessidade real (overhead de coordenação).
@@ -189,4 +196,4 @@ Toda subtask e todo plano de decomposição DEVE classificar seu nível de rever
 - Padrões Planner-Worker e decomposição hierárquica (AgentOrchestra, 2026).
 - Cockburn — níveis "sea/sub-functional" de decomposição de user stories.
 - Prática de mercado: granularidade 2-3 níveis como regra geral para custo-benefício de coordenação.
-
+- `references/plan-template-feature.md` — template de plano `feature`/`architecture` (R-064).

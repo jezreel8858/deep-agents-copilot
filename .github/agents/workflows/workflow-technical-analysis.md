@@ -79,3 +79,4 @@ workflow_state:
 
 ---
 
+> **Diretórios Canônicos de Persistência R-064 (`docs/plans/<tipo>/`)**: Gate 1 (`plan_type: architecture`) em `docs/plans/architecture/` (e `docs/plans/requirements/` para requisitos, `docs/plans/architecture/` para arquitetura, `docs/plans/test-strategy/` para estratégia de testes); Gate 2 (`plan_type: implementation`) em `docs/plans/implementation/`. Agentes planejadores/advisors permanecem 100% Read-Only (com `author` preservando o autor intelectual real do plano e proibição de `@tech-solution-architect` materializar docs no `WORKFLOW-BUG-FIX`), delegando a escrita física do `.md` a `@docs-engineer` / `@governance-maintainer` antes da aprovação humana (`status: APPROVED`, `approved: true`, `allowed_files`).

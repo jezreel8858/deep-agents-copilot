@@ -1,10 +1,6 @@
 ---
 name: angular-performance-patterns
-description: >-
-  Diretrizes enterprise de engenharia de performance para Angular (v17–v21+):
-  Zoneless change detection, fine-grained reactivity com Signals, @defer views,
-  SSR com incremental hydration e event replay, Core Web Vitals (INP/LCP/CLS),
-  NgOptimizedImage, bundle budgets e prevenção de memory leaks.
+description: "Define diretrizes e padrões para diretrizes enterprise de engenharia de performance para Angular (v17–v21+): Zoneless change detection, fine-grained reactivity com Signals, @defer views, SSR com incremental hydration e event replay, Core Web Vitals (INP/LCP/CLS), NgOptimizedImage, bundle budgets e prevenção de memory leaks. Use quando atuar em performance angular, otimização angular, zoneless angular. Não use para tarefas fora do escopo de angular-performance-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: quality
 triggers:
@@ -31,6 +27,10 @@ tools: []
 > **Relação com Padrões Universais**: Esta skill especializa as diretrizes arquiteturais e thresholds de performance definidos em [.github/skills/performance-engineering-patterns/SKILL.md](../performance-engineering-patterns/SKILL.md) para o ecossistema Angular moderno (Signals, Zoneless, @defer). Consulte a skill genérica para métricas globais (Core Web Vitals thresholds, SLA/SLO, pirâmide de diagnóstico).
 
 > Base de conhecimento especializada em **engenharia de performance frontend** para aplicações Angular modernas (v17 a v21+). Utilizada pelo `@angular-engineer` em modo Advisory (auditoria, diagnóstico de gargalos) e Implementação (aplicação direta de código otimizado).
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `angular-performance-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando Usar
 

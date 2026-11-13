@@ -1,10 +1,6 @@
 ---
 name: business-rules-governance
-description: >
-  Taxonomia, templates e padrões para extração, documentação e validação de
-  regras de negócio a partir de código-fonte em qualquer linguagem. Define
-  o formato markdown canônico para que regras sejam consumíveis por AI Copilot
-  como ground truth na validação de refatorações.
+description: "Define diretrizes e padrões para taxonomia, templates e padrões para extração, documentação e validação de regras de negócio a partir de código-fonte em qualquer linguagem. Define o formato markdown canônico para que regras sejam consumíveis por AI Copilot como ground truth na validação de refatorações. Use quando atuar em extrair regras de negócio, documentar regra, business rule. Não use para tarefas fora do escopo de business-rules-governance ou implementação direta de código de negócio não relacionado."
 tier: 1
 category: documentation
 triggers:
@@ -19,12 +15,7 @@ triggers:
   - "breaking change"
   - "regra quebrada"
   - "documentação de código"
-tools:
-  - "read_file"
-  - "grep_search"
-  - "file_search"
-  - "create_file"
-  - "insert_edit_into_file"
+tools: ['read_file', 'grep_search', 'file_search', 'create_file', 'insert_edit_into_file']
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
@@ -37,6 +28,18 @@ Padrões para extração, documentação e validação de regras de negócio a p
 > **Aplica-se a**: `@business-rules-extractor`, `@refactor-planner`, `@tech-solution-architect`, `@docs-engineer` e qualquer agent que precise rastrear ou validar comportamento de negócio.
 
 ---
+
+## Quando Usar
+
+- Ativação em cenários de extrair regras de negócio, documentar regra, business rule.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `business-rules-governance` ou quando outra skill específica cobrir integralmente o escopo.
+
+## Diretrizes e Padrões Canônicos
+
+- Seguir estritamente as regras, invariantes e fluxos descritos nas seções abaixo.
 
 ## 1) Taxonomia de Regras de Negócio
 
@@ -55,66 +58,7 @@ Padrões para extração, documentação e validação de regras de negócio a p
 
 ## 2) Template Canônico de Documento de Regras
 
-Cada arquivo de regras de negócio segue a estrutura abaixo. Nome: `business-rules-<modulo>.md` em `docs/business-rules/`.
-
-```markdown
----
-module: <nome-do-modulo>
-version: 1.0.0
-last_updated: YYYY-MM-DD
-status: active | draft | deprecated
-source_files:
-  - src/path/to/file.ext
----
-
-# Regras de Negócio — <Nome do Módulo>
-
-> Documento gerado por `@business-rules-extractor`. Atualizar sempre que a lógica de negócio mudar.
-> Ground truth para validação de refatorações via `@business-rules-extractor` em modo validate.
-
-## Sumário de Regras
-
-| ID | Categoria | Nome | Status |
-|---|---|---|---|
-| BR-001 | VAL | [Nome da Regra] | active |
-| BR-002 | CALC | [Nome da Regra] | active |
-
----
-
-## BR-001 — [Nome da Regra]
-
-**Categoria:** VAL — Validação  
-**Status:** active  
-**Arquivo:** `src/modulo/Arquivo.ext:42`  
-**Símbolo:** `NomeDaClasseOuMetodo`
-
-### Descrição
-[Descrição em linguagem de negócio — o que a regra garante e por quê existe]
-
-### Lógica Implementada
-[Descrição precisa do que o código faz — condições, valores, casos]
-
-### Condições e Edge Cases
-- **Condição principal:** [quando a regra se aplica]
-- **Edge case 1:** [comportamento em caso especial 1]
-- **Edge case 2:** [comportamento em caso especial 2]
-- **Valor padrão:** [o que acontece quando nenhuma condição é atendida]
-
-### Dependências
-- Depende de: [outra regra ou serviço]
-- Impacta: [o que é afetado por esta regra]
-
-### Exemplos
-| Entrada | Resultado esperado |
-|---|---|
-| [caso 1] | [resultado 1] |
-| [caso 2] | [resultado 2] |
-
-### Histórico
-- `YYYY-MM-DD`: [o que mudou]
-```
-
----
+- Estruturar cada regra (`BR-XXX`) com: Sumário, Descrição, Lógica Implementada, Condições/Edge Cases, Dependências, Exemplos e Histórico. Template Markdown completo em [`references/detailed-patterns-and-examples.md`](references/detailed-patterns-and-examples.md).
 
 ## 3) ID de Regra — Convenção
 
@@ -282,3 +226,6 @@ Para que a documentação seja consumida eficientemente pelo Copilot:
 - Skill `code-tracing` — para localizar regras no código
 - Skill `mermaid-diagrams` — para diagramar fluxos de estado
 
+## Checklist de Conformidade
+
+- [ ] Diretrizes, contratos e restrições de escopo de `business-rules-governance` verificados e atendidos.

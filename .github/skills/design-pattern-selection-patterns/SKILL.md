@@ -1,6 +1,6 @@
 ---
 name: design-pattern-selection-patterns
-description: Fornece Decision Tree objetiva para selecionar (ou descartar) design patterns GoF, funcionais, arquiteturais e de resiliência na fase de planejamento, com guardrails anti-overengineering e registro em mini-ADR dentro do Template de Plano de Implementação Técnica (R-064).
+description: "Fornece Decision Tree objetiva para selecionar (ou descartar) design patterns GoF, funcionais, arquiteturais e de resiliência na fase de planejamento, com guardrails anti-overengineering e registro em mini-ADR dentro do Template de Plano de Implementação Técnica (R-064). Use quando atuar em demandas de design-pattern-selection-patterns. Não use para tarefas fora do escopo de design-pattern-selection-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: governance
 triggers: ["seleção de design pattern", "mini-ADR", "decision tree de patterns", "golden hammer", "premature pattern", "nenhum pattern necessário", "trade-offs arquiteturais"]
@@ -20,6 +20,10 @@ tools: []
 # Design Pattern Selection Patterns
 
 Skill **puramente analítica/decisória**, consumida pelos agents `<stack>-arch-advisor` (read-only). Opera apenas na fase de planejamento (equivalente a *Design Doc Review*): valida a necessidade e a escolha de pattern ANTES de qualquer código. Nunca prescreve edição de arquivo nem implementação.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `design-pattern-selection-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## 1) Quando Usar
 

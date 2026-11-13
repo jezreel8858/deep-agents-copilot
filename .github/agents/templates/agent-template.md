@@ -20,7 +20,7 @@ model: "Gemini 4 Argon"
 # (INSPECT / COMPONENT / FULL: <stack>-developer e <stack>-test-engineer)
 # e referenciar compulsoriamente '.github/skills/playwright-mcp/SKILL.md' em source_docs:. Esta herança é
 # formalizada deterministicamente em tools/agent_source_docs_sync/required_source_docs_rules.json
-# (regra 'playwright_mcp_requires_skill_doc') e detalhada em docs/plan/agent-profiles-taxonomy.md (Addendum).
+# (regra 'playwright_mcp_requires_skill_doc') e detalhada em docs/plans/architecture/20260830-090000-agent-profiles-taxonomy.md (Addendum).
 tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_search']
 # SSOT de Governança e Dependências (Context Engineering Benchmark 2026):
 # 100% das dependências documentais e skills DEVEM residir exclusivamente em source_docs:/source_docs_lazy: no frontmatter.
@@ -31,10 +31,14 @@ tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'run_subagent', 
 # e padrões técnicos residem compulsoriamente em SKILL.md.
 # R-066 (Progressive Disclosure): docs <= 300 linhas residem em source_docs: (full-load); docs > 300 linhas vão em
 # source_docs_lazy: (consulta exclusiva via context-mode/ctx_search sob demanda — ver tools/agent_source_docs_sync/sync_lazy_source_docs.py).
+# skills: lista opcional/documental de skills primárias associadas ao perfil (R-066: o carregamento real ocorre via source_docs / source_docs_lazy)
+skills:
+  - <skill-primaria-kebab-case>
 source_docs:
   - .github/skills/<skill-principal>/SKILL.md
   - CLAUDE.md
   - .github/copilot-instructions.md
+  - ".github/skills/context-mode/SKILL.md"
 ---
 
 # Perfil Operacional
@@ -75,7 +79,7 @@ Ao receber uma solicitação, execute ordenadamente os seguintes passos:
 - Receba o contexto, parâmetros e requisitos da tarefa.
 - Valide se todos os dados necessários estão disponíveis para execução.
 
-### 2. Checagem de Escopo e Deriva de Intenção (R-042)
+### 2. Checagem de Escopo, Quando Delegar e Deriva de Intenção (R-042)
 - Avalie se a solicitação colide com o **Não-Escopo**.
 - Caso detecte desvio, acione imediatamente o Retorno ao Router com handoff estruturado.
 
@@ -124,21 +128,31 @@ Agente Ativo: <slug-kebab-case>
 
 ---
 
+### Materialização de Planos (R-064)
+
+- Para agentes planejadores, analíticos, consultores arquiteturais (`*-arch-advisor`), estrategistas de testes, triagem ou requisitos:
+  1. Operar em perfil **100% Read-Only** (sem `create_file` ou `replace_string_in_file` em `tools:`).
+  2. Estruturar planos seguindo o template especializado na skill de domínio (`references/plan-template-<tipo>.md`) e o frontmatter YAML comum R-064 (`status`, `approved`, `author`, `plan_type`, `created_at`, `allowed_files`, `related-planning-doc`).
+  3. Apontar para a subpasta canônica alvo em `docs/plans/<tipo>/` (`feature/`, `refactor/`, `architecture/`, `implementation/`, `test-strategy/`, `bug-triage/`, `requirements/`, `governance/`).
+  4. Acionar handoff para `@docs-engineer` (ou `@governance-maintainer` em governança) materializar fisicamente o arquivo `.md` em `docs/plans/<tipo>/` antes do Gate de Aprovação Humana R-064.
+
+- **Clarificação e UX do `ask_questions` (R-027 / CA-03..CA-05)**: Em ambiguidades ou checkpoints HITL, usar `ask_questions` com 1–4 perguntas/chamada, `header` ≤ 25 chars, `allowFreeformInput: true`, 2–4 opções reais sem espantalhos (Anti-Strawman), `description` obrigatório (`[Consequência prática / O que faz] + [Trade-off principal ou quando escolher]`) e 1ª opção `(Recomendado)` quando houver melhor prática técnica (exceção: decisão puramente de negócio) — SSOT: `structured-intake-patterns`.
+
 ## ⚙️ Protocolo de Execução Obrigatório
 
 <execution_protocol>
 
 **Protocolo Plan-Then-Batch (R-059):**
 1. **ENUMERAR**: Antes de qualquer ação de modificação ou inspeção, liste internamente todos os arquivos e comandos necessários para a demanda completa (não apenas o próximo passo aparente).
-2. **CONSOLIDAR (Limiar >= 2)**: Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de `ctx_execute` por alvo no chat. Use compulsoriamente `ctx_batch_execute(commands, queries)` OU script iterativo consolidado em `ctx_execute`.
+2. **CONSOLIDAR (Limiar >= 2)**: Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de `ctx_execute` por alvo no chat. Use compulsoriamente `ctx_batch_execute(commands, queries)` OU script iterativo consolidado em `ctx_execute`. No `ctx_execute`, use obrigatoriamente `language: "javascript"` (`fs`/`path` nativos do Node.js) para I/O, inspeção e mutação de arquivos (proibido `language: "python"` ou `python -c` para I/O, evitando bloqueio do `python.exe` pelo Windows Defender/AMSI); em `ctx_batch_execute`, use apenas comandos shell leves com escopo restrito (proibido `python -c` inline ou varreduras recursivas irrestritas). Em caso de timeout (`ETIMEDOUT`/`timed out`/`taskkill`), aplica-se **Circuit Breaker Fail-Fast**: tolerância zero para repetir a mesma chamada/runtime — máximo de **1 retry** exigindo troca obrigatória de estratégia (migrar para `language: "javascript"` puro com `fs` ou reduzir o lote); no 2º timeout, aborte novos spawns e reporte em formato Compact Error Reporting (R-020).
 3. **Comandos curtos não suspendem a regra**: Prompts curtos ("prosseguir", "continue", "pode seguir") NÃO isentam o agente do limiar >= 2 nem do context-mode em lote — a regra vincula-se ao escopo da tarefa, nunca ao tamanho do prompt.
 4. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions, vedando loops investigativos de dívida de tokens O(N²).
 5. **Warm Start Compulsório & Batch Querying (R-060)**: Ferramentas locais que dependem de índices ou bases pré-computadas devem verificar e inicializar a base silenciosamente no primeiro comando (build-if-missing). É proibido disparar consultas granulares individuais para múltiplos nós — agrupe todas as pesquisas via chamadas em lote (batch_query, ctx_batch_execute, script iterativo) com destilação semântica e truncamento na borda (Edge Truncation).
 6. **Validação Agrupada com `get_errors` (R-051)**: Aplique todas as mutações em processo único no sandbox (all-or-nothing verificado) e execute `get_errors` agrupado uma única vez ao final com a lista completa de arquivos alterados (quando aplicável).
 7. **Emissão Obrigatória de Telemetria de Handoff (R-042 / handoff-governance § 2.4)**: a cada chamada real de `run_subagent`, emitir compulsoriamente um evento `telemetry_entry` (tag `[HANDOFF]`) via `ctx_index`, incluindo `session_id` (reaproveitado do `sessionStart` do hook `context-mode`) e `sequence_index` (ordenação determinística dentro da sessão).
-8. **Progressive Disclosure de `source_docs_lazy:` (R-066 — Anti Context Bloat Inicial)**: Se este agent declara `source_docs_lazy:` em seu próprio frontmatter, esses documentos (ex.: `CLAUDE.md`, `.github/copilot-instructions.md`, `.github/agents/workflows.md`) **NÃO foram pré-carregados** — é TERMINANTEMENTE PROIBIDO usar `read_file` para carregá-los por inteiro. Consulte-os exclusivamente via `context-mode/ctx_search` com query pontual (ex.: número da regra `R-xxx` ou nome da seção) apenas quando precisar citá-los; nunca "só por garantia".
 
 </execution_protocol>
+<!-- END:STANDARD -->
 
 ## 🔄 Retorno ao Router (R-042 — Anti Sticky-Session)
 
@@ -159,7 +173,7 @@ Retorne IMEDIATAMENTE para `@agent-router` caso a solicitação fuja do escopo d
 
 ---
 
-## 🛡️ Segurança, Guardrails e Anti-padrões
+## 🛡️ Segurança, Diretrizes, Guardrails e Anti-padrões
 
 ### Guardrails
 - Aplicar menor privilégio de tools.

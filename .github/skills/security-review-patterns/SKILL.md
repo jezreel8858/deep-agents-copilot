@@ -1,10 +1,6 @@
 ---
 name: security-review-patterns
-description: >
-  Diretrizes consolidadas de segurança aplicada para revisão especializada de código —
-  OWASP Top 10:2025, ASVS 5.0, OWASP Top 10 para LLM Apps (2025) e OWASP Agentic
-  AI Security (2026). Cobre SAST, SCA (dependências/CVE), detecção de secrets,
-  triagem de falso-positivo e checklists por domínio (auth, input, crypto).
+description: "Define diretrizes e padrões para diretrizes consolidadas de segurança aplicada para revisão especializada de código — OWASP Top 10:2025, ASVS 5.0, OWASP Top 10 para LLM Apps (2025) e OWASP Agentic AI Security (2026). Cobre SAST, SCA (dependências/CVE), detecção de secrets, triagem de falso-positivo e checklists por domínio (auth, input, crypto). Use quando atuar em revisão de segurança, security review, owasp. Não use para tarefas fora do escopo de security-review-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: security
 triggers:
@@ -33,6 +29,10 @@ tools: []
 # Security Review Patterns
 
 > Base de conhecimento para agents que fazem **revisão especializada de segurança de código de aplicação** (não confundir com `agent-safety-guardrails`, que cobre segurança do **próprio agent de IA** — prompt injection, blast radius de tools).
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `security-review-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando Usar
 

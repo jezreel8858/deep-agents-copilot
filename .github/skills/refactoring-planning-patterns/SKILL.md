@@ -1,9 +1,6 @@
 ---
 name: refactoring-planning-patterns
-description: >-
-  Diretrizes consolidadas para planejamento e decomposição macro de refatorações
-  estruturais: Mikado Method, Strangler Fig, Branch by Abstraction, testes de
-  caracterização (Golden Master), métricas de acoplamento e rollback multicamada.
+description: "Define diretrizes e padrões para diretrizes consolidadas para planejamento e decomposição macro de refatorações estruturais: Mikado Method, Strangler Fig, Branch by Abstraction, testes de caracterização (Golden Master), métricas de acoplamento e rollback multicamada. Use quando atuar em planejamento de refatoração, refactor planning, mikado method. Não use para tarefas fora do escopo de refactoring-planning-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: process
 triggers:
@@ -27,6 +24,10 @@ tools: []
 # Refactoring Planning Patterns
 
 > Base de conhecimento especializada em **planejamento e governança de refatorações estruturais e arquiteturais**. Utilizada pelo `@refactor-planner` para estruturar planos acíclicos atômicos (DAGs) com garantias de zero-downtime, rede de segurança e rollback desacoplado de reversão de commit.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `refactoring-planning-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando Usar
 
@@ -167,6 +168,13 @@ Evitar dependência exclusiva de `git revert` em produção. Planejar contingên
 
 ---
 
+## 6) Contrato de Plano R-064 — `refactor`
+
+- **`plan_type: refactor`** → `docs/plans/refactor/<AAAAMMDD-HHMMSS>-<identificador>.md`.
+- Frontmatter YAML comum R-064 obrigatório; `allowed_files` = blast radius planejado do DAG.
+- `@refactor-planner` permanece **100% Read-Only**: emite o plano (DAG, Safety Net, Matriz de Rollback); `@docs-engineer` materializa o `.md`.
+- Template completo: `references/plan-template-refactor.md`.
+
 ## Checklist Verificável de Planejamento
 
 - [ ] Código alvo possui safety net (testes unitários confiáveis ou testes de caracterização documentados).
@@ -202,4 +210,4 @@ Evitar dependência exclusiva de `git revert` em produção. Planejar contingên
 - Tornhill, Adam. *Your Code as a Crime Scene*. Pragmatic Bookshelf, 2ª ed., 2024.
 - Hammant, Paul. *Branch by Abstraction* (https://paulhammant.com/blog/branch-by-abstraction.html)
 - Martin, Robert C. *Clean Architecture: Software Structure and Design*. Prentice Hall, 2017.
-
+- `references/plan-template-refactor.md` — template de plano `refactor` (R-064).

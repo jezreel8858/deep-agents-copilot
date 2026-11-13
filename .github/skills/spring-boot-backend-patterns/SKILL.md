@@ -1,8 +1,6 @@
 ---
 name: spring-boot-backend-patterns
-description: >-
-  Diretrizes enterprise para análise e recomendação de arquitetura, operação e
-  evolução de serviços backend com Spring Boot, sem implementação direta.
+description: "Define diretrizes e padrões para diretrizes enterprise para análise e recomendação de arquitetura, operação e evolução de serviços backend com Spring Boot, sem implementação direta. Use quando atuar em spring boot enterprise, boas práticas spring boot, arquitetura backend spring. Não use para tarefas fora do escopo de spring-boot-backend-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: quality
 triggers:
@@ -21,6 +19,10 @@ tools: []
 # Spring Boot Backend Patterns
 
 > Esta skill cobre o modo **Advisory** (análise/recomendação, sem código). Para o modo **Implementação** (codificar feature/bugfix), ver [`spring-boot-implementation-patterns`](../spring-boot-implementation-patterns/SKILL.md).
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `spring-boot-backend-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando usar
 

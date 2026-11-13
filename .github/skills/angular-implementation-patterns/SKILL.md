@@ -1,10 +1,6 @@
 ---
 name: angular-implementation-patterns
-description: >-
-  Padrões de mercado consolidados (2026) para IMPLEMENTAR features novas e
-  correções de bug em Angular — fronteira Signals/RxJS, workflow testing-first,
-  diffs mínimos e checklist de PR. Contraparte de execução da
-  `angular-frontend-patterns` (que é só análise/recomendação).
+description: "Define diretrizes e padrões para padrões de mercado consolidados (2026) para IMPLEMENTAR features novas e correções de bug em Angular — fronteira Signals/RxJS, workflow testing-first, diffs mínimos e checklist de PR. Contraparte de execução da `angular-frontend-patterns` (que é só análise/recomendação). Use quando atuar em implementar componente angular, corrigir bug angular, feature angular nova. Não use para tarefas fora do escopo de angular-implementation-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: quality
 triggers:
@@ -23,6 +19,10 @@ tools: []
 ---
 
 # Angular Implementation Patterns
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `angular-implementation-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando Usar
 

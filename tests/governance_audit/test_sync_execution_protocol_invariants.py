@@ -220,3 +220,30 @@ def test_execution_protocol_option3_h2_header_and_commonmark_formatting():
         f"{len(violations)} arquivo(s) violam o padrão de formatação Opção 3 (H2 + CommonMark):\n"
         + "\n".join(f"  - {v}" for v in violations)
     )
+
+
+def test_clauses_enforce_javascript_runtime_and_fail_fast_timeout_circuit_breaker() -> None:
+    """CA-1 a CA-5: CLAUSE_BATCH_OR_EXEC, CLAUSE_EXEC_ONLY e CLAUSE_GATHER_ONLY impoem
+    higiene anti-timeout e Circuit Breaker Fail-Fast (max 1 retry com troca de estrategia),
+    sem vazar a string literal ctx_execute em CLAUSE_GATHER_ONLY.
+    """
+    from tools.agent_protocol_sync.sync_execution_protocol import (
+        CLAUSE_BATCH_OR_EXEC,
+        CLAUSE_EXEC_ONLY,
+        CLAUSE_GATHER_ONLY,
+    )
+
+    for clause_name, clause_text in [
+        ("CLAUSE_BATCH_OR_EXEC", CLAUSE_BATCH_OR_EXEC),
+        ("CLAUSE_EXEC_ONLY", CLAUSE_EXEC_ONLY),
+    ]:
+        assert 'language: "javascript"' in clause_text, f"Falta language: javascript em {clause_name}"
+        assert "python -c" in clause_text, f"Falta proibicao de python -c em {clause_name}"
+        assert "Circuit Breaker Fail-Fast" in clause_text, f"Falta Circuit Breaker Fail-Fast em {clause_name}"
+        assert "1 retry" in clause_text, f"Falta limite de 1 retry em {clause_name}"
+
+    assert "ctx_execute" not in CLAUSE_GATHER_ONLY, "CLAUSE_GATHER_ONLY NAO pode conter a substring literal ctx_execute"
+    assert "ctx_batch_execute" in CLAUSE_GATHER_ONLY
+    assert "python -c" in CLAUSE_GATHER_ONLY
+    assert "Circuit Breaker Fail-Fast" in CLAUSE_GATHER_ONLY
+    assert "1 retry" in CLAUSE_GATHER_ONLY

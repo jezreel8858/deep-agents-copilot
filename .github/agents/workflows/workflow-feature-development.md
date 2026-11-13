@@ -49,7 +49,7 @@ flowchart TD
 
 #### Cadeia Sequencial e Papéis:
 1. **Estado 1 — Estruturação de Prompt (`@prompt-structuring`)**: Transforma pedidos abertos no formato canônico Markdown (`## Tarefa`, `## Contexto`, `## Restrições e Não-Escopo`, `## Formato de Saída Esperado`).
-2. **Estado 2 — Elicitação de Requisitos (`@requirements-analyst` / `@feature-planner` — negociação do Sprint Contract — § 1.4)**: Detalha regras funcionais (BDD/EARS) e não-funcionais com critérios de aceitação objetivos, prevenindo *solution-jumping* e persistindo a especificação oficial em `docs/requirements/REQ-<modulo>.md` (perfil Híbrido Documental sob R-056). Os critérios de aceitação aqui definidos constituem o `sprint_contract` que o Avaliador Cético do Estado 6 usará como rubrica de corte objetiva — nenhum critério pode ser adicionado ou reinterpretado retroativamente pelo Gerador (Estado 5) sem nova negociação explícita.
+2. **Estado 2 — Elicitação de Requisitos (`@requirements-analyst` / `@feature-planner` — negociação do Sprint Contract — § 1.4)**: Detalha regras funcionais (BDD/EARS) e não-funcionais com critérios de aceitação objetivos, prevenindo *solution-jumping* e persistindo a especificação oficial em `docs/plans/requirements/<AAAAMMDD-HHMMSS>-<modulo>.md` (perfil Híbrido Documental sob R-056). Os critérios de aceitação aqui definidos constituem o `sprint_contract` que o Avaliador Cético do Estado 6 usará como rubrica de corte objetiva — nenhum critério pode ser adicionado ou reinterpretado retroativamente pelo Gerador (Estado 5) sem nova negociação explícita.
 3. **Estado 3 — Technical Blueprint & Contratos (`@tech-solution-architect`)**:
    - Modela contratos de integração (OpenAPI v3), esquema de banco de dados (relacional ou NoSQL/Firestore/BaaS), máquina de estados e mitigação de concorrência.
    - Particionamento de escopo: isola se a demanda é **Fullstack**, **Backend-Only**, **Frontend-Only** ou **Database-Only**.
@@ -58,7 +58,7 @@ flowchart TD
    - *⚠️ Invariante de Blueprint e Decomposição Obrigatórios (R-058 / Smell 2.27)*: É terminantemente proibido pular o Estado 3 e despachar diretamente para domain routers ou especialistas de código quando a feature envolver novo schema, máquina de estados (3+ transições), concorrência ou infraestrutura/push. É expressamente vedado ao router listar lacunas de arquitetura e deixá-las para o implementador resolver no improviso.
 4. **Estado 4 — Estratégia de Testes por Risco (`@test-strategy`)**: Mapeia casos de borda, matriz de risco e cobertura recomendada (mínimo 80%) antes de codificar.
 4b. **Gate 2 Mandatório — Autoria do Plano de Implementação Técnica (R-064)**:
-   - *Autoria*: O `<stack>-arch-advisor` emite o Plano de Implementação em `docs/implementation-plans/` (Tier Full) com arquitetura técnica detalhada e allowlist de arquivos.
+   - *Autoria*: O `<stack>-arch-advisor` emite o Plano de Implementação em `docs/plans/implementation/` (Tier Full) com arquitetura técnica detalhada e allowlist de arquivos.
    - *Aprovação*: Checkpoint obrigatório via `ask_questions` gerando `plan_ref` e `status: approved` antes de qualquer linha de código no Estado 5/6. Mapeia casos de borda, matriz de risco e cobertura recomendada (mínimo 80%) antes de codificar.
 5. **Estado 5 — Implementação Domain TDD & Paridade UI (`domain routers & specialists`)**:
    - Padrão **Contract-First**: o contrato OpenAPI / DTO é a SSOT.
@@ -80,7 +80,7 @@ flowchart TD
 workflow_state:
   feature_id: "<slug-da-feature>"
   escopo_stack: "frontend_only | backend_only | fullstack"
-  requisitos_doc: "docs/requirements/REQ-<feature>.md"
+  requisitos_doc: "docs/plans/requirements/<AAAAMMDD-HHMMSS>-<feature>.md"
   blueprint:
     contrato_openapi: "<caminho/openapi.yaml ou inline>"
     tabelas_banco: ["<tabela_a>", "<tabela_b>"]
@@ -111,3 +111,4 @@ workflow_state:
 
 ---
 
+> **Diretórios Canônicos de Persistência R-064 (`docs/plans/<tipo>/`)**: Gate 1 (`plan_type: feature`) em `docs/plans/feature/` (e `docs/plans/requirements/` para requisitos, `docs/plans/architecture/` para arquitetura, `docs/plans/test-strategy/` para estratégia de testes); Gate 2 (`plan_type: implementation`) em `docs/plans/implementation/`. Agentes planejadores/advisors permanecem 100% Read-Only (com `author` preservando o autor intelectual real do plano e proibição de `@tech-solution-architect` materializar docs no `WORKFLOW-BUG-FIX`), delegando a escrita física do `.md` a `@docs-engineer` / `@governance-maintainer` antes da aprovação humana (`status: APPROVED`, `approved: true`, `allowed_files`).

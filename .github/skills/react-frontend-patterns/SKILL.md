@@ -1,8 +1,6 @@
 ---
 name: react-frontend-patterns
-description: >-
-  Boas práticas e patterns de codificação React moderno (React 19+) para componentes,
-  Server/Client Components, hooks, reatividade, segurança e consistência arquitetural.
+description: "Define diretrizes e padrões para boas práticas e patterns de codificação React moderno (React 19+) para componentes, Server/Client Components, hooks, reatividade, segurança e consistência arquitetural. Use quando atuar em boas práticas react, padrões de componente react, server components. Não use para tarefas fora do escopo de react-frontend-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: quality
 triggers:
@@ -21,6 +19,10 @@ tools: []
 # React Frontend Patterns
 
 > Esta skill cobre o modo **Advisory** (análise/recomendação, sem código). Para o modo **Implementação** (codificar feature/bugfix), ver [`react-implementation-patterns`](../react-implementation-patterns/SKILL.md).
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `react-frontend-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando Usar
 

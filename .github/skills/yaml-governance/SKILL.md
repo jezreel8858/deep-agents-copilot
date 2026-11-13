@@ -1,8 +1,6 @@
 ---
 name: yaml-governance
-description: >
-  Boas práticas genéricas para ler, gerar, revisar e validar arquivos YAML/YML
-  com segurança, tipagem explícita e schema validation.
+description: "Define diretrizes e padrões para boas práticas genéricas para ler, gerar, revisar e validar arquivos YAML/YML com segurança, tipagem explícita e schema validation. Use quando atuar em yaml, yml, yamllint. Não use para tarefas fora do escopo de yaml-governance ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: governance
 triggers:
@@ -24,6 +22,14 @@ tools: []
 # YAML Governance — Boas práticas genéricas
 
 Use esta skill sempre que a tarefa envolver arquivos `.yml` ou `.yaml`.
+
+## Quando Usar
+
+- Ativação em cenários de yaml, yml, yamllint.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `yaml-governance` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## 1) Diretrizes essenciais
 

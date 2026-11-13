@@ -1,6 +1,6 @@
 """
 test_playwright_mcp_frontend_governance.py — Governança determinística do MCP Playwright nos agents
-frontend (Angular + React). plan_ref: docs/implementation-plans/20261008-governance-maintenance-playwright-mcp-frontend-consolidation.md (T12).
+frontend (Angular + React). plan_ref: docs/plans/implementation/20261008-090300-governance-maintenance-playwright-mcp-frontend-consolidation.md (T12).
 
 Garante:
 1. Paridade das tools `playwright/*` entre Angular e React (developer = 13, test-engineer = 18) e

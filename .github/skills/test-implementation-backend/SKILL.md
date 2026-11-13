@@ -1,9 +1,6 @@
 ---
 name: test-implementation-backend
-description: 
-  Padrões genéricos e agnósticos para implementação de testes em qualquer projeto
-  backend, independente de linguagem ou framework. Define contratos, tipos de teste
-  e estratégias de cobertura aplicáveis a qualquer stack server-side.
+description: "Define diretrizes e padrões para padrões genéricos e agnósticos para implementação de testes em qualquer projeto backend, independente de linguagem ou framework. Define contratos, tipos de teste e estratégias de cobertura aplicáveis a qualquer stack server-side. Use quando atuar em testar backend, testes de serviço, unit test backend. Não use para tarefas fora do escopo de test-implementation-backend ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: testing
 triggers:
@@ -32,6 +29,14 @@ tools: []
 >
 > **Quando usar esta skill**: ao definir estratégia de testes, revisar cobertura
 > ou trabalhar em projeto com stack ainda não catalogada.
+
+## Quando Usar
+
+- Ativação em cenários de testar backend, testes de serviço, unit test backend.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `test-implementation-backend` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## 1) Tipos de Teste — Pirâmide
 

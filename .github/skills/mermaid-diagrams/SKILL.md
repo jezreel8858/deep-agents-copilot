@@ -1,9 +1,6 @@
 ---
 name: mermaid-diagrams
-description: >
-  Boas práticas para criar diagramas Mermaid em Markdown em contextos multi-projeto.
-  Use quando o agente precisar transformar fluxos, sequências, entidades, estados
-  ou cronogramas em diagramas legíveis e versionáveis.
+description: "Define diretrizes e padrões para boas práticas para criar diagramas Mermaid em Markdown em contextos multi-projeto. Use quando o agente precisar transformar fluxos, sequências, entidades, estados ou cronogramas em diagramas legíveis e versionáveis. Não use para tarefas fora do escopo de mermaid-diagrams ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: documentation
 triggers:
@@ -33,6 +30,10 @@ tools: []
 # mermaid-diagrams — Boas práticas genéricas
 
 Mermaid deve ser usado para converter explicações textuais em diagramas curtos, legíveis e fáceis de revisar.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `mermaid-diagrams` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## 1) Quando usar
 
@@ -120,3 +121,11 @@ sequenceDiagram
 - Mermaid Live: `https://mermaid.live/`
 - GitHub Advanced Formatting: `https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams`
 - Kroki Mermaid: `https://docs.kroki.io/kroki/formats/mermaid/`
+
+## Checklist de Conformidade
+
+- [ ] Diretrizes, contratos e restrições de escopo de `mermaid-diagrams` verificados e atendidos.
+
+## Referências
+
+- Documentação normativa em `CLAUDE.md` e `.github/copilot-instructions.md`.

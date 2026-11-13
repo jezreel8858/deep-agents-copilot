@@ -113,7 +113,7 @@ deep-agents-copilot/
 │   ├── implementation-plans/                    # ⭐ Planos de Implementação técnica por workflow (R-064)
 │   ├── agent-context/                           # Guias de uso de ferramentas
 │   ├── plan/                                    # Planos arquiteturais
-│   │   └── agent-profiles-taxonomy.md           # Taxonomia consolidada de agents de mercado
+│   │   └── 20260830-090000-agent-profiles-taxonomy.md           # Taxonomia consolidada de agents de mercado
 │   ├── requirements/                            # Requisitos formais de sistema
 │   └── schemas/                                 # Schemas JSON canônicos (IR de migração)
 │
@@ -237,7 +237,7 @@ flowchart TD
 
 ## Cobertura de Mercado — Perfis de Agents
 
-> Análise completa: [`docs/plan/agent-profiles-taxonomy.md`](docs/plan/agent-profiles-taxonomy.md) — consolidação de fontes de mercado (Anthropic, OpenAI, Microsoft, Google DeepMind, GitHub, SpecWeave, ArXiv) sobre quais perfis de agent devem existir em um flow multi-agent de desenvolvimento de software.
+> Análise completa: [`docs/plans/architecture/20260830-090000-agent-profiles-taxonomy.md`](docs/plans/architecture/20260830-090000-agent-profiles-taxonomy.md) — consolidação de fontes de mercado (Anthropic, OpenAI, Microsoft, Google DeepMind, GitHub, SpecWeave, ArXiv) sobre quais perfis de agent devem existir em um flow multi-agent de desenvolvimento de software.
 
 ### O que o mercado recomenda (2026)
 
@@ -348,8 +348,8 @@ flowchart TB
 - **Workflows Operacionais Determinísticos (R-050):** [`.github/agents/workflows.md`](.github/agents/workflows.md)
 - **Grafo de Roteamento (R-040):** [`.github/agents/routing-graph.yaml`](.github/agents/routing-graph.yaml)
 - **Suíte de Evals:** [`.github/agents/evals/casos-roteamento.yaml`](.github/agents/evals/casos-roteamento.yaml)
-- **Cobertura de Mercado — Perfis de Agents:** [`docs/plan/agent-profiles-taxonomy.md`](docs/plan/agent-profiles-taxonomy.md)
-- **Plano de Melhorias Implementado:** [`docs/plan/plano-implementacao-orquestracao.md`](docs/plan/plano-implementacao-orquestracao.md)
+- **Cobertura de Mercado — Perfis de Agents:** [`docs/plans/architecture/20260830-090000-agent-profiles-taxonomy.md`](docs/plans/architecture/20260830-090000-agent-profiles-taxonomy.md)
+- **Plano de Melhorias Implementado:** [`docs/plans/implementation/20260830-090000-architecture-plano-implementacao-orquestracao.md`](docs/plans/implementation/20260830-090000-architecture-plano-implementacao-orquestracao.md)
 - **Agents Disponíveis:** `.github/agents/README.md`
 - **Skills Disponíveis:** `.github/skills/README.md`
 - **Adapters Registrados:** `.github/instructions/README.md`
@@ -407,7 +407,7 @@ flowchart TB
 - ✅ `.github/agents/routing-graph.yaml` — grafo de roteamento declarado (R-040): 42 nós, arestas condicionais e política de cascata rule-based→semantic→LLM; aresta reversa universal `*downstream → agent-router` (R-042)
 - ✅ `.github/agents/evals/casos-roteamento.yaml` — suíte de testes de regressão de roteamento (canônicos, ambíguos, regressão, segurança + variantes)
 - ✅ `.github/instructions/README.md` v1.2 — seção `governance_artefacts` com os artefatos estruturais
-- ✅ `docs/plan/agent-profiles-taxonomy.md` — análise consolidada de mercado + gaps + recomendações
+- ✅ `docs/plans/architecture/20260830-090000-agent-profiles-taxonomy.md` — análise consolidada de mercado + gaps + recomendações
 
 ### Anti Sticky-Session (R-042)
 - ✅ Todo agent downstream/specialist declara seção "Retorno ao Router" com gatilho objetivo de deriva de intenção (mudança de verbo de ação, stack fora de competência, pedido de execução em agent read-only).

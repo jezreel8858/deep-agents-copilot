@@ -1,6 +1,6 @@
 ---
 name: git-worktree-governance
-description: Diretrizes de ciclo de vida e isolamento para execução de agentes paralelos e explorações especulativas via Git Worktrees sem colisão de arquivos ou concorrência de build.
+description: "Define diretrizes e padrões para diretrizes de ciclo de vida e isolamento para execução de agentes paralelos e explorações especulativas via Git Worktrees sem colisão de arquivos ou concorrência de build. Use quando atuar em git worktree, worktree governance, execução paralela de agentes. Não use para tarefas fora do escopo de git-worktree-governance ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: governance
 triggers:
@@ -10,8 +10,7 @@ triggers:
   - "parallel agent isolation"
   - "branch especulativa"
   - "workspace isolation"
-tools:
-  - "run_in_terminal"
+tools: ['run_in_terminal']
 source_docs:
   - .github/skills/git-governance/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
@@ -20,6 +19,10 @@ source_docs:
 ---
 
 # Git Worktree Governance
+
+## Quando Usar
+
+- Ativação em cenários de git worktree, worktree governance, execução paralela de agentes.
 
 ## 0) Problema Resolvido & Princípios Fundamentais
 
@@ -137,3 +140,6 @@ Antes de encerrar o ciclo do worktree:
 - ❌ Deixar worktrees órfãos ou não removidos após a conclusão do plano.
 - ❌ Fazer merge para a branch principal sem validação prévia de testes no ambiente isolado.
 
+## Referências
+
+- Documentação normativa em `CLAUDE.md` e `.github/copilot-instructions.md`.

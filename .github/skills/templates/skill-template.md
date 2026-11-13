@@ -1,7 +1,9 @@
 ---
 name: <nome-kebab-case>
 description: >-
-  Fornece diretrizes e padrões canônicos para <objetivo central em 3ª pessoa>. Use quando precisar de <cenário de uso com gatilho>. Não use para <cenário fora de escopo>.
+  Fornece/Define <padrões e diretrizes canônicas do domínio em 3ª pessoa, ≤ 400 caracteres>.
+  Use quando <cenários e gatilhos explícitos de ativação>.
+  Não use para <limites negativos e casos que pertencem a outra skill/agent>.
 tier: 2
 category: process
 triggers:

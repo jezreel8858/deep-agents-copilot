@@ -50,12 +50,10 @@ flowchart TD
    - *Diagnóstico de Smells & Reúso*: O `@agent-auditor` executa auditoria estática e comportamental contra os smells canônicos de governança e avalia compulsoriamente Q1, Q2 e Q3.
    - *Auditoria de Higiene & Documentação*: O `@repo-hygiene-auditor` audita a saúde do repositório, licença e segurança de versionamento; o `@docs-engineer` mapeia a integridade documental, alinhamento técnico de manuais e conformidade de guias de governança.
    - *Pesquisa Prévia Compulsória (Criação de Artefatos / Stack)*: O `@governance-factory` delega compulsoriamente ao `@deep-search` a investigação de mercado antes de escrever novos prompts, skills ou agents.
-2. **Estado 2 — Modelagem e Checkpoint de Aprovação Humana**:
-   - Apresentação objetiva dos achados ou especificações do novo artefato, incluindo a matriz de generalização sistêmica (artefatos alvo + peers + templates + testes).
-   - *Estado 2b (Checkpoint Humano)*: Toda manutenção estrutural ou criação de stack exige autorização explícita via `ask_questions` antes de qualquer alteração física nos catálogos.
-2c. **Gate 2 Mandatório — Plano de Implementação de Governança (R-064)**:
-   - *Autoria*: Plano tipo `governance` elaborado por `@governance-maintainer` ou `@agent-auditor` em `docs/implementation-plans/` delimitando o escopo de arquivos de governança.
-   - *Aprovação*: Aprovado no checkpoint humano (Estado 2b) antes de disparar a execução física.
+2. **Estado 2 — Materialização Física do Plano R-064 em `docs/plans/governance/` (`status: DRAFT`)**:
+   - *Autoria e Persistência Pré-Checkpoint*: O `@agent-auditor` estrutura o plano (`plan_type: "governance"`) e aciona `@docs-engineer` ou `@governance-maintainer` para materializá-lo fisicamente em `docs/plans/governance/<AAAAMMDD-HHMMSS>-governance-maintenance-<slug>.md` com `status: DRAFT` e `approved: false` **ANTES** do Checkpoint Humano R-064.
+3. **Estado 3 — Checkpoint Humano R-064 (`ask_questions` sobre `plan_ref`)**:
+   - Toda manutenção estrutural ou criação de stack exige aprovação humana explícita via `ask_questions` referenciando o `plan_ref` já gravado em `docs/plans/governance/` antes de qualquer mutação na malha (modo **Fail-Closed**).
 3. **Estado 3 — Execução e Sincronização em Lote por Tipo de Artefato (R-015 / R-046 — requires_plan: true)**:
    - O `@governance-maintainer` aplica as alterações em lote único (*Single-Turn Batching*) utilizando o `context-mode` MCP no sandbox para zero desperdício de tokens, atuando em conjunto com o `@docs-engineer` para atualização e consolidação formal de documentação técnica, manuais e guias de governança.
    - **Sincronização Atômica por Tipo (R-015 — gap corrigido)**: o conjunto de arquivos sincronizados depende do tipo de artefato, nunca uma lista fixa de 4 arquivos:
@@ -99,3 +97,4 @@ workflow_state:
 
 ---
 
+> **Diretórios Canônicos de Persistência R-064 (`docs/plans/<tipo>/`)**: Gate 1 (`plan_type: governance`) em `docs/plans/governance/` (e `docs/plans/requirements/` para requisitos, `docs/plans/architecture/` para arquitetura, `docs/plans/test-strategy/` para estratégia de testes); Gate 2 (`plan_type: implementation`) em `docs/plans/governance/`. Agentes planejadores/advisors permanecem 100% Read-Only (com `author` preservando o autor intelectual real do plano e proibição de `@tech-solution-architect` materializar docs no `WORKFLOW-BUG-FIX`), delegando a escrita física do `.md` a `@docs-engineer` / `@governance-maintainer` antes da aprovação humana (`status: APPROVED`, `approved: true`, `allowed_files`).

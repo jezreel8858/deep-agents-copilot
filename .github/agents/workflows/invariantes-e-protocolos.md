@@ -324,7 +324,7 @@ Com esse bloco, qualquer especialista na cadeia sequencial sabe exatamente onde 
 ## 10. R-064 — Duplo Gate Documental de Planejamento e Implementação Universal
 
 > **Fonte de verdade normativa:** [`CLAUDE.md`](../../../CLAUDE.md) § R-064 e [`.github/copilot-instructions.md`](../../copilot-instructions.md) § 1.1 e § 2.  
-> **Diretórios canônicos:** [`docs/plans/`](../../../docs/plans/README.md) e [`docs/implementation-plans/`](../../../docs/implementation-plans/README.md).
+> **Diretórios canônicos:** [`docs/plans/`](../../../docs/plans/README.md) e [`docs/plans/implementation/`](../../../docs/plans/implementation/README.md).
 
 ### 10.1 Princípio Operacional e Estrutura dos Gates
 
@@ -335,7 +335,7 @@ Etapa Inicial (Elicitação / RCA / Escopo)
                    │
                    ▼
   [ GATE 1: PLANO DE PLANEJAMENTO ]
-  ├─ Arquivo: docs/plans/<AAAAMMDD>-<workflow>-<identificador-curto>.md
+  ├─ Arquivo: docs/plans/<tipo>/<AAAAMMDD-HHMMSS>-<workflow>-<identificador-curto>.md
   ├─ Autoria: Especialista analítico/triagem dono da Etapa 1/2
   ├─ Insumo: Não autoriza alteração de código da aplicação
   ├─ Materialização: Orquestrador Raiz (Flat Delegation R-037/R-042)
@@ -343,7 +343,7 @@ Etapa Inicial (Elicitação / RCA / Escopo)
                    │ (Aprovado pelo Usuário)
                    ▼
   [ GATE 2: PLANO DE IMPLEMENTAÇÃO TÉCNICA (UNIVERSAL) ]
-  ├─ Arquivo: docs/implementation-plans/<AAAAMMDD>-<workflow>-<identificador-curto>.md
+  ├─ Arquivo: docs/plans/implementation/<AAAAMMDD-HHMMSS>-<workflow>-<identificador-curto>.md
   ├─ Autoria: <stack>-arch-advisor (domínio específico) ou especialista técnico do workflow
   ├─ Tiers: Tier Full (complexo/alto risco) ou Tier Light (cirúrgico/≤20 linhas/1 arquivo)
   ├─ Materialização: Orquestrador Raiz
@@ -355,9 +355,9 @@ Etapa de Execução / Mutação de Código (Batch Execution R-046 / R-059)
 
 ### 10.2 Matriz de Responsabilidade de Autoria por Workflow
 
-| Workflow Canônico | Gate 1: Plano de Planejamento (`docs/plans/`) | Gate 2: Plano de Implementação (`docs/implementation-plans/`) |
+| Workflow Canônico | Gate 1: Plano de Planejamento (`docs/plans/`) | Gate 2: Plano de Implementação (`docs/plans/implementation/`) |
 |---|---|---|
-| **WORKFLOW-BUG-FIX** | `@bug-triage` (RCA, evidências e escopo como insumo em `docs/plans/`) | `<stack>-arch-advisor` (SEMPRE emite o plano em `docs/implementation-plans/`, podendo ser delta enxuto referenciando o plano do bug-triage) |
+| **WORKFLOW-BUG-FIX** | `@bug-triage` (RCA, evidências e escopo como insumo em `docs/plans/`) | `<stack>-arch-advisor` (SEMPRE emite o plano em `docs/plans/implementation/`, podendo ser delta enxuto referenciando o plano do bug-triage) |
 | **WORKFLOW-REFACTORING** | `@refactor-planner` (diagnóstico e Mikado DAG) | `<stack>-arch-advisor` (detalhamento técnico de blast radius e allowlist de arquivos) |
 | **WORKFLOW-FEATURE-DEVELOPMENT** | `@requirements-analyst` / `@tech-solution-architect` | `<stack>-arch-advisor` (arquitetura e etapas técnicas) |
 | **WORKFLOW-GOVERNANCE-MAINTENANCE** | `@agent-auditor` / `@repo-hygiene-auditor` | Especialista analítico do lote (`@governance-maintainer` ou `@agent-auditor` — plano tipo `governance`) |
@@ -368,17 +368,17 @@ Etapa de Execução / Mutação de Código (Batch Execution R-046 / R-059)
 
 1. **Exceções Formais (Não exigem Plano do Arch-Advisor)**:
    - **(a) Tarefas Testes-Only**: Autoria ou manutenção exclusiva de suítes de testes (`*-test-engineer` / `@test-strategy`) sem qualquer alteração em código de produção da aplicação. Opera estritamente sob o plano de testes / test-strategy aprovado.
-   - **(b) Documentação e Configuração Não Sensível**: Alterações restritas a arquivos Markdown (`docs/`, `*.md`), comentários de documentação ou configurações puramente declarativas, sem tocar em secrets, credenciais, pipelines de CI/CD, scripts de infraestrutura ou código de persistência/negócio.
+   - **(b) Documentação Pura (`docs_only`)**: A isenção `isencao_r064: docs_only` aplica-se **exclusivamente** a documentação pura em `docs/**` (exceto `docs/plans/**`), `README.md` ou `CHANGELOG.md`, sendo **estritamente proibida** (`isencao_r064` inválida) quando o escopo tocar `.github/agents/**`, `.github/skills/**`, `.github/prompts/**`, `.github/instructions/**`, `CLAUDE.md`, `AGENTS.md`, `tools/**`, `tests/**` ou arquivos `.py`/`.json`/`.yaml`.
 2. **NÃO São Exceções (Exigem Plano de Implementação R-064)**:
    - **Hotfix**: Correções urgentes NÃO possuem isenção de plano; são classificadas estritamente em Tier `light` ou Tier `full` conforme os critérios técnicos da regra, gerando plano e exigindo aprovação humana.
    - **Retry R-053**: Tentativas subsequentes de compilação ou execução dentro do escopo de plano já aprovado reutilizam o mesmo `plan_ref` (sem novo plano). Caso haja mudança de escopo de arquivos ou persistam mais de 2 falhas consecutivas, o fluxo interrompe a execução e retorna ao `<stack>-arch-advisor`.
-3. **Fast-Path Determinístico (R-041, Tier 1)**: Para correções pontuais, refatorações com alvo definido e análises diretas, o Plano de Planejamento (`docs/plans/`) pode ser dispensado, mas o **Plano de Implementação (`docs/implementation-plans/`) permanece 100% obrigatório** antes de tocar em código.
+3. **Fast-Path Determinístico (R-041, Tier 1)**: Para correções pontuais, refatorações com alvo definido e análises diretas, o Plano de Planejamento (`docs/plans/`) pode ser dispensado, mas o **Plano de Implementação (`docs/plans/implementation/`) permanece 100% obrigatório** antes de tocar em código.
 4. **Workflows Read-Only**: `WORKFLOW-TECHNICAL-ANALYSIS`, `WORKFLOW-RELEASE-READINESS` e `WORKFLOW-PROMPT-SYNTHESIS` são isentos do Plano de Implementação (não realizam mutação de código na aplicação), podendo produzir apenas o Plano de Planejamento quando a profundidade analítica demandar alinhamento prévio.
 5. **Zero Discovery pelo Router (R-054)**: O `@agent-router` e os routers de stack não inspecionam o sistema de arquivos para descobrir planos; eles apenas propagam e exigem o parâmetro `plan_ref` e `status: approved` no payload de despacho downstream.
 
 ### 10.4 Pré-condição de Codificação Universal (R-064) & Contrato do Plano
 
-Nenhum agente codificador (desenvolvedores `*-developer`, engenheiros de teste `*-test-engineer` quando alterando código de produção, especialistas de banco de dados `oracle-database-specialist`, `informix-database-specialist`, `database-specialist` ou qualquer codificador de workflows presentes e futuros) pode criar ou editar código sem `plan_ref` de plano de implementação aprovado em `docs/implementation-plans/` elaborado pelo `<stack>-arch-advisor` (ou fallback de governança) e aprovado por humano.
+Nenhum agente codificador (desenvolvedores `*-developer`, engenheiros de teste `*-test-engineer` quando alterando código de produção, especialistas de banco de dados `oracle-database-specialist`, `informix-database-specialist`, `database-specialist` ou qualquer codificador de workflows presentes e futuros) pode criar ou editar código sem `plan_ref` de plano de implementação aprovado em `docs/plans/implementation/` elaborado pelo `<stack>-arch-advisor` (ou fallback de governança) e aprovado por humano.
 
 1. **Pré-condição no Codificador (Linha de Guarda)**: Se um agente codificador receber despacho sem `plan_ref` com `status: approved` ou for solicitado a editar arquivo fora da allowlist do plano, deve compulsoriamente abortar a edição e retornar imediatamente ao router com:
    ```yaml
@@ -386,14 +386,14 @@ Nenhum agente codificador (desenvolvedores `*-developer`, engenheiros de teste `
      para: "@<stack>-router" # ou @agent-router
      motivo: "pre_condicao_plano"
      contexto:
-       mensagem: "Execução de código bloqueada por ausência de plan_ref aprovado em docs/implementation-plans/ (R-064)"
+       mensagem: "Execução de código bloqueada por ausência de plan_ref aprovado em docs/plans/implementation/ (R-064)"
    ```
 2. **Contrato do Plano de Implementação (Frontmatter Canônico)**:
    ```yaml
    ---
    status: approved # 'draft' antes do checkpoint, 'approved' após aprovação humana via ask_questions
    tier: full | light | governance
-   plan_ref: docs/implementation-plans/<AAAAMMDD>-<workflow>-<identificador>.md
+   plan_ref: docs/plans/implementation/<AAAAMMDD-HHMMSS>-<workflow>-<identificador>.md
    allowed_files:
      - src/main/java/com/exemplo/Service.java
      - src/main/resources/application.yml
@@ -410,16 +410,16 @@ A autoria do Plano de Implementação pelo `<stack>-arch-advisor` divide-se em d
 
 1. **Tier `full` (Plano Completo)**:
    - **Gatilhos**: >3 arquivos afetados, OU >1 camada arquitetural, OU migração/schema/DDL de banco de dados, OU autenticação/segurança/dados sensíveis, OU introdução de nova biblioteca/dependência, OU baixa confiança/complexidade alta.
-   - **Estrutura**: Documento estruturado em `docs/implementation-plans/` contendo análise de blast radius, decomposição de tarefas com granularidade micro-batch, dependências, matriz de risco, estratégia de rollback e allowlist de arquivos.
+   - **Estrutura**: Documento estruturado em `docs/plans/implementation/` contendo análise de blast radius, decomposição de tarefas com granularidade micro-batch, dependências, matriz de risco, estratégia de rollback e allowlist de arquivos.
 2. **Tier `light` (Plano Mínimo / Fast Delta)**:
    - **Gatilhos**: Diff cirúrgico descritível em 1 frase, ≤20 linhas modificadas, 1 único arquivo, 1 única camada, e ausência total dos gatilhos de Tier `full`.
-   - **Estrutura**: Documento conciso em `docs/implementation-plans/` (ou delta enxuto de 1 parágrafo referenciando o plano de triagem) AINDA elaborado pelo `<stack>-arch-advisor` (modo validar delta) com frontmatter canônico e submetido à aprovação humana via `ask_questions`.
+   - **Estrutura**: Documento conciso em `docs/plans/implementation/` (ou delta enxuto de 1 parágrafo referenciando o plano de triagem) AINDA elaborado pelo `<stack>-arch-advisor` (modo validar delta) com frontmatter canônico e submetido à aprovação humana via `ask_questions`.
    - **Hotfix**: Correções emergenciais utilizam obrigatoriamente Tier `light` ou `full` segundo seus critérios técnicos — não há exceção sem plano para hotfix.
 
 ### 10.6 Stacks sem Arch-Advisor e Fallback Fora de Stack
 
-1. **Codificadores Fora de Stack de Domínio**: Para manutenção de governança, documentação executável ou infraestrutura governada (`@governance-maintainer`, `@docs-engineer` etc.), o plano é de tipo `governance`, elaborado pelo `@agent-auditor` ou pelo próprio executor especialista, persistido em `docs/implementation-plans/` e aprovado por humano via `ask_questions`. O fluxo nunca é bloqueado por ausência de stack específica.
-2. **Stack sem Arch-Advisor Dedicado**: Caso uma stack tecnológica do projeto não possua ainda um `<stack>-arch-advisor` especializado no catálogo, adota-se o mesmo fallback explícito: o plano técnico é elaborado pelo especialista analítico disponível ou router de stack, validado por humano e persistido sob o contrato de `docs/implementation-plans/`.
+1. **Codificadores Fora de Stack de Domínio (Fail-Closed R-064)**: Em fluxos de governança (`WORKFLOW-GOVERNANCE-MAINTENANCE`), o plano (`plan_type: "governance"`) é estruturado pelo `@agent-auditor` e obrigatoriamente materializado fisicamente em `docs/plans/governance/<AAAAMMDD-HHMMSS>-governance-maintenance-<slug>.md` (via `@docs-engineer` ou `@governance-maintainer` em modo `DRAFT`) ANTES do checkpoint `ask_questions`. O fluxo opera em modo **Fail-Closed**: nenhuma mutação de lote pode iniciar sem `plan_ref` físico existente em `docs/plans/<tipo>/` com `approved: true`.
+2. **Stack sem Arch-Advisor Dedicado**: Caso uma stack tecnológica do projeto não possua ainda um `<stack>-arch-advisor` especializado no catálogo, adota-se o mesmo fallback explícito: o plano técnico é elaborado pelo especialista analítico disponível ou router de stack, validado por humano e persistido sob o contrato de `docs/plans/implementation/`.
 
 ### 10.7 Invariante para Novos Workflows com Etapa de Código
 
@@ -427,3 +427,30 @@ Qualquer novo workflow canônico ou customizado adicionado ao ecossistema que en
 1. Declarar a etapa `implementation_plan_authoring` posicionada estritamente antes de qualquer etapa de codificação no `routing-graph.yaml`.
 2. Declarar a guarda `requires_plan: true` em cada etapa subsequente de edição de código.
 3. Conectar o checkpoint de aprovação humana via `ask_questions` antes de autorizar a entrega do `plan_ref` ao agente executor.
+
+> **Árvore Universal R-064**: Subpastas tipadas canônicas de `docs/plans/<tipo>/`: `docs/plans/feature/`, `docs/plans/refactor/`, `docs/plans/architecture/`, `docs/plans/implementation/`, `docs/plans/test-strategy/`, `docs/plans/bug-triage/`, `docs/plans/requirements/` e `docs/plans/governance/`. O campo `author` registra sempre o `@<agente-planejador>` autor intelectual real (100% Read-Only), a persistência física ocorre via handoff para `@docs-engineer` / `@governance-maintainer`, `@tech-solution-architect` é proibido de materializar documentos no `WORKFLOW-BUG-FIX`, e todo plano exige `plan_type`, `allowed_files`, `status: APPROVED` e `approved: true`.
+
+### Política Anti-Timeout, Runtime Preferencial JavaScript (`fs` nativo) e Circuit Breaker Fail-Fast (`ctx_execute` / `ctx_batch_execute`)
+
+1. **Runtime Obrigatório `language: "javascript"` no `ctx_execute` (Anti-Defender/AMSI Hang)**:
+   - No Windows, a invocação de `python.exe` (`language: "python"` ou `python -c`) ou cadeias pesadas de subshells a partir do processo Node.js do servidor MCP `context-mode` sofre interceptação síncrona pelo Windows Defender (`MsMpEng.exe` / Behavior Monitoring / AMSI), causando bloqueios severos de I/O e timeouts (`ETIMEDOUT` / `taskkill /F /T`).
+   - Portanto, `language: "javascript"` (com módulos nativos `fs` e `path` do Node.js) é o **runtime obrigatório** no `ctx_execute` para leitura, inspeção, busca, parsing JSON/texto e modificação em lote de arquivos.
+   - É **terminantemente proibido** invocar `language: "python"`, `python -c` ou subshells aninhados para I/O de arquivos. (A execução de binários Python via `child_process` é restrita exclusivamente a ferramentas CLI do ecossistema, como `pytest` ou scripts de sincronização canônicos, nunca para ler/editar arquivos).
+2. **Higiene de Comandos em `ctx_batch_execute`**:
+   - Os comandos shell em `ctx_batch_execute` devem ser leves, atômicos e com escopo de diretório estritamente restrito.
+   - É **proibido** disparar `python -c` inline em lote ou varreduras recursivas irrestritas na raiz do workspace sem filtro de pasta/extensão (evitando estourar o orçamento de tempo do batch).
+3. **Política Fail-Fast & Circuit Breaker de Timeout (Máx. 1 Retry com Troca de Estratégia)**:
+   - Em caso de erro de timeout (`ETIMEDOUT`, `timed out`, `taskkill`) em `ctx_execute` ou `ctx_batch_execute`, o agente tem **tolerância zero para repetir a mesma chamada/runtime**.
+   - É permitido no **máximo 1 retry**, contanto que haja **troca obrigatória de estratégia** (migrar de `python`/`shell` para `language: "javascript"` puro com `fs` nativo, ou dividir o lote em comandos menores/escopo restrito).
+   - Se ocorrer um **2º timeout**, o **Circuit Breaker Fail-Fast** abre imediatamente: o agente deve abortar novas tentativas de spawn, registrar a evidência e acionar o fallback canônico ou reportar o bloqueio em formato Compact Error Reporting (R-020).
+
+### Invariante 19 — Clarificação Estruturada via `ask_questions` (R-027)
+
+- **Contrato de UX e Qualidade do `ask_questions` (CA-03, CA-04, CA-05 / R-027)**:
+  - **CA-03 (Padrão Obrigatório do `description`)**: Toda opção DEVE preencher `description` (1–2 frases) no formato `[Consequência prática / O que faz] + [Trade-off principal ou quando escolher]`. Proibido `options` sem `description` ou que apenas repita o `label`.
+  - **CA-04 (Regra da Opção Recomendada — Default Effect)**: Quando houver melhor prática técnica ou arquitetural clara, posicioná-la como **1ª opção** com sufixo `(Recomendado)` no `label` e justificativa técnica no `description`. **Exceção explícita**: decisões puramente de negócio/produto sem alternativa técnica superior NÃO devem forçar `(Recomendado)`.
+  - **CA-05 (Anti-Strawman & Limites Ergonômicos)**: Entre **2 e 4 alternativas reais, viáveis, mutuamente exclusivas e defensáveis** por pergunta (proibido opções espantalho/strawman ou dummy `"Outro"`), **1 a 4 perguntas por chamada**, `header` ≤ 25 caracteres e `allowFreeformInput: true` por padrão (SSOT: `structured-intake-patterns`).
+
+### Exceção Canônica — Slash Prompts Explícitos (`router_bypass: utility | slash_workflow` — R-037 / R-063)
+
+Quando o usuário invocar explicitamente qualquer Slash Prompt (`.github/prompts/<nome>.prompt.md` com `router_bypass: utility` ou `router_bypass: slash_workflow` no frontmatter — todos os Slash Prompts exceto `/agent-router`), o comando já foi selecionado pelo usuário e possui fluxo determinístico próprio; portanto, o Orquestrador Raiz **NUNCA deve invocar `@agent-router`** na triagem inicial, devendo executar diretamente as instruções/fluxo do `.prompt.md` (ou despachar diretamente para o subagente previsto no próprio `.prompt.md`). Para solicitações em chat livre (ou via `/agent-router`), a passagem inicial por `@agent-router` permanece 100% obrigatória (R-037 / R-063).

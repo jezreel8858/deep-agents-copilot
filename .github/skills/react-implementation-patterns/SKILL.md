@@ -1,9 +1,6 @@
 ---
 name: react-implementation-patterns
-description: >-
-  Padrões de mercado 2025/2026 para implementar features/bugs em React (hooks, TanStack
-  Query + Zustand, TDD red-green-refactor, checklist de PR) — contraparte de execução
-  de react-frontend-patterns.
+description: "Define diretrizes e padrões para padrões de mercado 2025/2026 para implementar features/bugs em React (hooks, TanStack Query + Zustand, TDD red-green-refactor, checklist de PR) — contraparte de execução de react-frontend-patterns. Use quando atuar em implementar feature react, criar componente react, tanstack query zustand. Não use para tarefas fora do escopo de react-implementation-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: quality
 triggers:
@@ -21,6 +18,14 @@ tools: []
 # React Implementation Patterns
 
 > Esta skill cobre o modo **Implementação**. Para o modo **Advisory**, ver [`react-frontend-patterns`](../react-frontend-patterns/SKILL.md).
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `react-implementation-patterns` ou quando outra skill específica cobrir integralmente o escopo.
+
+## Diretrizes e Padrões Canônicos
+
+- Seguir estritamente as regras, invariantes e fluxos descritos nas seções abaixo.
 
 ## Quando Usar
 

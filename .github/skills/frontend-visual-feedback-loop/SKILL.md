@@ -1,11 +1,6 @@
 ---
 name: frontend-visual-feedback-loop
-description: >-
-  Diretrizes e padrões canônicos para executar o Visual Feedback Loop (VFL) em
-  interfaces frontend de qualquer framework (Angular, React, Vue, Svelte) via
-  renderização isolada (Storybook/dev-server), inspeção multimodal multi-viewport
-  (375px/768px/1440px), Árvore de Acessibilidade (AOM) e asserções com Playwright.
-  Não use para testes de lógica pura sem camada visual.
+description: "Define diretrizes e padrões para diretrizes e padrões canônicos para executar o Visual Feedback Loop (VFL) em interfaces frontend de qualquer framework (Angular, React, Vue, Svelte) via renderização isolada (Storybook/dev-server), inspeção multimodal multi-viewport (375px/768px/1440px), Árvore de Acessibilidade (AOM) e asserções com Playwright. Não use para testes de lógica pura sem camada visual. Use quando atuar em feedback visual frontend, inspecionar layout com screenshot, visual feedback loop."
 tier: 2
 category: quality
 triggers:
@@ -25,6 +20,10 @@ tools: []
 ---
 
 # Frontend Visual Feedback Loop
+
+## Quando Usar
+
+- Ativação em cenários de feedback visual frontend, inspecionar layout com screenshot, visual feedback loop.
 
 ## 0) Problema Resolvido & Princípios Fundamentais
 

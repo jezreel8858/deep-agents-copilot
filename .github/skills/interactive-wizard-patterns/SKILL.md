@@ -1,7 +1,6 @@
 ---
 name: interactive-wizard-patterns
-description: >-
-  Padrões para criação de scripts interativos e wizards passo a passo para operações que exigem intervenção humana (HITL), configuração de infraestrutura, credenciais, segredos de CI e migrações manuais de cutover. Use quando a automação 100% não for viável por restrições de permissão ou segurança. Não use para etapas totalmente automatizáveis.
+description: "Define diretrizes e padrões para padrões para criação de scripts interativos e wizards passo a passo para operações que exigem intervenção humana (HITL), configuração de infraestrutura, credenciais, segredos de CI e migrações manuais de cutover. Use quando a automação 100% não for viável por restrições de permissão ou segurança. Não use para etapas totalmente automatizáveis."
 tier: 2
 category: process
 triggers:
@@ -23,6 +22,10 @@ tools: []
 > Base de conhecimento especializada na **criação de scripts interativos e assistentes passo a passo (wizards)** para conduzir desenvolvedores ou operadores por procedimentos manuais, sensíveis ou que requerem intervenção humana (HITL - Human-in-the-Loop).
 
 ---
+
+## Quando Usar
+
+- Ativação em cenários de wizard, setup interativo, passo a passo manual.
 
 ## 0) Problema Resolvido & Princípios Fundamentais
 

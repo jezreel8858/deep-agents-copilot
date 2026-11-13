@@ -1,11 +1,6 @@
 ---
 name: langfuse-observability
-description: >
-  Especialização Langfuse para observabilidade de LLMs/Agents: modelo de dados
-  trace→observations (span/generation/event), prompt management versionado com
-  labels, evaluations/datasets/scores (LLM-as-judge) e integração com coding
-  assistants via CLI/SDK/MCP. Complementa `agent-observability-otel`
-  (convenções OTel GenAI vendor-neutral) com práticas Langfuse-specific (2025/2026).
+description: "Define diretrizes e padrões para especialização Langfuse para observabilidade de LLMs/Agents: modelo de dados trace→observations (span/generation/event), prompt management versionado com labels, evaluations/datasets/scores (LLM-as-judge) e integração com coding assistants via CLI/SDK/MCP. Complementa `agent-observability-otel` (convenções OTel GenAI vendor-neutral) com práticas Langfuse-specific (2025/2026). Use quando atuar em langfuse, prompt versioning, prompt management. Não use para tarefas fora do escopo de langfuse-observability ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: observability
 triggers:
@@ -28,6 +23,10 @@ tools: []
 ---
 
 # Langfuse Observability
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `langfuse-observability` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## 1) Quando Usar / Escopo
 

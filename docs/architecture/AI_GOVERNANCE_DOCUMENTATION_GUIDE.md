@@ -74,8 +74,8 @@ APRENDIZADO ────────────────────┼─�
 - **Estrutura**: Narrativa conceitual, diagramas de contexto/componentes (Mermaid), trade-offs avaliados e referências de mercado/academia.
 - **Exemplos no Projeto**:
   - `docs/architecture/ARCHITECTURE_AND_GOVERNANCE_GUIDE.md`: Especificação mestre arc42 do sistema.
-  - `docs/plan/plano-motor-migracao-agnostica.md`: Racional do pipeline desacoplado baseado em Representação Intermediária (IR).
-  - `docs/plan/agent-profiles-taxonomy.md`: Fundamentação da taxonomia de papéis de agentes baseada em benchmarks de mercado.
+  - `docs/plans/architecture/20260830-090300-plano-motor-migracao-agnostica.md`: Racional do pipeline desacoplado baseado em Representação Intermediária (IR).
+  - `docs/plans/architecture/20260830-090000-agent-profiles-taxonomy.md`: Fundamentação da taxonomia de papéis de agentes baseada em benchmarks de mercado.
 
 ---
 

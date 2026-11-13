@@ -22,7 +22,6 @@
     "reflection-self-critique-patterns"
   ],
   "tools": [
-    "context-mode/ctx_execute",
     "grep_search",
     "file_search",
     "list_dir",
@@ -31,7 +30,6 @@
     "run_subagent",
     "context-mode/ctx_search",
     "context-mode/ctx_batch_execute",
-    "context-mode/ctx_execute_file",
     "context-mode/ctx_index"
   ],
   "security_profile": {

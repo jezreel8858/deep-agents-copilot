@@ -1,9 +1,6 @@
 ---
 name: codegraph-optave-usage
-description: >
-  Uso da lib externa @optave/codegraph (CLI local, zero API keys) como motor único
-  de construção e consulta de grafo de conhecimento de código — build, query,
-  blast radius, ciclos, dead code e CI gate. Substitui scripts legados de build de grafo.
+description: "Define diretrizes e padrões para uso da lib externa @optave/codegraph (CLI local, zero API keys) como motor único de construção e consulta de grafo de conhecimento de código — build, query, blast radius, ciclos, dead code e CI gate. Substitui scripts legados de build de grafo. Use quando atuar em grafo de codigo, code knowledge graph, codegraph. Não use para tarefas fora do escopo de codegraph-optave-usage ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: tooling
 triggers:
@@ -23,6 +20,18 @@ source_docs:
 # codegraph-optave-usage — Motor de grafo de conhecimento de código
 
 Skill genérica para operar `@optave/codegraph` (repo `optave/ops-codegraph-tool`, Apache-2.0) como **motor único** de construção/consulta de grafo de código, via CLI local — sem LLM, sem API key, sem chamada de rede.
+
+## Quando Usar
+
+- Ativação em cenários de grafo de codigo, code knowledge graph, codegraph.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `codegraph-optave-usage` ou quando outra skill específica cobrir integralmente o escopo.
+
+## Diretrizes e Padrões Canônicos
+
+- Seguir estritamente as regras, invariantes e fluxos descritos nas seções abaixo.
 
 ## 1) Objetivo
 

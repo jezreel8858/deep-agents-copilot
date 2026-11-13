@@ -33,3 +33,5 @@ flowchart TD
 - Credenciais SOMENTE por variáveis de ambiente (nunca em prompt, `browser_type`/`browser_fill_form`, log, trace ou commit); `--extension` proibido.
 - `@playwright/mcp` em versão fixa (sem tag flutuante); decisão MCP vs CLI conforme `playwright-mcp/SKILL.md` § 7.3.
 - Roteamento: os routers de domínio (`@angular-router`, `@react-router`) despacham em nível plano e não possuem tools `playwright/*`.
+
+> **Diretórios Canônicos de Persistência R-064 (`docs/plans/<tipo>/`)**: Gate 1 (`plan_type: feature`) em `docs/plans/feature/` (e `docs/plans/requirements/` para requisitos, `docs/plans/architecture/` para arquitetura, `docs/plans/test-strategy/` para estratégia de testes); Gate 2 (`plan_type: implementation`) em `docs/plans/implementation/`. Agentes planejadores/advisors permanecem 100% Read-Only (com `author` preservando o autor intelectual real do plano e proibição de `@tech-solution-architect` materializar docs no `WORKFLOW-BUG-FIX`), delegando a escrita física do `.md` a `@docs-engineer` / `@governance-maintainer` antes da aprovação humana (`status: APPROVED`, `approved: true`, `allowed_files`).

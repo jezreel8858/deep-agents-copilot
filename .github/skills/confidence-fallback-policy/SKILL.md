@@ -1,9 +1,6 @@
 ---
 name: confidence-fallback-policy
-description: >
-  Política de confiança e fallback para decisões de roteamento e execução de agents.
-  Define escala de score (0-1), thresholds de ação, estratégias de escalonamento e
-  exemplos concretos de aplicação por agent.
+description: "Define diretrizes e padrões para política de confiança e fallback para decisões de roteamento e execução de agents. Define escala de score (0-1), thresholds de ação, estratégias de escalonamento e exemplos concretos de aplicação por agent. Use quando atuar em confiança, confianca, fallback. Não use para tarefas fora do escopo de confidence-fallback-policy ou implementação direta de código de negócio não relacionado."
 tier: 1
 category: governance
 triggers:
@@ -24,6 +21,10 @@ tools: []
 ---
 
 # Confidence & Fallback Policy
+
+## Quando Usar
+
+- Ativação em cenários de confiança, confianca, fallback.
 
 ## 0) Problema Resolvido & Princípios Fundamentais
 
@@ -232,3 +233,6 @@ routing_log:
 - [ ] Fallback para `ask_questions` acionado compulsoriamente se score < 0.70.
 - [ ] Proibição absoluta de inferir intenção do usuário no escuro (R-027).
 
+## Referências
+
+- Documentação normativa em `CLAUDE.md` e `.github/copilot-instructions.md`.

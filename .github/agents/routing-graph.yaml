@@ -242,7 +242,7 @@ workflows:
         agent: "<stack>-arch-advisor"
         resolvido_por: "domain-router-stack"
         regra: "R-064"
-        entregavel: "docs/implementation-plans/<AAAAMMDD>-<wf>-<id>.md"
+        entregavel: "docs/plans/implementation/<AAAAMMDD-HHMMSS>-<wf>-<id>.md"
         bloqueia_proxima_etapa: true
         descricao: "Autoria do Plano de Implementacao pelo <stack>-arch-advisor antes de qualquer correcao de codigo (R-064)"
       - etapa: 4
@@ -309,7 +309,7 @@ workflows:
         agent: "<stack>-arch-advisor"
         resolvido_por: "domain-router-stack"
         regra: "R-064"
-        entregavel: "docs/implementation-plans/<AAAAMMDD>-<wf>-<id>.md"
+        entregavel: "docs/plans/implementation/<AAAAMMDD-HHMMSS>-<wf>-<id>.md"
         bloqueia_proxima_etapa: true
         descricao: "Autoria do Plano de Implementacao pelo <stack>-arch-advisor antes de qualquer refatoracao em lote (R-064)"
       - etapa: 5
@@ -411,7 +411,7 @@ workflows:
         agent: "<stack>-arch-advisor"
         resolvido_por: "domain-router-stack"
         regra: "R-064"
-        entregavel: "docs/implementation-plans/<AAAAMMDD>-<wf>-<id>.md"
+        entregavel: "docs/plans/implementation/<AAAAMMDD-HHMMSS>-<wf>-<id>.md"
         bloqueia_proxima_etapa: true
         descricao: "Autoria do Plano de Implementacao pelo <stack>-arch-advisor antes de qualquer codificacao (R-064)"
       - etapa: 6
@@ -467,7 +467,7 @@ workflows:
         agent: "governance-maintainer | agent-auditor"
         resolvido_por: "governance-maintainer"
         regra: "R-064"
-        entregavel: "docs/implementation-plans/<AAAAMMDD>-<wf>-<id>.md"
+        entregavel: "docs/plans/implementation/<AAAAMMDD-HHMMSS>-<wf>-<id>.md"
         bloqueia_proxima_etapa: true
         descricao: "Autoria do Plano de Implementacao tipo governance pelo specialist/auditor antes da execucao em lote (R-064)"
       - etapa: 4
@@ -516,7 +516,7 @@ workflows:
         agent: "<stack>-arch-advisor"
         resolvido_por: "domain-router-stack"
         regra: "R-064"
-        entregavel: "docs/implementation-plans/<AAAAMMDD>-<wf>-<id>.md"
+        entregavel: "docs/plans/implementation/<AAAAMMDD-HHMMSS>-<wf>-<id>.md"
         bloqueia_proxima_etapa: true
         descricao: "Autoria do Plano de Implementacao pelo <stack>-arch-advisor antes de qualquer bump ou adaptacao de codigo (R-064)"
       - etapa: 4
@@ -585,7 +585,7 @@ workflows:
         agent: "<stack>-arch-advisor"
         resolvido_por: "domain-router-stack-destino"
         regra: "R-064"
-        entregavel: "docs/implementation-plans/<AAAAMMDD>-<wf>-<id>.md"
+        entregavel: "docs/plans/implementation/<AAAAMMDD-HHMMSS>-<wf>-<id>.md"
         bloqueia_proxima_etapa: true
         descricao: "Autoria do Plano de Implementacao pelo <stack>-arch-advisor antes de qualquer codemod (R-064)"
       - etapa: 4

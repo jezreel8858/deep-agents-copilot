@@ -1,9 +1,6 @@
 ---
 name: context-mode
-description: >
-  Boas práticas de uso do context-mode MCP em ambientes multi-projeto para reduzir
-  poluição de contexto, preservar memória de sessão e otimizar custo de créditos.
-  Prioriza processamento em sandbox e busca indexada.
+description: "Define diretrizes e padrões para boas práticas de uso do context-mode MCP em ambientes multi-projeto para reduzir poluição de contexto, preservar memória de sessão e otimizar custo de créditos. Prioriza processamento em sandbox e busca indexada. Use quando atuar em ctx, contexto, economizar tokens. Não use para tarefas fora do escopo de context-mode ou implementação direta de código de negócio não relacionado."
 tier: 1
 category: process
 triggers:
@@ -18,18 +15,7 @@ triggers:
   - "analisar classe"
   - "mapear repositorio"
   - "historico da sessao"
-tools:
-  - "context-mode/ctx_search"
-  - "context-mode/ctx_batch_execute"
-  - "context-mode/ctx_execute"
-  - "context-mode/ctx_execute_file"
-  - "context-mode/ctx_index"
-  - "context-mode/ctx_fetch_and_index"
-  - "context-mode/ctx_stats"
-  - "context-mode/ctx_doctor"
-  - "context-mode/ctx_upgrade"
-  - "context-mode/ctx_purge"
-  - "context-mode/ctx_insight"
+tools: ['context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_index', 'context-mode/ctx_fetch_and_index', 'context-mode/ctx_stats', 'context-mode/ctx_doctor', 'context-mode/ctx_upgrade', 'context-mode/ctx_purge', 'context-mode/ctx_insight']
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
@@ -38,6 +24,14 @@ source_docs:
 # context-mode — Operação de alto rendimento
 
 Skill para operar `ctx_*` com mínimo consumo de contexto: coletar em lote, processar em sandbox e responder apenas com sinal útil.
+
+## Quando Usar
+
+- Ativação em cenários de ctx, contexto, economizar tokens.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `context-mode` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## 1) Objetivo
 
@@ -207,35 +201,7 @@ Determinados hosts ou adapters (ex.: variações do OpenCode) convertem internam
 
 ## 7) Playbooks curtos
 
-**Retomada de sessão**
-
-```javascript
-ctx_search({
-  queries: ["summary", "decision", "blocker"],
-  sort: "timeline"
-})
-```
-
-**Coleta + resposta em lote**
-
-```javascript
-ctx_batch_execute({
-  commands: [{ label: "service", command: "rg -n \"class .*Service\" src" }],
-  queries: ["serviços críticos", "pontos de risco"],
-  query_scope: "batch",
-  cwd: "/caminho/raiz/do/repositorio"
-})
-```
-
-**Análise de arquivo grande**
-
-```javascript
-ctx_execute_file({
-  path: "logs/app.log",
-  language: "javascript",
-  code: "const errs=FILE_CONTENT.split('\\n').filter(l=>l.includes('ERROR')); console.log(errs.length);"
-})
-```
+- Playbooks de inspeção de logs/testes (`ctx_execute` / `ctx_execute_file`), documentação externa (`ctx_fetch_and_index` + `ctx_search`) e auditoria em lote (`ctx_batch_execute`) detalhados em [`references/detailed-patterns-and-examples.md`](references/detailed-patterns-and-examples.md).
 
 ## 8) Comandos ctx (atalhos)
 
@@ -255,36 +221,9 @@ Quando conectado a coletores ou dashboards analíticos organizacionais (ex.: Ins
 
 ## 9) Dimensões de Memória: Short-Term vs Long-Term
 
-O `context-mode` gerencia dois tipos distintos de memória com semântica diferente:
-
-| Dimensão | Short-term (sessão) | Long-term (cross-sessão) |
-|---|---|---|
-| **Duração** | Vida da sessão de chat | Persiste entre sessões |
-| **Tipo de informação** | Estado atual, coletas brutas, decisões da sessão | Fatos do projeto, regras de negócio, decisões arquiteturais |
-| **Escopo** | Thread/conversa atual | Projeto, ecossistema ou organização |
-| **Estratégia de atualização** | Sobrescreve a cada sessão | Acumulativa — novas informações enriquecem sem apagar |
-| **Mecanismo de retrieval** | `ctx_search` sem `source` | `ctx_search(source: "projeto-x")` com source declarado |
-| **Permissão de escrita** | Qualquer agent na sessão | Apenas agents com escopo de escrita declarado no catálogo |
-
-**Padrões de uso:**
-
-```javascript
-// Short-term — coleta local da sessão (padrão)
-ctx_search({ queries: ["decisão atual", "estado da tarefa"] })
-
-// Long-term — busca em fonte persistente nomeada
-ctx_search({ queries: ["regra de negócio X"], source: "projeto-alpha" })
-
-// Indexação long-term — requer source explícito
-ctx_index({ path: "docs/context/decisoes-arquiteturais.md", source: "projeto-alpha" })
-```
-
-**Anti-padrões:**
-- ❌ Indexar dados de sessão em fonte persistente sem intenção explícita (polui memória long-term)
-- ❌ Buscar memória long-term sem `source` declarado (retorna mistura ambígua de sessões)
-- ❌ Tratar `ctx_index` sem `source` como memória permanente (comportamento não garantido entre sessões)
-
-> **Memória procedimental** (avançado): capacidade de agents atualizarem seus próprios system prompts com base em feedback acumulado. Consulte a skill [`agent-memory-policy`](./../agent-memory-policy/SKILL.md) (Tier 3 — Experimental) para política completa, guardrails e ciclo de atualização controlada.
+- **Short-Term (Working Memory)**: artefatos indexados via `ctx_index`/`ctx_batch_execute` na sessão ativa.
+- **Long-Term (Cross-Session)**: decisões arquiteturais (`ADR`), planos em `docs/plans/` e regras normativas.
+- Matriz comparativa completa em [`references/detailed-patterns-and-examples.md`](references/detailed-patterns-and-examples.md).
 
 ## 10) Trade-offs Arquiteturais e Limitações Conhecidas
 
@@ -319,3 +258,24 @@ A transição de chamadas diretas de ferramentas (tool-calling declarativo) para
 - `anthropics/claude-code#24327` — risco de o modelo parar/desistir ao interpretar um `deny` de hook como negação do usuário em vez de feedback corrigível: https://github.com/anthropics/claude-code/issues/24327
 - `microsoft/copilot-intellij-feedback#1819` — limitação conhecida: JetBrains Copilot honra apenas `deny`, não reescreve input (`updatedInput`/`modifiedArgs`) como VS Code/Copilot CLI: https://github.com/microsoft/copilot-intellij-feedback/issues/1819
 
+### Política Anti-Timeout, Runtime Preferencial JavaScript (`fs` nativo) e Circuit Breaker Fail-Fast (`ctx_execute` / `ctx_batch_execute`)
+
+1. **Runtime Obrigatório `language: "javascript"` no `ctx_execute` (Anti-Defender/AMSI Hang)**:
+   - No Windows, a invocação de `python.exe` (`language: "python"` ou `python -c`) ou cadeias pesadas de subshells a partir do processo Node.js do servidor MCP `context-mode` sofre interceptação síncrona pelo Windows Defender (`MsMpEng.exe` / Behavior Monitoring / AMSI), causando bloqueios severos de I/O e timeouts (`ETIMEDOUT` / `taskkill /F /T`).
+   - Portanto, `language: "javascript"` (com módulos nativos `fs` e `path` do Node.js) é o **runtime obrigatório** no `ctx_execute` para leitura, inspeção, busca, parsing JSON/texto e modificação em lote de arquivos.
+   - É **terminantemente proibido** invocar `language: "python"`, `python -c` ou subshells aninhados para I/O de arquivos. (A execução de binários Python via `child_process` é restrita exclusivamente a ferramentas CLI do ecossistema, como `pytest` ou scripts de sincronização canônicos, nunca para ler/editar arquivos).
+2. **Higiene de Comandos em `ctx_batch_execute`**:
+   - Os comandos shell em `ctx_batch_execute` devem ser leves, atômicos e com escopo de diretório estritamente restrito.
+   - É **proibido** disparar `python -c` inline em lote ou varreduras recursivas irrestritas na raiz do workspace sem filtro de pasta/extensão (evitando estourar o orçamento de tempo do batch).
+3. **Política Fail-Fast & Circuit Breaker de Timeout (Máx. 1 Retry com Troca de Estratégia)**:
+   - Em caso de erro de timeout (`ETIMEDOUT`, `timed out`, `taskkill`) em `ctx_execute` ou `ctx_batch_execute`, o agente tem **tolerância zero para repetir a mesma chamada/runtime**.
+   - É permitido no **máximo 1 retry**, contanto que haja **troca obrigatória de estratégia** (migrar de `python`/`shell` para `language: "javascript"` puro com `fs` nativo, ou dividir o lote em comandos menores/escopo restrito).
+   - Se ocorrer um **2º timeout**, o **Circuit Breaker Fail-Fast** abre imediatamente: o agente deve abortar novas tentativas de spawn, registrar a evidência e acionar o fallback canônico ou reportar o bloqueio em formato Compact Error Reporting (R-020).
+
+## Checklist de Conformidade
+
+- [ ] Diretrizes, contratos e restrições de escopo de `context-mode` verificados e atendidos.
+
+## Referências
+
+- Detalhamento estendido em `references/` e documentação normativa em `CLAUDE.md`.

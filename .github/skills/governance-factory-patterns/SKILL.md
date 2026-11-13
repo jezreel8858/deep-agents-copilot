@@ -1,17 +1,12 @@
 ---
 name: governance-factory-patterns
-description: >
-  Fluxo canônico "Factory Pattern" para agents que criam/revisam artefatos de
-  governança (agent, skill, prompt, stack) — Decision Tree comum, checklist de
-  qualidade estrutural e template de saída com validações ✅/❌ parametrizável
-  por tipo de artefato ou subsistema de domínio.
-tier: 1
+description: "Define o fluxo canônico 'Factory Pattern' para criar, revisar e manter artefatos de governança (agent, skill, prompt e stack), incluindo Decision Tree, templates SSOT e checklists de qualidade. Use quando criar ou auditar agents, skills, prompts ou stacks. Não use para implementar código de aplicação de negócio ou executar auditoria read-only isolada."
+tier: core
 category: governance
 triggers:
-  - "criar agent"
+  - "criar agente"
   - "criar skill"
   - "criar prompt"
-  - "criar stack"
   - "nova stack"
   - "ecossistema de agentes"
   - "factory pattern"
@@ -26,372 +21,111 @@ tools: []
 
 # Governance Factory Patterns
 
+## Quando Usar
+
+- Ativação em cenários de criar agente, criar skill, criar prompt.
+
 ## 0) Problema Resolvido
 
-Esta skill formaliza o fluxo compartilhado pelos 4 tipos de artefatos e subsistemas de governança criados/revisados por `governance-factory` (**agent**, **skill**, **prompt** e **stack** — ecossistema de domínio completo). Os 3 primeiros unificam a governança atômica (que antes eram `agent-factory`, `skill-factory`, `prompt-factory`), enquanto o tipo `stack` padroniza a criação de novos subsistemas tecnológicos hierárquicos isolados (como Angular, Spring Boot e Spring Reactive), evitando a proliferação desordenada de nós no catálogo central. Sem esta skill, cada `type` reimplementaria o mesmo fluxo com variações e risco de drift (R-015, R-040, R-042).
+Formaliza o fluxo canônico compartilhado pelos 4 tipos de artefatos e subsistemas de governança criados/revisados por `@governance-factory` e mantidos por `@governance-maintainer` (**agent**, **skill**, **prompt** e **stack** — ecossistema de domínio completo), garantindo paridade com os templates SSOT em `.github/agents/templates/`, `.github/prompts/templates/` e `.github/skills/templates/`.
 
-## 1) Decision Tree Canônica (Factory Pattern)
+## 1) Quando Usar vs Quando NÃO Usar
+
+### ✅ Quando Usar
+- Criar ou revisar `.agent.md`, `SKILL.md`, `.prompt.md` ou uma nova `stack` de domínio.
+- Sincronizar contratos estruturais de artefatos com os templates SSOT e regras `R-015`, `R-040`, `R-055`, `R-066` e `R-067`.
+- Avaliar pertinência de importação de skills externas antes da materialização (`R-067`).
+
+### ❌ Quando NÃO Usar
+- Implementar regras de negócio ou código de aplicação (`backend`, `frontend`, `mobile`) — delegar ao developer da stack.
+- Executar auditoria estática/read-only de smells sem criação ou refatoração — usar `governance-audit-patterns` com `@agent-auditor`.
+
+## 2) Diretrizes Operacionais e Decision Tree Canônica (Factory Pattern)
 
 ```text
-Solicitação de criar/revisar/auditar artefato de governança
-    ↓
-Tipo de artefato? → agent | skill | prompt | stack
-    ↓
-[Se tipo = skill E origem = IMPORTAÇÃO EXTERNA — OBRIGATÓRIO, R-067]
-    Executar o Protocolo de Avaliação de Pertinência de Importação de Skills (§3.4)
-    ANTES de qualquer alteração de código/arquivo:
-      ├─ Pertinente, sem duplicidade e sem alternativa melhor → prosseguir normalmente
-      ├─ NÃO pertinente → reportar impacto negativo da importação (§3.4) e PARAR (zero mutação)
-      └─ Conceito útil mas importação literal inadequada → propor solução alternativa (§3.4)
-              e aguardar decisão do usuário antes de prosseguir
-    ↓
-Já existe artefato/ecossistema equivalente? (busca por nome + escopo semântico)
-    ├─ Sim → propor REVISÃO do existente (nunca duplicar)
-    │        [OBRIGATÓRIO - R-055 Systemic Reuse Gate (§3.2)]
-    │        Avaliar Q1 (impacto em peers/irmãos), Q2 (atualização de template) e Q3 (testes no pytest)
-    │        antes de aplicar a alteração, agrupando em lote sistêmico único.
-    └─ Não → prosseguir para CRIAÇÃO
-    ↓
-[Se CRIAÇÃO — OBRIGATÓRIO] Delegar ao @deep-search via run_subagent:
-    Pesquisar na web (quando disponível via Tavily) e internamente sobre
-    as melhores diretrizes, tooling de testes e skills para o artefato/stack
-    ↓
-[Após retorno do @deep-search] Consumir síntese e incorporar diretrizes/skills ao escopo
-    ↓
-Coletar campos obrigatórios via ask_questions (ver `structured-intake-patterns`
-para o padrão de intake, se aplicável)
-    ↓
-Gerar arquivo(s) seguindo template canônico do tipo de artefato ou topologia da stack:
-    ├─ agent  → .github/agents/<name>.agent.md
-    ├─ skill  → .github/skills/<nome>/SKILL.md
-    ├─ prompt → .github/prompts/<verbo>-<objeto>.prompt.md
-    └─ stack  → .github/agents/<camada>/<stack>/ (<stack>-catalog.yaml + <stack>-router + especialistas)
-    ↓
-Se artefato = agent | prompt | router de stack → Selecionar e validar `model:` (§9 desta skill —
-  classificar perfil, escrever candidato, rodar get_errors, confirmar antes de prosseguir)
-    ↓
-Autocrítica grounded, 1 round (§3.1 — gate obrigatório antes de finalizar)
-    ↓
-Executar Checklist de Qualidade Estrutural (§3 desta skill)
-    ↓
-Atualizar catálogo(s) + README na MESMA entrega (R-015 — atomicidade obrigatória):
-    ├─ agent  → catalog.yaml + README.md
-    ├─ skill  → .index.json + README.md
-    ├─ prompt → README.md de prompts
-    └─ stack  → catalog.yaml (apenas router) + routing-graph.yaml + agent-router.agent.md + README.md
-    ↓
-[Se tipo = skill — OBRIGATÓRIO] Pós-criação: Varrer catalog.yaml e .github/prompts/ para identificar
-  artefatos aptos (agents/prompts com domínio/keywords aderentes) -> Aplicar retrofit em lote de
-  source_docs/source_docs_lazy nos artefatos identificados (R-015/R-055, ver §3.3)
-    ↓
-Reportar no Formato de Saída (§4 desta skill)
+Solicitação (create / update / review de agent | skill | prompt | stack)
+  ├─ 1. Gate de Pertinência / Anti-Duplicidade (R-003 / origem = IMPORTAÇÃO EXTERNA -> Gate R-067 §3.4)
+  ├─ 2. Classificação de Tipo e Perfil (Router | Analítico/Read-Only/Advisor | Executor/Developer/Test-Engineer)
+  ├─ 3. Seleção de Template SSOT (.github/{agents,prompts,skills}/templates/)
+  ├─ 4. Aplicação de Progressive Disclosure (R-066: SKILL.md <= 300 linhas; docs > 300 linhas em source_docs_lazy)
+  ├─ 5. Gate de Autocrítica Semântica (1 round grounded) + Portão de Reúso Sistêmico (R-055 Q1/Q2/Q3)
+  └─ 6. Atualização Atômica de Catálogos (R-015 / R-040) + Validação pytest / get_errors
 ```
 
-## 2) Campos Obrigatórios por Tipo de Artefato
+## 3) Padrões Canônicos e Campos Obrigatórios por Tipo de Artefato
 
-| Campo | agent | skill | prompt | stack |
-|---|---|---|---|---|
-| Nome (kebab-case) | ✅ | ✅ | ✅ | ✅ |
-| Descrição objetiva (frontmatter) — ≤ 500 caracteres, ver §10 | ✅ | ✅ | ✅ | ✅ (no sub-catálogo e no router) |
-| Tier/Categoria | — | ✅ | — | — |
-| Model | ✅ | — | ✅ (se aplicável) | ✅ (no router e nos especialistas) |
-| Tools (com `run_subagent` obrigatório — R-042; se `run_in_terminal` presente, `terminal-governance` em `source_docs` é obrigatório — R-049) | ✅ | opcional | opcional | ✅ (em todos os agents) |
-| Triggers (PT-BR) | — | ✅ | — | — |
-| Source_docs | ✅ obrigatório | ✅ | ✅ obrigatório | ✅ |
-| Registro em índice/catálogo | `catalog.yaml` + `README.md` | `.index.json` + `README.md` | `README.md` de prompts | `catalog.yaml` + `routing-graph.yaml` + `agent-router.agent.md` + `README.md` |
+> Detalhamento completo e exemplos estendidos em `references/artifact-specs-and-stack-topology.md`.
 
-## 3) Checklist Genérico de Qualidade Estrutural
+### 3.1) `type: agent` (`.github/agents/templates/{agent-template,operational-agent,research-agent,router-agent}.md`)
+- **Parametrização por Perfil**:
+  - `Router`: triagem, Decision Tree, delegação via `run_subagent` com banner `R-042`, zero edição direta (`R-062`/`R-063`).
+  - `Analítico/Read-Only/Advisor`: diagnóstico e blueprint acionável sem mutar arquivos e sem terceirizar edição manual ao usuário (`R-057`/`R-058`).
+  - `Executor/Developer/Test-Engineer`: mutação em lote (`Plan-Then-Batch` / `R-059`), validação `get_errors` (`R-051`) e teto `≤ 5` turnos (`R-060`).
+- **Frontmatter YAML obrigatório**: `name`, `description` (3ª pessoa, `≤ 400` chars), `model` (conforme matriz §9 e `R-021`), `tools` (menor privilégio + `run_subagent`, estritamente em sintaxe inline `tools: ['...']` — proibido formato de lista YAML multilinha `tools:\n  - ...`), `skills`, `source_docs` (docs `≤ 300` linhas) e `source_docs_lazy` (docs `> 300` linhas, `R-066`).
+- **Seções canônicas obrigatórias**: `Perfil`, `ESCOPO E NÃO-ESCOPO`, `Diretrizes`, `Quando Delegar`, `Checklist`, `Formato de Saída`, `Anti-padrões`, `Combina Com`, `Retorno ao Router (R-042)` e `<execution_protocol>` (`R-059`/`R-060`).
 
-- [ ] Nome em `kebab-case`, sem espaços/maiúsculas.
-- [ ] Campo obrigatório do tipo de artefato presente (ver tabela §2).
-- [ ] Não duplica artefato existente (busca prévia por nome E por escopo semântico).
-- [ ] Se CRIAÇÃO: pesquisa prévia de melhores diretrizes e skills delegada ao `@deep-search` (web/local) e síntese incorporada ao design do artefato/ecossistema.
-- [ ] Catálogo/índice atualizado **na mesma entrega** (R-015 — nunca "depois").
-- [ ] README correspondente atualizado **na mesma entrega**.
-- [ ] Se `agent`: H1 padronizado exclusivamente para `# Perfil Operacional`, sem identificador nominal no título (o nome reside exclusivamente no frontmatter `name:`).
-- [ ] Se `agent`: `run_subagent` presente no frontmatter `tools:` (bloqueante — R-042); seção "Retorno ao Router" declarada; banner "Agente Ativo" presente no Formato de Saída.
-- [ ] Se `agent`: Classificação obrigatória de perfil de ferramentas em `tools:` (Gather-only vs Gather+Process). O agente necessita de (a) agregação computacional entre múltiplos arquivos (percentil, delta, ratio), (b) estrutura derivada de N variável descoberto em runtime (grafo, catálogo inteiro, bounded context map), ou (c) geração/transformação condicional de código-fonte (codegen/mutação)? Se NÃO (Gather-only), declare exclusivamente `context-mode/ctx_batch_execute` (com `ctx_search` e `ctx_index`), OMITINDO `context-mode/ctx_execute` e `context-mode/ctx_execute_file`. Se SIM (Gather+Process), declare as ferramentas de execução completas.
-- [ ] Se `agent`/`prompt`: `source_docs` presente no frontmatter apontando para as skills/regras que são DEPENDÊNCIA FUNCIONAL REAL do agent (não apenas afinidade temática) — reutilizar o Gate de Autocrítica §3.1 para validar isso.
-- [ ] Se `run_in_terminal` for declarado em `tools:` (agent, prompt ou especialista de stack): inclusão COMPULSÓRIA de `.github/skills/terminal-governance/SKILL.md` em `source_docs:` (ou na seção `skills:` do sub-catálogo local da stack) para assegurar governança de terminal (R-049).
-- [ ] Se `skill`: `tier`, `category`, `triggers` em PT-BR presentes; `source_docs` aponta para arquivos reais (não inventados).
-- [ ] Se `prompt`: nomenclatura `.prompt.md`, frontmatter mínimo (`description`, `model` quando aplicável), separação de responsabilidade clara com `.instructions.md` (não duplicar regra já coberta por adapter).
-- [ ] Se `stack`: diretório isolado criado em `.github/agents/<camada>/<stack>/` contendo `<stack>-catalog.yaml`, `<stack>-router.agent.md` e pacote canônico de especialistas (.agent.md) — ver §11.
-- [ ] Se `stack`: `<stack>-router.agent.md` implementa R-042, banner de visibilidade de fluxo, e consulta ao `@test-strategy` (Fluxo 2 TDD).
-- [ ] [se stack]: sincronização atômica em 4 arquivos globais (`catalog.yaml` [apenas o router], `routing-graph.yaml`, `agent-router.agent.md`, `README.md`).
-- [ ] [se revisão / R-055]: Portão de Reúso Sistêmico avaliado (Q1: peers análogos, Q2: template correspondente, Q3: teste determinístico).
-- [ ] Se `agent`/`prompt`/`stack`: `model:` é string única (nunca array), Title Case oficial (nunca kebab-case), e validado via `get_errors` sem `Unknown model` (§9).
-- [ ] `description` do frontmatter ≤ 500 caracteres (alvo ≤ 400), 1 parágrafo, sem RF-ID/RNF-ID/changelog embutido (§10).
+### 3.2) `type: prompt` (`.github/prompts/templates/prompt-template.md`)
+- **Frontmatter YAML obrigatório**: `name`, `description`, `agent`, `model`, `tools` (estritamente inline `tools: ['...']`, proibido `tools:\n  - ...`), `argument-hint`, `source_docs`, `source_docs_lazy`.
+- **Seções obrigatórias**: `## 🎯 Invocação e Variáveis Nativas` (`${file}`, `${selection}`, `${workspaceFolder}`), `## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO`, `## 📋 Fluxo de Execução Passo a Passo`, `## ✅ Checklist Antes de Apresentar`, `## 📊 Formato de Saída` e `## ⚙️ Protocolo de Execução Obrigatório` (`<execution_protocol>` com `R-059`/`R-060`).
+
+### 3.3) `type: skill` (`.github/skills/templates/skill-template.md`)
+- **Frontmatter YAML obrigatório**: `name` e `description` em 3ª pessoa com gatilhos explícitos (`Fornece/Define... Use quando... Não use para...`, `≤ 400` chars), `tools` (estritamente em sintaxe inline `tools: ['...']` ou `tools: []` — proibido formato multilinha `tools:\n  - ...`), além de metadados de proveniência quando adaptada (`R-067`).
+- **Seções obrigatórias**: `## Quando Usar`, `## Quando NÃO Usar`, `## Diretrizes` / `## Padrões` (com exemplos contrastantes `✅ BOM` vs `❌ RUIM`), `## Checklist` e `## Referências`.
+- **Progressive Disclosure (`R-066`)**: teto estrito de `≤ 300 linhas` no `SKILL.md` principal, extraindo tabelas/catálogos/exemplos extensos para `references/`.
+
+### 3.6) Enforcement de Agents de Planejamento (R-064 / CA-04 — mandatório)
+
+Todo agent criado ou revisado que atue em planejamento, arquitetura (`*-arch-advisor`, `tech-solution-architect`), estratégia de testes (`test-strategy`), triagem (`bug-triage`) ou requisitos (`requirements-analyst`) DEVE: (a) manter perfil **100% Read-Only**; (b) vincular-se ao template de plano da sua skill com frontmatter R-064; (c) apontar para `docs/plans/<tipo>/`; (d) declarar handoff de materialização física `.md` para `@docs-engineer` (ou `@governance-maintainer`). Detalhes em `references/artifact-specs-and-stack-topology.md` §2.1.
+
+## 4) Checklist de Qualidade Estrutural e Gates Obrigatórios
 
 ### 3.1) Gate de Autocrítica Semântica (grounded, 1 round — obrigatório)
-
-> Fecha o gap que a checklist estrutural acima **não cobre**: coerência de *conteúdo*, não de *forma*. Baseado no padrão single-shot de [`reflection-self-critique-patterns/SKILL.md`](../reflection-self-critique-patterns/SKILL.md) §2 — aplicado aqui porque os 3 factory agents **geram artefato revisável** (diferente de um Retriever decidindo parar/continuar uma chamada externa, que é anti-padrão de uso desta mesma skill).
-
-Antes de finalizar o conteúdo (antes do Checklist §3), responder objetivamente, com evidência (não opinião):
-
-1. **Toda referência cruzada a outra skill/agent no conteúdo gerado é uma dependência FUNCIONAL real, ou apenas um rótulo semântico?** (ex.: registrar um agent como "consumidor" de uma skill exige que o mecanismo do agent dependa daquela skill — não basta o tema "parecer" relacionado).
-2. **O escopo declarado da skill/agent sendo referenciado bate com o uso real proposto?** Reler a `description`/§0 do artefato referenciado e confirmar, não assumir pelo nome.
-3. **Esta mudança introduz acoplamento novo entre 2 artefatos que antes eram independentes?** Se sim, esse acoplamento é necessário ou é conveniência de redação?
-
-Se qualquer resposta indicar inconsistência: corrigir o conteúdo (remover referência indevida, ajustar redação) **antes** de prosseguir para o Checklist §3 — máximo 1 round de correção automática (alinhado a R-011/regra "Sem Loops"); se ainda inconsistente após 1 round, reportar como bloqueante (R-020) e aguardar orientação.
+Revisar o artefato gerado contra escopo negativo, ausência de escopo fantasma e paridade com o template SSOT antes de persistir.
 
 ### 3.2) Portão de Reúso e Generalização Sistêmica (R-055 / Anti-Silo Fix — obrigatório em revisões)
-
-Toda revisão de agent, prompt ou skill DEVE obrigatoriamente passar pelo crivo do *Systemic Reuse Gate* antes de aplicar qualquer alteração, eliminando o anti-padrão de correções em silo (*one-off fixes*):
-
-1. **Q1 (Impacto Horizontal / Peers)**: *Esta melhoria ou correção se aplica a outros artefatos do mesmo perfil, camada ou família (ex.: outros routers, outros testers, outros advisors)?* Se sim, expandir compulsoriamente o lote de alteração para cobrir todos os artefatos análogos na mesma entrega (R-046).
-2. **Q2 (Prevenção Futura / Templates)**: *O template canônico em `templates/` (`router-agent.md`, `operational-agent.md`, etc.) reflete essa nova regra?* Se não, atualizar o template correspondente na mesma entrega para que futuros artefatos gerados pelo `@governance-factory` já nasçam em conformidade.
-3. **Q3 (Blindagem por Teste / Quality Gate)**: *A suíte determinística em `tests/governance_audit/` já valida essa regra?* Se não, criar asserção no pytest para impedir regressões futuras.
+Responder obrigatoriamente antes de concluir:
+- **Q1 (Artefatos Irmãos / Peers)**: outros agents/skills do mesmo perfil possuem a mesma lacuna?
+- **Q2 (Template Canônico / Herança)**: deve ser propagado para `.github/{agents,prompts,skills}/templates/` ou `required_source_docs_rules.json`?
+- **Q3 (Enforcement Determinístico)**: requer teste automatizado em `tests/governance_audit/`?
 
 ### 3.3) Retrofit e Descoberta de Consumidores Pós-Criação de Skill (obrigatório)
-
-Toda finalização de CRIAÇÃO de uma nova skill DEVE compulsoriamente mapear e vincular os agents e prompts aptos no mesmo ciclo de entrega, eliminando o anti-padrão de skills "órfãs" sem consumidores declarados:
-
-1. **Varredura**: Varrer `catalog.yaml` (agents) e `.github/prompts/` por aderência temática — domínio, `keywords` e descrição semanticamente correlatos ao propósito da nova skill.
-2. **Identificação**: Selecionar os agents e prompts aptos ao consumo (sobreposição de domínio/escopo funcional).
-3. **Retrofit em lote**: Aplicar imediatamente a inclusão da nova skill em `source_docs` (prompts e agents sem Progressive Disclosure) ou `source_docs_lazy` (agents com R-066 aplicado) dos artefatos identificados, na MESMA entrega (R-015/R-055).
+Mapear agents consumidores em `.github/agents/` e registrar a skill em `source_docs:` (se `≤ 300` linhas) ou `source_docs_lazy:` (se `> 300` linhas, `R-066`) e em `.github/skills/.index.json`.
 
 ### 3.4) Protocolo de Avaliação de Pertinência de Importação de Skills (Skill Import Viability & Solution Alternative Gate — R-067, obrigatório em toda importação externa)
+Antes de importar ou adaptar qualquer skill externa (URL, repositório GitHub, marketplace), executar obrigatoriamente os **4 critérios de avaliação**:
+1. **Critério de Pertinência**: A skill resolve problema real das stacks do repositório ou introduz peso morto?
+2. **Critério de Duplicidade**: Já existe skill em `.github/skills/` (`.index.json`) com escopo equivalente ou sobreposto (`R-003`)?
+3. **Critério de Aderência Estrutural**: O conteúdo pode ser adaptado ao padrão N1/N2/N3 (frontmatter, Progressive Disclosure `≤ 300` linhas, `tier`/`category`/`triggers` em PT-BR)?
+4. **Critério de Guardrails**: Compatível com `R-031`, `R-038` e `R-044`?
+- **Desfecho**: (a) Aprovada com adaptação + Proveniência (`adapted_from`, `source_url`, `source_license`, `adaptation_notes`); (b) Rejeitada com reporte de impacto negativo e proposta obrigatória de **solução alternativa**; (c) Inconclusiva → consultar usuário via `ask_questions`.
 
-Toda solicitação de importação de skill externa (catálogo/repositório de terceiros) DEVE compulsoriamente passar por esta avaliação ANTES de qualquer criação/alteração de arquivo:
+### 3.5) Checklist de Genericidade (R-038) e Anonimização (R-044)
+- [ ] Zero caminhos locais de máquina, nomes de projetos reais, endpoints internos ou IDs de demandas (`R-038` / `R-044`).
+- [ ] Sincronização atômica (`R-015` / `R-040`): `catalog.yaml`, `routing-graph.yaml`, `agent-router.agent.md`, `evals/casos-roteamento.yaml`, `.index.json`, `copilot-instructions.md`, `CLAUDE.md`, `README.md` e `CHANGELOG.md`.
 
-1. **Critério de Pertinência**: A skill externa atende a um domínio/escopo real e não-coberto deste repositório de governança?
-2. **Critério de Duplicidade/Concorrência**: Já existe skill catalogada (`.github/skills/.index.json`) com escopo equivalente ou sobreposto? (busca por nome E por escopo semântico, análoga a R-003).
-3. **Critério de Aderência Estrutural**: O conteúdo pode ser adaptado ao padrão N1/N2/N3 (frontmatter, Progressive Disclosure, `tier`/`category`/`triggers` em PT-BR) sem violar `governance-factory-patterns`?
-4. **Critério de Guardrails**: O conteúdo é compatível com R-031 (Plano Auto-Implementável), R-038 (Genericidade Obrigatória) e demais regras normativas vigentes (sem instrução de autonomia indevida, sem conteúdo específico de projeto)?
+## 5) Formato de Saída — Bloco de Validações ✅/❌ (parametrizável)
 
-**Resultado da avaliação:**
+- ✅ Template SSOT respeitado (`agent-template.md` / `prompt-template.md` / `skill-template.md`).
+- ✅ Progressive Disclosure (`R-066`): `SKILL.md ≤ 300 linhas` e `source_docs` vs `source_docs_lazy` sincronizados.
+- ✅ Atualização Atômica (`R-015` / `R-040`) e Portão `R-055` (Q1/Q2/Q3) validados.
+- ❌ Anti-padrões bloqueados: criar artefato sem consultar `.index.json`/`catalog.yaml`, omitir `Non-Scope`, exceder 300 linhas em `SKILL.md` ou fixar modelo Opus permanentemente sem exceção formal (`R-021`).
 
-| Resultado | Ação Obrigatória |
-|---|---|
-| ✅ Pertinente, sem duplicidade, aderente | Prosseguir normalmente para a Decision Tree de CRIAÇÃO (§1), incluindo pesquisa via `@deep-search` para validar paridade de mercado. |
-| ❌ NÃO pertinente | PARAR — nenhuma alteração de arquivo. Reportar formalmente ao usuário o **impacto negativo específico** de importá-la (ex.: poluição de contexto/Progressive Disclosure, quebra de fronteira de responsabilidade com skill(s) existente(s), duplicidade conceitual, riscos de segurança/licenciamento, concessão de autonomia indevida) e aguardar nova orientação via `ask_questions`. |
-| 🔁 Conceito útil, importação literal inadequada | PARAR a importação literal. Propor **solução alternativa concreta** (assimilação seletiva de conceitos via retrofit em skill já existente — ver §3.3 —, adaptação de formato/escopo, ou modularização sem dependência de fonte externa) e aguardar decisão do usuário via `ask_questions` antes de materializar qualquer arquivo. |
+## 6) Seleção de Modelo (`model:` — R-021), `description` e Topologia de Stacks (`type: stack`)
 
-Catalogação da violação em `.github/skills/governance-audit-patterns/SKILL.md` § 2.33 (Smell — Importação de Skill Externa sem Avaliação de Pertinência).
+- **Classificação de Perfil (`model:` — R-021)**:
+  - `"Gemini 3.8 Flash"`: Perfil Procedural / Operacional / SLM de alta velocidade (routers, executores leves).
+  - `"Claude Sonnet 5.5"` / `"Gemini 4 Argon"`: Perfil Decompositivo / Deliberativo (arquitetura, `*-developer`, `*-test-engineer`).
+  - Proibido fixar tier máximo (`Claude Opus`) permanentemente sem `model_exception_reason:` formalizado (`R-021`). Validar disponibilidade real na IDE (VS Code vs JetBrains).
+- **Tamanho e Conteúdo da `description`**:
+  - `agent` e `skill`: `≤ 400` caracteres em 3ª pessoa (`Fornece/Define... Use quando... Não use para...`).
+  - `prompt`: `≤ 200` caracteres em 3ª pessoa.
+- **Topologia para Novas Stacks (`type: stack`)**:
+  - Isolamento em `.github/agents/<categoria>/<stack>/`, sub-catálogo local `<stack>-catalog.yaml`, supervisor `<stack>-router.agent.md`, pacote canônico `3+1` (`router`, `arch-advisor`, `developer`, `test-engineer`) e Quádrupla Sincronização Global (`R-015`). Ver detalhes completos em `references/artifact-specs-and-stack-topology.md`.
 
-### 3.5) Checklist de Genericidade (R-038)
+## 7) Referências e Documentação Conexa
 
-**ANTES de submeter arquivo novo em `.github/` (agents, skills, prompts, copilot-instructions):**
-
-- [ ] Substitua mentalmente todos os nomes de projeto por `[PROJETO]` — o texto faz sentido?
-- [ ] Substitua todas as tecnologias/frameworks por `[TECH]` — o texto ainda é válido?
-- [ ] Nenhuma referência a: domínio de negócio, linguagem de programação específica, framework exclusivo.
-- [ ] Se há customização de tech/domínio, está em `.github/instructions/*.instructions.md` (adapter)?
-- [ ] Se há lista de exemplos concretos, apontam para `.github/instructions/README.md` e nunca duplicam?
-
-**Teste rápido**: Seu documento continua útil para um projeto completamente diferente (ex: Go backend, React frontend)?
-- ✅ Sim? → Pode ir para `.github/` (global)
-- ❌ Não? → Deve ir para `.github/instructions/<adapter>.instructions.md` (adapter)
-
-### 3.6) Checklist de Anonimização de Evidência Real (R-044)
-
-**ANTES de persistir qualquer changelog, seção de validação ou exemplo derivado de análise de repositório real** (aplica-se sobretudo a agents analíticos: `codegraph-engine`, `business-rules-extractor`, `context-builder`, `project-scanner`):
-
-- [ ] Nomes de repositório/projeto genericizados (`[PROJETO-A]`, `[PROJETO-B]`, ...)?
-- [ ] Nomes de classe/método/variável reais trocados por equivalentes de exemplo (`ServicoExemploX`, `operacaoExemploX`)?
-- [ ] Pacotes/namespaces/domínios reais (`com.empresa.*`, URLs reais) trocados por `com.exemplo.*`/`http://contrato.exemplo.com/...`?
-- [ ] Caminhos absolutos de sistema de arquivos (ex.: `[DRIVE]:\[USUARIO]\...`, `[DRIVE]:\[WORKSPACE]\...`, `/[HOME]/[USUARIO]/...`) trocados por `<workspace>/[PROJETO-X]` ou removidos?
-- [ ] Nome de empresa/ecossistema real trocado por `exemplo`/`[ECOSSISTEMA]`?
-- [ ] Métricas numéricas agregadas (contagem de nós, arestas, órfãos, cobertura %) mantidas reais?
-- [ ] Evidência efêmera mantida apenas no chat e NUNCA gravada em arquivo commitável de governança compartilhada?
-
-**Teste objetivo**: Um terceiro lendo o arquivo commitado NÃO deve conseguir inferir qual projeto/empresa foi analisado.
-
-## 4) Formato de Saída — Bloco de Validações ✅/❌ (parametrizável)
-
-```markdown
-Arquivo criado/alterado: `.github/<tipo>/<nome>.<extensao>` (ou pasta `.github/agents/<camada>/<stack>/`)
-
-Validações:
-- Nome kebab-case: ✅/❌
-- Campo obrigatório do tipo presente: ✅/❌
-- Não duplica artefato existente: ✅/❌
-- [se criação] Pesquisa prévia via @deep-search executada e incorporada: ✅/❌
-- [se revisão] Portão de Reúso Sistêmico avaliado (R-055 / Q1-Q2-Q3): ✅/❌
-- Catálogo/índice atualizado atomicamente (R-015): ✅/❌
-- README atualizado atomicamente: ✅/❌
-- [se agent] run_subagent presente (R-042): ✅/❌
-- [se agent] Seção "Retorno ao Router" presente: ✅/❌
-- [se agent/prompt] source_docs presente e funcionalmente justificado: ✅/❌
-- [se tools contém run_in_terminal] terminal-governance em source_docs/skills (R-049): ✅/❌
-- [se skill] tier/category/triggers presentes: ✅/❌
-- [se agent/prompt/stack] model: string única, Title Case oficial, validado via get_errors (§9): ✅/❌
-- [se stack] Sub-catálogo local e supervisor configurados (§11): ✅/❌
-- [se stack] Quádrupla sincronização global executada (catalog + routing-graph + agent-router + README): ✅/❌
-- [se skill IMPORTADA de fonte externa] Gate de Viabilidade de Importação executado (R-067 — pertinente/não pertinente/solução alternativa proposta): ✅/❌/N/A
-- description do frontmatter ≤ 500 caracteres, sem changelog/RF-ID embutido (§10): ✅/❌
-
-Arquivos atualizados:
-- <lista de catálogo/README/índice tocados>
-
-Resumo: <1-2 linhas do que foi criado/revisado e por quê>
-```
-
-## 5) Regra de Ouro: Atualização Atômica (R-015)
-
-Nenhuma criação/revisão de artefato de governança é considerada completa sem a atualização do catálogo/índice correspondente **na mesma entrega**. Isso é comum aos 4 tipos de artefato e não deve ser tratado como etapa opcional/posterior — um artefato criado sem registro no catálogo é invisível para o `agent-router` e para descoberta progressiva (`@agent list`, `@skill list`). Para novas stacks (`type: stack`), a atomicidade é quádrupla: catálogo central (apenas router), grafo de roteamento, agent-router e README.
-
-## 6) Anti-padrões
-
-- ❌ Criar novo agent, prompt, skill ou stack sem delegar previamente a pesquisa de melhores diretrizes e skills ao `@deep-search` (web quando disponível / repositório).
-- ❌ Descartar ou ignorar os achados retornados pelo `@deep-search` ao gerar o artefato ou ecossistema.
-- ❌ Criar artefato e "esquecer" de atualizar catálogo/README na mesma entrega (viola R-015).
-- ❌ Criar especialistas de uma nova stack espalhados na raiz `.github/agents/` em vez de isolados em pasta dedicada com sub-catálogo (causa explosão de nós no catálogo central).
-- ❌ Duplicar artefato existente por não ter buscado por escopo semântico (só buscar por nome exato é insuficiente).
-- ❌ Agent criado sem `run_subagent` no frontmatter (estruturalmente incapaz de cumprir R-042).
-- ❌ Declarar a ferramenta `run_in_terminal` em `tools:` de agent, prompt ou especialista de stack sem vincular compulsoriamente `.github/skills/terminal-governance/SKILL.md` em `source_docs` ou `skills:` (viola R-049).
-- ❌ Skill criada sem `triggers` em PT-BR ou com `source_docs` apontando para arquivo inexistente.
-- ❌ Reinventar o fluxo de Decision Tree em vez de referenciar esta skill — risco de drift entre os 4 `type` (agent/skill/prompt/stack) do `governance-factory`.
-- ❌ Registrar referência cruzada a outra skill/agent (ex.: "consumidor de X") sem confirmar dependência funcional real — pular o gate §3.1 e validar só a estrutura (achado real: `deep-search` registrado como consumidor de `reflection-self-critique-patterns` sem uso funcional).
-- ❌ Definir `model:` como array ou como slug kebab-case sem rodar `get_errors` (§9) — achado real: 15+ agents/prompts com `Unknown model` por usar `["a","b"]` ou `claude-haiku-4.5` em vez do display name oficial.
-- ❌ `description` do frontmatter virar resumo de changelog/RF-ID (§10) — achado real: `codegraph-engine` v2.1.0 com description de +1300 caracteres misturando função do agent com histórico de correções.
-
-- ❌ Importar skill externa (ou materializar qualquer arquivo decorrente) sem executar previamente o Protocolo de Avaliação de Pertinência de Importação de Skills (§3.4 / R-067) — omitir o relato de impacto negativo quando não pertinente, ou deixar de propor solução alternativa quando o conceito é útil mas a importação literal é inadequada.
-
-## 7) Consumidores Mapeados
-
-- `governance-factory` — único consumidor; mantém especificidade por `type` (templates `operational-agent.md`, `research-agent.md` e `agent-template.md` para `type: agent`, template `skill-template.md` para `type: skill`, template `prompt-template.md` para `type: prompt`, e topologia hierárquica §11 para `type: stack`), referencia esta skill para o fluxo genérico e checklist comum a todos os tipos.
-- **Futuro:** qualquer novo tipo de artefato de governança (ex.: `instructions-factory`, se vier a existir) herda o padrão sem reinventar o fluxo.
-
-## 8) Referências
-
-- `CLAUDE.md` — R-015 (atualização atômica de catálogo).
-- `.github/copilot-instructions.md` — R-042 (tooling mínimo, `run_subagent` bloqueante).
-- `.github/skills/agent-contracts/SKILL.md` §8-9 — baseline de formato de saída e tooling mínimo por perfil.
-- `.github/skills/reflection-self-critique-patterns/SKILL.md` — padrão de autocrítica grounded 1-round usado no gate §3.1.
-- `.github/skills/governance-audit-patterns/SKILL.md` — taxonomia de smells usada como referência de coerência semântica no gate §3.1 (auditoria pós-hoc equivalente feita por `agent-auditor`).
-- `CLAUDE.md` — R-067 (Protocolo de Avaliação de Pertinência de Importação de Skills).
-- GitHub Docs — [Supported AI models in GitHub Copilot](https://docs.github.com/copilot/reference/ai-models/supported-models) — fonte oficial de nomenclatura de modelo, usada em §9.
-
-## 9) Seleção e Validação de Modelo (`model:` — obrigatório para `agent`/`prompt`)
-
-> Aplica-se quando `governance-factory` cria `type: agent` ou `type: prompt` (skills não têm campo `model:` — ver tabela §2). Fecha 2 gaps reais encontrados em auditoria (2026-09-01): (a) 15+ artefatos usavam array `["a","b"]` — campo não suporta lista, sempre falha; (b) slugs kebab-case (`claude-haiku-4.5`) não são reconhecidos pelo validador do IDE — o nome correto é o **display name oficial** (Title Case).
-
-### 9.1) Classificação de Perfil (escolha do modelo — antes de qualquer validação técnica)
-
-A governança do repositório adota dois paradigmas fundamentais para a atribuição de modelos:
-
-| Paradigma | Perfil / Casos de Uso | Modelo |
-|---|---|---|
-| **Prompt Procedural** (SLM / Alta Velocidade) | Execuções determinísticas, diretas e algorítmicas, sem planejamento abstrato ou análise deliberativa aberta (scanners, templates, geradores, roteadores de stack, implementadores TDD, fixers, test-writers, enforcers). **Escolha padrão em toda a base.** | **`"Gemini 3.8 Flash"`** |
-| **Prompt Decompositivo / Raciocínio Guiado** (Pensamento Profundo) | Análises deliberativas, orquestração central, exploração de múltiplos caminhos de decisão, trade-offs e avaliação crítica de riscos antes da resposta final (`agent-router`, `refactor-planner`, `requirements-analyst`, `deep-search`, especialistas advisor de arquitetura). | **`"Claude Sonnet 5.5"`** |
-| **Raciocínio Crítico Avançado / Diagnóstico Profundo** (High-Complexity Thinking) | Arquitetura técnica complexa, Technical Blueprint formal, análise de causa raiz profunda e investigação minuciosa de bugs críticos (`tech-solution-architect`, `debugger`). | **`"Claude Opus 5.5"`** |
-
-**Regra de ouro (redução de créditos):** nunca escalar para `"Claude Sonnet 5.5"` sem justificativa objetiva de raciocínio profundo, orquestração ou arquitetura complexa — um agent operacional ou procedural em Sonnet é desperdício de créditos sem ganho de qualidade.
-
-### 9.2) Validação de Disponibilidade Real (obrigatória — antes de finalizar o artefato)
-
-O valor de `model:` deve ser a **string exata do display name oficial** (Title Case) da [tabela oficial](https://docs.github.com/copilot/reference/ai-models/supported-models) — nunca kebab-case, nunca slug de API.
-
-**Protocolo (nesta ordem, sem pular etapa):**
-1. Escrever o candidato (Title Case oficial, ex.: `"Gemini 3.8 Flash"`) no frontmatter do arquivo já criado/editado.
-2. Chamar `get_errors` no arquivo.
-3. Se aparecer `Unknown model: '<valor>'` → modelo não reconhecido **neste ambiente real** (VS Code ou JetBrains) — não prosseguir com esse valor; tentar o próximo candidato do mesmo tier (ex.: se `"Gemini 3.8 Flash"` falhar, considerar `"Claude Sonnet 4.6"` como fallback temporário) e repetir o passo 2.
-4. Se `get_errors` não reportar erro de modelo → validado, prosseguir para o restante do checklist (§3).
-5. Se 2 candidatos do mesmo tier falharem e não houver certeza de qual string funciona, perguntar ao usuário via `ask_questions`: *"Qual modelo aparece disponível no seletor do Copilot Chat (VS Code) ou do plugin Copilot/AI Assistant (JetBrains) para o tier <Haiku|Sonnet|Opus>?"* com opções pré-preenchidas da tabela oficial + campo aberto — nunca adivinhar variações às cegas indefinidamente.
-
-### 9.3) VS Code vs JetBrains — Sem Paridade Garantida
-
-A tabela oficial declara disponibilidade por superfície (colunas "Visual Studio Code" vs "JetBrains IDEs" vs "Copilot CLI" etc.) — nem todo modelo tem paridade entre as duas. `get_errors` reflete o **ambiente real da sessão atual** e é sempre a fonte de verdade — a tabela estática pode estar desatualizada ou o modelo pode estar indisponível pelo plano/tier de Copilot do usuário (Free vs Pro vs Business/Enterprise), mesmo que a tabela o liste.
-
-### 9.4) Nunca Fazer (Anti-padrões de §9)
-
-- ❌ Usar array `["a","b"]` no campo `model:` — não suportado; sempre string única.
-- ❌ Usar slug kebab-case (`claude-haiku-4.5`, `gpt-5.3-codex`) — usar o display name oficial (Title Case).
-- ❌ Finalizar o artefato sem rodar `get_errors` para confirmar que o modelo é reconhecido neste ambiente.
-- ❌ Escalar para tier mais caro (Sonnet/Opus) quando Haiku atende ao perfil real da tarefa (§9.1) — desperdício de créditos.
-- ❌ Perguntar ao usuário (§9.2 passo 5) antes de tentar a validação automática via `get_errors` — pergunta é último recurso, não primeiro passo.
-
-## 10) Tamanho e Conteúdo da `description` (Frontmatter — obrigatório para `agent`, `skill`, `prompt`)
-
-> Fecha gap real (2026-09-01): `codegraph-engine.agent.md` acumulou uma `description` de +1300 caracteres em bloco YAML multi-linha (`description: >`), misturando o que o agent faz com changelog de correções ("RF-021 consolidação de motor", "bug corrigido nesta rodada", validação 9/9, histórico de versões). Isso é *anti-padrão* — `description` é metadado de **descoberta** (usado por `@agent search`, `catalog.yaml`, roteamento), não documentação de mudança.
-
-### 10.1) Regra de Ouro (Tamanho)
-
-- **Alvo: ≤ 400 caracteres. Teto rígido: 500 caracteres.** Sempre 1 parágrafo contínuo — sem quebra de linha decorativa nem lista.
-- **2-3 frases, no máximo.** Se precisar de uma 4ª frase para explicar o agent, o conteúdo pertence ao corpo (`## Objetivo`), não ao frontmatter.
-- Medir com contagem de caracteres do valor de `description` (sem contar a chave `description:`) antes de finalizar — não estimar de cabeça.
-
-### 10.2) O Que Entra (conteúdo permitido)
-
-1. **O quê** o artefato faz (1 frase, verbo de ação).
-2. **Quando/para quem** é o ponto de entrada certo (1 frase — diferenciador vs. artefato vizinho, se houver confusão possível).
-3. Opcionalmente, 1 restrição crítica de escopo (ex.: "read-only", "nunca implementa código").
-
-### 10.3) O Que NÃO Entra (mover para o corpo do artefato)
-
-| Proibido na `description` | Onde vai de verdade |
-|---|---|
-| Lista de IDs de requisito (RF-00X, RNF-00X) | `## Objetivo` ou seção dedicada do corpo |
-| Changelog / "corrigido nesta rodada" / histórico de versão | `version:` no frontmatter (já existe para isso) + corpo |
-| Resultado de validação/gate ("9/9 ✅", "validado em produção") | Seção de critérios objetivos do corpo |
-| Detalhe de motor/algoritmo interno (ex.: nome de lib, subprocess) | Seção técnica do corpo (ex.: "Estrutura Interna") |
-| Justificativa extensa de decisão de design | Corpo, com link para REQ/ADR se existir |
-| Exemplos de uso, tabelas, listas com bullets | Corpo |
-
-### 10.4) Exemplo Real (antes/depois — `codegraph-engine`)
-
-**❌ Antes (anti-padrão, ~1300 caracteres, 6+ frases, changelog embutido):** descrição misturava função do agent com RF-001..RF-022, RNF-008..RNF-013, "já removidos", "validado em 4 rodadas reais", regras de motor primário/fallback em detalhe.
-
-**✅ Depois (~350 caracteres, 3 frases):**
-```yaml
-description: >-
-  Constrói e consulta o grafo de conhecimento de código-fonte (imports, chamadas,
-  blast radius, acoplamento, ciclos), cross-projeto e puramente determinístico —
-  nunca invoca LLM. Motor único: pattern-matching via regex (TypeScript + Java),
-  100% Node.js built-ins. FASE obrigatória de `/add-project-context`; grafo
-  sempre indexado via ctx_index.
-```
-
-### 10.5) Checklist de Conformidade
-
-- [ ] `description` ≤ 500 caracteres (alvo ≤ 400) — contado, não estimado.
-- [ ] No máximo 3 frases, 1 parágrafo, sem lista/tabela embutida.
-- [ ] Nenhum ID de requisito (RF-/RNF-), changelog ou "corrigido nesta rodada" no valor.
-- [ ] Detalhe técnico/algoritmo movido para o corpo (`## Objetivo` ou seção dedicada).
-- [ ] Se o artefato tem `version:`, ele é o lugar do histórico — não a `description`.
-
-### 10.6) Anti-padrões
-
-- ❌ `description` como resumo executivo do REQ inteiro (achado real: `codegraph-engine` v2.1.0).
-- ❌ Usar `description: >` (multi-linha) como desculpa para escrever um parágrafo de changelog — o formato YAML permitir múltiplas linhas não significa que o conteúdo deva crescer sem limite.
-- ❌ Copiar a `description` de uma versão anterior e ir "só adicionando mais uma frase" a cada rodada de correção sem nunca revisar o tamanho total.
-- ❌ Repetir no frontmatter o mesmo texto já detalhado em `## Objetivo` — se ambos existem, a `description` deve ser o resumo curto, `## Objetivo` o detalhado.
-
-## 11) Topologia e Padrão Canônico para Novas Stacks (type: stack)
-
-A criação de um novo ecossistema de stack (ex.: EJB, React, Python FastAPI) segue a topologia hierárquica consolidada em Angular, Spring Boot e Spring Reactive, estruturada em 5 passos atômicos:
-
-### 11.1) Estrutura de Diretórios e Isolamento
-- Caminho: `.github/agents/<camada>/<stack>/`
-- `<camada>`: `frontend` ou `backend`
-- Mantém o catálogo raiz despoluído e confina os especialistas ao seu respectivo domínio.
-
-### 11.2) Sub-catálogo Local (`<stack>-catalog.yaml`)
-- Define metadados do domínio (`domain: "<camada>-<stack>"`), papel do supervisor (`router: id: "<stack>-router"`) e dicionário dos especialistas (`agents:`).
-- Cada especialista declara: `id`, `model`, `role` (advisory, implementer, fixer, performance, tester), `domain`, `description` (≤ 400 caracteres), `keywords`, `tools` (com `run_subagent`; se `run_in_terminal` presente, `terminal-governance` em `skills`/`source_docs` por R-049) e `skills`.
-
-### 11.3) Supervisor de Domínio (`<stack>-router.agent.md`)
-- Nome: `<stack>-router`
-- Função: Supervisor hierárquico — recebe tarefas do `agent-router` central e despacha para os especialistas locais.
-- Dependências documentais: consolidadas no frontmatter 'source_docs:' (CLAUDE.md, copilot-instructions.md, sub-catálogo e skills).
-- Banner obrigatório: `Agente Ativo: <stack>-router`.
-- Anti-sticky session: regra R-042 com retorno ao `@agent-router` em deriva de intenção.
-- Fluxo 2 TDD: consulta prévia ao `@test-strategy` para requisitos de teste complexos antes de acionar test-writers locais.
-
-### 11.4) Pacote Canônico de Especialistas (Tríade 3+1)
-- **Backend (ex.: Python, Spring Boot, Spring Reactive, EJB, Struts)**:
-  - `<stack>-arch-advisor` (Read-Only: arquitetura, migrações, dependências, R-064)
-  - `<stack>-developer` (Mutativo Core: novos endpoints, componentes, bugfixes cirúrgicos, performance)
-  - `<stack>-test-engineer` (Mutativo Qualidade: testes unitários, integração, autocorreção sob R-053)
-- **Frontend (ex.: Angular, React)**:
-  - `<stack>-arch-advisor` (Read-Only: arquitetura, migrações, performance CWV, R-064)
-  - `<stack>-developer` (Mutativo Core: componentes, stores, estilização com Design System, correções visuais e de runtime sob Test-Last)
-  - `<stack>-test-engineer` (Mutativo Qualidade: testes unitários, componentes, testes E2E Playwright, autocorreção)
-
-### 11.5) Quádrupla Sincronização Global Obrigatória (R-015)
-Ao criar a stack, o `governance-factory` DEVE atualizar atomicamente:
-1. **`.github/agents/catalog.yaml`**: adiciona o nó do `<stack>-router` (apenas o router, não os especialistas locais).
-2. **`.github/agents/routing-graph.yaml`**: adiciona o nó `domain_router` e as arestas bidirecionais de/para `agent-router`.
-3. **`.github/agents/agent-router.agent.md`**: adiciona o router na tabela de conhecimento, no branch da Decision Tree e na lista de delegação.
-4. **`.github/agents/README.md`**: adiciona o router na tabela de catálogo e no mapeamento de rotas rápidas.
+- `references/artifact-specs-and-stack-topology.md` — Tabelas completas de campos, exemplos antes/depois, validação de modelos e topologia detalhada de stacks (`Progressive Disclosure` / `R-066`).
+- `.github/agents/templates/agent-template.md`, `operational-agent.md`, `research-agent.md`, `router-agent.md` — Templates SSOT de Agents.
+- `.github/prompts/templates/prompt-template.md` — Template SSOT de Prompts.
+- `.github/skills/templates/skill-template.md` — Template SSOT de Skills.
+- `CLAUDE.md` e `.github/copilot-instructions.md` — Regras normativas da governança.

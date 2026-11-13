@@ -1,7 +1,6 @@
 ---
 name: figma-design-to-code-patterns
-description: >-
-  Fornece diretrizes e padrões canônicos de Design-to-Code para traduzir especificações do Figma (`get_file_nodes`, `get_styles`, `get_component_sets`, `export_image`, `get_comments`) em UI Angular ou React: mapeamento de tokens para variáveis do projeto (zero hex inline), reuso de componentes compartilhados (`shared/`), conversão de propriedades Auto Layout (`layoutMode`, `itemSpacing`, `padding*`, `layoutSizingHorizontal/Vertical`) em Flexbox/CSS Grid responsivo, mapeamento de variantes para Props/Inputs tipados e estados/acessibilidade WCAG 2.2 AA. Use quando implementar ou revisar telas e componentes a partir de design Figma via `figma-mcp`. Não use para configuração de servidor/autenticação MCP (ver `figma-mcp`), para contratos genéricos de componentes (ver `design-system-component-contracts`) nem para validação visual pós-implementação (ver `frontend-visual-feedback-loop`).
+description: "Fornece diretrizes e padrões canônicos de Design-to-Code para traduzir especificações do Figma (`get_file_nodes`, `get_styles`, `get_component_sets`, `export_image`, `get_comments`) em UI Angular ou React: mapeamento de tokens para variáveis do projeto (zero hex inline), reuso de componentes compartilhados (`shared/`), conversão de propriedades Auto Layout (`layoutMode`, `itemSpacing`, `padding*`, `layoutSizingHorizontal/Vertical`) em Flexbox/CSS Grid responsivo, mapeamento de variantes para Props/Inputs tipados e estados/acessibilidade WCAG 2.2 AA. Use quando implementar ou revisar telas e componentes a partir de design Figma via `figma-mcp`. Não use para configuração de servidor/autenticação MCP (ver `figma-mcp`), para contratos genéricos de componentes (ver `design-system-component-contracts`) nem para validação visual pós-implementação (ver `frontend-visual-feedback-loop`)."
 tier: 2
 category: frontend
 triggers:
@@ -20,6 +19,10 @@ source_docs:
 ---
 
 # Figma Design-to-Code Patterns — Tradução Determinística de Design para UI
+
+## Quando Usar
+
+- Ativação em cenários de implementar design do figma, figma para codigo, design to code.
 
 ## 0) Problema Resolvido & Princípios Fundamentais
 

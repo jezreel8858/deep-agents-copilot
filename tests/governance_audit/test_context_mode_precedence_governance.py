@@ -881,3 +881,24 @@ def test_context_mode_few_shot_batching_and_model_routing_fan_out_signal():
         "copilot-instructions.md deve declarar o limiar de fan-out (>= 10 alvos/arquivos/operações)"
     )
 
+
+def test_javascript_preferential_runtime_and_timeout_circuit_breaker_in_governance_docs() -> None:
+    """CA-1, CA-2, CA-3: Governanca central impoe runtime preferencial JavaScript (fs nativo),
+    higiene em ctx_batch_execute e Circuit Breaker Fail-Fast de timeout (max 1 retry com troca de estrategia).
+    """
+    target_docs = [
+        REPO_ROOT / ".github" / "skills" / "context-mode" / "SKILL.md",
+        REPO_ROOT / ".github" / "skills" / "context-mode" / "examples" / "hierarquia-ferramentas.md",
+        REPO_ROOT / ".github" / "skills" / "efficient-batch-code-modification" / "SKILL.md",
+        REPO_ROOT / "docs" / "agent-context" / "context-mode.md",
+        REPO_ROOT / "CLAUDE.md",
+        REPO_ROOT / ".github" / "copilot-instructions.md",
+        REPO_ROOT / ".github" / "agents" / "workflows" / "invariantes-e-protocolos.md",
+    ]
+    for doc_path in target_docs:
+        assert doc_path.exists(), f"Documento ausente: {doc_path}"
+        text = doc_path.read_text(encoding="utf-8")
+        assert 'language: "javascript"' in text, f"Falta runtime preferencial javascript em {doc_path}"
+        assert "python -c" in text, f"Falta proibicao de python -c para I/O em {doc_path}"
+        assert "Circuit Breaker Fail-Fast" in text, f"Falta Circuit Breaker Fail-Fast em {doc_path}"
+        assert "1 retry" in text, f"Falta limite de 1 retry com troca de estrategia em {doc_path}"

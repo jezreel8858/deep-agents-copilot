@@ -1,9 +1,6 @@
 ---
 name: prompt-engineering-patterns
-description: >
-  Catálogo de técnicas consolidadas de prompt engineering (2024-2026) para estruturar,
-  refinar e detectar ambiguidade em prompts antes da execução — base de conhecimento
-  do agent prompt-structuring (exceção R-041).
+description: "Define diretrizes e padrões para catálogo de técnicas consolidadas de prompt engineering (2024-2026) para estruturar, refinar e detectar ambiguidade em prompts antes da execução — base de conhecimento do agent prompt-structuring (exceção R-041). Use quando atuar em estruturar prompt, refinar prompt, detectar ambiguidade. Não use para tarefas fora do escopo de prompt-engineering-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: process
 triggers:
@@ -24,6 +21,14 @@ tools: []
 # Prompt Engineering Patterns
 
 > Técnicas consolidadas para estruturar e refinar prompts antes da execução por outro agent, com base em pesquisa sobre otimização de prompt (APE, OPRO, DSPy) e guias oficiais (Anthropic, OpenAI).
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `prompt-engineering-patterns` ou quando outra skill específica cobrir integralmente o escopo.
+
+## Diretrizes e Padrões Canônicos
+
+- Seguir estritamente as regras, invariantes e fluxos descritos nas seções abaixo.
 
 ## Quando Usar
 
@@ -103,3 +108,8 @@ Ao redigir instruções persistentes para agentes (como arquivos de instrução 
 - [`.github/agents/prompt-structuring.agent.md`](../../agents/prompt-structuring.agent.md) — agent consumidor desta skill.
 - `CLAUDE.md` § R-041 — exceção de loop controlado.
 
+### Desambiguação e Interação HITL via `ask_questions` (R-027 / CA-03..CA-05)
+Quando o prompt ou agente precisar desambiguar requisitos com o usuário via `ask_questions`, siga o contrato canônico de `structured-intake-patterns`:
+- **CA-03**: `description` obrigatório em todas as opções no formato `[Consequência prática / O que faz] + [Trade-off principal ou quando escolher]`.
+- **CA-04**: 1ª opção com sufixo `(Recomendado)` quando houver melhor prática técnica (exceção: decisões puramente de negócio/produto).
+- **CA-05**: 2 a 4 alternativas reais e mutuamente exclusivas (Anti-Strawman), 1 a 4 perguntas por chamada, `header` ≤ 25 caracteres e `allowFreeformInput: true` nativo (sem opção artificial `"Outro"`).

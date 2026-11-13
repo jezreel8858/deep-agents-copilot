@@ -1,11 +1,6 @@
 ---
 name: code-tracing
-description: >
-  Estratégias consolidadas para rastrear código de um sintoma até a causa raiz —
-  cobrindo grep vs busca semântica, parsing de stack trace, navegação de call graph,
-  rastreio de API/método e coleta mínima de evidências. Agnóstico de linguagem e
-  framework. Use em qualquer contexto de investigação de bug, análise de impacto
-  ou compreensão de código desconhecido.
+description: "Define diretrizes e padrões para estratégias consolidadas para rastrear código de um sintoma até a causa raiz — cobrindo grep vs busca semântica, parsing de stack trace, navegação de call graph, rastreio de API/método e coleta mínima de evidências. Agnóstico de linguagem e framework. Use em qualquer contexto de investigação de bug, análise de impacto ou compreensão de código desconhecido. Use quando atuar em rastrear código, encontrar onde está implementado, stack trace. Não use para tarefas fora do escopo de code-tracing ou implementação direta de código de negócio não relacionado."
 tier: 1
 category: tooling
 triggers:
@@ -23,11 +18,7 @@ triggers:
   - "grep no código"
   - "busca semântica"
   - "dependência de método"
-tools:
-  - "grep_search"
-  - "file_search"
-  - "read_file"
-  - "run_in_terminal"
+tools: ['grep_search', 'file_search', 'read_file', 'run_in_terminal']
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
@@ -40,6 +31,14 @@ Estratégias consolidadas para navegar um codebase a partir de um sintoma — lo
 > **Aplica-se a**: `bug-triage`, `test-engineer`, `tech-solution-architect`, `refactor-planner` e qualquer agent ou prompt que precise localizar código a partir de um comportamento observado.
 
 ---
+
+## Quando Usar
+
+- Ativação em cenários de rastrear código, encontrar onde está implementado, stack trace.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `code-tracing` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## 0.1) Fase "Feedback Loop First" — Construir Reprodução Antes de Hipótese
 
@@ -102,69 +101,7 @@ Antes de qualquer busca, extrair os **identificadores concretos** do sintoma:
 
 ## 3) Fase 2: Localizar — Grep vs Busca Semântica
 
-### Decisão: quando usar cada abordagem
-
-```
-Identificador é exato (nome de classe, método, string)?
-├─ Sim → GREP (mais rápido, sem ambiguidade)
-│  └─ Fallback: se 0 resultados → Busca Semântica
-└─ Não (comportamento, conceito, intenção)?
-   └─ BUSCA SEMÂNTICA (grep_search com termos relacionados)
-```
-
-### Grep — padrões efetivos por tipo
-
-```bash
-# Classe/interface por nome exato
-grep_search "class NomeDaClasse"
-grep_search "interface NomeDaInterface"
-
-# Método por assinatura
-grep_search "def nome_metodo"         # Python
-grep_search "function nomeMetodo"      # JS/TS
-grep_search "nomeMetodo("              # Java/C#/TS (invocação)
-
-# Endpoint de API
-grep_search "@GetMapping(\"/endpoint\")"   # Spring Boot
-grep_search "router.get('/endpoint'"        # Express
-grep_search "path: '/endpoint'"             # Angular routes
-
-# String de erro literal
-grep_search "\"mensagem de erro exata\""
-
-# Import/dependency
-grep_search "import.*NomeDoModulo"
-grep_search "from.*nome-pacote"
-
-# Anotação/decorator
-grep_search "@NomeAnnotation"
-grep_search "@Component\|@Service\|@Injectable"
-```
-
-### Busca Semântica — padrões para conceitos
-
-```bash
-# Conceito de negócio (não literal)
-grep_search "validacao cpf"           # sem quotes — mais tolerante
-grep_search "calcular desconto"
-grep_search "enviar notificacao"
-
-# Comportamento esperado
-grep_search "retry backoff"
-grep_search "autenticacao oauth"
-grep_search "paginacao cursor"
-```
-
-### Estratégia de refinamento progressivo
-
-```
-1. Busca ampla → muitos resultados → refinar com grep mais específico
-2. Busca específica → 0 resultados → ampliar com termos relacionados
-3. Ainda 0 resultados → file_search por nome de arquivo (padrão de nomenclatura)
-4. Ainda 0 resultados → ask_questions para obter mais contexto
-```
-
----
+Grep para símbolos/strings literais (classe, método, endpoint, erro, import, decorator); busca semântica para conceitos de negócio e comportamento esperado; refinar progressivamente (amplo → específico). Padrões efetivos e exemplos em `references/tracing-search-and-parsing-details.md`.
 
 ## 4) Fase 3: Traçar Call Chain
 
@@ -253,63 +190,9 @@ Confiança: Alta (evidências em 3 pontos independentes)
 
 ---
 
-## 7) Stack Trace Parsing
+## 7–8) Stack Trace Parsing e Rastreio de API / Endpoint
 
-Quando há um stack trace disponível, seguir este protocolo:
-
-### Estrutura de parsing
-
-```
-1. Identificar o frame mais próximo do código-fonte do projeto
-   → ignorar frames de frameworks (spring, angular, node internals)
-   → focar nos frames com pacote/namespace do projeto
-
-2. Extrair: arquivo + linha do frame de projeto mais alto
-   → este é o ponto de entrada na investigação
-
-3. Se stack trace é de frontend minificado:
-   → buscar source maps (.map) em dist/ ou build/
-   → mapear frame ofuscado para linha original
-
-4. Se stack trace inclui trace ID (distributed tracing):
-   → usar o trace ID para correlacionar spans
-   → identificar serviço de origem da chamada
-```
-
-### Padrão de frame por linguagem
-
-| Linguagem | Formato do frame | O que extrair |
-|---|---|---|
-| Java | `at com.empresa.Classe.metodo(Arquivo.java:42)` | Classe + método + linha |
-| Python | `File "src/modulo.py", line 87, in funcao` | Arquivo + linha + função |
-| TypeScript/JS | `at ClasseOuFuncao (arquivo.ts:42:10)` | Arquivo + linha |
-| C# | `at Namespace.Classe.Metodo() in Arquivo.cs:line 42` | Namespace + linha |
-
----
-
-## 8) Rastreio de API / Endpoint
-
-Para sintomas originados em chamadas de API:
-
-```bash
-# 1. Localizar o handler pelo path
-grep_search "'/api/endpoint'"
-grep_search "\"/api/endpoint\""
-grep_search "@RequestMapping.*endpoint"
-
-# 2. Localizar o service chamado pelo handler
-grep_search "NomeDoService"   # dentro do controller encontrado
-
-# 3. Localizar o repositório/client chamado pelo service
-grep_search "NomeDoRepository\|NomeDoClient"
-
-# 4. Para APIs externas — localizar a configuração
-grep_search "http://\|https://"
-grep_search "baseUrl\|apiUrl\|API_URL"
-grep_search "HttpClient\|axios\|fetch"
-```
-
----
+Estrutura de parsing, padrão de frame por linguagem e roteiro handler → service → repositório/client em `references/tracing-search-and-parsing-details.md`. Regra: iniciar pelo primeiro frame do código do projeto e seguir o call chain até a causa raiz.
 
 ## 9) Classificação de Confiança da Hipótese
 
@@ -322,6 +205,12 @@ Após o rastreio, classificar a confiança da hipótese de causa raiz:
 | **Baixa** (<50%) | Evidências ambíguas ou contraditórias | `ask_questions` para mais contexto antes de prosseguir |
 
 ---
+
+## 9.1) Contrato de Plano R-064 — `bug-triage`
+
+- **`plan_type: bug-triage`** → `docs/plans/bug-triage/<AAAAMMDD-HHMMSS>-<identificador>.md`.
+- Frontmatter YAML comum R-064 obrigatório; `@bug-triage` permanece **100% Read-Only** e emite a triagem (sintoma, evidências de rastreio, hipótese com confiança, correção proposta); `@docs-engineer` materializa o `.md`.
+- Template completo: `references/plan-template-bug-triage.md`.
 
 ## 10) Anti-padrões de Tracing
 
@@ -346,4 +235,9 @@ Após o rastreio, classificar a confiança da hipótese de causa raiz:
 - LLM-Guided Code Navigation: https://arxiv.org/html/2506.18191v1
 - Stack Trace Study (multi-language): https://github.com/tintin10q/stack-trace-study
 - Skill `terminal-governance` — para comandos grep no terminal com output truncado
+- `references/tracing-search-and-parsing-details.md` — padrões de grep/busca semântica, stack trace e rastreio de API.
+- `references/plan-template-bug-triage.md` — template de plano `bug-triage` (R-064).
 
+## Checklist de Conformidade
+
+- [ ] Diretrizes, contratos e restrições de escopo de `code-tracing` verificados e atendidos.

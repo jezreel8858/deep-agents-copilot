@@ -1,6 +1,6 @@
 ---
 name: git-governance
-description: Índice canônico (SSOT) de git workflow — branch naming, commits semânticos, PRs com matriz de risco e rollback, guardrail de segredos e changelog.
+description: "Define diretrizes e padrões para índice canônico (SSOT) de git workflow — branch naming, commits semânticos, PRs com matriz de risco e rollback, guardrail de segredos e changelog. Use quando atuar em como nomear branch, padrão de commit, convention de PR. Não use para tarefas fora do escopo de git-governance ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: governance
 triggers:
@@ -24,6 +24,14 @@ source_docs:
 > **Progressive Disclosure**: Nível 1 = frontmatter; Nível 2 = este índice (regras curtas); Nível 3 = `references/` (carregar apenas o necessário via `ctx_execute_file`/`ctx_search`).
 
 Padroniza versionamento Git: histórico semântico, commits atômicos, PRs auditáveis e zero segredos. **SSOT única** consumida por `/commit` e `@pr-gatekeeper`.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `git-governance` ou quando outra skill específica cobrir integralmente o escopo.
+
+## Diretrizes e Padrões Canônicos
+
+- Seguir estritamente as regras, invariantes e fluxos descritos nas seções abaixo.
 
 ## 1) Quando Usar
 

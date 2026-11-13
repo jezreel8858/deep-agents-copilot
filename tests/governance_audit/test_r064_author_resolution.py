@@ -3,7 +3,7 @@ test_r064_author_resolution.py — Validação determinística da autoria do Pla
 
 Garante que:
 1. O agente bug-triage (.github/agents/bug-triage.agent.md) delega a autoria técnica do Plano de Implementação
-   (docs/implementation-plans/, R-064) dinamicamente para <stack>-arch-advisor (via domain-router da stack).
+   (docs/plans/implementation/, R-064) dinamicamente para <stack>-arch-advisor (via domain-router da stack).
 2. Veda terminantemente @tech-solution-architect para essa finalidade no WORKFLOW-BUG-FIX,
    restringindo sua atuação ao estado WF1_SECURITY_CHECKPOINT (parecer de segurança read-only).
 """
@@ -39,7 +39,7 @@ def test_bug_triage_delegates_implementation_plan_to_generic_stack_arch_advisor(
 
     plan_lines = [
         line for line in delegation_text.splitlines()
-        if "Plano de Implementação" in line or "implementation-plans" in line
+        if "Plano de Implementação" in line or "docs/plans/implementation" in line
     ]
     assert plan_lines, remediation(
         "Nenhuma linha sobre 'Plano de Implementação' encontrada na tabela 'Quando Delegar' de bug-triage.agent.md",
@@ -55,9 +55,9 @@ def test_bug_triage_delegates_implementation_plan_to_generic_stack_arch_advisor(
         "A linha de delegação do Plano de Implementação deve referenciar formalmente a regra R-064",
         fix_hint="Incluir a sigla '(R-064)' na descrição da delegação em bug-triage.agent.md."
     )
-    assert "docs/implementation-plans/" in matched_line, remediation(
-        "A linha de delegação deve citar o diretório canônico 'docs/implementation-plans/'",
-        fix_hint="Incluir 'docs/implementation-plans/' na coluna de situação da tabela 'Quando Delegar'."
+    assert "docs/plans/implementation/" in matched_line, remediation(
+        "A linha de delegação deve citar o diretório canônico 'docs/plans/implementation/'",
+        fix_hint="Incluir 'docs/plans/implementation/' na coluna de situação da tabela 'Quando Delegar'."
     )
 
 
@@ -69,7 +69,7 @@ def test_bug_triage_forbids_tech_solution_architect_for_implementation_plan():
 
     plan_lines = [
         line for line in delegation_text.splitlines()
-        if "Plano de Implementação" in line or "implementation-plans" in line
+        if "Plano de Implementação" in line or "docs/plans/implementation" in line
     ]
     assert plan_lines, "Linha de Plano de Implementação deve existir na tabela de delegação"
     matched_line = plan_lines[0]

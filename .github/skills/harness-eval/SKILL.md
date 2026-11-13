@@ -1,13 +1,6 @@
 ---
 name: harness-eval
-description: >-
-  Executa o protocolo de avaliação determinística de harness de agentes (Track A: regressão de
-  instruções; Track B: calibração de prompts; Track C: auditoria dual-judge) comparando o
-  comportamento esperado contra evidências observáveis. Use quando precisar auditar
-  deterministicamente a fidelidade de execução de um harness/prompt contra claims e critérios
-  de aceitação. Não use para diagnóstico contínuo de harness-vs-modelo (isso é
-  `harness-engineering-patterns`) nem para métricas de qualidade de resposta do modelo em si
-  (isso é `agent-evals-lab`).
+description: "Define diretrizes e padrões para executa o protocolo de avaliação determinística de harness de agentes (Track A: regressão de instruções; Track B: calibração de prompts; Track C: auditoria dual-judge) comparando o comportamento esperado contra evidências observáveis. Use quando precisar auditar deterministicamente a fidelidade de execução de um harness/prompt contra claims e critérios de aceitação. Não use para diagnóstico contínuo de harness-vs-modelo (isso é `harness-engineering-patterns`) nem para métricas de qualidade de resposta do modelo em si (isso é `agent-evals-lab`)."
 tier: 2
 category: quality
 license: "CC-BY-4.0"
@@ -29,6 +22,10 @@ tools: []
 ---
 
 # Harness Eval
+
+## Quando Usar
+
+- Ativação em cenários de quando precisar avaliar deterministamente a eficácia do harness de um agente, quando for necessário rodar auditoria dual-judge em prompts de agentes, quando executar testes de regressão de instruções ou calibração de harness.
 
 ## 0) Problema Resolvido & Atribuição de Origem
 

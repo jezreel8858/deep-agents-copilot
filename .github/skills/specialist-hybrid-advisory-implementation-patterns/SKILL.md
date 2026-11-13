@@ -1,10 +1,6 @@
 ---
 name: specialist-hybrid-advisory-implementation-patterns
-description: >
-  Template canônico do "perfil híbrido" (Advisory + Implementação) para agents
-  especialistas de stack técnico — critério de desambiguação de modo, formatos
-  de saída de cada modo e checklist unificado "Antes de Analisar/Implementar",
-  parametrizável por domínio técnico.
+description: "Define diretrizes e padrões para template canônico do 'perfil híbrido' (Advisory + Implementação) para agents especialistas de stack técnico — critério de desambiguação de modo, formatos de saída de cada modo e checklist unificado 'Antes de Analisar/Implementar', parametrizável por domínio técnico. Use quando atuar em perfil híbrido, modo advisory, modo implementação. Não use para tarefas fora do escopo de specialist-hybrid-advisory-implementation-patterns ou implementação direta de código de negócio não relacionado."
 tier: 1
 category: governance
 triggers:
@@ -23,6 +19,14 @@ tools: []
 ---
 
 # Specialist Hybrid Advisory + Implementation Patterns
+
+## Quando Usar
+
+- Ativação em cenários de perfil híbrido, modo advisory, modo implementação.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `specialist-hybrid-advisory-implementation-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## 0) Problema Resolvido
 
@@ -112,6 +116,13 @@ Toda implementação de feature/bugfix no modo Implementação **deve** ser acom
 - **Proibição de usurpação de papel**: specialists NUNCA executam comandos do CLI `codegraph` diretamente nem realizam varreduras exploratórias de diretórios (`list_dir`, `read_dir`) para mapear arquitetura ou dependências.
 - **Fluxo de delegação obrigatório**: quando a análise exigir relações entre camadas, fluxo de chamadas ou dependências de módulos/serviços, o specialist DEVE invocar `@codegraph-engine` via `run_subagent(agentName: 'codegraph-engine', ...)`. O papel do specialist é interpretar tecnicamente o resultado do grafo sob a ótica das melhores práticas do seu framework (Angular, Spring, etc.).
 
+## 4.2) Planos R-064 — Gate 2 (`implementation`) e Modo Arquitetural (`architecture`)
+
+- **Gate 2** → `plan_type: implementation`, destino `docs/plans/implementation/`.
+- **Modo arquitetural/migração** → `plan_type: architecture`, destino `docs/plans/architecture/`.
+- Frontmatter YAML comum R-064 obrigatório. No modo Advisory o especialista é **100% Read-Only**: emite o plano segundo o template e delega a materialização física `.md` a `@docs-engineer`.
+- Template completo: `references/plan-template-implementation.md`.
+
 ## 5) Checklist Unificado — Antes de Analisar/Implementar
 
 - [ ] Modo desambiguado explicitamente (Advisory vs. Implementação) — via pergunta direta ou intenção inequívoca do pedido.
@@ -138,4 +149,4 @@ Toda implementação de feature/bugfix no modo Implementação **deve** ser acom
 - `CLAUDE.md` — R-027 (Clarificação Obrigatória), R-029 (Postura Senior Engineer).
 - `.github/skills/agent-contracts/SKILL.md` §8 — Camada 2 de Formato de Saída por perfil ("Especialista de Recomendação").
 - `.github/skills/confidence-fallback-policy/SKILL.md` — escala de confiança usada no bloco Advisory.
-
+- `references/plan-template-implementation.md` — template de plano `implementation` (R-064).

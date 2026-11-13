@@ -298,3 +298,54 @@ def test_canonical_templates_progressive_disclosure_threshold():
         + "\n".join(f"  - {v}" for v in violations),
         fix_hint="Mova documentos com <= 300 linhas de source_docs_lazy: para source_docs: nos templates canônicos.",
     )
+
+
+def test_all_skills_respect_300_lines_ceiling():
+    """Valida que 100% dos arquivos .github/skills/*/SKILL.md (81 skills) respeitam
+    o teto estrito de <= 300 linhas (R-066 Progressive Disclosure)."""
+    skills_dir = REPO_ROOT / ".github" / "skills"
+    skill_files = sorted(p for p in skills_dir.glob("*/SKILL.md") if "templates" not in p.parts)
+    assert len(skill_files) == 81, f"Esperado 81 skills, encontrado {len(skill_files)}"
+
+    violations: list[str] = []
+    for sf in skill_files:
+        lc = len(sf.read_text(encoding="utf-8").splitlines())
+        if lc > LAZY_LINE_THRESHOLD:
+            violations.append(f"{sf.relative_to(REPO_ROOT)}: {lc} linhas (teto={LAZY_LINE_THRESHOLD})")
+
+    assert not violations, remediation(
+        f"{len(violations)} skill(s) excedem o teto de {LAZY_LINE_THRESHOLD} linhas (R-066):\n"
+        + "\n".join(f"  - {v}" for v in violations),
+        fix_hint="Extraia exemplos extensos e tabelas detalhadas para references/*.md.",
+    )
+
+
+def test_clause_lazy_docs_present_iff_source_docs_lazy_non_empty():
+    """Valida que nos prompts e templates canônicos com <execution_protocol>, a cláusula
+    de source_docs_lazy (CLAUSE_LAZY_DOCS) está presente se e somente se source_docs_lazy
+    no frontmatter não for vazio."""
+    files_to_check = [
+        *sorted((REPO_ROOT / ".github" / "prompts").glob("*.prompt.md")),
+        *_get_template_files(),
+    ]
+    violations: list[str] = []
+    for f in files_to_check:
+        content = f.read_text(encoding="utf-8")
+        if "<execution_protocol>" not in content:
+            continue
+        fm = _parse_frontmatter(f)
+        lazy_docs = fm.get("source_docs_lazy") or []
+        has_lazy_fm = bool(lazy_docs)
+        ep_match = content.split("<execution_protocol>", 1)[1].split("</execution_protocol>", 1)[0]
+        has_lazy_clause = "source_docs_lazy" in ep_match
+        if has_lazy_fm != has_lazy_clause:
+            violations.append(
+                f"{f.relative_to(REPO_ROOT)}: source_docs_lazy no frontmatter={has_lazy_fm}, "
+                f"mas CLAUSE_LAZY_DOCS no <execution_protocol>={has_lazy_clause}"
+            )
+
+    assert not violations, remediation(
+        f"{len(violations)} inconsistência(s) entre source_docs_lazy e CLAUSE_LAZY_DOCS:\n"
+        + "\n".join(f"  - {v}" for v in violations),
+        fix_hint="Sincronize o bloco <execution_protocol> com o estado de source_docs_lazy no frontmatter.",
+    )

@@ -5,7 +5,7 @@ Verifica que agentes classificados como "Gather-only" não possuem ferramentas
 de execução pesada ('context-mode/ctx_execute' e 'context-mode/ctx_execute_file')
 em seu frontmatter 'tools:', mantendo compulsoriamente 'context-mode/ctx_batch_execute'.
 
-Referência: docs/implementation-plans/20261003-governance-maintenance-ctx-execute-profile-classification.md
+Referência: docs/plans/implementation/20261003-090000-governance-maintenance-ctx-execute-profile-classification.md
 """
 
 from pathlib import Path

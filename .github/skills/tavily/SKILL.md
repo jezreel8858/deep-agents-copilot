@@ -1,9 +1,6 @@
 ---
 name: tavily
-description: >
-  Boas práticas de uso do Tavily MCP para pesquisa externa — documentação técnica,
-  versões, changelogs, CVEs e padrões de mercado. Define hierarquia de decisão,
-  estratégias de query e integração com context-mode.
+description: "Define diretrizes e padrões para boas práticas de uso do Tavily MCP para pesquisa externa — documentação técnica, versões, changelogs, CVEs e padrões de mercado. Define hierarquia de decisão, estratégias de query e integração com context-mode. Use quando atuar em pesquisar web, buscar documentação, tavily. Não use para tarefas fora do escopo de tavily ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: research
 triggers:
@@ -19,16 +16,13 @@ triggers:
 source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
-tools:
-  - "tavily/tavily_search"
-  - "tavily/tavily_extract"
-  - "tavily/tavily_crawl"
-  - "tavily/tavily_map"
-  - "tavily/tavily_research"
-  - "context-mode/ctx_search"
----
+tools: ['tavily/tavily_search', 'tavily/tavily_extract', 'tavily/tavily_crawl', 'tavily/tavily_map', 'tavily/tavily_research', 'context-mode/ctx_search', '--']
 
 # Tavily — Pesquisa Externa
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `tavily` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## 1) Hierarquia de Decisão — Quando Usar
 

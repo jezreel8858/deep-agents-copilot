@@ -1,10 +1,6 @@
 ---
 name: test-implementation-angular-vitest
-description: >
-  Padrões consolidados para implementação de testes em Angular 20/21+ com Vitest,
-  incluindo configuração nativa (Angular 20+ via @angular/build:unit-test),
-  setup com TestBed, mocking com vi.fn()/vi.spyOn(), testes zoneless,
-  Signals, cobertura com @vitest/coverage-v8 e migração de Jasmine/Karma.
+description: "Define diretrizes e padrões para padrões consolidados para implementação de testes em Angular 20/21+ com Vitest, incluindo configuração nativa (Angular 20+ via @angular/build:unit-test), setup com TestBed, mocking com vi.fn()/vi.spyOn(), testes zoneless, Signals, cobertura com @vitest/coverage-v8 e migração de Jasmine/Karma. Use quando atuar em vitest angular, angular vitest, migrar jasmine vitest. Não use para tarefas fora do escopo de test-implementation-angular-vitest ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: testing
 triggers:
@@ -38,6 +34,14 @@ tools: []
 > - [.github/skills/test-implementation-frontend/SKILL.md](../test-implementation-frontend/SKILL.md)
 > Para padrões com Jasmine/Karma (legado), consulte `test-implementation-angular-jasmine`.
 
+## Quando Usar
+
+- Ativação em cenários de vitest angular, angular vitest, migrar jasmine vitest.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `test-implementation-angular-vitest` ou quando outra skill específica cobrir integralmente o escopo.
+
 ## Contexto
 
 A partir do **Angular 20**, o suporte nativo ao Vitest foi introduzido via builder `@angular/build:unit-test`. No **Angular 21** o suporte tornou-se **estável e padrão** para novos projetos — ao rodar `ng new`, Vitest é a opção padrão e Karma/Jasmine são considerados legado.
@@ -53,90 +57,8 @@ A partir do **Angular 20**, o suporte nativo ao Vitest foi introduzido via build
 
 ## 1) Setup — Configuração Nativa Angular 20+
 
-### Dependências
-
-```bash
-# Instalação mínima (happy-dom é detectado automaticamente pelo Angular CLI)
-npm install -D vitest happy-dom @vitest/coverage-v8
-```
-
-### angular.json
-
-```json
-{
-  "projects": {
-    "[nome-projeto]": {
-      "architect": {
-        "test": {
-          "builder": "@angular/build:unit-test",
-          "options": {
-            "tsConfig": "tsconfig.spec.json",
-            "runner": "vitest",
-            "buildTarget": "::development",
-            "providersFile": "src/test-providers.ts"
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-### src/test-providers.ts (providers globais — Angular 20+ com `providersFile`)
-
-```typescript
-import { provideZonelessChangeDetection } from '@angular/core';
-
-// Providers disponíveis em TODOS os testes — sem repetição em cada spec
-export default [
-  provideZonelessChangeDetection(),
-];
-```
-
-### tsconfig.spec.json
-
-```json
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "outDir": "./out-tsc/spec",
-    "types": ["vitest/globals"]
-  },
-  "files": ["src/test-providers.ts"],
-  "include": ["src/**/*.spec.ts", "src/**/*.d.ts"]
-}
-```
-
-### vitest.config.ts (configuração estendida)
-
-```typescript
-import { defineConfig } from 'vitest/config';
-
-export default defineConfig({
-  test: {
-    globals: true,
-    environment: 'happy-dom',
-    setupFiles: ['src/test-setup.ts'],
-    include: ['src/**/*.spec.ts'],
-    restoreMocks: true,                    // limpa vi.spyOn/vi.fn após cada teste
-    clearMocks: true,                      // limpa mock.calls entre testes
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'html', 'lcov'],
-      reportsDirectory: 'coverage',
-      thresholds: {
-        statements: 80,
-        branches: 70,
-        functions: 80,
-        lines: 80,
-      },
-      exclude: ['src/environments/**', '**/*.config.ts', '**/*.routes.ts'],
-    },
-  },
-});
-```
-
----
+- Utilizar `@angular/build:unit-test` com `runner: "vitest"` e `happy-dom` (ou `vitest.config.ts` customizado para cobertura v8).
+- Arquivos completos de configuração (`angular.json`, `test-providers.ts`, `tsconfig.spec.json`, `vitest.config.ts`) em [`references/detailed-patterns-and-examples.md`](references/detailed-patterns-and-examples.md).
 
 ## 2) Unit Tests — Componentes com TestBed
 
@@ -280,54 +202,12 @@ it('deve testar input signal de componente', async () => {
 
 ## 6) HTTP Testing com HttpTestingController
 
-```typescript
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideHttpClient } from '@angular/common/http';
-
-describe('[Nome]Service — HTTP', () => {
-  let service: [Nome]Service;
-  let httpMock: HttpTestingController;
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [[Nome]Service, provideHttpClient(), provideHttpClientTesting()],
-    });
-    service = TestBed.inject([Nome]Service);
-    httpMock = TestBed.inject(HttpTestingController);
-  });
-
-  afterEach(() => httpMock.verify());
-
-  it('deve fazer GET e retornar dados', () => {
-    service.buscar().subscribe(data => expect(data).toEqual([{ id: 1 }]));
-    const req = httpMock.expectOne('/api/[recurso]');
-    expect(req.request.method).toBe('GET');
-    req.flush([{ id: 1 }]);
-  });
-});
-```
-
----
+- Configurar `provideHttpClient()` + `provideHttpClientTesting()`, validar requests via `HttpTestingController.expectOne()` e chamar `httpMock.verify()` no `afterEach`.
 
 ## 7) Testes de Snapshot e Coverage
 
-Consulte as diretrizes e ciclo de vida universal de snapshots e coverage em `test-implementation-frontend`.
-
-```typescript
-// Snapshot Angular específico
-it('deve renderizar componente conforme snapshot', async () => {
-  fixture.detectChanges();
-  await fixture.whenStable();
-  expect(fixture.nativeElement).toMatchSnapshot();
-});
-```
-
-Diretiva para ignorar linhas específicas no coverage v8:
-```typescript
-/* v8 ignore next -- @preserve */
-```
-
----
+- Priorizar asserções explícitas de DOM sobre snapshots amplos; metas mínimas: 80% lines/branches.
+- Exemplos de código completos em [`references/detailed-patterns-and-examples.md`](references/detailed-patterns-and-examples.md).
 
 ## 8) Comandos com Zero Ruído (R-008 / R-049)
 
@@ -403,3 +283,7 @@ test('deve navegar entre rotas standalone', async ({ page }) => {
 - Angular Testing Guide: https://angular.dev/guide/testing
 - Vitest Documentation: https://vitest.dev/
 - AnalogJS Vitest Angular: https://analogjs.org/docs/features/testing/vitest
+
+## Checklist de Conformidade
+
+- [ ] Diretrizes, contratos e restrições de escopo de `test-implementation-angular-vitest` verificados e atendidos.

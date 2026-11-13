@@ -18,6 +18,7 @@ source_docs:
   - .github/skills/<skill-principal>/SKILL.md
   - CLAUDE.md
   - .github/copilot-instructions.md
+  - ".github/skills/context-mode/SKILL.md"
 ---
 
 # Perfil Operacional
@@ -115,20 +116,67 @@ Agente Ativo: <slug-kebab-case>
 
 ## Pré-condição de Plano de Implementação (R-064)
 
-- ❌ **Bloqueio de Execução sem Plano Aprovado**: Agentes executores não podem editar código de produção sem `plan_ref` de Plano de Implementação aprovado em `docs/implementation-plans/` (`status: approved`). Sem `plan_ref` aprovado, retornar ao router com `motivo: "pre_condicao_plano"`.
+- ❌ **Bloqueio de Execução sem Plano Aprovado**: Agentes executores não podem editar código de produção sem `plan_ref` de Plano de Implementação aprovado em `docs/plans/implementation/` (`status: approved`). Sem `plan_ref` aprovado, retornar ao router com `motivo: "pre_condicao_plano"`.
 - ✅ **Exceções Formais**: tarefas testes-only e documentação/configuração não sensível.
 
+- **Clarificação e UX do `ask_questions` (R-027 / CA-03..CA-05)**: Em ambiguidades ou checkpoints HITL, usar `ask_questions` com 1–4 perguntas/chamada, `header` ≤ 25 chars, `allowFreeformInput: true`, 2–4 opções reais sem espantalhos (Anti-Strawman), `description` obrigatório (`[Consequência prática / O que faz] + [Trade-off principal ou quando escolher]`) e 1ª opção `(Recomendado)` quando houver melhor prática técnica (exceção: decisão puramente de negócio) — SSOT: `structured-intake-patterns`.
+
+## ⚙️ Protocolo de Execução Obrigatório
+
+<!--
+  FONTE CANONICA UNICA do bloco <execution_protocol> (Protocolo Plan-Then-Batch R-059 +
+  Teto de Tool Turns / Warm Start R-060 + Emissão Obrigatória de Telemetria R-042 +
+
+  Arquitetura Opção C: Composição Dinâmica por Capabilities + Opção 3 (H2 + tag XML):
+  O utilitário `tools/agent_protocol_sync/sync_execution_protocol.py` compõe
+  o protocolo operacional inspecionando o frontmatter de cada agent e prompt:
+  - Cabeçalho H2 CommonMark: '## ⚙️ Protocolo de Execução Obrigatório'
+  - CORE: Núcleo imperativo comum obrigatório para todos os elegíveis (R-059 / R-060).
+  - CLAUSE_MUTATION: Validação agrupada com get_errors injetada apenas se o artefato
+    possuir ferramentas de mutação/edição ou for executor (R-051).
+  - CLAUSE_HANDOFF: Telemetria de handoff injetada apenas se run_subagent estiver em tools: (R-042).
+
+  NAO EDITE os arquivos .agent.md ou *.prompt.md diretamente para mudar este protocolo.
+  Edite este fragmento e execute:
+    python tools/agent_protocol_sync/sync_execution_protocol.py --apply
+-->
+
+<!-- BEGIN:CORE -->
+**Protocolo Plan-Then-Batch (R-059):**
+1. **ENUMERAR**: Antes de qualquer ação de modificação ou inspeção, liste internamente todos os arquivos e comandos necessários para a demanda completa (não apenas o próximo passo aparente).
+2. **CONSOLIDAR (Limiar >= 2)**: Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de `ctx_execute` por alvo no chat. Use compulsoriamente `ctx_batch_execute(commands, queries)` OU script iterativo consolidado em `ctx_execute`.
+3. **Comandos curtos não suspendem a regra**: Prompts curtos ("prosseguir", "continue", "pode seguir") NÃO isentam o agente do limiar >= 2 nem do context-mode em lote — a regra vincula-se ao escopo da tarefa, nunca ao tamanho do prompt.
+4. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions, vedando loops investigativos de dívida de tokens O(N²).
+5. **Warm Start Compulsório & Batch Querying (R-060)**: Ferramentas locais que dependem de índices ou bases pré-computadas devem verificar e inicializar a base silenciosamente no primeiro comando (build-if-missing). É proibido disparar consultas granulares individuais para múltiplos nós — agrupe todas as pesquisas via chamadas em lote (batch_query, ctx_batch_execute, script iterativo) com destilação semântica e truncamento na borda (Edge Truncation).
+<!-- END:CORE -->
+
+<!-- BEGIN:CLAUSE_MUTATION -->
+**Validação Agrupada com `get_errors` (R-051)**: Aplique todas as mutações em processo único no sandbox (all-or-nothing verificado) e execute `get_errors` agrupado uma única vez ao final com a lista completa de arquivos alterados (quando aplicável).
+<!-- END:CLAUSE_MUTATION -->
+
+<!-- BEGIN:CLAUSE_HANDOFF -->
+**Emissão Obrigatória de Telemetria de Handoff (R-042 / handoff-governance § 2.4)**: a cada chamada real de `run_subagent`, emitir compulsoriamente um evento `telemetry_entry` (tag `[HANDOFF]`) via `ctx_index`, incluindo `session_id` (reaproveitado do `sessionStart` do hook `context-mode`) e `sequence_index` (ordenação determinística dentro da sessão).
+<!-- END:CLAUSE_HANDOFF -->
+
+<!-- BEGIN:CLAUSE_LAZY_DOCS -->
+<!-- END:CLAUSE_LAZY_DOCS -->
+
+<!-- BEGIN:STANDARD -->
 ## ⚙️ Protocolo de Execução Obrigatório
 
 <execution_protocol>
 
-**Protocolo Plan-Then-Batch (Smell 2.26 / Smell 2.13 / R-059):**
-1. **ENUMERAR**: Antes de qualquer ação de modificação ou inspeção, liste internamente todos os arquivos e comandos necessários para a demanda completa (não apenas o próximo passo aparente).
-2. **CONSOLIDAR (Limiar >= 2)**: Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de `ctx_execute` por alvo no chat. Use compulsoriamente `ctx_batch_execute(commands, queries, cwd)` OU script iterativo consolidado em `ctx_execute`.
-3. **DESPACHAR & VALIDAR**: Aplique todas as mutações em processo único no sandbox (all-or-nothing verificado, R-051) e execute `get_errors` agrupado uma única vez ao final com a lista completa de arquivos alterados.
-4. **Comandos curtos não suspendem a regra**: Prompts curtos ("prosseguir", "continue", "pode seguir") NÃO isentam o agente do limiar >= 2 nem do context-mode em lote — a regra vincula-se ao escopo da tarefa, nunca ao tamanho do prompt.
+**Protocolo Plan-Then-Batch (R-059):**
+6. **ENUMERAR**: Antes de qualquer ação de modificação ou inspeção, liste internamente todos os arquivos e comandos necessários para a demanda completa (não apenas o próximo passo aparente).
+7. **CONSOLIDAR (Limiar >= 2)**: Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de `ctx_execute` por alvo no chat. Use compulsoriamente `ctx_batch_execute(commands, queries)` OU script iterativo consolidado em `ctx_execute`.
+8. **Comandos curtos não suspendem a regra**: Prompts curtos ("prosseguir", "continue", "pode seguir") NÃO isentam o agente do limiar >= 2 nem do context-mode em lote — a regra vincula-se ao escopo da tarefa, nunca ao tamanho do prompt.
+9. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions, vedando loops investigativos de dívida de tokens O(N²).
+10. **Warm Start Compulsório & Batch Querying (R-060)**: Ferramentas locais que dependem de índices ou bases pré-computadas devem verificar e inicializar a base silenciosamente no primeiro comando (build-if-missing). É proibido disparar consultas granulares individuais para múltiplos nós — agrupe todas as pesquisas via chamadas em lote (batch_query, ctx_batch_execute, script iterativo) com destilação semântica e truncamento na borda (Edge Truncation).
+11. **Validação Agrupada com `get_errors` (R-051)**: Aplique todas as mutações em processo único no sandbox (all-or-nothing verificado) e execute `get_errors` agrupado uma única vez ao final com a lista completa de arquivos alterados (quando aplicável).
+12. **Emissão Obrigatória de Telemetria de Handoff (R-042 / handoff-governance § 2.4)**: a cada chamada real de `run_subagent`, emitir compulsoriamente um evento `telemetry_entry` (tag `[HANDOFF]`) via `ctx_index`, incluindo `session_id` (reaproveitado do `sessionStart` do hook `context-mode`) e `sequence_index` (ordenação determinística dentro da sessão).
 
 </execution_protocol>
+<!-- END:STANDARD -->
 
 ## 🔄 Retorno ao Router (R-042 — Anti Sticky-Session)
 
@@ -144,7 +192,7 @@ Se a resposta decorre de handoff recebido, adicione na linha seguinte:
 Handoff: <agent-origem> → <slug-kebab-case> (motivo: <motivo>)
 ```
 
-### Gatilho de Deriva de Intenção
+### Quando Delegar e Gatilho de Deriva de Intenção
 Retorne IMEDIATAMENTE para `@agent-router` caso ocorra qualquer uma das situações:
 1. **Deriva de Domínio**: Solicitação migrou para outra stack ou camada tecnológica.
 2. **Deriva de Papel**: Solicitação solicita análise arquitetural aberta, elicitação de requisitos ou auditoria holística.

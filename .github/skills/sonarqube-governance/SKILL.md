@@ -1,9 +1,6 @@
 ---
 name: sonarqube-governance
-description: >
-  Boas práticas para uso de SonarQube em métricas de qualidade, security hotspots,
-  quality gates, análise de PR e integração CI/CD. Baseado em SonarQube 10+ e
-  metodologia Clean as You Code (2025).
+description: "Define diretrizes e padrões para boas práticas para uso de SonarQube em métricas de qualidade, security hotspots, quality gates, análise de PR e integração CI/CD. Baseado em SonarQube 10+ e metodologia Clean as You Code (2025). Use quando atuar em sonarqube, sonar, qualidade de código. Não use para tarefas fora do escopo de sonarqube-governance ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: quality
 triggers:
@@ -24,6 +21,14 @@ tools: []
 ---
 
 # SonarQube Governance
+
+## Quando Usar
+
+- Ativação em cenários de sonarqube, sonar, qualidade de código.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `sonarqube-governance` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## 1) Metodologia: Clean as You Code
 
@@ -178,3 +183,7 @@ sonar.exclusions=**/generated/**,**/*Config.java
 - Clean as You Code: https://docs.sonarsource.com/sonarqube/latest/user-guide/clean-as-you-code/
 - Security Hotspots: https://www.product-security.expert/05-application-security/sonarqube-modern-practical-guide-quality-gates-hotspots-and-review-workflows.html
 - CI/CD Integration 2025: https://medium.com/@lamjed.gaidi070/sonarqube-in-2025-the-ultimate-guide-to-code-quality-ci-cd-integration-alerting-43e96018d36f
+
+## Checklist de Conformidade
+
+- [ ] Diretrizes, contratos e restrições de escopo de `sonarqube-governance` verificados e atendidos.

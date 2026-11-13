@@ -1,10 +1,6 @@
 ---
 name: performance-engineering-patterns
-description: >
-  Diretrizes consolidadas de performance engineering para revisão especializada —
-  Core Web Vitals (LCP/INP/CLS) no frontend, N+1 queries e profiling de latência
-  no backend, otimização de índice e queries no banco. Baseado em padrões de
-  mercado 2026 (web.dev, DORA, práticas de revisão de performance).
+description: "Define diretrizes e padrões para diretrizes consolidadas de performance engineering para revisão especializada — Core Web Vitals (LCP/INP/CLS) no frontend, N+1 queries e profiling de latência no backend, otimização de índice e queries no banco. Baseado em padrões de mercado 2026 (web.dev, DORA, práticas de revisão de performance). Use quando atuar em performance, otimização, latência. Não use para tarefas fora do escopo de performance-engineering-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: quality
 triggers:
@@ -32,6 +28,10 @@ tools: []
 # Performance Engineering Patterns
 
 > Base de conhecimento para agents que fazem **análise especializada de performance** — complementa a dimensão "Performance" já existente em `code-review-patterns` (genérica) com critérios objetivos por camada (frontend, backend, banco).
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `performance-engineering-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando Usar
 

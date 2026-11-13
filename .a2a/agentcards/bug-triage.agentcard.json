@@ -25,8 +25,7 @@
     "agent-contracts",
     "confidence-fallback-policy",
     "agent-evals-lab",
-    "jira-mcp",
-    "jira-writing-patterns"
+    "jira-mcp"
   ],
   "tools": [
     "grep_search",

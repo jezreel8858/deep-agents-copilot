@@ -9,7 +9,7 @@ Este repositório provê a infraestrutura de governança corporativa de IA. As r
 
 ## 1.1) 🚀 **AGENT ROUTER FIRST — Ponto de Entrada Obrigatório** (R-037)
 
-**SEM EXCEÇÃO:** Toda solicitação deve começar com `@agent-router`.
+**SEM EXCEÇÃO:** Toda solicitação deve começar com `@agent-router`. **Exceção Canônica — Slash Prompts Explícitos (`router_bypass: utility | slash_workflow`)**: Quando o usuário invocar explicitamente qualquer Slash Prompt (`.github/prompts/<nome>.prompt.md` com `router_bypass: utility` ou `router_bypass: slash_workflow` no frontmatter — todos os Slash Prompts exceto `/agent-router`), o comando já foi selecionado pelo usuário e possui fluxo determinístico próprio; portanto, o Orquestrador Raiz **NUNCA deve invocar `@agent-router`** na triagem inicial, devendo executar diretamente as instruções/fluxo do `.prompt.md` (ou despachar diretamente para o subagente previsto no próprio `.prompt.md`; nos prompts com `router_bypass: utility`, sem delegar a subagentes e aplicando diretamente o fallback/Compact Error Reporting R-020 definido no próprio prompt caso alguma tool MCP específica não esteja exposta no host).
 
 ```text
 Solicitação (turno N)
@@ -17,7 +17,7 @@ Solicitação (turno N)
 @agent-router (triagem inicial & Health Check R-034)
     ↓
 Agent ativo de turno anterior? (R-042)
-    ├─ Não -> triagem normal (OBRIGATÓRIO invocar @agent-router via run_subagent antes de qualquer tool — R-063; "ausência de agent ativo" NUNCA autoriza execução direta)
+    ├─ Não -> triagem normal (OBRIGATÓRIO invocar @agent-router via run_subagent antes de qualquer tool — R-063; "ausência de agent ativo" NUNCA autoriza execução direta) **Exceção Canônica — Slash Prompts Explícitos (`router_bypass: utility | slash_workflow`)**: Quando o usuário invocar explicitamente qualquer Slash Prompt (`.github/prompts/<nome>.prompt.md` com `router_bypass: utility` ou `router_bypass: slash_workflow` no frontmatter — todos os Slash Prompts exceto `/agent-router`), o comando já foi selecionado pelo usuário e possui fluxo determinístico próprio; portanto, o Orquestrador Raiz **NUNCA deve invocar `@agent-router`** na triagem inicial, devendo executar diretamente as instruções/fluxo do `.prompt.md` (ou despachar diretamente para o subagente previsto no próprio `.prompt.md`; nos prompts com `router_bypass: utility`, sem delegar a subagentes e aplicando diretamente o fallback/Compact Error Reporting R-020 definido no próprio prompt caso alguma tool MCP específica não esteja exposta no host).
     └─ Sim -> checar deriva de intenção antes de responder
               ├─ Sem deriva -> devolve ao agent ativo (sem re-rotear)
               └─ Deriva -> handoff (motivo: "deriva_de_intencao") -> triagem completa
@@ -29,7 +29,7 @@ Agent ativo de turno anterior? (R-042)
         └─ @prompt-structuring (R-041 — loop máx. 5 iterações) → retorno obrigatório a @agent-router
     ↓
 [Execução Sequencial no Workflow Canônico (R-050)]
-    (Planos em docs/plans/ e docs/implementation-plans/ com aprovação humana R-064, vide invariantes-e-protocolos.md § 10)
+    (Planos em docs/plans/<tipo>/<AAAAMMDD-HHMMSS>-<slug>.md e docs/plans/implementation/<AAAAMMDD-HHMMSS>-<workflow>-<slug>.md com aprovação humana R-064 (`docs/plans/<tipo>/` (`feature/`, `refactor/`, `architecture/`, `implementation/`, `test-strategy/`, `bug-triage/`, `requirements/`, `governance/`), proibidos prefixos `PLAN-`/`REQ-`), vide invariantes-e-protocolos.md § 10)
     ↓
 Turno seguinte muda de fase/escopo? (R-042)
     ├─ Sim -> agent ativo retorna a @agent-router (handoff de deriva)
@@ -42,9 +42,10 @@ Vide [`.github/agents/agent-router.agent.md`](agents/agent-router.agent.md) § *
 ## 2) 🛑 Regras de Autonomia (não negociáveis)
 
 ### ✅ Sempre
-- **Agent Router First (R-037)**: Toda solicitação começa com `@agent-router`. O Orquestrador despacha o downstream uma única vez em nível plano (Flat Delegation).
+- **Agent Router First (R-037)**: Toda solicitação começa com `@agent-router`. O Orquestrador despacha o downstream uma única vez em nível plano (Flat Delegation). **Exceção Canônica — Slash Prompts Explícitos (`router_bypass: utility | slash_workflow`)**: Quando o usuário invocar explicitamente qualquer Slash Prompt (`.github/prompts/<nome>.prompt.md` com `router_bypass: utility` ou `router_bypass: slash_workflow` no frontmatter — todos os Slash Prompts exceto `/agent-router`), o Orquestrador Raiz NUNCA deve invocar `@agent-router` na triagem inicial, executando diretamente o fluxo/subagente previsto no próprio `.prompt.md`.
+- **Clarificação e UX de `ask_questions` (R-027)**: Em ambiguidades ou checkpoints HITL, use `ask_questions` com 1–4 perguntas/chamada, `header` ≤ 25 chars, `allowFreeformInput: true`, 2–4 opções reais e mutuamente exclusivas (Anti-Strawman), `description` obrigatório (`[Consequência prática / O que faz] + [Trade-off ou quando escolher]`) e 1ª opção `(Recomendado)` para melhor prática técnica (salvo decisão puramente de negócio) — SSOT: `structured-intake-patterns`.
 - **Re-triagem Obrigatória por Turno (R-042 — Anti Sticky-Session)**: Reavaliar intenção a cada turno; detectada deriva ou nova demanda pós-conclusão de workflow anterior (R-052 / conclusao_de_workflow_anterior), retornar imediatamente a `@agent-router` (*Anti Sticky-Agent*).
-- **Zero Execução Direta pelo Orquestrador Raiz sem Router (R-063 — Anti Silent Bypass)**: É terminantemente proibido ao modelo do turno raiz executar diretamente tarefas técnicas sem passar por `@agent-router`; o Orquestrador Raiz deve sempre invocar o router para triagem.
+- **Zero Execução Direta pelo Orquestrador Raiz sem Router (R-063 — Anti Silent Bypass)**: É terminantemente proibido ao modelo do turno raiz executar diretamente tarefas técnicas sem passar por `@agent-router`; o Orquestrador Raiz deve sempre invocar o router para triagem. **Exceção Canônica — Slash Prompts Explícitos (`router_bypass: utility | slash_workflow`)**: Quando o usuário invocar explicitamente qualquer Slash Prompt (`.github/prompts/<nome>.prompt.md`, exceto `/agent-router`), o comando já foi selecionado pelo usuário e possui fluxo determinístico próprio; portanto, o Orquestrador Raiz NUNCA deve invocar `@agent-router` na triagem inicial, devendo executar diretamente as instruções/fluxo do `.prompt.md` (ou despachar diretamente para o subagente previsto no próprio `.prompt.md`).
 - **Zero Impersonation pelo Orquestrador Raiz (R-062 — Anti Root-Agent-Impersonation)**: O modelo do turno raiz nunca deve se autodenominar ou assinar como qualquer especialista antes de delegar via `run_subagent`.
 - **Precedência Mandatória e 100% Obrigatória de Context Mode (R-008, R-056)**: O uso de `context-mode` MCP (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_search`, `ctx_index`) é 100% OBRIGATÓRIO para leitura, modificação e criação de arquivos; ferramentas nativas de editor são estritamente proibidas quando o context-mode estiver disponível (rebaixadas a fallback exclusivo de indisponibilidade).
 - **Single-Turn MCP Batching e Protocolo Plan-Then-Batch (R-046, R-059 — Smell 2.26)**: Ao atingir o Limiar >= 2 alvos ou comandos, aplicar compulsoriamente o Protocolo Plan-Then-Batch (etapas: ENUMERAR arquivos/comandos, CONSOLIDAR em `ctx_batch_execute` ou script iterativo `ctx_execute`, DESPACHAR & VALIDAR com `get_errors` ao final). Comandos curtos do usuário ("prosseguir", "continue") mantêm o rigor do protocolo.
@@ -115,3 +116,17 @@ Toda resposta técnica deve iniciar com o banner de agente ativo e estruturar-se
 3. **Economia de Turnos**: Operações em lote consolidadas no sandbox.
 4. **Riscos / Alinhamento**: Quality gates e invariantes preservados.
 5. **Próximo Passo**: Conclusão ou recomendação imediata.
+
+### Política Anti-Timeout, Runtime Preferencial JavaScript (`fs` nativo) e Circuit Breaker Fail-Fast (`ctx_execute` / `ctx_batch_execute`)
+
+1. **Runtime Obrigatório `language: "javascript"` no `ctx_execute` (Anti-Defender/AMSI Hang)**:
+   - No Windows, a invocação de `python.exe` (`language: "python"` ou `python -c`) ou cadeias pesadas de subshells a partir do processo Node.js do servidor MCP `context-mode` sofre interceptação síncrona pelo Windows Defender (`MsMpEng.exe` / Behavior Monitoring / AMSI), causando bloqueios severos de I/O e timeouts (`ETIMEDOUT` / `taskkill /F /T`).
+   - Portanto, `language: "javascript"` (com módulos nativos `fs` e `path` do Node.js) é o **runtime obrigatório** no `ctx_execute` para leitura, inspeção, busca, parsing JSON/texto e modificação em lote de arquivos.
+   - É **terminantemente proibido** invocar `language: "python"`, `python -c` ou subshells aninhados para I/O de arquivos. (A execução de binários Python via `child_process` é restrita exclusivamente a ferramentas CLI do ecossistema, como `pytest` ou scripts de sincronização canônicos, nunca para ler/editar arquivos).
+2. **Higiene de Comandos em `ctx_batch_execute`**:
+   - Os comandos shell em `ctx_batch_execute` devem ser leves, atômicos e com escopo de diretório estritamente restrito.
+   - É **proibido** disparar `python -c` inline em lote ou varreduras recursivas irrestritas na raiz do workspace sem filtro de pasta/extensão (evitando estourar o orçamento de tempo do batch).
+3. **Política Fail-Fast & Circuit Breaker de Timeout (Máx. 1 Retry com Troca de Estratégia)**:
+   - Em caso de erro de timeout (`ETIMEDOUT`, `timed out`, `taskkill`) em `ctx_execute` ou `ctx_batch_execute`, o agente tem **tolerância zero para repetir a mesma chamada/runtime**.
+   - É permitido no **máximo 1 retry**, contanto que haja **troca obrigatória de estratégia** (migrar de `python`/`shell` para `language: "javascript"` puro com `fs` nativo, ou dividir o lote em comandos menores/escopo restrito).
+   - Se ocorrer um **2º timeout**, o **Circuit Breaker Fail-Fast** abre imediatamente: o agente deve abortar novas tentativas de spawn, registrar a evidência e acionar o fallback canônico ou reportar o bloqueio em formato Compact Error Reporting (R-020).

@@ -1,9 +1,6 @@
 ---
 name: documentation-writing-patterns
-description: >-
-  Diretrizes agnósticas de domínio para estruturar e escrever documentação
-  técnica em Markdown com qualidade de mercado (Diátaxis, ADR/MADR, README,
-  front-matter, formatação chunking-friendly para consumo por IA).
+description: "Define diretrizes e padrões para diretrizes agnósticas de domínio para estruturar e escrever documentação técnica em Markdown com qualidade de mercado (Diátaxis, ADR/MADR, README, front-matter, formatação chunking-friendly para consumo por IA). Use quando atuar em escrever documentação, criar documentação técnica, estruturar README. Não use para tarefas fora do escopo de documentation-writing-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: documentation
 triggers:
@@ -22,6 +19,14 @@ source_docs:
 # Documentation Writing Patterns
 
 > Base de conhecimento agnóstica de assunto para qualquer agent cujo trabalho seja **produzir documentação técnica em Markdown** — independente do domínio (código, processo, arquitetura, API, decisão, incidente).
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `documentation-writing-patterns` ou quando outra skill específica cobrir integralmente o escopo.
+
+## Diretrizes e Padrões Canônicos
+
+- Seguir estritamente as regras, invariantes e fluxos descritos nas seções abaixo.
 
 ## Quando Usar
 
@@ -64,13 +69,18 @@ Front-matter YAML canônico:
 
 ```yaml
 ---
-status: draft # draft | approved | superseded
-date: YYYY-MM-DD
-autor: <nome-do-agent-gerador>
-workflow: <workflow-canonico-1-a-9>
-related-plan: <path-do-doc-de-implementacao-correspondente | N/A>
+status: DRAFT | APPROVED
+approved: false | true
+author: "@<nome-do-agent-planejador>"
+plan_type: "feature | refactor | architecture | implementation | test-strategy | bug-triage | requirements | governance"
+created_at: "AAAA-MM-DD"
+related-planning-doc: "docs/plans/<tipo>/<arquivo>.md | N/A"
+allowed_files:
+  - "caminho/ou/glob/**"
 ---
 ```
+
+**Árvore unificada R-064**: planos residem em `docs/plans/<tipo>/` — `feature/`, `refactor/`, `architecture/`, `implementation/`, `test-strategy/`, `bug-triage/`, `requirements/`, `governance/` (`plan_type` = nome da subpasta). Agents planejadores permanecem **100% Read-Only** e emitem o plano estruturado; a **persistência física `.md`** é de `@docs-engineer` (ou `@governance-maintainer` para `governance`).
 
 Estrutura mínima obrigatória: Front-matter → Contexto/Problema → Opções consideradas → Decisão → **Alternativas Rejeitadas (obrigatória)** → **🛡️ Modelagem de Ameaças & Requisitos de Segurança (Shift-Left) (obrigatória)** → Consequências/Riscos → DoD (1 critério único de "pronto" a nível de documento).
 
@@ -124,7 +134,7 @@ status: approved
 date: 2026-01-10
 autor: tech-solution-architect
 workflow: 3-arquitetura
-related-plan: docs/plan/refactor-auth-module-plan.md
+related-plan: docs/plans/refactor-auth-module-plan.md
 ---
 
 # Blueprint: Migração do módulo de autenticação
@@ -147,7 +157,7 @@ status: draft
 date: 2026-01-11
 autor: refactor-planner
 workflow: 3-arquitetura
-related-planning-doc: docs/plan/refactor-auth-module-blueprint.md
+related-planning-doc: docs/plans/refactor-auth-module-blueprint.md
 progress: 0
 reversibility: T2
 ---

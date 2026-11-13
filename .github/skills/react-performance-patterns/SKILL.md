@@ -1,8 +1,6 @@
 ---
 name: react-performance-patterns
-description: >-
-  Diretrizes de performance e Core Web Vitals para aplicações React (React Compiler,
-  code-splitting, streaming SSR, memoização orientada a medição).
+description: "Define diretrizes e padrões para diretrizes de performance e Core Web Vitals para aplicações React (React Compiler, code-splitting, streaming SSR, memoização orientada a medição). Use quando atuar em performance react, core web vitals react, react compiler. Não use para tarefas fora do escopo de react-performance-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: quality
 triggers:
@@ -21,6 +19,10 @@ tools: []
 # React Performance Patterns
 
 > **Relação com Padrões Universais**: Esta skill especializa as diretrizes arquiteturais e thresholds de performance definidos em [.github/skills/performance-engineering-patterns/SKILL.md](../performance-engineering-patterns/SKILL.md) para o ecossistema React (React Compiler, streaming SSR, Suspense). Consulte a skill genérica para métricas globais (Core Web Vitals thresholds, SLA/SLO, pirâmide de diagnóstico).
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `react-performance-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando Usar
 

@@ -1,15 +1,6 @@
 ---
 name: harness-engineering-patterns
-description: >-
-  Fornece diretrizes e heurísticas canônicas de Harness Engineering — o subconjunto de
-  Context Engineering que trata do "arnês" ao redor do modelo (tools, system prompt,
-  gestão de janela de contexto, permissões, hooks). Use quando precisar diagnosticar
-  comportamento anômalo de agent (harness vs. modelo), podar instrução/contexto
-  acumulado ("bloat"), aplicar o limiar prático de ~100k tokens de "zona inteligente"
-  ou auditar minimalismo/progressive disclosure de arquivos AGENTS.md/CLAUDE.md/
-  instructions. Não use para avaliação de qualidade de resposta do modelo em si
-  (isso é `agent-evals-lab`) nem para estruturação do prompt de tarefa (isso é
-  `prompt-engineering-patterns`).
+description: "Fornece diretrizes e heurísticas canônicas de Harness Engineering — o subconjunto de Context Engineering que trata do 'arnês' ao redor do modelo (tools, system prompt, gestão de janela de contexto, permissões, hooks). Use quando precisar diagnosticar comportamento anômalo de agent (harness vs. modelo), podar instrução/contexto acumulado ('bloat'), aplicar o limiar prático de ~100k tokens de 'zona inteligente' ou auditar minimalismo/progressive disclosure de arquivos AGENTS.md/CLAUDE.md/ instructions. Não use para avaliação de qualidade de resposta do modelo em si (isso é `agent-evals-lab`) nem para estruturação do prompt de tarefa (isso é `prompt-engineering-patterns`)."
 tier: 1
 category: process
 triggers:
@@ -35,6 +26,10 @@ tools: []
 ---
 
 # Harness Engineering Patterns
+
+## Quando Usar
+
+- Ativação em cenários de harness engineering, diagnostico de harness, harness vs modelo.
 
 ## 0) Problema Resolvido & Princípios Fundamentais
 

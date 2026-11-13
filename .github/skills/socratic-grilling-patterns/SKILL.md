@@ -1,7 +1,6 @@
 ---
 name: socratic-grilling-patterns
-description: >-
-  Fornece algoritmo de árvore de decisão e protocolo de registro concorrente (Grill-with-Docs) para conduzir interrogatório socrático estruturado via ask_questions, mapeando a fronteira ativa de incerteza até decisões arquiteturais documentadas. Use quando um requisito, decisão arquitetural ou trade-off técnico permanecer ambíguo após a primeira rodada de clarificação. Não use para coleta trivial de dados objetivos — usar structured-intake-patterns.
+description: "Fornece algoritmo de árvore de decisão e protocolo de registro concorrente (Grill-with-Docs) para conduzir interrogatório socrático estruturado via ask_questions, mapeando a fronteira ativa de incerteza até decisões arquiteturais documentadas. Use quando um requisito, decisão arquitetural ou trade-off técnico permanecer ambíguo após a primeira rodada de clarificação. Não use para coleta trivial de dados objetivos — usar structured-intake-patterns."
 tier: 2
 category: process
 triggers:
@@ -21,6 +20,10 @@ tools: []
 ---
 
 # Socratic Grilling Patterns
+
+## Quando Usar
+
+- Ativação em cenários de interrogatório socrático, socratic grilling, trade-off arquitetural.
 
 ## 0) Problema Resolvido & Princípios Fundamentais
 
@@ -57,7 +60,7 @@ Durante o interrogatório, registrar **concorrentemente** (nunca apenas ao final
 - **Decisões arquiteturais tomadas**: decisão + racional + responsável pela resposta.
 - **Glossário ubíquo**: termos de domínio definidos durante a conversa, evitando deriva semântica em artefatos subsequentes.
 
-Este registro concorrente alimenta diretamente `docs/requirements/REQ-<modulo>.md`, ADRs (`@adr-sentinel`) ou o Blueprint Técnico (`@tech-solution-architect`).
+Este registro concorrente alimenta diretamente `docs/plans/requirements/<AAAAMMDD-HHMMSS>-<modulo>.md`, ADRs (`@adr-sentinel`) ou o Blueprint Técnico (`@tech-solution-architect`).
 
 ---
 
@@ -93,7 +96,7 @@ Quando o impasse técnico não pode ser resolvido apenas com o usuário do chat 
 
 | Consumidor | Papel na Relação | Momento de Uso |
 |---|---|---|
-| `@requirements-analyst` | Elicitação de requisito ambíguo | Antes de materializar `REQ-<modulo>.md` |
+| `@requirements-analyst` | Elicitação de requisito ambíguo | Antes de materializar `docs/plans/requirements/<AAAAMMDD-HHMMSS>-<modulo>.md` |
 | `@tech-solution-architect` | Trade-off de blueprint técnico | Antes de fechar contrato de API/modelo de dados |
 | `@refactor-planner` | Decisão de escopo de refatoração | Antes de fechar o DAG de etapas quando o escopo é ambíguo |
 
@@ -105,3 +108,10 @@ Quando o impasse técnico não pode ser resolvido apenas com o usuário do chat 
 - `.github/skills/structured-intake-patterns/SKILL.md`
 - `.github/skills/requirements-engineering-patterns/SKILL.md`
 - `docs/agent-context/templates/stakeholder-questionnaire.md`
+
+## Contrato Canônico de UX do `ask_questions` (CA-03, CA-04, CA-05)
+
+Ao formular perguntas socráticas via `ask_questions`, cumpra rigorosamente o contrato canônico definido em `structured-intake-patterns` (R-027):
+- **CA-03 (`description` Obrigatório com Consequência + Trade-off)**: Cada opção deve conter `description` (1–2 frases) estruturado como `[Consequência prática / O que faz] + [Trade-off principal ou quando escolher]`. Nunca emita `options` apenas com `label`.
+- **CA-04 (1ª Opção `(Recomendado)` — Default Effect)**: Se houver melhor prática técnica/arquitetural clara, posicione-a na **1ª opção** com sufixo `(Recomendado)` no `label`. **Exceção explícita**: decisões puramente de negócio/produto sem alternativa técnica superior não devem forçar `(Recomendado)`.
+- **CA-05 (Anti-Strawman e Limites Ergonômicos)**: Forneça entre **2 e 4 opções reais, viáveis, mutuamente exclusivas e defensáveis** (proibido opções espantalho/strawman ou opção artificial `"Outro"`), limite a rodada a **1–4 perguntas por chamada**, mantenha `header` ≤ 25 caracteres e `allowFreeformInput: true` por padrão.

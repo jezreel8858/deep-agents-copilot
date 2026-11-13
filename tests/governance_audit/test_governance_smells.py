@@ -934,3 +934,57 @@ def test_commit_prompt_not_normative_ssot():
                     f"[commit.prompt.md] Prompt se declara incorretamente como SSOT normativa na linha: '{line.strip()}'",
                     fix_hint="Prompts são atalhos executores. Aponte a skill git-governance como a verdadeira SSOT.",
                 ))
+
+
+# ─────────────────────────────────────────────────────────────
+# SMELL 2.14 / R-053 — Frontmatter tools: Deve Ser Array Inline (tools: ['...'])
+# ─────────────────────────────────────────────────────────────
+
+def test_smell_2_14_frontmatter_tools_must_be_inline_array():
+    """Valida que o campo 'tools:' no texto bruto do frontmatter YAML de todos os arquivos
+    .agent.md (.github/agents/), .prompt.md (.github/prompts/) e SKILL.md (.github/skills/),
+    incluindo templates/, esteja estritamente em formato inline array (tools: [...]) e
+    nunca em formato de lista YAML multilinha (tools:\n  - ...)."""
+    target_files: list[Path] = []
+    target_files.extend(sorted(AGENTS_DIR.glob("**/*.agent.md")))
+    target_files.extend(sorted(AGENTS_DIR.glob("templates/*.md")))
+    target_files.extend(sorted(PROMPTS_DIR.glob("**/*.prompt.md")))
+    target_files.extend(sorted(PROMPTS_DIR.glob("templates/*.md")))
+    target_files.extend(sorted(SKILLS_DIR.glob("**/SKILL.md")))
+    target_files.extend(sorted(SKILLS_DIR.glob("templates/*.md")))
+
+    seen: set[Path] = set()
+    unique_files: list[Path] = []
+    for f in target_files:
+        if f not in seen and f.is_file():
+            seen.add(f)
+            unique_files.append(f)
+
+    assert len(unique_files) >= 80, "Deve inspecionar todos os agents, prompts e skills do repositório"
+
+    multiline_pattern = re.compile(r"^tools:\s*\r?\n\s*-", re.MULTILINE)
+    inline_pattern = re.compile(r"^tools:\s*\[.*\]\s*$", re.MULTILINE)
+    any_tools_key = re.compile(r"^tools:", re.MULTILINE)
+
+    violations: list[str] = []
+    for file_path in unique_files:
+        content = file_path.read_text(encoding="utf-8")
+        if not content.startswith("---"):
+            continue
+        parts = content.split("---", 2)
+        if len(parts) < 3:
+            continue
+        raw_fm = parts[1]
+        rel = file_path.relative_to(REPO_ROOT).as_posix()
+
+        if multiline_pattern.search(raw_fm):
+            violations.append(f"[{rel}] declara 'tools:' em formato multilinha (tools:\\n  - ...)")
+        elif any_tools_key.search(raw_fm) and not inline_pattern.search(raw_fm):
+            violations.append(f"[{rel}] declara 'tools:' fora do formato inline array (tools: [...])")
+
+    assert not violations, remediation(
+        f"Encontrada(s) {len(violations)} violação(ões) de sintaxe inline em 'tools:' no frontmatter:\n"
+        + "\n".join(f"  - {v}" for v in violations),
+        fix_hint="Converta 'tools:' no frontmatter para sintaxe inline array: tools: ['tool1', 'tool2'].",
+    )
+

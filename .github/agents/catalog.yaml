@@ -472,7 +472,6 @@ agents:
     - context-mode/ctx_search
     - context-mode/ctx_batch_execute
     - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
     - context-mode/ctx_index
     related_skills:
     - governance-audit-patterns
@@ -1589,7 +1588,7 @@ agents:
     description: Especialista em elicitação, refinamento e estruturação de requisitos
       de negócio e técnicos a partir de pedidos ambíguos. Converte intenção em especificações
       precisas com critérios de aceitação e regras de negócio antes do planejamento
-      técnico, materializando-as em docs/requirements/REQ-<modulo>.md como ground truth.
+      técnico, materializando-as em docs/plans/requirements/<AAAAMMDD-HHMMSS>-<modulo>.md como ground truth.
     keywords:
     - levantar requisitos
     - requisito ambiguo
@@ -2357,7 +2356,7 @@ metadata:
     aos 7 nomes antigos em .github/ e docs/ai-context/ — as unicas ocorrencias restantes
     sao mencoes historicas legitimas (changelog desta propria entrada, atribuicao
     de autoria em snippets/code-summarizer/{cli-runner.js,README.md}, docs/ai-context/evals/casos-code-summarizer.yaml
-    campo responsavel, e documentos datados em docs/plan/*.md e docs/requirements/*.md
+    campo responsavel, e documentos datados em docs/plans/*.md e docs/plans/requirements/*.md
     que registram decisoes passadas e nao devem ser reescritos retroativamente). Nenhuma
     pendencia remanescente desta demanda. total_agents permanece 34. | 2026-09-02
     (32) — A pedido do usuario (''nao deixe nada pendente pode ajustar os routing-graph.yaml
@@ -2381,11 +2380,11 @@ metadata:
     e mais sobre roteamento de agent, e sobre selecao de modo dentro do agent). Suite
     mantida em 56 casos (24 canonicos, 6 ambiguos, 22 regressao), validada via parser
     YAML e get_errors — 0 erros em ambos os arquivos. Nenhuma pendencia remanescente.
-    docs/plan/analise-arquitetura-multi-agent-alinhamento.md atualizado (secao 8.5
+    docs/plans/architecture/20260902-090000-analise-arquitetura-multi-agent-alinhamento.md atualizado (secao 8.5
     de ''pendente'' para ''resolvido''). total_agents permanece 34 (nenhum agent novo/removido
     nesta rodada, apenas sincronizacao de grafo/evals). | 2026-09-02 (32) — A pedido
     do usuario (''preciso que revise essa analise se estiver correta pode implementar
-    todas as mudancas'', a partir de docs/plan/analise-arquitetura-multi-agent-alinhamento.md),
+    todas as mudancas'', a partir de docs/plans/architecture/20260902-090000-analise-arquitetura-multi-agent-alinhamento.md),
     executada revisao critica seguida de implementacao. CORRECOES aplicadas a analise
     original antes de implementar: (1) REJEITADA a fusao ''code-review absorve code-style-enforcer''
     — apos ler os 2 agents reais, code-style-enforcer segue o MESMO padrao arquitetural
@@ -2812,11 +2811,11 @@ metadata:
     arquivos, ~4min, 849 nos, 1047 arestas (1017 import, 68 http), 3 ciclos reais
     detectados, 28 arestas cross-repo (21 exact + 7 heuristic, 0 falso-positivo pos-fix).
     Agent registrado atomicamente (README.md, este catalog.yaml); nenhuma mudanca
-    em total_agents (26). Documentado em docs/requirements/REQ-grafo-conhecimento-codigo.md
+    em total_agents (26). Documentado em docs/plans/requirements/REQ-grafo-conhecimento-codigo.md
     §15..§17. [NOTA 2026-09-01 rodada 24: este motor anterior foi REMOVIDO integralmente
     na rodada 24 apos instabilidade real de producao — ver entry (24) acima. Registro
     historico mantido apenas para rastreabilidade, nao reflete o estado atual do agent.]
-    | 2026-09-01 (16) — Executado plano de remocao autorizado (docs/requirements/REQ-grafo-conhecimento-codigo.md
+    | 2026-09-01 (16) — Executado plano de remocao autorizado (docs/plans/requirements/REQ-grafo-conhecimento-codigo.md
     §13.4, rodada 14): removida a skill dependency-graph-mapping do repositorio apos
     Gate de Paridade Funcional (RNF-012) validado 9/9 com evidencia de execucao real
     (§11/§12 do REQ). Atualizados atomicamente: codegraph-engine.agent.md (v1.1.0->v1.2.0,
@@ -2828,7 +2827,7 @@ metadata:
     arquivo .github/skills/dependency-graph-mapping/SKILL.md (removido fisicamente).
     Nenhuma referencia orfa remanescente em .github/ apos varredura final (R-015/R-040).
     | 2026-09-01 (15) — Estendido agent codegraph-engine (v1.0.0 -> v1.1.0) implementando
-    RF-013..RF-019/RNF-011/RNF-012 (docs/requirements/REQ-grafo-conhecimento-codigo.md
+    RF-013..RF-019/RNF-011/RNF-012 (docs/plans/requirements/REQ-grafo-conhecimento-codigo.md
     §8.3, plano tecnico do analysis-architect rodada 6): agora cobre tambem o nivel
     arquitetural entre sistemas/servicos — coleta de artefatos de integracao via grep_search/file_search
     (RF-013), construcao real de nos type:system|service e arestas type:http|queue|event
@@ -2852,7 +2851,7 @@ metadata:
     sem alterar o veredito de RF-012/RNF-009. Registrado atomicamente em catalog.yaml
     e README.md (R-015); total_agents permanece 26. | 2026-09-01 (14) — Criado agent
     codegraph-engine (perfil Operacional/Executor, puramente deterministico) implementando
-    o MVP de nivel codigo (RF-001..RF-011) do REQ docs/requirements/REQ-grafo-conhecimento-codigo.md:
+    o MVP de nivel codigo (RF-001..RF-011) do REQ docs/plans/requirements/REQ-grafo-conhecimento-codigo.md:
     ponto de entrada unico para construcao/consulta de grafo de conhecimento de codigo-fonte
     cross-projeto (RF-003), 3 granularidades de no (arquivo/classe/funcao, RF-004)
     e 4 tipos de aresta (import/chamada/heranca/sql-table, RF-005), reaproveitando

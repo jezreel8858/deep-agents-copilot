@@ -406,9 +406,9 @@ def test_no_local_project_identifiers_in_file_paths():
 
 
 def test_implementation_plans_are_covered_by_isolation_scan():
-    """Emenda B7 (c): todo arquivo em docs/implementation-plans/ (tracked ou untracked) entra na varredura, salvo se ignorado pelo Git."""
-    plans_dir = REPO_ROOT / "docs" / "implementation-plans"
-    assert plans_dir.is_dir(), "docs/implementation-plans/ deve existir"
+    """Emenda B7 (c): todo arquivo em docs/plans/implementation/ (tracked ou untracked) entra na varredura, salvo se ignorado pelo Git."""
+    plans_dir = REPO_ROOT / "docs" / "plans" / "implementation"
+    assert plans_dir.is_dir(), "docs/plans/implementation/ deve existir"
     scanned = {f.resolve() for f in get_git_tracked_files()}
     uncovered: list[str] = []
     for fpath in sorted(p for p in plans_dir.rglob("*") if p.is_file()):
@@ -417,7 +417,7 @@ def test_implementation_plans_are_covered_by_isolation_scan():
         ignored = subprocess.run(["git", "check-ignore", "-q", str(fpath)], cwd=REPO_ROOT).returncode == 0
         if not ignored:
             uncovered.append(fpath.relative_to(REPO_ROOT).as_posix())
-    assert not uncovered, f"Arquivos de docs/implementation-plans/ fora da varredura de isolamento: {uncovered}"
+    assert not uncovered, f"Arquivos de docs/plans/implementation/ fora da varredura de isolamento: {uncovered}"
 
 
 def test_forbidden_identifiers_not_empty_when_local_overlay_present():
@@ -470,7 +470,7 @@ def _escrever(repo: Path, rel: str, conteudo: str) -> Path:
 
 def test_deve_detectar_arquivo_untracked_quando_contem_identificador_sintetico_antes_de_git_add(repo_git_temporario: Path):
     """D1: plano novo NÃO rastreado com id sintético é detectado sem nenhum `git add`."""
-    _escrever(repo_git_temporario, "docs/implementation-plans/20260101-plano-novo.md", f"Referência ao {_ID_SINTETICO} aqui.\n")
+    _escrever(repo_git_temporario, "docs/plans/implementation/20260101-090000-feature-development-plano-novo.md", f"Referência ao {_ID_SINTETICO} aqui.\n")
     assert _git(repo_git_temporario, "ls-files", "--cached").stdout.strip() == ""
     leaks = find_identifier_leaks(repo_git_temporario, {_ID_SINTETICO})
     assert len(leaks) == 1
