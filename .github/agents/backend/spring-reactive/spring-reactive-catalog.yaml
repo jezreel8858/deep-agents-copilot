@@ -23,7 +23,7 @@ agents:
     - list_dir
     - ask_questions
     - context-mode/ctx_search
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     skills:
     - spring-reactive-webflux-patterns
     - spring-reactive-implementation-patterns
@@ -60,9 +60,9 @@ agents:
     - run_in_terminal
     - context-mode/ctx_execute
     - context-mode/ctx_search
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - context-mode/ctx_index
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     skills:
     - spring-reactive-implementation-patterns
     - spring-reactive-webflux-patterns
@@ -102,9 +102,9 @@ agents:
     - run_in_terminal
     - context-mode/ctx_execute
     - context-mode/ctx_search
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - context-mode/ctx_index
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     skills:
     - spring-reactive-implementation-patterns
     - test-implementation-backend

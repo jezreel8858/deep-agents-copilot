@@ -145,7 +145,7 @@ def _instalar_copilot_falso(
     subagent_erro: str = "falha simulada",
     shell_full_command_text: str = "git --no-pager status",
     shell_read_only: bool = True,
-    mcp_tool_name: str = "ctx_batch_execute",
+    mcp_tool_name: str = "ctx_batch",
     mcp_server_name: str = "context-mode",
     mcp_read_only: bool = False,
     usage_total_nano_aiu: float | None = None,
@@ -1741,7 +1741,7 @@ class TestPermissionRequestShell:
     ) -> None:
         """Bug real investigado (2026-10-04): o SDK headless real reporta
         `PermissionRequestMcp.tool_name` como o nome CRU exposto pelo
-        servidor MCP (ex.: "ctx_batch_execute"), SEM o prefixo de exibicao
+        servidor MCP (ex.: "ctx_batch"), SEM o prefixo de exibicao
         da IDE ("mcp_context-mode_ctx_batch_execute") esperado por
         `permission_policy.tool_mcp_e_cataloga`. Isso negava `context-mode`/
         `codegraph`/`tavily` mesmo com o servidor MCP conectado e
@@ -1760,7 +1760,7 @@ class TestPermissionRequestShell:
             monkeypatch,
             eventos_disparados=eventos_disparados,
             tipo_permission_request="mcp",
-            mcp_tool_name="ctx_batch_execute",
+            mcp_tool_name="ctx_batch",
             mcp_server_name="context-mode",
             mcp_read_only=False,
         )

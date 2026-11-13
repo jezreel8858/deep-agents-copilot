@@ -111,8 +111,8 @@ def test_database_arch_advisor_is_gather_only():
     frontmatter = yaml.safe_load(content.split("---")[1])
     tools = set(frontmatter.get("tools", []))
     assert "context-mode/ctx_execute" not in tools
-    assert "context-mode/ctx_execute_file" not in tools
-    assert "context-mode/ctx_batch_execute" in tools
+    assert "context-mode/ctx_execute" not in tools
+    assert "context-mode/ctx_batch" in tools
 
 
 def test_database_executors_declare_r046_and_zero_noise():

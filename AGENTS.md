@@ -15,7 +15,7 @@ Para evitar duplicação e divergência de instruções, a fonte canônica e int
    - A cada turno, a intenção é reavaliada contra a matriz de Não-Escopo para prevenir sticky sessions.
 
 2. **Precedência Mandatória de Context Mode & Think-in-Code (R-008 / R-056)**:
-   - Uso 100% obrigatório do MCP `context-mode` (`ctx_execute`, `ctx_batch_execute`, etc.) para leitura, escrita e testes.
+   - Uso 100% obrigatório do MCP `context-mode` (`ctx_execute`, `ctx_batch`, etc.) para leitura, escrita e testes.
    - Ferramentas nativas de editor e shell exploratório são estritamente proibidas quando o context-mode estiver acessível (rebaixadas a fallback exclusivo de indisponibilidade).
 
 3. **Batching Compulsório (R-046 / R-059 / R-060)**:

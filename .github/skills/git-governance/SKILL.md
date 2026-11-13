@@ -21,7 +21,7 @@ source_docs:
 
 # Git Governance
 
-> **Progressive Disclosure**: Nível 1 = frontmatter; Nível 2 = este índice (regras curtas); Nível 3 = `references/` (carregar apenas o necessário via `ctx_execute_file`/`ctx_search`).
+> **Progressive Disclosure**: Nível 1 = frontmatter; Nível 2 = este índice (regras curtas); Nível 3 = `references/` (carregar apenas o necessário via `ctx_execute`/`ctx_search`).
 
 Padroniza versionamento Git: histórico semântico, commits atômicos, PRs auditáveis e zero segredos. **SSOT única** consumida por `/commit` e `@pr-gatekeeper`.
 

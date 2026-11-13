@@ -68,11 +68,11 @@ Divergência entre o perfil do agent (`Router`, `Analítico/Read-Only/Advisor`, 
 ### 2.7.1 — Matriz Canônica de Conformidade (Perfil ↔ Tools ↔ Skills)
 - `Router`: sem tools de escrita; requer `run_subagent` e `handoff-governance`.
 - `Analítico/Read-Only/Advisor`: sem tools de edição (`insert_edit_into_file`, `create_file`, `replace_string_in_file`); requer `run_subagent` e `context-mode/ctx_search`.
-- `Executor/Developer/Test-Engineer`: possui tools de mutação/execução (`ctx_execute`, `ctx_batch_execute`, `get_errors`) e skills `safe-file-editing` / `efficient-batch-code-modification`.
+- `Executor/Developer/Test-Engineer`: possui tools de mutação/execução (`ctx_execute`, `ctx_batch`, `get_errors`) e skills `safe-file-editing` / `efficient-batch-code-modification`.
 - **Invariante Sintática de `tools:`**: Em `.agent.md`, `.prompt.md` e `SKILL.md`, o campo `tools:` no frontmatter deve ser declarado estritamente em sintaxe inline `tools: ['...']` (ou `tools: []`), sendo proibido o formato de lista YAML multilinha (`tools:\n  - ...`).
 
 ### 2.8 — Violação de Batching e Limiar de Modificação (R-046)
-Edições sequenciais arquivo a arquivo no chat em vez de consolidação em lote via `ctx_batch_execute` / `ctx_execute` (`R-046` / `R-059`).
+Edições sequenciais arquivo a arquivo no chat em vez de consolidação em lote via `ctx_batch` / `ctx_execute` (`R-046` / `R-059`).
 
 ### 2.9 — Não Conformidade com Template Canônico de Agent e Matriz de Modelo
 Desvio das seções de `.github/agents/templates/{agent-template,operational-agent,research-agent,router-agent}.md` ou fixação indevida de modelo tier máximo (`Claude Opus`) sem `model_exception_reason:` (`R-021`).
@@ -125,8 +125,8 @@ Uso de ferramentas nativas de editor/terminal quando o `context-mode` é **100% 
 ### 2.25 — Terceirização Indevida de Edição ao Usuário por Agentes Analíticos / Read-Only (Anti-Manual User Delegation & Dead-End Analysis / R-057)
 Agente analítico/read-only que instrui o usuário a editar arquivos manualmente ("adicione a linha X", "edite o arquivo Y") em vez de delegar ao agente operacional ou retornar ao `@agent-router` (`R-057`).
 
-### 2.26 — MCP Tool Chaining Sequencial no Chat / Omissão de ctx_batch_execute e Script Consolidado (R-008 / R-046 / R-056)
-Múltiplas chamadas unitárias sequenciais no chat em vez de **Single-Turn MCP Batching** via chamada única de `ctx_batch_execute` ou script iterativo consolidado (`R-008` / `R-046` / `R-056` / `R-059`).
+### 2.26 — MCP Tool Chaining Sequencial no Chat / Omissão de ctx_batch e Script Consolidado (R-008 / R-046 / R-056)
+Múltiplas chamadas unitárias sequenciais no chat em vez de **Single-Turn MCP Batching** via chamada única de `ctx_batch` ou script iterativo consolidado (`R-008` / `R-046` / `R-056` / `R-059`).
 
 ### 2.27 — Desvio Prematuro para Implementação e Despejo de Lacunas Arquiteturais (Premature Implementation Bypass & Gap Dumping / R-058)
 Pular o gate de Blueprint Técnico de `@tech-solution-architect` em tarefas arquiteturais/cross-stack ou despejar perguntas técnicas abertas ao usuário sem recomendação fundamentada (`R-058`).
@@ -143,7 +143,7 @@ O orquestrador raiz executa tools de inspeção/edição diretamente para respon
 ### 2.31 — Progressive Disclosure Violation / Full-Load Forçado de Documento Lazy (R-066)
 Manter documento `> 300 linhas` em `source_docs:` (full-load) em vez de `source_docs_lazy:` (consulta via `ctx_search`), ou `SKILL.md > 300 linhas` sem extrair para `references/` (`R-066`).
 
-### 2.32 — Capability Overreach de `ctx_execute`/`ctx_execute_file` em Agent Gather-only (R-008 / R-046 / R-056 / R-059)
+### 2.32 — Capability Overreach de `ctx_execute` (com `file`) em Agent Gather-only (R-008 / R-046 / R-056 / R-059)
 Agente estritamente read-only/gather-only que utiliza `ctx_execute` para mutar estado ou executar ações fora do perfil analítico.
 
 ### 2.33 — Importação de Skill Externa sem Avaliação de Pertinência (Skill Import Viability Gate / R-067)
@@ -159,7 +159,7 @@ Plano fora de `docs/plans/<tipo>/` (incl. caminhos legados `docs/plans/implement
 
 ## 4) Checklist de Conformidade da Auditoria
 
-- [ ] Todos os diretórios (`.github/agents/`, `.github/skills/`, `.github/prompts/`) e catálogos cruzados foram verificados em lote (`ctx_batch_execute`).
+- [ ] Todos os diretórios (`.github/agents/`, `.github/skills/`, `.github/prompts/`) e catálogos cruzados foram verificados em lote (`ctx_batch`).
 - [ ] Sensores estáticos (`pytest tests/governance_audit/ -q --tb=short`) executados e validados.
 - [ ] Nenhum arquivo foi modificado diretamente pelo auditor read-only (`R-057`).
 

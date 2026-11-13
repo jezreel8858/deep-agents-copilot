@@ -45,7 +45,7 @@ agents:
       - ask_questions
       - run_subagent
       - context-mode/ctx_search
-      - context-mode/ctx_batch_execute
+      - context-mode/ctx_batch
       - context-mode/ctx_index
     skills:
       - "spring-boot-backend-patterns"
@@ -80,9 +80,9 @@ agents:
       - run_in_terminal
       - context-mode/ctx_execute
       - context-mode/ctx_search
-      - context-mode/ctx_batch_execute
+      - context-mode/ctx_batch
       - context-mode/ctx_index
-      - context-mode/ctx_execute_file
+      - context-mode/ctx_execute
     skills:
       - "spring-boot-implementation-patterns"
       - "spring-boot-performance-patterns"
@@ -122,9 +122,9 @@ agents:
       - run_in_terminal
       - context-mode/ctx_execute
       - context-mode/ctx_search
-      - context-mode/ctx_batch_execute
+      - context-mode/ctx_batch
       - context-mode/ctx_index
-      - context-mode/ctx_execute_file
+      - context-mode/ctx_execute
     skills:
       - "test-implementation-spring-boot"
       - "test-coverage-governance"

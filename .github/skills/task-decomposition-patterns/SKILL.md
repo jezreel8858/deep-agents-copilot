@@ -119,7 +119,7 @@ Toda subtask gerada que referencie símbolos, dependências ou contratos de cód
 
 - **Fonte primária de verdade**: o grafo de conhecimento de código (`codegraph`/KG) exposto por `@codegraph-engine` (operações `diff-impact`/`fn-impact`/`symbol-lookup`). Toda alegação sobre dependência, fan-in/fan-out ou contrato de API referenciada em uma subtask deve ser verificável por essa fonte.
 - **Proibido**: declarar dependência, assinatura de método ou efeito colateral de código existente sem consulta prévia ao KG — tratar como lacuna explícita (`.github/skills/documentation-writing-patterns/SKILL.md` § 5) quando a verificação não for possível.
-- **Consolidação em lote**: toda consulta de grounding ao KG necessária para decompor um plano deve ser batelada em uma única chamada consolidada (`run_subagent` para `@codegraph-engine` ou `ctx_batch_execute`), nunca em consultas unitárias sequenciais por subtask (R-046/R-060).
+- **Consolidação em lote**: toda consulta de grounding ao KG necessária para decompor um plano deve ser batelada em uma única chamada consolidada (`run_subagent` para `@codegraph-engine` ou `ctx_batch`), nunca em consultas unitárias sequenciais por subtask (R-046/R-060).
 
 ## 4) Validação de Dependências (Antes de Executar)
 

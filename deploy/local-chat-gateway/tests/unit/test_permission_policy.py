@@ -719,7 +719,7 @@ class TestToolMcpECataloga:
     # permanecem liberados sem exigir denylist (ver docstring/comentario de
     # `tool_call_nao_escrita_e_segura` com a analise do @codegraph-engine).
 
-    # Achado code-review 4a iteracao (fail-open em `ctx_batch_execute`):
+    # Achado code-review 4a iteracao (fail-open em `ctx_batch`):
     # o campo `commands` (lista de `{label, command}`) nao era reconhecido
     # por nenhuma extracao, caindo no fallback final "nenhum campo
     # reconhecido => seguro" e liberando comandos destrutivos incondicionalmente.

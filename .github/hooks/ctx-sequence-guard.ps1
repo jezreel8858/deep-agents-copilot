@@ -88,7 +88,7 @@ try {
     } catch {}
 
     if ($counter -ge 2) {
-        $reason = 'Circuit Breaker R-046/R-059/R-060 (context-mode SKILL.md secao 4.1): 2+ chamadas consecutivas de ctx_execute/ctx_execute_file SEM ctx_batch_execute interposto. Isto e feedback automatizado corrigivel (equivalente a erro de lint) - NAO pare, NAO peca permissao ao usuario e NAO repita a mesma chamada isolada. Reconsolide TODOS os alvos pendentes desta tarefa em UMA unica chamada ctx_batch_execute(commands:[...], queries:[...]) e prossiga imediatamente.'
+        $reason = 'Circuit Breaker R-046/R-059/R-060 (context-mode SKILL.md secao 4.1): 2+ chamadas consecutivas de ctx_execute/ctx_execute SEM ctx_batch interposto. Isto e feedback automatizado corrigivel (equivalente a erro de lint) - NAO pare, NAO peca permissao ao usuario e NAO repita a mesma chamada isolada. Reconsolide TODOS os alvos pendentes desta tarefa em UMA unica chamada ctx_batch(commands:[...], queries:[...]) e prossiga imediatamente.'
         $out = @{ permissionDecision = 'deny'; permissionDecisionReason = $reason } | ConvertTo-Json -Compress
         Write-Output $out
         exit 0

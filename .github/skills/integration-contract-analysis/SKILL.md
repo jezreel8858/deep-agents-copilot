@@ -10,7 +10,7 @@ triggers:
   - "Validar compatibilidade retroativa de contrato gRPC ou GraphQL"
   - "Antes de fazer merge de PR que altera contrato público"
   - "Auditar drift entre contrato spec e comportamento real da API"
-tools: ['grep_search', 'file_search', 'read_file', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute']
+tools: ['grep_search', 'file_search', 'read_file', 'context-mode/ctx_batch', 'context-mode/ctx_execute']
 source_docs:
   - .github/agents/tech-solution-architect.agent.md
   - CLAUDE.md

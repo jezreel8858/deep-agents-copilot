@@ -105,11 +105,11 @@ Se **TODOS SIM**: ✅ Você está usando corretamente!
 Use esta lista para revisar qualquer prompt `.prompt.md` antes de publicar:
 
 - [ ] O prompt inicia com retomada por `ctx_search(..., sort: "timeline")` quando aplicável?
-- [ ] A coleta principal usa `ctx_batch_execute(commands, queries)` em vez de chamadas fragmentadas?
+- [ ] A coleta principal usa `ctx_batch(commands, queries)` em vez de chamadas fragmentadas?
 - [ ] As perguntas de follow-up estão agrupadas em um único `queries: [...]`?
 - [ ] O prompt orienta uso de `source` quando houver múltiplas fontes indexadas?
 - [ ] Há regra explícita contra saída bruta extensa no chat?
-- [ ] Para arquivos grandes, o prompt manda usar `ctx_execute_file` em vez de leitura integral?
+- [ ] Para arquivos grandes, o prompt manda usar `ctx_execute` em vez de leitura integral?
 - [ ] Há bloqueio explícito para `ctx_index(content: ...)` com payload grande?
 - [ ] O fallback para terminal está restrito e justificado?
 - [ ] O prompt evita releitura redundante de dados já coletados/indexados?

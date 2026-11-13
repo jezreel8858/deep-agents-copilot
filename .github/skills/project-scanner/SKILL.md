@@ -138,7 +138,7 @@ Quando `adapter-generator` é disparado:
 
 ## 6) Exemplo: Fluxo Completo
 
-- Executar varredura em lote (P1: linguagem/framework, P2: estrutura/codestyle, P3: testes/CI) via `ctx_batch_execute`.
+- Executar varredura em lote (P1: linguagem/framework, P2: estrutura/codestyle, P3: testes/CI) via `ctx_batch`.
 - Script completo de exemplo em [`references/detailed-patterns-and-examples.md`](references/detailed-patterns-and-examples.md).
 
 ## 7) Fontes de Mercado Consolidadas (Pesquisa Externa — R-019, 2026-09-01)

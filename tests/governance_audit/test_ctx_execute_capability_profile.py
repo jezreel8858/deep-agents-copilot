@@ -2,8 +2,8 @@
 test_ctx_execute_capability_profile.py — Validação determinística do perfil de ferramentas context-mode (R-055 / Smell 2.32).
 
 Verifica que agentes classificados como "Gather-only" não possuem ferramentas
-de execução pesada ('context-mode/ctx_execute' e 'context-mode/ctx_execute_file')
-em seu frontmatter 'tools:', mantendo compulsoriamente 'context-mode/ctx_batch_execute'.
+de execução pesada ('context-mode/ctx_execute' e 'context-mode/ctx_execute')
+em seu frontmatter 'tools:', mantendo compulsoriamente 'context-mode/ctx_batch'.
 
 Referência: docs/plans/implementation/20261003-090000-governance-maintenance-ctx-execute-profile-classification.md
 """
@@ -64,7 +64,7 @@ def all_agent_files():
 
 
 def test_gather_only_agents_do_not_have_ctx_execute(all_agent_files):
-    """Garante que nenhum dos 26 agentes Gather-only declare ctx_execute ou ctx_execute_file."""
+    """Garante que nenhum dos 26 agentes Gather-only declare ctx_execute ou ctx_execute."""
     violations = []
     missing_batch = []
 
@@ -77,17 +77,15 @@ def test_gather_only_agents_do_not_have_ctx_execute(all_agent_files):
 
         if "context-mode/ctx_execute" in tools:
             violations.append(f"{name} ({file_path.name}) possui 'context-mode/ctx_execute'")
-        if "context-mode/ctx_execute_file" in tools:
-            violations.append(f"{name} ({file_path.name}) possui 'context-mode/ctx_execute_file'")
-        if "context-mode/ctx_batch_execute" not in tools:
-            missing_batch.append(f"{name} ({file_path.name}) NÃO possui 'context-mode/ctx_batch_execute'")
+        if "context-mode/ctx_batch" not in tools:
+            missing_batch.append(f"{name} ({file_path.name}) NÃO possui 'context-mode/ctx_batch'")
 
     assert not violations, (
         f"Violação de perfil Gather-only detectada em {len(violations)} caso(s):\n"
         + "\n".join(violations)
     )
     assert not missing_batch, (
-        f"Agentes Gather-only sem 'context-mode/ctx_batch_execute':\n"
+        f"Agentes Gather-only sem 'context-mode/ctx_batch':\n"
         + "\n".join(missing_batch)
     )
 

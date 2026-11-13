@@ -27,7 +27,7 @@ SKILLS_DIR = REPO_ROOT / ".github" / "skills"
 
 # Nomes de arquivo (.agent.md) dos 26 agentes Gather-only (R-055/Smell 2.32) — fonte única
 # em test_ctx_execute_capability_profile.py::GATHER_ONLY_AGENTS. Estes agentes NÃO possuem
-# 'context-mode/ctx_execute'/'context-mode/ctx_execute_file' por design (poda cirúrgica em
+# 'context-mode/ctx_execute'/'context-mode/ctx_execute' por design (poda cirúrgica em
 # [2.52.4]), mas continuam exigidos para as demais 3 ferramentas context-mode.
 GATHER_ONLY_AGENT_FILES = {f"{name}.agent.md" for name in GATHER_ONLY_AGENTS}
 
@@ -292,8 +292,8 @@ def test_smell_2_26_documented_in_governance_audit_patterns():
     assert "MCP Tool Chaining Sequencial no Chat" in content, (
         "Smell 2.26 DEVE identificar o anti-padrão de MCP Tool Chaining Sequencial no Chat"
     )
-    assert "ctx_batch_execute" in content, (
-        "Smell 2.26 DEVE referenciar ctx_batch_execute"
+    assert "ctx_batch" in content, (
+        "Smell 2.26 DEVE referenciar ctx_batch"
     )
     assert "Single-Turn MCP Batching" in content, (
         "Smell 2.26 DEVE referenciar a exigência de Single-Turn MCP Batching"
@@ -321,13 +321,13 @@ def test_mcp_batch_execution_and_tool_chaining_prohibition_in_normative_docs():
         assert "Smell 2.26" in c or "Tool Chaining" in c or "tool chaining" in c, (
             f"[{name}] DEVE referenciar Smell 2.26 ou proibição de tool chaining sequencial"
         )
-        assert "ctx_batch_execute" in c, f"[{name}] DEVE citar ctx_batch_execute"
+        assert "ctx_batch" in c, f"[{name}] DEVE citar ctx_batch"
 
 
 def test_all_agents_with_ctx_execute_declare_ctx_batch_execute():
     """
     Valida que 100% dos agentes que declaram context-mode/ctx_execute
-    também declaram compulsoriamente context-mode/ctx_batch_execute em tools: (Smell 2.26).
+    também declaram compulsoriamente context-mode/ctx_batch em tools: (Smell 2.26).
     """
     import re
 
@@ -348,11 +348,11 @@ def test_all_agents_with_ctx_execute_declare_ctx_batch_execute():
         if not tools_match:
             continue
         tools_str = tools_match.group(1)
-        if "context-mode/ctx_execute" in tools_str and "context-mode/ctx_batch_execute" not in tools_str:
+        if "context-mode/ctx_execute" in tools_str and "context-mode/ctx_batch" not in tools_str:
             missing_batch.append(str(af.relative_to(REPO_ROOT)))
 
     assert not missing_batch, (
-        f"Smell 2.26: {len(missing_batch)} agentes possuem ctx_execute mas não possuem ctx_batch_execute:\n"
+        f"Smell 2.26: {len(missing_batch)} agentes possuem ctx_execute mas não possuem ctx_batch:\n"
         + "\n".join(missing_batch)
     )
 
@@ -360,7 +360,7 @@ def test_all_agents_with_ctx_execute_declare_ctx_batch_execute():
 def test_catalog_yaml_declares_ctx_batch_execute_for_all_ctx_execute_agents():
     """
     Valida que toda entrada em catalog.yaml que declara context-mode/ctx_execute
-    também declara context-mode/ctx_batch_execute em tools:.
+    também declara context-mode/ctx_batch em tools:.
     """
     import yaml
 
@@ -372,18 +372,18 @@ def test_catalog_yaml_declares_ctx_batch_execute_for_all_ctx_execute_agents():
     missing_in_cat = []
     for ag_id, ag_info in agents.items():
         tools = ag_info.get("tools", [])
-        if "context-mode/ctx_execute" in tools and "context-mode/ctx_batch_execute" not in tools:
+        if "context-mode/ctx_execute" in tools and "context-mode/ctx_batch" not in tools:
             missing_in_cat.append(ag_id)
 
     assert not missing_in_cat, (
-        f"catalog.yaml possui agentes com ctx_execute sem ctx_batch_execute: {missing_in_cat}"
+        f"catalog.yaml possui agentes com ctx_execute sem ctx_batch: {missing_in_cat}"
     )
 
 
 def test_all_non_router_agents_declare_ctx_batch_execute_and_ctx_execute():
     """
     Valida que 100% dos agentes não-roteadores (exceto prompt-structuring, que não possui tools de arquivo)
-    declaram compulsoriamente 'context-mode/ctx_batch_execute' e 'context-mode/ctx_execute' em tools:.
+    declaram compulsoriamente 'context-mode/ctx_batch' e 'context-mode/ctx_execute' em tools:.
     """
     import re
 
@@ -411,14 +411,14 @@ def test_all_non_router_agents_declare_ctx_batch_execute_and_ctx_execute():
             continue
         tools_str = tools_match.group(1)
         rel = str(af.relative_to(REPO_ROOT))
-        if "context-mode/ctx_batch_execute" not in tools_str:
+        if "context-mode/ctx_batch" not in tools_str:
             missing_batch.append(rel)
         # Agentes Gather-only (R-055/Smell 2.32) são isentos de ctx_execute por design.
         if af.name not in GATHER_ONLY_AGENT_FILES and "context-mode/ctx_execute" not in tools_str:
             missing_exec.append(rel)
 
     assert not missing_batch, (
-        f"100% dos agentes não-roteadores DEVEM possuir ctx_batch_execute. Faltam ({len(missing_batch)}):\n"
+        f"100% dos agentes não-roteadores DEVEM possuir ctx_batch. Faltam ({len(missing_batch)}):\n"
         + "\n".join(missing_batch)
     )
     assert not missing_exec, (
@@ -468,7 +468,7 @@ def test_prompts_declare_context_mode_precedence_and_batching():
     for p, name in [(commit_p, "commit.prompt.md"), (review_p, "review.prompt.md"), (tpl_p, "prompt-template.md")]:
         assert p.exists()
         c = p.read_text(encoding="utf-8")
-        assert "ctx_batch_execute" in c, f"[{name}] DEVE declarar ctx_batch_execute"
+        assert "ctx_batch" in c, f"[{name}] DEVE declarar ctx_batch"
         assert "100% OBRIGATÓRIO" in c or "100% obrigatório" in c, f"[{name}] DEVE declarar context-mode 100% obrigatório"
 
 
@@ -565,18 +565,18 @@ def test_all_executor_agents_absence_of_native_editor_tools():
 def test_all_executor_agents_declare_all_ctx_tools():
     """
     Valida que 100% dos 50 agentes executores declaram compulsoriamente as 3 ferramentas
-    context-mode universais (ctx_batch_execute, ctx_index, ctx_search) em tools:, e que os
+    context-mode universais (ctx_batch, ctx_index, ctx_search) em tools:, e que os
     agentes Gather+Process (não classificados como Gather-only em R-055/Smell 2.32) também
-    declaram ctx_execute/ctx_execute_file.
+    declaram ctx_execute/ctx_execute.
     """
     import re
 
     universal_ctx = [
-        "context-mode/ctx_batch_execute",
+        "context-mode/ctx_batch",
         "context-mode/ctx_index",
         "context-mode/ctx_search",
     ]
-    heavy_ctx = ["context-mode/ctx_execute", "context-mode/ctx_execute_file"]
+    heavy_ctx = ["context-mode/ctx_execute", "context-mode/ctx_execute"]
     agent_files = [
         p for p in AGENTS_DIR.glob("**/*.agent.md")
         if p.name in EXECUTOR_AGENT_NAMES
@@ -678,18 +678,18 @@ def test_all_non_router_agents_absence_of_native_editor_tools():
 def test_all_non_router_agents_declare_all_ctx_tools():
     """
     Valida que 100% de todos os agentes nao-roteadores (exceto prompt-structuring) declaram
-    compulsoriamente as 3 ferramentas context-mode universais (ctx_batch_execute, ctx_index,
+    compulsoriamente as 3 ferramentas context-mode universais (ctx_batch, ctx_index,
     ctx_search) em tools:, e que os agentes Gather+Process (fora da lista Gather-only de
-    R-055/Smell 2.32) também declaram ctx_execute/ctx_execute_file.
+    R-055/Smell 2.32) também declaram ctx_execute/ctx_execute.
     """
     import re
 
     universal_ctx = [
-        "context-mode/ctx_batch_execute",
+        "context-mode/ctx_batch",
         "context-mode/ctx_index",
         "context-mode/ctx_search",
     ]
-    heavy_ctx = ["context-mode/ctx_execute", "context-mode/ctx_execute_file"]
+    heavy_ctx = ["context-mode/ctx_execute", "context-mode/ctx_execute"]
     all_agents = [
         p for p in AGENTS_DIR.glob("**/*.agent.md")
         if "templates" not in p.parts
@@ -757,14 +757,14 @@ def test_all_non_router_agents_contain_execution_protocol_block():
 
 def test_codegraph_engine_specific_plan_then_batch_safeguard():
     """
-    Valida se codegraph-engine.agent.md contem salvaguarda especifica exigindo ctx_batch_execute
+    Valida se codegraph-engine.agent.md contem salvaguarda especifica exigindo ctx_batch
     ou script de leitura em lote consolidado antes de queries de grafo, proibindo N chamadas de ctx_execute (Smell 2.26 / R-059).
     """
     ckg_file = AGENTS_DIR / "codegraph-engine.agent.md"
     assert ckg_file.exists()
     content = ckg_file.read_text(encoding="utf-8")
 
-    assert "ctx_batch_execute" in content, "codegraph-engine deve referenciar ctx_batch_execute"
+    assert "ctx_batch" in content, "codegraph-engine deve referenciar ctx_batch"
     assert "<execution_protocol>" in content, "codegraph-engine deve conter <execution_protocol>"
     assert "N chamadas" in content or "chamadas sequenciais unitárias" in content, (
         "codegraph-engine deve proibir explicitamente N chamadas unitarias de ctx_execute"
@@ -805,7 +805,7 @@ def test_agent_router_safeguard_against_model_discovery_r054():
 def test_context_mode_sequential_tool_chaining_circuit_breaker_and_explicit_cwd():
     """
     Valida se context-mode/SKILL.md formaliza o Circuit Breaker de Tool-Chaining Sequencial
-    (limite de 2 chamadas consecutivas de ctx_execute/ctx_execute_file), a mitigação de cwd explícito
+    (limite de 2 chamadas consecutivas de ctx_execute/ctx_execute), a mitigação de cwd explícito
     (anti-PathNotFound / anti-fallback), e se CLAUDE.md referencia o mecanismo sob R-059.
     """
     skill_file = SKILLS_DIR / "context-mode" / "SKILL.md"
@@ -884,7 +884,7 @@ def test_context_mode_few_shot_batching_and_model_routing_fan_out_signal():
 
 def test_javascript_preferential_runtime_and_timeout_circuit_breaker_in_governance_docs() -> None:
     """CA-1, CA-2, CA-3: Governanca central impoe runtime preferencial JavaScript (fs nativo),
-    higiene em ctx_batch_execute e Circuit Breaker Fail-Fast de timeout (max 1 retry com troca de estrategia).
+    higiene em ctx_batch e Circuit Breaker Fail-Fast de timeout (max 1 retry com troca de estrategia).
     """
     target_docs = [
         REPO_ROOT / ".github" / "skills" / "context-mode" / "SKILL.md",

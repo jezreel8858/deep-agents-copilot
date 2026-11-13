@@ -38,7 +38,7 @@
     "run_subagent",
     "context-mode/ctx_index",
     "context-mode/ctx_search",
-    "context-mode/ctx_batch_execute",
+    "context-mode/ctx_batch",
     "figma/get_file_nodes",
     "figma/export_image",
     "figma/get_styles",

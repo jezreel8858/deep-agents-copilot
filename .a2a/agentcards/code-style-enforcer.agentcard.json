@@ -26,11 +26,11 @@
     "grep_search",
     "file_search",
     "run_in_terminal",
-    "context-mode/ctx_batch_execute",
+    "context-mode/ctx_batch",
     "context-mode/ctx_execute",
     "run_subagent",
     "context-mode/ctx_search",
-    "context-mode/ctx_execute_file",
+    "context-mode/ctx_execute",
     "context-mode/ctx_index"
   ],
   "security_profile": {

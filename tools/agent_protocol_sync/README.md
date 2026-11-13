@@ -11,12 +11,12 @@ O protocolo **Plan-Then-Batch (R-059)** combinado com o **Teto Rígido de Tool T
 Com a **Composição Dinâmica por Capabilities**, o protocolo elimina ruído, repetições ("Smell 2.x") e instruções mortas:
 - **Núcleo Comum Imperativo (CORE):** Redação enxuta e obrigatória cobrindo:
   1. `ENUMERAR`: Mapeamento interno prévio de arquivos e comandos.
-  2. `CONSOLIDAR (Limiar >= 2)`: Uso compulsório de `ctx_batch_execute` ou script iterativo no sandbox.
+  2. `CONSOLIDAR (Limiar >= 2)`: Uso compulsório de `ctx_batch` ou script iterativo no sandbox.
   3. `Comandos curtos não suspendem a regra`: Respeito estrito ao limiar mesmo em comandos breves.
   4. `Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)`: Orçamento estrito com parada no 4º turno.
   5. `Warm Start Compulsório & Batch Querying (R-060)`: Inicialização silenciosa de índices locais e batch query.
 - **Cláusulas Condicionais por Capabilities:** Inspecionadas no frontmatter YAML:
-  * **Validação Agrupada com `get_errors` (R-051):** Injetada apenas se o artefato declarar ferramentas de mutação/edição (`replace_string_in_file`, `create_file`, `insert_edit_into_file`, `get_errors`) ou for executor com sandbox de execução (`ctx_execute`, `ctx_execute_file`).
+  * **Validação Agrupada com `get_errors` (R-051):** Injetada apenas se o artefato declarar ferramentas de mutação/edição (`replace_string_in_file`, `create_file`, `insert_edit_into_file`, `get_errors`) ou for executor com sandbox de execução (`ctx_execute`).
   * **Telemetria de Handoff (R-042):** Injetada apenas se `run_subagent` estiver na lista de `tools:`.
   * **Progressive Disclosure (R-066):** Injetada apenas se `source_docs_lazy:` estiver declarado.
 
@@ -24,7 +24,7 @@ Com a **Composição Dinâmica por Capabilities**, o protocolo elimina ruído, r
 
 ## 2) 🔍 Elegibilidade Primária por Tools (`is_ctx_eligible`)
 
-A injeção do bloco `<execution_protocol>` segue o princípio de **eliminação de instrução morta**: o protocolo descreve o uso de ferramentas MCP (`ctx_execute`, `ctx_batch_execute`, `ctx_search`, etc.), portanto sua presença só faz sentido em artefatos que efetivamente possuem essas ferramentas declaradas.
+A injeção do bloco `<execution_protocol>` segue o princípio de **eliminação de instrução morta**: o protocolo descreve o uso de ferramentas MCP (`ctx_execute`, `ctx_batch`, `ctx_search`, etc.), portanto sua presença só faz sentido em artefatos que efetivamente possuem essas ferramentas declaradas.
 
 - **Helper `is_ctx_eligible(tools: list[str]) -> bool`**: Retorna `True` se qualquer item da lista `tools` começar com `"context-mode/ctx_"`.
 - **Regra Primária Mandatória**: Só agents e prompts com ferramentas `context-mode/ctx_*` em `tools:` recebem o bloco `<execution_protocol>`. Arquivos SEM `ctx_*` em `tools:` **NUNCA** recebem o bloco, independentemente de papéis ou configurações.

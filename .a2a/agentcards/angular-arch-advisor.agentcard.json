@@ -25,7 +25,7 @@
     "list_dir",
     "ask_questions",
     "context-mode/ctx_search",
-    "context-mode/ctx_execute_file",
+    "context-mode/ctx_execute",
     "figma/get_file_nodes",
     "figma/export_image",
     "figma/get_styles",

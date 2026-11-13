@@ -14,7 +14,7 @@ ctx_search({
 **Coleta + resposta em lote**
 
 ```javascript
-ctx_batch_execute({
+ctx_batch({
   commands: [{ label: "service", command: "rg -n \"class .*Service\" src" }],
   queries: ["serviços críticos", "pontos de risco"],
   query_scope: "batch",
@@ -25,7 +25,7 @@ ctx_batch_execute({
 **Análise de arquivo grande**
 
 ```javascript
-ctx_execute_file({
+ctx_execute({
   path: "logs/app.log",
   language: "javascript",
   code: "const errs=FILE_CONTENT.split('\\n').filter(l=>l.includes('ERROR')); console.log(errs.length);"

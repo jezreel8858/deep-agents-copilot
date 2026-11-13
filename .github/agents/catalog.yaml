@@ -126,7 +126,7 @@ agents:
     - run_subagent
     - context-mode/ctx_index
     - context-mode/ctx_search
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - mcp-atlassian/jira_get_issue
     - mcp-atlassian/jira_search
     related_skills:
@@ -184,8 +184,8 @@ agents:
     - context-mode/ctx_execute
     - context-mode/ctx_index
     - context-mode/ctx_search
-    - context-mode/ctx_batch_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_batch
+    - context-mode/ctx_execute
     related_skills:
     - context-mode
     - agent-contracts
@@ -238,15 +238,15 @@ agents:
     - run_subagent
     - context-mode/ctx_index
     - context-mode/ctx_search
-    - context-mode/ctx_fetch_and_index
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_index
+    - context-mode/ctx_batch
     - context-mode/ctx_stats
     - context-mode/ctx_doctor
     - context-mode/ctx_upgrade
     - context-mode/ctx_purge
     - context-mode/ctx_insight
     - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - mcp-atlassian/jira_get_issue
     - mcp-atlassian/jira_search
     related_skills:
@@ -317,11 +317,11 @@ agents:
     - tavily/tavily_map
     - tavily/tavily_research
     - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     - context-mode/ctx_search
-    - context-mode/ctx_fetch_and_index
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_index
+    - context-mode/ctx_batch
     related_skills:
     - context-mode
     - terminal-governance
@@ -386,8 +386,8 @@ agents:
     - run_subagent
     - context-mode/ctx_index
     - context-mode/ctx_search
-    - context-mode/ctx_fetch_and_index
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_index
+    - context-mode/ctx_batch
     - context-mode/ctx_stats
     - context-mode/ctx_doctor
     - context-mode/ctx_upgrade
@@ -470,7 +470,7 @@ agents:
     - list_dir
     - run_subagent
     - context-mode/ctx_search
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - context-mode/ctx_execute
     - context-mode/ctx_index
     related_skills:
@@ -529,10 +529,10 @@ agents:
     - ask_questions
     - run_subagent
     - context-mode/ctx_search
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - context-mode/ctx_execute
     - context-mode/ctx_index
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     related_skills:
     - context-mode
     - agent-contracts
@@ -583,9 +583,9 @@ agents:
     - get_errors
     - ask_questions
     - run_subagent
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - context-mode/ctx_search
     - context-mode/ctx_index
     related_skills:
@@ -632,9 +632,9 @@ agents:
     - file_search
     - run_in_terminal
     - run_subagent
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     - context-mode/ctx_search
     related_skills:
@@ -682,7 +682,7 @@ agents:
     - file_search
     - list_dir
     - run_in_terminal
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - ask_questions
     - run_subagent
     - context-mode/ctx_search
@@ -749,9 +749,9 @@ agents:
     - run_subagent
     - context-mode/ctx_search
     - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - context-mode/ctx_index
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     related_skills:
     - agent-contracts
     - confidence-fallback-policy
@@ -805,8 +805,8 @@ agents:
     - context-mode/ctx_search
     - context-mode/ctx_index
     - context-mode/ctx_execute
-    - context-mode/ctx_batch_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_batch
+    - context-mode/ctx_execute
     related_skills:
     - context-mode
     - agent-contracts
@@ -856,8 +856,8 @@ agents:
     - run_subagent
     - context-mode/ctx_search
     - context-mode/ctx_execute
-    - context-mode/ctx_batch_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_batch
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     related_skills:
     - context-mode
@@ -911,8 +911,8 @@ agents:
     - run_subagent
     - context-mode/ctx_search
     - context-mode/ctx_execute
-    - context-mode/ctx_batch_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_batch
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     related_skills:
     - agent-contracts
@@ -956,10 +956,10 @@ agents:
     - grep_search
     - run_subagent
     - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     - context-mode/ctx_search
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     related_skills:
     - context-mode
     - agent-contracts
@@ -1007,8 +1007,8 @@ agents:
     - list_dir
     - run_subagent
     - context-mode/ctx_search
-    - context-mode/ctx_batch_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_batch
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     related_skills:
     - context-mode
@@ -1062,10 +1062,10 @@ agents:
     - ask_questions
     - run_subagent
     - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     - context-mode/ctx_search
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - mcp-atlassian/jira_get_issue
     - mcp-atlassian/jira_search
     related_skills:
@@ -1125,8 +1125,8 @@ agents:
     - run_subagent
     - run_in_terminal
     - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_execute
+    - context-mode/ctx_batch
     - context-mode/ctx_index
     - context-mode/ctx_search
     - codegraph/query
@@ -1178,11 +1178,11 @@ agents:
     - grep_search
     - file_search
     - run_in_terminal
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - context-mode/ctx_execute
     - run_subagent
     - context-mode/ctx_search
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     related_skills:
     - code-review-patterns
@@ -1234,11 +1234,11 @@ agents:
     - grep_search
     - file_search
     - run_in_terminal
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - context-mode/ctx_execute
     - run_subagent
     - context-mode/ctx_search
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     related_skills:
     - code-review-patterns
@@ -1287,8 +1287,8 @@ agents:
     - run_subagent
     - context-mode/ctx_search
     - context-mode/ctx_execute
-    - context-mode/ctx_batch_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_batch
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     related_skills:
     - compliance-governance-patterns
@@ -1337,11 +1337,11 @@ agents:
     - grep_search
     - file_search
     - run_in_terminal
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - context-mode/ctx_execute
     - run_subagent
     - context-mode/ctx_search
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     related_skills:
     - code-tracing
@@ -1390,8 +1390,8 @@ agents:
     - run_subagent
     - context-mode/ctx_search
     - context-mode/ctx_execute
-    - context-mode/ctx_batch_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_batch
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     related_skills:
     - devops-agent-patterns
@@ -1441,7 +1441,7 @@ agents:
     - get_errors
     - run_subagent
     - context-mode/ctx_search
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - context-mode/ctx_index
     related_skills:
     - documentation-writing-patterns
@@ -1495,7 +1495,7 @@ agents:
     - ask_questions
     - run_subagent
     - context-mode/ctx_search
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - context-mode/ctx_index
     - mcp-atlassian/jira_get_issue
     - mcp-atlassian/jira_search
@@ -1558,11 +1558,11 @@ agents:
     - grep_search
     - file_search
     - run_in_terminal
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - context-mode/ctx_execute
     - run_subagent
     - context-mode/ctx_search
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     related_skills:
     - performance-engineering-patterns
@@ -1618,7 +1618,7 @@ agents:
     - run_subagent
     - context-mode/ctx_index
     - context-mode/ctx_search
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - figma/get_file_nodes
     - figma/export_image
     - figma/get_styles
@@ -1690,11 +1690,11 @@ agents:
     - grep_search
     - file_search
     - run_in_terminal
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - context-mode/ctx_execute
     - run_subagent
     - context-mode/ctx_search
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     related_skills:
     - security-review-patterns

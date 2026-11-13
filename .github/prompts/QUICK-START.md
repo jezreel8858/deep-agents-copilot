@@ -136,10 +136,10 @@ Guia rápido para usar os prompts do Copilot Chat.
 ## 🧠 Regras Rápidas de Economia (ctx-first)
 
 - Faça retomada por `ctx_search(..., sort: "timeline")` antes de nova coleta.
-- Use `ctx_batch_execute(commands, queries)` como coleta principal.
+- Use `ctx_batch(commands, queries)` como coleta principal.
 - Agrupe perguntas relacionadas no mesmo `queries: [...]`.
 - Use `source` quando consultar múltiplas fontes indexadas.
-- Para conteúdo grande, use `ctx_execute_file` ou `ctx_index(path)`, nunca dump bruto.
+- Para conteúdo grande, use `ctx_execute` ou `ctx_index(path)`, nunca dump bruto.
 
 ---
 

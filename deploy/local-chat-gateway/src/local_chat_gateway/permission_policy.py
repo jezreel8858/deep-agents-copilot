@@ -163,7 +163,7 @@ _COMANDOS_BLOQUEADOS_SEMPRE: tuple[str, ...] = (
 )
 
 #: Padroes equivalentes a `_COMANDOS_BLOQUEADOS_SEMPRE` em outras linguagens
-#: aceitas pelo payload `language` de `ctx_execute`/`ctx_execute_file`
+#: aceitas pelo payload `language` de `ctx_execute` (com `file`)
 #: (python/javascript/typescript/rust/...) -- achado code-review 🔴 (iteracao
 #: final 3/3): a denylist textual original so cobria shell, permitindo
 #: bypass total via `shutil.rmtree(...)`, `fs.rmSync(...)`,
@@ -306,7 +306,7 @@ def _extrair_comando(params: Mapping[str, object]) -> str | None:
 
 
 #: Campo onde tools MCP de execucao de codigo (`mcp_context-mode_ctx_execute`/
-#: `ctx_execute_file`) expoem o payload real -- schema `language` + `code`,
+#: `ctx_execute`) expoem o payload real -- schema `language` + `code`,
 #: nunca `command`/`cmd`/`commandLine`/`script` (bug real 2026-10-03: isso
 #: causava bypass total da heuristica de comando perigoso para MCP).
 _CHAVES_PARAM_CODIGO_MCP: tuple[str, ...] = ("code",)
@@ -337,7 +337,7 @@ def _codigo_mcp_e_perigoso(codigo: str) -> bool:
 
 
 #: Chaves de parametro onde tools MCP de execucao podem expor um caminho de
-#: sistema de arquivos arbitrario -- `path` em `ctx_execute_file` (leitura
+#: sistema de arquivos arbitrario -- `path` em `ctx_execute` (leitura
 #: arbitraria), `cwd` em `ctx_execute` (diretorio de execucao arbitrario).
 #: Achado code-review 🟠 #1 (iteracao final 3/3): `_CHAVES_PARAM_CODIGO_MCP`
 #: so cobria `code`.
@@ -383,7 +383,7 @@ _CHAVE_PARAM_COMANDOS_BATCH = "commands"
 
 
 def _comando_batch_item_e_seguro(item: object) -> bool:
-    """Classifica um item de `commands` de `ctx_batch_execute` como seguro.
+    """Classifica um item de `commands` de `ctx_batch` como seguro.
 
     Fail-closed: itens que nao sejam `dict` com uma chave `command`
     textual nao-vazia sao tratados como perigosos (nunca ignorados
@@ -466,7 +466,7 @@ def tool_call_nao_escrita_e_segura(
         if comando is not None:
             return comando_terminal_e_seguro(comando)
         # Bug real corrigido (2026-10-03): `code` (+ `language`) e o payload
-        # real de `ctx_execute`/`ctx_execute_file` -- avaliado por denylist,
+        # real de `ctx_execute` (com `file`) -- avaliado por denylist,
         # nao pelo allowlist de `comando_terminal_e_seguro` (que rejeitaria
         # codigo legitimo em JS/Python que nao seja um comando de shell).
         # `path`/`cwd` suspeitos (achado 🟠 #1) sao verificados ANTES do
@@ -474,7 +474,7 @@ def tool_call_nao_escrita_e_segura(
         # payload (ex.: `cwd` em `ctx_execute`).
         if any(_caminho_mcp_e_suspeito(valor) for valor in _extrair_paths_mcp(params)):
             return False
-        # Achado code-review (4a iteracao): `ctx_batch_execute` expoe
+        # Achado code-review (4a iteracao): `ctx_batch` expoe
         # `commands` (lista de `{label, command}`), formato nao coberto por
         # nenhuma extracao anterior -- verificado ANTES do fallback final
         # para eliminar o fail-open de comandos destrutivos via batch.
@@ -509,7 +509,7 @@ def tool_call_nao_escrita_e_segura(
     # Debug investigativo (2026-10-04): bug real de MCP tools (context-mode)
     # negadas mesmo apos o servidor conectar com sucesso. Suspeita: o SDK
     # real reporta `tool_name` como nome CRU exposto pelo proprio servidor
-    # MCP (ex.: "ctx_batch_execute"), SEM o prefixo de exibicao da IDE
+    # MCP (ex.: "ctx_batch"), SEM o prefixo de exibicao da IDE
     # ("mcp_context-mode_ctx_batch_execute") que `tool_mcp_e_cataloga`/
     # `MCP_TOOL_PREFIXES` espera -- mesma classe de bug ja confirmada em
     # `mcp_servers_catalog.py` (nomes de pacote assumidos sem validar

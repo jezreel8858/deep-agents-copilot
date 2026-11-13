@@ -25,7 +25,7 @@
     "list_dir",
     "ask_questions",
     "context-mode/ctx_search",
-    "context-mode/ctx_execute_file"
+    "context-mode/ctx_execute"
   ],
   "security_profile": {
     "tool_zones": [

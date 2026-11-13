@@ -115,7 +115,7 @@ def test_dynamic_composition_by_capabilities():
     1. A cláusula de telemetria de handoff ([HANDOFF]) é injetada apenas se run_subagent estiver presente.
     2. A cláusula de progressive disclosure (source_docs_lazy) é injetada apenas se declarada.
     3. A cláusula de validação agrupada com get_errors é injetada apenas se houver ferramentas de mutação
-       ou execução (ctx_execute/ctx_execute_file), prevenindo instrução morta em agentes consultivos.
+       ou execução (ctx_execute/ctx_execute), prevenindo instrução morta em agentes consultivos.
     4. O núcleo comum elimina menções a 'Smell 2.x'.
     """
     import yaml
@@ -144,7 +144,7 @@ def test_dynamic_composition_by_capabilities():
         has_lazy = bool(fm.get("source_docs_lazy"))
         has_mutation = (
             any(t in tools for t in ["replace_string_in_file", "create_file", "insert_edit_into_file", "get_errors"])
-            or any(t in tools for t in ["context-mode/ctx_execute", "context-mode/ctx_execute_file"])
+            or any(t in tools for t in ["context-mode/ctx_execute", "context-mode/ctx_execute"])
         )
 
         match = re.search(r"<execution_protocol>([\s\S]*?)</execution_protocol>", text)
@@ -243,7 +243,7 @@ def test_clauses_enforce_javascript_runtime_and_fail_fast_timeout_circuit_breake
         assert "1 retry" in clause_text, f"Falta limite de 1 retry em {clause_name}"
 
     assert "ctx_execute" not in CLAUSE_GATHER_ONLY, "CLAUSE_GATHER_ONLY NAO pode conter a substring literal ctx_execute"
-    assert "ctx_batch_execute" in CLAUSE_GATHER_ONLY
+    assert "ctx_batch" in CLAUSE_GATHER_ONLY
     assert "python -c" in CLAUSE_GATHER_ONLY
     assert "Circuit Breaker Fail-Fast" in CLAUSE_GATHER_ONLY
     assert "1 retry" in CLAUSE_GATHER_ONLY

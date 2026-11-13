@@ -23,7 +23,7 @@ agents:
     - list_dir
     - ask_questions
     - context-mode/ctx_search
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - figma/get_file_nodes
     - figma/export_image
     - figma/get_styles
@@ -72,9 +72,9 @@ agents:
     - run_in_terminal
     - context-mode/ctx_execute
     - context-mode/ctx_search
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - context-mode/ctx_index
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - playwright/browser_snapshot
     - playwright/browser_navigate
     - playwright/browser_click
@@ -136,9 +136,9 @@ agents:
     - run_in_terminal
     - context-mode/ctx_execute
     - context-mode/ctx_search
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - context-mode/ctx_index
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - playwright/browser_snapshot
     - playwright/browser_navigate
     - playwright/browser_navigate_back

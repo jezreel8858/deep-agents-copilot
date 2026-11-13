@@ -561,7 +561,7 @@
         "grep_search",
         "file_search",
         "read_file",
-        "context-mode/ctx_batch_execute",
+        "context-mode/ctx_batch",
         "context-mode/ctx_execute"
       ],
       "related_agents": [

@@ -77,7 +77,7 @@ explicitamente o `agent-router` a **não delegar a nenhum subagent** e executar 
 
 **Se confirmado (subagent-bypass)**: a implicação prática é que **hooks `preToolUse` não são uma
 camada de enforcement confiável para tool calls originadas de dentro de um subagent** neste host —
-a disciplina via prompt/`SKILL.md` (preferir `ctx_batch_execute`) continua sendo a única linha de
+a disciplina via prompt/`SKILL.md` (preferir `ctx_batch`) continua sendo a única linha de
 defesa disponível para subagents, até que o plugin JetBrains corrija a paridade com a CLI. Recomenda-se
 reportar este achado como issue em `microsoft/copilot-intellij-feedback` referenciando o padrão de
 `github/copilot-cli#2392`.
@@ -104,8 +104,8 @@ reportar este achado como issue em `microsoft/copilot-intellij-feedback` referen
     Breaker ali descrito era puramente comportamental (prompt-only), sem enforcement real —
     o que permitia a LLMs fortes (incl. Claude Sonnet) ignorá-lo sob pressão de tarefa.
   - **Mecanismo**: mantém um contador de sessão em `.github/hooks/.state/ctx-sequence-guard.json`
-    (gitignored). Toda chamada de `ctx_execute`/`ctx_execute_file` incrementa o contador; toda
-    chamada de `ctx_batch_execute` (ou qualquer outra ferramenta) zera o contador. Ao atingir
+    (gitignored). Toda chamada de `ctx_execute` (com `file`) incrementa o contador; toda
+    chamada de `ctx_batch` (ou qualquer outra ferramenta) zera o contador. Ao atingir
     `counter >= 2` (2ª chamada consecutiva sem lote interposto), o hook retorna
     `{"permissionDecision":"deny", "permissionDecisionReason": "..."}`.
   - **Log de diagnóstico incondicional**: `.github/hooks/.state/ctx-sequence-guard.debug.log`
@@ -115,7 +115,7 @@ reportar este achado como issue em `microsoft/copilot-intellij-feedback` referen
     siga o checklist de diagnóstico abaixo antes de suspeitar do script em si.
   - **Reação esperada do agente a um `deny`**: tratar a mensagem como feedback automatizado
     corrigível (equivalente a um erro de lint/CI), nunca como uma negação de permissão do
-    usuário — isto é, replanejar imediatamente com `ctx_batch_execute` e prosseguir, sem parar
+    usuário — isto é, replanejar imediatamente com `ctx_batch` e prosseguir, sem parar
     nem pedir confirmação ao usuário.
   - `ctx-sequence-reset.ps1` / `.sh` (`SessionStart`, 1 entrada por evento, telemetria embutida)
     limpa o contador no início de cada sessão para não herdar estado `OPEN` de uma anterior.

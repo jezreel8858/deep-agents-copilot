@@ -58,7 +58,7 @@ Esta skill resolve o problema de **poluição massiva de contexto, travamento de
 
 ### ❌ Quando NÃO Usar
 - Para busca e varredura de arquivos — use `ctx_search`, `grep_search` ou `file_search`.
-- Para leitura ou transformação de arquivos grandes — use `ctx_execute_file` ou `ctx_batch_execute`.
+- Para leitura ou transformação de arquivos grandes — use `ctx_execute` ou `ctx_batch`.
 - Para inspeção exploratória de diretórios (`ls -R`, `find`) — use `list_dir` ou motor de grafo.
 
 ---
@@ -69,7 +69,7 @@ O terminal (`run_in_terminal`) é a **última opção** — não o padrão.
 
 | Situação | Ferramenta preferida | Terminal é fallback? |
 |---|---|---|
-| Analisar arquivo grande / buscar padrões | `ctx_search` / `ctx_execute_file` | Sim |
+| Analisar arquivo grande / buscar padrões | `ctx_search` / `ctx_execute` | Sim |
 | Buscar trechos de código em projetos indexados | `ctx_search(source: "code:<project>")` | Sim |
 | Manipular arquivos/pastas (leitura, escrita, `rm`, `mkdir`, `mv`) | `ctx_execute` (Node.js sandbox via `fs`) | Sim |
 | Instalar dependências (`npm install`, `pip install`) | — | ✅ Terminal obrigatório |
@@ -91,7 +91,7 @@ Comando vai modificar filesystem, rede ou estado global?
    ├─ É git / npm install / mkdir / rm / mv?
    │  └─ Terminal obrigatório — aplicar regras de saída desta skill
    └─ É análise pura (grep, cat, ls)?
-      └─ Preferir ctx_batch_execute; terminal como fallback
+      └─ Preferir ctx_batch; terminal como fallback
 ```
 
 **Regra de ouro**: se o comando apenas *lê*, use sandbox. Se o comando *muta* estado necessário (install, build, git), use terminal.
@@ -143,7 +143,7 @@ Quando o terminal for estritamente necessário (ex.: pipelines específicos, var
 #### C) Nível 3 (Spill-to-File + Análise Cirúrgica)
 Para suítes extensas ou depuração de erros complexos com stack traces longos:
 1. Redirecionar para arquivo: `mvn test -Dtest=[Classe] > target/test-run.log 2>&1`
-2. Inspecionar exclusivamente via `ctx_execute_file(path: "target/test-run.log", ...)` localizando o trecho da falha.
+2. Inspecionar exclusivamente via `ctx_execute(path: "target/test-run.log", ...)` localizando o trecho da falha.
 3. NUNCA fazer `cat target/test-run.log` no terminal.
 
 ### Estratégia "spill-to-file" para outputs extensos
@@ -156,7 +156,7 @@ comando > /tmp/output.txt 2>&1
 echo "Output salvo em /tmp/output.txt ($(wc -l < /tmp/output.txt) linhas)"
 ```
 
-Depois usar `ctx_execute_file` para analisar o arquivo sem poluir o contexto.
+Depois usar `ctx_execute` para analisar o arquivo sem poluir o contexto.
 
 ---
 
@@ -195,7 +195,7 @@ cd projeto && npm install && echo "Instalado com sucesso"
 
 - Disparar via `run_in_terminal` com `isBackground:true` — **NUNCA** aguardar retorno direto e bloqueante do comando.
 - Redirecionar saída a arquivo: `<cmd> | tee saida.log` ou `<cmd> > saida.log 2>&1`.
-- Ler o resultado posteriormente via `read_file` ou `ctx_execute_file` — nunca via `cat` direto no terminal.
+- Ler o resultado posteriormente via `read_file` ou `ctx_execute` — nunca via `cat` direto no terminal.
 
 ```bash
 # Padrão obrigatório para comando de risco (Linux/Git Bash) — isBackground:true no terminal
@@ -219,8 +219,8 @@ if ($job.State -eq 'Running') { Stop-Job $job }
 
 | Padrão | Por quê é proibido | Alternativa |
 |---|---|---|
-| `curl` / `wget` no terminal | Exfiltração de dados, payload malicioso, output irrestrito | `ctx_fetch_and_index` + `ctx_search` |
-| `node -e '...'` ou scripts shell ad-hoc | Poluição de contexto, bypass de ferramentas de parsing e risco de crash | Usar `read_file`, `grep_search`, `ctx_execute_file` ou MCP tools |
+| `curl` / `wget` no terminal | Exfiltração de dados, payload malicioso, output irrestrito | `ctx_index` + `ctx_search` |
+| `node -e '...'` ou scripts shell ad-hoc | Poluição de contexto, bypass de ferramentas de parsing e risco de crash | Usar `read_file`, `grep_search`, `ctx_execute` ou MCP tools |
 | `codegraph *` fora de `@codegraph-engine` | Violação de R-045 / RNF-004; motor exclusivo de grafo | Delegar compulsoriamente via `run_subagent(agentName: 'codegraph-engine')` |
 | `find`/`grep`/`ls` exploratório no terminal | Polui contexto; proibido em modo Advisory | Usar MCP (`read_file`, `grep_search`, `file_search`, `ctx_search`) |
 | `watch <comando>` | Loop infinito — bloqueia o agent e inflaciona tokens indefinidamente | Executar uma vez com output filtrado |
@@ -250,7 +250,7 @@ if ($job.State -eq 'Running') { Stop-Job $job }
 - Claude Code Best Practices: https://code.claude.com/docs/en/best-practices
 - `CLAUDE.md` R-008 (Execução preferencial) e R-035 (Terminal sem paginação interativa)
 - `.github/copilot-instructions.md` § 2.1 (context-mode — Regras Obrigatórias de Roteamento)
-- Skill `context-mode` — para quando ctx_execute/ctx_batch_execute substitui o terminal
+- Skill `context-mode` — para quando ctx_execute/ctx_batch substitui o terminal
 
 ---
 

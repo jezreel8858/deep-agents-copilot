@@ -308,7 +308,7 @@ class InsightsEngine:
                 "icon": "bolt",
                 "metric": "Oportunidade para acelerar tarefas com subagentes paralelos",
                 "evidence": f"{total_events} eventos processados de modo estritamente sequencial sem rajadas paralelas detectadas.",
-                "action": "Utilize run_subagent para buscas ou delegue pesquisas concorrentes via ctx_batch_execute.",
+                "action": "Utilize run_subagent para buscas ou delegue pesquisas concorrentes via ctx_batch.",
                 "roi": "Pesquisas paralelas reduzem em até 60% o tempo de espera do desenvolvedor.",
             })
 

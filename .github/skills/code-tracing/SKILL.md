@@ -158,13 +158,13 @@ grep_search "private.*NomeDaClasse"
 4. Nunca ler mais de 100 linhas por chamada de read_file
 ```
 
-### Quando usar ctx_execute_file vs read_file
+### Quando usar ctx_execute vs read_file
 
 | Situação | Ferramenta |
 |---|---|
 | Ler trecho específico (offset/limit conhecido) | `read_file` com offset + limit |
-| Contar ocorrências, parsear estrutura do arquivo | `ctx_execute_file` |
-| Arquivo > 500 linhas, procurar padrão | `ctx_execute_file` com grep interno |
+| Contar ocorrências, parsear estrutura do arquivo | `ctx_execute` |
+| Arquivo > 500 linhas, procurar padrão | `ctx_execute` com grep interno |
 | Arquivo pequeno (<100 linhas), ler inteiro | `read_file` sem limit |
 
 ---

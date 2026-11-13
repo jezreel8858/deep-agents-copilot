@@ -823,7 +823,7 @@ def test_smell_2_12_no_prompts_in_agent_source_docs():
 
 def test_agent_tools_cover_body_context_mode_invocations():
     """M10 (b): Garante que as ferramentas declaradas em 'tools:' no frontmatter de cada agent
-    cobrem as ferramentas context-mode invocadas operacionalmente no corpo (ex.: ctx_execute, ctx_execute_file).
+    cobrem as ferramentas context-mode invocadas operacionalmente no corpo (ex.: ctx_execute, ctx_execute).
     Evita que um agent Gather-only instrua execução própria que não possui ou que um agent mutador
     use ferramentas não declaradas."""
     from tests.governance_audit.test_ctx_execute_capability_profile import GATHER_ONLY_AGENTS
@@ -864,13 +864,13 @@ def test_agent_tools_cover_body_context_mode_invocations():
         body_clean = chr(10).join(cleaned_lines)
 
         agent_id = agent_file.stem.replace(".agent", "")
-        # Se for Gather-only, não deve instruir execução própria via ctx_execute ou ctx_execute_file
+        # Se for Gather-only, não deve instruir execução própria via ctx_execute ou ctx_execute
         if agent_id in gather_only_set:
             if re.search(r'\bctx_execute\b', body_clean) or re.search(r'\bctx_execute_file\b', body_clean):
-                violations.append(f"[{agent_file.relative_to(REPO_ROOT)}] Agente Gather-only instrui ctx_execute/ctx_execute_file no fluxo próprio.")
+                violations.append(f"[{agent_file.relative_to(REPO_ROOT)}] Agente Gather-only instrui ctx_execute/ctx_execute no fluxo próprio.")
         else:
             # Para outros agents, se usar no fluxo próprio, deve ter em declared
-            for tool in ["ctx_execute", "ctx_execute_file"]:
+            for tool in ["ctx_execute", "ctx_execute"]:
                 if re.search(r'\b' + tool + r'\b', body_clean) and tool not in declared:
                     violations.append(f"[{agent_file.relative_to(REPO_ROOT)}] Menciona '{tool}' no corpo mas não declara em tools:.")
 

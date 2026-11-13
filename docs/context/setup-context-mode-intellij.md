@@ -2,7 +2,7 @@
 
 Este documento consolida todas as etapas necessárias para configurar e estabilizar o **Context Mode** no ambiente JetBrains (IntelliJ IDEA), garantindo que o MCP, o Knowledge Base e o Insight Dashboard funcionem corretamente de forma genérica.
 
-## 📊 Status Atual (v1.0.162)
+## 📊 Status Atual (v2.1.10)
 
 ✅ **100% OPERACIONAL** — Verificado em 2026-06-17.
 A configuração genérica agora captura sessões e telemetria nativamente no IntelliJ IDEA, sem necessidade de triggers manuais após a primeira validação.
@@ -22,9 +22,9 @@ Defina as seguintes variáveis de sistema no Windows para garantir a persistênc
 
 | Variável              | Valor Recomendado                                   | Finalidade                                        |
 |-----------------------|-----------------------------------------------------|---------------------------------------------------|
-| `CONTEXT_MODE_DIR`    | `C:\Users\{username}\.config\JetBrains\context-mode` | Raiz de armazenamento dos bancos de dados         |
-| `INSIGHT_SESSION_DIR` | `%CONTEXT_MODE_DIR%\sessions`                       | Localização do banco de sessões e telemetria      |
-| `INSIGHT_CONTENT_DIR` | `%CONTEXT_MODE_DIR%\content`                        | Localização do banco de conteúdo (Knowledge Base) |
+| `CONTEXT_MODE_DATA_DIR`    | `C:\Users\{username}\.config\JetBrains\context-mode` | Raiz de armazenamento dos bancos de dados         |
+| `CONTEXT_MODE_DATA_DIR` | `%CONTEXT_MODE_DATA_DIR%\sessions`                       | Localização do banco de sessões e telemetria      |
+| `CONTEXT_MODE_DATA_DIR` | `%CONTEXT_MODE_DATA_DIR%\content`                        | Localização do banco de conteúdo (Knowledge Base) |
 
 ## 2. Configuração do MCP Server (mcp.json)
 
@@ -41,16 +41,16 @@ O arquivo de configuração do Copilot deve ser ajustado para operar de forma **
       "command": "cmd.exe",
       "args": [
         "/c",
-        "cd /d <workspace>\\[PROJETO-EXEMPLO] && <caminho-node>\\context-mode.cmd"
+        "npx",
+        "-y",
+        "context-mode",
+        "server",
+        "--agent",
+        "copilot-cli"
       ],
       "env": {
-        "SOURCE": "jetbrains-copilot",
         "IDEA_INITIAL_DIRECTORY": "<workspace>/[PROJETO-EXEMPLO]",
-        "CONTEXT_MODE_PROJECT_DIR": "<workspace>/[PROJETO-EXEMPLO]",
-        "CONTEXT_MODE_DIR": "C:\\Users\\{username}\\.config\\JetBrains\\context-mode",
-        "INSIGHT_SESSION_DIR": "C:\\Users\\{username}\\.config\\JetBrains\\context-mode\\sessions",
-        "INSIGHT_CONTENT_DIR": "C:\\Users\\{username}\\.config\\JetBrains\\context-mode\\content",
-        "CONTEXT_MODE_IDLE_TIMEOUT_MS": "0"
+        "CONTEXT_MODE_DATA_DIR": "C:\\Users\\{username}\\.config\\JetBrains\\context-mode\\sessions"
       }
     }
   }
@@ -276,6 +276,9 @@ Sempre que houver instabilidade ou ausência de dados no dashboard, utilize os a
 ---
 
 **Data da última atualização:** 2026-06-16  
-**Ambiente:** Windows + JetBrains + GitHub Copilot MCP + Context Mode v1.0.162  
+**Ambiente:** Windows + JetBrains + GitHub Copilot MCP + Context Mode v2.1.10  
 **Modo:** ✅ Genérico (funciona com qualquer projeto no IntelliJ)  
 **Hooks:** ✅ Globalmente configurados em `C:\Users\{username}\.codex\hooks.json`
+
+
+<!-- Configuração v2.1.10: server.mjs --agent copilot-cli | CONTEXT_MODE_DATA_DIR -->

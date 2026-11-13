@@ -29,7 +29,7 @@
     "ask_questions",
     "run_subagent",
     "context-mode/ctx_search",
-    "context-mode/ctx_batch_execute",
+    "context-mode/ctx_batch",
     "context-mode/ctx_index",
     "mcp-atlassian/jira_get_issue",
     "mcp-atlassian/jira_search",

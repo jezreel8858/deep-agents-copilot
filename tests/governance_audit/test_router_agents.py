@@ -226,13 +226,13 @@ def test_all_routers_and_template_tooling_strict_least_privilege():
     - OBRIGATÓRIO: run_subagent (R-042 - fundamental para despacho)
     - CONJUNTO PERMITIDO: estritamente o baseline canônico de roteamento
     - PROIBIDO: ferramentas mutativas de código (insert_edit_into_file, create_file, replace_string_in_file, apply_patch)
-    - PROIBIDO: ferramentas de execução pesada, terminal ou sandbox (run_in_terminal, ctx_execute, ctx_execute_file, ctx_batch_execute)
+    - PROIBIDO: ferramentas de execução pesada, terminal ou sandbox (run_in_terminal, ctx_execute, ctx_execute, ctx_batch)
     """
     all_routers = get_all_router_agents() + [ROUTER_TEMPLATE]
     prohibited_tools = {
         "insert_edit_into_file", "create_file", "replace_string_in_file", "apply_patch",
-        "run_in_terminal", "context-mode/ctx_execute", "context-mode/ctx_execute_file",
-        "context-mode/ctx_batch_execute"
+        "run_in_terminal", "context-mode/ctx_execute", "context-mode/ctx_execute",
+        "context-mode/ctx_batch"
     }
     allowed_tools = {
         "read_file", "file_search", "grep_search", "list_dir",

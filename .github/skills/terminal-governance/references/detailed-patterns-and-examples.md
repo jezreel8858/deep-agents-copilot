@@ -18,7 +18,7 @@
 > de rodar diretamente.
 
 **REGRA INVIOLÁVEL**: se o agent já possui `run_in_terminal` (ou `ctx_execute`/
-`ctx_batch_execute`) disponível em suas próprias `tools:` e o comando solicitado
+`ctx_batch`) disponível em suas próprias `tools:` e o comando solicitado
 está dentro do seu escopo de competência, é **TERMINANTEMENTE PROIBIDO** delegar
 essa execução via `run_subagent` apenas para "testar", "confirmar" ou "verificar"
 a própria capacidade. Execute o comando diretamente.

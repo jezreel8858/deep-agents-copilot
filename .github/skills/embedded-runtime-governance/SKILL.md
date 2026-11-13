@@ -22,7 +22,7 @@ source_docs:
 
 # Embedded Runtime Governance
 
-> **Progressive Disclosure**: Nível 1 = frontmatter; Nível 2 = este índice; Nível 3 = `references/` (carregar só o necessário via `ctx_search`/`ctx_execute_file`). **SSOT**: agents apenas apontam para esta skill (1–2 linhas) e nunca copiam o conteúdo.
+> **Progressive Disclosure**: Nível 1 = frontmatter; Nível 2 = este índice; Nível 3 = `references/` (carregar só o necessário via `ctx_search`/`ctx_execute`). **SSOT**: agents apenas apontam para esta skill (1–2 linhas) e nunca copiam o conteúdo.
 
 ## Quando NÃO Usar
 

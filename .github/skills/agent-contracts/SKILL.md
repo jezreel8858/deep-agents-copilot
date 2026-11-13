@@ -239,7 +239,7 @@ Já normatizado por R-016/R-020 e pelas seções 1-4 desta skill: banner de iden
 |---|---|---|
 | **Todos os perfis (baseline universal)** | `read_file`, `grep_search`, `file_search`, `run_subagent` | — |
 | Router/Triagem | baseline + `list_dir` | `ask_questions` |
-| Analista/Read-only (pesquisa) | baseline + `list_dir` | `context-mode/ctx_search`, `context-mode/ctx_batch_execute` |
+| Analista/Read-only (pesquisa) | baseline + `list_dir` | `context-mode/ctx_search`, `context-mode/ctx_batch` |
 | Analista / Híbrido Documental | baseline + `list_dir`, `create_file`, `insert_edit_into_file`, `get_errors` | `context-mode/*`, `ask_questions` |
 | Especialista de Recomendação | baseline + `list_dir`, `get_errors` | `context-mode/*`, ferramentas de pesquisa externa |
 | Operacional/Executor (cria/edita arquivos) | baseline + `insert_edit_into_file`, `create_file`, `list_dir`, `get_errors` | `ask_questions`, `run_in_terminal`, `context-mode/*` |

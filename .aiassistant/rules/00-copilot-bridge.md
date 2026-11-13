@@ -27,7 +27,7 @@ Antes de iniciar qualquer resposta ou plano, leia e absorva os arquivos:
 ---
 
 ## 3. Protocolo de Ferramentas (R-008, R-056, R-059)
-- Utilize as ferramentas MCP ativas (`ctx_execute`, `ctx_batch_execute`, `ctx_search`) para manipulação de arquivos e testes.
+- Utilize as ferramentas MCP ativas (`ctx_execute`, `ctx_batch`, `ctx_search`) para manipulação de arquivos e testes.
 - Aplique o protocolo Plan-Then-Batch (R-059) em execuções de mutação de código.
 
 ---

@@ -47,7 +47,7 @@ agents:
       - ask_questions
       - run_subagent
       - context-mode/ctx_search
-      - context-mode/ctx_batch_execute
+      - context-mode/ctx_batch
       - context-mode/ctx_index
     skills:
       - "performance-engineering-patterns"
@@ -87,9 +87,9 @@ agents:
       - run_in_terminal
       - context-mode/ctx_execute
       - context-mode/ctx_search
-      - context-mode/ctx_batch_execute
+      - context-mode/ctx_batch
       - context-mode/ctx_index
-      - context-mode/ctx_execute_file
+      - context-mode/ctx_execute
     skills:
       - "performance-engineering-patterns"
       - "efficient-batch-code-modification"
@@ -128,9 +128,9 @@ agents:
       - run_in_terminal
       - context-mode/ctx_execute
       - context-mode/ctx_search
-      - context-mode/ctx_batch_execute
+      - context-mode/ctx_batch
       - context-mode/ctx_index
-      - context-mode/ctx_execute_file
+      - context-mode/ctx_execute
     skills:
       - "test-implementation-python"
       - "test-implementation-backend"

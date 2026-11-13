@@ -95,7 +95,7 @@ NUNCA fazer Tavily → responder diretamente (desperdiça tokens)
 SEMPRE:
   1. ctx_search primeiro (cache de sessão)
   2. Se insuficiente → tavily_search
-  3. Indexar resultado → ctx_fetch_and_index (TTL 24h)
+  3. Indexar resultado → ctx_index (TTL 24h)
   4. Responder via ctx_search (economiza tokens)
 ```
 
@@ -109,7 +109,7 @@ ctx_search(queries=["Angular Vitest official support 2025"])
 tavily_search(query="Angular 20 21 official Vitest runner 2025 ng test builder")
 
 # 3. Indexar para reutilização
-ctx_fetch_and_index(url="https://timdeschryver.dev/blog/angular-testing-library-with-vitest",
+ctx_index(url="https://timdeschryver.dev/blog/angular-testing-library-with-vitest",
                    source="angular-vitest-2025")
 
 # 4. Consultar indexado

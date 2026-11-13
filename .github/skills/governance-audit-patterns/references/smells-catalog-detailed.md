@@ -16,7 +16,7 @@ Consolida, a partir de pesquisa de mercado (2025/2026), Anthropic Open Spec (dez
 | Anthropic Open Spec (dez/2025) & Skill Architecture | Padrão de *Progressive Disclosure* em 3 níveis (Metadados N1, Corpo N2, Recursos N3), descrições imperativas em 3ª pessoa e blocos de contraste ✅/❌ |
 | VS Code Copilot Agent/Prompt Engine | Variáveis de contexto nativas (`${file}`, `${selection}`, `${workspaceFolder}`, `${input:param}`), convenção `argument-hint` e parsing estrito de display names em `model:` |
 | TrustAgent taxonomy (KDD 2025) | Classifica origem do gap: **intrínseco** (brain/memory/tool do próprio agent) vs. **extrínseco** (user/other agents/environment) |
-| Protocolo R-046 & `efficient-batch-code-modification` | Hierarquia estrita de batching: editor tools para 1-4 arquivos em *Single-Turn Batching*; sandbox `ctx_execute`/`ctx_execute_file`/`ctx_batch_execute` para 5+ arquivos ou operações repetitivas |
+| Protocolo R-046 & `efficient-batch-code-modification` | Hierarquia estrita de batching: editor tools para 1-4 arquivos em *Single-Turn Batching*; sandbox `ctx_execute` (com `file`)/`ctx_batch` para 5+ arquivos ou operações repetitivas |
 | Matriz Biparadigma (§9 de `governance-factory-patterns`) | Alocação pragmática de SLM vs LLM: **Procedural/Operacional** (`Gemini 3.8 Flash`) vs **Decompositivo/Raciocínio Guiado** (`Claude Sonnet 5.5`) |
 | `code-review-patterns` (já existente) | Taxonomia de severidade tripla (**Bloqueador \| Alto \| Sugestão**) — reaproveitada nesta skill |
 | `agent-contracts/SKILL.md` §8-9 | Baseline de formato de saída por perfil e tooling mínimo por perfil |
@@ -128,7 +128,7 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 
 | Campo | Conteúdo |
 |---|---|
-| Sintoma | Agent com capacidade de mutação/edição de código que *(a)* não declara em seu workflow ou regras o protocolo de *Single-Turn Batching* e a hierarquia de limiar (1-4 arquivos via editor tools vs 5+ arquivos ou operações repetitivas via `ctx_execute`/`ctx_execute_file`/`ctx_batch_execute`); *(b)* prevê ou executa edições sequenciais arquivo por arquivo gerando turnos redundantes de chat; *(c)* prevê releitura imediata pós-edição apenas para "conferir" se salvou; ou *(d)* executa ou instrui validação via `get_errors` dispersa por arquivo ao invés de chamada única com array agregado `filePaths: [...]`. |
+| Sintoma | Agent com capacidade de mutação/edição de código que *(a)* não declara em seu workflow ou regras o protocolo de *Single-Turn Batching* e a hierarquia de limiar (1-4 arquivos via editor tools vs 5+ arquivos ou operações repetitivas via `ctx_execute` (com `file`)/`ctx_batch`); *(b)* prevê ou executa edições sequenciais arquivo por arquivo gerando turnos redundantes de chat; *(c)* prevê releitura imediata pós-edição apenas para "conferir" se salvou; ou *(d)* executa ou instrui validação via `get_errors` dispersa por arquivo ao invés de chamada única com array agregado `filePaths: [...]`. |
 | Como detectar | Inspecionar seções de Workflow/Regras em `.agent.md` executores e skills de implementação; checar presença de menção a Single-Turn Batching e R-046; verificar ausência da skill `efficient-batch-code-modification` em agents com escrita massiva |
 | Origem (TrustAgent) | Intrínseco — protocolo de execução ineficiente gerando consumo desnecessário de tokens e créditos |
 | Severidade | **Alta** (impacto direto de custo e latência na experiência do usuário) |
@@ -308,7 +308,7 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 
 | Campo | Conteúdo |
 |---|---|
-| Sintoma | Agente ou prompt utiliza ferramentas manuais nativas de editor (`read_file`, `replace_string_in_file`, `insert_edit_into_file`, `create_file`) ou terminal para leitura ou modificação/criação de arquivos quando context-mode está disponível no ambiente, em vez de cumprir a obrigatoriedade de 100% de execução no sandbox (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_search`), gerando poluição conversacional, queima de contexto e risco de truncamento/corrupção |
+| Sintoma | Agente ou prompt utiliza ferramentas manuais nativas de editor (`read_file`, `replace_string_in_file`, `insert_edit_into_file`, `create_file`) ou terminal para leitura ou modificação/criação de arquivos quando context-mode está disponível no ambiente, em vez de cumprir a obrigatoriedade de 100% de execução no sandbox (`ctx_execute`, `ctx_batch`, `ctx_search`), gerando poluição conversacional, queima de contexto e risco de truncamento/corrupção |
 | Como detectar | Agente possui ferramentas mutativas ou de leitura, mas seu contrato operacional (`.agent.md` ou template) omite a cláusula de uso 100% obrigatório de `context-mode` (R-008 / R-056) para leituras e escritas/criações, ou não proíbe estritamente ferramentas nativas de editor e terminal quando context-mode estiver disponível (rebaixando-as a fallback exclusivo de indisponibilidade comprovada); ou agente dispara chamadas de editor tools no chat com context-mode ativo |
 | Origem (TrustAgent) | Intrínseco — comodismo do modelo em recorrer a primitivas do editor em vez de compor o script all-or-nothing no sandbox via Think-in-Code (R-008 / R-051 / R-056) |
 | Severidade | **Bloqueador** (desperdício severo de créditos, ineficiência crítica de contexto e violação direta de R-008 e R-056) |
@@ -326,15 +326,15 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 | Remediação | (a) Injeção da cláusula R-057 no bloco CRÍTICO de todos os agentes analíticos/read-only e templates canônicos (`research-agent.md`, `agent-template.md`, `router-agent.md`); (b) Blindagem dos workflows canônicos em `workflows.md` com invariante explícito de avanço compulsório da etapa diagnóstica para a etapa executora; (c) Formalização de teste determinístico no pytest (`test_anti_manual_user_delegation_governance.py`). |
 
 ---
-### 2.26 — MCP Tool Chaining Sequencial no Chat / Omissão de ctx_batch_execute e Script Consolidado (R-008 / R-046 / R-056)
+### 2.26 — MCP Tool Chaining Sequencial no Chat / Omissão de ctx_batch e Script Consolidado (R-008 / R-046 / R-056)
 
 | Campo | Conteúdo |
 |---|---|
-| Sintoma | Um agente executa múltiplas chamadas individuais de `ctx_execute` sequenciais em turnos separados do chat para analisar diffs, arquivos, branches ou comandos (ex.: 10+ turnos sucessivos), reenviando todo o histórico acumulado do chat a cada turno e drenando tokens e créditos desnecessariamente, em vez de consolidar a análise em uma única rodada via `ctx_batch_execute` ou via script Node.js/Python iterativo consolidado no sandbox |
-| Como detectar | (a) Histórico de chamadas evidenciando sucessivos turnos com `ctx_execute` unitários para inspecionar alvos correlacionados; (b) Agente com `context-mode/ctx_execute` em `tools:` que omite `context-mode/ctx_batch_execute`; (c) Ausência da regra mandatória de Single-Turn MCP Batching e da proibição de Tool Chaining sequencial no bloco CRÍTICO/Diretrizes do agente ou template |
+| Sintoma | Um agente executa múltiplas chamadas individuais de `ctx_execute` sequenciais em turnos separados do chat para analisar diffs, arquivos, branches ou comandos (ex.: 10+ turnos sucessivos), reenviando todo o histórico acumulado do chat a cada turno e drenando tokens e créditos desnecessariamente, em vez de consolidar a análise em uma única rodada via `ctx_batch` ou via script Node.js/Python iterativo consolidado no sandbox |
+| Como detectar | (a) Histórico de chamadas evidenciando sucessivos turnos com `ctx_execute` unitários para inspecionar alvos correlacionados; (b) Agente com `context-mode/ctx_execute` em `tools:` que omite `context-mode/ctx_batch`; (c) Ausência da regra mandatória de Single-Turn MCP Batching e da proibição de Tool Chaining sequencial no bloco CRÍTICO/Diretrizes do agente ou template |
 | Origem (TrustAgent) | Intrínseco — miopia conversacional e ausência de agregação em memória, onde o modelo trata cada arquivo ou comando como um turno conversacional separado em vez de orquestrar a operação em lote no sandbox |
 | Severidade | **Bloqueador** (desperdício exponencial de créditos e tokens LLM, latência excessiva por roundtrips desnecessários e risco de exaustão da janela de contexto) |
-| Remediação | (a) Declarar compulsoriamente `'context-mode/ctx_batch_execute'` no frontmatter `tools:` de todos os agentes que operam com context-mode; (b) Injetar a cláusula de proibição de MCP Tool Chaining sequencial no bloco CRÍTICO/Diretrizes do agente e templates; (c) Consolidar inspeções múltiplas em `ctx_batch_execute` (com comandos e queries unificadas) ou em script síncrono único em `ctx_execute` |
+| Remediação | (a) Declarar compulsoriamente `'context-mode/ctx_batch'` no frontmatter `tools:` de todos os agentes que operam com context-mode; (b) Injetar a cláusula de proibição de MCP Tool Chaining sequencial no bloco CRÍTICO/Diretrizes do agente e templates; (c) Consolidar inspeções múltiplas em `ctx_batch` (com comandos e queries unificadas) ou em script síncrono único em `ctx_execute` |
 
 ---
 ### 2.27 — Desvio Prematuro para Implementação e Despejo de Lacunas Arquiteturais (Premature Implementation Bypass & Gap Dumping / R-058)
@@ -395,16 +395,16 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 
 ---
 
-### 2.32 — Capability Overreach de `ctx_execute`/`ctx_execute_file` em Agent Gather-only (R-008 / R-046 / R-056 / R-059)
+### 2.32 — Capability Overreach de `ctx_execute` (com `file`) em Agent Gather-only (R-008 / R-046 / R-056 / R-059)
 
 | Campo | Conteúdo |
 |---|---|
-| Sintoma | Agente puramente analítico, observacional, consultivo ou de auditoria ("Gather-only" — ex.: `agent-auditor`, reviewers, advisors arquiteturais, linters) declara `context-mode/ctx_execute` e/ou `context-mode/ctx_execute_file` em seu frontmatter `tools:`, sem necessidade comprovada de (a) agregação computacional multi-arquivo, (b) estrutura derivada de N variável em runtime, ou (c) codegen condicional. Como o hook `preToolUse` do IDE não intercepta subagents (`run_subagent`), a exposição indevida induz o modelo ao Tool Chaining sequencial (Smell 2.26) e evasão de `ctx_batch_execute`. |
+| Sintoma | Agente puramente analítico, observacional, consultivo ou de auditoria ("Gather-only" — ex.: `agent-auditor`, reviewers, advisors arquiteturais, linters) declara `context-mode/ctx_execute` e/ou `context-mode/ctx_execute` em seu frontmatter `tools:`, sem necessidade comprovada de (a) agregação computacional multi-arquivo, (b) estrutura derivada de N variável em runtime, ou (c) codegen condicional. Como o hook `preToolUse` do IDE não intercepta subagents (`run_subagent`), a exposição indevida induz o modelo ao Tool Chaining sequencial (Smell 2.26) e evasão de `ctx_batch`. |
 | Como detectar | (a) Execução de `tests/governance_audit/test_ctx_execute_capability_profile.py` no CI (camada estática determinística); (b) Inspeção de `tools:` cruzada contra os critérios de corte (a)/(b)/(c) definidos no plano canônico `docs/plans/20261003-090000-governance-maintenance-ctx-execute-profile-classification.md`. |
 | Origem (TrustAgent) | Intrínseco — cópia inercial de templates de agentes que propagam a totalidade das ferramentas MCP sem ponderação da superfície mínima de capacidades necessária para a função do agente (Principle of Least Privilege aplicado a Tooling). |
 | Severidade | **Médio** (não corrompe sintaxe, mas degrada determinismo, induz Tool Chaining sequencial e queima desnecessária de tokens e créditos em workflows multi-agent). |
 | Enforcement | **Textual/CI-estático obrigatório** via `test_ctx_execute_capability_profile.py`. |
-| Remediação | Remover cirurgicamente `'context-mode/ctx_execute'` e `'context-mode/ctx_execute_file'` do array `tools:` do `.agent.md` afetado, assegurando a retenção de `'context-mode/ctx_batch_execute'`. Delegar a aplicação em lote ao `@governance-maintainer` via `WORKFLOW-GOVERNANCE-MAINTENANCE`. |
+| Remediação | Remover cirurgicamente `'context-mode/ctx_execute'` e `'context-mode/ctx_execute'` do array `tools:` do `.agent.md` afetado, assegurando a retenção de `'context-mode/ctx_batch'`. Delegar a aplicação em lote ao `@governance-maintainer` via `WORKFLOW-GOVERNANCE-MAINTENANCE`. |
 
 ---
 
@@ -434,7 +434,7 @@ Esta skill **reaproveita** (não recria) a taxonomia de `code-review-patterns`:
 
 | Severidade | Critério Objetivo de Enquadramento |
 |---|---|
-| **Bloqueador** | Gap que impede o funcionamento técnico ou a governança do artefato: falta de `run_subagent` (R-042); `model:` inválido ou desconhecido (`Unknown model`); tool de escrita em agent read-only; uso de terminal sem `terminal-governance`; vazamento de evidência real de projeto (R-044); dessincronização crítica no catálogo (R-015); terceirização manual ao usuário por agent analítico (R-057 / Smell 2.25); MCP tool chaining sequencial no chat / omissão de ctx_batch_execute (Smell 2.26); ou desvio prematuro para implementação e despejo de lacunas arquiteturais em executores de código (R-058 / Smell 2.27). |
+| **Bloqueador** | Gap que impede o funcionamento técnico ou a governança do artefato: falta de `run_subagent` (R-042); `model:` inválido ou desconhecido (`Unknown model`); tool de escrita em agent read-only; uso de terminal sem `terminal-governance`; vazamento de evidência real de projeto (R-044); dessincronização crítica no catálogo (R-015); terceirização manual ao usuário por agent analítico (R-057 / Smell 2.25); MCP tool chaining sequencial no chat / omissão de ctx_batch (Smell 2.26); ou desvio prematuro para implementação e despejo de lacunas arquiteturais em executores de código (R-058 / Smell 2.27). |
 | **Alto** | Gap que gera desperdício severo de tokens/créditos, duplicação de manutenção ou risco de drift: violação de batching (R-046); divergência de templates canônicos (ausência de escopo ✅/❌ ou workflow); falta de variáveis nativas em prompts; código inline > 8 linhas em skills (R-026); sobreposição funcional ativa entre 2 agents; mensagem de sensor sem remediação acionável (Smell 2.28); ou progressive disclosure violation / full-load forçado de documento lazy (Smell 2.31 / R-066). |
 | **Sugestão** | Melhoria técnica não urgente ou cosmética: refinamento de `argument-hint`; ajuste fino de `description` dentro do limite; ou gap taxonômico de categoria intencionalmente não coberta. |
 

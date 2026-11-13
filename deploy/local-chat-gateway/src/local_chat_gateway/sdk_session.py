@@ -452,7 +452,7 @@ async def stream_chat(
             _args_mcp = getattr(perm_request, "args", None)
             # Bug real investigado (2026-10-04): o SDK headless real reporta
             # `tool_name` como o nome CRU exposto pelo proprio servidor MCP
-            # (ex.: "ctx_batch_execute"), SEM o prefixo de exibicao da IDE
+            # (ex.: "ctx_batch"), SEM o prefixo de exibicao da IDE
             # ("mcp_context-mode_ctx_batch_execute") que `permission_policy.
             # MCP_TOOL_PREFIXES`/`tool_mcp_e_cataloga` esperam -- o que fazia
             # `tool_call_nao_escrita_e_segura` cair incondicionalmente no
@@ -1474,7 +1474,7 @@ async def stream_chat_ag_ui(
             _args_mcp = getattr(perm_request, "args", None)
             # Bug real investigado (2026-10-04): o SDK headless real reporta
             # `tool_name` como o nome CRU exposto pelo proprio servidor MCP
-            # (ex.: "ctx_batch_execute"), SEM o prefixo de exibicao da IDE
+            # (ex.: "ctx_batch"), SEM o prefixo de exibicao da IDE
             # ("mcp_context-mode_ctx_batch_execute") que `permission_policy.
             # MCP_TOOL_PREFIXES`/`tool_mcp_e_cataloga` esperam -- o que fazia
             # `tool_call_nao_escrita_e_segura` cair incondicionalmente no

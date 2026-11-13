@@ -47,7 +47,7 @@ agents:
       - ask_questions
       - run_subagent
       - context-mode/ctx_search
-      - context-mode/ctx_batch_execute
+      - context-mode/ctx_batch
       - context-mode/ctx_index
     skills:
       - "java-jdk-backend-governance"
@@ -87,9 +87,9 @@ agents:
       - run_in_terminal
       - context-mode/ctx_execute
       - context-mode/ctx_search
-      - context-mode/ctx_batch_execute
+      - context-mode/ctx_batch
       - context-mode/ctx_index
-      - context-mode/ctx_execute_file
+      - context-mode/ctx_execute
     skills:
       - "java-jdk-backend-governance"
       - "performance-engineering-patterns"
@@ -128,9 +128,9 @@ agents:
       - run_in_terminal
       - context-mode/ctx_execute
       - context-mode/ctx_search
-      - context-mode/ctx_batch_execute
+      - context-mode/ctx_batch
       - context-mode/ctx_index
-      - context-mode/ctx_execute_file
+      - context-mode/ctx_execute
     skills:
       - "test-implementation-backend"
       - "test-coverage-governance"

@@ -47,8 +47,8 @@ Vide [`.github/agents/agent-router.agent.md`](agents/agent-router.agent.md) § *
 - **Re-triagem Obrigatória por Turno (R-042 — Anti Sticky-Session)**: Reavaliar intenção a cada turno; detectada deriva ou nova demanda pós-conclusão de workflow anterior (R-052 / conclusao_de_workflow_anterior), retornar imediatamente a `@agent-router` (*Anti Sticky-Agent*).
 - **Zero Execução Direta pelo Orquestrador Raiz sem Router (R-063 — Anti Silent Bypass)**: É terminantemente proibido ao modelo do turno raiz executar diretamente tarefas técnicas sem passar por `@agent-router`; o Orquestrador Raiz deve sempre invocar o router para triagem. **Exceção Canônica — Slash Prompts Explícitos (`router_bypass: utility | slash_workflow`)**: Quando o usuário invocar explicitamente qualquer Slash Prompt (`.github/prompts/<nome>.prompt.md`, exceto `/agent-router`), o comando já foi selecionado pelo usuário e possui fluxo determinístico próprio; portanto, o Orquestrador Raiz NUNCA deve invocar `@agent-router` na triagem inicial, devendo executar diretamente as instruções/fluxo do `.prompt.md` (ou despachar diretamente para o subagente previsto no próprio `.prompt.md`).
 - **Zero Impersonation pelo Orquestrador Raiz (R-062 — Anti Root-Agent-Impersonation)**: O modelo do turno raiz nunca deve se autodenominar ou assinar como qualquer especialista antes de delegar via `run_subagent`.
-- **Precedência Mandatória e 100% Obrigatória de Context Mode (R-008, R-056)**: O uso de `context-mode` MCP (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_search`, `ctx_index`) é 100% OBRIGATÓRIO para leitura, modificação e criação de arquivos; ferramentas nativas de editor são estritamente proibidas quando o context-mode estiver disponível (rebaixadas a fallback exclusivo de indisponibilidade).
-- **Single-Turn MCP Batching e Protocolo Plan-Then-Batch (R-046, R-059 — Smell 2.26)**: Ao atingir o Limiar >= 2 alvos ou comandos, aplicar compulsoriamente o Protocolo Plan-Then-Batch (etapas: ENUMERAR arquivos/comandos, CONSOLIDAR em `ctx_batch_execute` ou script iterativo `ctx_execute`, DESPACHAR & VALIDAR com `get_errors` ao final). Comandos curtos do usuário ("prosseguir", "continue") mantêm o rigor do protocolo.
+- **Precedência Mandatória e 100% Obrigatória de Context Mode (R-008, R-056)**: O uso de `context-mode` MCP (`ctx_execute`, `ctx_batch`, `ctx_search`, `ctx_index`) é 100% OBRIGATÓRIO para leitura, modificação e criação de arquivos; ferramentas nativas de editor são estritamente proibidas quando o context-mode estiver disponível (rebaixadas a fallback exclusivo de indisponibilidade).
+- **Single-Turn MCP Batching e Protocolo Plan-Then-Batch (R-046, R-059 — Smell 2.26)**: Ao atingir o Limiar >= 2 alvos ou comandos, aplicar compulsoriamente o Protocolo Plan-Then-Batch (etapas: ENUMERAR arquivos/comandos, CONSOLIDAR em `ctx_batch` ou script iterativo `ctx_execute`, DESPACHAR & VALIDAR com `get_errors` ao final). Comandos curtos do usuário ("prosseguir", "continue") mantêm o rigor do protocolo.
 - **Teto Rígido de Tool Turns (≤ 5) e Warm Start Compulsório (R-060)**: Orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução; inicialização silenciosa de bases pré-computadas (Warm Start) no primeiro comando e consolidação de buscas em lote com Edge Truncation.
 - **Portão de Reúso Sistêmico (R-055 / Anti-Silo Fix / Systemic Reuse Gate)**: Responder a Q1 (peers), Q2 (templates) e Q3 (testes no pytest) antes de finalizar melhorias de governança.
 - **Blueprint Técnico e Decomposição Obrigatórios (R-058 / Anti-Premature Implementation Bypass)**: Elaboração mandatória de Blueprint Técnico antes de codificar features complexas.
@@ -68,9 +68,9 @@ Vide [`.github/agents/agent-router.agent.md`](agents/agent-router.agent.md) § *
 
 | Operação | Ferramenta Canônica | Quando Usar |
 |---|---|---|
-| Leitura / Inspeção em lote | `ctx_execute` / `ctx_execute_file` | Leitura filtrada, scripts de inspeção no sandbox |
+| Leitura / Inspeção em lote | `ctx_execute` (com `file`) | Leitura filtrada, scripts de inspeção no sandbox |
 | Modificação multi-arquivo | `ctx_execute` (script iterativo) | Gravação em lote com verificação atômica |
-| Multi-comandos CLI em lote | `ctx_batch_execute` | Execução paralela de múltiplos comandos shell |
+| Multi-comandos CLI em lote | `ctx_batch` | Execução paralela de múltiplos comandos shell |
 | Busca em base indexada | `ctx_search` | Consultas estruturadas na base de conhecimento |
 | Indexação documental | `ctx_index` | Armazenamento de documentações e referências |
 
@@ -93,7 +93,7 @@ Avalie o tipo da tarefa e emita o sinal abaixo quando exigir modelo **1× ou sup
 | Arquitetura complexa · debug crítico · decisão crítica | Claude Opus 5.5 | 3× |
 | Tarefa multi-arquivo/alto fan-out (≥ 10 alvos/arquivos/operações homogêneas) (R-021.1) | Claude Sonnet / GPT-5 / Gemini Pro | 1× |
 
-- **Nota (R-021.1 — Fan-Out)**: Tarefas com ≥ 10 alvos/arquivos/operações homogêneas devem acionar escalonamento pontual para Claude Sonnet/GPT-5 para execução em lote confiável via `ctx_batch_execute`.
+- **Nota (R-021.1 — Fan-Out)**: Tarefas com ≥ 10 alvos/arquivos/operações homogêneas devem acionar escalonamento pontual para Claude Sonnet/GPT-5 para execução em lote confiável via `ctx_batch`.
 - **Nota (R-021.2 — Retry-Rate Escalation)**: Agents executores que implementam feature e rodam testes devem emitir o sinal de Retry-Rate Escalation quando o mesmo teste falhar 2 vezes consecutivas.
 
 ## 4) 🏥 Health Check — Binding Context (R-034)
@@ -117,16 +117,16 @@ Toda resposta técnica deve iniciar com o banner de agente ativo e estruturar-se
 4. **Riscos / Alinhamento**: Quality gates e invariantes preservados.
 5. **Próximo Passo**: Conclusão ou recomendação imediata.
 
-### Política Anti-Timeout, Runtime Preferencial JavaScript (`fs` nativo) e Circuit Breaker Fail-Fast (`ctx_execute` / `ctx_batch_execute`)
+### Política Anti-Timeout, Runtime Preferencial JavaScript (`fs` nativo) e Circuit Breaker Fail-Fast (`ctx_execute` / `ctx_batch`)
 
 1. **Runtime Obrigatório `language: "javascript"` no `ctx_execute` (Anti-Defender/AMSI Hang)**:
    - No Windows, a invocação de `python.exe` (`language: "python"` ou `python -c`) ou cadeias pesadas de subshells a partir do processo Node.js do servidor MCP `context-mode` sofre interceptação síncrona pelo Windows Defender (`MsMpEng.exe` / Behavior Monitoring / AMSI), causando bloqueios severos de I/O e timeouts (`ETIMEDOUT` / `taskkill /F /T`).
    - Portanto, `language: "javascript"` (com módulos nativos `fs` e `path` do Node.js) é o **runtime obrigatório** no `ctx_execute` para leitura, inspeção, busca, parsing JSON/texto e modificação em lote de arquivos.
    - É **terminantemente proibido** invocar `language: "python"`, `python -c` ou subshells aninhados para I/O de arquivos. (A execução de binários Python via `child_process` é restrita exclusivamente a ferramentas CLI do ecossistema, como `pytest` ou scripts de sincronização canônicos, nunca para ler/editar arquivos).
-2. **Higiene de Comandos em `ctx_batch_execute`**:
-   - Os comandos shell em `ctx_batch_execute` devem ser leves, atômicos e com escopo de diretório estritamente restrito.
+2. **Higiene de Comandos em `ctx_batch`**:
+   - Os comandos shell em `ctx_batch` devem ser leves, atômicos e com escopo de diretório estritamente restrito.
    - É **proibido** disparar `python -c` inline em lote ou varreduras recursivas irrestritas na raiz do workspace sem filtro de pasta/extensão (evitando estourar o orçamento de tempo do batch).
 3. **Política Fail-Fast & Circuit Breaker de Timeout (Máx. 1 Retry com Troca de Estratégia)**:
-   - Em caso de erro de timeout (`ETIMEDOUT`, `timed out`, `taskkill`) em `ctx_execute` ou `ctx_batch_execute`, o agente tem **tolerância zero para repetir a mesma chamada/runtime**.
+   - Em caso de erro de timeout (`ETIMEDOUT`, `timed out`, `taskkill`) em `ctx_execute` ou `ctx_batch`, o agente tem **tolerância zero para repetir a mesma chamada/runtime**.
    - É permitido no **máximo 1 retry**, contanto que haja **troca obrigatória de estratégia** (migrar de `python`/`shell` para `language: "javascript"` puro com `fs` nativo, ou dividir o lote em comandos menores/escopo restrito).
    - Se ocorrer um **2º timeout**, o **Circuit Breaker Fail-Fast** abre imediatamente: o agente deve abortar novas tentativas de spawn, registrar a evidência e acionar o fallback canônico ou reportar o bloqueio em formato Compact Error Reporting (R-020).

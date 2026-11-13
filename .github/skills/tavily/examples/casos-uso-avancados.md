@@ -75,7 +75,7 @@ tavily_extract({
   query: "<conceito chave>"
 })
 
-ctx_fetch_and_index({ url: "https://docs.<vendor>.com/<topic>" })
+ctx_index({ url: "https://docs.<vendor>.com/<topic>" })
 
 ctx_search({ queries: ["<conceito chave>"] })
 ```
