@@ -228,8 +228,25 @@ class InsightsEngine:
         total_sessions = kpis["totalSessions"]
         compact_rate = kpis["compactRate"]
         total_compacts = kpis["totalCompacts"]
+        cm_version = self.data.get("meta", {}).get("contextModeVersion", "2.1.10")
+        tokens_saved = kpis.get("tokensSaved", 0)
+        dollars_saved = kpis.get("dollarsSaved", 0.0)
 
-        if total_sessions >= 3:
+        if cm_version == "2.1.10" and compact_rate == 0.0 and tokens_saved > 0:
+            cards.append({
+                "id": "v2-sandbox-offloading",
+                "severity": "positive",
+                "badge": "Nice",
+                "icon": "bolt",
+                "metric": f"{tokens_saved:,} tokens economizados via Sandbox/FTS5 (v2.1.10)",
+                "evidence": (
+                    f"No context-mode v2.1.10, a compactação legada foi substituída por indexação FTS5 e truncamento "
+                    f"de borda em sandbox, gerando economia estimada de ${dollars_saved:.2f}."
+                ),
+                "action": "Continue utilizando ctx_execute com intent, ctx_batch e ctx_search para manter o contexto enxuto.",
+                "roi": f"Economia acumulada de ~{tokens_saved:,} tokens (${dollars_saved:.2f}) sem perda de precisão.",
+            })
+        elif total_sessions >= 3:
             if compact_rate > 35.0:
                 cards.append({
                     "id": "compact-high",

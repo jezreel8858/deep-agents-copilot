@@ -141,38 +141,230 @@ def resolve_default_directories(
     return sessions_dirs, content_dirs, debug_logs
 
 
+
+
+def detect_agent_in_text(text: str, known_agents: Any) -> Optional[str]:
+    """Detecta menção a um agente conhecido do catálogo no texto do evento."""
+    if not text or not known_agents:
+        return None
+    text_l = text.lower()
+    for ag in known_agents:
+        ag_l = ag.lower()
+        if f"@{ag_l}" in text_l or f'"{ag_l}"' in text_l or f"'{ag_l}'" in text_l or f"subagent_type={ag_l}" in text_l or f"agent_name={ag_l}" in text_l or f" {ag_l} " in f" {text_l} ":
+            return ag
+    return None
+
+
+def _epoch_to_iso(val: Any) -> str:
+    """Converte epoch ms, epoch s ou string ISO em ISO-8601 UTC."""
+    if val is None or val == "":
+        return ""
+    if isinstance(val, (int, float)):
+        ts = float(val)
+        if ts > 1e11:
+            ts = ts / 1000.0
+        try:
+            return datetime.fromtimestamp(ts, tz=timezone.utc).isoformat()
+        except Exception:
+            return str(val)
+    s = str(val).strip()
+    if s.isdigit():
+        ts = float(s)
+        if ts > 1e11:
+            ts = ts / 1000.0
+        try:
+            return datetime.fromtimestamp(ts, tz=timezone.utc).isoformat()
+        except Exception:
+            return s
+    return s
+
+
+def _is_doctor_synthetic(session_id: Optional[str], worktree: Optional[str] = None, body: Optional[str] = None) -> bool:
+    """Detecta sessões/eventos sintéticos gerados pelo 'context-mode doctor'."""
+    sid = (session_id or "").strip()
+    wt = (worktree or "").strip()
+    bd = (body or "").strip()
+    if sid == "context-mode-doctor-hook-runs" or sid.startswith("context-mode-doctor"):
+        return True
+    if "cm-doctor-runs-" in wt:
+        return True
+    if bd.startswith("context-mode doctor sample line"):
+        return True
+    return False
+
+
+def discover_v2_databases(
+    custom_data_dir: Optional[str] = None,
+    custom_sessions_dir: Optional[str] = None,
+    custom_content_dir: Optional[str] = None,
+) -> Tuple[List[Path], List[Path]]:
+    """
+    Descobre bancos SQLite do context-mode v2.1.10 (<root>/projects/<key>/context.db).
+    Retorna (data_roots, db_files).
+    Precedência:
+      1. custom_data_dir (--data-dir)
+      2. env CONTEXT_MODE_DATA_DIR
+      3. custom_sessions_dir / custom_content_dir (se contiverem projects/*/context.db ou context.db)
+      4. Default roots: ~/.config/JetBrains/context-mode, ~/.context-mode, ~/.claude/context-mode
+    Ignora backups/, v1-aside-*, node_modules e .cache.
+    """
+    candidate_roots: List[Path] = []
+    env_dir = os.environ.get("CONTEXT_MODE_DATA_DIR", "").strip()
+
+    if custom_data_dir:
+        candidate_roots.append(Path(custom_data_dir).expanduser())
+    elif env_dir:
+        candidate_roots.append(Path(env_dir).expanduser())
+    elif custom_sessions_dir or custom_content_dir:
+        for c in (custom_sessions_dir, custom_content_dir):
+            if c:
+                candidate_roots.append(Path(c).expanduser())
+    else:
+        home = Path.home()
+        default_candidates = [
+            home / ".config" / "JetBrains" / "context-mode",
+            home / ".context-mode",
+            home / ".claude" / "context-mode",
+        ]
+        for env_var in ("APPDATA", "LOCALAPPDATA", "XDG_CONFIG_HOME"):
+            val = os.environ.get(env_var)
+            if val:
+                default_candidates.append(Path(val) / "JetBrains" / "context-mode")
+                default_candidates.append(Path(val) / "context-mode")
+        for cand in default_candidates:
+            if cand.exists() and cand not in candidate_roots:
+                candidate_roots.append(cand)
+
+    active_roots: List[Path] = []
+    db_files: List[Path] = []
+
+    def _is_excluded(p: Path) -> bool:
+        parts_lower = [part.lower() for part in p.parts]
+        for bad in ("backups", "node_modules", ".cache", ".git"):
+            if bad in parts_lower:
+                return True
+        if any(part.startswith("v1-aside") for part in parts_lower):
+            return True
+        return False
+
+    for root in candidate_roots:
+        if not root.exists():
+            continue
+        found_in_root = False
+        if root.is_file() and root.name.endswith(".db") and not _is_excluded(root):
+            db_files.append(root)
+            active_roots.append(root.parent)
+            continue
+
+        direct_db = root / "context.db"
+        if direct_db.is_file() and not _is_excluded(direct_db) and direct_db not in db_files:
+            db_files.append(direct_db)
+            found_in_root = True
+
+        projects_dir = root / "projects"
+        if projects_dir.is_dir() and not _is_excluded(projects_dir):
+            for db_path in sorted(projects_dir.glob("*/context.db")):
+                if db_path.is_file() and not _is_excluded(db_path) and db_path not in db_files:
+                    db_files.append(db_path)
+                    found_in_root = True
+
+        if found_in_root and root not in active_roots:
+            active_roots.append(root)
+
+    return active_roots, db_files
+
+
 class ContextDataExtractor:
-    """Extrator unificado de telemetria e armazenamento local do Context Mode."""
+    """Extrator unificado de telemetria e armazenamento local do Context Mode (v2.1.10 + fallback v1)."""
 
     def __init__(
         self,
         sessions_dir: Optional[str] = None,
-        content_dir: Optional[str] = None
+        content_dir: Optional[str] = None,
+        data_dir: Optional[str] = None,
+        legacy_v1: bool = False,
     ):
-        self.sessions_dirs, self.content_dirs, self.debug_logs = resolve_default_directories(sessions_dir, content_dir)
+        self.custom_data_dir = data_dir
+        self.custom_sessions_dir = sessions_dir
+        self.custom_content_dir = content_dir
+        self.legacy_v1 = legacy_v1
         self.warnings: List[str] = []
-        self.source_paths: List[str] = [str(p) for p in self.sessions_dirs + self.content_dirs + self.debug_logs]
+
+        self.v2_roots, self.v2_db_files = ([], [])
+        if not self.legacy_v1:
+            self.v2_roots, self.v2_db_files = discover_v2_databases(
+                custom_data_dir=data_dir,
+                custom_sessions_dir=sessions_dir,
+                custom_content_dir=content_dir,
+            )
+
+        self.sessions_dirs, self.content_dirs, self.debug_logs = resolve_default_directories(
+            sessions_dir, content_dir
+        )
+
+        # Se v2 encontrou bancos (ou se data_dir/CONTEXT_MODE_DATA_DIR foi passado sem legacy_v1)
+        self.use_v2 = (not self.legacy_v1) and (
+            len(self.v2_db_files) > 0
+            or bool(data_dir)
+            or bool(os.environ.get("CONTEXT_MODE_DATA_DIR", "").strip())
+        )
+
+        if self.use_v2:
+            self.source_paths: List[str] = [str(p) for p in self.v2_roots + self.v2_db_files + self.debug_logs]
+        else:
+            self.source_paths = [str(p) for p in self.sessions_dirs + self.content_dirs + self.debug_logs]
 
     def extract_all(self) -> Dict[str, Any]:
-        """Executa a extração completa de sessions, eventos, json e content DBs."""
+        """Executa a extração completa (v2.1.10 unificado em projects/*/context.db ou legado v1)."""
         now_iso = datetime.now(timezone.utc).isoformat()
-        
+        otel_data = self._read_otel_spans()
+
+        if self.use_v2:
+            v2_events_data, stats_pid_data, schema_version, doctor_filtered = self._read_events_and_cost_v2()
+            content_dbs_data = self._read_content_v2()
+            if otel_data["spansCount"] == 0:
+                self.warnings.append("Nenhum span OTel nativo encontrado (fallback: telemetria SQLite v2 em uso).")
+            if not self.v2_db_files:
+                self.warnings.append("Nenhum banco projects/<key>/context.db do Context Mode v2 localizado.")
+            project_keys = [db.parent.name for db in self.v2_db_files]
+            return {
+                "meta": {
+                    "generatedAt": now_iso,
+                    "contextModeVersion": "2.1.10",
+                    "schemaVersion": schema_version,
+                    "dataRoots": [str(r) for r in self.v2_roots],
+                    "projectKeys": project_keys,
+                    "doctorEventsFiltered": doctor_filtered,
+                    "sourcePaths": self.source_paths,
+                    "warnings": self.warnings,
+                    "statsPidCount": stats_pid_data.get("filesCount", 0),
+                    "sessionDbsCount": v2_events_data.get("dbsCount", 0),
+                    "contentDbsCount": content_dbs_data.get("dbsCount", 0),
+                },
+                "sessions": v2_events_data.get("sessions", []),
+                "eventsSummary": v2_events_data.get("eventsSummary", {}),
+                "statsPid": stats_pid_data,
+                "content": content_dbs_data,
+                "otelSpans": otel_data,
+            }
+
         session_dbs_data = self._read_session_databases()
         stats_pid_data = self._read_stats_pid_files()
         content_dbs_data = self._read_content_databases()
-        otel_data = self._read_otel_spans()
         if otel_data["spansCount"] == 0:
             self.warnings.append("Nenhum span OTel nativo encontrado (fallback: heurística de regex em uso).")
-
         if not self.sessions_dirs:
             self.warnings.append("Nenhum diretório de sessões do Context Mode localizado na máquina.")
-
         if not self.content_dirs:
             self.warnings.append("Nenhum diretório de conteúdo do Context Mode localizado na máquina.")
-
         return {
             "meta": {
                 "generatedAt": now_iso,
+                "contextModeVersion": "legacy",
+                "schemaVersion": 1,
+                "dataRoots": [str(p) for p in self.sessions_dirs],
+                "projectKeys": [],
+                "doctorEventsFiltered": 0,
                 "sourcePaths": self.source_paths,
                 "warnings": self.warnings,
                 "statsPidCount": stats_pid_data.get("filesCount", 0),
@@ -184,6 +376,451 @@ class ContextDataExtractor:
             "statsPid": stats_pid_data,
             "content": content_dbs_data,
             "otelSpans": otel_data,
+        }
+
+    def _read_events_and_cost_v2(self) -> Tuple[Dict[str, Any], Dict[str, Any], int, int]:
+        """Lê eventos, sessões e métricas de custo/economia dos bancos context.db v2.1.10."""
+        all_sessions: List[Dict[str, Any]] = []
+        seen_session_ids = set()
+        total_events_count = 0
+        total_errors_count = 0
+        total_prompts_count = 0
+        total_reads_count = 0
+        total_writes_count = 0
+        hourly_counts: Dict[int, int] = {h: 0 for h in range(24)}
+        date_sessions_map: Dict[str, Dict[str, int]] = {}
+        tool_counts: Dict[str, int] = {}
+        mcp_tool_counts: Dict[str, Dict[str, int]] = {}
+        project_agg: Dict[str, Dict[str, Any]] = {}
+        subagent_events: List[Dict[str, Any]] = []
+        decisions_list: List[Dict[str, Any]] = []
+        detailed_events: List[Dict[str, Any]] = []
+        all_events_for_correlation: List[Tuple[datetime, str, str]] = []
+        session_proj_map: Dict[str, str] = {}
+        agent_stats: Dict[str, Dict[str, int]] = {}
+        known_agents = load_known_agents()
+
+        total_sandbox_bytes = 0
+        total_returned_bytes = 0
+        total_cost_calls = 0
+        by_tool_cost: Dict[str, Dict[str, int]] = {}
+        schema_version = 6
+        doctor_filtered = 0
+
+        read_tools = {"read", "read_file", "grep", "grep_search", "glob", "file_search", "list_dir", "ctx_search", "ctx_index", "ctx_fetch_and_index", "view"}
+        write_tools = {"edit", "write", "create_file", "replace_string_in_file", "insert_edit_into_file", "multi_edit"}
+
+        for db_file in self.v2_db_files:
+            try:
+                conn = sqlite3.connect(f"file:{db_file}?mode=ro", uri=True)
+                cur = conn.cursor()
+                tables = [r[0] for r in cur.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
+
+                if "meta" in tables:
+                    try:
+                        row = cur.execute("SELECT value FROM meta WHERE key='schema_version'").fetchone()
+                        if row and str(row[0]).isdigit():
+                            schema_version = max(schema_version, int(row[0]))
+                    except Exception:
+                        pass
+
+                if "events" not in tables:
+                    conn.close()
+                    continue
+
+                rows = cur.execute(
+                    "SELECT seq, session_id, worktree, agent, kind, tool, key, path, ok, exit_code, "
+                    "bytes, body, turn, sandbox_bytes, returned_bytes, created_at "
+                    "FROM events ORDER BY created_at ASC, seq ASC"
+                ).fetchall()
+
+                # Agrupamento de sessões neste DB
+                db_sessions: Dict[str, Dict[str, Any]] = {}
+
+                for (
+                    seq, s_id, worktree, agent_col, kind, tool, key_col, path_col,
+                    ok, exit_code, ev_bytes, body, turn, sb_bytes, ret_bytes, created_at
+                ) in rows:
+                    if _is_doctor_synthetic(s_id, worktree, body):
+                        doctor_filtered += 1
+                        continue
+
+                    s_id = s_id or f"unknown-{db_file.parent.name}"
+                    worktree = worktree or str(db_file.parent)
+                    proj_name = sanitize_project_name(worktree)
+                    session_proj_map[s_id] = proj_name
+                    iso_ts = _epoch_to_iso(created_at)
+                    kind_l = (kind or "").lower()
+                    tool_str = (tool or key_col or kind or "unknown").strip()
+                    tool_l = tool_str.lower()
+                    sb_b = int(sb_bytes or 0)
+                    ret_b = int(ret_bytes or 0)
+                    ev_b = int(ev_bytes or 0)
+
+                    # Métricas de economia / cost
+                    if kind_l == "cost" or sb_b > 0 or ret_b > 0:
+                        eff_sb = sb_b if sb_b > 0 else ev_b
+                        eff_ret = ret_b
+                        total_sandbox_bytes += eff_sb
+                        total_returned_bytes += eff_ret
+                        total_cost_calls += 1
+                        t_key = tool_str if tool_str and tool_str != "cost" else "ctx_execute"
+                        if t_key not in by_tool_cost:
+                            by_tool_cost[t_key] = {"calls": 0, "bytesReturned": 0, "sandboxBytes": 0}
+                        by_tool_cost[t_key]["calls"] += 1
+                        by_tool_cost[t_key]["bytesReturned"] += eff_ret
+                        by_tool_cost[t_key]["sandboxBytes"] += eff_sb
+
+                    # Sessão
+                    if s_id not in db_sessions:
+                        db_sessions[s_id] = {
+                            "sessionId": s_id,
+                            "projectDir": worktree,
+                            "projectName": proj_name,
+                            "startedAt": iso_ts,
+                            "lastEventAt": iso_ts,
+                            "minMs": created_at if isinstance(created_at, (int, float)) else 0,
+                            "maxMs": created_at if isinstance(created_at, (int, float)) else 0,
+                            "eventCount": 0,
+                            "compactCount": 0,
+                        }
+                    sess = db_sessions[s_id]
+                    sess["eventCount"] += 1
+                    sess["lastEventAt"] = iso_ts
+                    if isinstance(created_at, (int, float)):
+                        if sess["minMs"] == 0 or created_at < sess["minMs"]:
+                            sess["minMs"] = created_at
+                            sess["startedAt"] = iso_ts
+                        if created_at > sess["maxMs"]:
+                            sess["maxMs"] = created_at
+                            sess["lastEventAt"] = iso_ts
+
+                    total_events_count += 1
+
+                    # Contadores de erro, prompt, leitura e escrita
+                    is_err = (ok == 0) or (kind_l == "toolerr") or (exit_code is not None and int(exit_code) != 0)
+                    if is_err:
+                        total_errors_count += 1
+
+                    if kind_l == "prompt":
+                        total_prompts_count += 1
+                    elif kind_l == "edit" or tool_l in write_tools:
+                        total_writes_count += 1
+                    elif kind_l == "file" or tool_l in read_tools:
+                        total_reads_count += 1
+                    elif kind_l == "cmd":
+                        total_reads_count += 1
+
+                    # Horário e data
+                    dt_obj = None
+                    if iso_ts:
+                        try:
+                            dt_obj = datetime.fromisoformat(iso_ts.replace("Z", "+00:00"))
+                            hourly_counts[dt_obj.hour] = hourly_counts.get(dt_obj.hour, 0) + 1
+                            d_str = dt_obj.strftime("%Y-%m-%d")
+                            if d_str not in date_sessions_map:
+                                date_sessions_map[d_str] = {"sessions": 0, "events": 0, "compacts": 0, "_sids": set()}
+                            date_sessions_map[d_str]["events"] += 1
+                            date_sessions_map[d_str]["_sids"].add(s_id)
+                        except Exception:
+                            pass
+
+                    # Projeto
+                    if proj_name not in project_agg:
+                        project_agg[proj_name] = {"name": proj_name, "sessions": 0, "events": 0, "compacts": 0, "errors": 0, "_sids": set()}
+                    project_agg[proj_name]["events"] += 1
+                    project_agg[proj_name]["_sids"].add(s_id)
+                    if is_err:
+                        project_agg[proj_name]["errors"] += 1
+
+                    # Ferramentas
+                    if kind_l not in ("prompt", "cost"):
+                        t_label = (tool or kind or "unknown").strip()
+                        tool_counts[t_label] = tool_counts.get(t_label, 0) + 1
+                        is_mcp = t_label.startswith("ctx_") or t_label.startswith("mcp_") or t_label in ("execute", "batch_execute", "search", "index", "fetch_and_index", "stats", "doctor")
+                        if is_mcp:
+                            srv = "context-mode"
+                            m_key = f"{srv}:{t_label}"
+                            if m_key not in mcp_tool_counts:
+                                mcp_tool_counts[m_key] = {"server": srv, "tool": t_label, "count": 0, "errors": 0}
+                            mcp_tool_counts[m_key]["count"] += 1
+                            if is_err:
+                                mcp_tool_counts[m_key]["errors"] += 1
+
+                    # Decisões
+                    if kind_l == "decision" and body:
+                        decisions_list.append({
+                            "sessionId": s_id,
+                            "projectName": proj_name,
+                            "timestamp": iso_ts,
+                            "type": tool or "decision",
+                            "text": str(body)[:500],
+                        })
+
+                    # Agentes e Subagentes (detecção em body/key/agent)
+                    combined_text = f"{agent_col or ''} {tool or ''} {key_col or ''} {body or ''}"
+                    matched_agent = detect_agent_in_text(combined_text, known_agents)
+                    is_sub = "subagent" in tool_l or "run_subagent" in tool_l or kind_l == "subagent" or "[handoff]" in combined_text.lower()
+                    if matched_agent:
+                        if matched_agent not in agent_stats:
+                            agent_stats[matched_agent] = {"direct": 0, "subagent": 0, "total": 0}
+                        if is_sub:
+                            agent_stats[matched_agent]["subagent"] += 1
+                        else:
+                            agent_stats[matched_agent]["direct"] += 1
+                        agent_stats[matched_agent]["total"] += 1
+
+                    if is_sub and dt_obj:
+                        subagent_events.append({
+                            "sessionId": s_id,
+                            "project": proj_name,
+                            "createdAt": iso_ts,
+                            "timestamp": dt_obj,
+                            "agent": matched_agent or agent_col or "subagent",
+                            "rawData": str(body or key_col or "")[:200],
+                        })
+
+                    if dt_obj:
+                        all_events_for_correlation.append((dt_obj, s_id, combined_text[:200]))
+
+                    if len(detailed_events) < 400:
+                        detailed_events.append({
+                            "sessionId": s_id,
+                            "projectName": proj_name,
+                            "timestamp": iso_ts,
+                            "type": kind or "event",
+                            "category": tool or kind or "general",
+                            "priority": 2 if is_err else 1,
+                            "data": str(body or path_col or key_col or "")[:240],
+                        })
+
+                for s_id, s_info in db_sessions.items():
+                    if s_id in seen_session_ids:
+                        continue
+                    seen_session_ids.add(s_id)
+                    dur_min = 0.0
+                    if s_info["maxMs"] > s_info["minMs"] > 0:
+                        diff_ms = s_info["maxMs"] - s_info["minMs"]
+                        if s_info["maxMs"] < 1e11:  # caso timestamp estivesse em segundos
+                            dur_min = round(diff_ms / 60.0, 1)
+                        else:
+                            dur_min = round(diff_ms / 60000.0, 1)
+                    all_sessions.append({
+                        "sessionId": s_info["sessionId"],
+                        "projectDir": s_info["projectDir"],
+                        "projectName": s_info["projectName"],
+                        "startedAt": s_info["startedAt"],
+                        "lastEventAt": s_info["lastEventAt"],
+                        "durationMin": dur_min,
+                        "eventCount": s_info["eventCount"],
+                        "compactCount": 0,
+                    })
+
+                conn.close()
+            except Exception as exc:
+                self.warnings.append(f"Falha ao ler banco v2 {db_file.name}: {exc}")
+
+        # Incorpora logs de subagent JSONL e debug logs (mesma lógica do v1)
+        self._enrich_agents_from_jsonl_and_logs(
+            known_agents, agent_stats, subagent_events, all_events_for_correlation, session_proj_map
+        )
+
+        # Formata séries
+        sessions_by_date = []
+        for d_str in sorted(date_sessions_map.keys()):
+            entry = date_sessions_map[d_str]
+            sessions_by_date.append({
+                "date": d_str,
+                "sessions": len(entry["_sids"]),
+                "events": entry["events"],
+                "compacts": entry["compacts"],
+            })
+
+        projects_list = []
+        for p_name, p_info in project_agg.items():
+            projects_list.append({
+                "name": p_name,
+                "sessions": len(p_info["_sids"]),
+                "events": p_info["events"],
+                "compacts": p_info["compacts"],
+                "errors": p_info["errors"],
+            })
+        projects_list.sort(key=lambda x: x["events"], reverse=True)
+
+        total_tools_sum = sum(tool_counts.values()) or 1
+        tool_usage_list = [
+            {"tool": k, "count": v, "percentage": round((v / total_tools_sum) * 100, 1)}
+            for k, v in sorted(tool_counts.items(), key=lambda x: x[1], reverse=True)
+        ]
+
+        mcp_tools_list = sorted(mcp_tool_counts.values(), key=lambda x: x["count"], reverse=True)
+        subagent_analysis = self._analyze_subagent_bursts(subagent_events)
+
+        total_agent_inv = sum(v["total"] for v in agent_stats.values()) or 1
+        agent_invocations_list = [
+            {
+                "agent": ag,
+                "direct": st["direct"],
+                "subagent": st["subagent"],
+                "total": st["total"],
+                "percentage": round((st["total"] / total_agent_inv) * 100, 1),
+            }
+            for ag, st in sorted(agent_stats.items(), key=lambda x: x[1]["total"], reverse=True)
+        ]
+
+        all_sessions.sort(key=lambda x: x.get("startedAt") or "", reverse=True)
+        decisions_list.sort(key=lambda x: x.get("timestamp") or "", reverse=True)
+        detailed_events.sort(key=lambda x: x.get("timestamp") or "", reverse=True)
+
+        bytes_saved = max(0, total_sandbox_bytes - total_returned_bytes)
+        tokens_saved = int(round(bytes_saved / 4.0))
+        dollars_saved = round((tokens_saved / 1_000_000.0) * 3.0, 2)
+
+        stats_pid_data = {
+            "filesCount": len(self.v2_db_files),
+            "totalCalls": total_cost_calls,
+            "bytesReturned": total_returned_bytes,
+            "sandboxBytes": total_sandbox_bytes,
+            "bytesSaved": bytes_saved,
+            "tokensSavedLifetime": tokens_saved,
+            "dollarsSavedLifetime": dollars_saved,
+            "byTool": by_tool_cost,
+        }
+
+        events_data = {
+            "dbsCount": len(self.v2_db_files),
+            "sessions": all_sessions,
+            "eventsSummary": {
+                "totalEvents": total_events_count,
+                "totalErrors": total_errors_count,
+                "totalPrompts": total_prompts_count,
+                "totalReads": total_reads_count,
+                "totalWrites": total_writes_count,
+                "hourlyPattern": [{"hour": h, "count": hourly_counts[h]} for h in range(24)],
+                "sessionsByDate": sessions_by_date,
+                "toolUsage": tool_usage_list,
+                "mcpTools": mcp_tools_list,
+                "projects": projects_list,
+                "subagents": subagent_analysis,
+                "agentInvocations": agent_invocations_list,
+                "decisions": decisions_list[:200],
+                "detailedEvents": detailed_events[:250],
+            },
+        }
+        return events_data, stats_pid_data, schema_version, doctor_filtered
+
+    def _enrich_agents_from_jsonl_and_logs(
+        self,
+        known_agents: List[str],
+        agent_stats: Dict[str, Dict[str, int]],
+        subagent_events: List[Dict[str, Any]],
+        all_events_for_correlation: List[Tuple[datetime, str, str]],
+        session_proj_map: Dict[str, str],
+    ) -> None:
+        """Lê logs/subagent-telemetry.jsonl do repositório para enriquecer subagentes em modo v2."""
+        repo_root = Path(__file__).resolve().parent.parent.parent.parent
+        jsonl_candidates = [
+            repo_root / "tools" / "context-insight-visualizer" / "logs" / "subagent-telemetry.jsonl",
+        ]
+        for jf in jsonl_candidates:
+            if not jf.is_file():
+                continue
+            try:
+                for line in jf.read_text(encoding="utf-8", errors="ignore").splitlines():
+                    line = line.strip()
+                    if not line:
+                        continue
+                    rec = json.loads(line)
+                    ag = rec.get("subagent_type") or rec.get("agent") or detect_agent_in_text(json.dumps(rec), known_agents)
+                    if ag:
+                        ag_clean = ag.lstrip("@").strip()
+                        if ag_clean not in agent_stats:
+                            agent_stats[ag_clean] = {"direct": 0, "subagent": 0, "total": 0}
+                        agent_stats[ag_clean]["subagent"] += 1
+                        agent_stats[ag_clean]["total"] += 1
+            except Exception:
+                pass
+
+    def _read_content_v2(self) -> Dict[str, Any]:
+        """Lê sources e chunks (FTS5) dos bancos context.db v2.1.10 com degradação graciosa."""
+        total_sources = 0
+        total_chunks = 0
+        total_size_bytes = 0
+        sources_list: List[Dict[str, Any]] = []
+        chunks_by_source: Dict[Any, List[Dict[str, Any]]] = {}
+
+        for db_file in self.v2_db_files:
+            proj_key = db_file.parent.name
+            try:
+                conn = sqlite3.connect(f"file:{db_file}?mode=ro", uri=True)
+                cur = conn.cursor()
+                tables = [r[0] for r in cur.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
+
+                if "sources" in tables:
+                    try:
+                        s_rows = cur.execute(
+                            "SELECT id, label, kind, chunk_count, bytes_total, created_at "
+                            "FROM sources ORDER BY created_at DESC LIMIT 250"
+                        ).fetchall()
+                        for sid, slabel, skind, c_cnt, b_tot, c_at in s_rows:
+                            # Ignora fontes sintéticas do doctor
+                            if "context-mode-doctor" in str(slabel or "") or "cm-doctor-runs-" in str(slabel or ""):
+                                continue
+                            total_sources += 1
+                            c_cnt_int = int(c_cnt or 0)
+                            b_tot_int = int(b_tot or 0)
+                            total_chunks += c_cnt_int
+                            total_size_bytes += b_tot_int
+                            composite_id = f"{proj_key}:{sid}" if len(self.v2_db_files) > 1 else sid
+                            sanitized_label = str(slabel or "").replace("\\", "/")
+                            sources_list.append({
+                                "id": composite_id,
+                                "rawId": sid,
+                                "dbHash": proj_key,
+                                "label": sanitized_label,
+                                "kind": skind or "text",
+                                "chunkCount": c_cnt_int,
+                                "codeChunkCount": c_cnt_int if (skind or "") == "file" else 0,
+                                "bytesTotal": b_tot_int,
+                                "indexedAt": _epoch_to_iso(c_at),
+                                "filePath": sanitized_label,
+                            })
+                    except Exception as exc:
+                        self.warnings.append(f"Falha ao ler tabela sources em {proj_key}: {exc}")
+
+                if "chunks" in tables:
+                    try:
+                        c_rows = cur.execute(
+                            "SELECT source_id, title, length(body), substr(body, 1, 280) "
+                            "FROM chunks LIMIT 800"
+                        ).fetchall()
+                        for src_id, title, body_len, preview in c_rows:
+                            if preview and "context-mode doctor sample line" in str(preview):
+                                continue
+                            composite_id = f"{proj_key}:{src_id}" if len(self.v2_db_files) > 1 else src_id
+                            if composite_id not in chunks_by_source:
+                                chunks_by_source[composite_id] = []
+                            if len(chunks_by_source[composite_id]) < 25:
+                                chunks_by_source[composite_id].append({
+                                    "title": title or "Chunk",
+                                    "contentType": "markdown",
+                                    "sizeBytes": int(body_len or 0),
+                                    "preview": (preview or "").strip(),
+                                })
+                    except Exception as exc:
+                        self.warnings.append(f"FTS5/chunks indisponível em {proj_key} (degradação graciosa): {exc}")
+
+                conn.close()
+            except Exception as exc:
+                self.warnings.append(f"Falha ao ler conteúdo v2 em {db_file.name}: {exc}")
+
+        return {
+            "dbsCount": len(self.v2_db_files),
+            "totalSources": total_sources,
+            "totalChunks": total_chunks,
+            "totalSizeBytes": total_size_bytes,
+            "sources": sources_list,
+            "chunksBySource": chunks_by_source,
         }
 
     def _read_session_databases(self) -> Dict[str, Any]:

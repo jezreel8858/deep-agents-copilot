@@ -633,8 +633,7 @@ agents:
     - run_in_terminal
     - run_subagent
     - context-mode/ctx_batch
-    - context-mode/ctx_execute
-    - context-mode/ctx_execute
+    - context-mode/ctx_doctor
     - context-mode/ctx_index
     - context-mode/ctx_search
     related_skills:
@@ -644,9 +643,12 @@ agents:
     source_docs:
     - CLAUDE.md
     - .github/copilot-instructions.md
-    - .github/agents/runtime-verifier.agent.md
+    - .github/skills/git-governance/SKILL.md
+    - .github/skills/context-mode/SKILL.md
+    - .github/skills/efficient-batch-code-modification/SKILL.md
+    - .github/skills/handoff-governance/SKILL.md
+    - .github/skills/agent-contracts/SKILL.md
     - .github/skills/terminal-governance/SKILL.md
-    - .github/instructions/devops.instructions.md
     - .github/skills/embedded-runtime-governance/SKILL.md
     estimated_time_minutes: 10
   pr-gatekeeper:

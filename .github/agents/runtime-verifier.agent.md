@@ -7,7 +7,7 @@ description: >-
   dependentes (Docker/emulador/DB local) disponíveis, cache não corrompido.
   Read-only por definição: nunca corrige, apenas diagnostica e reporta bloqueio.
 model: "Gemini 4 Argon"
-tools: ['list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_batch', 'context-mode/ctx_search', 'context-mode/ctx_index']
+tools: ['list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_batch', 'context-mode/ctx_search', 'context-mode/ctx_index', 'context-mode/ctx_doctor']
 source_docs:
   - '.github/skills/git-governance/SKILL.md'
   - '.github/skills/context-mode/SKILL.md'

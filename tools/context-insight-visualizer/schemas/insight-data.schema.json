@@ -4,7 +4,12 @@
   "title": "ContextInsightData",
   "description": "Contrato de dados unificado para o visualizador standalone de métricas do Context Mode.",
   "type": "object",
-  "required": ["version", "meta", "kpis", "insightsActions"],
+  "required": [
+    "version",
+    "meta",
+    "kpis",
+    "insightsActions"
+  ],
   "properties": {
     "version": {
       "type": "string",
@@ -13,7 +18,11 @@
     },
     "meta": {
       "type": "object",
-      "required": ["generatedAt", "sourcePaths", "warnings"],
+      "required": [
+        "generatedAt",
+        "sourcePaths",
+        "warnings"
+      ],
       "properties": {
         "generatedAt": {
           "type": "string",
@@ -21,12 +30,16 @@
         },
         "sourcePaths": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "Caminhos e diretórios de dados locais lidos."
         },
         "warnings": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "Avisos de introspecção ou fontes ausentes/parciais."
         },
         "statsPidCount": {
@@ -40,6 +53,32 @@
         "contentDbsCount": {
           "type": "integer",
           "description": "Quantidade de bancos content/*.db processados."
+        },
+        "contextModeVersion": {
+          "type": "string",
+          "description": "Versão do layout do context-mode (2.1.10 ou legacy)."
+        },
+        "schemaVersion": {
+          "type": "number",
+          "description": "Versão do schema SQLite do context.db."
+        },
+        "dataRoots": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Diretórios raiz v2 descobertos."
+        },
+        "projectKeys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Chaves hash dos projetos v2."
+        },
+        "doctorEventsFiltered": {
+          "type": "number",
+          "description": "Total de eventos sintéticos do doctor filtrados."
         }
       }
     },
@@ -53,19 +92,58 @@
         "promptsPerSession"
       ],
       "properties": {
-        "totalSessions": { "type": "number", "description": "Total de sessões registradas." },
-        "readWriteRatio": { "type": "number", "description": "Razão de leituras de arquivo para escritas (reads : writes)." },
-        "compactRate": { "type": "number", "description": "Percentual de sessões que sofreram compactação de contexto (%)." },
-        "errorRatePct": { "type": "number", "description": "Taxa de erro nas chamadas de ferramenta (%)." },
-        "promptsPerSession": { "type": "number", "description": "Média de prompts do usuário por sessão." },
-        "totalEvents": { "type": "number", "description": "Total acumulado de eventos de sessão." },
-        "totalErrors": { "type": "number", "description": "Total de falhas ou erros registrados." },
-        "totalCompacts": { "type": "number", "description": "Total de eventos de compactação." },
-        "totalReads": { "type": "number", "description": "Total de eventos de leitura de arquivo." },
-        "totalWrites": { "type": "number", "description": "Total de eventos de escrita de arquivo." },
-        "tokensSaved": { "type": "number", "description": "Estimativa de tokens economizados." },
-        "dollarsSaved": { "type": "number", "description": "Estimativa de custo economizado em USD." },
-        "timeSavedMin": { "type": "number", "description": "Tempo estimado economizado em minutos por paralelismo." }
+        "totalSessions": {
+          "type": "number",
+          "description": "Total de sessões registradas."
+        },
+        "readWriteRatio": {
+          "type": "number",
+          "description": "Razão de leituras de arquivo para escritas (reads : writes)."
+        },
+        "compactRate": {
+          "type": "number",
+          "description": "Percentual de sessões que sofreram compactação de contexto (%)."
+        },
+        "errorRatePct": {
+          "type": "number",
+          "description": "Taxa de erro nas chamadas de ferramenta (%)."
+        },
+        "promptsPerSession": {
+          "type": "number",
+          "description": "Média de prompts do usuário por sessão."
+        },
+        "totalEvents": {
+          "type": "number",
+          "description": "Total acumulado de eventos de sessão."
+        },
+        "totalErrors": {
+          "type": "number",
+          "description": "Total de falhas ou erros registrados."
+        },
+        "totalCompacts": {
+          "type": "number",
+          "description": "Total de eventos de compactação."
+        },
+        "totalReads": {
+          "type": "number",
+          "description": "Total de eventos de leitura de arquivo."
+        },
+        "totalWrites": {
+          "type": "number",
+          "description": "Total de eventos de escrita de arquivo."
+        },
+        "tokensSaved": {
+          "type": "number",
+          "description": "Estimativa de tokens economizados."
+        },
+        "dollarsSaved": {
+          "type": "number",
+          "description": "Estimativa de custo economizado em USD."
+        },
+        "timeSavedMin": {
+          "type": "number",
+          "description": "Tempo estimado economizado em minutos por paralelismo."
+        }
       }
     },
     "sessions": {
@@ -73,16 +151,42 @@
       "description": "Lista das sessões agregadas ordenadas por início decrescente.",
       "items": {
         "type": "object",
-        "required": ["sessionId", "startedAt", "eventCount"],
+        "required": [
+          "sessionId",
+          "startedAt",
+          "eventCount"
+        ],
         "properties": {
-          "sessionId": { "type": "string" },
-          "projectDir": { "type": "string" },
-          "projectName": { "type": "string" },
-          "startedAt": { "type": ["string", "null"] },
-          "lastEventAt": { "type": ["string", "null"] },
-          "durationMin": { "type": "number" },
-          "eventCount": { "type": "number" },
-          "compactCount": { "type": "number" }
+          "sessionId": {
+            "type": "string"
+          },
+          "projectDir": {
+            "type": "string"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "startedAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lastEventAt": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "durationMin": {
+            "type": "number"
+          },
+          "eventCount": {
+            "type": "number"
+          },
+          "compactCount": {
+            "type": "number"
+          }
         }
       }
     },
@@ -91,12 +195,24 @@
       "description": "Volume diário de sessões e eventos.",
       "items": {
         "type": "object",
-        "required": ["date", "count", "events"],
+        "required": [
+          "date",
+          "count",
+          "events"
+        ],
         "properties": {
-          "date": { "type": "string" },
-          "count": { "type": "number" },
-          "events": { "type": "number" },
-          "compacts": { "type": "number" }
+          "date": {
+            "type": "string"
+          },
+          "count": {
+            "type": "number"
+          },
+          "events": {
+            "type": "number"
+          },
+          "compacts": {
+            "type": "number"
+          }
         }
       }
     },
@@ -105,10 +221,19 @@
       "description": "Histograma de eventos pelas 24 horas do dia (When You Code).",
       "items": {
         "type": "object",
-        "required": ["hour", "count"],
+        "required": [
+          "hour",
+          "count"
+        ],
         "properties": {
-          "hour": { "type": "integer", "minimum": 0, "maximum": 23 },
-          "count": { "type": "number" }
+          "hour": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 23
+          },
+          "count": {
+            "type": "number"
+          }
         }
       }
     },
@@ -117,10 +242,17 @@
       "description": "Distribuição de uso geral de ferramentas.",
       "items": {
         "type": "object",
-        "required": ["tool", "count"],
+        "required": [
+          "tool",
+          "count"
+        ],
         "properties": {
-          "tool": { "type": "string" },
-          "count": { "type": "number" }
+          "tool": {
+            "type": "string"
+          },
+          "count": {
+            "type": "number"
+          }
         }
       }
     },
@@ -129,11 +261,20 @@
       "description": "Detalhamento de chamadas a ferramentas context-mode MCP.",
       "items": {
         "type": "object",
-        "required": ["tool", "count"],
+        "required": [
+          "tool",
+          "count"
+        ],
         "properties": {
-          "tool": { "type": "string" },
-          "count": { "type": "number" },
-          "bytes": { "type": "number" }
+          "tool": {
+            "type": "string"
+          },
+          "count": {
+            "type": "number"
+          },
+          "bytes": {
+            "type": "number"
+          }
         }
       }
     },
@@ -142,25 +283,52 @@
       "description": "Atividade agregada por projeto.",
       "items": {
         "type": "object",
-        "required": ["projectDir", "projectName", "sessions", "events"],
+        "required": [
+          "projectDir",
+          "projectName",
+          "sessions",
+          "events"
+        ],
         "properties": {
-          "projectDir": { "type": "string" },
-          "projectName": { "type": "string" },
-          "sessions": { "type": "number" },
-          "events": { "type": "number" },
-          "compacts": { "type": "number" }
+          "projectDir": {
+            "type": "string"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "sessions": {
+            "type": "number"
+          },
+          "events": {
+            "type": "number"
+          },
+          "compacts": {
+            "type": "number"
+          }
         }
       }
     },
     "subagents": {
       "type": "object",
       "properties": {
-        "total": { "type": "number" },
-        "bursts": { "type": "number" },
-        "maxConcurrent": { "type": "number" },
-        "parallelCount": { "type": "number" },
-        "sequentialCount": { "type": "number" },
-        "timeSavedMin": { "type": "number" }
+        "total": {
+          "type": "number"
+        },
+        "bursts": {
+          "type": "number"
+        },
+        "maxConcurrent": {
+          "type": "number"
+        },
+        "parallelCount": {
+          "type": "number"
+        },
+        "sequentialCount": {
+          "type": "number"
+        },
+        "timeSavedMin": {
+          "type": "number"
+        }
       }
     },
     "agentInvocations": {
@@ -168,13 +336,33 @@
       "description": "Frequência de invocação de agentes e subagentes.",
       "items": {
         "type": "object",
-        "required": ["agent", "total", "direct", "subagent"],
+        "required": [
+          "agent",
+          "total",
+          "direct",
+          "subagent"
+        ],
         "properties": {
-          "agent": { "type": "string", "description": "Nome canônico do agente." },
-          "total": { "type": "number", "description": "Total de invocações (diretas + subagente)." },
-          "direct": { "type": "number", "description": "Quantidade de invocações diretas." },
-          "subagent": { "type": "number", "description": "Quantidade de invocações via subagente." },
-          "percentage": { "type": "number", "description": "Percentual relativo ao total ou ao topo." }
+          "agent": {
+            "type": "string",
+            "description": "Nome canônico do agente."
+          },
+          "total": {
+            "type": "number",
+            "description": "Total de invocações (diretas + subagente)."
+          },
+          "direct": {
+            "type": "number",
+            "description": "Quantidade de invocações diretas."
+          },
+          "subagent": {
+            "type": "number",
+            "description": "Quantidade de invocações via subagente."
+          },
+          "percentage": {
+            "type": "number",
+            "description": "Percentual relativo ao total ou ao topo."
+          }
         }
       }
     },
@@ -183,19 +371,47 @@
       "description": "Cards de insights avaliados deterministicamente pelo motor de regras.",
       "items": {
         "type": "object",
-        "required": ["id", "severity", "badge", "icon", "metric", "evidence", "action", "roi"],
+        "required": [
+          "id",
+          "severity",
+          "badge",
+          "icon",
+          "metric",
+          "evidence",
+          "action",
+          "roi"
+        ],
         "properties": {
-          "id": { "type": "string" },
+          "id": {
+            "type": "string"
+          },
           "severity": {
             "type": "string",
-            "enum": ["positive", "warning", "critical", "neutral"]
+            "enum": [
+              "positive",
+              "warning",
+              "critical",
+              "neutral"
+            ]
           },
-          "badge": { "type": "string" },
-          "icon": { "type": "string" },
-          "metric": { "type": "string" },
-          "evidence": { "type": "string" },
-          "action": { "type": "string" },
-          "roi": { "type": "string" }
+          "badge": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "metric": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "roi": {
+            "type": "string"
+          }
         }
       }
     },
@@ -223,16 +439,32 @@
       "type": "object",
       "description": "Telemetria nativa OTel GenAI exportada pelo Copilot/Claude Code (fonte opcional, opt-in por máquina).",
       "properties": {
-        "spansCount": { "type": "number" },
-        "byService": { "type": "object", "description": "Contagem por service.name (copilot-chat/github-copilot/claude-code)." },
-        "operationBreakdown": { "type": "object", "description": "Contagem por gen_ai.operation.name (chat/invoke_agent/execute_tool/execute_hook)." },
+        "spansCount": {
+          "type": "number"
+        },
+        "byService": {
+          "type": "object",
+          "description": "Contagem por service.name (copilot-chat/github-copilot/claude-code)."
+        },
+        "operationBreakdown": {
+          "type": "object",
+          "description": "Contagem por gen_ai.operation.name (chat/invoke_agent/execute_tool/execute_hook)."
+        },
         "tokenUsage": {
           "type": "object",
           "properties": {
-            "inputTokens": { "type": "number" },
-            "outputTokens": { "type": "number" },
-            "cacheReadTokens": { "type": "number" },
-            "cacheCreationTokens": { "type": "number" }
+            "inputTokens": {
+              "type": "number"
+            },
+            "outputTokens": {
+              "type": "number"
+            },
+            "cacheReadTokens": {
+              "type": "number"
+            },
+            "cacheCreationTokens": {
+              "type": "number"
+            }
           }
         },
         "modelBreakdown": {
@@ -240,10 +472,18 @@
           "items": {
             "type": "object",
             "properties": {
-              "model": { "type": "string" },
-              "calls": { "type": "number" },
-              "inputTokens": { "type": "number" },
-              "outputTokens": { "type": "number" }
+              "model": {
+                "type": "string"
+              },
+              "calls": {
+                "type": "number"
+              },
+              "inputTokens": {
+                "type": "number"
+              },
+              "outputTokens": {
+                "type": "number"
+              }
             }
           }
         },
@@ -251,7 +491,14 @@
           "type": "array",
           "items": {
             "type": "object",
-            "properties": { "agent": { "type": "string" }, "count": { "type": "number" } }
+            "properties": {
+              "agent": {
+                "type": "string"
+              },
+              "count": {
+                "type": "number"
+              }
+            }
           }
         }
       }

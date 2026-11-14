@@ -146,3 +146,13 @@ Cobre spans dos agentes **Copilot** e **Claude Code** dentro do JetBrains (ambos
 - **Zero Lock-in**: Não requer conta, login, token de API ou acesso à internet.
 - **Artefatos Distribuíveis**: O diretório `dist/` e artefatos de dados locais permanecem isolados e ignorados via `.gitignore`.
 
+
+
+## Compatibilidade com `context-mode` v2.1.10
+
+O extrator suporta nativamente o layout unificado por projeto da v2.1.10 (`<data_dir>/projects/<projectKey>/context.db`), descobrindo automaticamente:
+1. `--data-dir <caminho>` ou variável de ambiente `CONTEXT_MODE_DATA_DIR`
+2. `~/.config/JetBrains/context-mode/projects/*/context.db`
+3. `~/.context-mode/projects/*/context.db`
+
+Sessões sintéticas de diagnóstico (`context-mode-doctor-*` / `cm-doctor-runs-*`) são filtradas automaticamente. Para ler backups legados da v1 (`sessions/*.db`, `content/*.db`, `stats-pid-*.json`), utilize a flag `--legacy-v1`.
