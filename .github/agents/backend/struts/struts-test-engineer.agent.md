@@ -101,6 +101,6 @@ Agente Ativo: struts-test-engineer
 
 ## Retorno ao Router (R-042 — Anti Sticky-Session)
 
-**Banner obrigatório (visibilidade de fluxo)**: toda resposta deste agent abre com a linha `Agente Ativo: struts-test-engineer` antes de qualquer outro conteúdo — mesmo sem handoff neste turno. Se esta resposta é resultado de handoff/re-triagem recebido, adicionar `Handoff: <agent-origem> → struts-test-engineer (motivo: <motivo>)` na linha seguinte.
+**Banner obrigatório (visibilidade de fluxo)**: toda resposta deste agent abre com a linha `Agente Ativo: struts-test-engineer` antes de qualquer outro conteúdo — mesmo sem handoff neste turno. Se esta resposta é resultado de handoff/re-triagem recebido, adicionar `Handoff: <agent-origem> → struts-test-engineer (motivo: <motivo>)` na linha seguinte. Padrão de mercado: OpenAI Agents SDK (`HandoffOutputItem` — "Handed off from X to Y") e LangGraph (campo `active_agent` streamado ao usuário) — ver `agent-contracts/SKILL.md` seção 0.
 
 Se o teste falhar devido a defeito no código de produção, classificar como bug real e realizar handoff para `@struts-developer`.

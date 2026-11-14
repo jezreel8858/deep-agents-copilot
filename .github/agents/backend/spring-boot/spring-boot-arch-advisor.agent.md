@@ -66,9 +66,10 @@ Ao concluir o parecer arquitetural ou emitir o Plano de Implementação Técnica
 
 ## Retorno ao Router (R-042 — Anti Sticky-Session)
 
+**Banner obrigatório (visibilidade de fluxo)**: toda resposta deste agent abre com a linha `Agente Ativo: spring-boot-arch-advisor` antes de qualquer outro conteúdo — mesmo sem handoff neste turno. Se esta resposta é resultado de handoff/re-triagem recebido, adicionar `Handoff: <agent-origem> → spring-boot-arch-advisor (motivo: <motivo>)` na linha seguinte. Padrão de mercado: OpenAI Agents SDK (`HandoffOutputItem` — "Handed off from X to Y") e LangGraph (campo `active_agent` streamado ao usuário) — ver `agent-contracts/SKILL.md` seção 0.
+
 Toda resposta deste agente abre com a linha:
 `Agente Ativo: spring-boot-arch-advisor`
-
 
 ### Modos de Operação do Gate 2 de Implementação (R-064)
 - **Modo Emitir Plano Completo (Tier `full`)**: Acionado em demandas complexas (>3 arquivos, >1 camada, schema/DDL de banco, auth/segurança, nova dependência). Produz arquitetura técnica completa, decomposição de tarefas e allowlist de arquivos.

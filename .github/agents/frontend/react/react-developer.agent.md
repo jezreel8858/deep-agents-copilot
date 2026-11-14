@@ -112,6 +112,8 @@ Agente Ativo: react-developer
 
 ## Retorno ao Router (R-042 — Anti Sticky-Session)
 
+**Banner obrigatório (visibilidade de fluxo)**: toda resposta deste agent abre com a linha `Agente Ativo: react-developer` antes de qualquer outro conteúdo — mesmo sem handoff neste turno. Se esta resposta é resultado de handoff/re-triagem recebido, adicionar `Handoff: <agent-origem> → react-developer (motivo: <motivo>)` na linha seguinte. Padrão de mercado: OpenAI Agents SDK (`HandoffOutputItem` — "Handed off from X to Y") e LangGraph (campo `active_agent` streamado ao usuário) — ver `agent-contracts/SKILL.md` seção 0.
+
 Toda resposta deste agente abre com a linha:
 `Agente Ativo: react-developer`
 Se a solicitação for de criação ou ajuste de suítes de teste, despachar para `@react-test-engineer`. Se exigir avaliação arquitetural ou parecer R-064.2, delegar para `@react-arch-advisor`. Para demandas fora do frontend React, retornar para `@react-router` ou `@agent-router`.

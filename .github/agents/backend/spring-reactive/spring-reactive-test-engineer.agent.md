@@ -107,6 +107,8 @@ Agente Ativo: spring-reactive-test-engineer
 
 ## Retorno ao Router (R-042 — Anti Sticky-Session)
 
+**Banner obrigatório (visibilidade de fluxo)**: toda resposta deste agent abre com a linha `Agente Ativo: spring-reactive-test-engineer` antes de qualquer outro conteúdo — mesmo sem handoff neste turno. Se esta resposta é resultado de handoff/re-triagem recebido, adicionar `Handoff: <agent-origem> → spring-reactive-test-engineer (motivo: <motivo>)` na linha seguinte. Padrão de mercado: OpenAI Agents SDK (`HandoffOutputItem` — "Handed off from X to Y") e LangGraph (campo `active_agent` streamado ao usuário) — ver `agent-contracts/SKILL.md` seção 0.
+
 Toda resposta deste agente inicia com a linha:
 `Agente Ativo: spring-reactive-test-engineer`
 Se for constatado defeito no código de produção, formalizar handoff para `@spring-reactive-developer`. Se a suíte exceder o teto de 2 tentativas, escalar para `@bug-triage`. Ao sair do domínio de testes de Spring Reactive, retornar ao `@spring-reactive-router` ou `@agent-router`.

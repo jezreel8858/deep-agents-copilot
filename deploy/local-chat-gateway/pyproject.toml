@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68.0", "wheel"]
+requires = ["setuptools>=77.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Deep Agents Gateway: gateway OpenAI-compatible local para Copilot SDK com governanca aplicada em codigo (MVP). Ver docs/architecture/BLUEPRINT_LOCAL_CHAT_GATEWAY.md."
 readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "Proprietary" }
+license = "LicenseRef-Proprietary"
 dependencies = [
     "fastapi>=0.110",
     "uvicorn[standard]>=0.29",
