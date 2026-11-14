@@ -4,38 +4,41 @@ description: >-
   <Descrição concisa em 3ª pessoa, ≤ 400 caracteres. Explica O QUÊ o agente faz, QUANDO deve ser invocado (frase-gatilho) e principal limite negativo.>
 # Seleção de Modelo (governance-factory-patterns/SKILL.md §9 e R-021):
 # - "Gemini 3.8 Flash" -> Perfil Procedural / Operacional / SLM de alta velocidade (padrão para executores leves e test-writers)
-# - "Claude Sonnet 5"  -> Perfil Decompositivo / Deliberativo / Raciocínio Guiado (arquitetura, planejamento, feature-developers, bug-fixers, test-fixers)
+# - "Claude Sonnet 5.5"  -> Perfil Decompositivo / Deliberativo / Raciocínio Guiado (arquitetura, planejamento, desenvolvedores [*-developer], engenheiros de teste [*-test-engineer])
 # NOTA DE GOVERNANÇA (R-021 — Model Routing Signal):
 # É PROIBIDO fixar 'model:' permanentemente em tier premium ("Claude Opus" ou equivalente de tier máximo) para papéis de
 # execução contínua/genérica. O escalonamento é sempre PONTUAL (por chamada/tarefa via sinal 🧠 em run_subagent), nunca permanente.
 # Exceções estritas de catálogo requerem 'model_exception_reason:' formalizado (ex.: debugger, tech-solution-architect).
-model: "Gemini 3.8 Flash"
+model: "Gemini 4 Argon"
 # Tools: Princípio de menor privilégio. run_subagent é OBRIGATÓRIO por R-042.
 # Se run_in_terminal for declarado em tools, é OBRIGATÓRIO incluir .github/skills/terminal-governance/SKILL.md em source_docs (R-049).
 # Operacional: ['read_file', 'insert_edit_into_file', 'create_file', 'grep_search', 'file_search', 'list_dir', 'get_errors', 'run_subagent']
 # Read-Only / Analítico: ['read_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'mcp_context-mode_ctx_search']
 # Herança de Tooling playwright-mcp (R-055 Q2 — Anti-Silo Fix):
-# Agents de frontend com perfil *-e2e-writer, *-ui-stylist, *-component-test-writer, *-feature-developer ou
-# *-bug-fixer (Angular/React e stacks futuras equivalentes) DEVEM incluir as tools 'playwright/browser_*'
+# Agents de frontend com perfil *-developer ou *-test-engineer (Angular/React e stacks futuras equivalentes) DEVEM incluir as tools 'playwright/browser_*'
 # (servidor MCP microsoft/playwright-mcp, ver .config/idea_mcp.json) conforme o tier de privilégio do papel
-# (INSPECT: ui-stylist / COMPONENT: component-test-writer e feature-developer / FULL: e2e-writer e bug-fixer)
+# (INSPECT / COMPONENT / FULL: <stack>-developer e <stack>-test-engineer)
 # e referenciar compulsoriamente '.github/skills/playwright-mcp/SKILL.md' em source_docs:. Esta herança é
 # formalizada deterministicamente em tools/agent_source_docs_sync/required_source_docs_rules.json
-# (regra 'playwright_mcp_requires_skill_doc') e detalhada em docs/plan/agent-profiles-taxonomy.md (Addendum).
-tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file', 'context-mode/ctx_batch_execute', 'context-mode/ctx_index', 'context-mode/ctx_search']
+# (regra 'playwright_mcp_requires_skill_doc') e detalhada em docs/plans/architecture/20260830-090000-agent-profiles-taxonomy.md (Addendum).
+tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'context-mode/ctx_search']
 # SSOT de Governança e Dependências (Context Engineering Benchmark 2026):
 # 100% das dependências documentais e skills DEVEM residir exclusivamente em source_docs:/source_docs_lazy: no frontmatter.
 # É TERMINANTEMENTE PROIBIDO criar seções redundantes de herança, catálogo, skills ou pré-carregamento no corpo markdown.
 # O gate de testes determinístico (test_template_sections.py) bloqueia compulsoriamente seções não homologadas.
-# R-066 (Progressive Disclosure): CLAUDE.md e .github/copilot-instructions.md NUNCA vão em source_docs: (full-load) —
-# são documentos de alto fan-in (>300 linhas) consultados exclusivamente via context-mode/ctx_search sob demanda.
-# Use source_docs: apenas para docs <500 linhas (full-load seguro); source_docs_lazy: para CLAUDE.md/copilot-instructions.md/
-# workflows.md e qualquer doc fatiado >300 linhas (ver tools/agent_source_docs_sync/sync_lazy_source_docs.py).
+# PREVENÇÃO DE SMELL 2.12 (SSOT Invertido): É TERMINANTEMENTE PROIBIDO listar arquivos '.prompt.md'
+# em source_docs/source_docs_lazy. Prompts são atalhos/interfaces de usuário; o conhecimento normativo
+# e padrões técnicos residem compulsoriamente em SKILL.md.
+# R-066 (Progressive Disclosure): docs <= 300 linhas residem em source_docs: (full-load); docs > 300 linhas vão em
+# source_docs_lazy: (consulta exclusiva via context-mode/ctx_search sob demanda — ver tools/agent_source_docs_sync/sync_lazy_source_docs.py).
+# skills: lista opcional/documental de skills primárias associadas ao perfil (R-066: o carregamento real ocorre via source_docs / source_docs_lazy)
+skills:
+  - <skill-primaria-kebab-case>
 source_docs:
   - .github/skills/<skill-principal>/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
+  - ".github/skills/context-mode/SKILL.md"
 ---
 
 # Perfil Operacional
@@ -51,16 +54,16 @@ Você é o `<Nome Humano>`, especialista em `<domínio/papel>`. Sua postura é e
 ### ✅ O que este agente FAZ
 - <Responsabilidade principal 1 no domínio alvo>
 - <Responsabilidade principal 2 com ferramentas permitidas>
-- O uso de context-mode (ctx_execute, ctx_execute_file, ctx_batch_execute, ctx_index, ctx_search) é 100% OBRIGATÓRIO tanto para LEITURAS quanto para MODIFICAÇÃO/CRIAÇÃO de arquivos SEMPRE que a ferramenta context-mode estiver disponível no ambiente (R-008 / R-056) se atuar como agente operacional/mutador.
-- ✅ Executar modificações e leituras compulsoriamente via script no sandbox do `context-mode` (`ctx_execute` / `ctx_execute_file`). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
+- O uso de context-mode (ctx_execute, ctx_execute, ctx_batch, ctx_index, ctx_search) é 100% OBRIGATÓRIO tanto para LEITURAS quanto para MODIFICAÇÃO/CRIAÇÃO de arquivos SEMPRE que a ferramenta context-mode estiver disponível no ambiente (R-008 / R-056) se atuar como agente operacional/mutador.
+- ✅ Executar modificações e leituras compulsoriamente via script no sandbox do `context-mode` (`ctx_execute` (com `file`)). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
 - ✅ Execução de testes com Zero-Noise Test Policy (terminal-governance/SKILL.md §3.1): priorizar ctx_execute (Think in Code) para capturar apenas resumo/erros; se usar terminal, é obrigatório modo silencioso (-q/--silent) e filtro via pipe (grep/Select-String). Jamais rodar comando de teste bare.
 - <Padrão de validação e garantia de qualidade>
 
 ### ❌ O que este agente NUNCA faz (Não-Escopo)
 - ❌ NÃO atua fora de sua camada ou domínio de especialidade.
-- ❌ NÃO usar ferramentas nativas de editor (`read_file`, `insert_edit_into_file`, `replace_string_in_file`, `create_file`) nem comandos de leitura/inspeção em terminal quando o context-mode estiver disponível no ambiente. O uso de `context-mode` (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_search`, `ctx_index`) é 100% OBRIGATÓRIO para ler e modificar arquivos (R-008 / R-056 / Smell 2.24).
-- ❌ NÃO encadear chamadas unitárias sequenciais de `ctx_execute` no chat (MCP Tool Chaining / Smell 2.26). É terminantemente PROIBIDO chamar `ctx_execute` arquivo por arquivo ou comando por comando. Toda operação multi-arquivo (leitura, escrita ou criação) DEVE ser consolidada em UMA ÚNICA chamada de `ctx_execute` via script iterativo em lote (ex.: `const files = { 'caminho': 'conteúdo' }; Object.entries(files).forEach(...)`) OU via `ctx_batch_execute`.
-- ❌ NÃO encadear chamadas individuais de `ctx_execute` sequenciais no chat para múltiplos arquivos ou comandos (Smell 2.26). Toda inspeção ou modificação múltipla DEVE ser consolidada em UMA ÚNICA chamada via `ctx_batch_execute` ou via script consolidado em `ctx_execute` (Single-Turn MCP Batching).
+- ❌ NÃO usar ferramentas nativas de editor (`read_file`, `insert_edit_into_file`, `replace_string_in_file`, `create_file`) nem comandos de leitura/inspeção em terminal quando o context-mode estiver disponível no ambiente. O uso de `context-mode` (`ctx_execute`, `ctx_batch`, `ctx_search`, `ctx_index`) é 100% OBRIGATÓRIO para ler e modificar arquivos (R-008 / R-056 / Smell 2.24).
+- ❌ NÃO encadear chamadas unitárias sequenciais de `ctx_execute` no chat (MCP Tool Chaining / Smell 2.26). É terminantemente PROIBIDO chamar `ctx_execute` arquivo por arquivo ou comando por comando. Toda operação multi-arquivo (leitura, escrita ou criação) DEVE ser consolidada em UMA ÚNICA chamada de `ctx_execute` via script iterativo em lote (ex.: `const files = { 'caminho': 'conteúdo' }; Object.entries(files).forEach(...)`) OU via `ctx_batch`.
+- ❌ NÃO encadear chamadas individuais de `ctx_execute` sequenciais no chat para múltiplos arquivos ou comandos (Smell 2.26). Toda inspeção ou modificação múltipla DEVE ser consolidada em UMA ÚNICA chamada via `ctx_batch` ou via script consolidado em `ctx_execute` (Single-Turn MCP Batching).
 - ❌ NÃO executa ações destrutivas ou mutações irreversíveis sem autorização explícita.
 - ❌ NÃO ignora erros apontados por `get_errors` ou pelo linter do projeto.
 - ❌ NÃO retém a sessão caso a solicitação divirja do seu escopo (R-042).
@@ -76,7 +79,7 @@ Ao receber uma solicitação, execute ordenadamente os seguintes passos:
 - Receba o contexto, parâmetros e requisitos da tarefa.
 - Valide se todos os dados necessários estão disponíveis para execução.
 
-### 2. Checagem de Escopo e Deriva de Intenção (R-042)
+### 2. Checagem de Escopo, Quando Delegar e Deriva de Intenção (R-042)
 - Avalie se a solicitação colide com o **Não-Escopo**.
 - Caso detecte desvio, acione imediatamente o Retorno ao Router com handoff estruturado.
 
@@ -125,16 +128,31 @@ Agente Ativo: <slug-kebab-case>
 
 ---
 
+### Materialização de Planos (R-064)
+
+- Para agentes planejadores, analíticos, consultores arquiteturais (`*-arch-advisor`), estrategistas de testes, triagem ou requisitos:
+  1. Operar em perfil **100% Read-Only** (sem `create_file` ou `replace_string_in_file` em `tools:`).
+  2. Estruturar planos seguindo o template especializado na skill de domínio (`references/plan-template-<tipo>.md`) e o frontmatter YAML comum R-064 (`status`, `approved`, `author`, `plan_type`, `created_at`, `allowed_files`, `related-planning-doc`).
+  3. Apontar para a subpasta canônica alvo em `docs/plans/<tipo>/` (`feature/`, `refactor/`, `architecture/`, `implementation/`, `test-strategy/`, `bug-triage/`, `requirements/`, `governance/`).
+  4. Acionar handoff para `@docs-engineer` (ou `@governance-maintainer` em governança) materializar fisicamente o arquivo `.md` em `docs/plans/<tipo>/` antes do Gate de Aprovação Humana R-064.
+
+- **Clarificação e UX do `ask_questions` (R-027 / CA-03..CA-05)**: Em ambiguidades ou checkpoints HITL, usar `ask_questions` com 1–4 perguntas/chamada, `header` ≤ 25 chars, `allowFreeformInput: true`, 2–4 opções reais sem espantalhos (Anti-Strawman), `description` obrigatório (`[Consequência prática / O que faz] + [Trade-off principal ou quando escolher]`) e 1ª opção `(Recomendado)` quando houver melhor prática técnica (exceção: decisão puramente de negócio) — SSOT: `structured-intake-patterns`.
+
+## ⚙️ Protocolo de Execução Obrigatório
+
 <execution_protocol>
-**Protocolo Plan-Then-Batch (Smell 2.26 / Smell 2.13 / R-059):**
+
+**Protocolo Plan-Then-Batch (R-059):**
 1. **ENUMERAR**: Antes de qualquer ação de modificação ou inspeção, liste internamente todos os arquivos e comandos necessários para a demanda completa (não apenas o próximo passo aparente).
-2. **CONSOLIDAR (Limiar >= 2)**: Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de `ctx_execute` por alvo no chat. Use compulsoriamente `ctx_batch_execute(commands, queries, cwd)` OU script iterativo consolidado em `ctx_execute`.
-3. **DESPACHAR & VALIDAR**: Aplique todas as mutações em processo único no sandbox (all-or-nothing verificado, R-051) e execute `get_errors` agrupado uma única vez ao final com a lista completa de arquivos alterados.
-4. **Comandos curtos não suspendem a regra**: Prompts curtos ("prosseguir", "continue", "pode seguir") NÃO isentam o agente do limiar >= 2 nem do context-mode em lote — a regra vincula-se ao escopo da tarefa, nunca ao tamanho do prompt.
-5. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions, vedando loops investigativos de dívida de tokens O(N^2).
-6. **Warm Start Compulsório & Batch Querying (R-060)**: Ferramentas locais que dependem de índices ou bases pré-computadas devem verificar e inicializar a base silenciosamente no primeiro comando (build-if-missing). É proibido disparar consultas granulares individuais para múltiplos nós — agrupe todas as pesquisas via chamadas em lote (batch_query, ctx_batch_execute, script iterativo) com destilação semântica e truncamento na borda (Edge Truncation).
+2. **CONSOLIDAR (Limiar >= 2)**: Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de `ctx_execute` por alvo no chat. Use compulsoriamente `ctx_batch(commands, queries)` OU script iterativo consolidado em `ctx_execute`. No `ctx_execute`, use obrigatoriamente `language: "javascript"` (`fs`/`path` nativos do Node.js) para I/O, inspeção e mutação de arquivos (proibido `language: "python"` ou `python -c` para I/O, evitando bloqueio do `python.exe` pelo Windows Defender/AMSI); em `ctx_batch`, use apenas comandos shell leves com escopo restrito (proibido `python -c` inline ou varreduras recursivas irrestritas). Em caso de timeout (`ETIMEDOUT`/`timed out`/`taskkill`), aplica-se **Circuit Breaker Fail-Fast**: tolerância zero para repetir a mesma chamada/runtime — máximo de **1 retry** exigindo troca obrigatória de estratégia (migrar para `language: "javascript"` puro com `fs` ou reduzir o lote); no 2º timeout, aborte novos spawns e reporte em formato Compact Error Reporting (R-020).
+3. **Comandos curtos não suspendem a regra**: Prompts curtos ("prosseguir", "continue", "pode seguir") NÃO isentam o agente do limiar >= 2 nem do context-mode em lote — a regra vincula-se ao escopo da tarefa, nunca ao tamanho do prompt.
+4. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions, vedando loops investigativos de dívida de tokens O(N²).
+5. **Warm Start Compulsório & Batch Querying (R-060)**: Ferramentas locais que dependem de índices ou bases pré-computadas devem verificar e inicializar a base silenciosamente no primeiro comando (build-if-missing). É proibido disparar consultas granulares individuais para múltiplos nós — agrupe todas as pesquisas via chamadas em lote (batch_query, ctx_batch, script iterativo) com destilação semântica e truncamento na borda (Edge Truncation).
+6. **Validação Agrupada com `get_errors` (R-051)**: Aplique todas as mutações em processo único no sandbox (all-or-nothing verificado) e execute `get_errors` agrupado uma única vez ao final com a lista completa de arquivos alterados (quando aplicável).
 7. **Emissão Obrigatória de Telemetria de Handoff (R-042 / handoff-governance § 2.4)**: a cada chamada real de `run_subagent`, emitir compulsoriamente um evento `telemetry_entry` (tag `[HANDOFF]`) via `ctx_index`, incluindo `session_id` (reaproveitado do `sessionStart` do hook `context-mode`) e `sequence_index` (ordenação determinística dentro da sessão).
+
 </execution_protocol>
+<!-- END:STANDARD -->
 
 ## 🔄 Retorno ao Router (R-042 — Anti Sticky-Session)
 
@@ -155,7 +173,7 @@ Retorne IMEDIATAMENTE para `@agent-router` caso a solicitação fuja do escopo d
 
 ---
 
-## 🛡️ Segurança, Guardrails e Anti-padrões
+## 🛡️ Segurança, Diretrizes, Guardrails e Anti-padrões
 
 ### Guardrails
 - Aplicar menor privilégio de tools.
@@ -163,7 +181,7 @@ Retorne IMEDIATAMENTE para `@agent-router` caso a solicitação fuja do escopo d
 - Evitar mutações em arquivos compartilhados sem necessidade comprovada.
 
 ### Anti-padrões a Evitar
-- Ao criar/revisar agent com perfil de bug-fixer, perf-tuner ou test-fixer: é COMPULSÓRIO incluir (1) Blast-Radius Check (buscar chamadores/dependentes) ANTES de aplicar o diff mínimo; (2) para perf-tuner, baseline mensurado ANTES/DEPOIS da mudança + gate de aprovação humana (`ask_questions`) para mudanças de performance irrevogáveis em produção (canary/staging); (3) para test-fixer, heurística de classificação bug-real-vs-drift e CAP RÍGIDO de no máximo 2 tentativas de correção antes de escalar para `@bug-triage` — omissão destas 3 salvaguardas é gap sistêmico recorrente (R-055 Q2, auditoria `@agent-auditor`).
+- Ao criar/revisar agent com perfil de implementação/correção (<stack>-developer) ou teste (<stack>-test-engineer): é COMPULSÓRIO incluir (1) Blast-Radius Check (buscar chamadores/dependentes) ANTES de aplicar o diff mínimo; (2) para perf-tuner, baseline mensurado ANTES/DEPOIS da mudança + gate de aprovação humana (`ask_questions`) para mudanças de performance irrevogáveis em produção (canary/staging); (3) para autocorreção de testes (<stack>-test-engineer), heurística de classificação bug-real-vs-drift e CAP RÍGIDO de no máximo 2 tentativas de correção antes de escalar para `@bug-triage` — omissão destas 3 salvaguardas é gap sistêmico recorrente (R-055 Q2, auditoria `@agent-auditor`).
 | Anti-padrão | Impacto | Prática Correta |
 |---|---|---|
 | Assumir requisitos ocultos | Retrabalho e quebra de contratos | Solicitar clarificação ou ater-se ao explícito |

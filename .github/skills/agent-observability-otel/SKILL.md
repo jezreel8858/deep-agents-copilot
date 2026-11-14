@@ -1,9 +1,6 @@
 ---
 name: agent-observability-otel
-description: >
-  Convenções de observabilidade para agents de IA com OpenTelemetry GenAI Semantic
-  Conventions v1.41+ (2026). Cobre spans (invoke_agent, execute_tool, chat), métricas
-  de tokens/latência/custo, logs estruturados e integração com backends (Langfuse Cloud, Datadog).
+description: "Define diretrizes e padrões para convenções de observabilidade para agents de IA com OpenTelemetry GenAI Semantic Conventions v1.41+ (2026). Cobre spans (invoke_agent, execute_tool, chat), métricas de tokens/latência/custo, logs estruturados e integração com backends (Langfuse Cloud, Datadog). Use quando atuar em observability agent, opentelemetry llm, otel genai. Não use para tarefas fora do escopo de agent-observability-otel ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: observability
 triggers:
@@ -18,7 +15,7 @@ triggers:
   - "langfuse"
   - "rastreabilidade agent"
   - "mcp tool tracing"
-source_docs_lazy:
+source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
@@ -28,6 +25,14 @@ tools: []
 
 > **Baseado em**: OTel GenAI Semantic Conventions v1.41+ (status: Development) · 2026
 > **Nota**: atributos `gen_ai.*` podem mudar sem major version bump — validar contra spec antes de usar em produção. A partir de v1.36+, `gen_ai.system` foi **deprecado** em favor de `gen_ai.provider.name`; manter leitura de fallback apenas para instrumentações legadas ainda não migradas.
+
+## Quando Usar
+
+- Ativação em cenários de observability agent, opentelemetry llm, otel genai.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `agent-observability-otel` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## 1) Por que Observabilidade em Agents?
 
@@ -242,3 +247,7 @@ Para evitar consumo massivo de CPU/RAM em máquinas de desenvolvimento locais de
 - OpenLLMetry (instrumentação automática): https://github.com/traceloop/openllmetry
 - Langfuse Cloud (backend gerenciado SaaS): https://cloud.langfuse.com/
 - Langfuse Docs (OpenTelemetry Ingestion): https://langfuse.com/docs/analytics/overview
+
+## Checklist de Conformidade
+
+- [ ] Diretrizes, contratos e restrições de escopo de `agent-observability-otel` verificados e atendidos.

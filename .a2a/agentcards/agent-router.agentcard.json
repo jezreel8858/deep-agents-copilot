@@ -11,7 +11,10 @@
     "router",
     "triagem",
     "entrypoint",
-    "roteamento"
+    "roteamento",
+    "gate2",
+    "plan_ref",
+    "r-064"
   ],
   "skills": [
     "context-mode",
@@ -37,7 +40,7 @@
     "data_sensitivity": "internal"
   },
   "model_preferences": {
-    "recommended_model": "Claude Sonnet 5",
+    "recommended_model": "Claude Sonnet 5.5",
     "cost_tier": "1x"
   },
   "input_contract": {

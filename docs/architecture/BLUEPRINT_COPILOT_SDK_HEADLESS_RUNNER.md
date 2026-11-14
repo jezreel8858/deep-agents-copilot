@@ -588,7 +588,7 @@ Os testes determinísticos provam que, **no runner**, a governança é estrutura
 |---|---|
 | R-037 | Estado inicial obrigatório `Fase.ROUTER`; não existe caminho de código que invoque agent downstream sem `transicionar()` aprovado. `run_subagent` genérico **não** é exposto ao LLM. |
 | R-042 | Deriva checada por código a cada turno (hoje depende do agent lembrar). |
-| R-046 / R-060 | Batching e teto de turnos impostos por `budget.py`; tools MCP de leitura em lote (`ctx_batch_execute`) são as únicas de inspeção habilitadas. |
+| R-046 / R-060 | Batching e teto de turnos impostos por `budget.py`; tools MCP de leitura em lote (`ctx_batch`) são as únicas de inspeção habilitadas. |
 | R-050 | Salto/retrocesso de etapa é exceção, não "instrução ignorada". |
 | R-064 / Inv. 11 | Checkpoint humano exige `aprovacao_id` explícito; no CI não há humano → execução para em `AGUARDANDO_HUMANO` e publica o pedido no check. **Nenhum caso de uso do runner avança para etapas mutativas** (`governed_batch_execution`) nas fases deste ADR. |
 | R-063 | O processo raiz do runner (CLI) não executa lógica de domínio; só carrega grafo, instancia sessão e publica resultado. |

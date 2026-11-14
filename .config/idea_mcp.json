@@ -1,15 +1,17 @@
 {
   "servers": {
     "codegraph": {
-      "command": "cmd.exe",
+      "type": "stdio",
+      "command": "codegraph",
       "args": [
-        "/c",
-        "codegraph",
         "mcp",
-        "--multi-repo"
+        "--multi-repo",
+        "--db",
+        "%DEEP_AGENTS_COPILOT_DIR%\\.codegraph\\graph.db"
       ],
-      "env": {},
-      "disabled": false
+      "env": {
+        "DEEP_AGENTS_COPILOT_DIR": "D:\\workspace\\deep-agents-copilot"
+      }
     },
     "tavily": {
       "command": "cmd.exe",
@@ -31,13 +33,16 @@
         "/c",
         "npx",
         "-y",
-        "context-mode"
+        "context-mode",
+        "server",
+        "--agent",
+        "copilot-cli"
       ],
       "env": {
-        "SOURCE": "",
         "JAVA_HOME": "C:\\Program Files\\Java\\jdk-22",
-        "CONTEXT_MODE_IDLE_TIMEOUT_MS": "0"
+        "CONTEXT_MODE_DATA_DIR": "C:\\Users\\{username}\\.config\\JetBrains\\context-mode"
       },
+      "timeout": 600000,
       "disabled": false
     },
     "playwright": {
@@ -46,11 +51,42 @@
         "/c",
         "npx",
         "-y",
-        "@playwright/mcp@latest",
-        "--isolated"
+        "@playwright/mcp@0.0.83",
+        "--isolated",
+        "--storage-state=playwright/.auth/user.json",
+        "--output-dir=.playwright-mcp"
       ],
       "env": {},
       "disabled": false
+    },
+    "mcp-atlassian": {
+      "command": "uvx",
+      "args": [
+        "-q",
+        "mcp-atlassian"
+      ],
+      "env": {
+        "JIRA_URL": "https://your-company.atlassian.net",
+        "JIRA_USERNAME": "your.email@company.com",
+        "JIRA_API_TOKEN": "your_api_token",
+        "CONFLUENCE_URL": "https://your-company.atlassian.net/wiki",
+        "CONFLUENCE_USERNAME": "your.email@company.com",
+        "CONFLUENCE_API_TOKEN": "your_api_token"
+      }
+    },
+    "figma": {
+      "command": "uvx",
+      "args": [
+        "-q",
+        "--offline",
+        "--with",
+        "mcp==1.30.0",
+        "mcp-figma==0.0.2"
+      ],
+      "env": {
+        "FIGMA_ACCESS_TOKEN": "SEU_TOKEN_AQUI",
+        "SSL_CERT_FILE": "SEU_PATH_CERTIFICADO_PEM"
+      }
     }
   }
 }

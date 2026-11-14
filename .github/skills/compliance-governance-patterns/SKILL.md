@@ -1,10 +1,6 @@
 ---
 name: compliance-governance-patterns
-description: >
-  Diretrizes consolidadas de compliance/governança regulatória para código de
-  aplicação — SOC 2 (Type I/II), GDPR, HIPAA, ISO 27001, trilhas de auditoria,
-  políticas de retenção de dados e evidências de controle. Distinto de
-  agent-safety-guardrails (que cobre segurança do próprio agent de IA).
+description: "Define diretrizes e padrões para diretrizes consolidadas de compliance/governança regulatória para código de aplicação — SOC 2 (Type I/II), GDPR, HIPAA, ISO 27001, trilhas de auditoria, políticas de retenção de dados e evidências de controle. Distinto de agent-safety-guardrails (que cobre segurança do próprio agent de IA). Use quando atuar em compliance, auditoria, soc 2. Não use para tarefas fora do escopo de compliance-governance-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: security
 triggers:
@@ -25,7 +21,6 @@ triggers:
 source_docs:
   - .github/skills/agent-safety-guardrails/SKILL.md
   - .github/skills/security-review-patterns/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
@@ -34,6 +29,10 @@ tools: []
 # Compliance Governance Patterns
 
 > Base de conhecimento para agents que avaliam **conformidade regulatória da aplicação** (SOC 2, GDPR, HIPAA, ISO 27001) — diferente de `agent-safety-guardrails`, que cobre segurança do **próprio agent de IA** (prompt injection, blast radius de tools do Copilot).
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `compliance-governance-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando Usar
 

@@ -67,7 +67,7 @@ Prompts operacionais para workflow de execução no chat.
 | `/plan` | `.github/prompts/plan.prompt.md` | Cria plano de implementação detalhado com processo interativo |
 | `/implement` | `.github/prompts/implement.prompt.md` | Executa plano aprovado com checkpoints e pausas para verificação |
 | `/validate` | `.github/prompts/validate.prompt.md` | Valida implementação contra plano e identifica desvios |
-| `/commit` | `.github/prompts/commit.prompt.md` | ⭐ **(v1.2)** Gera mensagem de commit convencional (PT-BR, Conventional Commits) alinhada às diretrizes globais (`global-git-commit-instructions.md`), com guardrail de secrets, atomicidade e templates por complexidade (simples vs complexo). Nunca executa git. |
+| `/commit` | `.github/prompts/commit.prompt.md` | ⭐ **(v2.0)** Fluxo enxuto de 5 passos (segredos → inspeção → atomicidade → classificação → apresentação) que gera commit, título/descrição de PR (matriz de risco + plano de rollback) e entrada de CHANGELOG consumindo a SSOT `git-governance`. Nunca executa git. |
 | `/review` | `.github/prompts/review.prompt.md` | ⭐ **(v2.0)** Alias fino do agent `@code-review` — revisão de código por qualidade, convenções e impacto. Relatório compacto por severidade. |
 | `/craft-prompt` | `.github/prompts/craft-prompt.prompt.md` | ⭐ **(NEW)** Aciona o `WORKFLOW-PROMPT-SYNTHESIS` para refinar a solicitação, minerar caminhos reais e sintetizar o prompt canônico final em bloco `.md` para novo chat. |
 
@@ -105,11 +105,11 @@ Se **TODOS SIM**: ✅ Você está usando corretamente!
 Use esta lista para revisar qualquer prompt `.prompt.md` antes de publicar:
 
 - [ ] O prompt inicia com retomada por `ctx_search(..., sort: "timeline")` quando aplicável?
-- [ ] A coleta principal usa `ctx_batch_execute(commands, queries)` em vez de chamadas fragmentadas?
+- [ ] A coleta principal usa `ctx_batch(commands, queries)` em vez de chamadas fragmentadas?
 - [ ] As perguntas de follow-up estão agrupadas em um único `queries: [...]`?
 - [ ] O prompt orienta uso de `source` quando houver múltiplas fontes indexadas?
 - [ ] Há regra explícita contra saída bruta extensa no chat?
-- [ ] Para arquivos grandes, o prompt manda usar `ctx_execute_file` em vez de leitura integral?
+- [ ] Para arquivos grandes, o prompt manda usar `ctx_execute` em vez de leitura integral?
 - [ ] Há bloqueio explícito para `ctx_index(content: ...)` com payload grande?
 - [ ] O fallback para terminal está restrito e justificado?
 - [ ] O prompt evita releitura redundante de dados já coletados/indexados?
@@ -124,7 +124,7 @@ Use `@governance-factory` para auditar e corrigir automaticamente:
 | Campo | Status | Significado |
 |---|---|---|
 | `description` | **OBRIGATÓRIO** | Habilita discoverability no Quick Pick do Copilot |
-| `model` | Recomendado | "Gemini 3.8 Flash" / "Claude Sonnet 5" / "Claude Opus 5.5" (string única — arrays não são suportados) |
+| `model` | Recomendado | "Gemini 3.8 Flash" / "Claude Sonnet 5.5" / "Claude Opus 5.5" (string única — arrays não são suportados) |
 | `tools` | Quando usa ferramentas | Princípio de menor privilégio — listar apenas o necessário |
 | `source_docs` | Quando precisa de contexto | Pre-fetch de governança ou projeto |
 | `name` | Opcional | Override do filename como slash command |

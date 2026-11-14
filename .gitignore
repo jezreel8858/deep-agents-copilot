@@ -24,7 +24,6 @@ build/
 
 # Environment files
 .env
-.workflow-db/
 
 .env.local
 .env.*.local
@@ -58,6 +57,10 @@ __pycache__/
 docs/ai-context/catalog.local.yaml
 .github/instructions/local/
 
+# Perfis de modelo locais e saídas efêmeras de gerador (model-profiles, R-043)
+model-profiles.local.yaml
+.model-profiles/
+
 # Estado efêmero do circuit breaker mecânico ctx-sequence-guard (PreToolUse hook)
 .github/hooks/.state/
 
@@ -66,3 +69,21 @@ docs/ai-context/catalog.local.yaml
 .gemini/
 
 nul
+
+# ============================================
+# Playwright MCP & E2E Testing artifacts (auth, storage-state, traces, reports)
+# ============================================
+playwright/.auth/
+auth.json
+*storage-state*.json
+test-results/
+playwright-report/
+.playwright-mcp/
+playwright-traces/
+traces/
+*.bak
+
+# Runtime Maven embutido (cache do usuario; nunca versionar binarios)
+/assets/maven-mvnd-*/
+logs/dev/
+.awb/

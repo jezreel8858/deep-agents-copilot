@@ -1,10 +1,6 @@
 ---
 name: spring-boot-implementation-patterns
-description: >-
-  Padrões de mercado consolidados (2026) para IMPLEMENTAR features novas e
-  correções de bug em Spring Boot — virtual threads vs reativo, N+1/OSIV,
-  DTOs de borda, workflow testing-first. Contraparte de execução da
-  `spring-boot-backend-patterns` (que é só análise/recomendação).
+description: "Define diretrizes e padrões para padrões de mercado consolidados (2026) para IMPLEMENTAR features novas e correções de bug em Spring Boot — virtual threads vs reativo, N+1/OSIV, DTOs de borda, workflow testing-first. Contraparte de execução da `spring-boot-backend-patterns` (que é só análise/recomendação). Use quando atuar em implementar service spring boot, corrigir bug spring boot, feature spring boot nova. Não use para tarefas fora do escopo de spring-boot-implementation-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: quality
 triggers:
@@ -17,13 +13,16 @@ source_docs:
   - .github/agents/backend/spring-boot/spring-boot-router.agent.md
   - .github/skills/spring-boot-backend-patterns/SKILL.md
   - .github/instructions/spring-boot-backend.instructions.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
 ---
 
 # Spring Boot Implementation Patterns
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `spring-boot-implementation-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando Usar
 

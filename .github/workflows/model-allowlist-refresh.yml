@@ -1,0 +1,47 @@
+name: Model Allowlist Refresh (Scheduled)
+
+# Workflow de automação e auditoria periódica da allowlist de modelos (T-B3.1).
+# Mantido como esqueleto documentado / desativado por padrão, sem tokens de escrita,
+# até que a ferramenta tools/model_allowlist/refresh.py seja ativada operacionalmente.
+# O relatorio (.model-profiles/allowlist-refresh.md) e apenas um arquivo/artefato de leitura;
+# a atualizacao da allowlist e feita via PR humano. Abertura automatica de PR esta fora do escopo.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Executar em modo dry-run (apenas reportar diffs sem abrir PR)"
+        required: false
+        default: "true"
+  # Agendamento semanal desativado no esqueleto; descomentar quando ativado:
+  # schedule:
+  #   - cron: '0 6 * * 1' # Segundas-feiras às 06:00 UTC
+
+permissions:
+  contents: read # Tokens de escrita (contents: write, pull-requests: write) propositalmente desativados no esqueleto
+
+jobs:
+  model-allowlist-refresh:
+    runs-on: ubuntu-latest
+    name: Check Model Allowlist and Retirements
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r tests/requirements.txt
+
+      - name: Audit Allowlist Freshness and Retirements (check-only)
+        run: |
+          pytest tests/governance_audit/test_model_allowlist_governance.py -v --tb=short
+          python -m tools.model_allowlist.refresh --check

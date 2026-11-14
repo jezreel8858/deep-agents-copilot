@@ -119,12 +119,12 @@ def test_build_otlp_payload_usa_agent_name_dinamico_quando_fornecido() -> None:
         tools_executed=[],
         start_time_ns=1000,
         end_time_ns=2000,
-        agent_name="python-feature-developer",
+        agent_name="python-developer",
     )
 
     root = payload["resourceSpans"][0]["scopeSpans"][0]["spans"][0]
     attrs = {a["key"]: a["value"]["stringValue"] for a in root["attributes"]}
-    assert attrs["gen_ai.agent.name"] == "python-feature-developer"
+    assert attrs["gen_ai.agent.name"] == "python-developer"
 
 
 def test_build_otlp_payload_default_agent_name_preserva_regressao() -> None:
@@ -208,7 +208,7 @@ async def test_emit_governance_route_span_emite_atributos_deep_agents() -> None:
         await emit_governance_route_span(
             "http://otel-collector:4318",
             session_id="sessao-1",
-            escolhido="python-feature-developer",
+            escolhido="python-developer",
             workflow="WORKFLOW-FEATURE-DEVELOPMENT",
             nivel="rule_based",
             score=0.95,
@@ -221,7 +221,7 @@ async def test_emit_governance_route_span_emite_atributos_deep_agents() -> None:
         assert span["name"] == "governance.route"
         attrs = _atributos_do_unico_span(payload)
         assert attrs["deep_agents.routing.escolhido"] == {
-            "stringValue": "python-feature-developer"
+            "stringValue": "python-developer"
         }
         assert attrs["deep_agents.routing.workflow"] == {
             "stringValue": "WORKFLOW-FEATURE-DEVELOPMENT"
@@ -238,7 +238,7 @@ async def test_emit_governance_route_span_omite_nivel_score_quando_none() -> Non
         await emit_governance_route_span(
             "http://otel-collector:4318",
             session_id="sessao-1",
-            escolhido="python-feature-developer",
+            escolhido="python-developer",
             workflow=None,
             nivel=None,
             score=None,
@@ -570,7 +570,7 @@ async def test_emit_chat_trace_e_governance_spans_compartilham_trace_id_do_turno
         await emit_governance_route_span(
             "http://otel-collector:4318",
             session_id="sessao-turno",
-            escolhido="python-feature-developer",
+            escolhido="python-developer",
             workflow="WORKFLOW-FEATURE-DEVELOPMENT",
             nivel="rule_based",
             score=0.95,

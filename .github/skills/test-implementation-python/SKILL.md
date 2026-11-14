@@ -1,8 +1,6 @@
 ---
 name: test-implementation-python
-description: 
-  Padrões consolidados para implementação de testes em Python com pytest,
-  incluindo unit tests, integration tests e cobertura com coverage.py.
+description: "Define diretrizes e padrões para padrões consolidados para implementação de testes em Python com pytest, incluindo unit tests, integration tests e cobertura com coverage.py. Use quando atuar em python testing, pytest, python unit test. Não use para tarefas fora do escopo de test-implementation-python ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: testing
 triggers:
@@ -17,7 +15,6 @@ triggers:
 source_docs:
   - .github/skills/test-implementation-backend/SKILL.md
   - .github/skills/test-coverage-governance/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
@@ -27,6 +24,14 @@ tools: []
 
 > **Escopo**: implementação específica para stack **Python + pytest + coverage.py**.
 > Para padrões agnósticos de backend, consulte `test-implementation-backend`.
+
+## Quando Usar
+
+- Ativação em cenários de python testing, pytest, python unit test.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `test-implementation-python` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Contexto
 
@@ -141,64 +146,11 @@ def test_deve_validar_entrada(entrada, esperado):
 
 ## 3) Fixtures — conftest.py
 
-```python
-# tests/conftest.py
-import pytest
-from modulo.repository import [Entidade]Repository
-from modulo.service import [Entidade]Service
-
-
-@pytest.fixture(scope="session")
-def db_connection():
-    """Conexão de banco compartilhada na sessão de teste."""
-    conn = criar_conexao_teste()
-    yield conn
-    conn.close()
-
-
-@pytest.fixture
-def [entidade]_repository(db_connection):
-    return [Entidade]Repository(db=db_connection)
-
-
-@pytest.fixture
-def [entidade]_service([entidade]_repository):
-    return [Entidade]Service(repository=[entidade]_repository)
-```
+- Centralizar fixtures reutilizáveis em `tests/conftest.py` com escopo adequado.
 
 ## 4) Integration Tests
 
-```python
-import pytest
-from httpx import AsyncClient
-from app.main import app  # FastAPI / ASGI app
-
-
-@pytest.mark.asyncio
-async def test_deve_retornar_200_ao_buscar([entidade]):
-    async with AsyncClient(app=app, base_url="http://test") as client:
-        response = await client.get(f"/v1/[entidades]/1")
-
-    assert response.status_code == 200
-    assert response.json()["id"] == 1
-```
-
-### Mock de HTTP Externo — respx
-
-```python
-import respx
-import httpx
-
-
-@respx.mock
-def test_deve_chamar_api_externa():
-    respx.get("https://api.externa.com/dados").mock(
-        return_value=httpx.Response(200, json={"resultado": "ok"})
-    )
-
-    resultado = chamar_api_externa()
-    assert resultado["resultado"] == "ok"
-```
+- Testar endpoints FastAPI/ASGI com ` httpx.AsyncClient` e mockar chamadas HTTP externas com `respx`. Exemplos completos em [`references/detailed-patterns-and-examples.md`](references/detailed-patterns-and-examples.md).
 
 ## 5) Coverage Targets
 
@@ -290,3 +242,7 @@ def service() -> Generator[[Entidade]Service, None, None]:
 - respx: https://lundberg.github.io/respx/
 - freezegun: https://github.com/spulec/freezegun
 - [Padrões Genéricos Backend (Base)](../test-implementation-backend/SKILL.md)
+
+## Checklist de Conformidade
+
+- [ ] Diretrizes, contratos e restrições de escopo de `test-implementation-python` verificados e atendidos.

@@ -1,14 +1,6 @@
 ---
 name: continuous-garbage-collection-patterns
-description: >-
-  Diretrizes para varreduras periódicas de baixo custo ("Janitor Tasks") que
-  detectam drift documental, código morto, duplicação de regras entre camadas
-  de governança e desalinhamento entre catálogo/agents/skills em execução —
-  complementando a auditoria sob demanda do agent-auditor/repo-hygiene-auditor
-  com um modo de saneamento contínuo inspirado no conceito de "garbage
-  collection" de código-fonte aplicado a artefatos de governança e documentação
-  viva. Base de conhecimento para o modo autônomo de repo-hygiene-auditor e
-  governance-maintainer.
+description: "Define diretrizes e padrões para diretrizes para varreduras periódicas de baixo custo ('Janitor Tasks') que detectam drift documental, código morto, duplicação de regras entre camadas de governança e desalinhamento entre catálogo/agents/skills em execução — complementando a auditoria sob demanda do agent-auditor/repo-hygiene-auditor com um modo de saneamento contínuo inspirado no conceito de 'garbage collection' de código-fonte aplicado a artefatos de governança e documentação viva. Base de conhecimento para o modo autônomo de repo-hygiene-auditor e governance-maintainer. Use quando atuar em garbage collection de governança, drift de documentação, saneamento contínuo. Não use para tarefas fora do escopo de continuous-garbage-collection-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: process
 triggers:
@@ -25,13 +17,20 @@ source_docs:
   - .github/skills/documentation-writing-patterns/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md
   - .github/skills/governance-audit-patterns/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
 ---
 
 # Continuous Garbage Collection Patterns
+
+## Quando Usar
+
+- Ativação em cenários de garbage collection de governança, drift de documentação, saneamento contínuo.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `continuous-garbage-collection-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## 0) Propósito
 

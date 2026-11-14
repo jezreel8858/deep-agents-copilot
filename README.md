@@ -55,7 +55,7 @@ Exemplos:
 Centraliza todo o conhecimento técnico em quatro quadrantes Diátaxis:
 - 🎓 **Tutoriais**: Primeiros passos, setup de ambiente e motor de grafo.
 - 🛠️ **Guias Práticos (How-To)**: Execução dos 8 workflows determinísticos, scanner de projetos e context-mode.
-- 📖 **Referência Técnica**: Catálogos de agentes/skills, regras normativas R-001..R-057 e Schemas JSON (AgentCard, Semantic IR, Incidentes).
+- 📖 **Referência Técnica**: Catálogos de agentes/skills, regras normativas R-001..R-057 e Schemas JSON (AgentCard, Semantic IR).
 - 💡 **Conceitos & Arquitetura**: [Guia de Arquitetura arc42](docs/architecture/ARCHITECTURE_AND_GOVERNANCE_GUIDE.md) e [Guia de Documentação em Governança de IA](docs/architecture/AI_GOVERNANCE_DOCUMENTATION_GUIDE.md) (alinhado a NIST AI RMF, ISO 42001 e OWASP Agentic AI).
 
 ---
@@ -113,12 +113,11 @@ deep-agents-copilot/
 │   ├── implementation-plans/                    # ⭐ Planos de Implementação técnica por workflow (R-064)
 │   ├── agent-context/                           # Guias de uso de ferramentas
 │   ├── plan/                                    # Planos arquiteturais
-│   │   └── agent-profiles-taxonomy.md           # Taxonomia consolidada de agents de mercado
+│   │   └── 20260830-090000-agent-profiles-taxonomy.md           # Taxonomia consolidada de agents de mercado
 │   ├── requirements/                            # Requisitos formais de sistema
-│   └── schemas/                                 # Schemas JSON canônicos (IR de migração, incidentes)
+│   └── schemas/                                 # Schemas JSON canônicos (IR de migração)
 │
 ├── tools/                                       # Ferramentas Utilitárias e Telemetria
-│   ├── incident_recorder/                       # ⭐ Motor de persistência de incidentes e aprendizado (SQLite + Supabase)
 │   ├── codegraph-visualizer/                    # Visualizador de grafos de código
 │   ├── context-insight-visualizer/              # Visualizador de insights de contexto
 │   └── otel-langfuse/                           # Coletor OpenTelemetry proxy para Langfuse Cloud (ver docs/context/setup-telemetry-copilot.md)
@@ -171,6 +170,14 @@ Arquivos Locais (CLAUDE.md → copilot-instructions.md → adapters)
 
 ## Como Usar
 
+### Controle de Custo e Perfis de Modelos (model-profiles)
+Permite alternar localmente os modelos de LLM dos agents e prompts (`default`, `economico`, `balanceado` ou customizado em `model-profiles.local.yaml`), reduzindo consumo de tokens:
+- **Listar perfis:** `python -m tools.model_profiles list`
+- **Aplicar perfil local:** `python -m tools.model_profiles apply economico` (depois recarregue a janela/chat da IDE)
+- **Restaurar perfil default:** `python -m tools.model_profiles restore`
+- **Verificar integridade:** `python -m tools.model_profiles doctor`
+- Guia completo, limitações de IDE e fluxo Git seguro: [`docs/guides/model-profiles.md`](docs/guides/model-profiles.md).
+
 ### Para Desenvolvedores de IA (Copilot, Cursor, Claude Code)
 
 1. Carregue **`CLAUDE.md`** como fonte de verdade global
@@ -192,7 +199,7 @@ flowchart TD
     P --> E
     FP -- "Sim (Fast-Path R-050)" --> WF["Workflows Canônicos\n(Pipelines Determinísticos)"]
 
-    E & WF --> G1["🎯 Planning/Analysis\nrequirements-analyst · deep-search\nfeature-planner"]
+    E & WF --> G1["🎯 Planning/Analysis\nrequirements-analyst · deep-search\nfeature-planner · plan-critic"]
     E & WF --> G2["📐 Architecture/Design\ntech-solution-architect · codegraph-engine\nbusiness-rules-extractor · refactor-planner\nddd-bounded-context-mapper · adr-sentinel"]
     E & WF --> G3["💻 Implementation (Domain Routers & Specialists)\nangular-router · spring-boot-router · spring-reactive-router\nejb-router · python-router · database-router · database-specialist"]
     E & WF --> G4["✅ Quality/Validation\nbug-triage · debugger · test-strategy\ncode-review · code-style-enforcer · security-reviewer\nperformance-agent · devops-engineer · runtime-verifier\nrepo-hygiene-auditor"]
@@ -230,7 +237,7 @@ flowchart TD
 
 ## Cobertura de Mercado — Perfis de Agents
 
-> Análise completa: [`docs/plan/agent-profiles-taxonomy.md`](docs/plan/agent-profiles-taxonomy.md) — consolidação de fontes de mercado (Anthropic, OpenAI, Microsoft, Google DeepMind, GitHub, SpecWeave, ArXiv) sobre quais perfis de agent devem existir em um flow multi-agent de desenvolvimento de software.
+> Análise completa: [`docs/plans/architecture/20260830-090000-agent-profiles-taxonomy.md`](docs/plans/architecture/20260830-090000-agent-profiles-taxonomy.md) — consolidação de fontes de mercado (Anthropic, OpenAI, Microsoft, Google DeepMind, GitHub, SpecWeave, ArXiv) sobre quais perfis de agent devem existir em um flow multi-agent de desenvolvimento de software.
 
 ### O que o mercado recomenda (2026)
 
@@ -257,7 +264,7 @@ flowchart TB
         direction TB
         subgraph CAT1["🎯 PLANNING &amp; ANALYSIS"]
             direction TB
-            A1[requirements-analyst] ~~~ A2[deep-search] ~~~ A3[feature-planner]
+            A1[requirements-analyst] ~~~ A2[deep-search] ~~~ A3[feature-planner] ~~~ A4[plan-critic]
         end
 
         subgraph CAT2["📐 ARCHITECTURE &amp; DESIGN"]
@@ -341,8 +348,8 @@ flowchart TB
 - **Workflows Operacionais Determinísticos (R-050):** [`.github/agents/workflows.md`](.github/agents/workflows.md)
 - **Grafo de Roteamento (R-040):** [`.github/agents/routing-graph.yaml`](.github/agents/routing-graph.yaml)
 - **Suíte de Evals:** [`.github/agents/evals/casos-roteamento.yaml`](.github/agents/evals/casos-roteamento.yaml)
-- **Cobertura de Mercado — Perfis de Agents:** [`docs/plan/agent-profiles-taxonomy.md`](docs/plan/agent-profiles-taxonomy.md)
-- **Plano de Melhorias Implementado:** [`docs/plan/plano-implementacao-orquestracao.md`](docs/plan/plano-implementacao-orquestracao.md)
+- **Cobertura de Mercado — Perfis de Agents:** [`docs/plans/architecture/20260830-090000-agent-profiles-taxonomy.md`](docs/plans/architecture/20260830-090000-agent-profiles-taxonomy.md)
+- **Plano de Melhorias Implementado:** [`docs/plans/implementation/20260830-090000-architecture-plano-implementacao-orquestracao.md`](docs/plans/implementation/20260830-090000-architecture-plano-implementacao-orquestracao.md)
 - **Agents Disponíveis:** `.github/agents/README.md`
 - **Skills Disponíveis:** `.github/skills/README.md`
 - **Adapters Registrados:** `.github/instructions/README.md`
@@ -357,7 +364,7 @@ flowchart TB
 - ✅ **Portão de Reúso e Generalização Sistêmica (R-055 — Anti-Silo Fix)**: Avaliação compulsória de impacto em peers (Q1), templates canônicos (Q2) e testes determinísticos (Q3) em qualquer manutenção.
 - ✅ **Precedência Mandatória e Blindagem Universal de Context Mode (R-008 e R-056 / Smell 2.24)**: Primazia absoluta de sandboxing para leitura, modificação e criação de arquivos (Think-in-Code) blindada em 100% dos 49 agentes mutadores de todas as stacks, templates canônicos e fábrica (`governance-factory`), com proibição estrita de ferramentas nativas de editor e terminal quando context-mode disponível (rebaixadas a fallback exclusivo de indisponibilidade).
 - ✅ **Proibição Estrita de Terceirização de Edição Manual ao Usuário (R-057 / Smell 2.25 — Anti-Manual User Delegation)**: Erradicação de becos sem saída onde agentes analíticos e de triagem (read-only) instruíam o usuário a editar código por falta de tools; avanço determinístico de workflow e delegação plana obrigatória para executores downstream.
-- ✅ **Single-Turn MCP Batching Compulsório (R-008, R-046, R-056 / Smell 2.26)**: Erradicação do MCP Tool Chaining sequencial no chat; exigência de consolidação em chamada única via `ctx_batch_execute` ou script síncrono único em `ctx_execute` para análises multi-arquivo, diffs e comandos, com paridade de tooling em 100% dos agentes do catálogo.
+- ✅ **Single-Turn MCP Batching Compulsório (R-008, R-046, R-056 / Smell 2.26)**: Erradicação do MCP Tool Chaining sequencial no chat; exigência de consolidação em chamada única via `ctx_batch` ou script síncrono único em `ctx_execute` para análises multi-arquivo, diffs e comandos, com paridade de tooling em 100% dos agentes do catálogo.
 - ✅ **Workflows Canônicos Determinísticos (R-050)**: 8 workflows operacionais com State Machines rígidas e banners visuais anti-cegueira.
 - ✅ **Endurecimento Determinístico e Paridade de Governança em Bugfix e Refatoração (`WORKFLOW-BUG-FIX` e `WORKFLOW-REFACTORING`)**: Paridade estrita de rigor determinístico equivalente à migração de frameworks, erradicando intuições causais e efeitos colaterais silenciosos:
   - **`WORKFLOW-BUG-FIX`**: RCA estruturado (5 Whys / Fishbone) sob a regra inegociável *evidence before hypothesis* (mínimo de 2 fontes independentes de evidência técnica observável: stack trace, runtime log, payload de rede, APM ou teste isolado); classificação determinística compulsória entre falha `flaky` (instabilidade intermitente por concorrência/ambiente/poluição de estado) vs `regressao_real`; pré-requisito mandatório de declaração antecipada de `blast_radius_estimado` (callers e módulos afetados) e `rollback_plan` no `workflow_state` antes de emitir diff cirúrgico; **Mini Mutation-Check** proporcional ao risco no Estado 4 (injeção de 1 a 3 mutantes sintéticos eliminados pelo Red Test, erradicando falsos-verdes); e **Observação Pós-Fix / Canary Gate** no Estado 5 com métricas de telemetria e janela de observação definidas para defeitos críticos (P0/P1, segurança, autenticação e integridade de dados).
@@ -400,14 +407,14 @@ flowchart TB
 - ✅ `.github/agents/routing-graph.yaml` — grafo de roteamento declarado (R-040): 42 nós, arestas condicionais e política de cascata rule-based→semantic→LLM; aresta reversa universal `*downstream → agent-router` (R-042)
 - ✅ `.github/agents/evals/casos-roteamento.yaml` — suíte de testes de regressão de roteamento (canônicos, ambíguos, regressão, segurança + variantes)
 - ✅ `.github/instructions/README.md` v1.2 — seção `governance_artefacts` com os artefatos estruturais
-- ✅ `docs/plan/agent-profiles-taxonomy.md` — análise consolidada de mercado + gaps + recomendações
+- ✅ `docs/plans/architecture/20260830-090000-agent-profiles-taxonomy.md` — análise consolidada de mercado + gaps + recomendações
 
 ### Anti Sticky-Session (R-042)
 - ✅ Todo agent downstream/specialist declara seção "Retorno ao Router" com gatilho objetivo de deriva de intenção (mudança de verbo de ação, stack fora de competência, pedido de execução em agent read-only).
 - ✅ Visibilidade obrigatória: toda resposta abre com `Agente Ativo: <name>` e sinalização de handoff quando aplicável.
 
 ### Supervisores de Domínio e Especialistas por Stack
-- ✅ Supervisores hierárquicos (`angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `struts-router`, `python-router` e `database-router`) orquestram seus especialistas dedicados em análise (Advisory) e implementação tática, testing-first e diffs cirúrgicos.
+- ✅ Supervisores hierárquicos (`angular-router`, `spring-boot-router`, `react-router`, `spring-reactive-router`, `ejb-router`, `struts-router`, `python-router` e `database-router`) orquestram seus especialistas dedicados em análise (Advisory) e implementação tática, testing-first e diffs cirúrgicos.
 
 ---
 

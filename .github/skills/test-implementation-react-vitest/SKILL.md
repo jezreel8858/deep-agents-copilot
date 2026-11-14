@@ -1,9 +1,6 @@
 ---
 name: test-implementation-react-vitest
-description: >-
-  Padrões de teste unitário e de componente para React com Vitest e React Testing
-  Library — mocks isolados, queries acessíveis e boundary de responsabilidade entre
-  unit e component tests.
+description: "Define diretrizes e padrões para padrões de teste unitário e de componente para React com Vitest e React Testing Library — mocks isolados, queries acessíveis e boundary de responsabilidade entre unit e component tests. Use quando atuar em vitest react, react testing library, teste unitario react. Não use para tarefas fora do escopo de test-implementation-react-vitest ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: quality
 triggers:
@@ -12,16 +9,22 @@ triggers:
   - "teste unitario react"
   - "teste componente react"
 source_docs:
-  - .github/skills/test-implementation-frontend/SKILL.md
-  - .github/agents/frontend/react/react-unit-test-writer.agent.md
-  - .github/agents/frontend/react/react-component-test-writer.agent.md
-source_docs_lazy:
-  - CLAUDE.md
-  - .github/copilot-instructions.md
+  - '.github/skills/test-implementation-frontend/SKILL.md'
+  - '.github/agents/frontend/react/react-test-engineer.agent.md'
+  - 'CLAUDE.md'
+  - '.github/copilot-instructions.md'
 tools: []
 ---
 
 # Test Implementation — React (Vitest + RTL)
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `test-implementation-react-vitest` ou quando outra skill específica cobrir integralmente o escopo.
+
+## Diretrizes e Padrões Canônicos
+
+- Seguir estritamente as regras, invariantes e fluxos descritos nas seções abaixo.
 
 ## Quando Usar
 

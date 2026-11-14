@@ -46,7 +46,7 @@ TOOL_NAME="$(printf '%s' "$INPUT" | jq -r '.toolName // .tool_name // empty' 2>/
 [[ -z "$TOOL_NAME" ]] && allow
 
 if [[ ! "$TOOL_NAME" =~ ^ctx_execute(_file)?$ ]]; then
-  # Qualquer outra ferramenta (incl. ctx_batch_execute) reseta a sequencia.
+  # Qualquer outra ferramenta (incl. ctx_batch) reseta a sequencia.
   rm -f "$STATE_FILE" 2>/dev/null || true
   allow
 fi
@@ -61,7 +61,7 @@ COUNTER=$((COUNTER + 1))
 jq -n --argjson c "$COUNTER" '{counter: $c}' > "$STATE_FILE" 2>/dev/null || true
 
 if [[ "$COUNTER" -ge 2 ]]; then
-  REASON='Circuit Breaker R-046/R-059/R-060 (context-mode SKILL.md secao 4.1): 2+ chamadas consecutivas de ctx_execute/ctx_execute_file SEM ctx_batch_execute interposto. Isto e feedback automatizado corrigivel (equivalente a erro de lint) - NAO pare, NAO peca permissao ao usuario e NAO repita a mesma chamada isolada. Reconsolide TODOS os alvos pendentes desta tarefa em UMA unica chamada ctx_batch_execute(commands:[...], queries:[...]) e prossiga imediatamente.'
+  REASON='Circuit Breaker R-046/R-059/R-060 (context-mode SKILL.md secao 4.1): 2+ chamadas consecutivas de ctx_execute/ctx_execute SEM ctx_batch interposto. Isto e feedback automatizado corrigivel (equivalente a erro de lint) - NAO pare, NAO peca permissao ao usuario e NAO repita a mesma chamada isolada. Reconsolide TODOS os alvos pendentes desta tarefa em UMA unica chamada ctx_batch(commands:[...], queries:[...]) e prossiga imediatamente.'
   jq -n --arg r "$REASON" '{permissionDecision:"deny", permissionDecisionReason:$r}' 2>/dev/null || \
     echo "{\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"$REASON\"}"
   exit 0

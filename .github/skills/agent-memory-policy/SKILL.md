@@ -1,10 +1,6 @@
 ---
 name: agent-memory-policy
-description: >
-  Política de memória long-term para agents de IA: define os 3 tipos (episódica,
-  semântica, procedimental) e orienta quando e como implementar cada um, com foco
-  especial em memória procedimental (agents auto-adaptativos via atualização controlada
-  de prompts), guardrails de segurança e aprovação humana obrigatória.
+description: "Define diretrizes e padrões para política de memória long-term para agents de IA: define os 3 tipos (episódica, semântica, procedimental) e orienta quando e como implementar cada um, com foco especial em memória procedimental (agents auto-adaptativos via atualização controlada de prompts), guardrails de segurança e aprovação humana obrigatória. Use quando atuar em memória de agent, agent memory, memória procedimental. Não use para tarefas fora do escopo de agent-memory-policy ou implementação direta de código de negócio não relacionado."
 tier: 3
 category: governance
 triggers:
@@ -26,7 +22,6 @@ source_docs:
   - .github/skills/agent-observability-otel/SKILL.md
   - .github/prompts/ctx-checkpoint.prompt.md
   - .github/skills/terminal-governance/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
@@ -39,6 +34,14 @@ tools: []
 > ⚠️ **Tier 3 — Experimental**: use somente com validação explícita de caso de uso. Memória procedimental (agents atualizando seus próprios prompts) é uma capacidade avançada com risco de drift comportamental. Não aplique sem critério de rollback definido e baseline de evals.
 
 ---
+
+## Quando Usar
+
+- Ativação em cenários de memória de agent, agent memory, memória procedimental.
+
+## Diretrizes e Padrões Canônicos
+
+- Seguir estritamente as regras, invariantes e fluxos descritos nas seções abaixo.
 
 ## 1) Os 3 Tipos de Memória Long-Term
 

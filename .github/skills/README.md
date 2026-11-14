@@ -35,6 +35,7 @@ Toda skill deve declarar no topo:
 | `tavily` | Tier 2 | Pesquisar documentação externa, changelog, versões e referências de terceiros |
 | `context-compact` | Tier 2 | Compactar contexto pós-leitura, remover ruído e gerar resumos executáveis |
 | `mermaid-diagrams` | Tier 2 | Criar diagramas Mermaid legíveis para documentação, ADRs e análises técnicas |
+| `design-pattern-selection-patterns` | Tier 2 | Decision Tree objetiva para selecionar/descartar design patterns (GoF, funcionais, arquiteturais, resiliência) em planejamento, com guardrails anti-overengineering e mini-ADR no Plano R-064 — exclusiva dos agents `<stack>-arch-advisor` |
 | `agent-contracts` | Tier 1 | Padronizar contrato de entrada, saída e não-escopo de agents |
 | `handoff-governance` | Tier 1 | Definir critérios e payload mínimo de handoff entre agents |
 | `confidence-fallback-policy` | Tier 1 | Definir score de confiança e regras de fallback/escalonamento |
@@ -46,6 +47,8 @@ Toda skill deve declarar no topo:
 | **`test-implementation-backend`** | ⭐ **Tier 2** | Padrões **genéricos** de testes backend (agnóstico de framework — pirâmide, AAA, mocks) |
 | **`test-implementation-spring-boot`** | ⭐ **Tier 2** | Padrões **específicos** JUnit 5 + Mockito + JaCoCo para Spring Boot |
 | **`test-implementation-frontend`** | ⭐ **Tier 2** | Padrões **genéricos** de testes frontend (agnóstico de framework — componentes, E2E) |
+| **`jira-mcp`** | 🛠️ **Tier 2** | Integração segura com Jira via servidor MCP `sooperset/mcp-atlassian` (`uvx`) — Least-Tools por perfil, JQL enxuta, `context-mode` e guardrails contra prompt injection (ASI01) |
+| **`jira-writing-patterns`** | 📝 **Tier 2** | Estrutura, redação e formatação de issues Jira (Epic/Story/Task/Subtask/Bug) — templates por tipo, Gherkin, INVEST, DoR/DoD e formatação Cloud (ADF) vs Server/DC; complementa `jira-mcp` |
 | **`playwright-mcp`** | 🧠 **Tier 1** | Automação de navegador real via Accessibility Tree (`browser_snapshot`) para o servidor MCP `microsoft/playwright-mcp` — seletores semânticos, ciclo de vida de abas, inspeção de rede/console e guardrails de segurança (RCE, prompt injection) |
 | **`test-implementation-angular-jasmine`** | ⭐ **Tier 2** | Padrões **específicos** Jasmine/Karma + Playwright para Angular 21 (legado/migração) |
 | **`test-implementation-angular-vitest`** | ⭐ **Tier 2** | Padrões **específicos** Vitest 3+ + @angular/build:unit-test para Angular 20/21+ (oficial/novo padrão) |
@@ -53,7 +56,7 @@ Toda skill deve declarar no topo:
 | **`test-coverage-governance`** | 🧪 **Tier 2** | Estratégia agnóstica de cobertura por risco, seams pré-acordados (testing-first + refactor fora do loop) e relatórios consolidados |
 | `project-scanner` | Tier 2 | Scanner automático de projetos para detecção de stack e convenções |
 | **`project-context-builder`** | 🏗️ **Tier 2** | Scanner automático de projetos, scaffolding guiado e suporte a Bounded Contexts (`CONTEXT-MAP.md`) |
-| `git-governance` | Tier 2 | Convenções de git workflow, branch naming, commit standards e PR guidelines |
+| `git-governance` | Tier 2 | SSOT modular (Progressive Disclosure) de git workflow: branch naming, commits A/B, PR com matriz de risco e rollback, guardrail de segredos em camadas e Keep a Changelog — `references/` com 5 módulos |
 | **`git-conflict-resolution-patterns`** | 🔀 **Tier 2** | ⭐ ***(NEW)*** Protocolo determinístico de 4 passos (diagnóstico, fontes primárias via `git --no-pager log`, resolução semântica hunk-a-hunk, validação por testes/linter) para resolver conflitos de merge/rebase preservando intenção original — base de `pr-gatekeeper` |
 | **`git-worktree-governance`** | 🌲 **Tier 2** | ⭐ ***(NEW)*** Diretrizes de ciclo de vida e isolamento para execução de agentes paralelos e explorações especulativas via Git Worktrees |
 | **`terminal-governance`** | 🔧 **Tier 1** | Boas práticas obrigatórias para uso de `run_in_terminal` — prevenção de poluição de contexto, truncamento de saída, não-interativo, lote, padrões proibidos e watchdog obrigatório (`timeout -k` / `Start-Job`+`Wait-Job`) para comando potencialmente bloqueante |
@@ -94,9 +97,9 @@ Toda skill deve declarar no topo:
 | **`security-review-patterns`** | 🔒 **Tier 2** | ⭐ ***(NEW)*** OWASP Top 10:2025, ASVS 5.0, OWASP LLM/Agentic AI, SCA (CVE/CVSS), detecção de secrets e rubrica de triagem — base do agent `security-reviewer` |
 | **`performance-engineering-patterns`** | ⚡ **Tier 2** | ⭐ ***(NEW)*** Core Web Vitals (LCP/INP/CLS), N+1 queries, profiling de latência e otimização de query — base do agent `performance-agent` |
 | **`compliance-governance-patterns`** | 🛡️ **Tier 2** | ⭐ ***(NEW)*** SOC 2/GDPR/LGPD/HIPAA/ISO 27001, audit trails, least privilege e retenção de dado pessoal — base do agent `compliance-guardrails` |
-| **`task-decomposition-patterns`** | 📋 **Tier 2** | ⭐ ***(NEW)*** Decomposição sequencial/hierárquica/paralela, granularidade 2-3 níveis, validação de dependências — base do agent `feature-planner` |
+| **`task-decomposition-patterns`** | 📋 **Tier 2** | ⭐ ***(NEW)*** Decomposição sequencial/hierárquica/paralela, granularidade 2-3 níveis, validação de dependências, Reversibility Tiers (T1/T2/T3), protocolo `replan_node` e grounding factual via Knowledge Graph — base do agent `feature-planner` |
 | **`refactoring-planning-patterns`** | 🏗️ **Tier 2** | ⭐ ***(NEW)*** Planejamento de refatoração estrutural (Mikado Method, Strangler Fig, Branch by Abstraction, Characterization Tests, DAG de etapas e rollback multicamada) — base do agent `refactor-planner` |
-| **`plan-conformance-patterns`** | 🛡️ **Tier 2** | ⭐ ***(NEW)*** Protocolo determinístico em 3 níveis (Allowlist, Blast Radius via @codegraph-engine, Checagem Semântica) para verificar conformidade de escopo do diff contra o Plano de Implementação aprovado (R-064) — base dos agents `code-review` e `pr-gatekeeper` |
+| **`plan-conformance-patterns`** | 🛡️ **Tier 2** | ⭐ ***(NEW)*** Protocolo determinístico em níveis (Allowlist, Blast Radius via @codegraph-engine, Verificação de Reversibilidade Nível 2.1 e Checagem Semântica) para verificar conformidade de escopo do diff contra o Plano de Implementação aprovado (R-064) — base dos agents `code-review` e `pr-gatekeeper` |
 | **`devops-agent-patterns`** | 🐳 **Tier 2** | ⭐ ***(NEW)*** Checklists de revisão Dockerfile/Kubernetes/CI-CD/IaC e estratégias de deployment — base do agent `devops-engineer` |
 | **`codegraph-optave-usage`** | 🕸️ **Tier 2** | ⭐ ***(NEW)*** Uso da lib externa `@optave/codegraph` (CLI local e MCP Server enxuto, zero API keys) como motor único de build/consulta de grafo de código — query, blast radius, ciclos, dead code, dataflow e CI gate. Base do agent `codegraph-engine` |
 | **`efficient-batch-code-modification`** | ⚡ **Tier 1** | ⭐ ***(NEW)*** Edição em lote otimizada para economia de tokens e créditos Copilot — análise prévia (dry-run), tool calls agrupadas na mesma rodada, minimal diffs cirúrgicos e proteção anti-corrupção em arquivo único grande/estruturado via padrão verificado (R-051) |

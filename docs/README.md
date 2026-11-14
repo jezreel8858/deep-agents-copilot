@@ -33,7 +33,7 @@ APRENDIZADO ────────────────────┼─�
 
 - [**Guia de Primeiros Passos & Setup**](context/setup-context-mode-intellij.md): Configuração do ambiente integrado com JetBrains IntelliJ IDEA / PyCharm e ativação do `context-mode` MCP.
 - [**Guia Operacional do Motor de Grafo**](agent-context/codegraph-guia-uso.md): Tutorial prático de inicialização e consulta ao `@optave/codegraph` para análise estrutural de código sem IA.
-- [**Instruções Globais de Git Commit**](ai-copilot/global-git-commit-instructions.md): Tutorial sobre o formato padronizado Conventional Commits adotado pelos agentes.
+- [**Guia Rápido de Git Commits**](ai-copilot/global-git-commit-instructions.md): Referência rápida de Conventional Commits para desenvolvedores, alinhada à skill canônica git-governance.
 
 ---
 
@@ -42,9 +42,9 @@ APRENDIZADO ────────────────────┼─�
 
 - **Como Rodar Workflows Canônicos**:
   - [Workflows Operacionais Determinísticos](../.github/agents/workflows.md): Especificação dos 8 workflows canônicos, com endurecimento determinístico e paridade de rigor entre Migração (6 etapas, Symbol Exhaustion e Tríplice Redundância), Bug-Fix (RCA estruturado 5 Whys/Fishbone com dupla evidência observável, classificação flaky vs regressão real, pré-declaração de blast radius e rollback plan, mini mutation-check anti falso-verde e observação pós-fix/canary) e Refatoração (Contract Testing Pact-style / consumer-driven, camada de redundância proporcional com auditoria reversa de símbolos, mini mutation gate e differential replay leve, e rollback com registro de blast_radius_revertido).
-- **Como Elaborar Planos de Workflow (R-064)**:
-  - [Planos de Planejamento](plans/README.md): Convenção e elaboração do Plano de Planejamento funcional (`docs/plans/`).
-  - [Planos de Implementação](implementation-plans/README.md): Convenção e elaboração do Plano de Implementação técnica (`docs/implementation-plans/`).
+- **Como Elaborar Planos de Workflow (R-064 — Taxonomia Unificada `docs/plans/<tipo>/`)**:
+  - [Planos de Planejamento e Taxonomia `docs/plans/<tipo>/`](plans/README.md): Convenção das 8 subpastas canônicas (`feature/`, `refactor/`, `architecture/`, `implementation/`, `test-strategy/`, `bug-triage/`, `requirements/`, `governance/`), frontmatter R-064 e delegação de escrita.
+  - [Planos de Implementação Técnica](plans/implementation/README.md): Convenção e template do Plano de Implementação técnica (`docs/plans/implementation/`).
 - **Como Adicionar Contexto de Novo Projeto**:
   - [Project Context Builder](../.github/skills/project-context-builder/SKILL.md): Como executar `/add-project-context` para gerar adapters em `local/` sem vazar dados para o repositório público (R-043/R-044).
 - **Como Operar em Modo Context Mode**:
@@ -69,10 +69,8 @@ APRENDIZADO ────────────────────┼─�
 - **Schemas Canônicos de Validação (JSON Schema)**:
   - [`agentcard.schema.json`](schemas/agentcard.schema.json): Schema de especificação de identidade e capacidades de agentes (A2A Protocol / IETF Draft).
   - [`migration-ir.schema.json`](schemas/migration-ir.schema.json): Schema canônico da Representação Intermediária (Semantic IR) para migrações agnósticas de framework.
-  - [`workflow-incident.schema.json`](schemas/workflow-incident.schema.json): Schema de persistência estruturada de incidentes operacionais de workflows.
 - **Requisitos de Sistema (EARS / INVEST)**:
-  - [`REQ-migration-engine.md`](requirements/REQ-migration-engine.md): Requisitos do motor agnóstico de migração (REQ-001 a REQ-009).
-  - [`REQ-workflow-incident-persistence.md`](requirements/REQ-workflow-incident-persistence.md): Requisitos de auditoria e persistência de incidentes.
+  - [`20260830-090000-migration-engine.md`](plans/requirements/20260830-090000-migration-engine.md): Requisitos do motor agnóstico de migração (REQ-001 a REQ-009) em `docs/plans/requirements/`.
 - **Histórico e Versionamento**:
   - [CHANGELOG.md](../CHANGELOG.md): Histórico completo de versões SemVer e entregas do ecossistema.
 
@@ -87,9 +85,8 @@ APRENDIZADO ────────────────────┼─�
 - [**Guia de Boas Práticas de Documentação em Governança de IA**](architecture/AI_GOVERNANCE_DOCUMENTATION_GUIDE.md): Alinhamento com NIST AI RMF, ISO/IEC 42001, OWASP Agentic AI, Diátaxis e living documentation.
 - [**Guia Canônico de Segurança de Aplicação e Vulnerabilidades (AppSec)**](architecture/APPLICATION_SECURITY_GUIDE.md): Matriz dos 6 pilares de AppSec (SAST, SCA + Reachability, DAST, IAST, Secrets e ASPM), OWASP Top 10, ASVS 5.0 e SLAs de remediação CVSS.
 - **Planos e Decisões de Arquitetura (ADR / Blueprints)**:
-  - [Plano do Motor Agnóstico de Migração](plan/plano-motor-migracao-agnostica.md): Blueprint técnico do motor IR-based com paridade funcional e redundância pós-migração.
-  - [Taxonomia de Perfis de Agentes](plan/agent-profiles-taxonomy.md): Categorização de agentes segundo benchmarks de mercado (Anthropic, OpenAI, LangGraph).
-  - [Persistência de Incidentes de Workflows](plan/plano-persistencia-incidentes-workflows.md): Arquitetura de observabilidade e telemetria de falhas em tempo de execução.
+  - [Plano do Motor Agnóstico de Migração](plans/architecture/20260830-090300-plano-motor-migracao-agnostica.md): Blueprint técnico do motor IR-based em `docs/plans/architecture/`.
+  - [Taxonomia de Perfis de Agentes](plans/architecture/20260830-090000-agent-profiles-taxonomy.md): Categorização de agentes segundo benchmarks de mercado em `docs/plans/architecture/`.
 
 ---
 

@@ -326,7 +326,7 @@ def test_homologation_gate_no_unhomologated_sections_in_agents():
     ] + [
         p for p in (AGENTS_DIR / "templates").glob("*.md")
     ]
-    assert len(all_agent_files) >= 70
+    assert len(all_agent_files) >= 66
 
     violations = []
     for agent_file in all_agent_files:
@@ -431,3 +431,97 @@ def test_homologation_gate_blocks_unhomologated_injections(tmp_path: Path):
         for h in h2s
     )
     assert has_unhomologated is True, "Gate deveria identificar a seção não homologada como violação"
+
+
+# ─────────────────────────────────────────────────────────────
+# 7. ONDA 5 (CA-06) — Contratos Estritos de Prompts (22), Skills (81) e Blindagem @governance-factory
+# ─────────────────────────────────────────────────────────────
+
+def test_ca06_all_prompts_have_6_canonical_sections_and_native_variables():
+    """
+    Valida que todos os 22 prompts (.github/prompts/*.prompt.md) possuem:
+    - '🎯 Invocação e Variáveis Nativas' com '${file}', '${selection}', '${workspaceFolder}'
+    - '🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO'
+    - '📋 Fluxo de Execução Passo a Passo'
+    - '✅ Checklist Antes de Apresentar'
+    - '📊 Formato de Saída'
+    - '⚙️ Protocolo de Execução Obrigatório' e bloco '<execution_protocol>'
+    """
+    prompt_files = sorted(p for p in PROMPTS_DIR.glob("*.prompt.md") if "templates" not in p.parts)
+    assert len(prompt_files) == 22, f"Esperado 22 prompts em {PROMPTS_DIR}, encontrado {len(prompt_files)}"
+
+    required_markers = [
+        "🎯 Invocação e Variáveis Nativas",
+        "${file}",
+        "${selection}",
+        "${workspaceFolder}",
+        "🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO",
+        "📋 Fluxo de Execução Passo a Passo",
+        "✅ Checklist Antes de Apresentar",
+        "📊 Formato de Saída",
+        "⚙️ Protocolo de Execução Obrigatório",
+        "<execution_protocol>",
+        "</execution_protocol>",
+    ]
+
+    violations = []
+    for pf in prompt_files:
+        content = pf.read_text(encoding="utf-8")
+        missing = [m for m in required_markers if m not in content]
+        if missing:
+            violations.append(f"[{pf.relative_to(REPO_ROOT)}] marcadores ausentes: {missing}")
+
+    assert not violations, f"Violações de contrato nos 22 prompts:\n" + "\n".join(violations)
+
+
+def test_ca06_all_skills_have_5_canonical_sections_and_frontmatter_triggers():
+    """
+    Valida que todas as 81 skills (.github/skills/*/SKILL.md) possuem:
+    - description no frontmatter com 'Use quando' e 'Não use'
+    - Seções H2 obrigatórias: 'Quando Usar', 'Quando NÃO Usar', 'Diretrizes'/'Padrões', 'Checklist', 'Referências'
+    """
+    skill_files = sorted(p for p in SKILLS_DIR.glob("*/SKILL.md") if "templates" not in p.parts)
+    assert len(skill_files) == 81, f"Esperado 81 skills em {SKILLS_DIR}, encontrado {len(skill_files)}"
+
+    violations = []
+    for sf in skill_files:
+        content = sf.read_text(encoding="utf-8")
+        rel_path = sf.relative_to(REPO_ROOT)
+
+        fm_match = re.match(r"^---\r?\n([\s\S]*?)\r?\n---", content)
+        fm_text = fm_match.group(1) if fm_match else ""
+        if not re.search(r"Use quando", fm_text, re.IGNORECASE):
+            violations.append(f"[{rel_path}] frontmatter description sem gatilho 'Use quando'")
+        if not re.search(r"N[ãa]o use", fm_text, re.IGNORECASE):
+            violations.append(f"[{rel_path}] frontmatter description sem gatilho 'Não use'")
+
+        section_checks = [
+            ("Quando Usar", r"^##\s+.*Quando Usar"),
+            ("Quando NÃO Usar", r"^##\s+.*Quando N[ÃA]O Usar"),
+            ("Diretrizes/Padrões", r"^##\s+.*(Diretrizes|Padr[õo]es)"),
+            ("Checklist", r"^##\s+.*Checklist"),
+            ("Referências", r"^##\s+.*Refer[êe]ncias"),
+        ]
+        for label, pattern in section_checks:
+            if not re.search(pattern, content, re.IGNORECASE | re.MULTILINE):
+                violations.append(f"[{rel_path}] seção obrigatória ausente: {label}")
+
+    assert not violations, f"Violações de contrato nas 81 skills:\n" + "\n".join(violations)
+
+
+def test_ca06_governance_factory_references_official_templates():
+    """
+    Blindagem @governance-factory.agent.md: garante que o agente fábrica referencia
+    explicitamente os templates canônicos oficiais de agents, prompts e skills.
+    """
+    gf_path = AGENTS_DIR / "governance-factory.agent.md"
+    assert gf_path.is_file(), f"Arquivo não encontrado: {gf_path}"
+    content = gf_path.read_text(encoding="utf-8")
+
+    expected_refs = [
+        ".github/agents/templates/agent-template.md",
+        ".github/prompts/templates/prompt-template.md",
+        ".github/skills/templates/skill-template.md",
+    ]
+    missing = [ref for ref in expected_refs if ref not in content]
+    assert not missing, f"governance-factory.agent.md não referencia os templates oficiais: {missing}"

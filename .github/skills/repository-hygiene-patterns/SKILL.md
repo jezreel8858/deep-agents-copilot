@@ -1,10 +1,6 @@
 ---
 name: repository-hygiene-patterns
-description: >-
-  Diretrizes e matriz canônica para auditoria e garantia de higiene de
-  repositório, documentação essencial (README, CONTRIBUTING, LICENSE),
-  segurança de versionamento (.gitignore, prevenção de .env commitado) e
-  práticas de engenharia CI/CD. Base de conhecimento do repo-hygiene-auditor.
+description: "Define diretrizes e padrões para diretrizes e matriz canônica para auditoria e garantia de higiene de repositório, documentação essencial (README, CONTRIBUTING, LICENSE), segurança de versionamento (.gitignore, prevenção de .env commitado) e práticas de engenharia CI/CD. Base de conhecimento do repo-hygiene-auditor. Use quando atuar em higiene de repositório, repo hygiene, boas práticas de repositório. Não use para tarefas fora do escopo de repository-hygiene-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: process
 triggers:
@@ -18,13 +14,24 @@ triggers:
   - "contributing guide"
 source_docs:
   - .github/agents/repo-hygiene-auditor.agent.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
 ---
 
 # Repository Hygiene Patterns
+
+## Quando Usar
+
+- Ativação em cenários de higiene de repositório, repo hygiene, boas práticas de repositório.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `repository-hygiene-patterns` ou quando outra skill específica cobrir integralmente o escopo.
+
+## Diretrizes e Padrões Canônicos
+
+- Seguir estritamente as regras, invariantes e fluxos descritos nas seções abaixo.
 
 ## 1) Objetivo e Escopo
 
@@ -56,3 +63,10 @@ Esta skill estabelece os critérios e a matriz de maturidade para avaliação de
    - Presença de workflows de automação (`.github/workflows/` ou equivalente).
    - Ausência de arquivos temporários, logs ou lixeiras no versionamento.
 
+## Checklist de Conformidade
+
+- [ ] Diretrizes, contratos e restrições de escopo de `repository-hygiene-patterns` verificados e atendidos.
+
+## Referências
+
+- Documentação normativa em `CLAUDE.md` e `.github/copilot-instructions.md`.

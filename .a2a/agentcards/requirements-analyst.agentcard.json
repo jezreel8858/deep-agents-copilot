@@ -4,7 +4,7 @@
   "id": "requirements-analyst",
   "name": "Requirements Analyst",
   "version": "2.1.0",
-  "description": "Especialista em elicitação, refinamento e estruturação de requisitos de negócio e técnicos a partir de pedidos ambíguos. Converte intenção em especificações precisas com critérios de aceitação e regras de negócio antes do planejamento técnico, materializando-as em docs/requirements/REQ-<modulo>.md como ground truth.",
+  "description": "Especialista em elicitação, refinamento e estruturação de requisitos de negócio e técnicos a partir de pedidos ambíguos. Converte intenção em especificações precisas com critérios de aceitação e regras de negócio antes do planejamento técnico, materializando-as em docs/plans/requirements/<AAAAMMDD-HHMMSS>-<modulo>.md como ground truth.",
   "domain": "Elicitacao e estruturacao de requisitos (prospectivo, pre-tecnico)",
   "role": "specialist",
   "capabilities": [
@@ -23,7 +23,11 @@
     "agent-contracts",
     "context-mode",
     "efficient-batch-code-modification",
-    "socratic-grilling-patterns"
+    "socratic-grilling-patterns",
+    "jira-mcp",
+    "jira-writing-patterns",
+    "figma-mcp",
+    "figma-design-to-code-patterns"
   ],
   "tools": [
     "grep_search",
@@ -32,11 +36,16 @@
     "get_errors",
     "ask_questions",
     "run_subagent",
-    "context-mode/ctx_execute",
-    "context-mode/ctx_execute_file",
     "context-mode/ctx_index",
     "context-mode/ctx_search",
-    "context-mode/ctx_batch_execute"
+    "context-mode/ctx_batch",
+    "figma/get_file_nodes",
+    "figma/export_image",
+    "figma/get_styles",
+    "figma/get_component_sets",
+    "figma/get_comments",
+    "mcp-atlassian/jira_get_issue",
+    "mcp-atlassian/jira_search"
   ],
   "security_profile": {
     "tool_zones": [
@@ -46,7 +55,7 @@
     "data_sensitivity": "internal"
   },
   "model_preferences": {
-    "recommended_model": "Claude Sonnet 5",
+    "recommended_model": "Claude Sonnet 5.5",
     "cost_tier": "1x"
   },
   "input_contract": {

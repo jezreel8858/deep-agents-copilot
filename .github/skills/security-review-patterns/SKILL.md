@@ -1,10 +1,6 @@
 ---
 name: security-review-patterns
-description: >
-  Diretrizes consolidadas de segurança aplicada para revisão especializada de código —
-  OWASP Top 10:2025, ASVS 5.0, OWASP Top 10 para LLM Apps (2025) e OWASP Agentic
-  AI Security (2026). Cobre SAST, SCA (dependências/CVE), detecção de secrets,
-  triagem de falso-positivo e checklists por domínio (auth, input, crypto).
+description: "Define diretrizes e padrões para diretrizes consolidadas de segurança aplicada para revisão especializada de código — OWASP Top 10:2025, ASVS 5.0, OWASP Top 10 para LLM Apps (2025) e OWASP Agentic AI Security (2026). Cobre SAST, SCA (dependências/CVE), detecção de secrets, triagem de falso-positivo e checklists por domínio (auth, input, crypto). Use quando atuar em revisão de segurança, security review, owasp. Não use para tarefas fora do escopo de security-review-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: security
 triggers:
@@ -25,7 +21,6 @@ triggers:
 source_docs:
   - .github/skills/code-review-patterns/SKILL.md
   - .github/skills/sonarqube-governance/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
@@ -34,6 +29,10 @@ tools: []
 # Security Review Patterns
 
 > Base de conhecimento para agents que fazem **revisão especializada de segurança de código de aplicação** (não confundir com `agent-safety-guardrails`, que cobre segurança do **próprio agent de IA** — prompt injection, blast radius de tools).
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `security-review-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando Usar
 
@@ -55,7 +54,7 @@ tools: []
 | **OWASP Agentic AI Security** | 2026.1 (dez/2025) | Riscos ASI01-ASI10 para sistemas de agents autônomos — **escopo do agent de IA em si**, não da aplicação revisada |
 
 ### 1.2 A Matriz Canônica de Segurança de Aplicação (AppSec Stack)
-O ecossistema implementa a cobertura em profundidade através de 6 pilares complementares (detalhes em [`docs/architecture/APPLICATION_SECURITY_GUIDE.md`](../../docs/architecture/APPLICATION_SECURITY_GUIDE.md)):
+O ecossistema implementa a cobertura em profundidade através de 6 pilares complementares (detalhes em [`docs/architecture/APPLICATION_SECURITY_GUIDE.md`](../../../docs/architecture/APPLICATION_SECURITY_GUIDE.md)):
 1. **SAST (Static Application Security Testing)**: Varredura de código-fonte proprietário (Shift-Left) via AST e *Taint Analysis* (Semgrep, SonarQube, CodeQL).
 2. **SCA (Software Composition Analysis) + Reachability**: Análise de dependências com verificação de alcançabilidade no grafo de chamadas (Trivy, Snyk, pip-audit, npm audit).
 3. **DAST (Dynamic Application Security Testing)**: Testes de caixa preta em runtime contra APIs e endpoints (OWASP ZAP, StackHawk).

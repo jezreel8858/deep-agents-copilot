@@ -10,12 +10,12 @@ Para garantir que a cadeia sequencial seja seguida à risca e nenhum agente desv
 ```yaml
 handoff_payload:
   versao: "1.2"
-  para: "specialist-unit-test-writer"
+  para: "<stack>-test-engineer"
   motivo: "Hipótese de bug confirmada — criar teste de regressão que falhe"
   emissor:
     nome: "bug-triage"
     versao: "1.1.0"
-    modelo_llm: "Claude Sonnet 5"
+    modelo_llm: "Claude Sonnet 5.5"
     timestamp: "2026-09-10T12:00:00Z"
   workflow_tracking:
     workflow_id: "WORKFLOW-BUG-FIX"
@@ -23,7 +23,7 @@ handoff_payload:
     total_etapas: 5
     nome_etapa: "red_test_reproduction"
     proximos_agentes_permitidos:
-      - "specialist-bug-fixer"
+      - "<stack>-developer"
     politica_desvio: "strict"  # proíbe delegar fora da lista sem evento R-042
   contexto:
     solicitacao_original: "Botão de login quebra com erro 500 ao clicar"
@@ -41,17 +41,17 @@ handoff_payload:
 ## 5. Regras de Não-Desvio (Invariantes de Execução)
 
 1. **Invariante de Fast-Path**: Se a mensagem de entrada descreve um bug, erro, crash ou falha visual de layout, o `@agent-router` NUNCA deve invocar `@prompt-structuring`. O ingresso no `WORKFLOW-BUG-FIX` via `@bug-triage` é mandatório.
-2. **Invariante de Teste Prévio (TDD)**: No `WORKFLOW-BUG-FIX`, é terminantemente proibido invocar o `bug-fixer` sem antes ter o teste automatizado que reproduza a falha (Estado 2 obrigatório antes do Estado 3).
+2. **Invariante de Teste Prévio (TDD)**: No `WORKFLOW-BUG-FIX`, é terminantemente proibido invocar o especialista de correção (`<stack>-developer`) sem antes ter o teste automatizado que reproduza a falha (Estado 2 obrigatório antes do Estado 3).
 3. **Invariante de Grafo em Refatoração**: No `WORKFLOW-REFACTORING`, o `@refactor-planner` NUNCA deve realizar varredura manual de pastas; deve invocar compulsoriamente o `@codegraph-engine` para cálculo do blast radius (R-045).
 4. **Invariante Anti Beco Sem Saída (R-047)**: Ao concluir seu estado, o agente ativo DEVE despachar via `run_subagent` para a próxima etapa do workflow OU invocar `ask_questions` caso dependa de decisão humana.
 5. **Invariante de Deriva e Reset de Workflow (R-042 / R-052)**: Caso o usuário mude o escopo no meio do workflow (ex.: durante um bugfix, peça uma nova funcionalidade), ou **ao concluir qualquer workflow com sucesso**, o agente ativo encerra seu ciclo e DEVE acionar retorno imediato ao `@agent-router` com `motivo: "deriva_de_intencao"` ou `"conclusao_de_workflow_anterior"`. É expressamente proibido ao último agente ativo reter a sessão para a próxima solicitação (Anti Sticky-Agent).
-6. **Invariante de Separação Declarador/Executor em Circuit Breaker**: Nenhum agente estritamente read-only/advisory (`runtime-verifier`, `@code-review`, `@refactor-planner`, `@agent-auditor`, etc. — mesma classe validada em `test_readonly_advisory_agents_do_not_contain_mutation_tools`) pode executar a mutação de reversão (`git checkout`/`git restore`) de um Circuit Breaker. Esse agente apenas DETECTA e DECLARA o veredito; a execução física é sempre delegada, via `run_subagent`, ao especialista com ferramentas de edição/terminal que originou o diff (`specialist-bug-fixer`/`specialist-test-fixer` em Workflow 1; domain router/specialist por nó do DAG em Workflow 2). Violação desta invariante é tratada com a mesma severidade de uma violação de contrato de agent (ver § 8.1, item 2).
+6. **Invariante de Separação Declarador/Executor em Circuit Breaker**: Nenhum agente estritamente read-only/advisory (`runtime-verifier`, `@code-review`, `@refactor-planner`, `@agent-auditor`, etc. — mesma classe validada em `test_readonly_advisory_agents_do_not_contain_mutation_tools`) pode executar a mutação de reversão (`git checkout`/`git restore`) de um Circuit Breaker. Esse agente apenas DETECTA e DECLARA o veredito; a execução física é sempre delegada, via `run_subagent`, ao especialista com ferramentas de edição/terminal que originou o diff (`<stack>-developer`/`<stack>-test-engineer` em Workflow 1; domain router/specialist por nó do DAG em Workflow 2). Violação desta invariante é tratada com a mesma severidade de uma violação de contrato de agent (ver § 8.1, item 2).
 7. **Invariante de Resolução de Papel Genérico**: Nenhum agente invoca `run_subagent` com um nome `specialist-<papel>` literal — todo despacho tático passa primeiro pela resolução do domain router para o `id` concreto do catálogo (§ 1.3).
 8. **Invariante de Colaboração Dual-Stack em Migração (WORKFLOW-FRAMEWORK-MIGRATION)**: Em toda migração **cross-stack** (stack de origem legada ≠ stack de destino moderno — ex.: `ejb-router`→`spring-boot-router`, `struts-router`→`spring-boot-router`), o `@tech-solution-architect` NUNCA elabora blueprint ou renderiza o bloco `### 🗺️ Pipeline de Execução do Workflow` citando apenas o domain router de destino. Ambos os routers (origem e destino) DEVEM constar explicitamente como agentes participantes em TODAS as etapas do pipeline (1 a 6), com o router de origem atuando como oráculo de comportamento legado até o sign-off da auditoria reversa de órfãos pós-migração (Estado 6). Omitir o router de origem é tratado como a mesma classe de violação que pular um estado do workflow (ver § 3.7, item "Invariante de Colaboração Dual-Stack").
 9. **Invariante de Exclusividade do Motor de Grafo em Migração (R-045)**: `@codegraph-engine` é co-agente OBRIGATÓRIO (nunca sub-rotina meramente permitida) nas Etapas 1, 3, 4, 5 e 6 do `WORKFLOW-FRAMEWORK-MIGRATION`. `@tech-solution-architect` e os domain routers NUNCA mapeiam blast radius, dependências, ciclos ou auditoria reversa de símbolos manualmente durante uma migração — toda essa análise estrutural é delegada via `run_subagent` ao `@codegraph-engine`, com o mesmo rigor já aplicado em `WORKFLOW-REFACTORING` (Invariante 3). O `sign_off_codegraph_engine` (zero ciclos/dead-code novos e zero órfãos detectados) é pré-requisito do veredito final na Etapa 6, junto ao sign-off do domain router de origem.
 10. **Invariante de Fallback Proibido do Motor de Grafo (Falha de Tool Call)**: Se a chamada de tool do `@codegraph-engine` (ex.: `module_map`, `query`, `impact_analysis`) **falhar ou retornar erro/timeout**, é terminantemente proibido a qualquer agente (incluindo `@tech-solution-architect` e domain routers) recorrer a varredura manual substituta (`list_dir`, `grep`/`grep_search` em massa no repositório inteiro, leitura sequencial de dezenas de arquivos) como compensação silenciosa. A única ação permitida é: **(a)** retry da mesma consulta ao `@codegraph-engine` (build incremental se o índice estiver desatualizado) ou **(b)** declarar explicitamente ao usuário via relatório de 3 linhas (Causa/Local/Ação sugerida) que a análise estrutural determinística falhou e aguardar decisão (`ask_questions`) antes de prosseguir com qualquer heurística manual. Tratar a falha do tool como "gap silencioso" e prosseguir com grep manual é a mesma classe de violação de R-045 (ver `regr-023` e `regr-028`).
 11. **Invariante de Checkpoint Humano Não-Satisfeito por Continuação Genérica**: Em qualquer Etapa marcada como *Checkpoint Humano Obrigatório* (ex.: Estado 2b de `WORKFLOW-FRAMEWORK-MIGRATION`, Estado 3b de `WORKFLOW-FEATURE-DEVELOPMENT`, Estado 2b de `WORKFLOW-GOVERNANCE-MAINTENANCE`), se o Dashboard/relatório apresentado contiver **qualquer item marcado `⚠️`, `[⏳ PENDENTE]` ou `[⚠️ DIVERGENTE]`** exigindo decisão de negócio ou arquitetura, uma resposta genérica do usuário ("prossiga", "continue", clique em sugestão automática de continuação) **NUNCA** é interpretada como aprovação explícita das decisões pendentes específicas. O agente ativo DEVE, antes de avançar para a próxima etapa mutativa: **(a)** re-listar objetivamente cada item pendente com opções concretas (ex.: manter `[PENDENTE]` para implementação nesta fase vs. reclassificar `[DESACOPLADO]` com justificativa) via `ask_questions`; **(b)** só então prosseguir com a decisão explicitamente escolhida. É proibido o agente decidir unilateralmente a reclassificação de itens `⚠️`/`[⏳ PENDENTE]` da Matriz De-Para com base apenas em um "prossiga" genérico.
-12. **Invariante de Re-Banner em Transição de Fase (Extensão de R-048)**: Toda transição de um agente estritamente Advisory/Analítico (ex.: `@tech-solution-architect` na Etapa 1/2) para um agente ou papel que passa a **mutar arquivos** (codemod, implementação, criação de entidade/repositório) DEVE emitir um novo banner `Agente Ativo: <domain-router-DESTINO ou specialist-feature-developer>` **antes** da primeira tool call mutativa daquela etapa — mesmo dentro do mesmo workflow e da mesma sessão. É proibido a mesma resposta encadear dezenas de tool calls de implementação sob a identidade do agente analítico anterior sem declarar explicitamente o handoff de execução (mesma classe de violação de `regr-024`).
+12. **Invariante de Re-Banner em Transição de Fase (Extensão de R-048)**: Toda transição de um agente estritamente Advisory/Analítico (ex.: `@tech-solution-architect` na Etapa 1/2) para um agente ou papel que passa a **mutar arquivos** (codemod, implementação, criação de entidade/repositório) DEVE emitir um novo banner `Agente Ativo: <domain-router-DESTINO ou <stack>-developer>` **antes** da primeira tool call mutativa daquela etapa — mesmo dentro do mesmo workflow e da mesma sessão. É proibido a mesma resposta encadear dezenas de tool calls de implementação sob a identidade do agente analítico anterior sem declarar explicitamente o handoff de execução (mesma classe de violação de `regr-024`).
 13. **Invariante de Exaustão de Símbolos e Tríplice Redundância Pós-Migração (WORKFLOW-FRAMEWORK-MIGRATION)**: É terminantemente proibido:
     **(a) Avançar para codemod sem Symbol Exhaustion de 100%**: A Matriz De-Para (Etapa 2) deve ter correspondência auditada mecanicamente via `@codegraph-engine` para 100% dos métodos públicos/privados, queries e nós condicionais do legado. Proibido inventário parcial por mera amostragem de happy path.
     **(b) Aceitar código com omissão silenciosa de AST**: A Etapa 3 exige o Anti-Omission AST Validator no sandbox para comprovar que branches de exceção e tabelas de persistência secundária foram portadas.
@@ -68,7 +68,7 @@ handoff_payload:
 
 ---
 
-16. **Invariante de Proibição Estrita de Terceirização ao Usuário em Etapas Analíticas e Diagnósticas (R-057 / Smell 2.25)**: É expressamente vedado a qualquer agente participante de etapas analíticas, diagnósticas, de auditoria ou triagem (ex.: Etapa 1 de `WORKFLOW-BUG-FIX` com `@bug-triage`, Etapa 1 de `WORKFLOW-GOVERNANCE-MAINTENANCE` com `@agent-auditor`, Etapa 1 de `WORKFLOW-TECHNICAL-ANALYSIS`, etc.), ao constatar falta de ferramentas de escrita ou identificar a necessidade de alterações de código ou governança, encerrar seu turno emitindo instruções para que o usuário execute edições manuais. O agente analítico DEVE compulsoriamente avançar para o checkpoint de aprovação ou transferir deterministamente o controle para o agente executor competente (ex.: `@governance-maintainer`, `@bug-fixer`, `@feature-developer`).
+16. **Invariante de Proibição Estrita de Terceirização ao Usuário em Etapas Analíticas e Diagnósticas (R-057 / Smell 2.25)**: É expressamente vedado a qualquer agente participante de etapas analíticas, diagnósticas, de auditoria ou triagem (ex.: Etapa 1 de `WORKFLOW-BUG-FIX` com `@bug-triage`, Etapa 1 de `WORKFLOW-GOVERNANCE-MAINTENANCE` com `@agent-auditor`, Etapa 1 de `WORKFLOW-TECHNICAL-ANALYSIS`, etc.), ao constatar falta de ferramentas de escrita ou identificar a necessidade de alterações de código ou governança, encerrar seu turno emitindo instruções para que o usuário execute edições manuais. O agente analítico DEVE compulsoriamente avançar para o checkpoint de aprovação ou transferir deterministamente o controle para o agente executor competente (ex.: `@governance-maintainer`, `@<stack>-developer`).
 
 17. **Invariante de Visibilidade Progressiva, Red-Teaming de Solution Space e Painel de Evidências em Síntese de Prompt (WORKFLOW-PROMPT-SYNTHESIS)**: É terminantemente proibido:
     **(a) Execução Blackbox**: Emitir o prompt final diretamente ou apenas a listagem de checkboxes [✅] sem apresentar o Painel de Evidências por Etapa com o detalhamento de cada uma das 5 etapas (Elicitação no Problem Space, Grounding de Arquivos Reais, Mapeamento de Não-Escopo, Síntese de Caching e Quality Gate).
@@ -115,8 +115,8 @@ Para que o usuário nunca fique no escuro quanto ao fluxo em andamento, o `@agen
 ```markdown
 ### 🗺️ Pipeline de Execução: WORKFLOW-BUG-FIX (5 etapas)
 - [▶] **Etapa 1: Triagem & RCA Estruturado (2 Fontes)** → `@bug-triage` *(Em Andamento: 5 Whys/Fishbone, evidência dupla e classificação flaky vs regressão real)*
-- [⏳] **Etapa 2: Red Test de Caracterização & Baseline** → `specialist-unit-test-writer` *(Pendente: teste automatizado que falha comprovando o bug)*
-- [⏳] **Etapa 3: Correção Cirúrgica Mínima** → `specialist-bug-fixer` *(Pendente: blast radius estimado & rollback plan declarados, diff cirúrgico R-002/R-046)*
+- [⏳] **Etapa 2: Red Test de Caracterização & Baseline** → `<stack>-test-engineer` *(Pendente: teste automatizado que falha comprovando o bug)*
+- [⏳] **Etapa 3: Correção Cirúrgica Mínima** → `<stack>-developer` *(Pendente: blast radius estimado & rollback plan declarados, diff cirúrgico R-002/R-046)*
 - [⏳] **Etapa 4: Validação Green Test & Mini Mutation-Check** → `runtime-verifier` *(Pendente: 100% testes passando, linter limpo e mini mutation anti falso-verde)*
 - [⏳] **Etapa 5: Quality Gate, Observação Pós-Fix / Canary & Quality Review Loop (§ 1.5)** → `@code-review` / `@pr-gatekeeper` *(Pendente: revisão final, autorreflexão R-033, loop de qualidade até 3x se achados não-bloqueantes e canary para bugs críticos)*
 ```
@@ -165,7 +165,7 @@ Para que o usuário nunca fique no escuro quanto ao fluxo em andamento, o `@agen
 - [▶] **Etapa 1: Triagem de Vulnerabilidade & Advisory** → `@security-reviewer` *(Em Andamento: análise de CVE, CVSS e changelog)*
 - [⏳] **Etapa 2: Mapeamento de Blast Radius da Dependência** → `@codegraph-engine` *(Pendente: mapa de impacto e consumidores R-045)*
 - [⏳] **Etapa 3: Bump de Manifesto & Sincronização de Lockfile** → `specialist-developer` *(Pendente: atualização de dependências e lockfile)*
-- [⏳] **Etapa 4: Adaptação de Breaking Changes & Compilação** → `specialist-bug-fixer` / `specialist-test-fixer` *(Pendente: compatibilização de APIs e compilação limpa)*
+- [⏳] **Etapa 4: Adaptação de Breaking Changes & Compilação** → `<stack>-developer` / `<stack>-test-engineer` *(Pendente: compatibilização de APIs e compilação limpa)*
 - [⏳] **Etapa 5: Verificação de Regressão, SCA & Quality Review Loop (§ 1.5)** → `runtime-verifier` + `@code-review` + `@security-reviewer` *(Pendente: 100% testes verdes, scan SCA limpo e loop de qualidade até 3x)*
 ```
 
@@ -272,10 +272,10 @@ flowchart LR
 Nenhum workflow mutativo pode deixar o repositório em estado quebrado, sujo ou entrar em loops infinitos de autocorreção.
 
 1. **Orçamento Rígido de Autocorreção (Circuit Breaker)**:
-   - Em `WORKFLOW-BUG-FIX` (Etapa 4), o `specialist-test-fixer` possui um teto absoluto de **3 tentativas** para corrigir testes quebrados (mesmo `max_iteracoes: 3` declarado no sub-catálogo de domínio — precedência de workflow, ver § 3.1 Estado 4).
+   - Em `WORKFLOW-BUG-FIX` (Etapa 4), o `<stack>-test-engineer` possui um teto absoluto de **3 tentativas** para corrigir testes quebrados (mesmo `max_iteracoes: 3` declarado no sub-catálogo de domínio — precedência de workflow, ver § 3.1 Estado 4).
    - Se os testes não passarem na 3ª tentativa, o fluxo **NÃO** prossegue para o Quality Gate nem continua tentando cegamente.
 2. **Ativação Compulsória do Estado de Rollback (Estado 4b) — Separação Declarador/Executor**:
-   - **2a. `WORKFLOW-BUG-FIX` (contrato corrigido)**: o `runtime-verifier` (agente estritamente read-only, sem ferramentas de mutação) apenas DETECTA o esgotamento do teto e DECLARA o veredito de bloqueio. A reversão física dos diffs (`git checkout -- <arquivos>`) é sempre EXECUTADA pelo `specialist-bug-fixer`/`specialist-test-fixer` ativo (que possuem `run_in_terminal` + `insert_edit_into_file`) via `run_subagent` acionado pelo `runtime-verifier`, estritamente amparado pelo `rollback_plan` previamente declarado no Estado 3. **Um agente read-only nunca executa a mutação de rollback diretamente** — essa separação declarador/executor é invariante de arquitetura (ver Seção 5, item 6).
+   - **2a. `WORKFLOW-BUG-FIX` (contrato corrigido)**: o `runtime-verifier` (agente estritamente read-only, sem ferramentas de mutação) apenas DETECTA o esgotamento do teto e DECLARA o veredito de bloqueio. A reversão física dos diffs (`git checkout -- <arquivos>`) é sempre EXECUTADA pelo `<stack>-developer`/`<stack>-test-engineer` ativo (que possuem `run_in_terminal` + `insert_edit_into_file`) via `run_subagent` acionado pelo `runtime-verifier`, estritamente amparado pelo `rollback_plan` previamente declarado no Estado 3. **Um agente read-only nunca executa a mutação de rollback diretamente** — essa separação declarador/executor é invariante de arquitetura (ver Seção 5, item 6).
    - **2b. `WORKFLOW-REFACTORING` (Estado 5b — contrato corrigido)**: o `@refactor-planner` não possui **nenhuma** ferramenta de edição ou terminal em seu frontmatter (nem `run_in_terminal`) — é ainda mais estritamente read-only que o `runtime-verifier`. Ele DETECTA a violação (via relatório `@business-rules-extractor` modo Validate) e DECIDE o escopo do rollback (quais nós do DAG Mikado precisam reverter, com base na árvore de dependências que ele mesmo desenhou no Estado 3 — pode ser rollback parcial dos últimos micro-lotes, não necessariamente do plano inteiro). A EXECUÇÃO física da reversão é sempre delegada, nó a nó, ao domain router/specialist que aplicou aquele nó especificamente (`@angular-router`, `@spring-boot-router`, `@spring-reactive-router`, `@database-router`, `@python-router`, `@struts-router` — cada um reverte apenas os arquivos que executou), registrando compulsoriamente o `blast_radius_revertido` no `workflow_state`.
    - Em ambos os casos, o agente responsável gera um relatório compacto de falha (3 linhas: Causa, Local, Ação sugerida) e aciona `ask_questions` para decisão humana:
      - *Opção A: Ajustar a estratégia de teste manualmente.*
@@ -321,10 +321,10 @@ Com esse bloco, qualquer especialista na cadeia sequencial sabe exatamente onde 
 
 ---
 
-## 10. R-064 — Duplo Gate Documental de Planejamento e Implementação
+## 10. R-064 — Duplo Gate Documental de Planejamento e Implementação Universal
 
-> **Fonte de verdade normativa:** [`CLAUDE.md`](../../CLAUDE.md) § R-064 e [`.github/copilot-instructions.md`](../copilot-instructions.md) § 1.1 e § 2.  
-> **Diretórios canônicos:** [`docs/plans/`](../../docs/plans/README.md) e [`docs/implementation-plans/`](../../docs/implementation-plans/README.md).
+> **Fonte de verdade normativa:** [`CLAUDE.md`](../../../CLAUDE.md) § R-064 e [`.github/copilot-instructions.md`](../../copilot-instructions.md) § 1.1 e § 2.  
+> **Diretórios canônicos:** [`docs/plans/`](../../../docs/plans/README.md) e [`docs/plans/implementation/`](../../../docs/plans/implementation/README.md).
 
 ### 10.1 Princípio Operacional e Estrutura dos Gates
 
@@ -335,35 +335,127 @@ Etapa Inicial (Elicitação / RCA / Escopo)
                    │
                    ▼
   [ GATE 1: PLANO DE PLANEJAMENTO ]
-  ├─ Arquivo: docs/plans/<AAAAMMDD>-<workflow>-<identificador-curto>.md
+  ├─ Arquivo: docs/plans/<tipo>/<AAAAMMDD-HHMMSS>-<workflow>-<identificador-curto>.md
   ├─ Autoria: Especialista analítico/triagem dono da Etapa 1/2
+  ├─ Insumo: Não autoriza alteração de código da aplicação
   ├─ Materialização: Orquestrador Raiz (Flat Delegation R-037/R-042)
   └─ Checkpoint: ask_questions obrigatório (Aprovar / Solicitar Ajustes)
                    │ (Aprovado pelo Usuário)
                    ▼
-  [ GATE 2: PLANO DE IMPLEMENTAÇÃO TÉCNICA ]
-  ├─ Arquivo: docs/implementation-plans/<AAAAMMDD>-<workflow>-<identificador-curto>.md
+  [ GATE 2: PLANO DE IMPLEMENTAÇÃO TÉCNICA (UNIVERSAL) ]
+  ├─ Arquivo: docs/plans/implementation/<AAAAMMDD-HHMMSS>-<workflow>-<identificador-curto>.md
   ├─ Autoria: <stack>-arch-advisor (domínio específico) ou especialista técnico do workflow
+  ├─ Tiers: Tier Full (complexo/alto risco) ou Tier Light (cirúrgico/≤20 linhas/1 arquivo)
   ├─ Materialização: Orquestrador Raiz
   └─ Checkpoint: ask_questions obrigatório (Aprovar / Solicitar Ajustes)
-                   │ (Aprovado pelo Usuário)
+                   │ (Aprovado pelo Usuário -> status: approved, gera plan_ref)
                    ▼
 Etapa de Execução / Mutação de Código (Batch Execution R-046 / R-059)
 ```
 
 ### 10.2 Matriz de Responsabilidade de Autoria por Workflow
 
-| Workflow Canônico | Gate 1: Plano de Planejamento (`docs/plans/`) | Gate 2: Plano de Implementação (`docs/implementation-plans/`) |
+| Workflow Canônico | Gate 1: Plano de Planejamento (`docs/plans/`) | Gate 2: Plano de Implementação (`docs/plans/implementation/`) |
 |---|---|---|
-| **WORKFLOW-BUG-FIX** | `@bug-triage` (RCA, evidências e escopo) | `<stack>-arch-advisor` (ou analítico da stack) |
-| **WORKFLOW-REFACTORING** | `@refactor-planner` (diagnóstico e Mikado DAG) | `<stack>-arch-advisor` (detalhamento técnico de blast radius) |
+| **WORKFLOW-BUG-FIX** | `@bug-triage` (RCA, evidências e escopo como insumo em `docs/plans/`) | `<stack>-arch-advisor` (SEMPRE emite o plano em `docs/plans/implementation/`, podendo ser delta enxuto referenciando o plano do bug-triage) |
+| **WORKFLOW-REFACTORING** | `@refactor-planner` (diagnóstico e Mikado DAG) | `<stack>-arch-advisor` (detalhamento técnico de blast radius e allowlist de arquivos) |
 | **WORKFLOW-FEATURE-DEVELOPMENT** | `@requirements-analyst` / `@tech-solution-architect` | `<stack>-arch-advisor` (arquitetura e etapas técnicas) |
-| **WORKFLOW-GOVERNANCE-MAINTENANCE** | `@agent-auditor` / `@repo-hygiene-auditor` | Especialista analítico do lote (`@governance-maintainer`) |
-| **WORKFLOW-DEPENDENCY-VULNERABILITY** | Especialista de segurança / scan | Especialista analítico de dependências / `<stack>-arch-advisor` |
+| **WORKFLOW-GOVERNANCE-MAINTENANCE** | `@agent-auditor` / `@repo-hygiene-auditor` | Especialista analítico do lote (`@governance-maintainer` ou `@agent-auditor` — plano tipo `governance`) |
+| **WORKFLOW-DEPENDENCY-VULNERABILITY** | Especialista de segurança / scan (`@security-reviewer`) | `<stack>-arch-advisor` (estratégia técnica de adaptação de breaking changes) |
 | **WORKFLOW-FRAMEWORK-MIGRATION** | `@tech-solution-architect` (5D Assessment e De-Para) | `<stack>-arch-advisor` (estratégia técnica de paridade e codemod) |
 
 ### 10.3 Isenções e Regras de Exceção
 
-1. **Fast-Path Determinístico (R-041, Tier 1)**: Para correções pontuais, refatorações com alvo definido e análises diretas, o Plano de Planejamento (`docs/plans/`) pode ser dispensado, mas o **Plano de Implementação (`docs/implementation-plans/`) permanece 100% obrigatório** antes de tocar em código.
-2. **Workflows Read-Only**: `WORKFLOW-TECHNICAL-ANALYSIS`, `WORKFLOW-RELEASE-READINESS` e `WORKFLOW-PROMPT-SYNTHESIS` são isentos do Plano de Implementação (não realizam mutação de código na aplicação), podendo produzir apenas o Plano de Planejamento quando a profundidade analítica demandar alinhamento prévio.
-3. **Zero Discovery pelo Router (R-054)**: O `@agent-router` não gera, não persiste e não inspeciona planos; a materialização física dos arquivos gerados pelos agentes Read-Only é executada pelo Orquestrador Raiz.
+1. **Exceções Formais (Não exigem Plano do Arch-Advisor)**:
+   - **(a) Tarefas Testes-Only**: Autoria ou manutenção exclusiva de suítes de testes (`*-test-engineer` / `@test-strategy`) sem qualquer alteração em código de produção da aplicação. Opera estritamente sob o plano de testes / test-strategy aprovado.
+   - **(b) Documentação Pura (`docs_only`)**: A isenção `isencao_r064: docs_only` aplica-se **exclusivamente** a documentação pura em `docs/**` (exceto `docs/plans/**`), `README.md` ou `CHANGELOG.md`, sendo **estritamente proibida** (`isencao_r064` inválida) quando o escopo tocar `.github/agents/**`, `.github/skills/**`, `.github/prompts/**`, `.github/instructions/**`, `CLAUDE.md`, `AGENTS.md`, `tools/**`, `tests/**` ou arquivos `.py`/`.json`/`.yaml`.
+2. **NÃO São Exceções (Exigem Plano de Implementação R-064)**:
+   - **Hotfix**: Correções urgentes NÃO possuem isenção de plano; são classificadas estritamente em Tier `light` ou Tier `full` conforme os critérios técnicos da regra, gerando plano e exigindo aprovação humana.
+   - **Retry R-053**: Tentativas subsequentes de compilação ou execução dentro do escopo de plano já aprovado reutilizam o mesmo `plan_ref` (sem novo plano). Caso haja mudança de escopo de arquivos ou persistam mais de 2 falhas consecutivas, o fluxo interrompe a execução e retorna ao `<stack>-arch-advisor`.
+3. **Fast-Path Determinístico (R-041, Tier 1)**: Para correções pontuais, refatorações com alvo definido e análises diretas, o Plano de Planejamento (`docs/plans/`) pode ser dispensado, mas o **Plano de Implementação (`docs/plans/implementation/`) permanece 100% obrigatório** antes de tocar em código.
+4. **Workflows Read-Only**: `WORKFLOW-TECHNICAL-ANALYSIS`, `WORKFLOW-RELEASE-READINESS` e `WORKFLOW-PROMPT-SYNTHESIS` são isentos do Plano de Implementação (não realizam mutação de código na aplicação), podendo produzir apenas o Plano de Planejamento quando a profundidade analítica demandar alinhamento prévio.
+5. **Zero Discovery pelo Router (R-054)**: O `@agent-router` e os routers de stack não inspecionam o sistema de arquivos para descobrir planos; eles apenas propagam e exigem o parâmetro `plan_ref` e `status: approved` no payload de despacho downstream.
+
+### 10.4 Pré-condição de Codificação Universal (R-064) & Contrato do Plano
+
+Nenhum agente codificador (desenvolvedores `*-developer`, engenheiros de teste `*-test-engineer` quando alterando código de produção, especialistas de banco de dados `oracle-database-specialist`, `informix-database-specialist`, `database-specialist` ou qualquer codificador de workflows presentes e futuros) pode criar ou editar código sem `plan_ref` de plano de implementação aprovado em `docs/plans/implementation/` elaborado pelo `<stack>-arch-advisor` (ou fallback de governança) e aprovado por humano.
+
+1. **Pré-condição no Codificador (Linha de Guarda)**: Se um agente codificador receber despacho sem `plan_ref` com `status: approved` ou for solicitado a editar arquivo fora da allowlist do plano, deve compulsoriamente abortar a edição e retornar imediatamente ao router com:
+   ```yaml
+   handoff_payload:
+     para: "@<stack>-router" # ou @agent-router
+     motivo: "pre_condicao_plano"
+     contexto:
+       mensagem: "Execução de código bloqueada por ausência de plan_ref aprovado em docs/plans/implementation/ (R-064)"
+   ```
+2. **Contrato do Plano de Implementação (Frontmatter Canônico)**:
+   ```yaml
+   ---
+   status: approved # 'draft' antes do checkpoint, 'approved' após aprovação humana via ask_questions
+   tier: full | light | governance
+   plan_ref: docs/plans/implementation/<AAAAMMDD-HHMMSS>-<workflow>-<identificador>.md
+   allowed_files:
+     - src/main/java/com/exemplo/Service.java
+     - src/main/resources/application.yml
+   rollback_plan:
+     estrategia: git_restore
+     arquivos_afetados: [...]
+   ---
+   ```
+3. **Pós-Fato (Plan Drift Detection)**: Após a execução, o `@code-review` e `@pr-gatekeeper` auditam o diff real contra `allowed_files` e escopo planejado via skill `plan-conformance-patterns`. Qualquer desvio ou adição de arquivo não previsto reabre compulsoriamente o Gate 2 para nova aprovação.
+
+### 10.5 Tiers de Plano de Implementação e Hotfix
+
+A autoria do Plano de Implementação pelo `<stack>-arch-advisor` divide-se em dois níveis técnicos determinísticos:
+
+1. **Tier `full` (Plano Completo)**:
+   - **Gatilhos**: >3 arquivos afetados, OU >1 camada arquitetural, OU migração/schema/DDL de banco de dados, OU autenticação/segurança/dados sensíveis, OU introdução de nova biblioteca/dependência, OU baixa confiança/complexidade alta.
+   - **Estrutura**: Documento estruturado em `docs/plans/implementation/` contendo análise de blast radius, decomposição de tarefas com granularidade micro-batch, dependências, matriz de risco, estratégia de rollback e allowlist de arquivos.
+2. **Tier `light` (Plano Mínimo / Fast Delta)**:
+   - **Gatilhos**: Diff cirúrgico descritível em 1 frase, ≤20 linhas modificadas, 1 único arquivo, 1 única camada, e ausência total dos gatilhos de Tier `full`.
+   - **Estrutura**: Documento conciso em `docs/plans/implementation/` (ou delta enxuto de 1 parágrafo referenciando o plano de triagem) AINDA elaborado pelo `<stack>-arch-advisor` (modo validar delta) com frontmatter canônico e submetido à aprovação humana via `ask_questions`.
+   - **Hotfix**: Correções emergenciais utilizam obrigatoriamente Tier `light` ou `full` segundo seus critérios técnicos — não há exceção sem plano para hotfix.
+
+### 10.6 Stacks sem Arch-Advisor e Fallback Fora de Stack
+
+1. **Codificadores Fora de Stack de Domínio (Fail-Closed R-064)**: Em fluxos de governança (`WORKFLOW-GOVERNANCE-MAINTENANCE`), o plano (`plan_type: "governance"`) é estruturado pelo `@agent-auditor` e obrigatoriamente materializado fisicamente em `docs/plans/governance/<AAAAMMDD-HHMMSS>-governance-maintenance-<slug>.md` (via `@docs-engineer` ou `@governance-maintainer` em modo `DRAFT`) ANTES do checkpoint `ask_questions`. O fluxo opera em modo **Fail-Closed**: nenhuma mutação de lote pode iniciar sem `plan_ref` físico existente em `docs/plans/<tipo>/` com `approved: true`.
+2. **Stack sem Arch-Advisor Dedicado**: Caso uma stack tecnológica do projeto não possua ainda um `<stack>-arch-advisor` especializado no catálogo, adota-se o mesmo fallback explícito: o plano técnico é elaborado pelo especialista analítico disponível ou router de stack, validado por humano e persistido sob o contrato de `docs/plans/implementation/`.
+
+### 10.7 Invariante para Novos Workflows com Etapa de Código
+
+Qualquer novo workflow canônico ou customizado adicionado ao ecossistema que envolva mutação de arquivos de código de aplicação DEVE cumprir compulsoriamente:
+1. Declarar a etapa `implementation_plan_authoring` posicionada estritamente antes de qualquer etapa de codificação no `routing-graph.yaml`.
+2. Declarar a guarda `requires_plan: true` em cada etapa subsequente de edição de código.
+3. Conectar o checkpoint de aprovação humana via `ask_questions` antes de autorizar a entrega do `plan_ref` ao agente executor.
+
+> **Árvore Universal R-064**: Subpastas tipadas canônicas de `docs/plans/<tipo>/`: `docs/plans/feature/`, `docs/plans/refactor/`, `docs/plans/architecture/`, `docs/plans/implementation/`, `docs/plans/test-strategy/`, `docs/plans/bug-triage/`, `docs/plans/requirements/` e `docs/plans/governance/`. O campo `author` registra sempre o `@<agente-planejador>` autor intelectual real (100% Read-Only), a persistência física ocorre via handoff para `@docs-engineer` / `@governance-maintainer`, `@tech-solution-architect` é proibido de materializar documentos no `WORKFLOW-BUG-FIX`, e todo plano exige `plan_type`, `allowed_files`, `status: APPROVED` e `approved: true`.
+
+### Política Anti-Timeout, Runtime Preferencial JavaScript (`fs` nativo) e Circuit Breaker Fail-Fast (`ctx_execute` / `ctx_batch`)
+
+1. **Runtime Obrigatório `language: "javascript"` no `ctx_execute` (Anti-Defender/AMSI Hang)**:
+   - No Windows, a invocação de `python.exe` (`language: "python"` ou `python -c`) ou cadeias pesadas de subshells a partir do processo Node.js do servidor MCP `context-mode` sofre interceptação síncrona pelo Windows Defender (`MsMpEng.exe` / Behavior Monitoring / AMSI), causando bloqueios severos de I/O e timeouts (`ETIMEDOUT` / `taskkill /F /T`).
+   - Portanto, `language: "javascript"` (com módulos nativos `fs` e `path` do Node.js) é o **runtime obrigatório** no `ctx_execute` para leitura, inspeção, busca, parsing JSON/texto e modificação em lote de arquivos.
+   - É **terminantemente proibido** invocar `language: "python"`, `python -c` ou subshells aninhados para I/O de arquivos. (A execução de binários Python via `child_process` é restrita exclusivamente a ferramentas CLI do ecossistema, como `pytest` ou scripts de sincronização canônicos, nunca para ler/editar arquivos).
+2. **Higiene de Comandos em `ctx_batch`**:
+   - Os comandos shell em `ctx_batch` devem ser leves, atômicos e com escopo de diretório estritamente restrito.
+   - É **proibido** disparar `python -c` inline em lote ou varreduras recursivas irrestritas na raiz do workspace sem filtro de pasta/extensão (evitando estourar o orçamento de tempo do batch).
+3. **Política Fail-Fast & Circuit Breaker de Timeout (Máx. 1 Retry com Troca de Estratégia)**:
+   - Em caso de erro de timeout (`ETIMEDOUT`, `timed out`, `taskkill`) em `ctx_execute` ou `ctx_batch`, o agente tem **tolerância zero para repetir a mesma chamada/runtime**.
+   - É permitido no **máximo 1 retry**, contanto que haja **troca obrigatória de estratégia** (migrar de `python`/`shell` para `language: "javascript"` puro com `fs` nativo, ou dividir o lote em comandos menores/escopo restrito).
+   - Se ocorrer um **2º timeout**, o **Circuit Breaker Fail-Fast** abre imediatamente: o agente deve abortar novas tentativas de spawn, registrar a evidência e acionar o fallback canônico ou reportar o bloqueio em formato Compact Error Reporting (R-020).
+
+### Invariante 19 — Clarificação Estruturada via `ask_questions` (R-027)
+
+- **Contrato de UX e Qualidade do `ask_questions` (CA-03, CA-04, CA-05 / R-027)**:
+  - **CA-03 (Padrão Obrigatório do `description`)**: Toda opção DEVE preencher `description` (1–2 frases) no formato `[Consequência prática / O que faz] + [Trade-off principal ou quando escolher]`. Proibido `options` sem `description` ou que apenas repita o `label`.
+  - **CA-04 (Regra da Opção Recomendada — Default Effect)**: Quando houver melhor prática técnica ou arquitetural clara, posicioná-la como **1ª opção** com sufixo `(Recomendado)` no `label` e justificativa técnica no `description`. **Exceção explícita**: decisões puramente de negócio/produto sem alternativa técnica superior NÃO devem forçar `(Recomendado)`.
+  - **CA-05 (Anti-Strawman & Limites Ergonômicos)**: Entre **2 e 4 alternativas reais, viáveis, mutuamente exclusivas e defensáveis** por pergunta (proibido opções espantalho/strawman ou dummy `"Outro"`), **1 a 4 perguntas por chamada**, `header` ≤ 25 caracteres e `allowFreeformInput: true` por padrão (SSOT: `structured-intake-patterns`).
+
+### Exceção Canônica — Slash Prompts Explícitos (`router_bypass: utility | slash_workflow` — R-037 / R-063)
+
+Quando o usuário invocar explicitamente qualquer Slash Prompt (`.github/prompts/<nome>.prompt.md` com `router_bypass: utility` ou `router_bypass: slash_workflow` no frontmatter — todos os Slash Prompts exceto `/agent-router`), o comando já foi selecionado pelo usuário e possui fluxo determinístico próprio; portanto, o Orquestrador Raiz **NUNCA deve invocar `@agent-router`** na triagem inicial, devendo executar diretamente as instruções/fluxo do `.prompt.md` (ou despachar diretamente para o subagente previsto no próprio `.prompt.md`). Para solicitações em chat livre (ou via `/agent-router`), a passagem inicial por `@agent-router` permanece 100% obrigatória (R-037 / R-063).
+
+### 10.7 Quality Gate Universal de Revisão Cética Pré-HITL (`@plan-critic` / ADR-0014)
+
+- **Two-Tier Hybrid Gate antes de `ask_questions` (Gate 1 e Gate 2)**: Todo plano persistido como `DRAFT` nas 8 categorias de `docs/plans/<tipo>/` DEVE passar por: **(Tier 1)** validação estrutural determinística (frontmatter R-064, seções do template, `allowed_files`, isolamento R-043) e **(Tier 2)** revisão cética independente por `@plan-critic` (100% Read-Only sob Context Firewall, recebendo apenas caminho/conteúdo do plano, rubrica `pre-hitl-skeptical-review-rubric.md` e saída do Tier 1).
+- **Política de Iteração e Noise Budget**: Fast-Pass 1x quando Tier 1 = `PASS` e 0 findings `BLOCKER`/`HIGH`; teto máximo de 2 rodadas (3 em `tier: full`); Noise Budget ≤ 5 findings acionáveis (`BLOCKER`/`HIGH` apenas, R-065). Se persistir `BLOCKER` após o teto, marca `review_verdict: ESCALATED_HITL` e apresenta ao humano os bloqueios residuais no `ask_questions`.

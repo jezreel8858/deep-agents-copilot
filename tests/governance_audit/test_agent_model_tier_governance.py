@@ -103,7 +103,7 @@ def test_deve_bloquear_modelo_premium_sem_excecao_documentada_em_agents() -> Non
         f"Violação de R-021: {len(violations)} agent(s) com modelo premium fixo não autorizado:\n"
         + "\n".join(violations),
         fix_hint=(
-            "Altere 'model:' para 'Gemini 3.8 Flash' (operacional/test-writer) ou 'Claude Sonnet 5' "
+            "Altere 'model:' para 'Gemini 3.8 Flash' (operacional/test-writer) ou 'Claude Sonnet 5.5' "
             "(deliberativo/planejamento). Escalonamentos de modelo devem ser PONTUAIS via sinal 🧠 "
             "em run_subagent (R-021), nunca fixados permanentemente no catálogo. Para exceções "
             "arquiteturais estritas, adicione 'model_exception_reason: \"<justificativa>\"' no frontmatter."

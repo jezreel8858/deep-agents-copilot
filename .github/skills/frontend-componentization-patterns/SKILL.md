@@ -1,8 +1,6 @@
 ---
 name: frontend-componentization-patterns
-description: >-
-  Padrões genéricos de componentização frontend para reduzir acoplamento, aumentar
-  reutilização e melhorar manutenibilidade sem depender de framework específico.
+description: "Define diretrizes e padrões para padrões genéricos de componentização frontend para reduzir acoplamento, aumentar reutilização e melhorar manutenibilidade sem depender de framework específico. Use quando atuar em componentização frontend, quebrar componente grande, design de componente reutilizável. Não use para tarefas fora do escopo de frontend-componentization-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: process
 triggers:
@@ -14,13 +12,16 @@ triggers:
 source_docs:
   - .github/skills/test-implementation-frontend/SKILL.md
   - .github/skills/frontend-visual-feedback-loop/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
 ---
 
 # Frontend Componentization Patterns
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `frontend-componentization-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando Usar
 

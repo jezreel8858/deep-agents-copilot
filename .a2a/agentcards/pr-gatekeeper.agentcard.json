@@ -3,8 +3,8 @@
   "protocol": "A2A/1.0.0",
   "id": "pr-gatekeeper",
   "name": "Pr Gatekeeper",
-  "version": "1.3.0",
-  "description": "Prepara submissao de PR pos-aprovacao do quality gate — sintetiza diff, aplica guardrail de segredos e template semantico SSOT (/commit), gera titulo e descricao de PR com matriz de risco e atualiza CHANGELOG.md. Nunca executa git add/commit/push (R-031).",
+  "version": "2.0.0",
+  "description": "Orquestra submissao de PR pos-aprovacao do quality gate — sintetiza diff, aplica guardrail de segredos, gera commit, titulo/descricao de PR (matriz de risco e plano de rollback) e CHANGELOG.md conforme a skill git-governance (SSOT). Nunca executa git add/commit/push (R-031).",
   "domain": "Preparacao de entrega (PR/commit/changelog)",
   "role": "gatekeeper",
   "capabilities": [
@@ -18,20 +18,25 @@
     "git-governance",
     "agent-contracts",
     "terminal-governance",
-    "git-conflict-resolution-patterns"
+    "git-conflict-resolution-patterns",
+    "embedded-runtime-governance",
+    "jira-mcp",
+    "jira-writing-patterns"
   ],
   "tools": [
     "grep_search",
     "file_search",
     "list_dir",
     "run_in_terminal",
-    "context-mode/ctx_batch_execute",
-    "context-mode/ctx_execute",
+    "context-mode/ctx_batch",
     "ask_questions",
     "run_subagent",
     "context-mode/ctx_search",
-    "context-mode/ctx_execute_file",
-    "context-mode/ctx_index"
+    "context-mode/ctx_index",
+    "mcp-atlassian/jira_get_issue",
+    "mcp-atlassian/jira_search",
+    "mcp-atlassian/jira_add_comment",
+    "mcp-atlassian/jira_transition_issue"
   ],
   "security_profile": {
     "tool_zones": [
@@ -42,7 +47,7 @@
     "data_sensitivity": "internal"
   },
   "model_preferences": {
-    "recommended_model": "Gemini 3.8 Flash",
+    "recommended_model": "Gemini 4 Argon",
     "cost_tier": "1x"
   },
   "input_contract": {

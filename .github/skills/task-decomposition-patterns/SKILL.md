@@ -1,11 +1,6 @@
 ---
 name: task-decomposition-patterns
-description: >
-  Padrões consolidados de decomposição de tarefas complexas em subtasks —
-  decomposição sequencial/hierárquica/paralela, granularidade ideal (2-3 níveis),
-  rastreamento de dependências e validação antes de execução. Base para
-  planejamento genérico de features (distinto de refactor-planner, que é
-  específico para refatoração de código existente).
+description: "Define diretrizes e padrões para padrões consolidados de decomposição de tarefas complexas em subtasks — decomposição sequencial/hierárquica/paralela, granularidade ideal (2-3 níveis), rastreamento de dependências e validação antes de execução. Base para planejamento genérico de features (distinto de refactor-planner, que é específico para refatoração de código existente). Use quando atuar em decompor tarefa, quebrar em subtarefas, task decomposition. Não use para tarefas fora do escopo de task-decomposition-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: process
 triggers:
@@ -17,7 +12,12 @@ triggers:
   - "granularidade de tarefa"
   - "dependência entre tarefas"
   - "plano de execução"
-source_docs_lazy:
+  - "gatilho de replanejamento"
+  - "replanejamento tático"
+  - "tier de reversibilidade do plano"
+  - "grounding factual do plano"
+source_docs:
+  - .github/agents/codegraph-engine.agent.md
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
@@ -26,6 +26,10 @@ tools: []
 # Task Decomposition Patterns
 
 > Base de conhecimento para agents que decompõem requisitos/features complexas em subtasks executáveis — distinto de `refactor-planner` (específico para refatoração de código existente com foco em risco/rollback).
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `task-decomposition-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando Usar
 
@@ -93,6 +97,30 @@ tools: []
 - **Respeito à Fronteira**: Sempre priorizar o avanço das tarefas da fronteira ativa (aquelas com todas as arestas bloqueantes já resolvidas).
 - **Sem Snippets Instáveis**: Evitar colar blocos grandes de código efêmero nas descrições de subtasks; focar no comportamento observável e decisões de design consolidadas.
 
+## 3.2) Taxonomia de Gatilhos de Replanejamento (`replan_node`) e Replanejamento Tático Leve
+
+Durante a execução de um plano já aprovado, o agente executor DEVE monitorar continuamente por sinais que invalidem premissas do plano original. Ao detectar qualquer gatilho abaixo, aplicar o **Protocolo de Replanejamento Tático Leve**: um nó localizado de recálculo de subtasks (`replan_node`) que ajusta apenas o trecho afetado do grafo de tarefas — **nunca** abortar ou reiniciar o workflow completo.
+
+| Gatilho | Sintoma Observável | Ação do `replan_node` |
+|---|---|---|
+| **Contradição de Premissa** | Fato assumido no plano (API, schema, contrato) diverge do estado real do código | Recalcular apenas as subtasks dependentes da premissa invalidada |
+| **Obsolescência** | Plano foi aprovado há mais de 1 sessão/ciclo e o código-base mudou de forma não prevista no blast radius original | Revalidar blast radius via `@codegraph-engine` antes de retomar a fronteira ativa |
+| **Deriva de Escopo** | Subtask em execução exige arquivo/módulo fora da allowlist original sem decisão prévia | Isolar o desvio, registrar justificativa e, se o escopo crescer, re-submeter apenas o incremento via `ask_questions` |
+| **Novo Caminho Crítico** | Dependência bloqueante não mapeada surge no meio da execução (nova aresta no grafo) | Reordenar a fronteira ativa priorizando o novo bloqueador, sem descartar subtasks já convergidas |
+
+**Regras do Protocolo**:
+- O `replan_node` opera com escopo mínimo: afeta somente as subtasks a jusante do gatilho detectado (nunca reabre subtasks já concluídas e validadas).
+- Replanejamento tático é um **evento documentado**, não silencioso: registrar o gatilho, a subtask afetada e o ajuste aplicado no plano de implementação em execução.
+- Replanejamento tático leve **não substitui** um novo Plano de Planejamento (R-064) quando a Deriva de Escopo ultrapassa o blast radius aprovado — nesse caso, escalar para `plan-conformance-patterns` (Nível 1/2) e `ask_questions`.
+
+## 3.3) Grounding Factual via Knowledge Graph de Código (Anti-Alucinação de Planejamento)
+
+Toda subtask gerada que referencie símbolos, dependências ou contratos de código existente DEVE ser fundamentada (*grounded*) em uma fonte factual verificável antes de ser incluída no plano — nunca inferida apenas pelo nome do arquivo ou por convenção assumida.
+
+- **Fonte primária de verdade**: o grafo de conhecimento de código (`codegraph`/KG) exposto por `@codegraph-engine` (operações `diff-impact`/`fn-impact`/`symbol-lookup`). Toda alegação sobre dependência, fan-in/fan-out ou contrato de API referenciada em uma subtask deve ser verificável por essa fonte.
+- **Proibido**: declarar dependência, assinatura de método ou efeito colateral de código existente sem consulta prévia ao KG — tratar como lacuna explícita (`.github/skills/documentation-writing-patterns/SKILL.md` § 5) quando a verificação não for possível.
+- **Consolidação em lote**: toda consulta de grounding ao KG necessária para decompor um plano deve ser batelada em uma única chamada consolidada (`run_subagent` para `@codegraph-engine` ou `ctx_batch`), nunca em consultas unitárias sequenciais por subtask (R-046/R-060).
+
 ## 4) Validação de Dependências (Antes de Executar)
 
 - [ ] Toda subtask tem entrada e saída claramente definidas.
@@ -124,6 +152,14 @@ tools: []
 - <lista objetiva>
 ```
 
+## 5.1) Contrato de Plano R-064 — `feature` e `architecture`
+
+- **`plan_type: feature`** → `docs/plans/feature/` (decomposição de feature por `@feature-planner`).
+- **`plan_type: architecture`** → `docs/plans/architecture/` (blueprint macro de `@tech-solution-architect` e `<stack>-arch-advisor`).
+- Frontmatter YAML comum R-064 obrigatório (`status`, `approved`, `author`, `plan_type`, `created_at`, `related-planning-doc`, `allowed_files`).
+- Planejador/advisor **100% Read-Only**: emite o plano no template; `@docs-engineer` materializa o `.md` no step de persistência.
+- Template completo: `references/plan-template-feature.md`.
+
 ## 6) Anti-Padrões
 
 - ❌ Decompor além de 3 níveis sem necessidade real (overhead de coordenação).
@@ -132,6 +168,18 @@ tools: []
 - ❌ Confundir decomposição de feature nova (este skill) com planejamento de refactor de código existente (`refactor-planner`, que tem foco em risco/rollback).
 - ❌ Gerar plano sem validar dependências circulares.
 
+## 7) Reversibility Tiers (T1/T2/T3) e Matriz de Rollback
+
+Toda subtask e todo plano de decomposição DEVE classificar seu nível de reversibilidade antes da execução, para calibrar o rigor de confirmação exigido e o mecanismo de rollback aplicável. Esta é a taxonomia canônica reutilizada por `plan-conformance-patterns` e `refactoring-planning-patterns` (evitar redefinição divergente — R-055).
+
+| Tier | Definição | Exemplos | Confirmação Exigida | Rollback |
+|---|---|---|---|---|
+| **T1 — In-Memory/Scratchpad** | Estado efêmero, não persistido fora da sessão/sandbox | Rascunho de plano, variável de contexto, arquivo temporário em sandbox `ctx_execute` | Nenhuma (reversível por descarte) | Descartar o estado em memória |
+| **T2 — Local Git-Reversível** | Mutação de arquivo versionado no workspace local | `insert_edit_into_file`, `create_file`, commit local não publicado | Padrão (checklist de saída da subtask) | `git revert`/`git reset` local |
+| **T3 — Mutação Externa/Banco/Deploy** | Efeito que atravessa a fronteira do workspace local (banco de dados, deploy, API externa, infraestrutura) | Migration de schema, deploy em ambiente compartilhado, chamada a serviço externo com efeito colateral | **Estrita** — confirmação humana explícita via `ask_questions` antes de executar | Estratégia de rollback dedicada por camada (ver matriz multicamada em `refactoring-planning-patterns/SKILL.md` §5) — nunca assumir `git revert` como suficiente |
+
+**Regra de Anotação**: todo Plano de Implementação Técnica (R-064) DEVE declarar o metadado `[Reversibilidade: T1|T2|T3]` por subtask ou, no mínimo, o tier mais alto presente no documento (ver `documentation-writing-patterns/SKILL.md` § 2.1).
+
 ## Checklist de Saída
 
 - [ ] Objetivo de alto nível declarado.
@@ -139,10 +187,13 @@ tools: []
 - [ ] Dependências mapeadas e validadas (sem circularidade).
 - [ ] Marcação `[P]`/`[S]` por subtask (paralelo/sequencial, conforme R-018).
 - [ ] Critério de pronto objetivo por subtask e para o todo.
+- [ ] Gatilhos de replanejamento monitorados durante a execução; Replanejamento Tático Leve (`replan_node`) aplicado sem abortar o workflow completo, quando detectado.
+- [ ] Toda subtask com referência a código existente fundamentada via grafo de conhecimento de código (`@codegraph-engine`), sem inferência não verificada.
+- [ ] Tier de reversibilidade (T1/T2/T3) classificado por subtask ou para o plano como um todo.
 
 ## Referências
 
 - Padrões Planner-Worker e decomposição hierárquica (AgentOrchestra, 2026).
 - Cockburn — níveis "sea/sub-functional" de decomposição de user stories.
 - Prática de mercado: granularidade 2-3 níveis como regra geral para custo-benefício de coordenação.
-
+- `references/plan-template-feature.md` — template de plano `feature`/`architecture` (R-064).

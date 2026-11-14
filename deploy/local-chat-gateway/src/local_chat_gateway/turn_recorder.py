@@ -100,7 +100,7 @@ class AcumuladorDeTurno:
     # o badge de creditos no chat (2026-10-03, paridade com o plugin
     # Copilot da IDE, que mostra "<Modelo> · <N> Credits" ao final de cada
     # resposta). Distinto de `agent_model` (nome AMIGAVEL declarado no
-    # frontmatter do `.agent.md`, ex.: "Claude Sonnet 5") -- `sdk_session.
+    # frontmatter do `.agent.md`, ex.: "Claude Sonnet 5.5") -- `sdk_session.
     # stream_chat_ag_ui` prefere `agent_model` quando disponivel (mais
     # legivel) e cai para este campo tecnico como fallback.
     modelo_usado_real: str | None = None

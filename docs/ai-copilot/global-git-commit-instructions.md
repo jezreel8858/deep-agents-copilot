@@ -1,354 +1,208 @@
-# Diretrizes Globais para Mensagens de Commit (Copilot)
+---
+title: Guia Rápido de Git Commits e Governança
+description: Referência rápida de Conventional Commits e governança Git para desenvolvedores, alinhada à SSOT normativa git-governance.
+type: reference
+status: active
+ssot_reference: .github/skills/git-governance/SKILL.md
+last_updated: 2026-10-08
+---
 
-> **Referência rápida:**
-> `tipo(escopo): resumo no imperativo (máx. 72 chars)` → corpo (máx. 72 chars/linha) → rodapé
-> Execute `git status` **uma única vez** antes de gerar qualquer mensagem.
+# Guia Rápido de Git Commits e Governança
+
+> **SSOT Normativa do Repositório**:  
+> A especificação técnica canônica e obrigatória para agentes de IA e automações de CI/CD reside na skill [`.github/skills/git-governance/SKILL.md`](../../.github/skills/git-governance/SKILL.md) e em seus módulos em [`.github/skills/git-governance/references/`](../../.github/skills/git-governance/references/).  
+> Este documento é o **guia prático de consulta rápida para desenvolvedores humanos**, assegurando alinhamento imediato aos padrões do projeto sem divergências normativas.
 
 ---
 
-## 1. Idioma e Padrão
+## 1. Mapa de Referências Normativas (SSOT)
 
-- Toda mensagem de commit **deve ser em Português do Brasil**.
-- Siga o padrão **Conventional Commits**.
-- Tipos válidos e quando usá-los:
+Para detalhes normativos e regras automatizadas consumidas por ferramentas e agentes, consulte diretamente a documentação especializada:
+
+| Necessidade | Módulo Canônico | Descrição |
+|---|---|---|
+| Formatos A/B, tipos e atomicidade | [`commit-formats.md`](../../.github/skills/git-governance/references/commit-formats.md) | Regras completas de estrutura, quebra de contratos e trailers. |
+| Template de PR e Rollback | [`pr-template.md`](../../.github/skills/git-governance/references/pr-template.md) | Estrutura obrigatória de PR com plano de reversão e checklist. |
+| Avaliação de Risco e Blast Radius | [`risk-matrix.md`](../../.github/skills/git-governance/references/risk-matrix.md) | Matriz de classificação de risco e raio de impacto da alteração. |
+| Prevenção contra Vazamento de Segredos | [`secrets-guardrail.md`](../../.github/skills/git-governance/references/secrets-guardrail.md) | Defesa em 3 camadas, regexes proibidas e bloqueio em CI/agentes. |
+| Registro no Histórico de Mudanças | [`changelog.md`](../../.github/skills/git-governance/references/changelog.md) | Padrão Keep a Changelog 1.1 e mapeamento semântico de commits. |
+
+---
+
+## 2. Anatomia da Mensagem de Commit
+
+Todo commit no repositório segue o padrão **Conventional Commits**:
+
+```text
+<tipo>(<escopo>): <resumo curto no imperativo>
+
+- Descrição narrativa do que foi alterado e do porquê (wrap em máx. 72 colunas).
+
+Arquivos modificados / adicionados / removidos:
+- caminho/do/Arquivo.ts — o que mudou e por quê
+
+Como validar:
+- <comando executável de teste ou verificação>
+
+Rodapé opcional (Trailers):
+BREAKING CHANGE: <descrição do impacto>
+Closes #123
+```
+
+### 2.1 Regras de Redação do Título
+
+1. **Idioma**: sempre em **Português do Brasil (PT-BR)**.
+2. **Resumo (Título)**:
+   - Verbo no **imperativo**: `adiciona`, `corrige`, `atualiza`, `remove`, `refatora`, `migra`, `documenta`, etc.
+   - **Sem ponto final** ao término do título.
+   - Limite estrito de **72 caracteres**.
+3. **Escopo**: substantivo conciso em `kebab-case` indicando o módulo, camada ou domínio afetado (ex.: `auth`, `api`, `deps`, `governance`, `ui`).
+4. **Breaking Changes**: utilize `!` antes dos dois pontos (ex.: `feat(api)!: altera schema da rota /login`) **ou** declare o trailer `BREAKING CHANGE:` no rodapé — nunca utilize ambos simultaneamente.
+
+### 2.2 Estrutura do Corpo e Trailers
+
+- **Wrap de 72 colunas**: limite cada linha a 72 caracteres para legibilidade no `git log`.
+- **Foco no Porquê**: contextualize a motivação da mudança, não apenas a listagem técnica de arquivos.
+- **Trailers válidos**: dados reais como `BREAKING CHANGE: <desc>`, `Closes #123`, `Refs #456`, `Co-authored-by: Nome <email>`.
+
+---
+
+## 3. Tipos de Commit Válidos
+
+### 3.1 Tabela de Tipos Convencionais
 
 | Tipo | Quando usar |
 |---|---|
-| `feat` | Nova funcionalidade visível ao usuário/sistema |
-| `fix` | Correção de bug com impacto funcional |
-| `refactor` | Reestruturação de código sem alterar comportamento externo |
-| `test` | Adição, correção ou remoção de testes |
-| `docs` | Alterações exclusivas em documentação (`.md`, comentários, JSDoc) |
-| `chore` | Manutenção sem impacto funcional (deps, scripts, configs, dead code) |
-| `perf` | Otimização mensurável de performance |
-| `build` | Mudanças no sistema de build (`pom.xml`, `package.json`, `Dockerfile`) |
-| `ci` | Mudanças em pipelines de CI/CD |
-| `style` | Formatação pura (espaços, vírgulas) sem mudança de lógica |
-| `revert` | Reversão de commit anterior |
-| `wip` | Progresso parcial; **nunca fazer merge direto na branch principal** |
+| `feat` | Nova funcionalidade voltada ao usuário ou sistema |
+| `fix` | Correção de bug com alteração de comportamento externo |
+| `refactor` | Reestruturação de código sem alteração funcional externa |
+| `test` | Criação, ajuste ou exclusão de suítes de testes |
+| `docs` | Alterações exclusivas em documentação (`.md`, JSDoc, comentários) |
+| `chore` | Manutenções gerais (tarefas auxiliares, dependências, configs, dead code) |
+| `perf` | Melhoria mensurável de performance ou consumo de recursos |
+| `build` | Alterações no sistema de build (`package.json`, `Dockerfile`, `pom.xml`) |
+| `ci` | Alterações em pipelines de integração contínua e automações |
+| `style` | Ajustes de formatação pura (espaçamentos, lint) sem impacto de lógica |
+| `revert` | Reversão explícita de commit anterior |
+| `wip` | Trabalho em progresso temporário (**vedado merge direto na branch principal**) |
 
-- Estrutura obrigatória:
-  ```
-  tipo(escopo): resumo curto no imperativo
+### 3.2 Classificação de Exclusões
 
-  Corpo opcional — o que mudou e por quê. (máx. 72 chars/linha)
-
-  Rodapé opcional — BREAKING CHANGE: ... | Closes #123
-  ```
-
----
-
-## 2. Pré-requisitos Obrigatórios
-
-> **Execute SEMPRE antes de gerar a mensagem:**
-
-1. Rode `git status` **uma única vez** para ver os arquivos staged e não-staged.
-2. Baseie a mensagem **apenas** no que estiver em stage (`Changes to be committed`).
-3. Se nenhum arquivo estiver staged, oriente o usuário a fazer `git add ...` — **nunca invente alterações**.
-4. Se houver dúvida sobre o conteúdo de um arquivo modificado, leia-o antes de descrevê-lo.
-5. Se o commit implementa um plano documentado (ex: `PLANO_FUNCIONALIDADE.md`), referencie-o no corpo.
-
----
-
-## 3. Escopo e Granularidade
-
-- Commits devem ser **coerentes e atômicos**: uma mudança lógica por commit.
-- **Backend e frontend** em projetos separados → gerar **uma mensagem por projeto**.
-    - Exemplo: `feat(api): ...` e `feat(web): ...`
-- Não misturar `docs` com `feat/fix` no mesmo commit, salvo quando a documentação for entrega obrigatória da funcionalidade.
-
-### Quando dividir em múltiplos commits
-
-| Situação | Ação recomendada |
-|---|---|
-| Schema de banco + lógica de negócio + UI | Commits separados por camada |
-| Refatoração independente de nova feature | Commit de `refactor` antes do `feat` |
-| Hotfix aplicado junto com feature em desenvolvimento | Separar em `fix` + `feat` |
-| Mudança de dependência + uso da nova API | `build` + `feat` separados |
-
----
-
-## 4. Como Escrever o Resumo (título)
-
-- Verbo no **imperativo**: `adiciona`, `corrige`, `atualiza`, `remove`, `refatora`, `documenta`, `implementa`, `extrai`, `elimina`, `exclui`, `migra`, `expõe`, `protege`.
-- Máximo de **72 caracteres** no título.
-- **Evite:**
-    - Palavras vagas: "ajustes", "mudanças", "update", "fix stuff"
-    - Nomes de variáveis ou detalhes de implementação
-    - Frases sem contexto: "resolve bug", "melhora código"
-    - Emojis no título — prejudicam rastreabilidade em ferramentas de CI e `grep`
-
-### Tipo correto para exclusões
+Ao remover código ou arquivos, classifique com o tipo semântico preciso:
 
 | Situação da exclusão | Tipo recomendado |
 |---|---|
-| Classe substituída por outra (renomeação, decomposição) | `refactor` |
-| Código morto, orphan, nunca mais usado | `chore` |
-| Arquivo de teste desnecessário/duplicado | `test` |
-| Arquivo de configuração obsoleto | `chore` |
-| Remoção de feature completa | `feat` (com `BREAKING CHANGE`) |
-| Remoção de código deprecado após migração | `refactor` |
+| Classe/módulo substituído por novo design | `refactor` |
+| Código morto, arquivo órfão ou legado sem uso | `chore` |
+| Teste unitário ou suíte duplicada/desnecessária | `test` |
+| Arquivo de configuração ou dependência obsoleta | `chore` |
+| Remoção intencional de funcionalidade com quebra | `feat` (com `BREAKING CHANGE`) |
+| Remoção de elemento deprecado pós-janela de migração | `refactor` |
 
 ---
 
-## 5. Estrutura do Corpo
+## 4. Atomicidade e Regras de Escopo
 
-> **Regra de formatação:** cada linha do corpo deve ter no máximo **72 caracteres** para garantir legibilidade no `git log` e em ferramentas de revisão.
+- **Uma intenção lógica por commit**: cada commit deve representar uma unidade indivisível e coerente.
+- **O Teste do "e"**: se a mensagem precisa da conjunção "e" para juntar frentes não correlatas (ex.: "adiciona rota de login *e* corrige bug no carrinho"), divida o trabalho em múltiplos commits.
+- **Separação de Camadas e Monorepos**:
+  - Evite misturar commits de documentação (`docs`) com código funcional (`feat`/`fix`), a menos que a documentação componha a entrega obrigatória da funcionalidade.
+  - Em projetos desacoplados (ex.: `apps/web` e `services/api`), gere commits com escopos dedicados por aplicação.
 
-### 5.1 — Commits Simples (1 a 5 arquivos)
+---
 
-Liste cada arquivo com uma descrição objetiva. Use apenas as seções que se aplicam:
+## 5. Formatos de Mensagem
+
+Conforme definido na skill [`commit-formats.md`](../../.github/skills/git-governance/references/commit-formats.md), escolha o formato proporcional ao escopo:
+
+### 5.1 Formato A: Commits Simples (1 a 5 arquivos)
+
+Recomendado para a maioria das alterações cotidianas:
 
 ```text
-tipo(escopo): resumo curto em português
+tipo(escopo): resumo conciso no imperativo
 
-- Descrição narrativa do que foi feito e por quê.
-
-Arquivos adicionados:
-- caminho/do/NovoComponente.java — por que foi criado.
+- Explicação objetiva do contexto e impacto da alteração.
 
 Arquivos modificados:
-- caminho/do/ComponenteExistente.java — o que foi alterado.
-
-Arquivos removidos:
-- caminho/do/ComponenteObsoleto.java — por que foi removido; substituído por X (se aplicável).
+- caminho/do/Arquivo.ts — o que mudou e por quê
 
 Como validar:
-- mvn -Dtest=NomeDoTesteTest test > logs/test-run.out 2>&1
+- npm test -- path/to/arquivo.spec.ts
 ```
 
-> **Regra para arquivos removidos:** sempre explique o **motivo** da exclusão e, quando aplicável, qual classe/arquivo assumiu a responsabilidade. Nunca deixe a remoção sem contexto.
+### 5.2 Formato B: Commits Complexos (6+ arquivos ou múltiplas frentes)
 
----
-
-### 5.2 — Commits Complexos (6+ arquivos ou múltiplas funcionalidades)
-
-Quando o commit envolver muitos arquivos, **agrupe por categoria funcional** em vez de listar cada arquivo individualmente. Isso torna a mensagem legível e rastreável sem ser exaustiva.
+Recomendado para grandes refatorações, migrações de arquitetura ou novos módulos. Agrupe os arquivos por responsabilidade lógica usando marcadores visuais:
 
 ```text
-tipo(escopo): resumo curto em português
+tipo(escopo): resumo consolidado no imperativo
 
-- Descrição narrativa consolidada: o que o conjunto de mudanças entrega
-  e por que foi feito dessa forma.
+- Descrição narrativa do objetivo e da abordagem adotada.
+- Referência a plano ou issue quando aplicável (ex.: Plano de Modernização).
 
-─── Novos arquivos ──────────────────────────────────────────────────
-  [Grupo A — Nome da funcionalidade/camada]
-  - ArquivoExemplo1.java — responsabilidade/objetivo
-  - ArquivoExemplo2.java — responsabilidade/objetivo
+─── Novos arquivos ──────────────────────────────────────
+  [Domínio / Camada]
+  - caminho/NovoComponente.ts — responsabilidade da nova classe
 
-  [Grupo B — Testes]
-  - ArquivoExemplo1Test.java — o que é coberto
+─── Arquivos modificados ────────────────────────────────
+  [Infraestrutura / Serviços]
+  - caminho/ServicoExistente.ts — delega execução para novo componente
 
-─── Arquivos modificados ────────────────────────────────────────────
-  [Grupo C — Nome da camada/contexto]
-  - ArquivoExemplo3.java — o que foi alterado e por quê (resumido)
-  - ArquivoExemplo4.java — o que foi alterado e por quê (resumido)
+─── Arquivos removidos ──────────────────────────────────
+  [Legado / Obsoleto]
+  - caminho/ComponenteAntigo.ts — removido; substituído por NovoComponente.ts
 
-  [Grupo D — Documentação]
-  - docs/GUIA.md        — seções adicionadas/atualizadas
-
-─── Arquivos removidos ──────────────────────────────────────────────
-  [Grupo E — Motivo da exclusão]
-  - ArquivoAntigo.java  — substituído por ArquivoExemplo1.java (motivo)
-  - CodigoInativo.java  — código morto; sem uso desde refatoração X
-
-─── Breaking changes ────────────────────────────────────────────────
-  (omitir esta seção se não houver quebra de contrato)
-  - Descreva o que quebrou e como migrar.
+─── Breaking changes ────────────────────────────────────
+  (omitir caso não haja quebra de contrato)
 
 Como validar:
-- mvn -Dtest=SuiteOuClasseTest test > logs/test-run.out 2>&1
-  (ou o comando equivalente para o projeto)
+- npm run test:unit
 ```
 
-**Regras para commits complexos:**
-- Agrupe por responsabilidade, não por pasta (ex: "Infraestrutura de Dados", "Testes de Integração", "Documentação").
-- Arquivos com mudanças óbvias pelo contexto do grupo podem ter descrição reduzida a uma palavra-chave.
-- **Para arquivos removidos:** indique sempre o motivo — substituição, dead code, merge em outra classe, deprecação concluída.
-- Se o commit implementa um plano rastreável (ex: `PLANO_MIGRACAO.md`), referencie-o no corpo.
-- Mantenha os separadores visuais (`───`) para facilitar a leitura no histórico do Git.
-- Omita seções que não tiverem arquivos (ex: sem remoções → omite `─── Arquivos removidos`).
+> **Regra de Ouro para Arquivos Removidos:** nunca liste uma remoção sem declarar o **motivo** e o **substituto** (se houver).
 
 ---
 
-## 6. Seção "Como validar" (obrigatória para feat/fix/refactor)
+## 6. Instruções de Validação ("Como validar")
 
-- Sempre inclua o comando de teste ou verificação que o revisor deve executar.
-- **Backend (Maven):**
-  ```bash
-  mvn -Dtest=NomeDoTesteTest test > logs/test-run.out 2>&1
-  mvn -pl <modulo> test > logs/test-run.out 2>&1   # módulo específico
-  mvn test > logs/test-run.out 2>&1                # suite completa
-  ```
-- **Frontend (Angular/Vitest):**
-  ```bash
-  npm test
-  ng test --watch=false
-  ```
-- Para `docs` e `chore` sem impacto de teste, use: `Como validar: N/A — alteração sem impacto em testes.`
+O bloco `Como validar:` é **obrigatório** em commits dos tipos `feat`, `fix` e `refactor`.
+- Forneça o comando exato em linha de comando para reprodução rápida.
+- Exemplos:
+  - `npm test -- src/auth/auth.service.spec.ts`
+  - `mvn -pl modulo-core test -Dtest=UsuarioServiceTest`
 
 ---
 
-## 7. Rodapés e Trailers
+## 7. Guardrails de Governança e Segurança
 
-Use trailers padronizados no rodapé quando necessário:
-
-```text
-BREAKING CHANGE: descreva o que quebrou e como migrar.
-Closes #123
-Refs #456
-Co-authored-by: Nome Sobrenome <email@exemplo.com>
-Reviewed-by: Nome Sobrenome <email@exemplo.com>
-```
-
-| Trailer | Quando usar |
-|---|---|
-| `BREAKING CHANGE:` | Mudança que quebra contrato público (API, interface, schema) |
-| `Closes #N` | Issue/ticket resolvido **totalmente** por este commit |
-| `Refs #N` | Issue/ticket relacionado mas não fechado por este commit |
-| `Co-authored-by:` | Pair programming ou contribuição de outra pessoa |
-
-> `BREAKING CHANGE:` no rodapé é equivalente ao `!` no título (`feat!:`) — use um dos dois, não ambos.
+1. **Prevenção Absoluta contra Vazamento de Segredos (R-010 / R-044)**:
+   - Nunca inclua senhas, tokens de API, chaves privadas ou certificados no histórico do Git.
+   - Consulte o módulo [`secrets-guardrail.md`](../../.github/skills/git-governance/references/secrets-guardrail.md) para detalhes de proteção e remediação em caso de incidente.
+2. **Autonomia de Agentes de IA (R-031)**:
+   - Assistentes virtuais e agentes de IA **nunca executam `git commit` ou `git push` de forma autônoma**.
+   - O agente gera e propõe a mensagem padronizada; a revisão, confirmação e execução cabem exclusivamente ao desenvolvedor humano.
+3. **Rebase e Merge**:
+   - Commits `wip:` **nunca devem entrar na branch principal**; faça squash ou reword antes da abertura do PR.
+   - Evite rebase destrutivo em branches públicas/compartilhadas.
+   - Utilize squash merge para features pequenas (1 a 3 commits) e merge commit para releases consolidadas.
 
 ---
 
-## 8. Commits WIP (Work In Progress)
+## 8. Aplicação Segura no Terminal
 
-Para salvar progresso sem intenção de revisão imediata:
+Para preservar quebras de linha e blocos estruturados sem problemas de escape no terminal, aplique o commit via bloco heredoc:
 
-```text
-wip(escopo): descreve o estado parcial do trabalho
+```bash
+git commit -F - << 'EOF'
+feat(auth): adiciona validação de token jwt expirado
 
-- O que está feito e o que ainda falta implementar.
-- Este commit será squashed antes do merge.
-```
-
-> **Nunca faça merge de commit `wip:` diretamente na branch principal.**
-> Sempre faça `git rebase -i` para squash ou reword antes do PR.
-
----
-
-## 9. Exemplos de Referência
-
-### Commit Simples — `fix`
-```text
-fix(sessao): corrige renovação de acesso expirado no interceptor
-
-- O interceptor não estava reenviando a requisição original após o
-  refresh, causando perda silenciosa da chamada HTTP.
+- Intercepta requisições não autenticadas e aciona o fluxo de refresh automático.
 
 Arquivos modificados:
-- sessao/interceptors/sessao.interceptor.ts — adiciona reenvio após renovarAcesso()
+- src/auth/jwt-interceptor.ts — valida expiração antes do dispatch
 
 Como validar:
-- npm test -- --testPathPattern=sessao.interceptor
-```
-
----
-
-### Commit Simples — `feat` com breaking change
-```text
-feat(api)!: altera contrato do endpoint /itens para retornar PaginaDTO<ItemDTO>
-
-- Resposta anterior era ListaDTO<ItemDTO>; agora é PaginaDTO<ItemDTO> com campos
-  pagina, tamanhoPagina e totalElementos para suporte a paginação.
-
-Arquivos modificados:
-- controller/ItemController.java — atualiza retorno para Flux<PaginaDTO<ItemDTO>>
-- dto/ItemDTO.java               — adiciona campos de paginação
-
-Como validar:
-- mvn -Dtest=ItemControllerTest test > logs/test-run.out 2>&1
-
-BREAKING CHANGE: clientes que consumiam /itens como array devem
-  atualizar para ler o campo `conteudo` do objeto PaginaDTO retornado.
-```
-
----
-
-### Commit de Exclusão Simples — `refactor` (classe substituída)
-```text
-refactor(persistencia): remove RepositorioGenericoLegado após migração completa
-
-- A interface RepositorioGenericoLegado (raw/@Deprecated) foi removida após todos
-  os chamadores terem migrado para RepositorioTipado. O adaptador
-  AdaptadorRepositorioTipado mantém retrocompatibilidade para código externo.
-
-Arquivos removidos:
-- repositorio/RepositorioGenericoLegado.java — substituída por RepositorioTipado<T, ID>
-
-Arquivos modificados:
-- repositorio/AdaptadorRepositorioTipado.java — remove dependência da interface excluída
-- config/ConfiguracaoPersistencia.java       — atualiza mapeamento sem a interface legada
-
-Como validar:
-- mvn -pl modulo-persistencia test > logs/test-run.out 2>&1
-```
-
----
-
-### Commit de Exclusão Simples — `chore` (código morto)
-```text
-chore(cadastro): remove ConversorLegadoCadastro não utilizado desde v1.5
-
-- Classe sem chamadores após migração para mapeador automático em novembro/2025.
-  Nenhuma funcionalidade é afetada pela remoção.
-
-Arquivos removidos:
-- mapper/ConversorLegadoCadastro.java — código morto; zero referências no projeto
-
-Como validar:
-- mvn test > logs/test-run.out 2>&1
-```
-
----
-
-### Commit Complexo — `refactor` com remoções e plano rastreável
-```text
-refactor(persistencia): decomposição de classes extensas e melhorias de runtime (Plano V2 — itens 1.5, 3.2, 3.1)
-
-- RepositorioBaseImpl (~1600 linhas) decomposta em três classes auxiliares
-  com responsabilidade única. ConstrutorFiltroSql (~1285 linhas) decomposta em quatro
-  construtores focados. Adicionada instrumentação de métricas nas operações de banco.
-- Referência completa: docs/plan/PLANO_MELHORIA_PERSISTENCIA_V2.md
-
-─── Novos arquivos ──────────────────────────────────────────────────
-  [Decomposição RepositorioBaseImpl]
-  - repositorio/helper/AgregadorDeLinhas.java   — agregação de linhas e coleções
-  - repositorio/helper/MapeadorDeLinhas.java    — utilitários estáticos de mapeamento
-  - repositorio/helper/ExecutorDeEscrita.java   — INSERT/UPDATE/DELETE via DTO
-
-  [Decomposição ConstrutorFiltroSql]
-  - filtro/ConstrutorFiltroComplexo.java        — filtros para DTOs com junções
-  - filtro/ConstrutorFiltroSimples.java         — filtros para entidades simples
-  - filtro/ContextoFiltro.java                  — contexto mutável de construção
-  - filtro/ConstrutorPaginacao.java             — LIMIT/OFFSET
-
-  [Observabilidade]
-  - repositorio/MetricasPersistencia.java       — medição de tempo com padrão noop
-
-  [Testes]
-  - repositorio/helper/AgregadorDeLinhasTest.java
-  - repositorio/MetricasPersistenciaTest.java
-
-─── Arquivos modificados ────────────────────────────────────────────
-  [Orquestradores]
-  - repositorio/RepositorioBaseImpl.java        — reduzido a ~380 linhas; delega para auxiliares
-  - filtro/ConstrutorFiltroSql.java              — fachada pública ~180 linhas; delega para construtores
-
-  [Infraestrutura]
-  - config/ConfiguracaoPersistencia.java        — declaração dos novos componentes
-  - config/RegistradorDeRepositorio.java        — inicialização limpa; avisos isolados
-
-  [Documentação]
-  - modulo-persistencia/README.md               — documentação completa do módulo
-  - docs/plan/PLANO_MELHORIA_PERSISTENCIA_V2.md  — todos os 18 itens marcados como concluídos
-
-─── Arquivos removidos ──────────────────────────────────────────────
-  [Classes obsoletas após decomposição]
-  - filtro/ConstrutorFiltroSqlAntigo.java        — lógica migrada para novos construtores
-  - repositorio/AuxiliarMapeamento.java         — utilitários absorvidos por MapeadorDeLinhas
-
-Como validar:
-- mvn -pl modulo-persistencia test > logs/test-run.out 2>&1
+- npm test -- src/auth/jwt-interceptor.spec.ts
+EOF
 ```

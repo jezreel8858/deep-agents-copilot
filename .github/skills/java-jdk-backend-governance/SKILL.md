@@ -1,8 +1,6 @@
 ---
 name: java-jdk-backend-governance
-description: >-
-  Boas práticas de governança para versões Java/JDK em backend enterprise,
-  cobrindo LTS, compatibilidade de ecossistema, performance, segurança e migração.
+description: "Define diretrizes e padrões para boas práticas de governança para versões Java/JDK em backend enterprise, cobrindo LTS, compatibilidade de ecossistema, performance, segurança e migração. Use quando atuar em java lts, versão jdk backend, migração java. Não use para tarefas fora do escopo de java-jdk-backend-governance ou implementação direta de código de negócio não relacionado."
 tier: 1
 category: governance
 triggers:
@@ -14,13 +12,16 @@ triggers:
 source_docs:
   - .github/agents/backend/spring-boot/spring-boot-router.agent.md
   - .github/agents/backend/spring-reactive/spring-reactive-router.agent.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
 ---
 
 # Java/JDK Backend Governance
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `java-jdk-backend-governance` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando usar
 

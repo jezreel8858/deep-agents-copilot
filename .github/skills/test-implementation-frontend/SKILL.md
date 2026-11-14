@@ -1,9 +1,6 @@
 ---
 name: test-implementation-frontend
-description: 
-  Padrões genéricos e agnósticos para implementação de testes em qualquer projeto
-  frontend, independente de framework. Define contratos, tipos de teste e estratégias
-  de cobertura aplicáveis a qualquer stack client-side.
+description: "Define diretrizes e padrões para padrões genéricos e agnósticos para implementação de testes em qualquer projeto frontend, independente de framework. Define contratos, tipos de teste e estratégias de cobertura aplicáveis a qualquer stack client-side. Use quando atuar em testar frontend, testes de componente, component test. Não use para tarefas fora do escopo de test-implementation-frontend ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: testing
 triggers:
@@ -16,12 +13,11 @@ triggers:
   - "e2e test"
   - "testes de interface"
   - "cobertura frontend"
-source_docs_lazy:
+source_docs:
+  - .github/skills/test-coverage-governance/SKILL.md
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
-source_docs:
-  - .github/skills/test-coverage-governance/SKILL.md
 ---
 
 # Test Implementation — Frontend (Genérico)
@@ -35,6 +31,14 @@ source_docs:
 >
 > **Quando usar esta skill**: ao definir estratégia de testes, revisar cobertura
 > ou trabalhar em projeto com stack de frontend ainda não catalogada.
+
+## Quando Usar
+
+- Ativação em cenários de testar frontend, testes de componente, component test.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `test-implementation-frontend` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## 1) Tipos de Teste — Frontend
 
@@ -105,7 +109,7 @@ Date/Time      →     Mock de data fixa para determinismo
 | Componentes puramente visuais | Isento de testes unitários (validação visual/VFL) | ◯ Baixa |
 
 ### Metodologia de Execução: Test-Last com Verification Gate
-Em ambientes frontend com agentes de IA, o workflow canônico adota **Test-Last (Implementation-First)**: componentes, stores e lógica são estabilizados e validados estaticamente primeiro (`get_errors`), sendo a escrita de testes unitários executada ao final pelos especialistas de teste. Agentes e tarefas focados puramente em UI/estilização (`ui-stylist`) são **isentos** de criar ou rodar testes unitários, validando apenas contratos visuais, design tokens e acessibilidade.
+Em ambientes frontend com agentes de IA, o workflow canônico adota **Test-Last (Implementation-First)**: componentes, stores e lógica são estabilizados e validados estaticamente primeiro (`get_errors`), sendo a escrita de testes unitários executada ao final pelos especialistas de teste. Tarefas focadas puramente em UI/estilização no frontend (`<stack>-developer`) são **isentas** de criar ou rodar testes unitários, validando apenas contratos visuais, design tokens e acessibilidade.
 
 ## 4) Integration Tests — Conceitos
 

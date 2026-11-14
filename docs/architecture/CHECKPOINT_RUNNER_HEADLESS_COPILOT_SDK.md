@@ -97,7 +97,7 @@ git --no-pager diff --stat
 1. Aplicar os commits pendentes da Seção 3 (ou consolidar em um só) e dar push.
 2. Decidir o destino do PR #55 (fechar ou mergear).
 3. Rodar ao menos 1-2 ciclos reais de `agent-audit` em PRs `develop→main` genuínos (com a feature-flag ligada manualmente) para observar custo e comportamento antes de decidir avançar.
-4. Quando pronto para avançar, retomar pela **subtask 28** (`PLANO_DECOMPOSICAO_COPILOT_SDK_HEADLESS_RUNNER.md` §3) — expandir o runner com o 2º caso de uso `code-review`, delegando via `@agent-router` → `@python-router` → `@python-feature-developer`.
+4. Quando pronto para avançar, retomar pela **subtask 28** (`PLANO_DECOMPOSICAO_COPILOT_SDK_HEADLESS_RUNNER.md` §3) — expandir o runner com o 2º caso de uso `code-review`, delegando via `@agent-router` → `@python-router` → `@python-developer`.
 
 ---
 

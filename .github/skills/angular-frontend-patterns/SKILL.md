@@ -1,8 +1,6 @@
 ---
 name: angular-frontend-patterns
-description: >-
-  Boas práticas e patterns de codificação Angular para componentes modernos,
-  templates, reatividade, segurança e consistência arquitetural.
+description: "Define diretrizes e padrões para boas práticas e patterns de codificação Angular para componentes modernos, templates, reatividade, segurança e consistência arquitetural. Use quando atuar em boas práticas angular, padrões de componente angular, standalone angular. Não use para tarefas fora do escopo de angular-frontend-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: quality
 triggers:
@@ -13,7 +11,6 @@ triggers:
   - "template binding angular"
 source_docs:
   - .github/agents/frontend/angular/angular-router.agent.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
@@ -22,6 +19,10 @@ tools: []
 # Angular Frontend Patterns
 
 > Esta skill cobre o modo **Advisory** (análise/recomendação, sem código). Para o modo **Implementação** (codificar feature/bugfix), ver [`angular-implementation-patterns`](../angular-implementation-patterns/SKILL.md).
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `angular-frontend-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando Usar
 

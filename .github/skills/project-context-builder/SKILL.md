@@ -5,10 +5,7 @@ type: discovery-and-generation
 input_type: path-based
 output_type: structured-artifacts
 
-description: 
-  Scanner automático de projetos + Copilot Chat. Detecta stack, padrões e convenções
-  localmente (offline), depois Copilot gera novo_projeto.yaml + xxx.instructions.md
-  usando SEU PRÓPRIO MODELO (sem APIs externas). Funciona via `/add-project-context`.
+description: "Define diretrizes e padrões para scanner automático de projetos + Copilot Chat. Detecta stack, padrões e convenções localmente (offline), depois Copilot gera novo_projeto.yaml + xxx.instructions.md usando SEU PRÓPRIO MODELO (sem APIs externas). Funciona via `/add-project-context`. Use quando atuar em /add-project-context, novo projeto, adicionar projeto ao binding. Não use para tarefas fora do escopo de project-context-builder ou implementação direta de código de negócio não relacionado."
 
 triggers:
   - "/add-project-context"
@@ -50,15 +47,22 @@ constraints:
   - "Fallback para atualização manual com preview em caso de falha de tooling"
 
 category: process
-tools:
-  - "read_file"
-  - "create_file"
-  - "list_dir"
-  - "grep_search"
-  - "file_search"
+tools: ['read_file', 'create_file', 'list_dir', 'grep_search', 'file_search']
 ---
 
 # project-context-builder — Skill de Descoberta de Projeto
+
+## Quando Usar
+
+- Ativação em cenários de /add-project-context, novo projeto, adicionar projeto ao binding.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `project-context-builder` ou quando outra skill específica cobrir integralmente o escopo.
+
+## Diretrizes e Padrões Canônicos
+
+- Seguir estritamente as regras, invariantes e fluxos descritos nas seções abaixo.
 
 ## Precedentes de Mercado (Pesquisa Externa — R-019, 2026-09-01)
 
@@ -204,3 +208,10 @@ Adicionar novo tipo de stack:
 **LLM**: Copilot Chat (seu modelo no IDE, sem APIs externas)  
 **Custo**: Zero (offline na Fase 1, Copilot nativo na Fase 2)
 
+## Checklist de Conformidade
+
+- [ ] Diretrizes, contratos e restrições de escopo de `project-context-builder` verificados e atendidos.
+
+## Referências
+
+- Documentação normativa em `CLAUDE.md` e `.github/copilot-instructions.md`.

@@ -33,6 +33,19 @@
 #         - "base-backend"
 #       descricao: "Serviço de domínio X — Java/Spring Boot"
 #       adapter_local: ".github/instructions/local/meu-projeto-backend.instructions.md"
+#
+#     - id: "meu-projeto-frontend"
+#       name: "Meu Projeto Frontend"
+#       tipo: "frontend"
+#       path_externo: "D:\\workspace\\meu-projeto-frontend"  # read-only, nunca versionado
+#       extends:
+#         - "base-frontend"
+#       descricao: "SPA Angular/React — automação UI via Playwright MCP"
+#       adapter_local: ".github/instructions/local/meu-projeto-frontend.instructions.md"
+#       ui_url: "http://localhost:4200"
+#       auth_strategy: "storage_state"                         # storage_state | user_data_dir | none
+#       auth_env_var: "<PROJETO>_STORAGE_STATE_PATH"           # apenas o NOME da env var, nunca o valor
+#       token_storage: "localStorage"                          # opcional: cookie | localStorage | sessionStorage | indexeddb
 
 projetos: []
 

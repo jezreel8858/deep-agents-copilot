@@ -1,9 +1,6 @@
 ---
 name: project-scanner-governance
-description: |
-  Boas práticas para análise automática de repositórios e detecção de stack,
-  frameworks, estrutura, codestyle e arquitetura. Essencial para customização
-  de adapters e descoberta de convenções reais do projeto.
+description: "Define diretrizes e padrões para boas práticas para análise automática de repositórios e detecção de stack, frameworks, estrutura, codestyle e arquitetura. Essencial para customização de adapters e descoberta de convenções reais do projeto. Use quando atuar em scan project, detectar stack, analisar repositório. Não use para tarefas fora do escopo de project-scanner ou implementação direta de código de negócio não relacionado."
 tier: 2
 related_agents:
   - "adapter-generator"
@@ -22,19 +19,26 @@ source_docs:
   - .github/instructions/README.md
   - .github/agents/adapter-generator.agent.md
   - .github/prompts/add-project-context.prompt.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
-tools:
-  - "read_file"
-  - "list_dir"
-  - "grep_search"
-  - "file_search"
+tools: ['read_file', 'list_dir', 'grep_search', 'file_search']
 ---
 
 # Project Scanner Governance
 
 Diretrizes consolidadas para **scan automático de projetos** e descoberta de stack técnico, frameworks, padrões arquiteturais e convenções de codestyle.
+
+## Quando Usar
+
+- Ativação em cenários de scan project, detectar stack, analisar repositório.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `project-scanner` ou quando outra skill específica cobrir integralmente o escopo.
+
+## Diretrizes e Padrões Canônicos
+
+- Seguir estritamente as regras, invariantes e fluxos descritos nas seções abaixo.
 
 ## 1) Objetivo
 
@@ -44,237 +48,11 @@ Automaticamente **detectar características técnicas reais de um projeto** a pa
 
 ## 2) Artefatos Essenciais — Checklist de Scan
 
-### 2.1) Detecção de Linguagem & Runtime
-
-Prioridade: **P1 (Crítica)**
-
-| Arquivo | Indicador | Language | Priority |
-|---------|-----------|----------|----------|
-| `package.json` | Presença | Node.js / TypeScript / JavaScript | P1 |
-| `pom.xml` | `<modelVersion>` | Java + Maven | P1 |
-| `build.gradle` | Presença | Kotlin / Java + Gradle | P1 |
-| `build.gradle.kts` | Presença | Kotlin / Java + Gradle (Kotlin DSL) | P1 |
-| `requirements.txt` | Presença | Python + pip | P1 |
-| `Pipfile` / `Pipfile.lock` | Presença | Python + Pipenv | P1 |
-| `.swift-version` | Presença | Swift | P1 |
-| `Cargo.toml` | Presença | Rust | P1 |
-| `go.mod` | Presença | Go | P1 |
-| `Gemfile` | Presença | Ruby | P1 |
-| `Dockerfile` | `FROM <image>` | Container runtime | P2 |
-
-**Lógica**: Se `package.json` existe → Node ecosystem. Se `pom.xml` → Java/Maven. Etc.
-
-```json
-{
-  "language": "TypeScript",
-  "runtime": "Node.js 20+",
-  "package_manager": "npm | yarn | pnpm"
-}
-```
-
----
-
-### 2.2) Detecção de Framework & Ecossistema
-
-Prioridade: **P1 (Crítica)**
-
-#### Frontend Frameworks
-
-| Framework | Detection Signal | applyTo Pattern |
-|-----------|-----------------|-----------------|
-| **Angular** | `angular.json` + `"@angular/core"` in `package.json` | `src/app/**/*.ts` |
-| **React** | `"react"`, `"react-dom"` in `package.json` | `src/**/*.{ts,tsx}` |
-| **Vue** | `"vue"` in `package.json` + `vue.config.js` | `src/**/*.vue` |
-| **Next.js** | `"next"` in `package.json` + `next.config.js` | `pages/**/*.{ts,tsx}` |
-| **Svelte** | `"svelte"` in `package.json` | `src/**/*.svelte` |
-| **NuxtJS** | `"nuxt"` in `package.json` + `nuxt.config.js` | `pages/**/*.vue` |
-
-#### Backend Frameworks
-
-| Framework | Detection Signal | Language |
-|-----------|-----------------|----------|
-| **Spring Boot** | `spring-boot-starter-*` in `pom.xml` / `build.gradle` | Java / Kotlin |
-| **Nest.js** | `"@nestjs/core"` in `package.json` | TypeScript |
-| **Express** | `"express"` in `package.json` | JavaScript / TypeScript |
-| **Django** | `Django` in `requirements.txt` | Python |
-| **FastAPI** | `fastapi` in `requirements.txt` | Python |
-| **Flask** | `Flask` in `requirements.txt` | Python |
-| **Gin** | `github.com/gin-gonic/gin` in `go.mod` | Go |
-| **Echo** | `github.com/labstack/echo` in `go.mod` | Go |
-
-```yaml
-frameworks:
-  primary: "Angular 21"
-  secondary:
-    - "RxJS 7"
-    - "Material Design"
-  supported_versions: [21]
-```
-
----
-
-### 2.3) Detecção de Estrutura & Arquitetura
-
-Prioridade: **P2 (Alta)**
-
-| Pattern | Detection Signal | Meaning |
-|---------|-----------------|---------|
-| **Monorepo** | `lerna.json` / `nx.json` / `"workspaces"` in `package.json` | Multiple projects in same repo |
-| **Modular** | Subfolders: `src/module-a/`, `src/module-b/` | Organization by feature/domain |
-| **Layered** | Folders: `/controllers`, `/services`, `/repositories`, `/models` | N-tier architecture |
-| **Component-Based** | `/components`, `/pages`, `@Component` decorators | UI component pattern |
-| **Microservices** | Multiple `docker-compose.yml` / Kubernetes manifests | Service-oriented architecture |
-| **Monolithic** | Single `src/` folder, no clear separation | Single large application |
-
-```yaml
-structure:
-  type: "component-based"  # ou layered, modular, etc
-  organization: "by-feature"
-  examples:
-    - "src/app/components/"
-    - "src/app/pages/"
-    - "src/app/services/"
-```
-
----
-
-### 2.4) Detecção de Codestyle & Linting
-
-Prioridade: **P2 (Alta)**
-
-| Config File | Defines | Example |
-|-------------|---------|---------|
-| `.eslintrc.json` / `.eslintrc.js` | ESLint rules (JavaScript/TypeScript) | `"extends": "eslint:recommended"` |
-| `.prettierrc` / `prettier.config.js` | Code formatting | `"printWidth": 80`, `"semi": true` |
-| `tsconfig.json` | TypeScript compiler options | `"strict": true`, `"target": "ES2020"` |
-| `.editorconfig` | Editor conventions | `indent_style = space`, `indent_size = 2` |
-| `.checkstyle.xml` (Java) | Checkstyle rules | Google / Sun coding standards |
-| `sonar-project.properties` | SonarQube config | `sonar.sources=src`, `sonar.exclusions=**/*Test.java` |
-| `.stylelintrc` | CSS/SCSS linting | Ordering, naming conventions |
-
-```yaml
-codestyle:
-  linter: "eslint"
-  formatter: "prettier"
-  linter_config:
-    extends: "eslint:recommended"
-    rules:
-      semi: true
-      quotes: "single"
-  formatter_config:
-    printWidth: 100
-    semiColons: true
-  type_safety: "strict"  # from tsconfig.strict=true
-```
-
----
-
-### 2.5) Detecção de Type Safety & Compilação
-
-Prioridade: **P2 (Alta)**
-
-| Signal | Meaning | Detection |
-|--------|---------|-----------|
-| `tsconfig.json` with `"strict": true` | Strict type checking enabled | `grep -o '"strict":\s*true' tsconfig.json` |
-| `"noImplicitAny": false` | Allow implicit any types | Inverse of strict |
-| `"strictNullChecks": true` | Null safety enforced | Subset of strict |
-| `@deprecated` in JSDoc | Code quality signalling | Comment analysis |
-| `// @ts-expect-error` | Intentional type bypass | Comment analysis |
-
-```yaml
-type_safety:
-  enabled: true
-  strict_mode: true
-  implicit_any_allowed: false
-  null_checks_enabled: true
-```
-
----
-
-### 2.6) Detecção de Testing & Coverage
-
-Prioridade: **P2 (Alta)**
-
-| Artifact | Testing Framework | E2E Framework |
-|----------|-------------------|---------------|
-| `jest.config.js` | Jest (unit) | Jest + puppeteer optional |
-| `karma.conf.js` | Karma + Jasmine | Separate (Protractor/Cypress/Playwright) |
-| `cypress.config.js` | - | Cypress (E2E) |
-| `playwright.config.ts` | - | Playwright (E2E) |
-| `protractor.conf.js` | - | Protractor (deprecated) |
-| `/test` or `/tests` folder | Convention-based | - |
-| `coverage/` | Coverage report | - |
-| `.nycrc` / `.nyc_output` | NYC coverage | - |
-| `pom.xml` with `maven-surefire-plugin` | Maven test runner | - |
-
-```yaml
-testing:
-  unit_testing_framework: "jasmine"
-  unit_test_runner: "karma"
-  e2e_testing_framework: "playwright"
-  e2e_runner: "playwright"
-  has_coverage: true
-  coverage_threshold: 80
-  test_folder: "/test"
-```
-
----
-
-### 2.7) Detecção de CI/CD & Deployment
-
-Prioridade: **P3 (Média)**
-
-| File | CI/CD Tool | Signals |
-|------|-----------|---------|
-| `.github/workflows/*.yml` | GitHub Actions | `on: push`, `runs-on:` |
-| `.gitlab-ci.yml` | GitLab CI | `stages:`, `jobs:` |
-| `Jenkinsfile` | Jenkins | `pipeline {}` or `node {}` |
-| `azure-pipelines.yml` | Azure Pipelines | `trigger:`, `jobs:` |
-| `.travis.yml` | Travis CI | `language:`, `script:` |
-| `docker-compose.yml` | Docker Compose | Local dev/test orchestration |
-| `values-*.yaml` | Helm | Kubernetes deployments |
-| `Dockerfile` | Container build | `FROM`, `RUN`, `CMD` |
-
-```yaml
-ci_cd:
-  provider: "github-actions"
-  workflows:
-    - "test.yml"
-    - "deploy.yml"
-  deployment:
-    - "docker"
-    - "kubernetes"
-```
-
----
-
-### 2.8) Detecção de Banco de Dados & API Docs
-
-Prioridade: **P3 (Média)**
-
-| Signal | Technology |
-|--------|-----------|
-| `@Controller`, `@RequestMapping` + Swagger annotations | OpenAPI / Swagger |
-| `@Endpoint`, `@Operation` (Jakarta REST) | OpenAPI 3.0 |
-| Comments: `/**\n * @swagger` | Swagger 2.0 |
-| `oas3-definition.yml` / `openapi.json` | OpenAPI file |
-| `@Entity`, `@Table` in code | JPA/Hibernate (Java) |
-| `@Column`, `@OneToMany` | ORM persistence |
-| `db/schema.sql` / `migrations/` | Database schema |
-
-```yaml
-database:
-  type: "PostgreSQL"  # or null if not detected
-  orm: "Hibernate"   # JPA/ORM
-  schema_location: "db/schema.sql"
-
-api_documentation:
-  format: "openapi"
-  version: "3.0"
-  spec_file: "docs/openapi.yaml"
-```
-
----
+- **2.1 Linguagem & Runtime**: inspecionar manifestos raiz (`pom.xml`, `package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`).
+- **2.2 Framework & Ecossistema**: detectar Spring Boot, Angular, React, FastAPI, NestJS e dependências core.
+- **2.3 a 2.5 Estrutura, Codestyle & Type Safety**: mapear arquitetura de pastas, linters (`eslint`, `ruff`, `checkstyle`) e `tsconfig`/`mypy`.
+- **2.6 a 2.8 Testing, CI/CD & Database**: identificar runners (`vitest`, `jest`, `pytest`, `junit`), pipelines (`.github/workflows`) e migrações (`Flyway`, `Liquibase`, `Alembic`).
+- Tabelas completas de artefatos por categoria (2.1–2.8) em [`references/detailed-patterns-and-examples.md`](references/detailed-patterns-and-examples.md).
 
 ### 2.9) Detecção de Segredos/Credenciais (Redação Obrigatória — R-010 / OWASP LLM02:2025)
 
@@ -295,84 +73,23 @@ Prioridade: **P1 (Bloqueante — nunca percentual, qualquer reprodução literal
 
 ---
 
+### 2.10) Detecção de Local de Armazenamento do Token (`token_storage` — opcional, Emenda B)
+
+Prioridade: **P3** — somente frontend com autenticação. Detecta a **categoria** por grep, sem identificar projeto, chave ou valor do token.
+
+| Sinal (grep no código-fonte) | `token_storage` |
+|---|---|
+| `sessionStorage.setItem` | `sessionStorage` |
+| `localStorage.setItem`, `localStorageSync` | `localStorage` |
+| `document.cookie`, `withCredentials`, `Set-Cookie` | `cookie` |
+| `indexedDB.open` | `indexeddb` |
+
+Regra de saída: reportar apenas a categoria (múltiplos sinais → listar todos e pedir confirmação); nunca reproduzir nome de chave, valor ou caminho de arquivo identificável (R-010/R-044). Estratégia de auth derivada: `playwright-mcp/SKILL.md` § 7.4.
+
 ## 3) Resultado: Project Profile
 
-Consolidar scanner em um objeto estruturado (`project_profile`):
-
-```yaml
-# Exemplo output do scanner
-project_profile:
-  name: "exemplo"
-  base_path: "."  # from P6
-  
-  # Seção P1
-  language: "TypeScript"
-  runtime: "Node.js 20+"
-  package_manager: "npm"
-  
-  # Seção P1
-  frameworks:
-    primary: "Angular 21"
-    secondary:
-      - "RxJS 7"
-      - "@ngrx/store"
-    versions:
-      angular: "21.0.0"
-  
-  # Seção P2
-  architecture:
-    structure: "component-based"
-    patterns:
-      - "service-locator"
-      - "dependency-injection"
-    organization: "by-feature"
-  
-  # Seção P2
-  code_style:
-    linter: "eslint"
-    formatter: "prettier"
-    type_safety:
-      enabled: true
-      strict: true
-    config_files:
-      - ".eslintrc.json"
-      - ".prettierrc"
-      - "tsconfig.json"
-  
-  # Seção P2-P3
-  testing:
-    unit:
-      framework: "jasmine"
-      runner: "karma"
-    e2e:
-      framework: "playwright"
-      runner: "playwright"
-    coverage: true
-    test_dir: "src/"
-    coverage_threshold: 80
-  
-  # Seção P3
-  ci_cd:
-    provider: "github-actions"
-    workflows: ["test.yml", "deploy.yml"]
-  
-  # Seção P3
-  deployment:
-    container: "docker"
-    orchestration: "kubernetes"
-  
-  # Seção P3
-  api_docs:
-    format: "openapi"
-    version: "3.0"
-    spec_file: "docs/openapi.yaml"
-
-  # Metadata
-  scan_timestamp: "2026-06-11T14:30:00Z"
-  scanner_version: "1.0"
-```
-
----
+- O scanner consolida os metadados detectados no contrato `project_profile` (linguagem, build tool, frameworks, arquitetura, testes, CI/CD e segurança).
+- Exemplo completo do `project_profile` YAML em [`references/detailed-patterns-and-examples.md`](references/detailed-patterns-and-examples.md).
 
 ## 4) Uso no Adapter Generator
 
@@ -422,54 +139,8 @@ Quando `adapter-generator` é disparado:
 
 ## 6) Exemplo: Fluxo Completo
 
-**Input:**
-```
-projeto_path: "."
-catalog.yml: projetos=[exemplo], adapters=[frontend, backend]
-```
-
-**Execução Scanner:**
-```bash
-# P1: Detectar linguagem
-ls -la package.json        # Encontrado → Node.js
-ls -la pom.xml             # Não encontrado → skip Maven
-
-# P1: Detectar frameworks
-grep "@angular/core" package.json     # Encontrado → Angular
-grep "spring-boot" pom.xml            # Não encontrado → skip Spring
-
-# P2: Detectar estrutura
-ls -la src/app/components  # Encontrado → component-based
-ls -la src/app/pages       # Encontrado → feature-based org
-
-# P2: Detectar codestyle
-cat .eslintrc.json         # Lido → ESLint rules
-cat tsconfig.json          # Lido → TypeScript strict=true
-cat .prettierrc             # Lido → Prettier config
-
-# P3: Detectar testing
-cat karma.conf.js          # Encontrado → Karma
-cat playwright.config.ts   # Encontrado → Playwright
-ls -la src/                # coverage threshold
-```
-
-**Output Profile:**
-```yaml
-project_profile:
-  language: "TypeScript"
-  frameworks:
-    primary: "Angular 21"
-  code_style:
-    linter: "eslint"
-    formatter: "prettier"
-    type_safety: "strict"
-  testing:
-    unit: "jasmine/karma"
-    e2e: "playwright"
-  architecture: "component-based"
-```
-
----
+- Executar varredura em lote (P1: linguagem/framework, P2: estrutura/codestyle, P3: testes/CI) via `ctx_batch`.
+- Script completo de exemplo em [`references/detailed-patterns-and-examples.md`](references/detailed-patterns-and-examples.md).
 
 ## 7) Fontes de Mercado Consolidadas (Pesquisa Externa — R-019, 2026-09-01)
 

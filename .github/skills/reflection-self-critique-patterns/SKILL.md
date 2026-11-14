@@ -1,10 +1,6 @@
 ---
 name: reflection-self-critique-patterns
-description: >
-  Padrão generate → critique → revise (Reflection) para agents Executores
-  reexaminarem o próprio artefato de saída antes de reportar sucesso —
-  self-reflection de baixo custo (mesmo modelo) vs. critic separado
-  (alto risco), com critério objetivo de quando aplicar cada um.
+description: "Define diretrizes e padrões para padrão generate → critique → revise (Reflection) para agents Executores reexaminarem o próprio artefato de saída antes de reportar sucesso — self-reflection de baixo custo (mesmo modelo) vs. critic separado (alto risco), com critério objetivo de quando aplicar cada um. Use quando atuar em reflection, self-critique, auto-crítica. Não use para tarefas fora do escopo de reflection-self-critique-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: process
 triggers:
@@ -13,19 +9,26 @@ triggers:
   - "auto-crítica"
   - "revisar antes de reportar"
   - "generate critique revise"
-source_docs_lazy:
+source_docs:
+  - .github/skills/agent-contracts/SKILL.md
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
-source_docs:
-  - .github/skills/agent-contracts/SKILL.md
 ---
 
 # Reflection / Self-Critique Patterns
 
+## Quando Usar
+
+- Ativação em cenários de reflection, self-critique, auto-crítica.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `reflection-self-critique-patterns` ou quando outra skill específica cobrir integralmente o escopo.
+
 ## 0) Problema Resolvido
 
-Gap de mercado identificado em `docs/plan/categorizacao-agents-mercado.md` §5.1: nenhum agent Executor deste catálogo reexamina o **próprio artefato de saída** (documento gerado, cobertura de teste, código) antes de reportar sucesso — apenas o prompt de entrada é refinado (`prompt-structuring`). Pesquisa de mercado (2026) confirma que Reflection é um padrão de **baixo custo e alto retorno** quando aplicado como passo interno (não como agent separado) para tarefas de risco baixo/médio.
+Gap de mercado identificado em `docs/plans/20260830-090100-categorizacao-agents-mercado.md` §5.1: nenhum agent Executor deste catálogo reexamina o **próprio artefato de saída** (documento gerado, cobertura de teste, código) antes de reportar sucesso — apenas o prompt de entrada é refinado (`prompt-structuring`). Pesquisa de mercado (2026) confirma que Reflection é um padrão de **baixo custo e alto retorno** quando aplicado como passo interno (não como agent separado) para tarefas de risco baixo/médio.
 
 ## 1) Fundamentação de Mercado
 
@@ -88,5 +91,9 @@ Gap de mercado identificado em `docs/plan/categorizacao-agents-mercado.md` §5.1
 - Taskade, "Self-Improving AI Agents: The Reflection Loop" (2026) — https://www.taskade.com/blog/self-improving-ai-agents-reflection
 - Techademy, "ReAct, Plan-and-Execute & Reflection: AI Agent Patterns" (2026) — https://www.techademy.com/react-plan-execute-reflection-agent-patterns
 - Future AGI, "Evaluating LLM Self-Reflection Loops" (2026) — https://futureagi.com/blog/evaluating-llm-self-reflection-loops-2026
-- `docs/plan/categorizacao-agents-mercado.md` §5.1 — origem desta skill.
+- `docs/plans/20260830-090100-categorizacao-agents-mercado.md` §5.1 — origem desta skill.
 
+
+## Revisão Cética Separada Pré-HITL para Planos R-064 (`@plan-critic`)
+
+Para documentos de planejamento em `docs/plans/<tipo>/` (8 categorias R-064), aplica-se obrigatoriamente o padrão de **Critic Separado em Contexto Isolado** via `@plan-critic` (100% Read-Only, Context Firewall) antes do `ask_questions`, guiado pela rubrica [`pre-hitl-skeptical-review-rubric.md`](../plan-conformance-patterns/references/pre-hitl-skeptical-review-rubric.md) com Fast-Pass 1x, teto 2x (3x em `tier: full`), Noise Budget ≤ 5 (`BLOCKER`/`HIGH`, R-065) e escalada `ESCALATED_HITL`.

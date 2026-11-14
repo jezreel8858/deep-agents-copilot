@@ -1,9 +1,6 @@
 ---
 name: angular-responsive-ui-patterns
-description: >-
-  Diretrizes para responsividade em Angular: mobile-first, breakpoints,
-  layout fluido, container queries, imagens responsivas, acessibilidade e
-  validação em múltiplas larguras de tela.
+description: "Define diretrizes e padrões para diretrizes para responsividade em Angular: mobile-first, breakpoints, layout fluido, container queries, imagens responsivas, acessibilidade e validação em múltiplas larguras de tela. Use quando atuar em responsividade angular, angular responsivo, layout mobile first angular. Não use para tarefas fora do escopo de angular-responsive-ui-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: quality
 triggers:
@@ -14,13 +11,16 @@ triggers:
   - "container queries angular"
 source_docs:
   - .github/agents/frontend/angular/angular-router.agent.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
 ---
 
 # Angular Responsive UI Patterns
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `angular-responsive-ui-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando Usar
 

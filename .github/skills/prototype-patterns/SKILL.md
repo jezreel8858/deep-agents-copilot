@@ -1,7 +1,6 @@
 ---
 name: prototype-patterns
-description: >-
-  Padrão formalizado de prototipagem descartável para responder perguntas de design, validar modelos de estado e testar viabilidade de UI/API antes de implementar em produção. Use para spikes rápidos, prova de conceito (POC) e alinhamento HITL. Não use para código destinado diretamente a produção sem refatoração formal.
+description: "Define diretrizes e padrões para padrão formalizado de prototipagem descartável para responder perguntas de design, validar modelos de estado e testar viabilidade de UI/API antes de implementar em produção. Use para spikes rápidos, prova de conceito (POC) e alinhamento HITL. Não use para código destinado diretamente a produção sem refatoração formal. Use quando atuar em protótipo, prototipagem, spike."
 tier: 2
 category: process
 triggers:
@@ -14,7 +13,6 @@ triggers:
   - "HITL rápido"
 source_docs:
   - .github/skills/prompt-engineering-patterns/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
@@ -25,6 +23,10 @@ tools: []
 > Base de conhecimento especializada em **prototipagem rápida e descartável** (*throwaway prototypes*). Fornece diretrizes e heurísticas para criar código focado exclusivamente em responder a uma incerteza técnica ou pergunta de design com o menor esforço e tempo possíveis.
 
 ---
+
+## Quando Usar
+
+- Ativação em cenários de protótipo, prototipagem, spike.
 
 ## 0) Problema Resolvido & Princípios Fundamentais
 

@@ -3,17 +3,18 @@ name: 'craft-prompt'
 description: >-
   Aciona o WORKFLOW-PROMPT-SYNTHESIS para refinar, enriquecer com contexto determinístico e gerar o prompt perfeito em template Markdown para um novo chat
 agent: 'agent'
-model: "Gemini 3.8 Flash"
-tools: ['read_file', 'get_errors', 'ask_questions', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch_execute', 'context-mode/ctx_search']
+router_bypass: slash_workflow
+model: "Gemini 4 Argon"
+tools: ['read_file', 'get_errors', 'ask_questions', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_search']
 argument-hint: '[ideia-ou-requisito-inicial]'
 source_docs:
-  - .github/skills/prompt-engineering-patterns/SKILL.md
-  - .github/skills/requirements-engineering-patterns/SKILL.md
-  - .github/skills/structured-intake-patterns/SKILL.md
-source_docs_lazy:
-  - CLAUDE.md
-  - .github/copilot-instructions.md
-  - .github/agents/workflows.md
+  - '.github/skills/prompt-engineering-patterns/SKILL.md'
+  - '.github/skills/requirements-engineering-patterns/SKILL.md'
+  - '.github/skills/structured-intake-patterns/SKILL.md'
+  - 'CLAUDE.md'
+  - '.github/copilot-instructions.md'
+  - '.github/agents/workflows.md'
+  - '.github/skills/context-mode/SKILL.md'
 ---
 
 # `/craft-prompt`
@@ -46,6 +47,7 @@ Este prompt utiliza as variáveis de contexto nativas do VS Code / JetBrains Cop
 
 ## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
 
+- ✅ O uso de `context-mode` (`ctx_batch`, `ctx_execute`, `ctx_search`) é **100% OBRIGATÓRIO** quando disponível; ferramentas nativas são **fallback exclusivo** de indisponibilidade (`R-056`).
 - ✅ **APENAS** refinar requisitos, minerar contexto determinístico no codebase e sintetizar o prompt canônico final em bloco de código Markdown (`.md`).
 - ✅ **SEMPRE** tratar o prompt sintetizado como de **consumo exclusivo downstream** por outros agents e workflows em uma nova sessão limpa, nunca como resposta ou solução final direta ao usuário.
 - ✅ **SEMPRE** avaliar a natureza da solicitação no Passo 1: se envolver nova feature, regras de negócio ou demanda aberta, assumir compulsoriamente a postura de `@requirements-analyst` e disparar `ask_questions` para validar decisões e regras de domínio com o usuário antes de avançar (R-027 / Invariante 19).
@@ -53,6 +55,7 @@ Este prompt utiliza as variáveis de contexto nativas do VS Code / JetBrains Cop
 - ✅ **SEMPRE** garantir **Visibilidade Progressiva (Anti-Blackbox Execution)**: detalhar obrigatoriamente no chat os achados e decisões de cada uma das 5 etapas antes de emitir o prompt final.
 - ✅ **SEMPRE** operar no **Problem Space** durante o refino, formalizando Critérios de Aceitação (DoD) e Não-Escopo antes da síntese.
 - ✅ **SEMPRE** identificar e injetar caminhos reais de arquivos (seção `## Arquivos e Referências Grounded`) e componentes irmãos canônicos homologados.
+- ❌ **NÃO** invocar `@agent-router` na triagem inicial — este Slash Prompt possui `router_bypass: slash_workflow` (exceção canônica a R-037/R-063) e seu fluxo já está definido abaixo; o Orquestrador Raiz DEVE executar diretamente as instruções deste `.prompt.md` (ou despachar diretamente para o subagente previsto neste próprio prompt).
 - ❌ **NÃO** deduzir, supor ou inventar regras de negócio, telas, permissões ou fluxos de aprovação sem confirmação humana direta (proibição expressa de alucinação de requisitos).
 - ❌ **NÃO** tratar checkpoints de validação humana como opcionais em demandas com ambiguidade de domínio ou múltiplos caminhos de negócio viáveis.
 - ❌ **NÃO** realizar varredura manual de pastas, scripts exploratórios de diretório com `fs` no sandbox via `ctx_execute` ou MCP Tool Chaining sequencial (violação gravíssima de R-045 / RNF-004 e Smell 2.26). Toda análise estrutural pertence com exclusividade ao `@codegraph-engine`.
@@ -92,7 +95,8 @@ O processamento segue rigorosamente as 5 etapas do **`WORKFLOW-PROMPT-SYNTHESIS`
 
 ### Passo 3 — Mapeamento de Restrições e Não-Escopo (`@prompt-structuring`)
 - Extraia explicitamente o que **NÃO** deve ser feito (não-escopo negativo, proibições de regressão, contratos imutáveis).
-- Injete as convenções normativas obrigatórias do repositório (ex.: R-046 para modificações em lote cirúrgico, regras de modernização de framework, convenções de teste).
+- **Preservação Inegociável do Gate R-064**: Ao estruturar prompts (especialmente de governança, arquitetura, refatoração ou features), explicite que a restrição de *"não criar documentos/estudos avulsos em `docs/`"* refere-se apenas a textos teóricos fora de fluxo e **NUNCA** suprime a etapa obrigatória de materialização física do plano R-064 em `docs/plans/<tipo>/<AAAAMMDD-HHMMSS>-<workflow>-<slug>.md` antes do checkpoint `ask_questions`.
+- Injete as convenções normativas obrigatórias do repositório (ex.: R-046 para modificações em lote cirúrgico, R-064 para materialização física em `docs/plans/<tipo>/`, regras de modernização de framework, convenções de teste).
 - Registre as restrições na seção `### 🛑 Etapa 3: Mapeamento de Restrições e Não-Escopo`.
 
 ### Passo 4 — Síntese Estruturada & Otimização de Caching (`@prompt-structuring`)
@@ -243,14 +247,19 @@ Copie o bloco de código abaixo e cole na mensagem inicial da sua nova sessão:
 - `/craft-prompt`: Este prompt, sintetizando o artefato canônico com visibilidade total por etapa.
 - `[Novo Chat]`: Sessão limpa onde o prompt sintetizado garante execução determinística e sem ruído de contexto anterior.
 
+> **Contrato de UX `ask_questions` (R-027 / CA-03..CA-05)**: 1–4 perguntas/chamada, `header` ≤ 25 chars, `allowFreeformInput: true`, 2–4 opções reais e mutuamente exclusivas (Anti-Strawman), `description` obrigatório (`[Consequência prática / O que faz] + [Trade-off principal ou quando escolher]`) e 1ª opção `(Recomendado)` quando houver melhor prática técnica (exceção: decisão puramente de negócio/produto).
+
+## ⚙️ Protocolo de Execução Obrigatório
+
 <execution_protocol>
-**Protocolo Plan-Then-Batch (Smell 2.26 / Smell 2.13 / R-059):**
+
+**Protocolo Plan-Then-Batch (R-059):**
 1. **ENUMERAR**: Antes de qualquer ação de modificação ou inspeção, liste internamente todos os arquivos e comandos necessários para a demanda completa (não apenas o próximo passo aparente).
-2. **CONSOLIDAR (Limiar >= 2)**: Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de `ctx_execute` por alvo no chat. Use compulsoriamente `ctx_batch_execute(commands, queries)` OU script iterativo consolidado em `ctx_execute`.
-3. **DESPACHAR & VALIDAR**: Aplique todas as mutações ou leituras em processo único no sandbox (all-or-nothing verificado, R-051) e execute `get_errors` agrupado uma única vez ao final com a lista completa de arquivos alterados (quando aplicável).
-4. **Comandos curtos não suspendem a regra**: Prompts curtos ("prosseguir", "continue", "pode seguir") NÃO isentam o agente do limiar >= 2 nem do context-mode em lote — a regra vincula-se ao escopo da tarefa, nunca ao tamanho do prompt.
-5. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions, vedando loops investigativos de dívida de tokens O(N²).
-6. **Warm Start Compulsório & Batch Querying (R-060)**: Ferramentas locais que dependem de índices ou bases pré-computadas devem verificar e inicializar a base silenciosamente no primeiro comando (build-if-missing). É proibido disparar consultas granulares individuais para múltiplos nós — agrupe todas as pesquisas via chamadas em lote (batch_query, ctx_batch_execute, script iterativo) com destilação semântica e truncamento na borda (Edge Truncation).
+2. **CONSOLIDAR (Limiar >= 2)**: Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de `ctx_execute` por alvo no chat. Use compulsoriamente `ctx_batch(commands, queries)` OU script iterativo consolidado em `ctx_execute`. No `ctx_execute`, use obrigatoriamente `language: "javascript"` (`fs`/`path` nativos do Node.js) para I/O, inspeção e mutação de arquivos (proibido `language: "python"` ou `python -c` para I/O, evitando bloqueio do `python.exe` pelo Windows Defender/AMSI); em `ctx_batch`, use apenas comandos shell leves com escopo restrito (proibido `python -c` inline ou varreduras recursivas irrestritas). Em caso de timeout (`ETIMEDOUT`/`timed out`/`taskkill`), aplica-se **Circuit Breaker Fail-Fast**: tolerância zero para repetir a mesma chamada/runtime — máximo de **1 retry** exigindo troca obrigatória de estratégia (migrar para `language: "javascript"` puro com `fs` ou reduzir o lote); no 2º timeout, aborte novos spawns e reporte em formato Compact Error Reporting (R-020).
+3. **Comandos curtos não suspendem a regra**: Prompts curtos ("prosseguir", "continue", "pode seguir") NÃO isentam o agente do limiar >= 2 nem do context-mode em lote — a regra vincula-se ao escopo da tarefa, nunca ao tamanho do prompt.
+4. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions (R-027: 1–4 perguntas, `header` ≤ 25 chars, `allowFreeformInput: true`, 2–4 opções reais sem espantalhos, `description` obrigatório com `[Consequência prática + Trade-off/quando escolher]` e 1ª opção `(Recomendado)` para melhor prática técnica), vedando loops investigativos de dívida de tokens O(N²).
+5. **Warm Start Compulsório & Batch Querying (R-060)**: Ferramentas locais que dependem de índices ou bases pré-computadas devem verificar e inicializar a base silenciosamente no primeiro comando (build-if-missing). É proibido disparar consultas granulares individuais para múltiplos nós — agrupe todas as pesquisas via chamadas em lote (batch_query, ctx_batch, script iterativo) com destilação semântica e truncamento na borda (Edge Truncation).
+6. **Validação Agrupada com `get_errors` (R-051)**: Aplique todas as mutações em processo único no sandbox (all-or-nothing verificado) e execute `get_errors` agrupado uma única vez ao final com a lista completa de arquivos alterados (quando aplicável).
 7. **Emissão Obrigatória de Telemetria de Handoff (R-042 / handoff-governance § 2.4)**: a cada chamada real de `run_subagent`, emitir compulsoriamente um evento `telemetry_entry` (tag `[HANDOFF]`) via `ctx_index`, incluindo `session_id` (reaproveitado do `sessionStart` do hook `context-mode`) e `sequence_index` (ordenação determinística dentro da sessão).
-8. **Progressive Disclosure de `source_docs_lazy:` (R-066 — Anti Context Bloat Inicial)**: Se este agent declara `source_docs_lazy:` em seu próprio frontmatter, esses documentos (ex.: `CLAUDE.md`, `.github/copilot-instructions.md`, `.github/agents/workflows.md`) **NÃO foram pré-carregados** — é TERMINANTEMENTE PROIBIDO usar `read_file` para carregá-los por inteiro. Consulte-os exclusivamente via `context-mode/ctx_search` com query pontual (ex.: número da regra `R-xxx` ou nome da seção) apenas quando precisar citá-los; nunca "só por garantia".
+
 </execution_protocol>

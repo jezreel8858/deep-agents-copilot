@@ -1,8 +1,6 @@
 ---
 name: spring-reactive-webflux-patterns
-description: >-
-  Diretrizes enterprise para análise e recomendação de arquiteturas reativas com
-  Spring WebFlux e Project Reactor, com foco em resiliência, capacidade e operação.
+description: "Define diretrizes e padrões para diretrizes enterprise para análise e recomendação de arquiteturas reativas com Spring WebFlux e Project Reactor, com foco em resiliência, capacidade e operação. Use quando atuar em spring webflux, project reactor, backend reativo. Não use para tarefas fora do escopo de spring-reactive-webflux-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: quality
 triggers:
@@ -13,7 +11,6 @@ triggers:
   - "backpressure"
 source_docs:
   - .github/agents/backend/spring-reactive/spring-reactive-router.agent.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
@@ -22,6 +19,10 @@ tools: []
 # Spring Reactive / WebFlux Patterns
 
 > Esta skill cobre o modo **Advisory** (análise/recomendação, sem código). Para o modo **Implementação** (codificar feature/bugfix), ver [`spring-reactive-implementation-patterns`](../spring-reactive-implementation-patterns/SKILL.md).
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `spring-reactive-webflux-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando usar
 

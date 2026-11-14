@@ -76,6 +76,17 @@ def main():
         description="Gera o dashboard standalone Context Insight Visualizer a partir de telemetria local."
     )
     parser.add_argument(
+        "--data-dir",
+        type=str,
+        default=None,
+        help="Diretorio raiz do context-mode v2.1.10 (contendo projects/<key>/context.db). Tambem aceita CONTEXT_MODE_DATA_DIR.",
+    )
+    parser.add_argument(
+        "--legacy-v1",
+        action="store_true",
+        help="Forca modo legado v1 (sessions/*.db, content/*.db e stats-pid-*.json).",
+    )
+    parser.add_argument(
         "--sessions-dir",
         type=str,
         default=None,
@@ -135,6 +146,8 @@ def main():
     extractor = ContextDataExtractor(
         sessions_dir=args.sessions_dir,
         content_dir=args.content_dir,
+        data_dir=args.data_dir,
+        legacy_v1=args.legacy_v1,
     )
     extracted_data = extractor.extract_all()
 

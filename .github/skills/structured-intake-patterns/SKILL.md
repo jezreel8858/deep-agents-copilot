@@ -1,9 +1,6 @@
 ---
 name: structured-intake-patterns
-description: >
-  Padrão canônico de coleta estruturada de contexto via ask_questions (P1..PN)
-  com critério objetivo de "mínimo necessário para prosseguir" e template de
-  consolidação — evita reimplementação do mesmo bloco de intake em cada agent.
+description: "Define diretrizes e padrões para padrão canônico de coleta estruturada de contexto via ask_questions (P1..PN) com critério objetivo de 'mínimo necessário para prosseguir' e template de consolidação — evita reimplementação do mesmo bloco de intake em cada agent. Use quando atuar em coleta de contexto, pré-checklist, protocolo de detecção de contexto. Não use para tarefas fora do escopo de structured-intake-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: process
 triggers:
@@ -18,13 +15,20 @@ source_docs:
   - .github/agents/requirements-analyst.agent.md
   - .github/agents/bug-triage.agent.md
   - .github/agents/business-rules-extractor.agent.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: ['ask_questions']
 ---
 
 # Structured Intake Patterns
+
+## Quando Usar
+
+- Ativação em cenários de coleta de contexto, pré-checklist, protocolo de detecção de contexto.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `structured-intake-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## 0) Problema Resolvido
 
@@ -172,3 +176,64 @@ Quando não há relatório/fonte externa disponível (ex.: `test-engineer` sem r
 - `.github/copilot-instructions.md` — R-027, formato de `ask_questions`.
 - `.github/skills/context-mode/SKILL.md` — playbook de coleta ativa em lote antes de perguntar.
 
+## Contrato de Qualidade e UX do `ask_questions` (CA-03, CA-04, CA-05 / R-027)
+
+Toda invocação da ferramenta `ask_questions` em intake estruturado, desambiguação ou checkpoints HITL DEVE obedecer estritamente aos três contratos canônicos abaixo:
+
+### 1. CA-03 — Padrão Obrigatório do Campo `description`
+- Toda opção em `options` DEVE possuir o campo `description` preenchido em formato estruturado enxuto (1 a 2 frases):
+  `[Consequência prática / O que faz] + [Trade-off principal ou quando escolher]`.
+- **Proibido**: emitir `options` apenas com `label` (sem `description`) ou preencher um `description` redundante que apenas repete as palavras do `label`.
+
+### 2. CA-04 — Regra da Opção Recomendada (`Default Effect`)
+- Quando houver melhor prática técnica ou arquitetural clara, posicioná-la obrigatoriamente como a **1ª opção** da lista com o sufixo `(Recomendado)` no `label` e a justificativa técnica no `description`.
+- **Exceção explícita**: Decisões puramente de negócio/produto sem alternativa técnica superior NÃO devem forçar `(Recomendado)` artificialmente.
+
+### 3. CA-05 — Anti-Strawman & Limites Ergonômicos da Rodada
+- **Anti-Strawman (Proibição de Opções Espantalho)**: Proibido criar alternativas artificiais, inviáveis ou absurdas apenas para compor lista. Cada pergunta com opções deve ter entre **2 e 4 alternativas reais, viáveis, mutuamente exclusivas e defensáveis**.
+- **Ergonomia da Rodada**:
+  - Limite de **1 a 4 perguntas por chamada** de `ask_questions` (carrossel enxuto).
+  - `header` curto e identificável (**máx. 25 caracteres**).
+  - `allowFreeformInput: true` habilitado como padrão (proibido criar opção artificial `"Outro (especificar)"` quando o campo livre nativo já está ativo).
+
+### Exemplo Canônico: Bom vs. Ruim (JSON)
+
+```json
+{
+  "_comment_ruim": "❌ RUIM: Sem description, sem (Recomendado) em decisão técnica, opção espantalho e opção dummy 'Outro'",
+  "questions_bad": [
+    {
+      "header": "Estrategia de persistencia de dados do servico de pedidos",
+      "question": "Qual banco usar?",
+      "options": [
+        { "label": "Salvar em arquivo TXT local sem lock" },
+        { "label": "PostgreSQL" },
+        { "label": "Outro (especificar)" }
+      ]
+    }
+  ],
+  "_comment_bom": "✅ BOM: CA-03 (description = Consequência + Trade-off), CA-04 (1ª opção Recomendado), CA-05 (2-4 opções reais, header <= 25 chars, allowFreeformInput: true)",
+  "questions_good": [
+    {
+      "header": "Banco de Pedidos",
+      "question": "Qual estratégia de persistência devemos adotar para o serviço transacional de pedidos?",
+      "allowFreeformInput": true,
+      "options": [
+        {
+          "label": "PostgreSQL com ACID (Recomendado)",
+          "description": "Garante consistência transacional forte e integridade referencial nativa. Ideal para fluxos financeiros/pedidos, exigindo gestão de migrações relacionais."
+        },
+        {
+          "label": "DynamoDB Single-Table",
+          "description": "Oferece latência previsível em escala massiva com modelo serverless. Escolha apenas se os padrões de acesso forem fixos e não exigirem joins complexos."
+        }
+      ]
+    }
+  ]
+}
+```
+
+## Checklist de Qualidade
+- [ ] **CA-03 (`description` estruturado)**: `[Consequência prática / O que faz] + [Trade-off principal ou quando escolher]`.
+- [ ] **CA-04 (`(Recomendado)` na 1ª opção)**: 1ª opção `(Recomendado)` para melhor prática técnica (exceção para decisão puramente de negócio).
+- [ ] **CA-05 (Anti-Strawman e Ergonomia)**: 2–4 opções reais, 1–4 perguntas/chamada, `header` ≤ 25 chars e `allowFreeformInput: true`.

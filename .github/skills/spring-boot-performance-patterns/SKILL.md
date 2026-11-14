@@ -1,10 +1,6 @@
 ---
 name: spring-boot-performance-patterns
-description: >-
-  Diretrizes enterprise de engenharia de performance para Spring Boot (Java 21–25+):
-  Virtual Threads (Project Loom) e mitigação de carrier pinning, dimensionamento
-  de pool HikariCP, eliminação sistemática de N+1 (Record DTOs e EntityGraph),
-  cache multi-nível (Caffeine L1 + Redis L2), Generational ZGC, AppCDS e Spring AOT.
+description: "Define diretrizes e padrões para diretrizes enterprise de engenharia de performance para Spring Boot (Java 21–25+): Virtual Threads (Project Loom) e mitigação de carrier pinning, dimensionamento de pool HikariCP, eliminação sistemática de N+1 (Record DTOs e EntityGraph), cache multi-nível (Caffeine L1 + Redis L2), Generational ZGC, AppCDS e Spring AOT. Use quando atuar em performance spring boot, virtual threads spring boot, thread pinning loom. Não use para tarefas fora do escopo de spring-boot-performance-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: quality
 triggers:
@@ -20,7 +16,6 @@ triggers:
 source_docs:
   - .github/skills/performance-engineering-patterns/SKILL.md
   - .github/agents/backend/spring-boot/spring-boot-router.agent.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
@@ -31,6 +26,10 @@ tools: []
 > **Relação com Padrões Universais**: Esta skill especializa as diretrizes arquiteturais e thresholds de performance definidos em [.github/skills/performance-engineering-patterns/SKILL.md](../performance-engineering-patterns/SKILL.md) para o ecossistema Spring Boot / Java (Virtual Threads Loom, HikariCP, JPA N+1). Consulte a skill genérica para métricas globais (Core Web Vitals thresholds, SLA/SLO, pirâmide de diagnóstico).
 
 > Base de conhecimento especializada em **engenharia de performance backend** para aplicações Spring Boot modernas (Java 21 a Java 25+). Utilizada pelo `@spring-boot-engineer` em modo Advisory (auditoria, dimensionamento, gargalos) e Implementação (aplicação direta de código otimizado).
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `spring-boot-performance-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando Usar
 

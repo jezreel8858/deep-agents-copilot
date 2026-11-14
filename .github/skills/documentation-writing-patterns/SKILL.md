@@ -1,9 +1,6 @@
 ---
 name: documentation-writing-patterns
-description: >-
-  Diretrizes agnósticas de domínio para estruturar e escrever documentação
-  técnica em Markdown com qualidade de mercado (Diátaxis, ADR/MADR, README,
-  front-matter, formatação chunking-friendly para consumo por IA).
+description: "Define diretrizes e padrões para diretrizes agnósticas de domínio para estruturar e escrever documentação técnica em Markdown com qualidade de mercado (Diátaxis, ADR/MADR, README, front-matter, formatação chunking-friendly para consumo por IA). Use quando atuar em escrever documentação, criar documentação técnica, estruturar README. Não use para tarefas fora do escopo de documentation-writing-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: documentation
 triggers:
@@ -14,7 +11,7 @@ triggers:
   - "documentar decisão técnica"
   - "gerar arquivo .md de documentação"
 tools: []
-source_docs_lazy:
+source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---
@@ -22,6 +19,14 @@ source_docs_lazy:
 # Documentation Writing Patterns
 
 > Base de conhecimento agnóstica de assunto para qualquer agent cujo trabalho seja **produzir documentação técnica em Markdown** — independente do domínio (código, processo, arquitetura, API, decisão, incidente).
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `documentation-writing-patterns` ou quando outra skill específica cobrir integralmente o escopo.
+
+## Diretrizes e Padrões Canônicos
+
+- Seguir estritamente as regras, invariantes e fluxos descritos nas seções abaixo.
 
 ## Quando Usar
 
@@ -54,7 +59,7 @@ Todo documento pertence a **exatamente um** dos 4 quadrantes — nunca misturar 
 
 ## 2.1) Documentos de Planejamento de Workflow (Plan/Blueprint/Spec/Implementation Plan)
 
-Documentos produzidos pelos agentes de planejamento (`tech-solution-architect`, `refactor-planner`, `requirements-analyst`, `feature-planner`, `business-rules-extractor`, `*-arch-advisor`) pertencem a **uma de duas categorias**, análogas ao fluxo `spec.md → plan.md → tasks.md` do GitHub Spec Kit. Nunca misturar as duas no mesmo arquivo.
+Documentos produzidos pelos agentes de planejamento (`tech-solution-architect`, `refactor-planner`, `requirements-analyst`, `feature-planner`, `business-rules-extractor`, `<stack>-arch-advisor`) pertencem a **uma de duas categorias**, análogas ao fluxo `spec.md → plan.md → tasks.md` do GitHub Spec Kit. Nunca misturar as duas no mesmo arquivo.
 
 ### Categoria A — Documento de PLANEJAMENTO (prosa/escopo/decisão)
 
@@ -64,13 +69,18 @@ Front-matter YAML canônico:
 
 ```yaml
 ---
-status: draft # draft | approved | superseded
-date: YYYY-MM-DD
-autor: <nome-do-agent-gerador>
-workflow: <workflow-canonico-1-a-9>
-related-plan: <path-do-doc-de-implementacao-correspondente | N/A>
+status: DRAFT | APPROVED
+approved: false | true
+author: "@<nome-do-agent-planejador>"
+plan_type: "feature | refactor | architecture | implementation | test-strategy | bug-triage | requirements | governance"
+created_at: "AAAA-MM-DD"
+related-planning-doc: "docs/plans/<tipo>/<arquivo>.md | N/A"
+allowed_files:
+  - "caminho/ou/glob/**"
 ---
 ```
+
+**Árvore unificada R-064**: planos residem em `docs/plans/<tipo>/` — `feature/`, `refactor/`, `architecture/`, `implementation/`, `test-strategy/`, `bug-triage/`, `requirements/`, `governance/` (`plan_type` = nome da subpasta). Agents planejadores permanecem **100% Read-Only** e emitem o plano estruturado; a **persistência física `.md`** é de `@docs-engineer` (ou `@governance-maintainer` para `governance`).
 
 Estrutura mínima obrigatória: Front-matter → Contexto/Problema → Opções consideradas → Decisão → **Alternativas Rejeitadas (obrigatória)** → **🛡️ Modelagem de Ameaças & Requisitos de Segurança (Shift-Left) (obrigatória)** → Consequências/Riscos → DoD (1 critério único de "pronto" a nível de documento).
 
@@ -88,6 +98,7 @@ autor: <nome-do-agent-gerador>
 workflow: <workflow-canonico-1-a-9>
 related-planning-doc: <path-do-doc-de-planejamento-aprovado> # obrigatório, R-064
 progress: 0 # percentual opcional, calculável a partir do checklist
+reversibility: T1 | T2 | T3 # obrigatório, R-064 — tier predominante do documento, ver task-decomposition-patterns/SKILL.md §7
 ---
 ```
 
@@ -96,8 +107,8 @@ Checklist GFM obrigatório (formato único, GFM puro `[ ]`/`[x]` — substitui c
 ```markdown
 Progresso: 3/12 tarefas concluídas
 
-- [ ] <descrição atômica e rastreável da tarefa> `{paralelizavel: true, responsavel: "<stack>-bug-fixer"}`
-- [x] <tarefa já concluída> `{paralelizavel: false, responsavel: "feature-developer"}`
+- [ ] <descrição atômica e rastreável da tarefa> `{paralelizavel: true, responsavel: "<stack>-developer"}`
+- [x] <tarefa já concluída> `{paralelizavel: false, responsavel: "<stack>-developer"}`
 ```
 
 Regras do checklist:
@@ -106,6 +117,7 @@ Regras do checklist:
 - Seção de progresso agregado ("Progresso: N/M tarefas concluídas") no topo do documento, antes do primeiro item.
 - **Alternativas Rejeitadas não é obrigatória** (documento é prescritivo, não decisório) — referenciar o doc de planejamento aprovado via `related-planning-doc` para o racional da decisão.
 - **Checklist Defensivo Pré-Code-Review é obrigatório** no encerramento do documento para garantir validações de segurança (sanitização de inputs, ausência de secrets/tokens hardcoded, tratamento seguro de erros e conformidade de autorização) antes da submissão a code-review.
+- **`reversibility` é obrigatório** (R-064): declarar o tier T1/T2/T3 predominante do documento conforme `task-decomposition-patterns/SKILL.md` §7; mutações T3 exigem confirmação humana explícita e estratégia de rollback dedicada antes da execução.
 
 ### DoD vs Acceptance Criteria (não fundir)
 
@@ -122,7 +134,7 @@ status: approved
 date: 2026-01-10
 autor: tech-solution-architect
 workflow: 3-arquitetura
-related-plan: docs/plan/refactor-auth-module-plan.md
+related-plan: docs/plans/refactor-auth-module-plan.md
 ---
 
 # Blueprint: Migração do módulo de autenticação
@@ -145,16 +157,17 @@ status: draft
 date: 2026-01-11
 autor: refactor-planner
 workflow: 3-arquitetura
-related-planning-doc: docs/plan/refactor-auth-module-blueprint.md
+related-planning-doc: docs/plans/refactor-auth-module-blueprint.md
 progress: 0
+reversibility: T2
 ---
 
 # Plano de Refatoração: Módulo de autenticação
 
 Progresso: 0/3 tarefas concluídas
 
-- [ ] Extrair `AuthService` para interface `{paralelizavel: false, responsavel: "spring-boot-feature-developer"}`
-- [ ] Atualizar testes unitários `{paralelizavel: true, responsavel: "spring-boot-unit-test-writer"}`
+- [ ] Extrair `AuthService` para interface `{paralelizavel: false, responsavel: "spring-boot-developer"}`
+- [ ] Atualizar testes unitários `{paralelizavel: true, responsavel: "spring-boot-test-engineer"}`
 
 ## 🔒 Checklist Defensivo Pré-Code-Review
 - [ ] Sanitização e validação de inputs em todas as fronteiras de entrada

@@ -1,7 +1,6 @@
 ---
 name: git-conflict-resolution-patterns
-description: >-
-  Fornece protocolo determinístico para diagnosticar, investigar e resolver conflitos de merge, rebase ou cherry-pick em Git preservando a intenção semântica original de ambas as branches. Use quando um conflito precisar ser resolvido hunk a hunk com rastreabilidade de autoria e validação por testes. Não use para desfazer histórico (`git revert`) ou para resolução puramente automática sem revisão semântica.
+description: "Fornece protocolo determinístico para diagnosticar, investigar e resolver conflitos de merge, rebase ou cherry-pick em Git preservando a intenção semântica original de ambas as branches. Use quando um conflito precisar ser resolvido hunk a hunk com rastreabilidade de autoria e validação por testes. Não use para desfazer histórico (`git revert`) ou para resolução puramente automática sem revisão semântica."
 tier: 2
 category: process
 triggers:
@@ -15,13 +14,16 @@ triggers:
 source_docs:
   - .github/skills/git-governance/SKILL.md
   - .github/skills/terminal-governance/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
 ---
 
 # Git Conflict Resolution Patterns
+
+## Quando Usar
+
+- Ativação em cenários de conflito de merge, conflito de rebase, resolver conflito git.
 
 ## 0) Problema Resolvido & Princípios Fundamentais
 

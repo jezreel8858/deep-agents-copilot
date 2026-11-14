@@ -45,7 +45,7 @@ from governance_runner.routing.model import (
     WorkflowSpec,
 )
 
-_TOKEN_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+_TOKEN_PATTERN = re.compile(r"^(?:<[a-z0-9_-]+>|[a-z0-9]+)(?:-[a-z0-9]+)*$")
 _WILDCARD_PREFIX = "*"
 
 

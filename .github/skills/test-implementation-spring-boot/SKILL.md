@@ -1,8 +1,6 @@
 ---
 name: test-implementation-spring-boot
-description: 
-  Padrões consolidados para implementação de testes em Spring Boot com JUnit 5
-  e Mockito, incluindo unit tests, integration tests e testes de repositório.
+description: "Define diretrizes e padrões para padrões consolidados para implementação de testes em Spring Boot com JUnit 5 e Mockito, incluindo unit tests, integration tests e testes de repositório. Use quando atuar em spring boot testing, junit 5, mockito. Não use para tarefas fora do escopo de test-implementation-spring-boot ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: testing
 triggers:
@@ -18,7 +16,6 @@ triggers:
 source_docs:
   - .github/instructions/spring-boot-backend.instructions.md
   - .github/skills/test-implementation-backend/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
@@ -28,6 +25,14 @@ tools: []
 
 > **Escopo**: implementação específica para stack **Java + Spring Boot 3+ + JUnit 5 + Mockito + JaCoCo**.
 > Para padrões agnósticos de backend, consulte `test-implementation-backend`.
+
+## Quando Usar
+
+- Ativação em cenários de spring boot testing, junit 5, mockito.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `test-implementation-spring-boot` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Contexto
 
@@ -141,108 +146,16 @@ assertThrows(IntegrationException.class,
 
 ## 2) Repository Tests — @DataJpaTest
 
-### Test Slice com H2 In-Memory
-
-```java
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
-class [Entidade]RepositoryTest {
-  
-  @Autowired
-  private [Entidade]Repository [entidade]Repository;
-  
-  @Autowired
-  private TestEntityManager entityManager;
-  
-  @Test
-  @DisplayName("Deve retornar [entidade] por campo único")
-  void deveRetornarPorCampoUnico() {
-    [Entidade] entidade = [Entidade].builder().campo("valor").build();
-    entityManager.persistAndFlush(entidade);
-    
-    Optional<[Entidade]> resultado = [entidade]Repository.findByCampo("valor");
-    
-    assertTrue(resultado.isPresent());
-    assertEquals("valor", resultado.get().getCampo());
-  }
-
-  @Test
-  @DisplayName("Deve retornar lista vazia quando nenhum registro encontrado")
-  void deveRetornarListaVazia_quandoNenhumRegistroEncontrado() {
-    List<[Entidade]> resultado = [entidade]Repository.findAll();
-    assertThat(resultado).isEmpty();
-  }
-}
-```
+- Testar queries customizadas isoladamente com `@DataJpaTest` e banco em memória/Testcontainers.
 
 ## 3) Controller Tests — @WebMvcTest
 
-### HTTP Mock Testing com MockMvc
-
-```java
-@WebMvcTest([Entidade]Controller.class)
-class [Entidade]ControllerTest {
-  
-  @Autowired
-  private MockMvc mockMvc;
-  
-  @Autowired
-  private ObjectMapper objectMapper;
-  
-  @MockBean
-  private [Entidade]Service [entidade]Service;
-  
-  @Test
-  @DisplayName("Deve retornar 200 OK ao buscar [entidade]")
-  void deveRetornar200_aoBuscar() throws Exception {
-    [Entidade] entidade = [Entidade].builder().id(1L).build();
-    when([entidade]Service.obterPorId(1L)).thenReturn(entidade);
-    
-    mockMvc.perform(get("/v1/[entidades]/1")
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.id").value(1L));
-  }
-
-  @Test
-  @DisplayName("Deve retornar 400 Bad Request com validação falha")
-  void deveRetornar400_comValidacaoFalha() throws Exception {
-    mockMvc.perform(post("/v1/[entidades]")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content("{}"))
-        .andExpect(status().isBadRequest());
-    
-    verify([entidade]Service, never()).salvar(any());
-  }
-}
-```
+- Validar contratos HTTP, serialização JSON, status codes e Bean Validation (`@Valid`) via `MockMvc` e `@MockitoBean`.
 
 ## 4) Integration Tests — @SpringBootTest
 
-### Full Context (apenas para integração real)
-
-```java
-@SpringBootTest
-@Transactional
-class [Entidade]IntegrationTest {
-  
-  @Autowired
-  private [Entidade]Repository [entidade]Repository;
-  
-  @Autowired
-  private [Entidade]Service [entidade]Service;
-  
-  @Test
-  @DisplayName("Deve criar e buscar [entidade] end-to-end")
-  void deveCriarEBuscarE2E() {
-    [Entidade] entidade = [Entidade].builder().campo("valor").build();
-    [Entidade] salvo = [entidade]Repository.save(entidade);
-    
-    assertNotNull(salvo.getId());
-    assertTrue([entidade]Repository.findById(salvo.getId()).isPresent());
-  }
-}
-```
+- Reservar `@SpringBootTest` apenas para fluxos críticos ponta a ponta.
+- Exemplos completos de código Java para `@DataJpaTest`, `@WebMvcTest` e `@SpringBootTest` em [`references/detailed-patterns-and-examples.md`](references/detailed-patterns-and-examples.md).
 
 ## 5) Coverage Targets (JaCoCo)
 
@@ -333,3 +246,7 @@ assertThat(resultado)
 - Spring Testing: https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.testing
 - JaCoCo: https://www.eclemma.org/jacoco/
 - [Padrões Genéricos Backend (Base)](../test-implementation-backend/SKILL.md)
+
+## Checklist de Conformidade
+
+- [ ] Diretrizes, contratos e restrições de escopo de `test-implementation-spring-boot` verificados e atendidos.

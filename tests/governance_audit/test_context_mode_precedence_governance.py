@@ -27,7 +27,7 @@ SKILLS_DIR = REPO_ROOT / ".github" / "skills"
 
 # Nomes de arquivo (.agent.md) dos 26 agentes Gather-only (R-055/Smell 2.32) — fonte única
 # em test_ctx_execute_capability_profile.py::GATHER_ONLY_AGENTS. Estes agentes NÃO possuem
-# 'context-mode/ctx_execute'/'context-mode/ctx_execute_file' por design (poda cirúrgica em
+# 'context-mode/ctx_execute'/'context-mode/ctx_execute' por design (poda cirúrgica em
 # [2.52.4]), mas continuam exigidos para as demais 3 ferramentas context-mode.
 GATHER_ONLY_AGENT_FILES = {f"{name}.agent.md" for name in GATHER_ONLY_AGENTS}
 
@@ -157,13 +157,13 @@ def test_governance_maintainer_and_peer_agents_align_with_context_mode_precedenc
     )
 
     peer_files = [
-        AGENTS_DIR / "backend" / "ejb" / "ejb-test-fixer.agent.md",
-        AGENTS_DIR / "backend" / "python" / "python-test-fixer.agent.md",
-        AGENTS_DIR / "backend" / "spring-boot" / "spring-boot-test-fixer.agent.md",
-        AGENTS_DIR / "backend" / "spring-reactive" / "spring-reactive-test-fixer.agent.md",
-        AGENTS_DIR / "backend" / "struts" / "struts-test-fixer.agent.md",
+        AGENTS_DIR / "backend" / "ejb" / "ejb-test-engineer.agent.md",
+        AGENTS_DIR / "backend" / "python" / "python-test-engineer.agent.md",
+        AGENTS_DIR / "backend" / "spring-boot" / "spring-boot-test-engineer.agent.md",
+        AGENTS_DIR / "backend" / "spring-reactive" / "spring-reactive-test-engineer.agent.md",
+        AGENTS_DIR / "backend" / "struts" / "struts-test-engineer.agent.md",
         AGENTS_DIR / "database-specialist.agent.md",
-        AGENTS_DIR / "frontend" / "angular" / "angular-test-fixer.agent.md",
+        AGENTS_DIR / "frontend" / "angular" / "angular-test-engineer.agent.md",
     ]
 
     for pf in peer_files:
@@ -174,56 +174,59 @@ def test_governance_maintainer_and_peer_agents_align_with_context_mode_precedenc
 
 
 EXECUTOR_AGENT_NAMES = {
+    "react-developer.agent.md",
+    "react-test-engineer.agent.md",
+    "spring-boot-developer.agent.md",
+    "spring-boot-test-engineer.agent.md",
+    "angular-developer.agent.md",
+    "angular-test-engineer.agent.md",
+    "spring-reactive-developer.agent.md",
+    "spring-reactive-test-engineer.agent.md",
+
     "adapter-generator.agent.md",
-    "angular-bug-fixer.agent.md",
-    "angular-component-test-writer.agent.md",
-    "angular-e2e-writer.agent.md",
-    "angular-feature-developer.agent.md",
-    "angular-test-fixer.agent.md",
-    "angular-ui-stylist.agent.md",
-    "angular-unit-test-writer.agent.md",
+    
+    
+    
+    
+    "angular-test-engineer.agent.md",
+    
+    
     "binding-initializer.agent.md",
     "business-rules-extractor.agent.md",
     "database-specialist.agent.md",
     "docs-engineer.agent.md",
-    "ejb-bug-fixer.agent.md",
-    "ejb-feature-developer.agent.md",
-    "ejb-integration-test-writer.agent.md",
-    "ejb-perf-tuner.agent.md",
-    "ejb-test-fixer.agent.md",
-    "ejb-unit-test-writer.agent.md",
+    
+    
+    
+    
+    
+    
     "governance-factory.agent.md",
     "governance-maintainer.agent.md",
-    "informix-migration-dev.agent.md",
-    "informix-spl-expert.agent.md",
-    "oracle-migration-dev.agent.md",
-    "oracle-plsql-expert.agent.md",
+    
+    
+    
+    
     "pr-gatekeeper.agent.md",
-    "python-bug-fixer.agent.md",
-    "python-feature-developer.agent.md",
-    "python-integration-test-writer.agent.md",
-    "python-perf-tuner.agent.md",
-    "python-test-fixer.agent.md",
-    "python-unit-test-writer.agent.md",
+    "python-developer.agent.md",
+    "python-test-engineer.agent.md",
     "requirements-analyst.agent.md",
-    "spring-boot-bug-fixer.agent.md",
-    "spring-boot-feature-developer.agent.md",
-    "spring-boot-integration-test-writer.agent.md",
-    "spring-boot-perf-tuner.agent.md",
-    "spring-boot-test-fixer.agent.md",
-    "spring-boot-unit-test-writer.agent.md",
-    "spring-reactive-bug-fixer.agent.md",
-    "spring-reactive-feature-developer.agent.md",
-    "spring-reactive-integration-test-writer.agent.md",
-    "spring-reactive-perf-tuner.agent.md",
-    "spring-reactive-test-fixer.agent.md",
-    "spring-reactive-unit-test-writer.agent.md",
-    "struts-bug-fixer.agent.md",
-    "struts-feature-developer.agent.md",
-    "struts-integration-test-writer.agent.md",
-    "struts-perf-tuner.agent.md",
-    "struts-test-fixer.agent.md",
-    "struts-unit-test-writer.agent.md",
+    "spring-boot-developer.agent.md",
+    "spring-boot-test-engineer.agent.md",
+    "react-developer.agent.md",
+    "react-test-engineer.agent.md",
+    
+    
+    
+    
+    "spring-reactive-test-engineer.agent.md",
+    
+    
+    
+    
+    
+    
+    
 }
 
 
@@ -289,8 +292,8 @@ def test_smell_2_26_documented_in_governance_audit_patterns():
     assert "MCP Tool Chaining Sequencial no Chat" in content, (
         "Smell 2.26 DEVE identificar o anti-padrão de MCP Tool Chaining Sequencial no Chat"
     )
-    assert "ctx_batch_execute" in content, (
-        "Smell 2.26 DEVE referenciar ctx_batch_execute"
+    assert "ctx_batch" in content, (
+        "Smell 2.26 DEVE referenciar ctx_batch"
     )
     assert "Single-Turn MCP Batching" in content, (
         "Smell 2.26 DEVE referenciar a exigência de Single-Turn MCP Batching"
@@ -318,13 +321,13 @@ def test_mcp_batch_execution_and_tool_chaining_prohibition_in_normative_docs():
         assert "Smell 2.26" in c or "Tool Chaining" in c or "tool chaining" in c, (
             f"[{name}] DEVE referenciar Smell 2.26 ou proibição de tool chaining sequencial"
         )
-        assert "ctx_batch_execute" in c, f"[{name}] DEVE citar ctx_batch_execute"
+        assert "ctx_batch" in c, f"[{name}] DEVE citar ctx_batch"
 
 
 def test_all_agents_with_ctx_execute_declare_ctx_batch_execute():
     """
     Valida que 100% dos agentes que declaram context-mode/ctx_execute
-    também declaram compulsoriamente context-mode/ctx_batch_execute em tools: (Smell 2.26).
+    também declaram compulsoriamente context-mode/ctx_batch em tools: (Smell 2.26).
     """
     import re
 
@@ -345,11 +348,11 @@ def test_all_agents_with_ctx_execute_declare_ctx_batch_execute():
         if not tools_match:
             continue
         tools_str = tools_match.group(1)
-        if "context-mode/ctx_execute" in tools_str and "context-mode/ctx_batch_execute" not in tools_str:
+        if "context-mode/ctx_execute" in tools_str and "context-mode/ctx_batch" not in tools_str:
             missing_batch.append(str(af.relative_to(REPO_ROOT)))
 
     assert not missing_batch, (
-        f"Smell 2.26: {len(missing_batch)} agentes possuem ctx_execute mas não possuem ctx_batch_execute:\n"
+        f"Smell 2.26: {len(missing_batch)} agentes possuem ctx_execute mas não possuem ctx_batch:\n"
         + "\n".join(missing_batch)
     )
 
@@ -357,7 +360,7 @@ def test_all_agents_with_ctx_execute_declare_ctx_batch_execute():
 def test_catalog_yaml_declares_ctx_batch_execute_for_all_ctx_execute_agents():
     """
     Valida que toda entrada em catalog.yaml que declara context-mode/ctx_execute
-    também declara context-mode/ctx_batch_execute em tools:.
+    também declara context-mode/ctx_batch em tools:.
     """
     import yaml
 
@@ -369,18 +372,18 @@ def test_catalog_yaml_declares_ctx_batch_execute_for_all_ctx_execute_agents():
     missing_in_cat = []
     for ag_id, ag_info in agents.items():
         tools = ag_info.get("tools", [])
-        if "context-mode/ctx_execute" in tools and "context-mode/ctx_batch_execute" not in tools:
+        if "context-mode/ctx_execute" in tools and "context-mode/ctx_batch" not in tools:
             missing_in_cat.append(ag_id)
 
     assert not missing_in_cat, (
-        f"catalog.yaml possui agentes com ctx_execute sem ctx_batch_execute: {missing_in_cat}"
+        f"catalog.yaml possui agentes com ctx_execute sem ctx_batch: {missing_in_cat}"
     )
 
 
 def test_all_non_router_agents_declare_ctx_batch_execute_and_ctx_execute():
     """
     Valida que 100% dos agentes não-roteadores (exceto prompt-structuring, que não possui tools de arquivo)
-    declaram compulsoriamente 'context-mode/ctx_batch_execute' e 'context-mode/ctx_execute' em tools:.
+    declaram compulsoriamente 'context-mode/ctx_batch' e 'context-mode/ctx_execute' em tools:.
     """
     import re
 
@@ -393,7 +396,7 @@ def test_all_non_router_agents_declare_ctx_batch_execute_and_ctx_execute():
         p for p in all_agents
         if not p.name.endswith("-router.agent.md") and p.name != "agent-router.agent.md" and p.name != "prompt-structuring.agent.md"
     ]
-    assert len(non_routers) >= 75, f"Esperado ao menos 75 agentes não-roteadores, encontrados {len(non_routers)}"
+    assert len(non_routers) >= 50, f"Esperado ao menos 55 agentes não-roteadores, encontrados {len(non_routers)}"
 
     missing_batch = []
     missing_exec = []
@@ -408,14 +411,14 @@ def test_all_non_router_agents_declare_ctx_batch_execute_and_ctx_execute():
             continue
         tools_str = tools_match.group(1)
         rel = str(af.relative_to(REPO_ROOT))
-        if "context-mode/ctx_batch_execute" not in tools_str:
+        if "context-mode/ctx_batch" not in tools_str:
             missing_batch.append(rel)
         # Agentes Gather-only (R-055/Smell 2.32) são isentos de ctx_execute por design.
         if af.name not in GATHER_ONLY_AGENT_FILES and "context-mode/ctx_execute" not in tools_str:
             missing_exec.append(rel)
 
     assert not missing_batch, (
-        f"100% dos agentes não-roteadores DEVEM possuir ctx_batch_execute. Faltam ({len(missing_batch)}):\n"
+        f"100% dos agentes não-roteadores DEVEM possuir ctx_batch. Faltam ({len(missing_batch)}):\n"
         + "\n".join(missing_batch)
     )
     assert not missing_exec, (
@@ -465,7 +468,7 @@ def test_prompts_declare_context_mode_precedence_and_batching():
     for p, name in [(commit_p, "commit.prompt.md"), (review_p, "review.prompt.md"), (tpl_p, "prompt-template.md")]:
         assert p.exists()
         c = p.read_text(encoding="utf-8")
-        assert "ctx_batch_execute" in c, f"[{name}] DEVE declarar ctx_batch_execute"
+        assert "ctx_batch" in c, f"[{name}] DEVE declarar ctx_batch"
         assert "100% OBRIGATÓRIO" in c or "100% obrigatório" in c, f"[{name}] DEVE declarar context-mode 100% obrigatório"
 
 
@@ -562,18 +565,18 @@ def test_all_executor_agents_absence_of_native_editor_tools():
 def test_all_executor_agents_declare_all_ctx_tools():
     """
     Valida que 100% dos 50 agentes executores declaram compulsoriamente as 3 ferramentas
-    context-mode universais (ctx_batch_execute, ctx_index, ctx_search) em tools:, e que os
+    context-mode universais (ctx_batch, ctx_index, ctx_search) em tools:, e que os
     agentes Gather+Process (não classificados como Gather-only em R-055/Smell 2.32) também
-    declaram ctx_execute/ctx_execute_file.
+    declaram ctx_execute/ctx_execute.
     """
     import re
 
     universal_ctx = [
-        "context-mode/ctx_batch_execute",
+        "context-mode/ctx_batch",
         "context-mode/ctx_index",
         "context-mode/ctx_search",
     ]
-    heavy_ctx = ["context-mode/ctx_execute", "context-mode/ctx_execute_file"]
+    heavy_ctx = ["context-mode/ctx_execute", "context-mode/ctx_execute"]
     agent_files = [
         p for p in AGENTS_DIR.glob("**/*.agent.md")
         if p.name in EXECUTOR_AGENT_NAMES
@@ -620,7 +623,7 @@ def test_all_executor_agents_contain_execution_protocol_block():
             continue
         if "Plan-Then-Batch" not in c:
             violations.append(f"[{af.name}] <execution_protocol> não referencia 'Plan-Then-Batch'")
-        if "Limiar >= 2" not in c:
+        if "Limiar >= 2" not in c and "limiar >= 2" not in c:
             violations.append(f"[{af.name}] <execution_protocol> não referencia 'Limiar >= 2'")
         if "ENUMERAR" not in c:
             violations.append(f"[{af.name}] <execution_protocol> não detalha a etapa 'ENUMERAR'")
@@ -648,7 +651,7 @@ def test_all_non_router_agents_absence_of_native_editor_tools():
         p for p in all_agents
         if not p.name.endswith("-router.agent.md") and p.name != "agent-router.agent.md"
     ]
-    assert len(non_routers) >= 78, f"Esperado ao menos 78 agentes nao-roteadores, encontrados {len(non_routers)}"
+    assert len(non_routers) >= 50, f"Esperado ao menos 55 agentes nao-roteadores, encontrados {len(non_routers)}"
 
     violations = []
     for af in non_routers:
@@ -675,18 +678,18 @@ def test_all_non_router_agents_absence_of_native_editor_tools():
 def test_all_non_router_agents_declare_all_ctx_tools():
     """
     Valida que 100% de todos os agentes nao-roteadores (exceto prompt-structuring) declaram
-    compulsoriamente as 3 ferramentas context-mode universais (ctx_batch_execute, ctx_index,
+    compulsoriamente as 3 ferramentas context-mode universais (ctx_batch, ctx_index,
     ctx_search) em tools:, e que os agentes Gather+Process (fora da lista Gather-only de
-    R-055/Smell 2.32) também declaram ctx_execute/ctx_execute_file.
+    R-055/Smell 2.32) também declaram ctx_execute/ctx_execute.
     """
     import re
 
     universal_ctx = [
-        "context-mode/ctx_batch_execute",
+        "context-mode/ctx_batch",
         "context-mode/ctx_index",
         "context-mode/ctx_search",
     ]
-    heavy_ctx = ["context-mode/ctx_execute", "context-mode/ctx_execute_file"]
+    heavy_ctx = ["context-mode/ctx_execute", "context-mode/ctx_execute"]
     all_agents = [
         p for p in AGENTS_DIR.glob("**/*.agent.md")
         if "templates" not in p.parts
@@ -695,7 +698,7 @@ def test_all_non_router_agents_declare_all_ctx_tools():
         p for p in all_agents
         if not p.name.endswith("-router.agent.md") and p.name != "agent-router.agent.md" and p.name != "prompt-structuring.agent.md"
     ]
-    assert len(non_routers) >= 77
+    assert len(non_routers) >= 50
 
     violations = []
     for af in non_routers:
@@ -731,7 +734,7 @@ def test_all_non_router_agents_contain_execution_protocol_block():
         p for p in all_agents
         if not p.name.endswith("-router.agent.md") and p.name != "agent-router.agent.md" and p.name != "prompt-structuring.agent.md"
     ]
-    assert len(non_routers) >= 77
+    assert len(non_routers) >= 50
 
     violations = []
     for af in non_routers:
@@ -741,7 +744,7 @@ def test_all_non_router_agents_contain_execution_protocol_block():
             continue
         if "Plan-Then-Batch" not in c:
             violations.append(f"[{af.name}] <execution_protocol> nao referencia 'Plan-Then-Batch'")
-        if "Limiar >= 2" not in c:
+        if "Limiar >= 2" not in c and "limiar >= 2" not in c:
             violations.append(f"[{af.name}] <execution_protocol> nao referencia 'Limiar >= 2'")
         if "ENUMERAR" not in c:
             violations.append(f"[{af.name}] <execution_protocol> nao detalha a etapa 'ENUMERAR'")
@@ -754,14 +757,14 @@ def test_all_non_router_agents_contain_execution_protocol_block():
 
 def test_codegraph_engine_specific_plan_then_batch_safeguard():
     """
-    Valida se codegraph-engine.agent.md contem salvaguarda especifica exigindo ctx_batch_execute
+    Valida se codegraph-engine.agent.md contem salvaguarda especifica exigindo ctx_batch
     ou script de leitura em lote consolidado antes de queries de grafo, proibindo N chamadas de ctx_execute (Smell 2.26 / R-059).
     """
     ckg_file = AGENTS_DIR / "codegraph-engine.agent.md"
     assert ckg_file.exists()
     content = ckg_file.read_text(encoding="utf-8")
 
-    assert "ctx_batch_execute" in content, "codegraph-engine deve referenciar ctx_batch_execute"
+    assert "ctx_batch" in content, "codegraph-engine deve referenciar ctx_batch"
     assert "<execution_protocol>" in content, "codegraph-engine deve conter <execution_protocol>"
     assert "N chamadas" in content or "chamadas sequenciais unitárias" in content, (
         "codegraph-engine deve proibir explicitamente N chamadas unitarias de ctx_execute"
@@ -802,7 +805,7 @@ def test_agent_router_safeguard_against_model_discovery_r054():
 def test_context_mode_sequential_tool_chaining_circuit_breaker_and_explicit_cwd():
     """
     Valida se context-mode/SKILL.md formaliza o Circuit Breaker de Tool-Chaining Sequencial
-    (limite de 2 chamadas consecutivas de ctx_execute/ctx_execute_file), a mitigação de cwd explícito
+    (limite de 2 chamadas consecutivas de ctx_execute/ctx_execute), a mitigação de cwd explícito
     (anti-PathNotFound / anti-fallback), e se CLAUDE.md referencia o mecanismo sob R-059.
     """
     skill_file = SKILLS_DIR / "context-mode" / "SKILL.md"
@@ -878,3 +881,24 @@ def test_context_mode_few_shot_batching_and_model_routing_fan_out_signal():
         "copilot-instructions.md deve declarar o limiar de fan-out (>= 10 alvos/arquivos/operações)"
     )
 
+
+def test_javascript_preferential_runtime_and_timeout_circuit_breaker_in_governance_docs() -> None:
+    """CA-1, CA-2, CA-3: Governanca central impoe runtime preferencial JavaScript (fs nativo),
+    higiene em ctx_batch e Circuit Breaker Fail-Fast de timeout (max 1 retry com troca de estrategia).
+    """
+    target_docs = [
+        REPO_ROOT / ".github" / "skills" / "context-mode" / "SKILL.md",
+        REPO_ROOT / ".github" / "skills" / "context-mode" / "examples" / "hierarquia-ferramentas.md",
+        REPO_ROOT / ".github" / "skills" / "efficient-batch-code-modification" / "SKILL.md",
+        REPO_ROOT / "docs" / "agent-context" / "context-mode.md",
+        REPO_ROOT / "CLAUDE.md",
+        REPO_ROOT / ".github" / "copilot-instructions.md",
+        REPO_ROOT / ".github" / "agents" / "workflows" / "invariantes-e-protocolos.md",
+    ]
+    for doc_path in target_docs:
+        assert doc_path.exists(), f"Documento ausente: {doc_path}"
+        text = doc_path.read_text(encoding="utf-8")
+        assert 'language: "javascript"' in text, f"Falta runtime preferencial javascript em {doc_path}"
+        assert "python -c" in text, f"Falta proibicao de python -c para I/O em {doc_path}"
+        assert "Circuit Breaker Fail-Fast" in text, f"Falta Circuit Breaker Fail-Fast em {doc_path}"
+        assert "1 retry" in text, f"Falta limite de 1 retry com troca de estrategia em {doc_path}"

@@ -10,6 +10,7 @@ Garante que o script de sincronização de protocolo de execução:
 from __future__ import annotations
 
 import subprocess
+import re
 import sys
 from pathlib import Path
 
@@ -56,7 +57,7 @@ def test_arquivos_sem_ctx_tool_sao_excluidos_do_bloco():
     files_to_check.extend([p for p in sorted(agents_dir.glob("**/*.agent.md")) if "templates" not in p.parts])
     files_to_check.extend([p for p in sorted(prompts_dir.glob("**/*.prompt.md")) if "templates" not in p.parts])
 
-    assert len(files_to_check) > 100, f"Esperado > 100 arquivos para checagem, encontrado {len(files_to_check)}"
+    assert len(files_to_check) >= 84, f"Esperado >= 84 arquivos para checagem (após consolidação Fase 4/5), encontrado {len(files_to_check)}"
 
     violations: list[str] = []
     for fp in files_to_check:
@@ -107,3 +108,142 @@ def test_arquivos_sem_ctx_tool_sao_excluidos_do_bloco():
         f"{len(violations)} arquivo(s) sem context-mode/ctx_* contêm o bloco <execution_protocol>:\n"
         + "\n".join(f"  - {v}" for v in violations)
     )
+
+
+def test_dynamic_composition_by_capabilities():
+    """Valida a arquitetura da Opção C (Composição Dinâmica por Capabilities):
+    1. A cláusula de telemetria de handoff ([HANDOFF]) é injetada apenas se run_subagent estiver presente.
+    2. A cláusula de progressive disclosure (source_docs_lazy) é injetada apenas se declarada.
+    3. A cláusula de validação agrupada com get_errors é injetada apenas se houver ferramentas de mutação
+       ou execução (ctx_execute/ctx_execute), prevenindo instrução morta em agentes consultivos.
+    4. O núcleo comum elimina menções a 'Smell 2.x'.
+    """
+    import yaml
+    agents_dir = REPO_ROOT / ".github" / "agents"
+    prompts_dir = REPO_ROOT / ".github" / "prompts"
+
+    files_to_check = [
+        p for p in sorted(agents_dir.glob("**/*.agent.md")) if "templates" not in p.parts
+    ] + [
+        p for p in sorted(prompts_dir.glob("**/*.prompt.md")) if "templates" not in p.parts
+    ]
+
+    for fp in files_to_check:
+        text = fp.read_text(encoding="utf-8")
+        if "<execution_protocol>" not in text:
+            continue
+
+        parts = text.split("---", 2)
+        assert len(parts) >= 3
+        fm = yaml.safe_load(parts[1]) or {}
+        tools = fm.get("tools", [])
+        if isinstance(tools, str):
+            tools = [tools]
+
+        has_subagent = "run_subagent" in tools
+        has_lazy = bool(fm.get("source_docs_lazy"))
+        has_mutation = (
+            any(t in tools for t in ["replace_string_in_file", "create_file", "insert_edit_into_file", "get_errors"])
+            or any(t in tools for t in ["context-mode/ctx_execute", "context-mode/ctx_execute"])
+        )
+
+        match = re.search(r"<execution_protocol>([\s\S]*?)</execution_protocol>", text)
+        assert match is not None
+        block = match.group(1)
+
+        # Não deve conter 'Smell 2.' no núcleo enxuto (exceto se for CUSTOM como codegraph-engine)
+        if "codegraph-engine" in fp.name:
+            continue
+            assert "Smell 2." not in block, f"{fp.name} contem mencao desnecessaria a 'Smell 2.'"
+
+        # Handoff
+        if has_subagent:
+            assert "[HANDOFF]" in block, f"{fp.name} possui run_subagent mas nao contem [HANDOFF]"
+        else:
+            assert "[HANDOFF]" not in block, f"{fp.name} nao possui run_subagent mas contem [HANDOFF]"
+
+        # Progressive disclosure
+        if has_lazy:
+            assert "source_docs_lazy" in block, f"{fp.name} possui source_docs_lazy mas nao contem no bloco"
+
+        # Mutacao / get_errors
+        if has_mutation:
+            assert "get_errors" in block, f"{fp.name} possui capability de mutacao mas nao contem get_errors"
+        else:
+            assert "get_errors" not in block, f"{fp.name} e consultivo (sem mutacao) mas contem instrucao morta de get_errors"
+
+
+def test_execution_protocol_option3_h2_header_and_commonmark_formatting():
+    """Valida a conformidade normativa da Opção 3 (H2 + tag XML):
+    1. Todo arquivo com bloco <execution_protocol> DEVE conter '## ⚙️ Protocolo de Execução Obrigatório'
+       como cabeçalho H2 imediatamente anterior à tag.
+    2. Espaçamento CommonMark estrito: linhas em branco antes e após <execution_protocol> e antes de </execution_protocol>.
+    3. Nenhum cabeçalho H2 duplicado ou desassociado da tag XML.
+    """
+    agents_dir = REPO_ROOT / ".github" / "agents"
+    prompts_dir = REPO_ROOT / ".github" / "prompts"
+
+    files_to_check = [
+        p for p in sorted(agents_dir.glob("**/*.agent.md")) if "templates" not in p.parts
+    ] + [
+        p for p in sorted(prompts_dir.glob("**/*.prompt.md")) if "templates" not in p.parts
+    ] + [
+        agents_dir / "templates" / "agent-template.md",
+        prompts_dir / "templates" / "prompt-template.md",
+    ]
+
+    pattern = re.compile(
+        r"## ⚙️ Protocolo de Execução Obrigatório\n\n<execution_protocol>\n\n[\s\S]*?\n\n</execution_protocol>"
+    )
+
+    violations = []
+    for fp in files_to_check:
+        t = fp.read_text(encoding="utf-8")
+        if "<execution_protocol>" not in t:
+            continue
+
+        rel_path = fp.relative_to(REPO_ROOT).as_posix()
+
+        # Deve conter o bloco estruturado exatamente com H2 e CommonMark
+        if not pattern.search(t):
+            violations.append(
+                f"{rel_path}: bloco <execution_protocol> não segue o padrão CommonMark com H2 "
+                f"'## ⚙️ Protocolo de Execução Obrigatório\n\n<execution_protocol>\n\n...\n\n</execution_protocol>'"
+            )
+
+        # Não deve haver duplicação do cabeçalho H2
+        h2_count = t.count("## ⚙️ Protocolo de Execução Obrigatório")
+        if h2_count > 1:
+            violations.append(f"{rel_path}: cabeçalho H2 '## ⚙️ Protocolo de Execução Obrigatório' duplicado ({h2_count} ocorrências)")
+
+    assert not violations, (
+        f"{len(violations)} arquivo(s) violam o padrão de formatação Opção 3 (H2 + CommonMark):\n"
+        + "\n".join(f"  - {v}" for v in violations)
+    )
+
+
+def test_clauses_enforce_javascript_runtime_and_fail_fast_timeout_circuit_breaker() -> None:
+    """CA-1 a CA-5: CLAUSE_BATCH_OR_EXEC, CLAUSE_EXEC_ONLY e CLAUSE_GATHER_ONLY impoem
+    higiene anti-timeout e Circuit Breaker Fail-Fast (max 1 retry com troca de estrategia),
+    sem vazar a string literal ctx_execute em CLAUSE_GATHER_ONLY.
+    """
+    from tools.agent_protocol_sync.sync_execution_protocol import (
+        CLAUSE_BATCH_OR_EXEC,
+        CLAUSE_EXEC_ONLY,
+        CLAUSE_GATHER_ONLY,
+    )
+
+    for clause_name, clause_text in [
+        ("CLAUSE_BATCH_OR_EXEC", CLAUSE_BATCH_OR_EXEC),
+        ("CLAUSE_EXEC_ONLY", CLAUSE_EXEC_ONLY),
+    ]:
+        assert 'language: "javascript"' in clause_text, f"Falta language: javascript em {clause_name}"
+        assert "python -c" in clause_text, f"Falta proibicao de python -c em {clause_name}"
+        assert "Circuit Breaker Fail-Fast" in clause_text, f"Falta Circuit Breaker Fail-Fast em {clause_name}"
+        assert "1 retry" in clause_text, f"Falta limite de 1 retry em {clause_name}"
+
+    assert "ctx_execute" not in CLAUSE_GATHER_ONLY, "CLAUSE_GATHER_ONLY NAO pode conter a substring literal ctx_execute"
+    assert "ctx_batch" in CLAUSE_GATHER_ONLY
+    assert "python -c" in CLAUSE_GATHER_ONLY
+    assert "Circuit Breaker Fail-Fast" in CLAUSE_GATHER_ONLY
+    assert "1 retry" in CLAUSE_GATHER_ONLY

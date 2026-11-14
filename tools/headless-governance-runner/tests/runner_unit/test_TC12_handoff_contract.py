@@ -275,7 +275,7 @@ class TestTC12HandoffContractAdversarialRegressions:
     ) -> None:
         # Arrange: 'para' aponta para 'agent-auditor', mas 'roteamento_grafo.next_node' diverge
         payload = _criar_payload_agent_audit_valido_v1_3()
-        payload["roteamento_grafo"]["next_node"] = "python-feature-developer"
+        payload["roteamento_grafo"]["next_node"] = "python-developer"
 
         # Act & Assert
         with pytest.raises(HandoffPayloadInvalidoError) as exc_info:

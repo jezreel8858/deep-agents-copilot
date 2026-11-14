@@ -22,8 +22,8 @@
     "run_subagent",
     "run_in_terminal",
     "context-mode/ctx_execute",
-    "context-mode/ctx_execute_file",
-    "context-mode/ctx_batch_execute",
+    "context-mode/ctx_execute",
+    "context-mode/ctx_batch",
     "context-mode/ctx_index",
     "context-mode/ctx_search",
     "codegraph/query",
@@ -41,7 +41,7 @@
     "data_sensitivity": "internal"
   },
   "model_preferences": {
-    "recommended_model": "Gemini 3.8 Flash",
+    "recommended_model": "Gemini 4 Argon",
     "cost_tier": "1x"
   },
   "input_contract": {

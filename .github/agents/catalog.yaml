@@ -3,7 +3,7 @@ domain: governanca-ai-generica
 agents:
   agent-router:
     id: agent-router
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 1
     version: 2.0.0
     domain: Orquestracao agent-first
@@ -14,6 +14,9 @@ agents:
     - triagem
     - entrypoint
     - roteamento
+    - gate2
+    - plan_ref
+    - r-064
     prerequisite_docs:
     - CLAUDE.md
     - .github/copilot-instructions.md
@@ -50,7 +53,7 @@ agents:
     estimated_time_minutes: 15
   prompt-structuring:
     id: prompt-structuring
-    model: Gemini 3.8 Flash
+    model: Gemini 4 Argon
     priority: 1.5
     version: 2.0.0
     domain: Refinamento estrutural de prompt (passo mandatorio)
@@ -91,11 +94,11 @@ agents:
     estimated_time_minutes: 5
   bug-triage:
     id: bug-triage
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 2
     domain: Triagem de bugs e regressao
-    description: Classificar bugs, reproduzir erro, analisar blast radius e propor
-      plano minimo de correcao
+    description: Classificar bugs, reproduzir erro, analisar blast radius e propor plano
+      minimo de correcao
     keywords:
     - bug
     - regressao
@@ -121,11 +124,11 @@ agents:
     - run_in_terminal
     - ask_questions
     - run_subagent
-    - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
     - context-mode/ctx_index
     - context-mode/ctx_search
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
+    - mcp-atlassian/jira_get_issue
+    - mcp-atlassian/jira_search
     related_skills:
     - context-mode
     - terminal-governance
@@ -137,7 +140,9 @@ agents:
     - agent-contracts
     - confidence-fallback-policy
     - agent-evals-lab
+    - jira-mcp
     source_docs:
+    - .github/skills/jira-mcp/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
     - .github/agents/bug-triage.agent.md
@@ -151,7 +156,7 @@ agents:
     estimated_time_minutes: 25
   test-strategy:
     id: test-strategy
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 3
     domain: Estrategia de testes
     description: Planejar cobertura, cenarios e criterios de aceitacao por risco
@@ -179,8 +184,8 @@ agents:
     - context-mode/ctx_execute
     - context-mode/ctx_index
     - context-mode/ctx_search
-    - context-mode/ctx_batch_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_batch
+    - context-mode/ctx_execute
     related_skills:
     - context-mode
     - agent-contracts
@@ -196,7 +201,7 @@ agents:
     estimated_time_minutes: 25
   refactor-planner:
     id: refactor-planner
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 4
     version: 2.0.0
     domain: Planejamento e decomposição macro de refatoração
@@ -231,17 +236,19 @@ agents:
     - list_dir
     - ask_questions
     - run_subagent
-    - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
     - context-mode/ctx_index
     - context-mode/ctx_search
-    - context-mode/ctx_fetch_and_index
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_index
+    - context-mode/ctx_batch
     - context-mode/ctx_stats
     - context-mode/ctx_doctor
     - context-mode/ctx_upgrade
     - context-mode/ctx_purge
     - context-mode/ctx_insight
+    - context-mode/ctx_execute
+    - context-mode/ctx_execute
+    - mcp-atlassian/jira_get_issue
+    - mcp-atlassian/jira_search
     related_skills:
     - refactoring-planning-patterns
     - context-mode
@@ -252,15 +259,26 @@ agents:
     - integration-contract-analysis
     - socratic-grilling-patterns
     source_docs:
+    - .github/skills/documentation-writing-patterns/SKILL.md
+    - .github/skills/security-review-patterns/SKILL.md
+    - .github/skills/refactoring-planning-patterns/SKILL.md
+    - .github/skills/task-decomposition-patterns/SKILL.md
+    - .github/skills/business-rules-governance/SKILL.md
+    - .github/skills/context-mode/SKILL.md
+    - .github/skills/integration-contract-analysis/SKILL.md
+    - .github/skills/efficient-batch-code-modification/SKILL.md
+    - .github/skills/socratic-grilling-patterns/SKILL.md
+    - .github/skills/handoff-governance/SKILL.md
+    - .github/skills/agent-contracts/SKILL.md
+    - .github/skills/code-tracing/SKILL.md
+    - .github/skills/design-pattern-selection-patterns/SKILL.md
+    - .github/skills/jira-mcp/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
-    - .github/agents/refactor-planner.agent.md
-    - .github/skills/refactoring-planning-patterns/SKILL.md
-    - .github/skills/socratic-grilling-patterns/SKILL.md
     estimated_time_minutes: 30
   deep-search:
     id: deep-search
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 7
     version: 1.0.0
     domain: Pesquisa interna e externa (Retriever/Researcher)
@@ -299,11 +317,11 @@ agents:
     - tavily/tavily_map
     - tavily/tavily_research
     - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     - context-mode/ctx_search
-    - context-mode/ctx_fetch_and_index
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_index
+    - context-mode/ctx_batch
     related_skills:
     - context-mode
     - terminal-governance
@@ -326,11 +344,10 @@ agents:
     model: Claude Opus 5.5
     priority: 8
     version: 2.2.0
-    domain: Arquitetura técnica, blueprint, contratos de integração e divisão por
-      stack
+    domain: Arquitetura técnica, blueprint, contratos de integração e divisão por stack
     description: 'Arquiteto de solução técnica: viabilidade, blueprint técnico, contratos
-      de API (OpenAPI/AsyncAPI/gRPC), modelo de dados e divisão macro do trabalho
-      em seções isoladas ([BACKEND_TASKS], [FRONTEND_TASKS]) com metodologia B1/B2/B3.'
+      de API (OpenAPI/AsyncAPI/gRPC), modelo de dados e divisão macro do trabalho em
+      seções isoladas ([BACKEND_TASKS], [FRONTEND_TASKS]) com metodologia B1/B2/B3.'
     keywords:
     - blueprint técnico
     - tech solution architect
@@ -367,17 +384,22 @@ agents:
     - list_dir
     - ask_questions
     - run_subagent
-    - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
     - context-mode/ctx_index
     - context-mode/ctx_search
-    - context-mode/ctx_fetch_and_index
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_index
+    - context-mode/ctx_batch
     - context-mode/ctx_stats
     - context-mode/ctx_doctor
     - context-mode/ctx_upgrade
     - context-mode/ctx_purge
     - context-mode/ctx_insight
+    - figma/get_file_nodes
+    - figma/export_image
+    - figma/get_styles
+    - figma/get_component_sets
+    - figma/get_comments
+    - mcp-atlassian/jira_get_issue
+    - mcp-atlassian/jira_search
     related_skills:
     - context-mode
     - agent-contracts
@@ -389,21 +411,33 @@ agents:
     - mermaid-diagrams
     - code-tracing
     - socratic-grilling-patterns
+    - figma-mcp
+    - figma-design-to-code-patterns
     source_docs:
+    - .github/skills/documentation-writing-patterns/SKILL.md
+    - .github/skills/security-review-patterns/SKILL.md
+    - .github/skills/context-mode/SKILL.md
+    - .github/skills/integration-contract-analysis/SKILL.md
+    - .github/skills/mermaid-diagrams/SKILL.md
+    - .github/skills/task-decomposition-patterns/SKILL.md
+    - .github/skills/efficient-batch-code-modification/SKILL.md
+    - .github/skills/harness-engineering-patterns/SKILL.md
+    - .github/skills/requirements-engineering-patterns/SKILL.md
+    - .github/skills/socratic-grilling-patterns/SKILL.md
+    - .github/skills/handoff-governance/SKILL.md
+    - .github/skills/agent-contracts/SKILL.md
+    - .github/skills/code-tracing/SKILL.md
+    - .github/skills/agent-evals-lab/SKILL.md
+    - .github/skills/design-pattern-selection-patterns/SKILL.md
+    - .github/skills/figma-mcp/SKILL.md
+    - .github/skills/figma-design-to-code-patterns/SKILL.md
+    - .github/skills/jira-mcp/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
-    - .github/agents/tech-solution-architect.agent.md
-    - .github/agents/README.md
-    - .github/instructions/README.md
-    - .github/skills/README.md
-    - .github/skills/integration-contract-analysis/SKILL.md
-    - .github/skills/task-decomposition-patterns/SKILL.md
-    - .github/skills/mermaid-diagrams/SKILL.md
-    - .github/skills/socratic-grilling-patterns/SKILL.md
     estimated_time_minutes: 45
   agent-auditor:
     id: agent-auditor
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 8.4
     version: 1.2.0
     domain: Auditoria semantica de governanca do catalogo (meta-nivel, read-only)
@@ -436,9 +470,7 @@ agents:
     - list_dir
     - run_subagent
     - context-mode/ctx_search
-    - context-mode/ctx_batch_execute
-    - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_batch
     - context-mode/ctx_index
     related_skills:
     - governance-audit-patterns
@@ -460,7 +492,7 @@ agents:
     estimated_time_minutes: 30
   governance-factory:
     id: governance-factory
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 9
     version: 1.3.0
     domain: Governanca e autoria de artefatos e stacks (agent/skill/prompt/stack)
@@ -496,10 +528,10 @@ agents:
     - ask_questions
     - run_subagent
     - context-mode/ctx_search
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - context-mode/ctx_execute
     - context-mode/ctx_index
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     related_skills:
     - context-mode
     - agent-contracts
@@ -515,7 +547,7 @@ agents:
     estimated_time_minutes: 30
   governance-maintainer:
     id: governance-maintainer
-    model: Gemini 3.8 Flash
+    model: Gemini 4 Argon
     priority: 8.9
     version: 1.0.0
     domain: Manutenção atômica, refatoração e sincronização em lote da governanca
@@ -550,9 +582,9 @@ agents:
     - get_errors
     - ask_questions
     - run_subagent
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - context-mode/ctx_search
     - context-mode/ctx_index
     related_skills:
@@ -571,7 +603,7 @@ agents:
     estimated_time_minutes: 20
   runtime-verifier:
     id: runtime-verifier
-    model: Gemini 3.8 Flash
+    model: Gemini 4 Argon
     priority: 3.2
     version: 1.0.0
     domain: Verificacao de saude do ambiente de execucao (build/sandbox)
@@ -599,31 +631,35 @@ agents:
     - file_search
     - run_in_terminal
     - run_subagent
-    - context-mode/ctx_batch_execute
-    - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_batch
+    - context-mode/ctx_doctor
     - context-mode/ctx_index
     - context-mode/ctx_search
     related_skills:
     - terminal-governance
     - agent-contracts
+    - embedded-runtime-governance
     source_docs:
     - CLAUDE.md
     - .github/copilot-instructions.md
-    - .github/agents/runtime-verifier.agent.md
+    - .github/skills/git-governance/SKILL.md
+    - .github/skills/context-mode/SKILL.md
+    - .github/skills/efficient-batch-code-modification/SKILL.md
+    - .github/skills/handoff-governance/SKILL.md
+    - .github/skills/agent-contracts/SKILL.md
     - .github/skills/terminal-governance/SKILL.md
-    - .github/instructions/devops.instructions.md
+    - .github/skills/embedded-runtime-governance/SKILL.md
     estimated_time_minutes: 10
   pr-gatekeeper:
     id: pr-gatekeeper
-    model: Gemini 3.8 Flash
+    model: Gemini 4 Argon
     priority: 4.5
-    version: 1.3.0
+    version: 2.0.0
     domain: Preparacao de entrega (PR/commit/changelog)
-    description: Prepara submissao de PR pos-aprovacao do quality gate — sintetiza
-      diff, aplica guardrail de segredos e template semantico SSOT (/commit), gera
-      titulo e descricao de PR com matriz de risco e atualiza CHANGELOG.md. Nunca
-      executa git add/commit/push (R-031).
+    description: Orquestra submissao de PR pos-aprovacao do quality gate — sintetiza
+      diff, aplica guardrail de segredos, gera commit, titulo/descricao de PR (matriz
+      de risco e plano de rollback) e CHANGELOG.md conforme a skill git-governance (SSOT).
+      Nunca executa git add/commit/push (R-031).
     keywords:
     - pull request
     - commit semantico
@@ -636,8 +672,6 @@ agents:
     - .github/skills/terminal-governance/SKILL.md
     - .github/skills/git-governance/SKILL.md
     - .github/skills/git-conflict-resolution-patterns/SKILL.md
-    - .github/prompts/commit.prompt.md
-    - docs/ai-copilot/global-git-commit-instructions.md
     - .github/skills/efficient-batch-code-modification/SKILL.md
     - .github/skills/context-mode/SKILL.md
     - .github/projects.local.yaml
@@ -649,31 +683,42 @@ agents:
     - file_search
     - list_dir
     - run_in_terminal
-    - context-mode/ctx_batch_execute
-    - context-mode/ctx_execute
+    - context-mode/ctx_batch
     - ask_questions
     - run_subagent
     - context-mode/ctx_search
-    - context-mode/ctx_execute_file
     - context-mode/ctx_index
+    - mcp-atlassian/jira_get_issue
+    - mcp-atlassian/jira_search
+    - mcp-atlassian/jira_add_comment
+    - mcp-atlassian/jira_transition_issue
     related_skills:
     - git-governance
     - agent-contracts
     - terminal-governance
     - git-conflict-resolution-patterns
+    - embedded-runtime-governance
+    - jira-mcp
+    - jira-writing-patterns
     source_docs:
+    - .github/skills/git-governance/SKILL.md
+    - .github/skills/git-conflict-resolution-patterns/SKILL.md
+    - .github/skills/efficient-batch-code-modification/SKILL.md
+    - .github/skills/context-mode/SKILL.md
+    - .github/projects.local.yaml
+    - .github/skills/handoff-governance/SKILL.md
+    - .github/skills/agent-contracts/SKILL.md
+    - .github/skills/terminal-governance/SKILL.md
+    - .github/skills/jira-mcp/SKILL.md
+    - .github/skills/jira-writing-patterns/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
-    - .github/agents/pr-gatekeeper.agent.md
-    - .github/skills/git-governance/SKILL.md
-    - .github/skills/terminal-governance/SKILL.md
-    - .github/skills/git-conflict-resolution-patterns/SKILL.md
-    - .github/prompts/commit.prompt.md
-    - docs/ai-copilot/global-git-commit-instructions.md
+    - .github/skills/plan-conformance-patterns/SKILL.md
+    - .github/skills/embedded-runtime-governance/SKILL.md
     estimated_time_minutes: 15
   database-specialist:
     id: database-specialist
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 5.5
     version: 1.0.0
     domain: Migracoes de schema, otimizacao de query e integridade referencial
@@ -705,9 +750,9 @@ agents:
     - run_subagent
     - context-mode/ctx_search
     - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - context-mode/ctx_index
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     related_skills:
     - agent-contracts
     - confidence-fallback-policy
@@ -723,7 +768,7 @@ agents:
     estimated_time_minutes: 35
   ddd-bounded-context-mapper:
     id: ddd-bounded-context-mapper
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 4.8
     version: 1.0.0
     domain: Mapeamento semantico de Bounded Contexts (DDD), dominios de negocio e
@@ -761,8 +806,8 @@ agents:
     - context-mode/ctx_search
     - context-mode/ctx_index
     - context-mode/ctx_execute
-    - context-mode/ctx_batch_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_batch
+    - context-mode/ctx_execute
     related_skills:
     - context-mode
     - agent-contracts
@@ -777,7 +822,7 @@ agents:
     estimated_time_minutes: 25
   adr-sentinel:
     id: adr-sentinel
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 4.7
     version: 1.0.0
     domain: Auditoria de conformidade arquitetural contra Architectural Decision Records
@@ -812,8 +857,8 @@ agents:
     - run_subagent
     - context-mode/ctx_search
     - context-mode/ctx_execute
-    - context-mode/ctx_batch_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_batch
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     related_skills:
     - context-mode
@@ -827,9 +872,67 @@ agents:
     - .github/skills/documentation-writing-patterns/SKILL.md
     - .github/skills/context-mode/SKILL.md
     estimated_time_minutes: 20
+  plan-critic:
+    id: plan-critic
+    model: Claude Sonnet 5.5
+    priority: 4.75
+    version: 1.0.0
+    domain: Revisao cetica universal pre-HITL de planos R-064 (Two-Tier Hybrid, Dupla Lente)
+    description: Revisor Cetico Universal Pre-HITL dos planos R-064 nas 8 categorias de docs/plans/<tipo>/ com Tier 1 deterministico e Tier 2 semantico isolado (Context Firewall), Dupla Lente (Gate 1 dominio / Gate 2 codigo), Fast-Pass e teto de iteracoes. Estritamente read-only — nunca edita planos nem implementa codigo.
+    keywords:
+    - plan-critic
+    - revisor cetico
+    - revisao cetica pre-hitl
+    - critica de plano
+    - parecer do revisor
+    - pre-hitl review
+    prerequisite_docs:
+    - CLAUDE.md
+    - .github/copilot-instructions.md
+    - .github/agents/README.md
+    - .github/agents/catalog.yaml
+    related_agents:
+    - agent-router
+    - docs-engineer
+    - governance-maintainer
+    - adr-sentinel
+    - agent-auditor
+    tools:
+    - grep_search
+    - file_search
+    - list_dir
+    - ask_questions
+    - run_subagent
+    - context-mode/ctx_search
+    - context-mode/ctx_batch
+    - context-mode/ctx_index
+    related_skills:
+    - plan-conformance-patterns
+    - reflection-self-critique-patterns
+    - context-mode
+    - agent-contracts
+    - handoff-governance
+    - agent-safety-guardrails
+    - security-review-patterns
+    - code-review-patterns
+    - confidence-fallback-policy
+    - governance-audit-patterns
+    source_docs:
+    - CLAUDE.md
+    - .github/copilot-instructions.md
+    - .github/agents/plan-critic.agent.md
+    - .github/skills/plan-conformance-patterns/SKILL.md
+    - .github/skills/plan-conformance-patterns/references/pre-hitl-skeptical-review-rubric.md
+    - .github/skills/context-mode/SKILL.md
+    - .github/skills/agent-safety-guardrails/SKILL.md
+    - .github/skills/security-review-patterns/SKILL.md
+    - .github/skills/code-review-patterns/SKILL.md
+    - .github/skills/confidence-fallback-policy/SKILL.md
+    - .github/skills/governance-audit-patterns/SKILL.md
+    estimated_time_minutes: 15
   repo-hygiene-auditor:
     id: repo-hygiene-auditor
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 4.8
     version: 1.0.0
     domain: Auditoria de higiene estrutural, documentação essencial e padrões de repositório
@@ -867,8 +970,8 @@ agents:
     - run_subagent
     - context-mode/ctx_search
     - context-mode/ctx_execute
-    - context-mode/ctx_batch_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_batch
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     related_skills:
     - agent-contracts
@@ -882,7 +985,7 @@ agents:
     estimated_time_minutes: 15
   adapter-generator:
     id: adapter-generator
-    model: Gemini 3.8 Flash
+    model: Gemini 4 Argon
     priority: 10.7
     domain: Geracao automatica de adapters
     description: Gera automaticamente adapters por-projeto em `.github/instructions/local/`
@@ -912,10 +1015,10 @@ agents:
     - grep_search
     - run_subagent
     - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     - context-mode/ctx_search
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     related_skills:
     - context-mode
     - agent-contracts
@@ -931,7 +1034,7 @@ agents:
     version: 1.0.0
   binding-initializer:
     id: binding-initializer
-    model: Gemini 3.8 Flash
+    model: Gemini 4 Argon
     priority: 10.5
     domain: Inicializacao de binding context
     description: Agente operacional de inicialização de binding context. Detecta ausência
@@ -963,8 +1066,8 @@ agents:
     - list_dir
     - run_subagent
     - context-mode/ctx_search
-    - context-mode/ctx_batch_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_batch
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     related_skills:
     - context-mode
@@ -981,7 +1084,7 @@ agents:
     version: 1.0.0
   business-rules-extractor:
     id: business-rules-extractor
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 5
     domain: Extracao e validacao de regras de negocio
     description: 'Extrair regras de negócio de qualquer código-fonte e documentá-las
@@ -1018,26 +1121,35 @@ agents:
     - ask_questions
     - run_subagent
     - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     - context-mode/ctx_search
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
+    - mcp-atlassian/jira_get_issue
+    - mcp-atlassian/jira_search
     related_skills:
     - business-rules-governance
     - code-tracing
     - mermaid-diagrams
     - context-mode
     source_docs:
+    - .github/skills/business-rules-governance/SKILL.md
+    - .github/skills/documentation-writing-patterns/SKILL.md
+    - .github/skills/mermaid-diagrams/SKILL.md
+    - .github/skills/structured-intake-patterns/SKILL.md
+    - .github/skills/context-mode/SKILL.md
+    - .github/skills/efficient-batch-code-modification/SKILL.md
+    - .github/skills/handoff-governance/SKILL.md
+    - .github/skills/agent-contracts/SKILL.md
+    - .github/skills/code-tracing/SKILL.md
+    - .github/skills/jira-mcp/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
-    - .github/agents/business-rules-extractor.agent.md
-    - .github/skills/business-rules-governance/SKILL.md
-    - .github/skills/code-tracing/SKILL.md
     estimated_time_minutes: 60
     version: 1.1.0
   codegraph-engine:
     id: codegraph-engine
-    model: Gemini 3.8 Flash
+    model: Gemini 4 Argon
     priority: 4.95
     version: 4.1.1
     domain: Grafo de conhecimento de codigo-fonte (imports, chamadas, blast radius,
@@ -1072,8 +1184,8 @@ agents:
     - run_subagent
     - run_in_terminal
     - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_execute
+    - context-mode/ctx_batch
     - context-mode/ctx_index
     - context-mode/ctx_search
     - codegraph/query
@@ -1097,7 +1209,7 @@ agents:
     estimated_time_minutes: 30
   code-review:
     id: code-review
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 4.5
     domain: Revisao de codigo antes do merge (read-only, severidade)
     description: Revisa código (diff/PR) antes do merge por qualidade, segurança,
@@ -1125,11 +1237,11 @@ agents:
     - grep_search
     - file_search
     - run_in_terminal
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - context-mode/ctx_execute
     - run_subagent
     - context-mode/ctx_search
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     related_skills:
     - code-review-patterns
@@ -1151,7 +1263,7 @@ agents:
     version: 1.0.0
   code-style-enforcer:
     id: code-style-enforcer
-    model: Gemini 3.8 Flash
+    model: Gemini 4 Argon
     priority: 4.52
     version: 1.0.0
     domain: Verificacao de aderencia a convencoes de estilo (read-only)
@@ -1181,11 +1293,11 @@ agents:
     - grep_search
     - file_search
     - run_in_terminal
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - context-mode/ctx_execute
     - run_subagent
     - context-mode/ctx_search
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     related_skills:
     - code-review-patterns
@@ -1200,7 +1312,7 @@ agents:
     estimated_time_minutes: 15
   compliance-guardrails:
     id: compliance-guardrails
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 4.65
     version: 1.0.0
     domain: Avaliacao de conformidade regulatoria de aplicacao (read-only)
@@ -1234,8 +1346,8 @@ agents:
     - run_subagent
     - context-mode/ctx_search
     - context-mode/ctx_execute
-    - context-mode/ctx_batch_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_batch
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     related_skills:
     - compliance-governance-patterns
@@ -1284,11 +1396,11 @@ agents:
     - grep_search
     - file_search
     - run_in_terminal
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - context-mode/ctx_execute
     - run_subagent
     - context-mode/ctx_search
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     related_skills:
     - code-tracing
@@ -1305,7 +1417,7 @@ agents:
     estimated_time_minutes: 30
   devops-engineer:
     id: devops-engineer
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 8.9
     version: 1.0.0
     domain: Revisao de artefatos DevOps (read-only)
@@ -1337,8 +1449,8 @@ agents:
     - run_subagent
     - context-mode/ctx_search
     - context-mode/ctx_execute
-    - context-mode/ctx_batch_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_batch
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     related_skills:
     - devops-agent-patterns
@@ -1355,7 +1467,7 @@ agents:
     estimated_time_minutes: 25
   docs-engineer:
     id: docs-engineer
-    model: Gemini 3.8 Flash
+    model: Gemini 4 Argon
     priority: 6.5
     version: 1.0.0
     domain: Ciclo de vida de documentacao tecnica (autoria + curadoria)
@@ -1381,7 +1493,6 @@ agents:
     - business-rules-extractor
     - governance-factory
     tools:
-    - context-mode/ctx_execute
     - grep_search
     - file_search
     - list_dir
@@ -1389,8 +1500,7 @@ agents:
     - get_errors
     - run_subagent
     - context-mode/ctx_search
-    - context-mode/ctx_batch_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_batch
     - context-mode/ctx_index
     related_skills:
     - documentation-writing-patterns
@@ -1398,20 +1508,26 @@ agents:
     - agent-contracts
     - reflection-self-critique-patterns
     source_docs:
+    - .github/skills/documentation-writing-patterns/SKILL.md
+    - .github/skills/mermaid-diagrams/SKILL.md
+    - .github/skills/efficient-batch-code-modification/SKILL.md
+    - .github/skills/context-mode/SKILL.md
+    - .github/skills/reflection-self-critique-patterns/SKILL.md
+    - docs/agent-context/templates/CONTEXT.template.md
+    - .github/skills/handoff-governance/SKILL.md
+    - .github/skills/agent-contracts/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
-    - .github/agents/docs-engineer.agent.md
-    - .github/skills/documentation-writing-patterns/SKILL.md
     estimated_time_minutes: 25
   feature-planner:
     id: feature-planner
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 4.1
     version: 2.0.0
     domain: Decomposicao de feature nova em subtasks executaveis
-    description: Decompõe requisitos de feature nova (não refatoração) em subtasks
-      executáveis com dependências mapeadas, paralelização e critério de pronto objetivo.
-      Nunca implementa código; retorna plano estruturado para delegação a agents especializados.
+    description: Decompõe requisitos de feature nova (não refatoração) em subtasks executáveis
+      com dependências mapeadas, paralelização e critério de pronto objetivo. Nunca
+      implementa código; retorna plano estruturado para delegação a agents especializados.
       Distinto de refactor-planner (foco em risco/rollback de código existente).
     keywords:
     - decompor tarefa
@@ -1438,25 +1554,38 @@ agents:
     - ask_questions
     - run_subagent
     - context-mode/ctx_search
-    - context-mode/ctx_execute
-    - context-mode/ctx_batch_execute
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_batch
     - context-mode/ctx_index
+    - mcp-atlassian/jira_get_issue
+    - mcp-atlassian/jira_search
+    - mcp-atlassian/jira_create_issue
+    - mcp-atlassian/jira_update_issue
+    - mcp-atlassian/jira_add_comment
+    - mcp-atlassian/jira_transition_issue
     related_skills:
     - task-decomposition-patterns
     - agent-contracts
     - confidence-fallback-policy
     - context-mode
+    - jira-mcp
+    - jira-writing-patterns
     source_docs:
+    - .github/skills/documentation-writing-patterns/SKILL.md
+    - .github/skills/security-review-patterns/SKILL.md
+    - .github/skills/task-decomposition-patterns/SKILL.md
+    - .github/skills/requirements-engineering-patterns/SKILL.md
+    - .github/skills/context-mode/SKILL.md
+    - .github/skills/efficient-batch-code-modification/SKILL.md
+    - .github/skills/handoff-governance/SKILL.md
+    - .github/skills/agent-contracts/SKILL.md
+    - .github/skills/jira-mcp/SKILL.md
+    - .github/skills/jira-writing-patterns/SKILL.md
     - CLAUDE.md
     - .github/copilot-instructions.md
-    - .github/agents/feature-planner.agent.md
-    - .github/skills/task-decomposition-patterns/SKILL.md
-    - .github/skills/context-mode/SKILL.md
     estimated_time_minutes: 20
   performance-agent:
     id: performance-agent
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 4.6
     version: 1.0.0
     domain: Revisao especializada de performance (read-only)
@@ -1488,11 +1617,11 @@ agents:
     - grep_search
     - file_search
     - run_in_terminal
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - context-mode/ctx_execute
     - run_subagent
     - context-mode/ctx_search
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     related_skills:
     - performance-engineering-patterns
@@ -1511,15 +1640,14 @@ agents:
     estimated_time_minutes: 25
   requirements-analyst:
     id: requirements-analyst
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 4.8
     version: 2.1.0
     domain: Elicitacao e estruturacao de requisitos (prospectivo, pre-tecnico)
     description: Especialista em elicitação, refinamento e estruturação de requisitos
       de negócio e técnicos a partir de pedidos ambíguos. Converte intenção em especificações
       precisas com critérios de aceitação e regras de negócio antes do planejamento
-      técnico, materializando-as em docs/requirements/REQ-<modulo>.md como ground
-      truth.
+      técnico, materializando-as em docs/plans/requirements/<AAAAMMDD-HHMMSS>-<modulo>.md como ground truth.
     keywords:
     - levantar requisitos
     - requisito ambiguo
@@ -1547,11 +1675,16 @@ agents:
     - get_errors
     - ask_questions
     - run_subagent
-    - context-mode/ctx_execute
-    - context-mode/ctx_execute_file
     - context-mode/ctx_index
     - context-mode/ctx_search
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
+    - figma/get_file_nodes
+    - figma/export_image
+    - figma/get_styles
+    - figma/get_component_sets
+    - figma/get_comments
+    - mcp-atlassian/jira_get_issue
+    - mcp-atlassian/jira_search
     related_skills:
     - requirements-engineering-patterns
     - structured-intake-patterns
@@ -1560,17 +1693,30 @@ agents:
     - context-mode
     - efficient-batch-code-modification
     - socratic-grilling-patterns
+    - jira-mcp
+    - jira-writing-patterns
+    - figma-mcp
+    - figma-design-to-code-patterns
     source_docs:
-    - CLAUDE.md
-    - .github/copilot-instructions.md
-    - .github/agents/requirements-analyst.agent.md
     - .github/skills/requirements-engineering-patterns/SKILL.md
+    - .github/skills/structured-intake-patterns/SKILL.md
+    - .github/skills/documentation-writing-patterns/SKILL.md
+    - .github/skills/security-review-patterns/SKILL.md
+    - .github/skills/context-mode/SKILL.md
+    - .github/skills/efficient-batch-code-modification/SKILL.md
     - .github/skills/socratic-grilling-patterns/SKILL.md
     - docs/agent-context/templates/stakeholder-questionnaire.md
+    - .github/skills/handoff-governance/SKILL.md
+    - .github/skills/agent-contracts/SKILL.md
+    - .github/skills/jira-mcp/SKILL.md
+    - .github/skills/figma-mcp/SKILL.md
+    - .github/skills/figma-design-to-code-patterns/SKILL.md
+    - CLAUDE.md
+    - .github/copilot-instructions.md
     estimated_time_minutes: 25
   security-reviewer:
     id: security-reviewer
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 4.55
     version: 1.0.0
     domain: Revisao especializada de seguranca de aplicacao (read-only)
@@ -1603,11 +1749,11 @@ agents:
     - grep_search
     - file_search
     - run_in_terminal
-    - context-mode/ctx_batch_execute
+    - context-mode/ctx_batch
     - context-mode/ctx_execute
     - run_subagent
     - context-mode/ctx_search
-    - context-mode/ctx_execute_file
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     related_skills:
     - security-review-patterns
@@ -1627,14 +1773,13 @@ agents:
     estimated_time_minutes: 25
   angular-router:
     id: angular-router
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 8.5
     version: 2.0.0
     domain: Supervisor hierarquico e roteador do dominio Angular
     description: Roteador de domínio Angular e supervisor hierárquico — recebe solicitações
-      de frontend Angular do agent-router central e despacha para os 8 especialistas
-      do catálogo Angular (arch-advisor, feature-developer, bug-fixer, ui-stylist,
-      unit-test, component-test, test-fixer e e2e-writer).
+      de frontend Angular do agent-router central e despacha para os 3 especialistas
+      consolidados do catálogo Angular (angular-arch-advisor, angular-developer e angular-test-engineer).
     keywords:
     - angular
     - angular router
@@ -1650,13 +1795,8 @@ agents:
     related_agents:
     - agent-router
     - angular-arch-advisor
-    - angular-feature-developer
-    - angular-bug-fixer
-    - angular-ui-stylist
-    - angular-unit-test-writer
-    - angular-component-test-writer
-    - angular-test-fixer
-    - angular-e2e-writer
+    - angular-developer
+    - angular-test-engineer
     tools:
     - read_file
     - file_search
@@ -1673,17 +1813,15 @@ agents:
     - .github/agents/frontend/angular/angular-router.agent.md
     - .github/agents/frontend/angular/angular-catalog.yaml
     estimated_time_minutes: 15
-  database-router:
   react-router:
     id: react-router
     version: 1.0.0
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 8.5
     domain: Supervisor hierarquico e roteador do dominio React
     description: Roteador de domínio React e supervisor hierárquico — recebe solicitações
-      de frontend React do agent-router central e despacha para os 8 especialistas
-      do catálogo React (arch-advisor, feature-developer, bug-fixer, ui-stylist,
-      unit-test, component-test, test-fixer e e2e-writer).
+      de frontend React do agent-router central e despacha para os 3 especialistas
+      do catálogo React (react-arch-advisor, react-developer e react-test-engineer).
     keywords:
     - react
     - react router
@@ -1700,13 +1838,8 @@ agents:
     related_agents:
     - agent-router
     - react-arch-advisor
-    - react-feature-developer
-    - react-bug-fixer
-    - react-ui-stylist
-    - react-unit-test-writer
-    - react-component-test-writer
-    - react-test-fixer
-    - react-e2e-writer
+    - react-developer
+    - react-test-engineer
     tools:
     - read_file
     - file_search
@@ -1726,11 +1859,11 @@ agents:
   database-router:
     id: database-router
     version: 2.0.0
-    model: Gemini 3.8 Flash
+    model: Claude Sonnet 5.5
     description: Roteador de domínio de Banco de Dados e supervisor hierárquico —
       recebe solicitações de banco (Oracle e Informix) do agent-router central e despacha
-      para os 6 especialistas do catálogo database (oracle-migration-dev, oracle-plsql-expert,
-      oracle-query-tuner, informix-migration-dev, informix-spl-expert e informix-query-tuner).
+      para os 3 especialistas do catálogo database (database-arch-advisor, oracle-database-specialist
+      e informix-database-specialist).
     tools:
     - read_file
     - file_search
@@ -1756,12 +1889,9 @@ agents:
     - .github/agents/backend/database/database-catalog.yaml
     related_agents:
     - agent-router
-    - oracle-migration-dev
-    - oracle-plsql-expert
-    - oracle-query-tuner
-    - informix-migration-dev
-    - informix-spl-expert
-    - informix-query-tuner
+    - database-arch-advisor
+    - oracle-database-specialist
+    - informix-database-specialist
     related_skills:
     - agent-contracts
     - handoff-governance
@@ -1772,14 +1902,13 @@ agents:
     estimated_time_minutes: 15
   ejb-router:
     id: ejb-router
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 8.9
     version: 2.0.0
     domain: Supervisor hierarquico e roteador do dominio Java Legado EJB
     description: Roteador de domínio Java Legado EJB e supervisor hierárquico — recebe
       solicitações de backend EJB legado (EJB 2.x/3.x, JTA, MDB, EAR/WAR/JAR) do agent-router
-      central e despacha para os 7 especialistas do catálogo EJB (arch-advisor, feature-developer,
-      bug-fixer, perf-tuner, unit-test-writer, integration-test-writer e test-fixer).
+      central e despacha para os 3 especialistas do catálogo EJB (ejb-arch-advisor, ejb-developer e ejb-test-engineer).
     keywords:
     - ejb
     - ejb router
@@ -1798,12 +1927,8 @@ agents:
     related_agents:
     - agent-router
     - ejb-arch-advisor
-    - ejb-feature-developer
-    - ejb-bug-fixer
-    - ejb-perf-tuner
-    - ejb-unit-test-writer
-    - ejb-integration-test-writer
-    - ejb-test-fixer
+    - ejb-developer
+    - ejb-test-engineer
     tools:
     - read_file
     - file_search
@@ -1822,15 +1947,14 @@ agents:
     estimated_time_minutes: 15
   python-router:
     id: python-router
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 8.92
     version: 2.0.0
     domain: Supervisor hierarquico e roteador do dominio Python Backend
     description: Roteador de domínio Python Backend e supervisor hierárquico — recebe
       solicitações de backend Python (FastAPI, Flask, Django, Pydantic, SQLAlchemy,
       pytest) do agent-router central e despacha para os 7 especialistas do catálogo
-      Python (arch-advisor, feature-developer, bug-fixer, perf-tuner, unit-test-writer,
-      integration-test-writer e test-fixer).
+      Python (python-arch-advisor, python-developer e python-test-engineer).
     keywords:
     - python
     - python router
@@ -1849,12 +1973,8 @@ agents:
     related_agents:
     - agent-router
     - python-arch-advisor
-    - python-feature-developer
-    - python-bug-fixer
-    - python-perf-tuner
-    - python-unit-test-writer
-    - python-integration-test-writer
-    - python-test-fixer
+    - python-developer
+    - python-test-engineer
     tools:
     - read_file
     - file_search
@@ -1867,20 +1987,21 @@ agents:
     - agent-contracts
     - handoff-governance
     - context-mode
+    - embedded-runtime-governance
     source_docs:
     - .github/agents/backend/python/python-router.agent.md
     - .github/agents/backend/python/python-catalog.yaml
+    - .github/skills/embedded-runtime-governance/SKILL.md
     estimated_time_minutes: 15
   spring-boot-router:
     id: spring-boot-router
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 8.7
     version: 2.0.0
     domain: Supervisor hierarquico e roteador do dominio Spring Boot
     description: Roteador de domínio Spring Boot e supervisor hierárquico — recebe
       solicitações de backend Java/Spring Boot do agent-router central e despacha
-      para os 7 especialistas do catálogo Spring Boot (arch-advisor, feature-developer,
-      bug-fixer, perf-tuner, unit-test-writer, integration-test-writer e test-fixer).
+      para os 3 especialistas do catálogo Spring Boot (spring-boot-arch-advisor, spring-boot-developer e spring-boot-test-engineer).
     keywords:
     - spring boot
     - spring boot router
@@ -1896,12 +2017,8 @@ agents:
     related_agents:
     - agent-router
     - spring-boot-arch-advisor
-    - spring-boot-feature-developer
-    - spring-boot-bug-fixer
-    - spring-boot-perf-tuner
-    - spring-boot-unit-test-writer
-    - spring-boot-integration-test-writer
-    - spring-boot-test-fixer
+    - spring-boot-developer
+    - spring-boot-test-engineer
     tools:
     - read_file
     - file_search
@@ -1920,14 +2037,14 @@ agents:
     estimated_time_minutes: 15
   spring-reactive-router:
     id: spring-reactive-router
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     priority: 8.8
     version: 2.0.0
     domain: Supervisor hierarquico e roteador do dominio Spring Reactive
     description: Roteador de domínio Spring Reactive e supervisor hierárquico — recebe
       solicitações de backend reativo (WebFlux/Reactor/R2DBC) do agent-router central
-      e despacha para os 7 especialistas reativos (arch-advisor, feature-developer,
-      bug-fixer, perf-tuner, unit-test-writer, integration-test-writer, test-fixer).
+      e despacha para os 3 especialistas
+      consolidados (spring-reactive-arch-advisor, spring-reactive-developer e spring-reactive-test-engineer).
     keywords:
     - spring webflux
     - spring reactive router
@@ -1942,12 +2059,8 @@ agents:
     related_agents:
     - agent-router
     - spring-reactive-arch-advisor
-    - spring-reactive-feature-developer
-    - spring-reactive-bug-fixer
-    - spring-reactive-perf-tuner
-    - spring-reactive-unit-test-writer
-    - spring-reactive-integration-test-writer
-    - spring-reactive-test-fixer
+    - spring-reactive-developer
+    - spring-reactive-test-engineer
     tools:
     - read_file
     - file_search
@@ -1967,12 +2080,11 @@ agents:
   struts-router:
     id: struts-router
     version: 2.0.0
-    model: Claude Sonnet 5
+    model: Claude Sonnet 5.5
     description: Roteador de domínio Java Legado Struts e supervisor hierárquico —
       recebe solicitações de backend Struts legado (Struts 1.x/2.x, Actions, FormBeans,
       ActionServlet, Tiles) do agent-router central e despacha para os 7 especialistas
-      do catálogo Struts (arch-advisor, feature-developer, bug-fixer, perf-tuner,
-      unit-test-writer, integration-test-writer e test-fixer).
+      do catálogo Struts (struts-arch-advisor, struts-developer e struts-test-engineer).
     tools:
     - read_file
     - file_search
@@ -1998,12 +2110,8 @@ agents:
     related_agents:
     - agent-router
     - struts-arch-advisor
-    - struts-feature-developer
-    - struts-bug-fixer
-    - struts-perf-tuner
-    - struts-unit-test-writer
-    - struts-integration-test-writer
-    - struts-test-fixer
+    - struts-developer
+    - struts-test-engineer
     related_skills:
     - agent-contracts
     - handoff-governance
@@ -2013,7 +2121,7 @@ agents:
     - .github/agents/backend/struts/struts-catalog.yaml
     estimated_time_minutes: 15
 metadata:
-  total_agents: 37
+  total_agents: 38
   last_updated: '2026-09-15T00:00:00Z'
   changelog: '2026-09-15 (49) — Restauradas 21 entradas de agents no catalog.yaml
     (37 agents catalogados na raiz + 49 especialistas em sub-catalogos de stack =
@@ -2021,9 +2129,8 @@ metadata:
     completa do ecossistema de A2A AgentCards em .a2a/agentcards/. | 2026-09-12 (48)
     — Criado ecossistema de domínio backend para Java Legado Struts em .github/agents/backend/struts/
     (type: stack): supervisor hierárquico struts-router + sub-catálogo struts-catalog.yaml
-    + 7 especialistas canônicos (struts-arch-advisor [Read-Only], struts-feature-developer
-    [Implementer], struts-bug-fixer [Fixer], struts-perf-tuner [Performance], struts-unit-test-writer
-    [Tester], struts-integration-test-writer [Tester], struts-test-fixer [Fixer]);
+    + 3 especialistas canônicos (struts-arch-advisor [Read-Only], struts-developer
+    [Implementer/Fixer/Performance], struts-test-engineer [Tester/Fixer]);
     realizada a quádrupla sincronização atômica global obrigatória (R-015) em catalog.yaml,
     routing-graph.yaml, agent-router.agent.md e README.md. Validado via pytest — 100%
     verde. | 2026-09-11 (47) — Saneamento de governança: descontinuados e removidos
@@ -2035,9 +2142,8 @@ metadata:
     CLAUDE.md e README.md. Validado via pytest — 100% verde sem pendências. | 2026-09-11
     (46) — Criado ecossistema de domínio backend para Python em .github/agents/backend/python/
     (type: stack): supervisor hierárquico python-router + sub-catálogo python-catalog.yaml
-    + 7 especialistas canônicos (python-arch-advisor [Read-Only], python-feature-developer
-    [Implementer], python-bug-fixer [Fixer], python-perf-tuner [Performance], python-unit-test-writer
-    [Tester], python-integration-test-writer [Tester], python-test-fixer [Fixer]);
+    + 3 especialistas canônicos da tríade consolidada (python-arch-advisor [Read-Only], python-developer
+    [Implementer], python-test-engineer [Tester]);
     realizada a quádrupla sincronização atômica global obrigatória (R-015) em catalog.yaml,
     routing-graph.yaml, agent-router.agent.md e README.md. Validado via get_errors
     e pytest — 0 erros. | 2026-09-06 (45) — Sincronização atômica SSOT entre .github/prompts/commit.prompt.md
@@ -2065,10 +2171,9 @@ metadata:
     pesquisa previa compulsoria via @deep-search de diretrizes, padroes e tooling
     (JUnit 4/5, Mockito POJO unit tests, OpenEJB/TomEE Embedded, Arquillian com ShrinkWrap,
     Testcontainers para banco legado, CMT/BMT, MDB, mitigacao de deadlocks JTA e vazamentos
-    de Stateful Beans); criado sub-catalogo ejb-catalog.yaml com os 7 especialistas
-    canônicos (ejb-arch-advisor [Read-Only], ejb-feature-developer [Implementer],
-    ejb-bug-fixer [Fixer], ejb-perf-tuner [Performance], ejb-unit-test-writer [Tester],
-    ejb-integration-test-writer [Tester], ejb-test-fixer [Fixer]); criado supervisor
+    de Stateful Beans); criado sub-catalogo ejb-catalog.yaml com os 3 especialistas
+    canônicos (ejb-arch-advisor [Read-Only], ejb-developer [Implementer/Fixer/Performance],
+    ejb-test-engineer [Tester/Fixer]); criado supervisor
     hierarquico ejb-router.agent.md com R-042, banner de visibilidade de fluxo e suporte
     ao Fluxo 2 TDD (@test-strategy); e realizada a quadrupla sincronizacao atomica
     global obrigatoria (R-015) em catalog.yaml, routing-graph.yaml, agent-router.agent.md
@@ -2188,7 +2293,7 @@ metadata:
     (1 caso gov-cs-001, agent_solicitante + prosa). CLAUDE.md: nota do R-042 (v2.0.0
     -> v2.1.0 dos specialists) + diagrama de fluxo secao 4. Higiene adicional nao
     relacionada ao rename mas encontrada durante a edicao de CLAUDE.md: removida 1
-    linha orfa com caminho absoluto de sistema de arquivos real (''teste D:/workspace/porto/projeto-real'',
+    linha orfa com caminho absoluto de sistema de arquivos real (''teste <workspace>/[PROJETO-EXEMPLO]'',
     aparentemente artefato de teste acidental) no final do arquivo — violava R-043
     (nunca caminho local real em arquivo de governanca compartilhado); usuario notificado
     no texto da resposta ao vivo, nao apenas neste changelog. Preservados intencionalmente
@@ -2310,7 +2415,7 @@ metadata:
     aos 7 nomes antigos em .github/ e docs/ai-context/ — as unicas ocorrencias restantes
     sao mencoes historicas legitimas (changelog desta propria entrada, atribuicao
     de autoria em snippets/code-summarizer/{cli-runner.js,README.md}, docs/ai-context/evals/casos-code-summarizer.yaml
-    campo responsavel, e documentos datados em docs/plan/*.md e docs/requirements/*.md
+    campo responsavel, e documentos datados em docs/plans/*.md e docs/plans/requirements/*.md
     que registram decisoes passadas e nao devem ser reescritos retroativamente). Nenhuma
     pendencia remanescente desta demanda. total_agents permanece 34. | 2026-09-02
     (32) — A pedido do usuario (''nao deixe nada pendente pode ajustar os routing-graph.yaml
@@ -2334,11 +2439,11 @@ metadata:
     e mais sobre roteamento de agent, e sobre selecao de modo dentro do agent). Suite
     mantida em 56 casos (24 canonicos, 6 ambiguos, 22 regressao), validada via parser
     YAML e get_errors — 0 erros em ambos os arquivos. Nenhuma pendencia remanescente.
-    docs/plan/analise-arquitetura-multi-agent-alinhamento.md atualizado (secao 8.5
+    docs/plans/architecture/20260902-090000-analise-arquitetura-multi-agent-alinhamento.md atualizado (secao 8.5
     de ''pendente'' para ''resolvido''). total_agents permanece 34 (nenhum agent novo/removido
     nesta rodada, apenas sincronizacao de grafo/evals). | 2026-09-02 (32) — A pedido
     do usuario (''preciso que revise essa analise se estiver correta pode implementar
-    todas as mudancas'', a partir de docs/plan/analise-arquitetura-multi-agent-alinhamento.md),
+    todas as mudancas'', a partir de docs/plans/architecture/20260902-090000-analise-arquitetura-multi-agent-alinhamento.md),
     executada revisao critica seguida de implementacao. CORRECOES aplicadas a analise
     original antes de implementar: (1) REJEITADA a fusao ''code-review absorve code-style-enforcer''
     — apos ler os 2 agents reais, code-style-enforcer segue o MESMO padrao arquitetural
@@ -2450,7 +2555,7 @@ metadata:
     EJB''), identificado e corrigido gap estrutural: o motor so detectava cross-repo
     via REST (Angular apiUrl <-> Spring @RequestMapping), sem nenhuma nocao de contratos
     SOAP/JAX-WS. Investigacao real: server-side encontrado em [PROJETO-B]/[MODULO-WS]/.../ServicoExemploWeb.java
-    (classe @WebService), client-side (stub JAX-WS RI gerado) encontrado em [PROJETO-A]/.../websoma/obtervistoria/security/ServicoExemploWeb.java
+    (classe @WebService), client-side (stub JAX-WS RI gerado) encontrado em [PROJETO-A]/.../[MODULO-WS]/obtervistoria/...
     (interface @WebService) injetado em ServicoClienteExemploImpl. Implementado RF-025
     em motor-legado: deteccao de client stub (interface @WebService, operacoes via
     @RequestWrapper.localName) e implementacao server-side (classe @WebService, operacoes
@@ -2765,11 +2870,11 @@ metadata:
     arquivos, ~4min, 849 nos, 1047 arestas (1017 import, 68 http), 3 ciclos reais
     detectados, 28 arestas cross-repo (21 exact + 7 heuristic, 0 falso-positivo pos-fix).
     Agent registrado atomicamente (README.md, este catalog.yaml); nenhuma mudanca
-    em total_agents (26). Documentado em docs/requirements/REQ-grafo-conhecimento-codigo.md
+    em total_agents (26). Documentado em docs/plans/requirements/REQ-grafo-conhecimento-codigo.md
     §15..§17. [NOTA 2026-09-01 rodada 24: este motor anterior foi REMOVIDO integralmente
     na rodada 24 apos instabilidade real de producao — ver entry (24) acima. Registro
     historico mantido apenas para rastreabilidade, nao reflete o estado atual do agent.]
-    | 2026-09-01 (16) — Executado plano de remocao autorizado (docs/requirements/REQ-grafo-conhecimento-codigo.md
+    | 2026-09-01 (16) — Executado plano de remocao autorizado (docs/plans/requirements/REQ-grafo-conhecimento-codigo.md
     §13.4, rodada 14): removida a skill dependency-graph-mapping do repositorio apos
     Gate de Paridade Funcional (RNF-012) validado 9/9 com evidencia de execucao real
     (§11/§12 do REQ). Atualizados atomicamente: codegraph-engine.agent.md (v1.1.0->v1.2.0,
@@ -2781,7 +2886,7 @@ metadata:
     arquivo .github/skills/dependency-graph-mapping/SKILL.md (removido fisicamente).
     Nenhuma referencia orfa remanescente em .github/ apos varredura final (R-015/R-040).
     | 2026-09-01 (15) — Estendido agent codegraph-engine (v1.0.0 -> v1.1.0) implementando
-    RF-013..RF-019/RNF-011/RNF-012 (docs/requirements/REQ-grafo-conhecimento-codigo.md
+    RF-013..RF-019/RNF-011/RNF-012 (docs/plans/requirements/REQ-grafo-conhecimento-codigo.md
     §8.3, plano tecnico do analysis-architect rodada 6): agora cobre tambem o nivel
     arquitetural entre sistemas/servicos — coleta de artefatos de integracao via grep_search/file_search
     (RF-013), construcao real de nos type:system|service e arestas type:http|queue|event
@@ -2805,7 +2910,7 @@ metadata:
     sem alterar o veredito de RF-012/RNF-009. Registrado atomicamente em catalog.yaml
     e README.md (R-015); total_agents permanece 26. | 2026-09-01 (14) — Criado agent
     codegraph-engine (perfil Operacional/Executor, puramente deterministico) implementando
-    o MVP de nivel codigo (RF-001..RF-011) do REQ docs/requirements/REQ-grafo-conhecimento-codigo.md:
+    o MVP de nivel codigo (RF-001..RF-011) do REQ docs/plans/requirements/REQ-grafo-conhecimento-codigo.md:
     ponto de entrada unico para construcao/consulta de grafo de conhecimento de codigo-fonte
     cross-projeto (RF-003), 3 granularidades de no (arquivo/classe/funcao, RF-004)
     e 4 tipos de aresta (import/chamada/heranca/sql-table, RF-005), reaproveitando

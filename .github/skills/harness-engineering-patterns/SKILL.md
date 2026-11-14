@@ -1,15 +1,6 @@
 ---
 name: harness-engineering-patterns
-description: >-
-  Fornece diretrizes e heurísticas canônicas de Harness Engineering — o subconjunto de
-  Context Engineering que trata do "arnês" ao redor do modelo (tools, system prompt,
-  gestão de janela de contexto, permissões, hooks). Use quando precisar diagnosticar
-  comportamento anômalo de agent (harness vs. modelo), podar instrução/contexto
-  acumulado ("bloat"), aplicar o limiar prático de ~100k tokens de "zona inteligente"
-  ou auditar minimalismo/progressive disclosure de arquivos AGENTS.md/CLAUDE.md/
-  instructions. Não use para avaliação de qualidade de resposta do modelo em si
-  (isso é `agent-evals-lab`) nem para estruturação do prompt de tarefa (isso é
-  `prompt-engineering-patterns`).
+description: "Fornece diretrizes e heurísticas canônicas de Harness Engineering — o subconjunto de Context Engineering que trata do 'arnês' ao redor do modelo (tools, system prompt, gestão de janela de contexto, permissões, hooks). Use quando precisar diagnosticar comportamento anômalo de agent (harness vs. modelo), podar instrução/contexto acumulado ('bloat'), aplicar o limiar prático de ~100k tokens de 'zona inteligente' ou auditar minimalismo/progressive disclosure de arquivos AGENTS.md/CLAUDE.md/ instructions. Não use para avaliação de qualidade de resposta do modelo em si (isso é `agent-evals-lab`) nem para estruturação do prompt de tarefa (isso é `prompt-engineering-patterns`)."
 tier: 1
 category: process
 triggers:
@@ -29,13 +20,16 @@ source_docs:
   - .github/skills/context-mode/SKILL.md
   - .github/skills/prompt-engineering-patterns/SKILL.md
   - .github/skills/agent-evals-lab/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
 ---
 
 # Harness Engineering Patterns
+
+## Quando Usar
+
+- Ativação em cenários de harness engineering, diagnostico de harness, harness vs modelo.
 
 ## 0) Problema Resolvido & Princípios Fundamentais
 
@@ -110,6 +104,13 @@ Para tarefas longas e bem delimitadas com critério de saída objetivo (ex.: imp
 - **Não é um Workflow Canônico adicional** (R-050) — é uma **técnica de execução** aplicável dentro de `WORKFLOW-REFACTORING`, `WORKFLOW-BUG-FIX` ou `WORKFLOW-FEATURE-DEVELOPMENT` já existentes, quando o plano tiver múltiplos itens homogêneos e independentes.
 
 ---
+
+### 2.5) Poda Cirúrgica Anti-Bloat ("Delete e Observe" — R-061(d))
+
+Suspeita de degradação por acúmulo de instrução redundante, ambígua ou excessivamente verbosa deve ser tratada através de poda cirúrgica:
+- **Procedimento**: Remova cirurgicamente o excesso instrucional suspeito (nunca silenciosamente) e execute os testes automatizados ou o ciclo de evals para observar a normalização do comportamento.
+- **Proteção Normativa**: É expressamente VEDADO remover qualquer regra normativa (`R-xxx`) sem aprovação humana explícita via `ask_questions`.
+- **Destino Canônico**: Regras especializadas ou checklists extensos devem migrar para suas respectivas skills (`.github/skills/`) ou adapters (`.github/instructions/`), preservando os arquivos-raiz de instrução enxutos e estritamente globais.
 
 ## 3) Padrões Canônicos com Exemplos Contrastantes
 

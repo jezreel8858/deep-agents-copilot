@@ -91,7 +91,7 @@ def convert_agent_to_agentcard(agent_id: str, data: Dict[str, Any], catalog_path
     role = infer_role(agent_id, data.get("domain", ""))
     tools = data.get("tools", ["read_file", "ask_questions", "run_subagent"])
     security_profile = infer_security_profile(role, tools)
-    model = data.get("model", "Claude Sonnet 5")
+    model = data.get("model", "Claude Sonnet 5.5")
 
     capabilities = data.get("keywords", [])
     if not capabilities:

@@ -1,9 +1,6 @@
 ---
 name: refactoring-planning-patterns
-description: >-
-  Diretrizes consolidadas para planejamento e decomposição macro de refatorações
-  estruturais: Mikado Method, Strangler Fig, Branch by Abstraction, testes de
-  caracterização (Golden Master), métricas de acoplamento e rollback multicamada.
+description: "Define diretrizes e padrões para diretrizes consolidadas para planejamento e decomposição macro de refatorações estruturais: Mikado Method, Strangler Fig, Branch by Abstraction, testes de caracterização (Golden Master), métricas de acoplamento e rollback multicamada. Use quando atuar em planejamento de refatoração, refactor planning, mikado method. Não use para tarefas fora do escopo de refactoring-planning-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: process
 triggers:
@@ -19,7 +16,6 @@ triggers:
   - "rollback de refatoração"
 source_docs:
   - .github/agents/refactor-planner.agent.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
@@ -28,6 +24,10 @@ tools: []
 # Refactoring Planning Patterns
 
 > Base de conhecimento especializada em **planejamento e governança de refatorações estruturais e arquiteturais**. Utilizada pelo `@refactor-planner` para estruturar planos acíclicos atômicos (DAGs) com garantias de zero-downtime, rede de segurança e rollback desacoplado de reversão de commit.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `refactoring-planning-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando Usar
 
@@ -156,6 +156,8 @@ Cada nó do plano de refatoração deve ser estruturado com contratos estritos:
 
 ## 5) Matriz de Rollback Multicamada (Zero-Downtime)
 
+> Esta matriz detalha o rollback específico de refatorações zero-downtime; para a classificação genérica de reversibilidade (T1/T2/T3) aplicável a qualquer plano de decomposição, ver `task-decomposition-patterns/SKILL.md` §7 (fonte canônica, evitar redefinição divergente — R-055).
+
 Evitar dependência exclusiva de `git revert` em produção. Planejar contingência por camada:
 
 | Camada | Padrão Aplicado | Mecanismo de Rollback Rápido |
@@ -165,6 +167,13 @@ Evitar dependência exclusiva de `git revert` em produção. Planejar contingên
 | **Persistência / DB** | *Expand & Contract* (Parallel Change) | 1. Reverter leitura para coluna legada<br>2. Desativar dual-write<br>3. Drop de coluna nova apenas após soak time |
 
 ---
+
+## 6) Contrato de Plano R-064 — `refactor`
+
+- **`plan_type: refactor`** → `docs/plans/refactor/<AAAAMMDD-HHMMSS>-<identificador>.md`.
+- Frontmatter YAML comum R-064 obrigatório; `allowed_files` = blast radius planejado do DAG.
+- `@refactor-planner` permanece **100% Read-Only**: emite o plano (DAG, Safety Net, Matriz de Rollback); `@docs-engineer` materializa o `.md`.
+- Template completo: `references/plan-template-refactor.md`.
 
 ## Checklist Verificável de Planejamento
 
@@ -201,4 +210,4 @@ Evitar dependência exclusiva de `git revert` em produção. Planejar contingên
 - Tornhill, Adam. *Your Code as a Crime Scene*. Pragmatic Bookshelf, 2ª ed., 2024.
 - Hammant, Paul. *Branch by Abstraction* (https://paulhammant.com/blog/branch-by-abstraction.html)
 - Martin, Robert C. *Clean Architecture: Software Structure and Design*. Prentice Hall, 2017.
-
+- `references/plan-template-refactor.md` — template de plano `refactor` (R-064).

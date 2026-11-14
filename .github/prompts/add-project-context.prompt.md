@@ -6,17 +6,17 @@ description: >-
   Análise estática offline → geração automática de YAML/Markdown → validação e binding atômico.
   Execute UMA VEZ POR PROJETO (reutilizável). PRÉ-REQUISITO `/init-context` já executado.
 agent: 'agent'
+router_bypass: slash_workflow
 model: "Gemini 3.8 Flash"
 tools: ['file_search', 'grep_search', 'read_file', 'run_in_terminal', 'run_subagent', 'ask_questions', 'context-mode/ctx_search']
 argument-hint: '<caminho-absoluto-do-projeto>'
 source_docs:
-  - .github/skills/yaml-governance/SKILL.md
-  - .github/skills/context-mode/SKILL.md
-  - .github/projects.local.yaml.example
-  - .github/skills/terminal-governance/SKILL.md
-source_docs_lazy:
-  - CLAUDE.md
-  - .github/copilot-instructions.md
+  - '.github/skills/yaml-governance/SKILL.md'
+  - '.github/projects.local.yaml.example'
+  - '.github/skills/terminal-governance/SKILL.md'
+  - 'CLAUDE.md'
+  - '.github/copilot-instructions.md'
+  - '.github/skills/context-mode/SKILL.md'
 ---
 
 # `/add-project-context`
@@ -41,8 +41,19 @@ Auto-carregar contexto estruturado de um projeto com Intent Classification + Mul
 
 ---
 
+## 🎯 Invocação e Variáveis Nativas
+
+Invocação via comando slash `/add-project-context` (argumento: `<caminho-absoluto-do-projeto>`), com suporte às variáveis nativas do VS Code Copilot:
+- `${file}`: Arquivo ativo atualmente aberto e em foco no editor.
+- `${selection}`: Trecho de código ou texto selecionado no editor no momento da chamada.
+- `${workspaceFolder}`: Diretório raiz do workspace ativo na sessão.
+
+---
+
 ## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
 
+- ❌ **NÃO** invocar `@agent-router` na triagem inicial — este Slash Prompt possui `router_bypass: slash_workflow` (exceção canônica a R-037/R-063) e seu fluxo já está definido abaixo; o Orquestrador Raiz DEVE executar diretamente as instruções deste `.prompt.md` (ou despachar diretamente para o subagente previsto neste próprio prompt).
+- ✅ O uso de `context-mode` (`ctx_batch`, `ctx_execute`, `ctx_search`) é **100% OBRIGATÓRIO** quando disponível; ferramentas nativas são **fallback exclusivo** de indisponibilidade (`R-056`).
 - ✅ **APENAS** analisar o projeto externo indicado em modo read-only e gerar o adapter local em `.github/instructions/local/`.
 - ✅ **SEMPRE** atualizar o overlay local `projects.local.yaml` (gitignored, R-043) — **nunca** `catalog.yaml`.
 - ❌ **NÃO** modificar nenhum arquivo dentro do projeto externo escaneado.
@@ -51,6 +62,16 @@ Auto-carregar contexto estruturado de um projeto com Intent Classification + Mul
 ---
 >
 > **Se você é o Copilot**: Execute as FASES 1 → 2 → 3 → 4 → 4.1 sequencialmente conforme descrito abaixo. **FASE 4 (grafo de conhecimento) é OBRIGATÓRIA** — nunca opcional, nunca pulada. FASE 4.1 (integrações multi-projeto) executa automaticamente quando houver >1 projeto registrado.
+
+---
+
+---
+
+## 📋 Fluxo de Execução Passo a Passo
+
+1. **Coleta de Contexto**: Avaliar os insumos fornecidos (`${file}`, `${selection}`, `${workspaceFolder}` ou argumentos do comando `/add-project-context`).
+2. **Execução Governada**: Seguir rigorosamente as etapas operacionais detalhadas nas seções abaixo respeitando os limites de escopo e precedência do `context-mode` (`R-056`/`R-059`).
+3. **Validação e Apresentação**: Verificar o checklist de conformidade antes de apresentar a saída consolidada.
 
 ---
 
@@ -205,6 +226,11 @@ Não reexecutar o scanner — usar diretamente o `project_profile` já obtido vi
   extends: ["<adapter-sugerido-Q3>"]
   descrição: "<Q2>"
   adapter_local: ".github/instructions/local/<Q1>.instructions.md"
+  # Opcional para frontend com automação Playwright MCP (T14 / Plan frontend consolidation):
+  ui_url: "<http://localhost:porta-dev>"             # base dev URL via placeholder/env var
+  auth_strategy: "storage_state"                     # storage_state | user_data_dir | none
+  auth_env_var: "<PROJETO>_STORAGE_STATE_PATH"       # apenas o NOME da env var, nunca o valor
+  token_storage: "localStorage"                      # opcional: cookie | localStorage | sessionStorage | indexeddb (detectado pelo scanner)
   ```
 
 - **`<nome>.instructions.md`** em `./.github/instructions/local/` (SOMENTE se Q3 = "Criar novo adapter") — **delegado ao `adapter-generator`**, nunca gerado inline pelo Copilot:
@@ -235,7 +261,7 @@ Não reexecutar o scanner — usar diretamente o `project_profile` já obtido vi
 
 ### FASE 3: **Binding Atômico via Tools Nativas** (Execução — sem script externo)
 
-**Regra R-008**: Preferir `ctx_execute`/`ctx_batch_execute` para coleta e validação; aplicar mudanças com tools de edição de arquivo.
+**Regra R-008**: Preferir `ctx_execute`/`ctx_batch` para coleta e validação; aplicar mudanças com tools de edição de arquivo.
 
 O Copilot aplica mudanças **atomicamente por plano validado** (sem depender de runtime Python):
 
@@ -584,15 +610,36 @@ Exemplo típico:
 
 ---
 
+---
+
+## ✅ Checklist Antes de Apresentar
+
+- [ ] Escopo e limites de Não-Escopo (`R-056` / `R-059` / `R-060`) integralmente respeitados.
+- [ ] Entradas e contexto (`${file}`, `${selection}`, `${workspaceFolder}` ou argumentos) validados.
+- [ ] Todas as etapas operacionais do fluxo concluídas sem desvios ou inferências não autorizadas.
+- [ ] Saída formatada com evidências rastreáveis e pronta para revisão do usuário.
+
+---
+
+## 📊 Formato de Saída
+
+Apresente o resultado consolidado da execução de `/add-project-context` conforme a estrutura operacional definida neste prompt:
+- **Comando Executado**: `/add-project-context`
+- **Escopo Processado**: `${file}` / `${workspaceFolder}`
+- **Status e Evidências**: Resumo objetivo das verificações/ações realizadas e próximo passo recomendado.
+
+> **Contrato de UX `ask_questions` (R-027 / CA-03..CA-05)**: 1–4 perguntas/chamada, `header` ≤ 25 chars, `allowFreeformInput: true`, 2–4 opções reais e mutuamente exclusivas (Anti-Strawman), `description` obrigatório (`[Consequência prática / O que faz] + [Trade-off principal ou quando escolher]`) e 1ª opção `(Recomendado)` quando houver melhor prática técnica (exceção: decisão puramente de negócio/produto).
+
+## ⚙️ Protocolo de Execução Obrigatório
 
 <execution_protocol>
-**Protocolo Plan-Then-Batch (Smell 2.26 / Smell 2.13 / R-059):**
+
+**Protocolo Plan-Then-Batch (R-059):**
 1. **ENUMERAR**: Antes de qualquer ação de modificação ou inspeção, liste internamente todos os arquivos e comandos necessários para a demanda completa (não apenas o próximo passo aparente).
-2. **CONSOLIDAR (Limiar >= 2)**: Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de `ctx_execute` por alvo no chat. Use compulsoriamente `ctx_batch_execute(commands, queries)` OU script iterativo consolidado em `ctx_execute`.
-3. **DESPACHAR & VALIDAR**: Aplique todas as mutações ou leituras em processo único no sandbox (all-or-nothing verificado, R-051) e execute `get_errors` agrupado uma única vez ao final com a lista completa de arquivos alterados (quando aplicável).
-4. **Comandos curtos não suspendem a regra**: Prompts curtos ("prosseguir", "continue", "pode seguir") NÃO isentam o agente do limiar >= 2 nem do context-mode em lote — a regra vincula-se ao escopo da tarefa, nunca ao tamanho do prompt.
-5. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions, vedando loops investigativos de dívida de tokens O(N²).
-6. **Warm Start Compulsório & Batch Querying (R-060)**: Ferramentas locais que dependem de índices ou bases pré-computadas devem verificar e inicializar a base silenciosamente no primeiro comando (build-if-missing). É proibido disparar consultas granulares individuais para múltiplos nós — agrupe todas as pesquisas via chamadas em lote (batch_query, ctx_batch_execute, script iterativo) com destilação semântica e truncamento na borda (Edge Truncation).
-7. **Emissão Obrigatória de Telemetria de Handoff (R-042 / handoff-governance § 2.4)**: a cada chamada real de `run_subagent`, emitir compulsoriamente um evento `telemetry_entry` (tag `[HANDOFF]`) via `ctx_index`, incluindo `session_id` (reaproveitado do `sessionStart` do hook `context-mode`) e `sequence_index` (ordenação determinística dentro da sessão).
-8. **Progressive Disclosure de `source_docs_lazy:` (R-066 — Anti Context Bloat Inicial)**: Se este agent declara `source_docs_lazy:` em seu próprio frontmatter, esses documentos (ex.: `CLAUDE.md`, `.github/copilot-instructions.md`, `.github/agents/workflows.md`) **NÃO foram pré-carregados** — é TERMINANTEMENTE PROIBIDO usar `read_file` para carregá-los por inteiro. Consulte-os exclusivamente via `context-mode/ctx_search` com query pontual (ex.: número da regra `R-xxx` ou nome da seção) apenas quando precisar citá-los; nunca "só por garantia".
+2. **CONSOLIDAR (Limiar >= 2)**: Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de `ctx_execute` por alvo no chat. Use compulsoriamente `ctx_batch(commands, queries)` OU script iterativo consolidado em `ctx_execute`. No `ctx_execute`, use obrigatoriamente `language: "javascript"` (`fs`/`path` nativos do Node.js) para I/O, inspeção e mutação de arquivos (proibido `language: "python"` ou `python -c` para I/O, evitando bloqueio do `python.exe` pelo Windows Defender/AMSI); em `ctx_batch`, use apenas comandos shell leves com escopo restrito (proibido `python -c` inline ou varreduras recursivas irrestritas). Em caso de timeout (`ETIMEDOUT`/`timed out`/`taskkill`), aplica-se **Circuit Breaker Fail-Fast**: tolerância zero para repetir a mesma chamada/runtime — máximo de **1 retry** exigindo troca obrigatória de estratégia (migrar para `language: "javascript"` puro com `fs` ou reduzir o lote); no 2º timeout, aborte novos spawns e reporte em formato Compact Error Reporting (R-020).
+3. **Comandos curtos não suspendem a regra**: Prompts curtos ("prosseguir", "continue", "pode seguir") NÃO isentam o agente do limiar >= 2 nem do context-mode em lote — a regra vincula-se ao escopo da tarefa, nunca ao tamanho do prompt.
+4. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions (R-027: 1–4 perguntas, `header` ≤ 25 chars, `allowFreeformInput: true`, 2–4 opções reais sem espantalhos, `description` obrigatório com `[Consequência prática + Trade-off/quando escolher]` e 1ª opção `(Recomendado)` para melhor prática técnica), vedando loops investigativos de dívida de tokens O(N²).
+5. **Warm Start Compulsório & Batch Querying (R-060)**: Ferramentas locais que dependem de índices ou bases pré-computadas devem verificar e inicializar a base silenciosamente no primeiro comando (build-if-missing). É proibido disparar consultas granulares individuais para múltiplos nós — agrupe todas as pesquisas via chamadas em lote (batch_query, ctx_batch, script iterativo) com destilação semântica e truncamento na borda (Edge Truncation).
+6. **Emissão Obrigatória de Telemetria de Handoff (R-042 / handoff-governance § 2.4)**: a cada chamada real de `run_subagent`, emitir compulsoriamente um evento `telemetry_entry` (tag `[HANDOFF]`) via `ctx_index`, incluindo `session_id` (reaproveitado do `sessionStart` do hook `context-mode`) e `sequence_index` (ordenação determinística dentro da sessão).
+
 </execution_protocol>

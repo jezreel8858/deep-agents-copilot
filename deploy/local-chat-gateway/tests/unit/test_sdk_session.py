@@ -139,13 +139,13 @@ def _instalar_copilot_falso(
     tool_name_esperado: str = "read_file",
     tipo_permission_request: str = "custom_tool",
     caminho_escrita: str = "/workspaces/app/main.py",
-    subagent_agent_name: str = "python-bug-fixer",
+    subagent_agent_name: str = "python-developer",
     subagent_display_name: str = "Python Bug Fixer",
     subagent_falha: bool = False,
     subagent_erro: str = "falha simulada",
     shell_full_command_text: str = "git --no-pager status",
     shell_read_only: bool = True,
-    mcp_tool_name: str = "ctx_batch_execute",
+    mcp_tool_name: str = "ctx_batch",
     mcp_server_name: str = "context-mode",
     mcp_read_only: bool = False,
     usage_total_nano_aiu: float | None = None,
@@ -601,7 +601,7 @@ class TestStreamChat:
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """`agent_display_name` pode vir vazio -- deve cair para `agent_name`
-        (identificador tecnico, ex.: `python-bug-fixer`) em vez de exibir
+        (identificador tecnico, ex.: `python-developer`) em vez de exibir
         string vazia."""
         from local_chat_gateway.api.schemas import ChatMessage
 
@@ -609,7 +609,7 @@ class TestStreamChat:
             monkeypatch,
             eventos_disparados=[],
             tool_name_esperado="run_subagent",
-            subagent_agent_name="python-bug-fixer",
+            subagent_agent_name="python-developer",
             subagent_display_name="",
         )
 
@@ -624,7 +624,7 @@ class TestStreamChat:
         ]
 
         conteudo_inicio = chunks[2].choices[0].delta.content or ""
-        assert "python-bug-fixer" in conteudo_inicio
+        assert "python-developer" in conteudo_inicio
 
     async def test_deve_exibir_erro_quando_subagent_falha(
         self, monkeypatch: pytest.MonkeyPatch
@@ -639,7 +639,7 @@ class TestStreamChat:
             monkeypatch,
             eventos_disparados=[],
             tool_name_esperado="run_subagent",
-            subagent_agent_name="python-feature-developer",
+            subagent_agent_name="python-test-engineer",
             subagent_display_name="",
             subagent_falha=True,
             subagent_erro="timeout apos 120s",
@@ -657,7 +657,7 @@ class TestStreamChat:
 
         conteudo_fim = chunks[3].choices[0].delta.content or ""
         assert "Subagent falhou" in conteudo_fim
-        assert "python-feature-developer" in conteudo_fim
+        assert "python-test-engineer" in conteudo_fim
         assert "timeout apos 120s" in conteudo_fim
 
     async def test_deve_usar_workspaces_como_working_directory_padrao(
@@ -1021,7 +1021,7 @@ class TestStreamChat:
 
         catalogo_fake = [
             {
-                "name": "python-bug-fixer",
+                "name": "python-developer",
                 "description": "Especialista em bugs Python",
                 "prompt": "Voce e especialista em bugs Python.",
                 "infer": True,
@@ -1741,7 +1741,7 @@ class TestPermissionRequestShell:
     ) -> None:
         """Bug real investigado (2026-10-04): o SDK headless real reporta
         `PermissionRequestMcp.tool_name` como o nome CRU exposto pelo
-        servidor MCP (ex.: "ctx_batch_execute"), SEM o prefixo de exibicao
+        servidor MCP (ex.: "ctx_batch"), SEM o prefixo de exibicao
         da IDE ("mcp_context-mode_ctx_batch_execute") esperado por
         `permission_policy.tool_mcp_e_cataloga`. Isso negava `context-mode`/
         `codegraph`/`tavily` mesmo com o servidor MCP conectado e
@@ -1760,7 +1760,7 @@ class TestPermissionRequestShell:
             monkeypatch,
             eventos_disparados=eventos_disparados,
             tipo_permission_request="mcp",
-            mcp_tool_name="ctx_batch_execute",
+            mcp_tool_name="ctx_batch",
             mcp_server_name="context-mode",
             mcp_read_only=False,
         )
@@ -2000,7 +2000,7 @@ class TestStreamChatAgUiCreditsBadge:
                 permission_handler=lambda *_: True,
                 thread_id="thread-1",
                 run_id="run-1",
-                agent_model="Claude Sonnet 5",
+                agent_model="Claude Sonnet 5.5",
             )
         ]
 
@@ -2011,7 +2011,7 @@ class TestStreamChatAgUiCreditsBadge:
         )
         # agent_model (nome amigavel) tem precedencia sobre usage_model (id
         # tecnico da API) na exibicao -- mesma convencao do badge "Agente Ativo".
-        assert "Claude Sonnet 5 · 1.9 Credits" in texto_completo
+        assert "Claude Sonnet 5.5 · 1.9 Credits" in texto_completo
 
     async def test_nao_deve_exibir_badge_quando_sdk_nao_reporta_nenhum_uso(
         self, monkeypatch: pytest.MonkeyPatch
@@ -2038,7 +2038,7 @@ class TestStreamChatAgUiCreditsBadge:
                 permission_handler=lambda *_: True,
                 thread_id="thread-1",
                 run_id="run-1",
-                agent_model="Claude Sonnet 5",
+                agent_model="Claude Sonnet 5.5",
             )
         ]
 
@@ -2153,7 +2153,7 @@ class TestStreamChatAgUiContextWindowBadge:
                 permission_handler=lambda *_: True,
                 thread_id="thread-1",
                 run_id="run-1",
-                agent_model="Claude Sonnet 5",
+                agent_model="Claude Sonnet 5.5",
             )
         ]
 
@@ -2163,7 +2163,7 @@ class TestStreamChatAgUiContextWindowBadge:
             if isinstance(e, TextMessageContentEvent) and e.subagent_run_id is None
         )
         assert (
-            "*🧮 Claude Sonnet 5 · 1.9 Credits · 25% contexto (50.0k/200.0k tokens)*"
+            "*🧮 Claude Sonnet 5.5 · 1.9 Credits · 25% contexto (50.0k/200.0k tokens)*"
             in texto_completo
         )
 

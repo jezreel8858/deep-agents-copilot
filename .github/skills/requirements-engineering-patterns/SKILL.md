@@ -1,11 +1,6 @@
 ---
 name: requirements-engineering-patterns
-description: >
-  Diretrizes consolidadas de Engenharia de Requisitos (ISO/IEC/IEEE 29148, notação
-  EARS, INVEST, Gherkin/BDD, FURPS+) para elicitar, estruturar e validar requisitos
-  funcionais e não-funcionais a partir de pedidos de negócio ambíguos — antes de
-  qualquer análise técnica de impacto ou plano de implementação. Base de
-  conhecimento do agent `requirements-analyst`.
+description: "Define diretrizes e padrões para diretrizes consolidadas de Engenharia de Requisitos (ISO/IEC/IEEE 29148, notação EARS, INVEST, Gherkin/BDD, FURPS+) para elicitar, estruturar e validar requisitos funcionais e não-funcionais a partir de pedidos de negócio ambíguos — antes de qualquer análise técnica de impacto ou plano de implementação. Base de conhecimento do agent `requirements-analyst`. Use quando atuar em levantar requisitos, requisito ambíguo, elicitação de requisitos. Não use para tarefas fora do escopo de requirements-engineering-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: process
 triggers:
@@ -19,13 +14,20 @@ triggers:
   - "escrever requisito"
 source_docs:
   - .github/agents/requirements-analyst.agent.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
 ---
 
 # Requirements Engineering Patterns
+
+## Quando Usar
+
+- Ativação em cenários de levantar requisitos, requisito ambíguo, elicitação de requisitos.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `requirements-engineering-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## 1) Qualidade de Requisito Individual (ISO/IEC/IEEE 29148 Clause 5)
 
@@ -113,6 +115,8 @@ Fonte de mercado: sistemas de mediação de arquitetura para LLM assistants demo
 
 Documento estruturado tipo StRS simplificado (Stakeholder Requirements Specification, ISO 29148 Clause 8/9): cabeçalho de contexto, lista de requisitos com ID rastreável `REQ-NNN`, categoria (funcional/não-funcional), notação EARS, critério de aceite Gherkin, prioridade MoSCoW, citação da fonte.
 
+**Destino canônico (R-064)**: `docs/plans/requirements/<AAAAMMDD-HHMMSS>-<modulo>.md` (proibidos prefixos `REQ-` ou `PLAN-`), com frontmatter R-064 comum e `plan_type: requirements`. `@requirements-analyst` permanece **100% Read-Only**: emite o documento no template; `@docs-engineer` materializa o `.md`. Template: `references/plan-template-requirements.md`.
+
 ## 10) Anti-padrões Gerais
 
 - Misturar funcional e não-funcional no mesmo item.
@@ -131,4 +135,8 @@ Documento estruturado tipo StRS simplificado (Stakeholder Requirements Specifica
 - Gherkin/BDD (Cucumber).
 - FURPS+ (Robert Grady, HP; extensão IBM/Peter Eeles).
 - Pesquisa 2024-2025 sobre elicitação de requisitos multi-agente com LLMs (hallucination, domain-knowledge gaps) e mediação anti-solution-jumping.
+- `references/plan-template-requirements.md` — template de plano `requirements` (R-064).
 
+## Checklist de Conformidade
+
+- [ ] Diretrizes, contratos e restrições de escopo de `requirements-engineering-patterns` verificados e atendidos.

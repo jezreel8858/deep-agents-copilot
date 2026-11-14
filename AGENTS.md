@@ -15,7 +15,7 @@ Para evitar duplicação e divergência de instruções, a fonte canônica e int
    - A cada turno, a intenção é reavaliada contra a matriz de Não-Escopo para prevenir sticky sessions.
 
 2. **Precedência Mandatória de Context Mode & Think-in-Code (R-008 / R-056)**:
-   - Uso 100% obrigatório do MCP `context-mode` (`ctx_execute`, `ctx_batch_execute`, etc.) para leitura, escrita e testes.
+   - Uso 100% obrigatório do MCP `context-mode` (`ctx_execute`, `ctx_batch`, etc.) para leitura, escrita e testes.
    - Ferramentas nativas de editor e shell exploratório são estritamente proibidas quando o context-mode estiver acessível (rebaixadas a fallback exclusivo de indisponibilidade).
 
 3. **Batching Compulsório (R-046 / R-059 / R-060)**:
@@ -26,3 +26,5 @@ Para evitar duplicação e divergência de instruções, a fonte canônica e int
 - **Catálogo de Agentes**: [`.github/agents/catalog.yaml`](./.github/agents/catalog.yaml)
 - **Grafo de Roteamento**: [`.github/agents/routing-graph.yaml`](./.github/agents/routing-graph.yaml)
 - **Adapters de Instrução por Stack**: [`.github/instructions/README.md`](./.github/instructions/README.md)
+
+- **Materialização Universal de Planos (R-064)**: Todos os planos de workflows são persistidos sob `docs/plans/<tipo>/` nas 8 subpastas canônicas (`feature/`, `refactor/`, `architecture/`, `implementation/`, `test-strategy/`, `bug-triage/`, `requirements/`, `governance/`), emitidos por agentes planejadores/advisors 100% Read-Only e gravados fisicamente via handoff para `@docs-engineer` (ou `@governance-maintainer` em governança) antes da aprovação humana.

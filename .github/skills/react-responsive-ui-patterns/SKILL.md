@@ -1,8 +1,6 @@
 ---
 name: react-responsive-ui-patterns
-description: >-
-  Padrões de estilização Tailwind CSS/CSS Modules, layout responsivo mobile-first e
-  acessibilidade WCAG 2.2 AA para componentes React.
+description: "Define diretrizes e padrões para padrões de estilização Tailwind CSS/CSS Modules, layout responsivo mobile-first e acessibilidade WCAG 2.2 AA para componentes React. Use quando atuar em tailwind react, layout responsivo react, acessibilidade react. Não use para tarefas fora do escopo de react-responsive-ui-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: quality
 triggers:
@@ -11,14 +9,17 @@ triggers:
   - "acessibilidade react"
   - "wcag react"
 source_docs:
-  - .github/agents/frontend/react/react-ui-stylist.agent.md
-source_docs_lazy:
+  - .github/agents/frontend/react/react-developer.agent.md
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
 ---
 
 # React Responsive UI Patterns
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `react-responsive-ui-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando Usar
 

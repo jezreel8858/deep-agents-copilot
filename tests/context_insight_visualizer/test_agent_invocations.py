@@ -161,4 +161,62 @@ def test_declarative_hook_jsonl_recording(tmp_path):
     assert loaded["sessionId"] == "test-session"
 
 
+def test_jira_mcp_capability_matrix_and_catalog_parity():
+    """Valida R-024/R-054: paridade Jira-MCP entre .agent.md e catalog.yaml, Least-Tools e Matriz no agent-router."""
+    import yaml
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[2]
+    if not (root / ".github/agents/catalog.yaml").exists():
+        root = Path.cwd()
+    catalog = yaml.safe_load((root / ".github/agents/catalog.yaml").read_text(encoding="utf-8"))
+    cat_agents = catalog.get("agents", {})
+
+    expected_jira_agents = {
+        "requirements-analyst": {"mcp-atlassian/jira_get_issue", "mcp-atlassian/jira_search"},
+        "bug-triage": {"mcp-atlassian/jira_get_issue", "mcp-atlassian/jira_search"},
+        "business-rules-extractor": {"mcp-atlassian/jira_get_issue", "mcp-atlassian/jira_search"},
+        "tech-solution-architect": {"mcp-atlassian/jira_get_issue", "mcp-atlassian/jira_search"},
+        "refactor-planner": {"mcp-atlassian/jira_get_issue", "mcp-atlassian/jira_search"},
+        "feature-planner": {
+            "mcp-atlassian/jira_get_issue",
+            "mcp-atlassian/jira_search",
+            "mcp-atlassian/jira_create_issue",
+            "mcp-atlassian/jira_update_issue",
+            "mcp-atlassian/jira_add_comment",
+            "mcp-atlassian/jira_transition_issue",
+        },
+        "pr-gatekeeper": {
+            "mcp-atlassian/jira_get_issue",
+            "mcp-atlassian/jira_search",
+            "mcp-atlassian/jira_add_comment",
+            "mcp-atlassian/jira_transition_issue",
+        },
+    }
+
+    for md_path in root.glob(".github/agents/**/*.agent.md"):
+        parts = md_path.read_text(encoding="utf-8").split("---", 2)
+        fm = yaml.safe_load(parts[1])
+        aid = fm["name"]
+        md_jira_tools = {t for t in fm.get("tools", []) if t.startswith("mcp-atlassian/jira_")}
+        if aid in cat_agents and "tools" in cat_agents[aid]:
+            cat_jira_tools = {t for t in cat_agents[aid].get("tools", []) if t.startswith("mcp-atlassian/jira_")}
+            assert md_jira_tools == cat_jira_tools, f"Desalinhamento Jira tools em {aid}: md={md_jira_tools} vs catalog={cat_jira_tools}"
+
+        if aid == "docs-engineer":
+            assert not md_jira_tools, "docs-engineer NAO deve possuir tools mcp-atlassian/jira_*"
+        if aid in expected_jira_agents:
+            assert md_jira_tools == expected_jira_agents[aid], f"Tools Jira inesperadas para {aid}: {md_jira_tools}"
+        else:
+            assert not md_jira_tools, f"Agent fora da matriz ({aid}) nao pode ter tools Jira: {md_jira_tools}"
+
+        if "mcp-atlassian/jira_create_issue" in md_jira_tools or "mcp-atlassian/jira_update_issue" in md_jira_tools:
+            assert aid == "feature-planner", f"Apenas feature-planner pode criar/atualizar issues Jira, encontrado em {aid}"
+        if "mcp-atlassian/jira_add_comment" in md_jira_tools or "mcp-atlassian/jira_transition_issue" in md_jira_tools:
+            assert aid in {"feature-planner", "pr-gatekeeper"}, f"Apenas feature-planner e pr-gatekeeper podem comentar/transicionar issues Jira, encontrado em {aid}"
+
+    router_text = (root / ".github/agents/agent-router.agent.md").read_text(encoding="utf-8")
+    assert "Matriz Estática de Capabilities Jira-MCP" in router_text
+    for aid in expected_jira_agents:
+        assert f"@{aid}" in router_text, f"agent-router deve documentar @{aid} na Matriz Jira-MCP"
 

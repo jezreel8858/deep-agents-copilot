@@ -2,12 +2,15 @@
 name: plan
 description: Cria plano de implementação detalhado com análise de dependências, paralelismo e checklist de autonomia.
 agent: 'agent'
-model: "Claude Sonnet 5"
-tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch_execute', 'context-mode/ctx_execute', 'context-mode/ctx_execute_file']
+router_bypass: slash_workflow
+model: "Claude Sonnet 5.5"
+tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_execute']
 argument-hint: '[descrição-da-feature | caminho-do-arquivo]'
-source_docs_lazy:
-  - CLAUDE.md
-  - .github/copilot-instructions.md
+source_docs:
+  - 'docs/plans/README.md'
+  - 'CLAUDE.md'
+  - '.github/copilot-instructions.md'
+  - '.github/skills/context-mode/SKILL.md'
 ---
 
 # `/plan`
@@ -18,8 +21,19 @@ source_docs_lazy:
 
 ---
 
+## 🎯 Invocação e Variáveis Nativas
+
+Invocação via comando slash `/plan` (argumento: `[descrição-da-feature | caminho-do-arquivo]`), com suporte às variáveis nativas do VS Code Copilot:
+- `${file}`: Arquivo ativo atualmente aberto e em foco no editor.
+- `${selection}`: Trecho de código ou texto selecionado no editor no momento da chamada.
+- `${workspaceFolder}`: Diretório raiz do workspace ativo na sessão.
+
+---
+
 ## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
 
+- ❌ **NÃO** invocar `@agent-router` na triagem inicial — este Slash Prompt possui `router_bypass: slash_workflow` (exceção canônica a R-037/R-063) e seu fluxo já está definido abaixo; o Orquestrador Raiz DEVE executar diretamente as instruções deste `.prompt.md` (ou despachar diretamente para o subagente previsto neste próprio prompt).
+- ✅ O uso de `context-mode` (`ctx_batch`, `ctx_execute`, `ctx_search`) é **100% OBRIGATÓRIO** quando disponível; ferramentas nativas são **fallback exclusivo** de indisponibilidade (`R-056`).
 - ✅ **APENAS** elaborar plano detalhado com fases atômicas, rastreabilidade e estimativas.
 - ✅ **SEMPRE** mapear dependências e responsabilidades no formato `{paralelizavel: bool, responsavel: "<agent>"}` e contingências inline `[fallback: X]`.
 - ✅ **SEMPRE** incorporar análise de segurança Shift-Left e Checklist Defensivo Pré-Code-Review nos planos gerados.
@@ -29,6 +43,16 @@ source_docs_lazy:
 ---
 
 Você é responsável por criar planos de implementação detalhados com processo interativo. Seja cético, exaustivo e colaborativo para produzir specs técnicas de alta qualidade.
+
+---
+
+## 📋 Fluxo de Execução Passo a Passo
+
+1. **Coleta de Contexto**: Avaliar os insumos fornecidos (`${file}`, `${selection}`, `${workspaceFolder}` ou argumentos do comando `/plan`).
+2. **Execução Governada**: Seguir rigorosamente as etapas operacionais detalhadas nas seções abaixo respeitando os limites de escopo e precedência do `context-mode` (`R-056`/`R-059`).
+3. **Validação e Apresentação**: Verificar o checklist de conformidade antes de apresentar a saída consolidada.
+
+---
 
 ## Resposta Inicial
 
@@ -48,7 +72,7 @@ Dica: `/plan <descrição ou caminho do arquivo>` para começar direto.
 ### Passo 1: Contexto Inicial
 
 1. **Faça retomada de sessão** com `ctx_search(..., sort: "timeline")` antes de qualquer nova coleta.
-2. **Levante contexto do codebase** via `ctx_batch_execute(commands, queries)` como coleta primária.
+2. **Levante contexto do codebase** via `ctx_batch(commands, queries)` como coleta primária.
 3. **Use `ctx_search(queries:[...])`** para follow-up sobre o que já foi indexado.
 4. **Leia arquivo integralmente apenas em exceção** (quando faltar literal essencial para o plano).
 5. **Analise e verifique entendimento**:
@@ -154,7 +178,7 @@ Após aprovação do outline, escreva o plano com:
 
 1. **Seja cético** — questione requisitos vagos; verifique com código
 2. **Seja interativo** — valide etapa por etapa, não escreva tudo de uma vez
-3. **Seja exaustivo** — use `ctx_search` e `ctx_batch_execute` para levantar contexto real
+3. **Seja exaustivo** — use `ctx_search` e `ctx_batch` para levantar contexto real
 4. **Token budget** — agrupe perguntas no mesmo `queries`, use `source` e evite múltiplas chamadas unitárias
 5. **Sem TBD** — qualquer item "a definir" no plano final é inválido
 6. **Decisões explícitas** — toda decisão de design deve ser registrada na seção "Decisões Tomadas"
@@ -167,14 +191,43 @@ Após aprovação do outline, escreva o plano com:
 - `/validate` → valida a implementação contra este plano
 - `/commit` → gera mensagem (usuário commita)
 
+## 📄 Materialização Universal em `docs/plans/<tipo>/` e Gate R-064
+
+- Todo plano gerado deve ser estruturado conforme a árvore canônica `docs/plans/<tipo>/` (`feature/`, `refactor/`, `architecture/`, `implementation/`, `test-strategy/`, `bug-triage/`, `requirements/`, `governance/`) documentada em `docs/plans/README.md`.
+- O plano deve incluir o frontmatter YAML comum R-064 (`.github/skills/plan-conformance-patterns/references/plan-frontmatter-r064.md`) com `status`, `approved`, `author`, `plan_type`, `created_at`, `allowed_files` e `related-planning-doc`.
+- Agentes planejadores, `*-arch-advisor`, analistas de requisitos e agentes de triagem operam em perfil **100% Read-Only (R-025)**: a persistência física do arquivo `.md` em `docs/plans/<tipo>/` ocorre via handoff para `@docs-engineer` (ou `@governance-maintainer` em governança) antes do Gate de Aprovação Humana R-064 (`ask_questions`).
+
+---
+
+## ✅ Checklist Antes de Apresentar
+
+- [ ] Escopo e limites de Não-Escopo (`R-056` / `R-059` / `R-060`) integralmente respeitados.
+- [ ] Entradas e contexto (`${file}`, `${selection}`, `${workspaceFolder}` ou argumentos) validados.
+- [ ] Todas as etapas operacionais do fluxo concluídas sem desvios ou inferências não autorizadas.
+- [ ] Saída formatada com evidências rastreáveis e pronta para revisão do usuário.
+
+---
+
+## 📊 Formato de Saída
+
+Apresente o resultado consolidado da execução de `/plan` conforme a estrutura operacional definida neste prompt:
+- **Comando Executado**: `/plan`
+- **Escopo Processado**: `${file}` / `${workspaceFolder}`
+- **Status e Evidências**: Resumo objetivo das verificações/ações realizadas e próximo passo recomendado.
+
+> **Contrato de UX `ask_questions` (R-027 / CA-03..CA-05)**: 1–4 perguntas/chamada, `header` ≤ 25 chars, `allowFreeformInput: true`, 2–4 opções reais e mutuamente exclusivas (Anti-Strawman), `description` obrigatório (`[Consequência prática / O que faz] + [Trade-off principal ou quando escolher]`) e 1ª opção `(Recomendado)` quando houver melhor prática técnica (exceção: decisão puramente de negócio/produto).
+
+## ⚙️ Protocolo de Execução Obrigatório
+
 <execution_protocol>
-**Protocolo Plan-Then-Batch (Smell 2.26 / Smell 2.13 / R-059):**
+
+**Protocolo Plan-Then-Batch (R-059):**
 1. **ENUMERAR**: Antes de qualquer ação de modificação ou inspeção, liste internamente todos os arquivos e comandos necessários para a demanda completa (não apenas o próximo passo aparente).
-2. **CONSOLIDAR (Limiar >= 2)**: Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de `ctx_execute` por alvo no chat. Use compulsoriamente `ctx_batch_execute(commands, queries)` OU script iterativo consolidado em `ctx_execute`.
-3. **DESPACHAR & VALIDAR**: Aplique todas as mutações ou leituras em processo único no sandbox (all-or-nothing verificado, R-051) e execute `get_errors` agrupado uma única vez ao final com a lista completa de arquivos alterados (quando aplicável).
-4. **Comandos curtos não suspendem a regra**: Prompts curtos ("prosseguir", "continue", "pode seguir") NÃO isentam o agente do limiar >= 2 nem do context-mode em lote — a regra vincula-se ao escopo da tarefa, nunca ao tamanho do prompt.
-5. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions, vedando loops investigativos de dívida de tokens O(N²).
-6. **Warm Start Compulsório & Batch Querying (R-060)**: Ferramentas locais que dependem de índices ou bases pré-computadas devem verificar e inicializar a base silenciosamente no primeiro comando (build-if-missing). É proibido disparar consultas granulares individuais para múltiplos nós — agrupe todas as pesquisas via chamadas em lote (batch_query, ctx_batch_execute, script iterativo) com destilação semântica e truncamento na borda (Edge Truncation).
+2. **CONSOLIDAR (Limiar >= 2)**: Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de `ctx_execute` por alvo no chat. Use compulsoriamente `ctx_batch(commands, queries)` OU script iterativo consolidado em `ctx_execute`. No `ctx_execute`, use obrigatoriamente `language: "javascript"` (`fs`/`path` nativos do Node.js) para I/O, inspeção e mutação de arquivos (proibido `language: "python"` ou `python -c` para I/O, evitando bloqueio do `python.exe` pelo Windows Defender/AMSI); em `ctx_batch`, use apenas comandos shell leves com escopo restrito (proibido `python -c` inline ou varreduras recursivas irrestritas). Em caso de timeout (`ETIMEDOUT`/`timed out`/`taskkill`), aplica-se **Circuit Breaker Fail-Fast**: tolerância zero para repetir a mesma chamada/runtime — máximo de **1 retry** exigindo troca obrigatória de estratégia (migrar para `language: "javascript"` puro com `fs` ou reduzir o lote); no 2º timeout, aborte novos spawns e reporte em formato Compact Error Reporting (R-020).
+3. **Comandos curtos não suspendem a regra**: Prompts curtos ("prosseguir", "continue", "pode seguir") NÃO isentam o agente do limiar >= 2 nem do context-mode em lote — a regra vincula-se ao escopo da tarefa, nunca ao tamanho do prompt.
+4. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions (R-027: 1–4 perguntas, `header` ≤ 25 chars, `allowFreeformInput: true`, 2–4 opções reais sem espantalhos, `description` obrigatório com `[Consequência prática + Trade-off/quando escolher]` e 1ª opção `(Recomendado)` para melhor prática técnica), vedando loops investigativos de dívida de tokens O(N²).
+5. **Warm Start Compulsório & Batch Querying (R-060)**: Ferramentas locais que dependem de índices ou bases pré-computadas devem verificar e inicializar a base silenciosamente no primeiro comando (build-if-missing). É proibido disparar consultas granulares individuais para múltiplos nós — agrupe todas as pesquisas via chamadas em lote (batch_query, ctx_batch, script iterativo) com destilação semântica e truncamento na borda (Edge Truncation).
+6. **Validação Agrupada com `get_errors` (R-051)**: Aplique todas as mutações em processo único no sandbox (all-or-nothing verificado) e execute `get_errors` agrupado uma única vez ao final com a lista completa de arquivos alterados (quando aplicável).
 7. **Emissão Obrigatória de Telemetria de Handoff (R-042 / handoff-governance § 2.4)**: a cada chamada real de `run_subagent`, emitir compulsoriamente um evento `telemetry_entry` (tag `[HANDOFF]`) via `ctx_index`, incluindo `session_id` (reaproveitado do `sessionStart` do hook `context-mode`) e `sequence_index` (ordenação determinística dentro da sessão).
-8. **Progressive Disclosure de `source_docs_lazy:` (R-066 — Anti Context Bloat Inicial)**: Se este agent declara `source_docs_lazy:` em seu próprio frontmatter, esses documentos (ex.: `CLAUDE.md`, `.github/copilot-instructions.md`, `.github/agents/workflows.md`) **NÃO foram pré-carregados** — é TERMINANTEMENTE PROIBIDO usar `read_file` para carregá-los por inteiro. Consulte-os exclusivamente via `context-mode/ctx_search` com query pontual (ex.: número da regra `R-xxx` ou nome da seção) apenas quando precisar citá-los; nunca "só por garantia".
+
 </execution_protocol>

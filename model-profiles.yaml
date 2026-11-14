@@ -1,0 +1,121 @@
+schema_version: 1
+
+tier_map:
+  premium:
+    - tech-solution-architect
+    - debugger
+  orchestration:
+    - agent-router
+    - database-router
+    - ejb-router
+    - python-router
+    - spring-boot-router
+    - spring-reactive-router
+    - struts-router
+    - angular-router
+    - react-router
+    - templates/router-agent
+    - prompt:agent-router
+    - prompt:implement
+  standard:
+    - adr-sentinel
+    - agent-auditor
+    - informix-database-specialist
+    - oracle-database-specialist
+    - bug-triage
+    - business-rules-extractor
+    - code-review
+    - compliance-guardrails
+    - database-specialist
+    - ddd-bounded-context-mapper
+    - deep-search
+    - devops-engineer
+    - feature-planner
+    - governance-factory
+    - performance-agent
+    - plan-critic
+    - refactor-planner
+    - repo-hygiene-auditor
+    - requirements-analyst
+    - security-reviewer
+    - test-strategy
+    - templates/research-agent
+    - prompt:connect-integration-graphs
+    - prompt:deep-search
+    - prompt:plan
+    - prompt:strategic-review
+  light:
+    - adapter-generator
+    - binding-initializer
+    - code-style-enforcer
+    - codegraph-engine
+    - docs-engineer
+    - governance-maintainer
+    - pr-gatekeeper
+    - prompt-structuring
+    - runtime-verifier
+    - templates/agent-template
+    - templates/operational-agent
+    - prompt:craft-prompt
+    - prompt:eval-workflows
+    - prompt:review
+    - prompt:validate
+  utility:
+    - prompt:add-project-context
+    - prompt:commit
+    - prompt:ctx-checkpoint
+    - prompt:ctx-doctor
+    - prompt:ctx-insight
+    - prompt:ctx-resume
+    - prompt:ctx-start
+    - prompt:ctx-status
+    - prompt:del-project-context
+    - prompt:health
+    - prompt:init-context
+    - prompt:templates/prompt-template
+    - prompt:visualize-graph
+  stack-arch:
+    - "*-arch-advisor"
+  stack-squad:
+    - "*-developer"
+    - "*-test-engineer"
+
+profiles:
+  default:
+    description: "Configuração canônica espelhada nos frontmatters atuais do repositório."
+    tiers:
+      premium: Claude Opus 5.5
+      orchestration: Claude Sonnet 5.5
+      standard: Claude Sonnet 5.5
+      light: Gemini 4 Argon
+      utility: Gemini 3.8 Flash
+      stack-arch: Claude Sonnet 5.5
+      stack-squad: Gemini 4 Argon
+
+  balanceado:
+    extends: default
+    description: "Substitui Opus por Sonnet no tier premium; otimiza stack-arch e revisores selecionados com Gemini 4 Argon."
+    quality_warning: "Arquitetura e debug profundo perdem raciocínio premium."
+    tiers:
+      premium: Claude Sonnet 5.5
+      stack-arch: Gemini 4 Argon
+    agents:
+      security-reviewer: Gemini 4 Argon
+      code-review: Gemini 4 Argon
+      bug-triage: Gemini 4 Argon
+
+  economico:
+    extends: balanceado
+    description: "Rebaixa orquestração para Gemini 3.8 Flash e demais tiers operacionais para Claude Haiku 5.5; preserva D6."
+    quality_warning: "Roteamento, planos e código podem perder precisão; routers podem errar triagem."
+    tiers:
+      orchestration: Gemini 3.8 Flash
+      standard: Claude Haiku 5.5
+      light: Claude Haiku 5.5
+      utility: Claude Haiku 5.5
+      stack-arch: Gemini 3.8 Flash
+      stack-squad: Claude Haiku 5.5
+    agents:
+      security-reviewer: Claude Haiku 5.5
+      code-review: Claude Haiku 5.5
+      bug-triage: Claude Haiku 5.5

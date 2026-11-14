@@ -42,27 +42,27 @@ class TestTC05StateMachineValidTransitions:
         assert s1.etapa == 1
         assert s1.agente_ativo == "bug-triage"
 
-        # 2. Avanço para etapa 2 (specialist-unit-test-writer)
+        # 2. Avanço para etapa 2 (<stack>-test-engineer)
         ev_2 = Evento(
             origem="usuario",
             tipo=TipoEvento.AVANCO_ETAPA,
             etapa_solicitada=2,
-            agente_solicitado="specialist-unit-test-writer",
+            agente_solicitado="<stack>-test-engineer",
         )
         s2 = transicionar(s1, ev_2, tabela_real)
         assert s2.etapa == 2
-        assert s2.agente_ativo == "specialist-unit-test-writer"
+        assert s2.agente_ativo == "<stack>-test-engineer"
 
-        # 3. Avanço para etapa 3 (specialist-bug-fixer)
+        # 3. Avanço para etapa 3 (<stack>-developer)
         ev_3 = Evento(
             origem="usuario",
             tipo=TipoEvento.AVANCO_ETAPA,
             etapa_solicitada=3,
-            agente_solicitado="specialist-bug-fixer",
+            agente_solicitado="<stack>-developer",
         )
         s3 = transicionar(s2, ev_3, tabela_real)
         assert s3.etapa == 3
-        assert s3.agente_ativo == "specialist-bug-fixer"
+        assert s3.agente_ativo == "<stack>-developer"
 
         # 4. Avanço para etapa 4 (runtime-verifier)
         ev_4 = Evento(
@@ -136,12 +136,12 @@ class TestTC05StateMachineValidTransitions:
         s3 = transicionar(s2, ev_3, tabela_real)
         assert s3.etapa == 3
 
-        # 4. Etapa 4 (specialist-feature-developer)
+        # 4. Etapa 4 (<stack>-developer)
         ev_4 = Evento(
             origem="usuario",
             tipo=TipoEvento.AVANCO_ETAPA,
             etapa_solicitada=4,
-            agente_solicitado="specialist-feature-developer",
+            agente_solicitado="<stack>-developer",
         )
         s4 = transicionar(s3, ev_4, tabela_real)
         assert s4.etapa == 4

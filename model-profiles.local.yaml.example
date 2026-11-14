@@ -1,0 +1,22 @@
+# model-profiles.local.yaml (gitignored, R-043) — Exemplo de configuração local do usuário
+#
+# Para ativar perfis locais ou customizações pontuais:
+# 1. Copie este arquivo para model-profiles.local.yaml na raiz do repositório:
+#    cp model-profiles.local.yaml.example model-profiles.local.yaml
+# 2. Configure seus perfis e modelos customizados abaixo.
+# 3. model-profiles.local.yaml é protegido por gitignore (R-043) e nunca será commitado.
+#
+# Precedência de resolução (D2):
+# agents / prompts > tiers > extends > default
+#
+schema_version: 1
+profiles:
+  meu-perfil:
+    extends: economico
+    description: "Perfil customizado para desenvolvimento local de baixo custo."
+    tiers:
+      standard: Grok 4.7
+    agents:
+      tech-solution-architect: Claude Opus 5.5
+    prompts:
+      prompt:commit: Gemini 3.8 Flash

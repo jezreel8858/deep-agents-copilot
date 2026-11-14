@@ -1,0 +1,512 @@
+# Governance Audit Patterns — Catálogo Detalhado de Smells (2.1 a 2.33) e Matrizes
+
+> Documento de referência complementar (Progressive Disclosure — R-066) extraído de `.github/skills/governance-audit-patterns/SKILL.md`.
+
+# Governance Audit Patterns
+
+## 0) Propósito
+
+Consolida, a partir de pesquisa de mercado (2025/2026), Anthropic Open Spec (dez/2025), padrões de extensibilidade do VS Code Copilot e regras normativas do repositório, um catálogo objetivo de "cheiros" (smells) de governança detectáveis em artefatos `.agent.md`, `SKILL.md` e `.prompt.md`. Evita que uma auditoria de catálogo (ex.: agent `agent-auditor`) invente critérios ad-hoc. Cada smell é definido por: **nome · sintoma observável · como detectar · severidade · remediação (agent executor a acionar)**.
+
+## 1) Fundamentação de Mercado e Governança
+
+| Fonte | O que aporta |
+|---|---|
+| `SpecDetect4LLM` (arXiv:2512.18020, 2026) | Padrão de catalogar "cheiros" de forma estática: nome, sintoma, efeito na qualidade, remediação — adaptado aqui para artefatos de governança |
+| Anthropic Open Spec (dez/2025) & Skill Architecture | Padrão de *Progressive Disclosure* em 3 níveis (Metadados N1, Corpo N2, Recursos N3), descrições imperativas em 3ª pessoa e blocos de contraste ✅/❌ |
+| VS Code Copilot Agent/Prompt Engine | Variáveis de contexto nativas (`${file}`, `${selection}`, `${workspaceFolder}`, `${input:param}`), convenção `argument-hint` e parsing estrito de display names em `model:` |
+| TrustAgent taxonomy (KDD 2025) | Classifica origem do gap: **intrínseco** (brain/memory/tool do próprio agent) vs. **extrínseco** (user/other agents/environment) |
+| Protocolo R-046 & `efficient-batch-code-modification` | Hierarquia estrita de batching: editor tools para 1-4 arquivos em *Single-Turn Batching*; sandbox `ctx_execute` (com `file`)/`ctx_batch` para 5+ arquivos ou operações repetitivas |
+| Matriz Biparadigma (§9 de `governance-factory-patterns`) | Alocação pragmática de SLM vs LLM: **Procedural/Operacional** (`Gemini 3.8 Flash`) vs **Decompositivo/Raciocínio Guiado** (`Claude Sonnet 5.5`) |
+| `code-review-patterns` (já existente) | Taxonomia de severidade tripla (**Bloqueador \| Alto \| Sugestão**) — reaproveitada nesta skill |
+| `agent-contracts/SKILL.md` §8-9 | Baseline de formato de saída por perfil e tooling mínimo por perfil |
+
+## 1.1) Arquitetura Two-Tier Hybrid (Quality Gate Estático + LLM Audit)
+
+Para maximizar a precisão, eliminar alucinações e economizar tokens, a governança adota o modelo **Two-Tier Hybrid**:
+
+1. **Tier 1 — Quality Gate Estático Determinístico (`tests/governance_audit/`)**:
+   - Execução ultrarrápida (< 2 segundos) no CI/CD ou localmente com **zero consumo de tokens**.
+   - Valida regras puramente estruturais: Smell 2.2 (gaps de frontmatter e `run_subagent`), Smell 2.6/2.14 (vazamento de path/R-044), Smell 2.7/2.7.1 (matriz de conformidade perfil ↔ tools), Smell 2.8 (protocolo R-046 em mutadores) e Smell 2.11 (código inline R-026).
+2. **Tier 2 — Auditoria Semântica Interpretativa (`@agent-auditor`)**:
+   - Consome os achados estruturais do Tier 1 como ponto de partida.
+   - Foca a capacidade do LLM nos aspectos essencialmente semânticos e contextuais: Smell 2.1 (sobreposição semântica), Smell 2.3 (regras sem enforcement), Smell 2.4 (duplicação entre camadas), Smell 2.5 (taxonomia), Smell 2.12 (conflito de autoridade) e Smell 2.13 (hipertrofia e concisão).
+   - Formula o plano de remediação acionável e delega via handoff.
+
+## 2) Catálogo de Smells de Governança
+
+### 2.1 — Anti-padrão Estrutural (Duplicação sem Skill Equivalente)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Bloco de conteúdo quase idêntico (>70% de sobreposição textual/estrutural) repetido em 3+ arquivos `.agent.md`/`SKILL.md` |
+| Como detectar | `grep_search` por trechos característicos (títulos de seção, frases-chave) em `.github/agents/*.agent.md`; comparar contagem de ocorrências × ausência de skill equivalente em `.index.json` |
+| Origem (TrustAgent) | Intrínseco — falta de reuso de conhecimento compartilhado entre agents |
+| Severidade | Alta (custo de manutenção cresce linearmente com nº de agents afetados) |
+| Remediação | Extrair para nova skill via `@governance-factory`; atualizar os agents consumidores para referenciar a skill (não duplicar) |
+
+### 2.2 — Gap de Perfil (Agent Incompleto)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Agent sem `run_subagent` no frontmatter `tools:` (R-042); sem seção "Retorno ao Router"; sem banner "Agente Ativo" no Formato de Saída; sem `source_docs:` válido no frontmatter (SSOT); sem `version` quando outros agents do mesmo tier já declaram; ou falta de `description` válida (≤ 500 caracteres, conforme §10 de `governance-factory-patterns`) |
+| Como detectar | Checklist de `agent-contracts/SKILL.md` §9 e `governance-factory-patterns` §3 aplicado retroativamente a todo `.agent.md` existente |
+| Origem (TrustAgent) | Intrínseco — componente "tool"/"brain" do agent incompleto |
+| Severidade | **Bloqueador** (se falta `run_subagent` — R-042 estruturalmente inviável) / **Alta** (demais gaps de perfil) |
+| Remediação | `@governance-factory` revisa e completa o agent afetado |
+
+### 2.3 — Gap de Diretriz (Regra Não Referenciada ou Sem Enforcement)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Regra normativa `R-001..R-051` declarada em `CLAUDE.md` mas nunca referenciada por nenhum agent/skill; ou referenciada em prosa mas sem nenhum checklist/mecanismo que a torne verificável |
+| Como detectar | `grep_search` de cada `R-0XX` em `.github/agents/` + `.github/skills/`; contagem zero ou "referência solta sem checklist correspondente" |
+| Origem (TrustAgent) | Extrínseco — desalinhamento entre política declarada (environment/governance) e comportamento do agent |
+| Severidade | Alta (regra sem enforcement é regra decorativa) |
+| Remediação | `@docs-engineer` avalia se a regra deve ganhar checklist explícito em skill/agent relevante, ou ser removida de `CLAUDE.md` por obsolescência |
+
+### 2.4 — Diretriz Redundante (Duplicação entre Camadas de Governança)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Mesma regra/conteúdo normativo duplicado em `CLAUDE.md` **e** `copilot-instructions.md` **e/ou** uma skill — viola R-003 (sem duplicação entre camadas) |
+| Como detectar | Comparação textual entre os 3 arquivos-fonte de governança global + skills candidatas; sobreposição >50% de uma seção inteira é sinal forte |
+| Origem (TrustAgent) | Extrínseco — múltiplas fontes de verdade para a mesma política |
+| Severidade | Média / Sugestão (risco de drift quando só 1 das cópias é atualizada) |
+| Remediação | `@docs-engineer` consolida em 1 única fonte de verdade e substitui as demais por referência |
+
+### 2.5 — Gap de Cobertura de Categoria (Taxonomia)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Grupo taxonômico de `20260830-090100-categorizacao-agents-mercado.md` §2 sem nenhum agent correspondente no catálogo real; **ou** 2+ agents ocupando o mesmo papel taxonômico sem distinção clara de escopo (sobreposição funcional) |
+| Como detectar | Cruzar `docs/plans/20260830-090100-categorizacao-agents-mercado.md` §2 (grupos mapeados) contra `.github/agents/catalog.yaml` (agents reais) |
+| Origem (TrustAgent) | Extrínseco — desenho do sistema multi-agent (arquitetura de orquestração) |
+| Severidade | **Alta** se sobreposição ativa (2 agents competindo pelo mesmo papel); **Sugestão** se é apenas um gap de categoria intencionalmente não coberta |
+| Remediação | Propor fusão/substituição via `@governance-factory` + atualização de `agent-router` ou registrar gap intencional |
+
+### 2.6 — Vazamento de Evidência Real (R-044)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Arquivo commitado sob `.github/**` (exceto `local/`), `CLAUDE.md` ou `.github/instructions/README.md` contém nome de repositório/classe/método/pacote/namespace/caminho de arquivo REAL derivado de análise de projeto do usuário (típico de agents analíticos como `codegraph-engine`, `business-rules-extractor`, `context-builder`, `project-scanner`) |
+| Como detectar | `grep_search` por padrões de caminho absoluto (`[A-Za-z]:\\`, `/home/`, `/Users/`) e por identificadores específicos nos arquivos de governança; comparar com checklist de R-044 |
+| Origem (TrustAgent) | Intrínseco — agent confunde evidência efêmera da conversa com evidência persistível em arquivo compartilhado |
+| Severidade | **Bloqueador** (risco de privacidade e contaminação de workspace) |
+| Remediação | Genericizar in-place (repositório → `[PROJETO-X]`, classe → `ServicoExemploX`, caminho → `<workspace>/[PROJETO-X]`) e acionar `@governance-factory` para adicionar guardrail no agent de origem |
+
+### 2.7 — Desalinhamento Contratual (Perfil ↔ Tools ↔ Skills ↔ Catálogo)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Inconsistência entre papel/perfil declarado do agent e as ferramentas ou competências atribuídas: *(a)* agent Read-Only / Advisory contendo tools mutativas de escrita (`create_file`, `insert_edit_into_file`); *(b)* agent ou prompt com `run_in_terminal` sem declarar skill mandatória `terminal-governance` em `source_docs` (ou `skills:` em sub-catálogo) (Tools/Source_Docs Inconsistency — R-049); *(c)* agent com MCP `context-mode/*` sem declarar skill `context-mode`; *(d)* agent implementer/fixer/tester sem ferramentas de validação (`get_errors`); *(e)* agent sem `run_subagent` no frontmatter (viola R-042); *(f)* divergência atômica (R-015) onde `tools:` ou `skills:` do arquivo `.agent.md` divergem do `catalog.yaml` ou `<stack>-catalog.yaml`. |
+| Como detectar | Execução da **Matriz Canônica de Conformidade (§2.7.1)** cruzando cada `.agent.md` contra seu catálogo e regras de `agent-contracts/SKILL.md` § 8-9 |
+| Origem (TrustAgent) | Intrínseco — violação de integridade entre contrato do agente (brain/tools) e habilidades declaradas (skills/memory) |
+| Severidade | **Bloqueador** se: tool mutativa em agent read-only; falta de `run_subagent` (R-042); ou uso de terminal sem `terminal-governance` em `source_docs`/`skills` (R-049).<br>**Alta** se: divergência entre `.agent.md` e `catalog.yaml` (R-015); falta de `get_errors` em agent implementer; ou MCP `context-mode` sem skill correspondente.<br>**Sugestão** se: skills de domínio complementares ausentes. |
+| Remediação | `@governance-factory` revisa o `.agent.md` e sincroniza o `catalog.yaml` / sub-catálogo na mesma entrega (R-015) |
+
+### 2.7.1 — Matriz Canônica de Conformidade (Perfil ↔ Tools ↔ Skills)
+
+| Perfil / Papel do Agent | Tools Permitidas | Tools Proibidas | Skills Mandatórias |
+|---|---|---|---|
+| **Read-Only / Advisor / Critic**<br>*(ex.: `<stack>-arch-advisor`, `security-reviewer`, `performance-agent`, `compliance-guardrails`, `agent-auditor`)* | `read_file`, `grep_search`, `file_search`, `list_dir`, `ask_questions`, `run_subagent`, `context-mode/*` | ❌ `create_file`, `insert_edit_into_file`, `replace_string_in_file` | `agent-contracts`, skill da especialidade |
+| **Implementer / Feature-Developer**<br>*(ex.: `*-developer`)* | `read_file`, `create_file`, `insert_edit_into_file`, `get_errors`, `run_in_terminal`, `ask_questions`, `run_subagent`, `context-mode/*` | ❌ Ausência de `get_errors` | Skill de implementação da stack, `test-implementation-*` |
+| **Developer / Test-Engineer**<br>*(ex.: `*-developer`, `*-test-engineer`)* | `read_file`, `insert_edit_into_file`, `get_errors`, `run_in_terminal`, `ask_questions`, `run_subagent`, `context-mode/*` | ❌ Ausência de `get_errors` | `code-tracing` (para developer), skill da stack |
+| **Tester / Test-Writer**<br>*(ex.: `*-test-engineer`)* | `read_file`, `create_file`, `insert_edit_into_file`, `get_errors`, `run_in_terminal`, `ask_questions`, `run_subagent`, `context-mode/*` | ❌ Ausência de `get_errors` | `test-implementation-*` correspondente |
+| **Domain Router / Supervisor**<br>*(ex.: `*-router`)* | `read_file`, `file_search`, `grep_search`, `list_dir`, `ask_questions`, `run_subagent`, `context-mode/ctx_search` | ❌ `create_file`, `insert_edit_into_file`, `run_in_terminal` | `agent-contracts`, `handoff-governance` |
+| **Analista / Híbrido Documental**<br>*(ex.: `business-rules-extractor`, `requirements-analyst`)* | `read_file`, `grep_search`, `file_search`, `list_dir`, `create_file`, `insert_edit_into_file`, `get_errors`, `ask_questions`, `run_subagent`, `context-mode/*` | ❌ `run_in_terminal`, alteração fora de `docs/` | `agent-contracts`, `efficient-batch-code-modification`, skill de domínio |
+
+#### Invariantes Transversais de Tooling:
+1. **Tool `run_in_terminal` presente** ➔ **OBRIGATÓRIO** declarar a skill `terminal-governance` nas `skills:` e/ou `source_docs:` de `.agent.md`, `.prompt.md` e em `catalog.yaml` / sub-catálogos locais (R-049).
+2. **Tools `context-mode/*` presentes** ➔ **OBRIGATÓRIO** declarar a skill `context-mode` nas `skills:` e `source_docs:` do `.agent.md` e em `catalog.yaml`.
+3. **Tool `run_subagent`** ➔ **OBRIGATÓRIO E BLOQUEANTE** em 100% dos agents (R-042).
+4. **Sincronismo R-015** ➔ As ferramentas declaradas no frontmatter `tools:` e as skills em `skills:` do `.agent.md` DEVEM ser idênticas às declaradas no `catalog.yaml` (ou `<stack>-catalog.yaml`).
+
+---
+
+### 2.8 — Violação de Batching e Limiar de Modificação (R-046)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Agent com capacidade de mutação/edição de código que *(a)* não declara em seu workflow ou regras o protocolo de *Single-Turn Batching* e a hierarquia de limiar (1-4 arquivos via editor tools vs 5+ arquivos ou operações repetitivas via `ctx_execute` (com `file`)/`ctx_batch`); *(b)* prevê ou executa edições sequenciais arquivo por arquivo gerando turnos redundantes de chat; *(c)* prevê releitura imediata pós-edição apenas para "conferir" se salvou; ou *(d)* executa ou instrui validação via `get_errors` dispersa por arquivo ao invés de chamada única com array agregado `filePaths: [...]`. |
+| Como detectar | Inspecionar seções de Workflow/Regras em `.agent.md` executores e skills de implementação; checar presença de menção a Single-Turn Batching e R-046; verificar ausência da skill `efficient-batch-code-modification` em agents com escrita massiva |
+| Origem (TrustAgent) | Intrínseco — protocolo de execução ineficiente gerando consumo desnecessário de tokens e créditos |
+| Severidade | **Alta** (impacto direto de custo e latência na experiência do usuário) |
+| Remediação | `@governance-factory` atualiza o workflow do agent incorporando o protocolo de *Single-Turn Batching*, limiar de 5 arquivos e validação única via `get_errors` agrupado |
+
+### 2.9 — Não Conformidade com Template Canônico de Agent e Matriz de Modelo
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Arquivo `.agent.md` que diverge dos templates canônicos (`.github/agents/templates/agent-template.md`, `operational-agent.md`, `research-agent.md`): *(a)* ausência dos blocos contrastantes obrigatórios `## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO` com sub-seções `### ✅ O que este agente FAZ` e `### ❌ O que este agente NUNCA faz`; *(b)* ausência de workflow sequencial numerado; *(c)* ausência de Contrato Operacional com entradas mínimas e formato de saída estruturado; *(d)* modelo configurado em desacordo com a Matriz Biparadigma (`"Gemini 3.8 Flash"` para procedural/operacional vs `"Claude Sonnet 5.5"` para deliberativo/decompositivo); *(e)* `model:` declarado como array ou kebab-case sem validação via `get_errors`; ou *(f)* `description` > 500 caracteres ou com changelog embutido (§10). |
+| Como detectar | Comparação estrutural contra os templates de referência em `.github/agents/templates/` e validação de `model:` via `get_errors` |
+| Origem (TrustAgent) | Intrínseco — inconsistência estrutural e instrucional do agente |
+| Severidade | **Bloqueador** se `model:` inválido (`Unknown model`) ou ausência de escopo delimitado; **Alta** para ausência de blocos ✅/❌ ou workflow numerado; **Sugestão** para pequenos desvios de formatação |
+| Remediação | `@governance-factory` reestrutura o `.agent.md` alinhando-o estritamente ao template correspondente de seu paradigma |
+
+### 2.10 — Desvio de Sintaxe e Variáveis em Prompts (`.prompt.md`)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Arquivo `.prompt.md` que diverge de `.github/prompts/templates/prompt-template.md`: *(a)* ausência de `argument-hint` no frontmatter quando o comando aceita parâmetros dinâmicos; *(b)* uso de variáveis ad-hoc ou incorretas em vez das variáveis nativas do VS Code Copilot (`${file}`, `${selection}`, `${workspaceFolder}`, `${input:param}`); *(c)* ausência do bloco delimitador `## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO`; *(d)* ausência de checklist de pré-apresentação ou formato de saída estruturado; *(e)* nomenclatura fora do padrão kebab-case `<verbo>-<objeto>.prompt.md`; *(f)* prompt que declara `run_in_terminal` em `tools:` sem incluir `.github/skills/terminal-governance/SKILL.md` em `source_docs:` (R-049). |
+| Como detectar | Inspeção do frontmatter e corpo dos prompts em `.github/prompts/*.prompt.md` contra o template canônico |
+| Origem (TrustAgent) | Intrínseco — quebra de compatibilidade com a runtime de prompts do VS Code Copilot |
+| Severidade | **Alta** se ausência de variáveis nativas onde esperado ou falta de escopo estrito; **Sugestão** se falta de `argument-hint` ou detalhamento cosmético |
+| Remediação | `@governance-factory` refatora o `.prompt.md` aplicando as variáveis nativas e o template oficial |
+
+### 2.11 — Não Conformidade com a Spec de Skills (Progressive Disclosure)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Arquivo `SKILL.md` que diverge de `.github/skills/templates/skill-template.md` ou dos princípios da Anthropic Open Spec: *(a)* quebra de *Progressive Disclosure* — Nível 1 ausente ou incompleto no frontmatter (`name`, `description` em 3ª pessoa com gatilho e limite negativo, `tier`, `category`, `triggers` em PT-BR); *(b)* Nível 2 ausente ou com seções obrigatórias faltantes (`## 0) Problema Resolvido`, `## 1) Quando Usar vs Quando NÃO Usar` com blocos contrastantes ✅/❌, `## 2) Diretrizes Operacionais`, `## 3) Padrões Canônicos com Exemplos Contrastantes ✅/❌`, `## 4) Checklist`); *(c)* código inline excedendo 8 linhas violando R-026 (deveria residir em `snippets/` ou `templates/` no Nível 3); *(d)* `description` redigida em 1ª pessoa ou sem declarar quando usar e quando NÃO usar; ou *(e)* falta de sincronização atômica em `.github/skills/.index.json` e `README.md` (R-015). |
+| Como detectar | Inspeção das skills em `.github/skills/*/SKILL.md` contra `skill-template.md` e contagem de linhas em blocos de código inline |
+| Origem (TrustAgent) | Intrínseco — degradação da clareza instrucional e consumo ineficiente de contexto |
+| Severidade | **Bloqueador** se ausência de frontmatter N1 ou quebra de R-015 no índice; **Alta** se código inline > 8 linhas (R-026) ou ausência de blocos ✅/❌; **Sugestão** se refinamento estilístico de gatilhos |
+| Remediação | `@governance-factory` reestrutura a skill conformando-a aos 3 níveis de *Progressive Disclosure* e extraindo códigos longos para snippets |
+
+### 2.12 — Conflito de Responsabilidade Cross-Artefato (Agents vs Prompts vs Skills)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Sobreposição de responsabilidade funcional entre um `.agent.md`, uma `SKILL.md` e/ou um `.prompt.md` que tratam do MESMO domínio/ação sem fronteira clara de papel: *(a)* um `.prompt.md` reimplementa lógica de decisão/fluxo que deveria pertencer ao agent (deixando de ser um "alias fino" que apenas invoca `@agent`); *(b)* uma `SKILL.md` contém instruções de orquestração/roteamento/decisão (verbos como "delegar", "rotear", "decidir entre X ou Y") em vez de conhecimento declarativo reutilizável — skills não devem tomar decisão de fluxo; *(c)* um `.agent.md` embute bloco extenso de conhecimento de domínio que deveria estar extraído como skill reutilizável (relacionado mas distinto do smell 2.1, que é duplicação entre agents — aqui é agent carregando peso que é papel de skill); *(d)* dois ou mais artefatos de tipos DIFERENTES (agent + skill, ou agent + prompt, ou skill + prompt) descrevem a MESMA responsabilidade com fronteiras redundantes, deixando ambíguo qual arquivo é a fonte de verdade operacional para aquele domínio. |
+| Como detectar | Cruzar o propósito declarado (`description`) do `.agent.md` contra as skills que ele referencia em `skills:`/`source_docs:` e contra os `.prompt.md` que o invocam (`agent: '<nome>'` no frontmatter do prompt ou lógica duplicada no corpo); `grep_search` por verbos de fluxo/decisão ("delegar", "rotear", "decidir", "classificar intenção") dentro de `SKILL.md` — presença desses verbos como instrução operacional (não como exemplo) é sinal de invasão de papel; comparar percentual de lógica decisória duplicada entre prompt e agent (>30% de sobreposição de fluxo é sinal forte de que o prompt deixou de ser alias fino). |
+| Origem (TrustAgent) | Extrínseco — desenho arquitetural do sistema multi-agent (fronteiras de papel mal definidas entre as 3 camadas de artefato: agent=decisão, skill=conhecimento, prompt=atalho de invocação) |
+| Severidade | **Alta** se a sobreposição ativa gera ambiguidade real sobre qual artefato é a fonte de verdade operacional (2 artefatos podem ser invocados para o mesmo efeito com comportamento potencialmente divergente); **Sugestão** se é apenas duplicação leve de descrição/propósito sem impacto funcional comprovado. |
+| Remediação | `@governance-factory` redefine a fronteira de responsabilidade: prompt volta a ser "alias fino" (apenas invoca o agent, sem lógica própria); skill perde qualquer instrução de fluxo/decisão e vira puro conhecimento declarativo; agent mantém a decisão/orquestração. Consolidar ou remover o artefato redundante quando a sobreposição for total. |
+
+### 2.13 — Hipertrofia Instrucional e Redundância de Saída em Runtime (Output Bloat / Multi-Layer Redundancy)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Artefato (`.agent.md`, `.prompt.md` ou `SKILL.md`) que prescreve instruções prolixas ou formato de saída inflado em tempo de execução: *(a)* **Redundância Multicamada:** fluxo que instrui o modelo a imprimir os mesmos dados em múltiplas seções consecutivas (ex.: banner repetido, resumo preliminar, tabela detalhada e re-resumo final contendo os mesmos atributos); *(b)* **Overhead Cosmético:** prescrição de decorações ASCII pesadas, caixas de diálogo decorativas ou múltiplos banners visuais que poluem o histórico de chat e consomem janela de contexto desnecessariamente; *(c)* **Mismatch de Perfil (`agent-contracts` § 8):** agent do tipo Router ou Operacional instruído a emitir relatórios narrativos longos em vez de payload determinístico/compacto, ou agent Analista instruído a emitir prosa antes/depois de tabelas sem valor analítico novo; *(d)* **Violação de Postura Sênior (`R-029`):** prompts instruindo introduções genéricas ("Com certeza, vou analisar..."), conclusões redundantes ("Espero ter ajudado...") ou eco integral do contexto lido; *(e)* **Tamanho Desproporcional do Artefato:** prompt/agent com mais de 300 linhas de diretrizes cuja complexidade operacional real não justifica a densidade instrucional (prompt bloat). |
+| Como detectar | Inspecionar a seção `Formato de Saída` de `.agent.md` e `.prompt.md`; contar blocos de exibição previstos; verificar repetição de variáveis/dados em mais de um bloco de saída; cruzar o perfil taxonômico do agent contra a tabela de templates de `agent-contracts` § 8; verificar presença de instruções mandatórias de ASCII art ou introduções de cortesia. |
+| Origem (TrustAgent) | Intrínseco — falha no design instrucional do artefato, resultando em poluição de contexto, alta latência de streaming e consumo ineficiente de tokens/créditos de chat. |
+| Severidade | **Alta** se há redundância multicamada grave (mesmos dados repetidos 3+ vezes) ou saída inflada que degrade sensivelmente a janela de contexto da sessão; **Sugestão** para pequenos ajustes de concisão, eliminação de frases de cortesia ou refinamento estético de saída. |
+| Remediação | `@governance-factory` refatora a seção `Formato de Saída` e as diretrizes do artefato: consolida saídas dispersas em uma única apresentação densa (tabela ou checklist compacto), remove decorações cosméticas redundantes e alinha o template estritamente ao perfil correspondente em `agent-contracts` § 8 e `R-029`. |
+
+### 2.14 — Evidência Real Não-Anonimizada em Evals Minerados (Violação R-044 na Telemetria)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Caso de teste proposto ou injetado em `.github/agents/evals/casos-roteamento.yaml` (originário de mineração de telemetria `[INTENT_DRIFT]` ou `[LOOP_LIMIT]`) contendo nomes reais de repositórios, pacotes corporativos, classes reais (`OrderService`, `UsuarioController`), URLs de endpoints internos ou caminhos absolutos locais (`<drive>:\<caminho>`, `/<pasta>/...`). |
+| Como detectar | Inspeção do arquivo `casos-roteamento.yaml` com regex buscando caminhos de disco (`[A-Za-z]:\\`, `/home/`, `/Users/`), pacotes (`com\.[a-z0-9]+\.`), ou cruzando termos do prompt contra nomes de projetos reais conhecidos. |
+| Origem (TrustAgent) | Extrínseco — falha no pipeline de ingestão de dados da telemetria (falta de filtro sanitizador antes da persistência). |
+| Severidade | **Bloqueador** — violação direta das normas R-044 (Anonimização Obrigatória de Evidência Real) e R-038 (Genericidade Obrigatória). |
+| Remediação | `@governance-maintainer` sanitiza imediatamente o arquivo `casos-roteamento.yaml`, aplicando a genericização padrão (`[PROJETO-X]`, `ServicoExemploX`) e removendo quaisquer caminhos locais absolutos antes do commit. |
+
+**Matriz de Fronteiras §2.13 e §2.14 (Anti-Sobreposição):**
+
+```text
+[Smell 2.1]  --> Duplicação ESTÁTICA de texto ENTRE 3+ arquivos do repositório.
+[Smell 2.4]  --> Duplicação de REGRA NORMATIVA entre CLAUDE.md e copilot-instructions.
+[Smell 2.8]  --> Ineficiência de TOOL CALLS no FILESYSTEM (R-046 / Single-Turn Batching).
+[Smell 2.9]  --> Ausência ESTRUTURAL da seção "Formato de Saída" no .agent.md (presença do bloco).
+[Smell 2.10] --> Erro de SINTAXE em variáveis de prompt (${file}, argument-hint).
+[Smell 2.11] --> Limite de CÓDIGO INLINE no corpo da skill (≤ 8 linhas via R-026).
+[Smell 2.12] --> Fronteira de AUTORIDADE/PAPEL funcional (decisão vs conhecimento vs atalho).
+[Smell 2.13] --> QUALIDADE, CONCISÃO E ECONOMIA DE TOKENS DO PAYLOAD DE CHAT (runtime output).
+-----------------------------------------------------------------------------------------
+[Smell 2.14] --> VAZAMENTO DE EVIDÊNCIA REAL/DADOS LOCAIS EM EVALS MINERADOS (R-044/R-038).
+```
+
+---
+
+### 2.15 — Acoplamento Rígido de Range Normativo (Hardcoded Normative Range Coupling)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Acoplamento de range numérico fechado em prompts ou documentação (ex.: `R-001..R-051`), acoplando o consumidor à cardinalidade exata de regras vigentes em `CLAUDE.md` e forçando *Shotgun Surgery* (edições em massa em 44+ arquivos e queima de créditos a cada nova regra criada) |
+| Como detectar | Regex `R-001\.\.R-(\d{3})` em cada `.github/agents/**/*.agent.md` e prompts; qualquer ocorrência de range numérico fechado é um achado. Ver Tier 1: `test_smell_2_15_no_hardcoded_normative_rule_range` |
+| Origem (TrustAgent) | Intrínseco — acoplamento frágil entre consumidores de governança e o contador numérico de regras |
+| Severidade | **Alta em Custo Operacional** (gera retrabalho sistêmico, edições em massa e gasto desnecessário de tokens/créditos em cascata) |
+| Remediação | Substituir o range fechado por herança aberta e desacoplada: `- Regras normativas globais em [caminho]/CLAUDE.md.` |
+
+### 2.16 — Agent Mutativo Sem Skill de Edição Segura Referenciada (R-051)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Agent com `insert_edit_into_file` e/ou `replace_string_in_file` no frontmatter `tools:` não referencia `efficient-batch-code-modification` em `source_docs:`/`skills:` — fica sem o guardrail que previne corrupção de arquivo único grande/estruturado e Markdown com seções/âncoras repetidas (R-051) |
+| Como detectar | Para cada `.agent.md` com `insert_edit_into_file` ou `replace_string_in_file` em `tools:`, verificar se `efficient-batch-code-modification` aparece em `source_docs:` ou nas listas `skills:` de sub-catálogos. Ver Tier 1: `test_smell_2_16_mutating_agents_reference_safe_editing_skill` |
+| Origem (TrustAgent) | Intrínseco — agent herda tool de mutação sem herdar o protocolo de segurança correspondente |
+| Severidade | **Bloqueador** (risco de corrupção documentado em R-051: truncamento por `insert_edit_into_file` em `workflows.md`/`routing-graph.yaml` e corrupção/wiping por `replace_string_in_file` com fuzzy matching em `codegraph-engine.agent.md`) |
+| Remediação | Adicionar `.github/skills/efficient-batch-code-modification/SKILL.md` a `source_docs:` (ou `skills:` no sub-catálogo) do agent afetado via `@governance-maintainer` |
+
+### 2.17 — Comando Git Sem Desativação de Pager (Violação R-035)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Arquivo de prompt (`.prompt.md`) ou skill de terminal contém exemplo de comando git (`git diff`, `git log`, `git show`, `git branch`, `git tag`) desprovido de flag não-interativa (`--no-pager` ou `GIT_PAGER=cat` ou pipe `\| cat`), induzindo os agents a executar comandos paginados interativos que travam a sessão indefinidamente em "Processing..." |
+| Como detectar | Varredura estática por comandos `git (diff\|log\|show\|branch\|tag)` em `.github/prompts/*.prompt.md` e skills; verificar ausência de `--no-pager`, `GIT_PAGER` ou pipe seguro. Ver Tier 1: `test_smell_2_17_no_bare_git_pager_commands_in_prompts_and_governance` |
+| Origem (TrustAgent) | Intrínseco — documentação e prompts de governança exemplificam comandos interativos sem prever o comportamento de pager em terminais não-TTY |
+| Severidade | **Bloqueador** (trava a execução do terminal do IDE à espera de `q` no pager `less`, exigindo intervenção manual do usuário) |
+| Remediação | Substituir o comando no arquivo por sua forma canônica não-interativa (`git --no-pager diff ...`, `git --no-pager log ...`) e assegurar `git config core.pager cat` no repositório |
+
+### 2.18 — Gap de Definição de Pronto (Feature Não-Alcançável / Rota Órfã de Navegação)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Pipeline de `WORKFLOW-FEATURE-DEVELOPMENT` entrega nova(s) rota(s) navegáveis (Angular Router, tabs, deep-links) com testes verdes e build íntegro, mas **nenhum artefato do pipeline** verifica se a rota está de fato alcançável pelo usuário final via componente de navegação (sidenav/menu/tab-bar) do projeto — a feature existe no código mas é invisível na UI |
+| Como detectar | Para diffs frontend com nova(s) entrada(s) em arquivo de rotas (`app.routes.ts`/equivalente), `grep_search` pelo `path` da nova rota dentro dos componentes de navegação do projeto (ex.: `sidenav.component.ts/html`, menu principal, tab-bar); ausência de `routerLink`/entrada correspondente é achado positivo. Verificar também se `tech-solution-architect` particionou `[FRONTEND_TASKS]` sem tarefa explícita de integração ao shell de navegação, e se `test-strategy`/`code-review` cobriram "navegabilidade" como cenário/dimensão |
+| Origem (TrustAgent) | Extrínseco — nenhum agent do pipeline (blueprint, implementer, test-strategy, code-review) declara "alcançabilidade via navegação" como critério de conclusão; falha estrutural simultânea em 3+ artefatos, não lapso pontual de 1 agent |
+| Severidade | **Alta** (feature entregue e "aprovada" porém inutilizável para o usuário final — falha de valor de negócio) |
+| Remediação | `@governance-factory`/`@governance-maintainer` insere passo obrigatório de "integração ao shell de navegação" no workflow de implementação (`angular-implementation-patterns` e skills equivalentes de outras stacks com UI), no Context Firewall de `tech-solution-architect` e na dimensão de análise de `code-review-patterns` |
+
+### 2.19 — Ausência de Verificação de Reuso de Design System / Componentes Compartilhados
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Agent implementer de UI cria HTML/CSS customizado (cards, filtros, badges, diálogos, selects) para uma capacidade que já possui componente compartilhado documentado no projeto (ex.: `shared/components/` + `docs/*componentes*`/`docs/*padrao*`), gerando inconsistência visual e duplicação de padrão em vez de reaproveitamento |
+| Como detectar | Comparar o(s) novo(s) template(s) `.html` contra o inventário de componentes compartilhados do projeto (barrel `shared/components/index.ts` ou equivalente) e contra documentação interna de design system referenciada (ou ausente) no adapter local (`.github/instructions/local/<projeto>.instructions.md`); presença de `<select>`/`<input>` nativo ou classes CSS ad-hoc quando existe componente shared documentado para a mesma capacidade é achado positivo; ausência de execução de script de auditoria de padrão do projeto (quando existente, ex.: `npm run <lint-de-padrao-ui>`) no Quality Gate é agravante |
+| Origem (TrustAgent) | Extrínseco — (a) adapter local (Camada 3) não referencia a documentação interna de design system já existente no projeto, quebrando a cadeia de descoberta; (b) skills genéricas de implementação/componentização não tratam "buscar componente equivalente antes de criar um novo" (Reuse-First) como etapa obrigatória do workflow |
+| Severidade | **Alta** (inconsistência de UX e retrabalho de refatoração; não bloqueia função, mas degrada padrão de produto) |
+| Remediação | `@adapter-generator`/`@docs-engineer` garante que adapters locais referenciem documentação interna de design system quando detectada no projeto; `@governance-factory` insere etapa "Reuse-First" em `frontend-componentization-patterns`/`angular-implementation-patterns` (ou skill equivalente de outra stack) e nos agents implementer/stylist de UI; `code-review-patterns` ganha dimensão de análise correspondente |
+
+### 2.20 — Duplicação por Aninhamento de Router (Nested Subagent Sprawl)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | O `@agent-router` (ou supervisor hierárquico) invoca subagente executor downstream via `run_subagent` por dentro de si mesmo, e ao concluir e retornar ao Orquestrador Raiz com o bloco de decisão (`Delegado: @<agent>`), o orquestrador re-dispara o mesmo subagente, gerando execução duplicada, gasto excessivo de créditos e reexecução redundante de testes/diffs (incidente real documentado em 2026-09 com prompt `commit <projeto>`) |
+| Como detectar | Inspeção de traces/tool calls onde `agent-router` invoca executores downstream (`pr-gatekeeper`, `*-developer`, `*-test-engineer`) via `run_subagent`; ausência da regra mandatória de Delegação Plana (Flat Delegation) no `agent-router.agent.md` e na regra R-047. Ver Tier 1: `test_smell_2_20_router_forbids_nested_subagent_execution` |
+| Origem (TrustAgent) | Intrínseco — ambiguidade no escopo do router (confundir classificador de rota com despachante executor) somada à redação de R-047 sem exceção explícita para blocos de decisão de roteamento |
+| Severidade | **Bloqueador** (desperdício financeiro direto de créditos, duplicação de runtime e loops de cancelamento pelo usuário) |
+| Remediação | Declarar explicitamente a Delegação Plana (Flat Delegation) em `agent-router.agent.md` e a exceção em R-047: o router emite apenas o bloco de decisão de rota e encerra o turno sem chamar executores via `run_subagent`. A invocação de `run_subagent` pelo router é restrita a `@prompt-structuring` (R-041) e `@binding-initializer` (R-034). O Orquestrador Raiz despacha o downstream em nível plano exatamente uma única vez |
+
+### 2.21 — Cegueira Visual e Suposição de Contratos de UI (Visual Blindness & Unverified UI Contracts)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Entrega de funcionalidade de frontend concluída com testes unitários e build verdes ("sucesso aparente"), porém com severas divergências visuais em tempo de execução: vazamento de texto de ícone no cabeçalho, diálogos desalinhados sem classes utilitárias de scroll e padding, uso de cores hexadecimais arbitrárias inline em SCSS, componentes de empty-state colapsados no centro da viewport, ou consumo de componentes compartilhados com propriedades inferidas em inglês (`[icon]`, `[title]`) quando o design system modelou em português (`[icone]`, `[titulo]`), fazendo com que o Angular trate atributos não mapeados como atributos HTML nativos inertes sem acusar erro de compilação |
+| Como detectar | Inspeção de arquivos SCSS de features buscando cores hexadecimais (`#[0-9a-fA-F]{3,6}`) em vez de variáveis de tema/tokens semânticos; verificação de templates `.html` contra o arquivo de declaração TypeScript (`.component.ts`) dos componentes `shared/` consumidos; ausência do protocolo "Canonical Sibling First" (inspeção prévia de componente irmão); ausência de classes utilitárias de diálogo (`.app-dialog-content`, `.form-grid`); ausência de separação clara entre lógica e contratos de estilo no workflow |
+| Origem (TrustAgent) | Intrínseco/Extrínseco — (a) intrínseco: agent presume que compilação limpa e testes headless equivalem a Definition of Done visual (cegueira visual); supõe inputs em inglês sem ler a definição TypeScript do componente compartilhado; (b) extrínseco: workflow de features (`WORKFLOW-FEATURE-DEVELOPMENT`) sem duplo gate explícito de qualidade visual e design system |
+| Severidade | **Alta** (não impede o build, mas entrega interface quebrada para o usuário final, gerando retrabalho imediato de layout e refatoração de contratos de template) |
+| Remediação | `@governance-factory`/`@governance-maintainer` estabelece: (a) Protocolo "Canonical Sibling First" e leitura obrigatória da interface `.ts` de componentes `shared/` em `angular-implementation-patterns` e `angular-developer`; (b) Proibição estrita de hex colors em SCSS de features e checklist de diálogos em `angular-developer`; (c) Duplo Gate de Qualidade (Gate 1: Lógica/Testes/OWASP, Gate 2: Design System & Paridade de UI) no `WORKFLOW-FEATURE-DEVELOPMENT` de `workflows.md` |
+
+---
+### 2.22 — Sticky Agent e Falha de Reset de Workflow (R-042 / R-052)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | O último agente ativo em um turno ou ao término de um workflow canônico retém o controle da conversa e tenta responder a uma nova solicitação do usuário, justificando que o pedido pertence ao mesmo ecossistema/stack técnica, violando a centralidade do `@agent-router` e bypassando o pipeline de requisitos ou triagem do workflow canônico aplicável. |
+| Como detectar | Agente downstream aceita nova tarefa diretamente sem handoff de retorno ao router; ausência de reset de workflow ao concluir entrega técnica. |
+| Origem (TrustAgent) | Intrínseco — inércia conversacional e afinidade de stack (Sticky Session / Sticky Agent). |
+| Severidade | **Bloqueador** (violação R-042 e R-052). |
+| Remediação | Todo agente downstream ao concluir sua entrega deve registrar o workflow como concluído e acionar handoff de retorno ao `@agent-router` (`motivo: "conclusao_de_workflow_anterior"`), proibindo sticky-sessions inter-tarefas. |
+
+---
+### 2.23 — Router Over-Empowerment e Pre-Routing Discovery Bloat (R-054)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Um agente com perfil de Router (`agent-router` central ou supervisores de domínio `*-router`) possui ferramentas mutativas, de terminal ou de sandbox (`ctx_execute`, `run_in_terminal`) e executa dezenas de tool calls de leitura e discovery nos arquivos do projeto antes de emitir a decisão de roteamento, consumindo múltiplos turnos e créditos em modelos topo de linha (ex.: Claude Sonnet 5.5) e assumindo indevidamente o papel analítico ou investigativo que pertence exclusivamente aos agentes downstream |
+| Como detectar | (a) Presença de ferramentas mutativas (`create_file`, `insert_edit_into_file`, `replace_string_in_file`, `apply_patch`), terminal (`run_in_terminal`) ou sandbox (`context-mode/ctx_execute*`) no frontmatter de qualquer router; (b) Ausência da regra mandatória de **Zero Pre-Routing Discovery** (`ZERO TOOL CALLS DE DISCOVERY`) no bloco de restrições críticas do router ou template; (c) Ausência da regra mandatória de **Delegação Plana (Flat Delegation)** |
+| Origem (TrustAgent) | Intrínseco — violação do Princípio da Responsabilidade Única (SRP) e Least Privilege (R-024) para o perfil de roteamento, confundindo classificação de intenção e despacho com análise/diagnóstico de domínio do problema |
+| Severidade | **Bloqueador** (desperdício exponencial de tokens e créditos LLM, latência excessiva para uma triagem) |
+| Remediação | (a) Restringir ferramentas de todos os routers estritamente ao baseline canônico de 7 ferramentas: `['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search']`; (b) Declarar a regra de Zero Discovery no bloco CRÍTICO de todos os routers e no template canônico `router-agent.md`; (c) Fazer o router operar sob Delegação Plana sem invocar downstream internamente via `run_subagent` |
+
+---
+### 2.24 — Omissão de Precedência de Context-Mode em Agentes Mutadores e Leitores (Editor Tool Sprawl / R-056)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Agente ou prompt utiliza ferramentas manuais nativas de editor (`read_file`, `replace_string_in_file`, `insert_edit_into_file`, `create_file`) ou terminal para leitura ou modificação/criação de arquivos quando context-mode está disponível no ambiente, em vez de cumprir a obrigatoriedade de 100% de execução no sandbox (`ctx_execute`, `ctx_batch`, `ctx_search`), gerando poluição conversacional, queima de contexto e risco de truncamento/corrupção |
+| Como detectar | Agente possui ferramentas mutativas ou de leitura, mas seu contrato operacional (`.agent.md` ou template) omite a cláusula de uso 100% obrigatório de `context-mode` (R-008 / R-056) para leituras e escritas/criações, ou não proíbe estritamente ferramentas nativas de editor e terminal quando context-mode estiver disponível (rebaixando-as a fallback exclusivo de indisponibilidade comprovada); ou agente dispara chamadas de editor tools no chat com context-mode ativo |
+| Origem (TrustAgent) | Intrínseco — comodismo do modelo em recorrer a primitivas do editor em vez de compor o script all-or-nothing no sandbox via Think-in-Code (R-008 / R-051 / R-056) |
+| Severidade | **Bloqueador** (desperdício severo de créditos, ineficiência crítica de contexto e violação direta de R-008 e R-056) |
+| Remediação | Injeção da cláusula de uso 100% obrigatório de `context-mode` para leituras e escritas/criações no bloco CRÍTICO e diretrizes de todos os agentes mutadores, operacionais e templates, declarando expressamente a proibição estrita de ferramentas nativas de editor e terminal quando context-mode estiver disponível, rebaixadas a fallback exclusivo de indisponibilidade comprovada |
+
+---
+### 2.25 — Terceirização Indevida de Edição ao Usuário por Agentes Analíticos / Read-Only (Anti-Manual User Delegation & Dead-End Analysis / R-057)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Um agente analítico, read-only, supervisor ou de triagem (ex.: `@agent-router`, `@agent-auditor`, `@code-review`, `@adr-sentinel`, `@repo-hygiene-auditor`, `@requirements-analyst`, `@test-strategy`, `@bug-triage`), desprovido de ferramentas mutativas em seu frontmatter, ao constatar a necessidade de alteração no código ou em artefatos de governança, em vez de acionar a próxima etapa do workflow determinístico ou transferir o controle via handoff para o agente executor competente (ex.: `@governance-maintainer`, `@<stack>-developer`), emite instruções de edição manual para o usuário ("edite você mesmo no arquivo X", "não possuo ferramentas de escrita, faça a alteração Y"), gerando quebra do ciclo autônomo, frustração do usuário e beco sem saída (violação R-047). |
+| Como detectar | (a) Resposta de agente analítico contendo orientações para que o próprio usuário edite código ou execute alterações manuais por ausência de ferramentas no agente; (b) Encerramento de turno de agente de análise com pendências técnicas sem acionamento de `run_subagent` ou avanço de etapa no pipeline do workflow; (c) Ausência da cláusula explícita de proibição de transferência de edição ao usuário (R-057) no bloco "CRÍTICO: ESCOPO E NÃO-ESCOPO" de agentes analíticos e templates canônicos (`research-agent.md`, `agent-template.md`, `router-agent.md`). |
+| Origem (TrustAgent) | Intrínseco — falha de alinhamento de agência e beco sem saída (R-047), onde o modelo constata a ausência de tools mutativas e tenta suprir a lacuna transferindo a execução manual ao usuário em vez de navegar a máquina de estados do workflow determinístico. |
+| Severidade | **Bloqueador** (interrompe o fluxo autônomo agent-first e desrespeita a divisão de responsabilidades entre agentes analíticos e executores). |
+| Remediação | (a) Injeção da cláusula R-057 no bloco CRÍTICO de todos os agentes analíticos/read-only e templates canônicos (`research-agent.md`, `agent-template.md`, `router-agent.md`); (b) Blindagem dos workflows canônicos em `workflows.md` com invariante explícito de avanço compulsório da etapa diagnóstica para a etapa executora; (c) Formalização de teste determinístico no pytest (`test_anti_manual_user_delegation_governance.py`). |
+
+---
+### 2.26 — MCP Tool Chaining Sequencial no Chat / Omissão de ctx_batch e Script Consolidado (R-008 / R-046 / R-056)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Um agente executa múltiplas chamadas individuais de `ctx_execute` sequenciais em turnos separados do chat para analisar diffs, arquivos, branches ou comandos (ex.: 10+ turnos sucessivos), reenviando todo o histórico acumulado do chat a cada turno e drenando tokens e créditos desnecessariamente, em vez de consolidar a análise em uma única rodada via `ctx_batch` ou via script Node.js/Python iterativo consolidado no sandbox |
+| Como detectar | (a) Histórico de chamadas evidenciando sucessivos turnos com `ctx_execute` unitários para inspecionar alvos correlacionados; (b) Agente com `context-mode/ctx_execute` em `tools:` que omite `context-mode/ctx_batch`; (c) Ausência da regra mandatória de Single-Turn MCP Batching e da proibição de Tool Chaining sequencial no bloco CRÍTICO/Diretrizes do agente ou template |
+| Origem (TrustAgent) | Intrínseco — miopia conversacional e ausência de agregação em memória, onde o modelo trata cada arquivo ou comando como um turno conversacional separado em vez de orquestrar a operação em lote no sandbox |
+| Severidade | **Bloqueador** (desperdício exponencial de créditos e tokens LLM, latência excessiva por roundtrips desnecessários e risco de exaustão da janela de contexto) |
+| Remediação | (a) Declarar compulsoriamente `'context-mode/ctx_batch'` no frontmatter `tools:` de todos os agentes que operam com context-mode; (b) Injetar a cláusula de proibição de MCP Tool Chaining sequencial no bloco CRÍTICO/Diretrizes do agente e templates; (c) Consolidar inspeções múltiplas em `ctx_batch` (com comandos e queries unificadas) ou em script síncrono único em `ctx_execute` |
+
+---
+### 2.27 — Desvio Prematuro para Implementação e Despejo de Lacunas Arquiteturais (Premature Implementation Bypass & Gap Dumping / R-058)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | O `@agent-router` (ou router de domínio), ao classificar uma nova funcionalidade, identifica lacunas conceituais e arquiteturais críticas (matriz de permissões/papéis, evolução de schema de persistência/banco, transações atômicas/concorrência, plugins de push notifications/infraestrutura), mas em vez de despachar compulsoriamente para o `@tech-solution-architect` (Estado 3 do `WORKFLOW-FEATURE-DEVELOPMENT`) para elaborar o Technical Blueprint e resolver os contratos no checkpoint humano 3b, desvia prematuramente o fluxo direto para o executor de código (`@<stack>-router` ou `@<stack>-developer`), listando as lacunas no bloco "Lacunas para handoff" para que o desenvolvedor resolva no improviso durante a codificação |
+| Como detectar | (a) Resposta do router despachando feature nova que cita lacunas de schema de banco, modelo de permissão ou infraestrutura no handoff diretamente para especialista/router de código sem passar por `@tech-solution-architect`; (b) Router gerando cronogramas ou listas arbitrárias de sub-etapas de implementação linear no chat em vez de despachar para `@feature-planner`; (c) Ausência da regra R-058 no bloco CRÍTICO de routers ou templates |
+| Origem (TrustAgent) | Intrínseco — miopia de stack e pressa de entrega, onde o roteador constata que todos os arquivos grounded estão no frontend e assume erroneamente que uma feature com persistência e concorrência dispensa arquitetura prévia |
+| Severidade | **Bloqueador** (gera código no escuro, risco severo de corrupção de dados ou regras de segurança falhas, e quebra do checkpoint humano 3b) |
+| Remediação | (a) Injeção de R-058 em `CLAUDE.md`, `copilot-instructions.md`, `agent-router.agent.md` e `router-agent.md`; (b) Roteamento compulsório de features com persistência/máquina de estados/push para `@tech-solution-architect` (WF4 Estado 3); (c) Decomposição em subtasks `[S]`/`[P]` com `@feature-planner` para demandas multi-task; (d) Teste determinístico no pytest (`test_architectural_blueprint_gate_governance.py`) |
+
+---
+### 2.28 — Mensagem de Sensor Sem Remediação Acionável (Non-Actionable Assertion Message / Anti Positive Prompt Injection)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Um teste determinístico (sensor computacional em `tests/governance_audit/` ou equivalente) falha emitindo apenas a descrição do sintoma (ex.: `"[agent.md] Ausência do campo 'source_docs'"`), sem indicar a ação corretiva exata. Isso força uma segunda rodada de raciocínio inferencial (LLM) só para descobrir "o que fazer a seguir", desperdiçando tokens e quebrando o ciclo cibernético de auto-correção descrito em *Harness Engineering for Coding Agent Users* (Böckeler/Fowler, Thoughtworks, 2026) |
+| Como detectar | (a) Mensagens de `assert` que terminam sem instrução imperativa de correção (sem verbo de ação como "adicione", "remova", "substitua"); (b) Ausência do helper padronizado de remediação (`remediation()` ou equivalente) em testes novos de `tests/governance_audit/`; (c) Sensores customizados (linters, scripts de auditoria) que retornam apenas código de erro sem contexto de arquivo/campo/valor esperado |
+| Origem (TrustAgent) | Intrínseco — o autor do teste otimiza para "detectar a violação" mas não para "fechar o loop de autocorreção do agente consumidor", tratando o sensor como gate humano em vez de sensor agent-first |
+| Severidade | **Alto** (não bloqueia a execução do teste, mas degrada significativamente a eficiência de autocorreção e aumenta o custo de tokens do ciclo feedback → correção) |
+| Remediação | (a) Todo `assert` novo em `tests/governance_audit/` DEVE usar o helper `remediation(message, fix_hint=...)` de `tests/governance_audit/_helpers.py`, retornando mensagem multilinha com bloco `REMEDIATION:` explícito; (b) `fix_hint` deve ser imperativo, específico e citar o arquivo/campo/valor esperado — nunca genérico ("corrija o problema"); (c) Sensores fora do pytest (linters JS/Python customizados) devem seguir o mesmo princípio de "Positive Prompt Injection": a mensagem de erro já contém a instrução de correção |
+
+### 2.29 — Root Orchestrator Agent Impersonation (R-062)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | O modelo do turno raiz (Orquestrador Raiz), dependendo do prompt/modelo (ex.: Claude Sonnet 5.5), lê diretamente o conteúdo de arquivos `.github/agents/**/*.agent.md` de agents específicos e passa a "atuar como" aquele agent diretamente no próprio chat, sem invocá-lo de fato via `run_subagent` a partir do `@agent-router` — bypassando R-037/R-042/R-050/R-054 |
+| Como detectar | (a) Resposta do turno raiz reproduz estrutura, tom ou persona de um agent específico (ex.: banner "Agente Ativo: X") sem que tenha havido chamada de `run_subagent` correspondente no histórico de tool calls; (b) Menção ou paráfrase do conteúdo de um `.agent.md` específico no chat sem invocação real; (c) Ausência da cláusula R-062 em `CLAUDE.md`, `copilot-instructions.md` e `agent-router.agent.md` |
+| Origem (TrustAgent) | Intrínseco — modelos de turno raiz com acesso a ferramentas de leitura de arquivo podem "atalhar" o custo de invocação de subagente lendo e simulando o papel do especialista diretamente, especialmente sob prompts curtos citando `@nome-do-agent` |
+| Severidade | **Bloqueador** (bypass estrutural de toda a governança agent-first: roteamento, re-triagem, least privilege de router e delegação plana) |
+| Remediação | (a) Declarar R-062 (Zero Impersonation pelo Orquestrador Raiz) em `CLAUDE.md` § 3; (b) Propagar cláusula redundante em `.github/copilot-instructions.md` §1.1 (bloco "Proibido:") e §2 ("✅ Sempre"); (c) Reforçar `agent-router.agent.md` deixando explícito que a proibição de Zero Discovery/Zero Impersonation é responsabilidade do Orquestrador Raiz mesmo antes de invocar o router; (d) Adicionar seção "Zero Impersonation pelo Orquestrador Raiz" ao template canônico `templates/router-agent.md`; (e) Validar via `tests/governance_audit/test_root_agent_impersonation_governance.py` |
+
+---
+
+### 2.30 — Silent Root Tool Execution / Zero-Agent Router Bypass (R-063)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | O modelo do turno raiz (Orquestrador Raiz) invoca diretamente uma tool nativa genérica (terminal, leitura de arquivo, grep, busca, edição) em resposta a um NOVO pedido do usuário sem que tenha havido invocação prévia de `run_subagent(agentName: 'agent-router', ...)` neste mesmo turno — independentemente de o usuário citar nome de agent, de o Orquestrador Raiz ter lido algum `.agent.md`, ou de haver agent ativo residente de turno anterior |
+| Como detectar | (a) Histórico de tool calls do turno mostra chamada de `read_file`, `grep_search`, `run_in_terminal`, `insert_edit_into_file` (ou equivalente) ANTES de qualquer `run_subagent(agent-router)` no mesmo turno; (b) Resposta do turno raiz produz resultado técnico (diagnóstico, edição, saída de comando) sem banner `Agente Ativo: <agent>` precedente; (c) Ausência da cláusula R-063 em `CLAUDE.md`, `copilot-instructions.md`, `agent-router.agent.md` e `templates/router-agent.md` |
+| Origem (TrustAgent) | Intrínseco — modelos de turno raiz com acesso direto a ferramentas nativas podem atalhar o custo de roteamento executando a tool solicitada de forma literal e imediata, sem produzir qualquer simulação de persona de agent específico (o que distingue este smell do Smell 2.29, que exige leitura/paráfrase de um `.agent.md` e simulação de papel) |
+| Severidade | **Bloqueador** (bypass estrutural do roteamento obrigatório, mesmo sem impersonation de agent específico) |
+| Remediação | (a) Declarar R-063 (Zero Execução Direta pelo Orquestrador Raiz sem Router / Anti Silent Bypass) em `CLAUDE.md` § 3, complementando R-042; (b) Propagar cláusula em `.github/copilot-instructions.md` §1.1 (diagrama, ramo Não → triagem normal) e §2 (bullet "Sempre"); (c) Adicionar subseção "Zero Execução Direta pelo Orquestrador Raiz (R-063)" em `agent-router.agent.md` e no template canônico `templates/router-agent.md`, propagada aos 7 domain routers; (d) Validar via `tests/governance_audit/test_root_orchestrator_silent_execution_governance.py` e `tests/governance_audit/test_router_agents.py` |
+
+---
+
+### 2.31 — Progressive Disclosure Violation / Full-Load Forçado de Documento Lazy (R-066)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Artefato (`.agent.md`/`SKILL.md`/`*.prompt.md`) declara `CLAUDE.md`, `.github/copilot-instructions.md` ou qualquer documento > 300 linhas dentro de `source_docs:` (camada full-load) em vez de `source_docs_lazy:`; ou um agente executa `read_file` integral de documento classificado como lazy em vez de consultá-lo via `context-mode/ctx_search` |
+| Como detectar | (a) `tests/governance_audit/test_r066_progressive_disclosure_budget.py` — audita o frontmatter declarado (drift determinístico, camada estática/CI); (b) Observação de histórico de tool calls com `read_file` integral de `CLAUDE.md`/`copilot-instructions.md` em sessão de agent especialista (camada observacional, não bloqueante) |
+| Origem (TrustAgent) | Intrínseco — saturação cega da janela de contexto inicial por hábito de full-load indiscriminado de documentação de referência, sem diferenciar metadados (sempre carregados), corpo do agent/skill (carregado no acionamento) e recursos grandes (carregados sob demanda) — padrão de Progressive Disclosure consolidado de mercado (Anthropic Agent Skills) |
+| Severidade | **Alto** (não bloqueador imediato de CI, mas gera custo recorrente de tokens em 100% das sessões/handoffs do agente afetado, agravado em workflows multi-agent com múltiplos `run_subagent`) |
+| Enforcement | **Textual/CI-estático apenas** — `source_docs`/`source_docs_lazy` não são campos reconhecidos nativamente por GitHub Copilot ou Anthropic Agent Skills (confirmado via pesquisa de mercado); não há bloqueio mecânico de runtime, mesma limitação já documentada para R-053/R-062/R-063 |
+| Remediação | (a) Declarar R-066 em `CLAUDE.md` § 3 e espelhar em `copilot-instructions.md`; (b) Rodar `tools/agent_source_docs_sync/sync_required_source_docs.py --apply` para `.agent.md` afetados — nunca editar a chave manualmente; (c) Validar via `tests/governance_audit/test_r066_progressive_disclosure_budget.py` |
+
+---
+
+### 2.32 — Capability Overreach de `ctx_execute` (com `file`) em Agent Gather-only (R-008 / R-046 / R-056 / R-059)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Agente puramente analítico, observacional, consultivo ou de auditoria ("Gather-only" — ex.: `agent-auditor`, reviewers, advisors arquiteturais, linters) declara `context-mode/ctx_execute` e/ou `context-mode/ctx_execute` em seu frontmatter `tools:`, sem necessidade comprovada de (a) agregação computacional multi-arquivo, (b) estrutura derivada de N variável em runtime, ou (c) codegen condicional. Como o hook `preToolUse` do IDE não intercepta subagents (`run_subagent`), a exposição indevida induz o modelo ao Tool Chaining sequencial (Smell 2.26) e evasão de `ctx_batch`. |
+| Como detectar | (a) Execução de `tests/governance_audit/test_ctx_execute_capability_profile.py` no CI (camada estática determinística); (b) Inspeção de `tools:` cruzada contra os critérios de corte (a)/(b)/(c) definidos no plano canônico `docs/plans/20261003-090000-governance-maintenance-ctx-execute-profile-classification.md`. |
+| Origem (TrustAgent) | Intrínseco — cópia inercial de templates de agentes que propagam a totalidade das ferramentas MCP sem ponderação da superfície mínima de capacidades necessária para a função do agente (Principle of Least Privilege aplicado a Tooling). |
+| Severidade | **Médio** (não corrompe sintaxe, mas degrada determinismo, induz Tool Chaining sequencial e queima desnecessária de tokens e créditos em workflows multi-agent). |
+| Enforcement | **Textual/CI-estático obrigatório** via `test_ctx_execute_capability_profile.py`. |
+| Remediação | Remover cirurgicamente `'context-mode/ctx_execute'` e `'context-mode/ctx_execute'` do array `tools:` do `.agent.md` afetado, assegurando a retenção de `'context-mode/ctx_batch'`. Delegar a aplicação em lote ao `@governance-maintainer` via `WORKFLOW-GOVERNANCE-MAINTENANCE`. |
+
+---
+
+### 2.33 — Importação de Skill Externa sem Avaliação de Pertinência (Skill Import Viability Gate / R-067)
+
+| Campo | Conteúdo |
+|---|---|
+| Sintoma | Skill externa (catálogo/repositório de terceiros) é importada/materializada em `.github/skills/` sem o `@governance-factory` ter executado previamente a avaliação de pertinência (domínio, duplicidade, aderência estrutural, guardrails R-031/R-038), resultando em skill redundante, fora de escopo ou semanticamente concorrente com skill já catalogada — sem reporte de impacto negativo nem proposta de solução alternativa ao usuário. |
+| Como detectar | (a) Auditoria manual/`agent-auditor` comparando nova skill importada contra `.index.json` por sobreposição semântica de `category`/`triggers`; (b) Ausência, no histórico de conversa/relatório de entrega, do bloco "Gate de Viabilidade de Importação" previsto em `governance-factory-patterns/SKILL.md` § 3.4; (c) `source_attribution`/`imported_from` preenchidos no frontmatter sem evidência de avaliação prévia documentada. |
+| Origem (TrustAgent) | Intrínseco — tendência do modelo em atender literalmente ao pedido de "importar X" sem avaliação crítica prévia de pertinência ou alternativas (Sycophancy / Instruction Over-Compliance). |
+| Severidade | **Alto** (gera duplicidade conceitual, poluição de Progressive Disclosure e risco de licenciamento/autonomia indevida não mitigado). |
+| Enforcement | **Textual/Instrucional obrigatório** via `governance-factory-patterns/SKILL.md` § 3.4 e `CLAUDE.md` § R-067; validação determinística de presença da regra via `tests/governance_audit/test_skill_import_viability_gate.py`. |
+| Remediação | `@governance-factory` executa retroativamente o Protocolo de Avaliação de Pertinência (§3.4): se a skill já importada for considerada não pertinente ou redundante, reportar o impacto negativo e propor remoção/consolidação; se o conceito for útil mas mal importado, aplicar retrofit de assimilação seletiva na skill já existente mais próxima. |
+
+---
+
+### 2.34 — Violação da Árvore `docs/plans/<tipo>/` e Escrita Direta por Planejador Read-Only (R-064)
+
+- **Detecção**: (a) arquivos de plano fora de `docs/plans/{feature,refactor,architecture,implementation,test-strategy,bug-triage,requirements,governance}/`; (b) referências a `docs/plans/implementation/` ou `docs/plans/requirements/` em skills/agents/prompts; (c) frontmatter sem `status`, `approved`, `author`, `plan_type`, `created_at`, `related-planning-doc`, `allowed_files`; (d) `plan_type` ≠ subpasta; (e) planejador Read-Only com `insert_edit_into_file`/`create_file`/`ctx_execute*` ou instrução de gravar o plano direto.
+- ✅ BOM: advisor emite plano no template e declara handoff de materialização para `@docs-engineer` (ou `@governance-maintainer`).
+- ❌ RUIM: `tech-solution-architect` grava `docs/plans/implementation/blueprint.md` diretamente.
+- **Severidade**: Alta (viola R-064/R-057).
+
+## 3) Severidade — Reaproveitamento da Taxonomia Existente
+
+Esta skill **reaproveita** (não recria) a taxonomia de `code-review-patterns`:
+
+| Severidade | Critério Objetivo de Enquadramento |
+|---|---|
+| **Bloqueador** | Gap que impede o funcionamento técnico ou a governança do artefato: falta de `run_subagent` (R-042); `model:` inválido ou desconhecido (`Unknown model`); tool de escrita em agent read-only; uso de terminal sem `terminal-governance`; vazamento de evidência real de projeto (R-044); dessincronização crítica no catálogo (R-015); terceirização manual ao usuário por agent analítico (R-057 / Smell 2.25); MCP tool chaining sequencial no chat / omissão de ctx_batch (Smell 2.26); ou desvio prematuro para implementação e despejo de lacunas arquiteturais em executores de código (R-058 / Smell 2.27). |
+| **Alto** | Gap que gera desperdício severo de tokens/créditos, duplicação de manutenção ou risco de drift: violação de batching (R-046); divergência de templates canônicos (ausência de escopo ✅/❌ ou workflow); falta de variáveis nativas em prompts; código inline > 8 linhas em skills (R-026); sobreposição funcional ativa entre 2 agents; mensagem de sensor sem remediação acionável (Smell 2.28); ou progressive disclosure violation / full-load forçado de documento lazy (Smell 2.31 / R-066). |
+| **Sugestão** | Melhoria técnica não urgente ou cosmética: refinamento de `argument-hint`; ajuste fino de `description` dentro do limite; ou gap taxonômico de categoria intencionalmente não coberta. |
+
+## 4) Cross-check de Segurança (Referência, Não Duplicação)
+
+Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), referenciar diretamente `agent-safety-guardrails/SKILL.md` — esta skill **não duplica** aquele conteúdo, apenas sinaliza quando um smell estrutural (ex.: agent com tools muito além do necessário para seu escopo declarado) deve ser cruzado com o checklist de segurança daquela skill.
+
+## 5) Formato de Saída Recomendado (para o agent consumidor)
+
+```markdown
+## Relatório de Auditoria de Governança
+
+| Smell | Local(is) afetado(s) | Severidade | Remediação sugerida | Agent a acionar |
+|---|---|---|---|---|
+| <2.1..2.28> | <arquivo(s)> | Bloqueador/Alto/Sugestão | <ação objetiva> | <@governance-factory/@docs-engineer/@governance-maintainer> |
+
+## Resumo por Severidade
+- Bloqueador: N
+- Alto: N
+- Sugestão: N
+
+## Próximo Passo Mínimo
+<aguardar aprovação item a item antes de qualquer remediação — R-033/R-031>
+```
+
+## 6) Checklist de Conformidade da Auditoria
+
+- [ ] Todo achado classificado estritamente em uma das 33 categorias de smell (2.1..2.33).
+- [ ] Toda solicitação de importação de skill externa passou pela avaliação de pertinência (R-067 / §2.33) antes de qualquer mutação de arquivo.
+- [ ] Severidade reaproveitada de `code-review-patterns` (Bloqueador/Alto/Sugestão).
+- [ ] Origem classificada como intrínseca ou extrínseca (TrustAgent) quando relevante.
+- [ ] Remediação aponta agent executor real do catálogo (nunca "corrigir diretamente" — agent de auditoria é estritamente read-only).
+- [ ] Achados de segurança cruzados com `agent-safety-guardrails`, não recriados.
+- [ ] Validações de tooling e perfil cruzadas com a Matriz Canônica de Conformidade (§2.7.1) e invariante de terminal em source_docs/skills (R-049).
+- [ ] Protocolo de Single-Turn Batching e limiar de 5 arquivos (R-046) verificado nos executores (§2.8).
+- [ ] Conformidade de templates de Agent (§2.9), Prompt (§2.10) e Skill (§2.11) validada.
+- [ ] Conflito de responsabilidade cross-artefato (agents vs prompts vs skills) verificado — fronteira decisão/conhecimento/atalho respeitada (§2.12).
+- [ ] Hipertrofia instrucional e redundância de saída em runtime verificada — sem banners multicamada, overhead cosmético ou mismatch de perfil vs `agent-contracts` §8 (§2.13).
+- [ ] Casos de teste minerados da telemetria sanitizados conforme R-044 antes de persistência em `casos-roteamento.yaml` (§2.14).
+- [ ] Mensagens de `assert` de sensores computacionais novos usam o helper `remediation()` com `fix_hint` acionável (§2.28).
+
+## 7) Anti-padrões
+
+- ❌ Agent de auditoria aplicar a correção diretamente (deve ser read-only — só análise e recomendação).
+- ❌ Inventar categoria de smell fora das 28 catalogadas nesta skill.
+- ❌ Duplicar taxonomia de severidade ou checklist de segurança já existentes em outras skills.
+- ❌ Reportar achado sem apontar agent executor de remediação (relatório inacionável).
+- ❌ Classificar achados como Bloqueadores sem critério estrutural comprovado.
+- ❌ Importar/materializar skill externa sem o gate de pertinência (R-067) ter sido executado e reportado (Smell 2.33).
+
+## 8) Consumidor Mapeado
+
+- `agent-auditor` (consumidor inicial — Critic/Analyst de meta-nível sobre o próprio catálogo de governança).
+- `governance-factory` (consumidor do Smell 2.33 — Skill Import Viability Gate — para autoavaliação prévia à importação de skills externas, antes de qualquer criação de arquivo).
+
+## 9) Referências
+
+- Anthropic Open Spec & Claude Prompt Engineering Guidelines (dez/2025).
+- GitHub Copilot Documentation: Prompt files & Native context variables (2025/2026).
+- arXiv:2512.18020, "Specification and Detection of LLM Code Smells" (2026).
+- EmergentMind, "Prompt Pattern Catalog".
+- KDD 2025, "A Survey on Trustworthy LLM Agents" (TrustAgent taxonomy).
+- OWASP GenAI Security Project, "Top 10 for Agentic Applications" (2026).
+- Lumenova AI, "Governance Frameworks for Multi-Agent Systems" (2026).
+- `docs/plans/20260830-090000-plano-otimizacao-catalogo-agents.md` §D — origem desta skill.
+
+### 2.32 Degradação de UX no `ask_questions` (R-027 / CA-03..CA-05)
+
+- **Severidade**: Médio
+- **Sintoma**: Chamadas ou instruções de `ask_questions` com `options` contendo apenas `label` (sem `description` explicando consequência prática e trade-off), ausência de `(Recomendado)` na 1ª opção quando há melhor prática técnica clara, inclusão de opções espantalho (*strawman*) ou opção artificial `"Outro (especificar)"`, `header` > 25 caracteres, mais de 4 perguntas por rodada ou omissão de `allowFreeformInput: true`.
+- **Causa Raiz**: Formulação ad-hoc de perguntas HITL sem observar o contrato ergonômico canônico de `structured-intake-patterns`.
+- **Remediação**:
+  1. **CA-03 (`description` Obrigatório)**: Preencher `description` (1–2 frases) em todas as opções no formato `[Consequência prática / O que faz] + [Trade-off principal ou quando escolher]`.
+  2. **CA-04 (Default Effect)**: Posicionar a melhor prática técnica como **1ª opção** com sufixo `(Recomendado)` no `label` (exceção explícita: decisões puramente de negócio/produto).
+  3. **CA-05 (Anti-Strawman e Ergonomia)**: Manter entre **2 e 4 alternativas reais, viáveis, mutuamente exclusivas e defensáveis**, **1 a 4 perguntas por chamada**, `header` ≤ 25 caracteres e `allowFreeformInput: true` nativo.

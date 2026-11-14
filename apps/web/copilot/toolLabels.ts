@@ -68,10 +68,8 @@ const ROTULOS_TOOLS: Record<string, RotuloTool> = {
   // --- context-mode (sandbox/indexacao) ---
   "context-mode/ctx_search": { icone: "🧭", rotulo: "Buscando no contexto indexado" },
   "context-mode/ctx_execute": { icone: "🧪", rotulo: "Executando no sandbox" },
-  "context-mode/ctx_execute_file": { icone: "🧪", rotulo: "Analisando arquivo no sandbox" },
   "context-mode/ctx_index": { icone: "🗃️", rotulo: "Indexando conteúdo" },
-  "context-mode/ctx_batch_execute": { icone: "🧪", rotulo: "Executando lote no sandbox" },
-  "context-mode/ctx_fetch_and_index": { icone: "🌐", rotulo: "Buscando e indexando página web" },
+  "context-mode/ctx_batch": { icone: "🧪", rotulo: "Executando lote no sandbox" },
   "context-mode/ctx_stats": { icone: "📊", rotulo: "Consultando estatísticas de contexto" },
   "context-mode/ctx_doctor": { icone: "🩺", rotulo: "Diagnosticando context-mode" },
   "context-mode/ctx_upgrade": { icone: "⬆️", rotulo: "Atualizando context-mode" },

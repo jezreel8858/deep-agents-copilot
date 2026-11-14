@@ -452,7 +452,7 @@ async def stream_chat(
             _args_mcp = getattr(perm_request, "args", None)
             # Bug real investigado (2026-10-04): o SDK headless real reporta
             # `tool_name` como o nome CRU exposto pelo proprio servidor MCP
-            # (ex.: "ctx_batch_execute"), SEM o prefixo de exibicao da IDE
+            # (ex.: "ctx_batch"), SEM o prefixo de exibicao da IDE
             # ("mcp_context-mode_ctx_batch_execute") que `permission_policy.
             # MCP_TOOL_PREFIXES`/`tool_mcp_e_cataloga` esperam -- o que fazia
             # `tool_call_nao_escrita_e_segura` cair incondicionalmente no
@@ -627,7 +627,7 @@ async def stream_chat(
 
     def _nome_exibicao_subagent(dado: Any) -> str:
         """Prioriza `agent_display_name` (rotulo amigavel); cai para
-        `agent_name` (identificador tecnico, ex.: `python-bug-fixer`) se o
+        `agent_name` (identificador tecnico, ex.: `python-developer`) se o
         display name vier vazio -- ambos confirmados como `str`
         obrigatorios em `SubagentStartedData`/`SubagentCompletedData`/
         `SubagentFailedData` (RT-03)."""
@@ -1263,11 +1263,11 @@ async def stream_chat_ag_ui(
 
     Args:
         agent_model: Valor de `model:` do frontmatter do `.agent.md` ativo
-            (ex.: "Claude Sonnet 5"), resolvido pelo chamador via
+            (ex.: "Claude Sonnet 5.5"), resolvido pelo chamador via
             `routes._resolver_modelo_agent` a partir do catalogo
             (`agent_catalog.CustomAgentConfig["model"]`, campo opcional).
             Quando fornecido, e exibido ao lado do nome no badge "Agente
-            Ativo" (ex.: "Agente Ativo: agent-router · Claude Sonnet 5"),
+            Ativo" (ex.: "Agente Ativo: agent-router · Claude Sonnet 5.5"),
             paridade com a informacao ja declarada no `.md` para o usuario
             saber qual modelo esta atendendo o turno sem abrir o catalogo.
             Se `None` (agent sem `model:` no frontmatter, ou nao encontrado
@@ -1474,7 +1474,7 @@ async def stream_chat_ag_ui(
             _args_mcp = getattr(perm_request, "args", None)
             # Bug real investigado (2026-10-04): o SDK headless real reporta
             # `tool_name` como o nome CRU exposto pelo proprio servidor MCP
-            # (ex.: "ctx_batch_execute"), SEM o prefixo de exibicao da IDE
+            # (ex.: "ctx_batch"), SEM o prefixo de exibicao da IDE
             # ("mcp_context-mode_ctx_batch_execute") que `permission_policy.
             # MCP_TOOL_PREFIXES`/`tool_mcp_e_cataloga` esperam -- o que fazia
             # `tool_call_nao_escrita_e_segura` cair incondicionalmente no

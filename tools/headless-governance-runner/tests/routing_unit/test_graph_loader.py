@@ -68,7 +68,7 @@ class TestCarregarGrafoCasoFeliz:
 
         bug_fix = next(w for w in grafo.workflows if w.id is Workflow.BUG_FIX)
         etapa_2 = bug_fix.etapas[1]
-        assert etapa_2.agent_permitidos == frozenset({"domain-router", "specialist-bug-fixer"})
+        assert etapa_2.agent_permitidos == frozenset({"domain-router", "<stack>-developer"})
         assert etapa_2.requer_aprovacao is True
 
     def test_rg04_agents_permitidos_lista_yaml_suportada(self) -> None:

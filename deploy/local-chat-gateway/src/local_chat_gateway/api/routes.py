@@ -123,7 +123,7 @@ def _conservative_permission_handler(tool_name: str, params: Mapping[str, Any]) 
 # Marcador textual emitido por `sdk_session.stream_chat` quando o evento
 # dedicado `SubagentStartedData` (RT-03, introspecao real confirmada via
 # wheel `github_copilot_sdk==1.0.15`) dispara -- carrega o NOME REAL do
-# agent invocado (`agent_display_name`/`agent_name`, ex.: `python-bug-fixer`),
+# agent invocado (`agent_display_name`/`agent_name`, ex.: `python-developer`),
 # nao mais o nome literal da tool `run_subagent`. `_extrair_nome_tool_do_delta`
 # precisa reconhecer este padrao para que `tools_executed` (telemetria
 # `emit_chat_trace`) registre QUAL agent foi delegado, nao apenas que uma
@@ -141,7 +141,7 @@ def _extrair_nome_tool_do_delta(delta: str) -> str | None:
     2. Delegacao de agent: `"**Subagent invocado:** `<nome>`"`
        (`SubagentStartedData`, RT-03) -- retorna `"subagent:<nome>"`
        (prefixado) para que `tools_executed` distinga na telemetria um
-       handoff de agent real (ex.: `subagent:python-bug-fixer`) de uma
+       handoff de agent real (ex.: `subagent:python-developer`) de uma
        tool comum, sem perder QUAL agent foi invocado.
 
     Args:
@@ -1036,7 +1036,7 @@ def _resolver_modelo_agent(
 ) -> str | None:
     """Resolve o `model:` declarado no frontmatter do `.agent.md` ativo.
 
-    Usado para exibir o modelo (ex.: "Claude Sonnet 5") ao lado do nome do
+    Usado para exibir o modelo (ex.: "Claude Sonnet 5.5") ao lado do nome do
     agent no badge "Agente Ativo" do chat (`sdk_session.stream_chat_ag_ui`,
     parametro `agent_model`) -- paridade com a informacao ja disponivel no
     catalogo (`agent_catalog.CustomAgentConfig["model"]`, campo opcional

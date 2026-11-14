@@ -608,7 +608,7 @@ def montar_contexto(
     compatibilidade com chamadas antigas/testes que nao fornecem o parametro.
 
     Args:
-        agente: Identificador do agente ativo (ex.: `python-feature-developer`).
+        agente: Identificador do agente ativo (ex.: `python-developer`).
         workflow: Workflow ativo (enum `governance.Workflow` ou `str`), ou
             `None` se a sessao ainda estiver no router.
         etapa: Numero da etapa atual dentro do workflow.

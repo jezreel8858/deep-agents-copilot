@@ -26,8 +26,8 @@ function renderKnowledgeBase() {
 
   // KPIs
   var totalSources = sources.length;
-  var totalChunks = sources.reduce(function(acc, s) { return acc + (s.chunkCount || 0); }, 0);
-  var totalCodeChunks = sources.reduce(function(acc, s) { return acc + (s.codeChunkCount || 0); }, 0);
+  var totalChunks = sources.reduce(function(acc, s) { return acc + ((s.chunkCount || 0) || 0); }, 0);
+  var totalCodeChunks = sources.reduce(function(acc, s) { return acc + ((s.codeChunkCount || 0) || 0); }, 0);
   var codePct = totalChunks > 0 ? Math.round((totalCodeChunks / totalChunks) * 100) : 0;
   var freshest = sources[0] ? sources[0].indexedAt.slice(0, 10) : "--";
 
@@ -68,8 +68,8 @@ function renderKnowledgeBase() {
               '<div class="sources-grid">';
 
       grpItems.forEach(function(s) {
-        var codeChunksCount = s.codeChunkCount || 0;
-        var totalC = s.chunkCount || 0;
+        var codeChunksCount = (s.codeChunkCount || 0) || 0;
+        var totalC = (s.chunkCount || 0) || 0;
         var codeRatio = totalC > 0 ? Math.round((codeChunksCount / totalC) * 100) : 0;
 
         html += '<div class="source-card" onclick="openSourceDetailModal(' + s.id + ')">' +

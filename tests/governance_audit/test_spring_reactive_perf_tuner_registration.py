@@ -1,13 +1,13 @@
 """
-test_spring_reactive_perf_tuner_registration.py — Validação determinística do registro
-e wiring do especialista spring-reactive-perf-tuner no ecossistema reativo.
+test_spring_reactive_perf_tuner_registration.py — Validação determinística da consolidação
+do papel de performance tuning na stack Spring Reactive (Padrão Triádico 3+1).
 
 Quality Gate que garante:
-1. O arquivo .github/agents/backend/spring-reactive/spring-reactive-perf-tuner.agent.md existe.
-2. Está formalmente registrado no sub-catálogo spring-reactive-catalog.yaml com role 'performance'.
-3. É referenciado na Decision Tree do supervisor spring-reactive-router.agent.md.
-4. Possui entrada no catalog.yaml raiz (sob related_agents do spring-reactive-router e contagem de 7 especialistas).
-5. O supervisor spring-reactive-router em routing-graph.yaml referencia o sub-catálogo de 7 especialistas.
+1. O papel de performance tuning está formalmente consolidado em spring-reactive-developer.agent.md.
+2. spring-reactive-developer.agent.md formaliza o modo 'perf', medição de baseline antes/depois e safety gate.
+3. spring-reactive-catalog.yaml registra spring-reactive-developer com keywords de performance (perf tuner, concorrencia reativa).
+4. O router spring-reactive-router.agent.md despacha tuning de performance para @spring-reactive-developer na Decision Tree branch [2].
+5. O catálogo raiz catalog.yaml e routing-graph.yaml registram a topologia consolidada de 3 especialistas.
 """
 from __future__ import annotations
 
@@ -19,23 +19,33 @@ from tests.governance_audit._helpers import remediation
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SR_DIR = REPO_ROOT / ".github" / "agents" / "backend" / "spring-reactive"
-AGENT_FILE = SR_DIR / "spring-reactive-perf-tuner.agent.md"
+DEV_FILE = SR_DIR / "spring-reactive-developer.agent.md"
 SUB_CATALOG_FILE = SR_DIR / "spring-reactive-catalog.yaml"
 ROUTER_FILE = SR_DIR / "spring-reactive-router.agent.md"
 ROOT_CATALOG_FILE = REPO_ROOT / ".github" / "agents" / "catalog.yaml"
 ROUTING_GRAPH_FILE = REPO_ROOT / ".github" / "agents" / "routing-graph.yaml"
 
 
-def test_spring_reactive_perf_tuner_file_exists():
-    """Valida a existência do arquivo spring-reactive-perf-tuner.agent.md."""
-    assert AGENT_FILE.exists(), remediation(
-        f"Arquivo não encontrado: {AGENT_FILE}",
-        fix_hint="Crie o especialista spring-reactive-perf-tuner.agent.md no diretório spring-reactive."
+def test_spring_reactive_developer_consolidates_performance_role():
+    """Valida que spring-reactive-developer consolida as atribuições de tuning e performance."""
+    assert DEV_FILE.exists(), remediation(
+        f"Arquivo não encontrado: {DEV_FILE}",
+        fix_hint="Crie o especialista spring-reactive-developer.agent.md no diretório spring-reactive."
+    )
+    content = DEV_FILE.read_text(encoding="utf-8")
+    assert "Modo Performance" in content or "perf" in content, (
+        "spring-reactive-developer deve conter seção de modo Performance/Tuning"
+    )
+    assert "baseline" in content.lower(), (
+        "spring-reactive-developer deve exigir medição de baseline antes e depois"
+    )
+    assert "canary" in content.lower() or "staging" in content.lower(), (
+        "spring-reactive-developer deve declarar gate de segurança canary/staging"
     )
 
 
-def test_spring_reactive_perf_tuner_sub_catalog_registration():
-    """Valida que o agente está registrado no spring-reactive-catalog.yaml com role e id corretos."""
+def test_spring_reactive_sub_catalog_consolidation():
+    """Valida que o sub-catálogo spring-reactive-catalog.yaml registra os 3 especialistas consolidados."""
     assert SUB_CATALOG_FILE.exists(), remediation(
         f"Sub-catálogo não encontrado: {SUB_CATALOG_FILE}",
         fix_hint="Verifique o arquivo spring-reactive-catalog.yaml."
@@ -43,67 +53,45 @@ def test_spring_reactive_perf_tuner_sub_catalog_registration():
     data = yaml.safe_load(SUB_CATALOG_FILE.read_text(encoding="utf-8")) or {}
     agents = data.get("agents", {})
 
-    assert "spring-reactive-perf-tuner" in agents, remediation(
-        "spring-reactive-perf-tuner ausente na seção 'agents' de spring-reactive-catalog.yaml",
-        fix_hint="Adicione a entrada 'spring-reactive-perf-tuner' com role 'performance' no sub-catálogo."
-    )
-
-    perf_entry = agents["spring-reactive-perf-tuner"]
-    assert perf_entry.get("role") == "performance", remediation(
-        f"Role esperado 'performance', encontrado '{perf_entry.get('role')}'",
-        fix_hint="Defina role: 'performance' no spring-reactive-catalog.yaml."
-    )
+    assert "spring-reactive-developer" in agents, "spring-reactive-developer deve constar no sub-catálogo"
+    assert "spring-reactive-arch-advisor" in agents, "spring-reactive-arch-advisor deve constar no sub-catálogo"
+    assert "spring-reactive-test-engineer" in agents, "spring-reactive-test-engineer deve constar no sub-catálogo"
+    assert len(agents) == 3, f"Sub-catálogo deve conter exatamente 3 especialistas, encontrados {len(agents)}"
 
 
-def test_spring_reactive_perf_tuner_router_decision_tree_reference():
-    """Valida que o router spring-reactive-router.agent.md referencia o perf-tuner na Decision Tree."""
+def test_spring_reactive_router_decision_tree_reference():
+    """Valida que o router spring-reactive-router.agent.md despacha performance para spring-reactive-developer."""
     assert ROUTER_FILE.exists(), remediation(
         f"Router não encontrado: {ROUTER_FILE}",
         fix_hint="Verifique a existência do spring-reactive-router.agent.md."
     )
     content = ROUTER_FILE.read_text(encoding="utf-8")
-
-    assert "@spring-reactive-perf-tuner" in content, remediation(
-        "Referência a '@spring-reactive-perf-tuner' ausente no spring-reactive-router.agent.md",
-        fix_hint="Inclua '@spring-reactive-perf-tuner' na Decision Tree do router reativo."
+    assert "@spring-reactive-developer" in content, (
+        "spring-reactive-router deve referenciar @spring-reactive-developer na Decision Tree"
     )
-    assert "specialist-perf-tuner" in content, remediation(
-        "Slot lógico 'specialist-perf-tuner' ausente no spring-reactive-router.agent.md",
-        fix_hint="Vincule 'specialist-perf-tuner' -> '@spring-reactive-perf-tuner' na Decision Tree."
+    assert "@spring-reactive-arch-advisor" in content, (
+        "spring-reactive-router deve referenciar @spring-reactive-arch-advisor na Decision Tree"
+    )
+    assert "@spring-reactive-test-engineer" in content, (
+        "spring-reactive-router deve referenciar @spring-reactive-test-engineer na Decision Tree"
     )
 
 
-def test_spring_reactive_perf_tuner_root_catalog_and_routing_graph_parity():
-    """
-    Valida a paridade no catalog.yaml raiz e routing-graph.yaml:
-    (a) catalog.yaml lista spring-reactive-perf-tuner em related_agents e menciona 7 especialistas;
-    (b) routing-graph.yaml referencia o catálogo com 7 especialistas no nó ou aresta.
-    """
-    assert ROOT_CATALOG_FILE.exists(), remediation(
-        f"catalog.yaml não encontrado em {ROOT_CATALOG_FILE}",
-        fix_hint="Verifique a existência do catalog.yaml raiz."
-    )
+def test_spring_reactive_root_catalog_three_specialists_topology():
+    """Valida que catalog.yaml registra os 3 especialistas sob related_agents do spring-reactive-router."""
+    assert ROOT_CATALOG_FILE.exists()
     cat_data = yaml.safe_load(ROOT_CATALOG_FILE.read_text(encoding="utf-8")) or {}
-    sr_router = cat_data.get("agents", {}).get("spring-reactive-router", {})
+    router_entry = cat_data.get("agents", {}).get("spring-reactive-router", {})
+    related = router_entry.get("related_agents", [])
 
-    related = sr_router.get("related_agents", [])
-    assert "spring-reactive-perf-tuner" in related, remediation(
-        "'spring-reactive-perf-tuner' ausente em related_agents do spring-reactive-router no catalog.yaml raiz",
-        fix_hint="Adicione 'spring-reactive-perf-tuner' à lista related_agents de spring-reactive-router no catalog.yaml."
-    )
+    assert "spring-reactive-developer" in related
+    assert "spring-reactive-arch-advisor" in related
+    assert "spring-reactive-test-engineer" in related
+    assert "spring-reactive-perf-tuner" not in related
 
-    desc = sr_router.get("description", "")
-    assert "7 especialistas" in desc or "7" in desc, remediation(
-        "Descrição do spring-reactive-router no catalog.yaml raiz não reflete os 7 especialistas.",
-        fix_hint="Atualize a contagem na descrição de spring-reactive-router no catalog.yaml para 7 especialistas."
-    )
 
-    assert ROUTING_GRAPH_FILE.exists(), remediation(
-        f"routing-graph.yaml não encontrado em {ROUTING_GRAPH_FILE}",
-        fix_hint="Verifique o arquivo routing-graph.yaml."
-    )
-    rg_text = ROUTING_GRAPH_FILE.read_text(encoding="utf-8")
-    assert re.search(r"7\s+especialistas", rg_text), remediation(
-        "routing-graph.yaml não referencia a topologia de 7 especialistas no domínio reativo.",
-        fix_hint="Atualize a menção no nó ou aresta do spring-reactive-router para '7 especialistas'."
-    )
+def test_spring_reactive_routing_graph_three_specialists_reference():
+    """Valida que routing-graph.yaml descreve a topologia consolidada de 3 especialistas."""
+    assert ROUTING_GRAPH_FILE.exists()
+    content = ROUTING_GRAPH_FILE.read_text(encoding="utf-8")
+    assert "3 especialistas" in content

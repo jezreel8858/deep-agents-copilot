@@ -22,7 +22,7 @@ A avaliação contínua (Evals) no ecossistema GitHub Copilot / Deep-Agents atua
 ### 2.1 Tool Correctness & Tool Selection
 - **Objetivo**: Avaliar se o subagente seleciona a ferramenta correta para o contexto e executa chamadas eficientes.
 - **Aspectos Avaliados**:
-  - **Tool Selection Ratio**: Escolha de `context-mode` (`ctx_execute`, `ctx_batch_execute`, `ctx_search`) em substituição a ferramentas nativas de editor (`read_file`, `create_file`).
+  - **Tool Selection Ratio**: Escolha de `context-mode` (`ctx_execute`, `ctx_batch`, `ctx_search`) em substituição a ferramentas nativas de editor (`read_file`, `create_file`).
   - **Batching & Consolidated Execution (Smell 2.26)**: Verificação de que operações envolvendo 2 ou mais arquivos são consolidadas em turnos únicos de execução, evitando encadeamento redundante de tool turns.
   - **Argument & Schema Correctness**: Validação de parâmetros (caminhos absolutos/relativos, timeouts, payloads válidos).
   - **Turn Budget Compliance**: Cumprimento do limite de turnos (≤ 5 tool turns por ciclo) com acionamento correto do Circuit Breaker na 4ª iteração.
@@ -55,7 +55,7 @@ A avaliação contínua (Evals) no ecossistema GitHub Copilot / Deep-Agents atua
 
 | ID | Dimensão | Tipo | Prioridade | Cenário / Comportamento Esperado | Risco Mitigado |
 |---|---|---|---|---|---|
-| **SCN-TOOL-01** | Tool Selection | Unit / Evals | **P1** | Subagente invoca `ctx_execute`/`ctx_batch_execute` para ler múltiplos arquivos em vez de encadear `read_file`. | Desperdício de contexto O(N), estouro de janela e violação do Smell 2.24/2.26. |
+| **SCN-TOOL-01** | Tool Selection | Unit / Evals | **P1** | Subagente invoca `ctx_execute`/`ctx_batch` para ler múltiplos arquivos em vez de encadear `read_file`. | Desperdício de contexto O(N), estouro de janela e violação do Smell 2.24/2.26. |
 | **SCN-TOOL-02** | Tool Correctness | Evals | **P1** | Parâmetros de execução (linguagem, cwd, timeout) fornecidos em conformidade com schema e sem falha de parsing. | Aborto precoce de subprocessos e falha na extração de evidências. |
 | **SCN-TOOL-03** | Turn Budget & Circuit Breaker | Integ | **P2** | Sessão interrompe chamadas após 4 turnos sem progresso, chamando `ask_questions` ou emitindo parecer conclusivo. | Loop investigativo infinito e exaustão de créditos (Smell 2.13). |
 | **SCN-ROUT-01** | Routing Accuracy | Evals | **P1** | Prompt canônico de frontend/backend direciona exatamente para o domain-router correspondente. | Roteamento errático, degradação da experiência e retrabalho de handoff. |

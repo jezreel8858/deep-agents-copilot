@@ -1,11 +1,6 @@
 ---
 name: frontend-visual-feedback-loop
-description: >-
-  Diretrizes e padrões canônicos para executar o Visual Feedback Loop (VFL) em
-  interfaces frontend de qualquer framework (Angular, React, Vue, Svelte) via
-  renderização isolada (Storybook/dev-server), inspeção multimodal multi-viewport
-  (375px/768px/1440px), Árvore de Acessibilidade (AOM) e asserções com Playwright.
-  Não use para testes de lógica pura sem camada visual.
+description: "Define diretrizes e padrões para diretrizes e padrões canônicos para executar o Visual Feedback Loop (VFL) em interfaces frontend de qualquer framework (Angular, React, Vue, Svelte) via renderização isolada (Storybook/dev-server), inspeção multimodal multi-viewport (375px/768px/1440px), Árvore de Acessibilidade (AOM) e asserções com Playwright. Não use para testes de lógica pura sem camada visual. Use quando atuar em feedback visual frontend, inspecionar layout com screenshot, visual feedback loop."
 tier: 2
 category: quality
 triggers:
@@ -18,13 +13,17 @@ triggers:
 source_docs:
   - .github/skills/frontend-componentization-patterns/SKILL.md
   - .github/skills/design-system-component-contracts/SKILL.md
-source_docs_lazy:
+  - .github/skills/playwright-mcp/SKILL.md
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
 ---
 
 # Frontend Visual Feedback Loop
+
+## Quando Usar
+
+- Ativação em cenários de feedback visual frontend, inspecionar layout com screenshot, visual feedback loop.
 
 ## 0) Problema Resolvido & Princípios Fundamentais
 
@@ -50,7 +49,7 @@ Esta skill formaliza o **Visual Feedback Loop (VFL)** agnóstico de framework:
 - Para validar responsividade e quebras em breakpoints padronizados (mobile 375px, tablet 768px, desktop 1440px).
 - Para auditar se elementos utilizam tokens semânticos do Design System em vez de cores hexadecimais inline.
 - Como base de conhecimento para o Gate 2 de Paridade Visual do `WORKFLOW-FEATURE-DEVELOPMENT`.
-- Como método de validação primário para agentes focados em UI e estilização (`ui-stylist`), os quais são **isentos** de criar ou rodar testes unitários.
+- Como método de validação primário para agentes focados em UI e estilização (`<stack>-developer`), os quais são **isentos** de criar ou rodar testes unitários quando em tarefas puramente de layout/estilo.
 
 ### ❌ Quando NÃO Usar
 - Para testes unitários de lógica de negócio, cálculo matemático, stores ou services puros (usar `test-implementation-*`).
@@ -67,9 +66,11 @@ O ciclo VFL opera em 4 etapas sequenciais:
 1. Executar o componente em sandbox (Storybook ou harness local de rota efêmera).
 2. Garantir renderização dos estados críticos: default, preenchido, vazio (`empty-state`), loading e erro.
 
-### Etapa 2: Captura Multi-Viewport e Snapshot Semântico
-1. Disparar automação headless via Playwright nos viewports canônicos: `375x667` (mobile), `768x1024` (tablet) e `1440x900` (desktop).
-2. Extrair o snapshot da Árvore de Acessibilidade (AOM) para validação de nós interativos e labels acessíveis.
+### Etapa 2: Captura Multi-Viewport e Snapshot Semântico (ordem de ferramentas — fonte única)
+Viewports canônicos (fonte única; demais skills apenas referenciam): `375x667` (mobile), `768x1024` (tablet) e `1440x900` (desktop).
+Para cada viewport, ordem fixa via Playwright MCP:
+1. `browser_resize` → 2. `browser_snapshot` (padrão; Árvore de Acessibilidade/AOM) → 3. `browser_console_messages` (erros/warnings) → 4. `browser_take_screenshot` **apenas sob demanda** (evidência visual; nunca para decidir ação).
+`browser_take_screenshot` é tool core; `--caps=vision` habilita apenas ferramentas por coordenada e permanece desligado. Sequência detalhada: `references/mcp-loop-runbook.md`.
 
 ### Etapa 3: Auditoria Visual e Critic Loop
 1. Validar que elementos de ícone não contenham texto literal desprovido de renderização de glifo/SVG.
@@ -79,6 +80,12 @@ O ciclo VFL opera em 4 etapas sequenciais:
 
 ### Etapa 4: Quality Gate de UI
 1. Anexar evidências resumidas (viewports validados, conformidade AOM e tokens verificados) ao relatório do Gate 2.
+
+### 2.5 Auth, Ambiente e Cleanup (fonte única)
+- **Auth**: ver `.github/skills/playwright-mcp/SKILL.md` § 7.2 (`storageState` com `--isolated`; `--user-data-dir` só para SSO/MFA). Credenciais SOMENTE por variáveis de ambiente — nunca literais em prompt, `browser_type`/`browser_fill_form`, log ou trace.
+- **Ambiente**: URL base por variável de ambiente (referência de portas: Vite 5173, Next 3000, Storybook 6006, `vite preview` 4173, `ng serve` 4200). Storybook preferido para layout isolado sem auth. Mesmo host na captura e na execução (`localhost` ≠ `127.0.0.1`). Redirect para `/login` = falha de auth, não bug de UI. Em Next/RSC aguardar hidratação (`browser_wait_for`) antes do snapshot.
+- **Ruído**: HMR e StrictMode (efeitos/logs duplicados em dev) não são erro de UI. Vitest browser mode está fora do escopo do VFL.
+- **Cleanup**: toda sessão termina com `browser_tabs` (close) e/ou `browser_close`; `storageState`, traces e `--output-dir` ficam fora do versionamento.
 
 ---
 
@@ -164,12 +171,16 @@ O ciclo VFL opera em 4 etapas sequenciais:
 - [ ] Estados vazios (`empty-state`) envelopados para ocupar a largura total do container de seção.
 - [ ] Arquivos SCSS auditados: zero cores hexadecimais inline (`#[0-9a-fA-F]{3,6}`) fora de tokens.
 - [ ] Nenhum bloco de código inline nesta skill ultrapassa 8 linhas (R-026).
+- [ ] Ordem `browser_resize` → `browser_snapshot` → console → `browser_take_screenshot` (sob demanda) respeitada.
+- [ ] Sessão encerrada com `browser_close`; credenciais apenas por variável de ambiente/`storageState` (nunca literais).
 
 ---
 
 ## 5) Referências
 
 - Playwright MCP Server & CLI: https://github.com/microsoft/playwright-mcp
+- `.github/skills/playwright-mcp/SKILL.md` — auth, flags e versão fixa do servidor MCP.
+- `references/mcp-loop-runbook.md` — sequência por viewport, setup de auth e config do servidor.
 - Component Story Format (CSF3) — Storybook: https://storybook.js.org/docs/api/csf
 - W3C Design Tokens Community Group: https://design-tokens.github.io/community-group/format/
 - Anthropic Agentic Coding Handbook — Visual Feedback Workflow (2025/2026).

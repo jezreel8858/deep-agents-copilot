@@ -1,9 +1,6 @@
 ---
 name: tavily
-description: >
-  Boas práticas de uso do Tavily MCP para pesquisa externa — documentação técnica,
-  versões, changelogs, CVEs e padrões de mercado. Define hierarquia de decisão,
-  estratégias de query e integração com context-mode.
+description: "Define diretrizes e padrões para boas práticas de uso do Tavily MCP para pesquisa externa — documentação técnica, versões, changelogs, CVEs e padrões de mercado. Define hierarquia de decisão, estratégias de query e integração com context-mode. Use quando atuar em pesquisar web, buscar documentação, tavily. Não use para tarefas fora do escopo de tavily ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: research
 triggers:
@@ -16,19 +13,17 @@ triggers:
   - "cve vulnerabilidade"
   - "best practices externas"
   - "docs atualizadas"
-source_docs_lazy:
+source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
-tools:
-  - "tavily/tavily_search"
-  - "tavily/tavily_extract"
-  - "tavily/tavily_crawl"
-  - "tavily/tavily_map"
-  - "tavily/tavily_research"
-  - "context-mode/ctx_search"
+tools: ['tavily/tavily_search', 'tavily/tavily_extract', 'tavily/tavily_crawl', 'tavily/tavily_map', 'tavily/tavily_research', 'context-mode/ctx_search']
 ---
 
 # Tavily — Pesquisa Externa
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `tavily` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## 1) Hierarquia de Decisão — Quando Usar
 
@@ -101,7 +96,7 @@ NUNCA fazer Tavily → responder diretamente (desperdiça tokens)
 SEMPRE:
   1. ctx_search primeiro (cache de sessão)
   2. Se insuficiente → tavily_search
-  3. Indexar resultado → ctx_fetch_and_index (TTL 24h)
+  3. Indexar resultado → ctx_index (TTL 24h)
   4. Responder via ctx_search (economiza tokens)
 ```
 
@@ -115,7 +110,7 @@ ctx_search(queries=["Angular Vitest official support 2025"])
 tavily_search(query="Angular 20 21 official Vitest runner 2025 ng test builder")
 
 # 3. Indexar para reutilização
-ctx_fetch_and_index(url="https://timdeschryver.dev/blog/angular-testing-library-with-vitest",
+ctx_index(url="https://timdeschryver.dev/blog/angular-testing-library-with-vitest",
                    source="angular-vitest-2025")
 
 # 4. Consultar indexado

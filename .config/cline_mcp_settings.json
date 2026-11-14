@@ -1,11 +1,5 @@
 {
   "mcpServers": {
-    "jetbrains-idea": {
-      "url": "http://127.0.0.1:64342/sse",
-      "type": "sse",
-      "disabled": false,
-      "autoApprove": []
-    },
     "codegraph": {
       "command": "cmd.exe",
       "args": [
@@ -38,17 +32,19 @@
       "command": "npx.cmd",
       "args": [
         "-y",
-        "context-mode"
+        "context-mode",
+        "server",
+        "--agent",
+        "copilot-cli"
       ],
       "env": {
-        "SOURCE": "",
         "JAVA_HOME": "C:\\Program Files\\Java\\jdk-22",
-        "CONTEXT_MODE_IDLE_TIMEOUT_MS": "0",
+        "CONTEXT_MODE_DATA_DIR": "D:\\workspace\\public\\deep-agents-copilot\\.claude\\context-mode\\sessions",
         "PATH": "C:\\Program Files\\nodejs;%PATH%"
       },
       "transportType": "stdio",
-      "disabled": false,
-      "timeout": 600
+      "timeout": 600,
+      "disabled": false
     }
   }
 }

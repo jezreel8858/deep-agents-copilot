@@ -30,24 +30,24 @@ def test_deve_retornar_lista_vazia_quando_diretorio_nao_existe(tmp_path: Path) -
 
 def test_deve_parsear_agent_valido_com_frontmatter_completo(tmp_path: Path) -> None:
     conteudo = """---
-name: python-bug-fixer
+name: python-developer
 description: Especialista em bugs Python
-model: Claude Sonnet 5
+model: Claude Sonnet 5.5
 tools: ['read_file', 'run_subagent']
 ---
 
 # Perfil Operacional
 Você é especialista em bugs Python.
 """
-    _escrever_agent_md(tmp_path, "python-bug-fixer.agent.md", conteudo)
+    _escrever_agent_md(tmp_path, "python-developer.agent.md", conteudo)
 
     resultado = descobrir_custom_agents(tmp_path)
 
     assert len(resultado) == 1
     agente = resultado[0]
-    assert agente["name"] == "python-bug-fixer"
+    assert agente["name"] == "python-developer"
     assert agente["description"] == "Especialista em bugs Python"
-    assert agente["model"] == "Claude Sonnet 5"
+    assert agente["model"] == "Claude Sonnet 5.5"
     # RC1 (bugfix 2026-10-02): "read_file" e traduzido para o nome nativo
     # do SDK headless. "run_subagent" NAO e mais traduzido (bugfix
     # 2026-10-04 -- ver comentario em `_ALIAS_TOOLS_SDK_HEADLESS`): o alias

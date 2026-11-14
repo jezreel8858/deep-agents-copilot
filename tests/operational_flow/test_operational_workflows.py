@@ -57,8 +57,8 @@ READONLY_ADVISORY_AGENTS = {
     "spring-boot-arch-advisor",
     "spring-reactive-arch-advisor",
     "ejb-arch-advisor",
-    "oracle-query-tuner",
-    "informix-query-tuner",
+    "database-arch-advisor",
+    "struts-arch-advisor",
 }
 
 
@@ -340,21 +340,26 @@ def test_workflow_bug_fix_edge_scenarios_and_state_bag(routing_graph):
     assert "observacao_pos_fix" in wf1, "Workflow 1 deve declarar observacao_pos_fix"
 
     estados = wf1.get("estados", [])
-    assert any("ui-stylist" in e.get("agent", "") for e in estados), "Workflow 1 deve incluir ui-stylist para layout"
+    assert any("<stack>-developer" in e.get("agent", "") for e in estados), "Workflow 1 deve incluir <stack>-developer para layout"
     assert any("database-specialist" in str(e.get("sub_rotinas_permitidas", [])) for e in estados), "Workflow 1 deve suportar database-specialist"
     
     etapa1 = next((e for e in estados if e["etapa"] == 1), {})
     assert "rca_gate" in etapa1, "Etapa 1 deve definir rca_gate"
     assert "classificacao_defeito" in etapa1, "Etapa 1 deve definir classificacao_defeito"
 
-    etapa3 = next((e for e in estados if e["etapa"] == 3), {})
-    assert "pre_requisito_diff" in etapa3, "Etapa 3 deve exigir pre_requisito_diff com blast radius e rollback"
+    etapa_plan = next((e for e in estados if e.get("nome") == "implementation_plan_authoring"), {})
+    assert "<stack>-arch-advisor" in etapa_plan.get("agent", "")
+    assert etapa_plan.get("regra") == "R-064"
 
-    etapa4 = next((e for e in estados if e["etapa"] == 4), {})
-    assert "mini_mutation_check" in etapa4, "Etapa 4 deve exigir mini_mutation_check"
+    etapa_fix = next((e for e in estados if e.get("nome") == "surgical_bug_fix"), {})
+    assert "pre_requisito_diff" in etapa_fix, "Etapa de fix deve exigir pre_requisito_diff com blast radius e rollback"
+    assert etapa_fix.get("requires_plan") is True
 
-    etapa5 = next((e for e in estados if e["etapa"] == 5), {})
-    assert "observacao_pos_fix" in etapa5, "Etapa 5 deve exigir observacao_pos_fix"
+    etapa_green = next((e for e in estados if e.get("nome") == "green_test_and_linter_validation"), {})
+    assert "mini_mutation_check" in etapa_green, "Etapa de green test deve exigir mini_mutation_check"
+
+    etapa_gate = next((e for e in estados if e.get("nome") == "quality_gate_and_pr"), {})
+    assert "observacao_pos_fix" in etapa_gate, "Etapa de quality gate deve exigir observacao_pos_fix"
 
 def test_workflow_refactoring_edge_scenarios_and_state_bag(routing_graph):
     """Valida que WORKFLOW-REFACTORING cobre cenários de Golden Master, Breaking Changes,
@@ -386,9 +391,9 @@ def test_workflow_refactoring_edge_scenarios_and_state_bag(routing_graph):
     etapa2 = next((e for e in estados if e["etapa"] == 2), {})
     assert "contract_gate" in etapa2, "Etapa 2 deve ter contract_gate"
 
-    etapa5 = next((e for e in estados if e["etapa"] == 5), {})
-    assert "redundancia_proporcional" in etapa5, "Etapa 5 deve ter redundancia_proporcional"
-    assert "blast_radius_revertido" in etapa5.get("circuit_breaker", ""), "Etapa 5 deve registrar blast_radius_revertido no circuit breaker"
+    etapa_review = next((e for e in estados if e.get("nome") == "ground_truth_validation_and_review"), {})
+    assert "redundancia_proporcional" in etapa_review, "Etapa de review deve ter redundancia_proporcional"
+    assert "blast_radius_revertido" in etapa_review.get("circuit_breaker", ""), "Etapa de review deve registrar blast_radius_revertido no circuit breaker"
 
 def test_workflow_bug_fix_and_refactoring_rigor_and_governance_parity(routing_graph):
     """Valida garantias contratuais e invariantes de governança R-050/R-055 para WORKFLOW-BUG-FIX e WORKFLOW-REFACTORING:
@@ -422,7 +427,7 @@ def test_workflow_technical_analysis_edge_scenarios_and_proposals(routing_graph)
     permitidos = etapa1.get("agents_permitidos", [])
     assert "angular-arch-advisor" in permitidos, "Workflow 3 deve permitir angular-arch-advisor"
     assert "spring-boot-arch-advisor" in permitidos, "Workflow 3 deve permitir spring-boot-arch-advisor"
-    assert "oracle-query-tuner" in permitidos, "Workflow 3 deve permitir query tuners"
+    assert "database-arch-advisor" in permitidos, "Workflow 3 deve permitir query tuners"
 
 def test_workflow_feature_development_edge_scenarios_and_state_bag(routing_graph):
     """Valida que WORKFLOW-FEATURE-DEVELOPMENT cobre particionamento de escopo (Fullstack/Back/Front),
@@ -461,11 +466,12 @@ def test_workflow_governance_maintenance_edge_scenarios_and_state_bag(routing_gr
     etapa1 = next((e for e in estados if e["etapa"] == 1), {})
     assert "deep-search" in str(etapa1.get("sub_rotinas_permitidas", [])), "Workflow 5 deve permitir deep-search na etapa 1"
 
-    etapa3 = next((e for e in estados if e["etapa"] == 3), {})
-    assert etapa3.get("sincronizacao_quadrupla_r015") is True, "Workflow 5 deve declarar sincronizacao_quadrupla_r015"
+    etapa_batch = next((e for e in estados if e.get("nome") == "governed_batch_execution"), {})
+    assert etapa_batch.get("sincronizacao_quadrupla_r015") is True, "Workflow 5 deve declarar sincronizacao_quadrupla_r015"
+    assert etapa_batch.get("requires_plan") is True
 
-    etapa4 = next((e for e in estados if e["etapa"] == 4), {})
-    assert "pytest" in str(etapa4.get("validacao_automatizada", "")), "Workflow 5 deve ter validacao_automatizada na etapa 4"
+    etapa_gate = next((e for e in estados if e.get("nome") == "tier1_governance_quality_gate"), {})
+    assert "pytest" in str(etapa_gate.get("validacao_automatizada", "")), "Workflow 5 deve ter validacao_automatizada na etapa de gate"
 
 
 

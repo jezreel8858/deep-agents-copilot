@@ -1,11 +1,6 @@
 ---
 name: efficient-batch-code-modification
-description: >
-  Diretrizes e padrões para execução de alterações de código em lote otimizadas
-  para consumo mínimo de tokens e créditos em sessões de AI Copilot — análise prévia
-  de impacto (dry-run), batching de tool calls em uma única rodada, minimal diffs cirúrgicos,
-  prevenção de loops de re-submissão de contexto e proteção anti-corrupção em edição de
-  arquivo único grande/estruturado via padrão verificado (R-051).
+description: "Define diretrizes e padrões para diretrizes e padrões para execução de alterações de código em lote otimizadas para consumo mínimo de tokens e créditos em sessões de AI Copilot — análise prévia de impacto (dry-run), batching de tool calls em uma única rodada, minimal diffs cirúrgicos, prevenção de loops de re-submissão de contexto e proteção anti-corrupção em edição de arquivo único grande/estruturado via padrão verificado (R-051). Use quando atuar em efficient batch code modification, edição em lote, batch modification. Não use para tarefas fora do escopo de efficient-batch-code-modification ou implementação direta de código de negócio não relacionado."
 tier: 1
 category: process
 triggers:
@@ -20,17 +15,8 @@ triggers:
   - "alterar múltiplos arquivos"
   - "reduzir tool calls"
   - "token budget"
-tools:
-  - "replace_string_in_file"
-  - "insert_edit_into_file"
-  - "create_file"
-  - "read_file"
-  - "grep_search"
-  - "get_errors"
-  - "context-mode/ctx_execute"
-  - "context-mode/ctx_execute_file"
-  - "context-mode/ctx_batch_execute"
-source_docs_lazy:
+tools: ['replace_string_in_file', 'insert_edit_into_file', 'create_file', 'read_file', 'grep_search', 'get_errors', 'context-mode/ctx_execute', 'context-mode/ctx_execute', 'context-mode/ctx_batch']
+source_docs:
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---
@@ -41,13 +27,26 @@ Esta skill estabelece o protocolo operacional obrigatório para execução de al
 
 ---
 
+## Protocolo Plan-Then-Batch e Regra do Limiar >= 2 (R-059 / Smell 2.26)
+
+1. **ENUMERAR**: Antes de qualquer leitura ou mutação, liste internamente todos os arquivos e comandos necessários.
+2. **Regra do Limiar >= 2**: Se a tarefa envolver 2 ou mais arquivos/comandos, consolide em chamada única no sandbox (Single-Turn MCP Batching). Comandos curtos do usuário (como `"prosseguir"` ou `"continue"`) mantêm o rigor integral do protocolo.
+
+## Quando Usar
+
+- Ativação em cenários de efficient batch code modification, edição em lote, batch modification.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `efficient-batch-code-modification` ou quando outra skill específica cobrir integralmente o escopo.
+
 ## 0. Hierarquia e Precedência de Ferramentas (R-056 — Context-Mode First)
 
-O uso de `context-mode` (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_index`, `ctx_search`) é **100% OBRIGATÓRIO tanto para LEITURAS quanto para MODIFICAÇÃO/CRIAÇÃO de arquivos** SEMPRE que a ferramenta context-mode estiver disponível no ambiente, eliminando categoricamente o anti-padrão de editor tool sprawl (Smell 2.24):
+O uso de `context-mode` (`ctx_execute`, `ctx_batch`, `ctx_index`, `ctx_search`) é **100% OBRIGATÓRIO tanto para LEITURAS quanto para MODIFICAÇÃO/CRIAÇÃO de arquivos** SEMPRE que a ferramenta context-mode estiver disponível no ambiente, eliminando categoricamente o anti-padrão de editor tool sprawl (Smell 2.24):
 
 | Nível de Precedência | Escopo / Cenário | Ferramenta Obrigatória | Mecanismo de Execução | Custo de Créditos |
 |---|---|---|---|:---:|
-| **Nível 1 (Primário / 100% Compulsório)** | **Qualquer leitura, busca, inspeção, modificação ou criação de arquivos** sempre que a ferramenta context-mode estiver disponível no ambiente | `ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_index` ou `ctx_search` (Context-Mode) | Script inline (Node.js/Python) que lê, valida unicidade em memória e salva em processo único all-or-nothing no sandbox (R-051 / R-056) | **Mínimo (~1 única tool call, zero overhead de chat)** |
+| **Nível 1 (Primário / 100% Compulsório)** | **Qualquer leitura, busca, inspeção, modificação ou criação de arquivos** sempre que a ferramenta context-mode estiver disponível no ambiente | `ctx_execute`, `ctx_batch`, `ctx_index` ou `ctx_search` (Context-Mode) | Script inline (Node.js/Python) que lê, valida unicidade em memória e salva em processo único all-or-nothing no sandbox (R-051 / R-056) | **Mínimo (~1 única tool call, zero overhead de chat)** |
 | **Nível 2 (Fallback Exclusivo quando Context-Mode Indisponível)** | **Estritamente proibidas quando context-mode estiver disponível**. Permitidas única e exclusivamente como fallback quando o servidor MCP context-mode estiver comprovadamente indisponível ou desconectado | `read_file`, `replace_string_in_file`, `insert_edit_into_file`, `create_file` (Editor) | Single-Turn Batching cirúrgico com 2-3 linhas de contexto exclusivo. **Proibido encadear múltiplas chamadas em série no chat.** | Baixo (~1 tool call) |
 
 > ⚠️ **REGRA NORMATIVA INEGOCIÁVEL (R-008 / R-056)**: Ferramentas nativas de editor (`read_file`, `replace_string_in_file`, `insert_edit_into_file`, `create_file`) e terminal são **estritamente proibidas quando o context-mode estiver disponível no ambiente**, sendo rebaixadas a **fallback exclusivo** para quando o servidor MCP context-mode estiver comprovadamente indisponível ou desconectado. Executar chamadas manuais de editor reenvia histórico massivo e arrisca corrupção por truncamento/fuzzy match.
@@ -62,7 +61,7 @@ Nos ambientes de AI Chat (VS Code / JetBrains Copilot):
   `read_file (1)` → *turno* → `replace (1)` → *turno* → `read_file (2)` → *turno* → `replace (2)` ...
   O agente realiza **30+ turnos sequenciais**. Com um histórico médio de 25k tokens, são processados mais de **750.000 tokens de entrada**, drenando rapidamente centenas de créditos de modelos premium (Claude Sonnet / GPT-5).
 - **O Anti-Padrão MCP Tool Chaining Sequencial no Chat (Smell 2.26)**: O mesmo dreno ocorre quando o agente substitui ferramentas de editor por `ctx_execute`, mas o invoca de forma sequencial turno a turno no chat (ex.: 10+ turnos sucessivos disparando um `ctx_execute` para cada arquivo/diff). Cada turno reenvia todo o histórico acumulado da conversa.
-- **A Solução Canônica:** Pré-análise em memória (Dry-Run) + Execução em Lote Único (*Single-Turn Batching* via `ctx_batch_execute` ou script consolidado em `ctx_execute`) + Diffs Cirúrgicos.
+- **A Solução Canônica:** Pré-análise em memória (Dry-Run) + Execução em Lote Único (*Single-Turn Batching* via `ctx_batch` ou script consolidado em `ctx_execute`) + Diffs Cirúrgicos.
 
 ---
 
@@ -71,7 +70,7 @@ Nos ambientes de AI Chat (VS Code / JetBrains Copilot):
 ### 2.1. Diretriz 1: Análise de Impacto Prévia (Dry-Run em Memória)
 
 Antes de invocar ferramentas de escrita (`ctx_execute`, `replace_string_in_file`, `insert_edit_into_file`, `create_file`):
-1. **Mapeamento Cirúrgico e Decisão de Ferramenta:** Inspecione a árvore e identifique de antemão todas as ocorrências necessárias (via `ctx_execute` ou busca programática no sandbox). Se context-mode estiver disponível, o uso de `ctx_execute`/`ctx_batch_execute` com script é **100% obrigatório**; ferramentas nativas de editor são reservadas exclusivamente como fallback se o MCP estiver comprovadamente indisponível.
+1. **Mapeamento Cirúrgico e Decisão de Ferramenta:** Inspecione a árvore e identifique de antemão todas as ocorrências necessárias (via `ctx_execute` ou busca programática no sandbox). Se context-mode estiver disponível, o uso de `ctx_execute`/`ctx_batch` com script é **100% obrigatório**; ferramentas nativas de editor são reservadas exclusivamente como fallback se o MCP estiver comprovadamente indisponível.
 2. **Resumo Compacto:** No planejamento mental ou resposta inicial, estruture a lista de arquivos afetados e os blocos específicos antes de tocar no disco.
 3. **Validação de Precondição:** Certifique-se de que os arquivos existem e não possuem conflitos óbvios antes de iniciar a primeira edição.
 
@@ -80,7 +79,7 @@ Antes de invocar ferramentas de escrita (`ctx_execute`, `replace_string_in_file`
 Antes de qualquer dry-run ou inspeção para batch edit, o agente NÃO DEVE ler arquivos inteiros (>100 linhas). O ciclo de vida acopla-se diretamente ao R-046:
 1. **Localização Exata**: Localize as âncoras e alvos via `grep_search`.
 2. **Leitura Paginada**: Utilize `read_file` informando `offset` e `limit` restritos à janela de modificação (60-80 linhas).
-3. **Processamento em Sandbox**: Se a inspeção for analítica/estrutural e o arquivo tiver mais de 300 linhas, delegue a derivação a `ctx_execute_file` sem trafegar o arquivo bruto na memória conversacional.
+3. **Processamento em Sandbox**: Se a inspeção for analítica/estrutural e o arquivo tiver mais de 300 linhas, delegue a derivação a `ctx_execute` sem trafegar o arquivo bruto na memória conversacional.
 
 ### 2.2. Diretriz 2: Aplicação em Lote (Batch Tool Calls)
 
@@ -104,50 +103,7 @@ Antes de qualquer dry-run ou inspeção para batch edit, o agente NÃO DEVE ler 
 
 ### 2.4. Diretriz 4: Single-Turn MCP Batching Compulsório (Anti-MCP Tool Chaining / Smell 2.26)
 
-Toda inspeção, análise, validação ou modificação envolvendo múltiplos alvos (diffs, arquivos, status, branches) DEVE ser consolidada em **UMA ÚNICA chamada de ferramenta MCP**:
-
-1. **Via A — Múltiplos comandos shell/leituras:** Usar compulsoriamente `ctx_batch_execute` com comandos rotulados e queries unificadas em uma única rodada:
-   ```javascript
-   ctx_batch_execute({
-     commands: [
-       { label: "git-diff", command: "git --no-pager diff --stat" },
-       { label: "git-log", command: "git --no-pager log -n 3 --oneline" },
-       { label: "status", command: "git status -s" }
-     ],
-     queries: ["arquivos modificados", "mensagens de commit recentes"],
-     concurrency: 2
-   })
-   ```
-2. **Via B — Múltiplos arquivos no filesystem:** Usar um único script síncrono em `ctx_execute` que itere por todos os alvos e emita um resumo consolidado:
-   ```javascript
-   ctx_execute({
-     language: "javascript",
-     code: `
-       const fs = require('fs');
-       const targets = ['src/a.ts', 'src/b.ts', 'src/c.ts'];
-       const summary = targets.map(f => ({ file: f, lines: fs.readFileSync(f, 'utf8').split('\\n').length }));
-       console.log(JSON.stringify(summary, null, 2));
-     `
-   })
-   ```
-3. **Proibição Absoluta**: É terminantemente proibido disparar turnos separados no chat chamando `ctx_execute` para cada arquivo/comando individualmente.
-
-#### Regra do Limiar >= 2 (Anti Tool Chaining — Smell 2.26 / R-059)
-
-> **Regra do Limiar >= 2 (inegociável):** SE o escopo da tarefa exigir inspecionar, ler, comparar, editar ou executar 2 (DOIS) OU MAIS arquivos/comandos/alvos, é TERMINANTEMENTE PROIBIDO disparar `ctx_execute` isolado por alvo em chamadas/turnos sucessivos. É OBRIGATÓRIO: (a) `ctx_batch_execute(commands, queries)` com todos os alvos rotulados em uma única chamada, OU (b) um único script iterativo em `ctx_execute` que processe todos os alvos em loop interno e imprima o resumo consolidado de uma só vez. Antes de disparar a primeira chamada de ferramenta, o agente DEVE enumerar mentalmente TODOS os alvos necessários para completar a tarefa (Plan-Then-Batch, ver abaixo) — nunca descobrir o próximo alvo reativamente turno-a-turno.
-
-#### Protocolo Plan-Then-Batch (Anti Miopia Reativa — Smell 2.13 / R-059)
-
-> 1. **ENUMERAR**: antes de qualquer tool call, liste internamente todos os arquivos/comandos que compõem a tarefa completa (não apenas o próximo passo aparente).
-> 2. **CONSOLIDAR**: se a lista tiver >= 2 itens, agrupe tudo em uma única payload (`commands[]` em `ctx_batch_execute` ou loop único em `ctx_execute`).
-> 3. **DESPACHAR**: dispare apenas 1 chamada de ferramenta de leitura/processamento por fase da tarefa — nunca N chamadas sequenciais para N alvos previsíveis.
-> 4. **Comandos curtos não suspendem a regra**: prompts do usuário como "prosseguir", "continue", "pode seguir" NÃO isentam o agente da obrigatoriedade de context-mode nem do limiar >= 2 — a obrigação é da TAREFA em andamento, não do tamanho do prompt do turno atual.
->
-> *(SSOT Normativa: `.github/copilot-instructions.md` § 2.1; alinhamento operacional em `.github/skills/context-mode/SKILL.md`)*.
->
-> - Ver exemplo few-shot Anti-Padrão vs Padrão Correto de batching em `.github/skills/context-mode/SKILL.md § 4.3`.
-
----
+- É terminantemente proibido encadear chamadas unitárias de `ctx_execute` por arquivo no chat (Smell 2.26). Consolidar leituras e escritas multi-arquivo em uma única chamada `ctx_execute` (`language: "javascript"`, `fs` nativo) ou `ctx_batch`. Exemplos em [`references/detailed-patterns-and-examples.md`](references/detailed-patterns-and-examples.md).
 
 ## 3. Matriz Comparativa: Execução Ingênua vs. Batch de Editor vs. Context-Mode Script
 
@@ -167,7 +123,7 @@ Toda inspeção, análise, validação ou modificação envolvendo múltiplos al
 
 Antes de iniciar a gravação de alterações:
 - [ ] O mapeamento de todos os arquivos impactados já está claro na memória?
-- [ ] **Hierarquia de Ferramenta**: Utilizei `ctx_execute`/`ctx_batch_execute` com script inline no sandbox (100% obrigatório quando context-mode disponível), evitando ferramentas manuais de editor?
+- [ ] **Hierarquia de Ferramenta**: Utilizei `ctx_execute`/`ctx_batch` com script inline no sandbox (100% obrigatório quando context-mode disponível), evitando ferramentas manuais de editor?
 - [ ] Se < 5 arquivos pontuais, todas as chamadas de substituição para arquivos independentes foram agrupadas no mesmo turno (Single-Turn Batching)?
 - [ ] O `oldString` contém apenas o contexto estrito para ser unívoco (2-3 linhas)?
 - [ ] Evitei releituras desnecessárias de arquivos que eu mesmo acabei de editar?
@@ -226,7 +182,7 @@ Uma sessão ingênua com 20 tool turns pode inflar o volume de tokens processado
 ### 6.2. Estratégia de Warm Start e Destilação na Borda (Edge Truncation)
 
 1. **Warm Start Compulsório**: Recursos locais (caches, grafos, compilações) nunca devem falhar no primeiro turno exigindo auto-recuperação reativa. Devem ser inicializados silenciosamente em lote (*build-if-missing*).
-2. **Batch Querying**: Agrupar todas as interrogações em uma única chamada agregada (ctx_batch_execute, batch_query ou script iterativo em sandbox).
+2. **Batch Querying**: Agrupar todas as interrogações em uma única chamada agregada (ctx_batch, batch_query ou script iterativo em sandbox).
 3. **Edge Truncation (Destilação Semântica)**: Truncar e filtrar dados volumosos *dentro da ferramenta/sandbox*. O chat recebe apenas métricas, anomalias e achados conclusivos.
 
 ### 6.3. Protocolo de Circuit Breaker no 4º Turno
@@ -241,10 +197,10 @@ Uma sessão ingênua com 20 tool turns pode inflar o volume de tokens processado
 
 ---
 
-## 7. Quando Preferir Script Python Determinístico vs. ctx_batch_execute
+## 7. Quando Preferir Script Python Determinístico vs. ctx_batch
 
 ### 7.1. Critério de Mercado e Limiar de Volume (≥ 6 Arquivos Homogêneos)
-Enquanto o `ctx_batch_execute` ou scripts iterativos em `ctx_execute` são ideais para modificações pontuais multi-arquivo (de 2 a 5 arquivos) com raciocínio contextual, **a partir de ~6 edições homogêneas repetidas em múltiplos arquivos**, um script Python determinístico dedicado torna-se expressivamente superior em custo, velocidade e segurança.
+Enquanto o `ctx_batch` ou scripts iterativos em `ctx_execute` são ideais para modificações pontuais multi-arquivo (de 2 a 5 arquivos) com raciocínio contextual, **a partir de ~6 edições homogêneas repetidas em múltiplos arquivos**, um script Python determinístico dedicado torna-se expressivamente superior em custo, velocidade e segurança.
 
 | Dimensão | Edição via Tool-Calls (`ctx_execute` / Chat) | Script Python Determinístico (`tools/...`) |
 | :--- | :--- | :--- |
@@ -267,3 +223,17 @@ O repositório adota como referência arquitetural o utilitário `tools/agent_pr
 ## 8. Referências Cruzadas
 
 - Ver exemplo few-shot Anti-Padrão vs Padrão Correto de batching em `.github/skills/context-mode/SKILL.md § 4.3`.
+
+### Política Anti-Timeout, Runtime Preferencial JavaScript (`fs` nativo) e Circuit Breaker Fail-Fast (`ctx_execute` / `ctx_batch`)
+
+1. **Runtime Obrigatório `language: "javascript"` no `ctx_execute` (Anti-Defender/AMSI Hang)**:
+   - No Windows, a invocação de `python.exe` (`language: "python"` ou `python -c`) ou cadeias pesadas de subshells a partir do processo Node.js do servidor MCP `context-mode` sofre interceptação síncrona pelo Windows Defender (`MsMpEng.exe` / Behavior Monitoring / AMSI), causando bloqueios severos de I/O e timeouts (`ETIMEDOUT` / `taskkill /F /T`).
+   - Portanto, `language: "javascript"` (com módulos nativos `fs` e `path` do Node.js) é o **runtime obrigatório** no `ctx_execute` para leitura, inspeção, busca, parsing JSON/texto e modificação em lote de arquivos.
+   - É **terminantemente proibido** invocar `language: "python"`, `python -c` ou subshells aninhados para I/O de arquivos. (A execução de binários Python via `child_process` é restrita exclusivamente a ferramentas CLI do ecossistema, como `pytest` ou scripts de sincronização canônicos, nunca para ler/editar arquivos).
+2. **Higiene de Comandos em `ctx_batch`**:
+   - Os comandos shell em `ctx_batch` devem ser leves, atômicos e com escopo de diretório estritamente restrito.
+   - É **proibido** disparar `python -c` inline em lote ou varreduras recursivas irrestritas na raiz do workspace sem filtro de pasta/extensão (evitando estourar o orçamento de tempo do batch).
+3. **Política Fail-Fast & Circuit Breaker de Timeout (Máx. 1 Retry com Troca de Estratégia)**:
+   - Em caso de erro de timeout (`ETIMEDOUT`, `timed out`, `taskkill`) em `ctx_execute` ou `ctx_batch`, o agente tem **tolerância zero para repetir a mesma chamada/runtime**.
+   - É permitido no **máximo 1 retry**, contanto que haja **troca obrigatória de estratégia** (migrar de `python`/`shell` para `language: "javascript"` puro com `fs` nativo, ou dividir o lote em comandos menores/escopo restrito).
+   - Se ocorrer um **2º timeout**, o **Circuit Breaker Fail-Fast** abre imediatamente: o agente deve abortar novas tentativas de spawn, registrar a evidência e acionar o fallback canônico ou reportar o bloqueio em formato Compact Error Reporting (R-020).

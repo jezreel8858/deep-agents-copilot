@@ -24,7 +24,8 @@
     "efficient-batch-code-modification",
     "agent-contracts",
     "confidence-fallback-policy",
-    "agent-evals-lab"
+    "agent-evals-lab",
+    "jira-mcp"
   ],
   "tools": [
     "grep_search",
@@ -34,11 +35,11 @@
     "run_in_terminal",
     "ask_questions",
     "run_subagent",
-    "context-mode/ctx_execute",
-    "context-mode/ctx_execute_file",
     "context-mode/ctx_index",
     "context-mode/ctx_search",
-    "context-mode/ctx_batch_execute"
+    "context-mode/ctx_batch",
+    "mcp-atlassian/jira_get_issue",
+    "mcp-atlassian/jira_search"
   ],
   "security_profile": {
     "tool_zones": [
@@ -50,7 +51,7 @@
     "data_sensitivity": "internal"
   },
   "model_preferences": {
-    "recommended_model": "Claude Sonnet 5",
+    "recommended_model": "Claude Sonnet 5.5",
     "cost_tier": "1x"
   },
   "input_contract": {

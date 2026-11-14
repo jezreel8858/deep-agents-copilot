@@ -57,13 +57,13 @@ def test_deve_criar_span_invoke_agent_com_atributos_semconv():
 
     with client.start_trace("agente-root", session_id="sess-1") as trace:
         with client.start_agent_span(
-            agent_name="python-feature-developer",
+            agent_name="python-developer",
             description="Implementa tracing",
             provider_name="anthropic",
             parent=trace,
         ) as span:
             assert span.attributes.get("gen_ai.operation.name") == "invoke_agent"
-            assert span.attributes.get("gen_ai.agent.name") == "python-feature-developer"
+            assert span.attributes.get("gen_ai.agent.name") == "python-developer"
             assert span.attributes.get("gen_ai.provider.name") == "anthropic"
 
 

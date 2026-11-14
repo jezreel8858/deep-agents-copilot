@@ -13,7 +13,7 @@
 - **Componentes reaproveitados**: `routing.router.rotear`, `routing.state_machine.transicionar`, `routing.handoff.validar_handoff`, `routing.drift.detectar_deriva`, `runner.budget.Budget` (`GOV_MAX_PREMIUM_REQUESTS`, `TETO_TURNOS_R060=5`), `runner.sdk_adapter` (`criar_cliente_sdk_real`, `SDKAuthenticationError`, `construir_permission_handler_read_only`), coletor `tools/otel-langfuse` (portas 4317/4318, processador `transform/redact-secrets`).
 - **Componentes novos**: `deploy/local-chat-gateway/` (`docker-compose.yml`, `Dockerfile`, `.env.example`) + pacote Python `local_chat_gateway`.
 
-### Correções à Premissa Original (achado do arch-advisor)
+### Correções à Premissa Original (achado do <stack>-arch-advisor)
 
 1. **`ToolCallData`** não é tratado hoje pelo `sdk_adapter.py` — ele só consome `AssistantMessageData` e `SessionIdleData`. O `EventMapper` precisa assinar esse evento adicionalmente, só para exibição na UI.
 2. **Quem barra a tool call é o callback `on_permission_request`**, não um evento — a decisão de allow/deny acontece ali, não no stream de eventos.

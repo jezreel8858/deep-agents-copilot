@@ -1,10 +1,6 @@
 ---
 name: spring-reactive-implementation-patterns
-description: >-
-  Padrões de mercado consolidados (2026) para IMPLEMENTAR features novas e
-  correções de bug em Spring WebFlux/Reactor — composição não-bloqueante,
-  tratamento de erro por operador, testing com StepVerifier/WebTestClient.
-  Contraparte de execução da `spring-reactive-webflux-patterns` (só análise).
+description: "Define diretrizes e padrões para padrões de mercado consolidados (2026) para IMPLEMENTAR features novas e correções de bug em Spring WebFlux/Reactor — composição não-bloqueante, tratamento de erro por operador, testing com StepVerifier/WebTestClient. Contraparte de execução da `spring-reactive-webflux-patterns` (só análise). Use quando atuar em implementar endpoint reativo, corrigir bug webflux, feature reativa nova. Não use para tarefas fora do escopo de spring-reactive-implementation-patterns ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: quality
 triggers:
@@ -16,13 +12,16 @@ triggers:
 source_docs:
   - .github/agents/backend/spring-reactive/spring-reactive-router.agent.md
   - .github/skills/spring-reactive-webflux-patterns/SKILL.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 tools: []
 ---
 
 # Spring Reactive Implementation Patterns
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `spring-reactive-implementation-patterns` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## Quando Usar
 

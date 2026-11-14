@@ -1,9 +1,6 @@
 ---
 name: integration-contract-analysis
-description: >-
-  Análise e validação de contratos de integração (OpenAPI, AsyncAPI, gRPC, GraphQL):
-  detecção de breaking changes, classificação BREAKING/COMPATIBLE/DEPRECIAÇÃO e
-  mapeamento de consumidores afetados.
+description: "Define diretrizes e padrões para análise e validação de contratos de integração (OpenAPI, AsyncAPI, gRPC, GraphQL): detecção de breaking changes, classificação BREAKING/COMPATIBLE/DEPRECIAÇÃO e mapeamento de consumidores afetados. Use quando atuar em Verificar se uma mudança de API é breaking change, Comparar versões de contrato OpenAPI ou AsyncAPI, Identificar consumidores afetados por mudança de endpoint. Não use para tarefas fora do escopo de integration-contract-analysis ou implementação direta de código de negócio não relacionado."
 tier: 2
 category: governance
 triggers:
@@ -13,15 +10,9 @@ triggers:
   - "Validar compatibilidade retroativa de contrato gRPC ou GraphQL"
   - "Antes de fazer merge de PR que altera contrato público"
   - "Auditar drift entre contrato spec e comportamento real da API"
-tools:
-  - grep_search
-  - file_search
-  - read_file
-  - context-mode/ctx_batch_execute
-  - context-mode/ctx_execute
+tools: ['grep_search', 'file_search', 'read_file', 'context-mode/ctx_batch', 'context-mode/ctx_execute']
 source_docs:
   - .github/agents/tech-solution-architect.agent.md
-source_docs_lazy:
   - CLAUDE.md
   - .github/copilot-instructions.md
 ---
@@ -29,6 +20,14 @@ source_docs_lazy:
 # Skill: Análise de Contrato de Integração
 
 > Detecção de breaking changes, classificação de compatibilidade e rastreamento de consumidores afetados para qualquer formato de contrato de integração.
+
+## Quando NÃO Usar
+
+- Não usar para demandas fora do domínio de `integration-contract-analysis` ou quando outra skill específica cobrir integralmente o escopo.
+
+## Diretrizes e Padrões Canônicos
+
+- Seguir estritamente as regras, invariantes e fluxos descritos nas seções abaixo.
 
 ## Quando Usar
 
