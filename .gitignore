@@ -86,9 +86,4 @@ traces/
 # Runtime Maven embutido (cache do usuario; nunca versionar binarios)
 /assets/maven-mvnd-*/
 logs/dev/
-
-
-.awb/
-
-
 .awb/
