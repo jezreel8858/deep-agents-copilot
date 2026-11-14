@@ -70,9 +70,9 @@ def test_promoted_executor_agents_use_claude_sonnet_5():
             content = agent_file.read_text(encoding="utf-8")
             fm = parse_frontmatter(content)
             model = fm.get("model")
-            assert model == "Grok 4.7", remediation(
-                f"Agent '{stem}' possui model '{model}' no frontmatter, esperado 'Grok 4.7'",
-                fix_hint=f"Edite {agent_file.relative_to(REPO_ROOT)} definindo model: \"Grok 4.7\""
+            assert model == "Gemini 4 Argon", remediation(
+                f"Agent '{stem}' possui model '{model}' no frontmatter, esperado 'Gemini 4 Argon'",
+                fix_hint=f"Edite {agent_file.relative_to(REPO_ROOT)} definindo model: \"Gemini 4 Argon\""
             )
 
 

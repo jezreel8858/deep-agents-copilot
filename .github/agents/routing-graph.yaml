@@ -173,6 +173,9 @@ nos:
     tipo: downstream
     descricao: "Auditoria de conformidade arquitetural contra Architectural Decision Records (ADRs) documentados no projeto, identificando violações, decisões obsoletas e ADRs ausentes; read-only"
 
+  - id: plan-critic
+    tipo: downstream
+    descricao: "Revisor Cético Universal Pré-HITL dos planos R-064 (Two-Tier Hybrid: Tier 1 determinístico + Tier 2 semântico isolado; Dupla Lente Gate 1/Gate 2); read-only"
   - id: repo-hygiene-auditor
     tipo: downstream
     descricao: "Auditoria de higiene estrutural, documentação essencial (README/CONTRIBUTING/LICENSE), segurança de versionamento (.gitignore, .env) e práticas de CI/CD agnóstica de stack; read-only"
@@ -1519,6 +1522,26 @@ arestas:
       nao_confundir_com:
         - "regras de negócio do código"   # → business-rules-extractor
         - "autoria/redação de novo adr"    # → docs-engineer
+
+  # Revisão cética pré-HITL de planos R-064 (Two-Tier Hybrid)
+  - de: agent-router
+    para: plan-critic
+    prioridade: 4.75
+    threshold_score: 0.90
+    nivel_routing: rule-based
+    condicoes:
+      keywords:
+        - "revisão cética"
+        - "revisor cético"
+        - "crítica de plano"
+        - "parecer pré-hitl"
+        - "plan-critic"
+        - "revisar plano antes do gate"
+      sinal_r006: "É revisão cética independente (pré-HITL) de um plano R-064 persistido em docs/plans/<tipo>/?"
+      nao_confundir_com:
+        - "auditoria de conformidade contra ADRs"   # → adr-sentinel
+        - "revisão de código/PR"                    # → code-review
+        - "persistir o parecer no plano"            # → docs-engineer
 
   # Auditoria de higiene de repositório, documentação essencial e padrões de engenharia
   - de: agent-router

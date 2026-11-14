@@ -1,6 +1,6 @@
 {
   "protocol": "A2A/1.0.0",
-  "total_agentcards": 62,
+  "total_agentcards": 63,
   "agents": {
     "adapter-generator": {
       "name": "Adapter Generator",
@@ -198,6 +198,12 @@
       "name": "Performance Agent",
       "role": "specialist",
       "domain": "Revisao especializada de performance (read-only)",
+      "version": "1.0.0"
+    },
+    "plan-critic": {
+      "name": "Plan Critic",
+      "role": "specialist",
+      "domain": "Revisao cetica universal pre-HITL de planos R-064 (Two-Tier Hybrid, Dupla Lente)",
       "version": "1.0.0"
     },
     "pr-gatekeeper": {

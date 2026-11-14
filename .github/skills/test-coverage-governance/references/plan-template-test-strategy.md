@@ -12,6 +12,10 @@ author: "@test-strategy"
 plan_type: "test-strategy"
 created_at: "AAAA-MM-DD"
 related-planning-doc: "docs/plans/feature/<arquivo>.md | N/A"
+review_verdict: PASS | PASS_WITH_NITS | ESCALATED_HITL
+review_rounds: 1
+reviewer: "@plan-critic"
+review_tier1: PASS | FAIL
 allowed_files:
   - "caminho/ou/glob/**"
 ---
@@ -31,6 +35,13 @@ allowed_files:
 4. Ferramentas e comandos canônicos
 5. **Alternativas Rejeitadas**
 6. Critério de pronto (metas verificáveis)
+
+
+## Parecer do Revisor Cético Pré-HITL (R-064)
+
+- **Tier 1 (Determinístico)**: `PASS | FAIL`
+- **Tier 2 (`@plan-critic`)**: `PASS | PASS_WITH_NITS | ESCALATED_HITL` (`review_rounds: 1..3`, Noise Budget ≤ 5 findings `BLOCKER`/`HIGH`)
+- **Findings e Resoluções**: (resumo objetivo ou `Nenhum finding BLOCKER/HIGH`).
 
 ## Checklist
 

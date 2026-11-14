@@ -174,7 +174,7 @@ Ao criar novos agents, respeitar o teto estrito de prompt tokens, o padrão can�
 1. **Entrada Obrigatória**: Inicia em `@agent-router` (R-037), que realiza Health Check de binding (R-034) e avalia o grafo de roteamento.
 2. **Refinamento**: Se ambíguo ou aberto, encaminha ao `prompt-structuring` (R-041) para clarificação antes do despacho.
 3. **Despacho Direto**: O router despacha o especialista downstream apropriado em nível plano (Flat Delegation, R-047/R-054).
-4. **Execução em Workflow**: Execuções técnicas seguem os Workflows Canônicos formalizados em `workflows.md` (R-050) com verificação em duplo gate (R-064).
+4. **Execução em Workflow**: Execuções técnicas seguem os Workflows Canônicos formalizados em `workflows.md` (R-050) com verificação em duplo gate (R-064). Antes do `ask_questions` (Gates 1 e 2), planos `DRAFT` passam pelo Quality Gate Pré-HITL Two-Tier Hybrid via `@plan-critic` (Fast-Pass 1x, teto 2x/3x, Noise Budget ≤ 5 `BLOCKER`/`HIGH`, `ESCALATED_HITL`).
 5. **Quality Review Loop**: Toda mutação passa por gates estritos de testes, higiene e arquitetura (R-065).
 6. **Handoff ou Conclusão**: Ao concluir o workflow, reset obrigatório devolvendo controle ao `@agent-router` (R-052). Derivas de intenção acionam re-triagem imediata (R-042).
 

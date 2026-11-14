@@ -9,22 +9,22 @@ description: >-
 model: "Claude Sonnet 5.5"
 tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'ask_questions', 'run_subagent', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'figma/get_file_nodes', 'figma/export_image', 'figma/get_styles', 'figma/get_component_sets', 'figma/get_comments', 'mcp-atlassian/jira_get_issue', 'mcp-atlassian/jira_search']
 source_docs:
-  - '.github/skills/requirements-engineering-patterns/SKILL.md'
-  - '.github/skills/structured-intake-patterns/SKILL.md'
-  - '.github/skills/documentation-writing-patterns/SKILL.md'
-  - '.github/skills/security-review-patterns/SKILL.md'
-  - '.github/skills/context-mode/SKILL.md'
-  - '.github/skills/efficient-batch-code-modification/SKILL.md'
-  - '.github/skills/socratic-grilling-patterns/SKILL.md'
-  - 'docs/agent-context/templates/stakeholder-questionnaire.md'
-  - '.github/skills/handoff-governance/SKILL.md'
-  - '.github/skills/agent-contracts/SKILL.md'
-  - '.github/skills/jira-mcp/SKILL.md'
-  - '.github/skills/figma-mcp/SKILL.md'
-  - '.github/skills/figma-design-to-code-patterns/SKILL.md'
-  - 'docs/plans/README.md'
-  - 'CLAUDE.md'
-  - '.github/copilot-instructions.md'
+  - .github/skills/requirements-engineering-patterns/SKILL.md
+  - .github/skills/structured-intake-patterns/SKILL.md
+  - .github/skills/documentation-writing-patterns/SKILL.md
+  - .github/skills/security-review-patterns/SKILL.md
+  - .github/skills/context-mode/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/skills/socratic-grilling-patterns/SKILL.md
+  - docs/agent-context/templates/stakeholder-questionnaire.md
+  - .github/skills/handoff-governance/SKILL.md
+  - .github/skills/agent-contracts/SKILL.md
+  - .github/skills/jira-mcp/SKILL.md
+  - .github/skills/figma-mcp/SKILL.md
+  - .github/skills/figma-design-to-code-patterns/SKILL.md
+  - docs/plans/README.md
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 ---
 
 # Perfil Operacional

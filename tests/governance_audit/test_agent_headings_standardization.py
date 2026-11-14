@@ -144,5 +144,5 @@ def test_coverage_exhaustion_count():
     agents = get_all_agent_files()
     templates = get_all_template_files()
     
-    assert len(agents) == 62, f"Esperados 62 agents (após consolidação Fase 4/5), encontrados {len(agents)}"
+    assert len(agents) == 63, f"Esperados 63 agents (após consolidação Fase 4/5), encontrados {len(agents)}"
     assert len(templates) == 4, f"Esperados 4 templates, encontrados {len(templates)}"

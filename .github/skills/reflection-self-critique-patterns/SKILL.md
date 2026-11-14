@@ -93,3 +93,7 @@ Gap de mercado identificado em `docs/plans/20260830-090100-categorizacao-agents-
 - Future AGI, "Evaluating LLM Self-Reflection Loops" (2026) — https://futureagi.com/blog/evaluating-llm-self-reflection-loops-2026
 - `docs/plans/20260830-090100-categorizacao-agents-mercado.md` §5.1 — origem desta skill.
 
+
+## Revisão Cética Separada Pré-HITL para Planos R-064 (`@plan-critic`)
+
+Para documentos de planejamento em `docs/plans/<tipo>/` (8 categorias R-064), aplica-se obrigatoriamente o padrão de **Critic Separado em Contexto Isolado** via `@plan-critic` (100% Read-Only, Context Firewall) antes do `ask_questions`, guiado pela rubrica [`pre-hitl-skeptical-review-rubric.md`](../plan-conformance-patterns/references/pre-hitl-skeptical-review-rubric.md) com Fast-Pass 1x, teto 2x (3x em `tier: full`), Noise Budget ≤ 5 (`BLOCKER`/`HIGH`, R-065) e escalada `ESCALATED_HITL`.

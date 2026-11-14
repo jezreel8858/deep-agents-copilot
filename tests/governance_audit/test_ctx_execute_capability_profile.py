@@ -30,6 +30,7 @@ GATHER_ONLY_AGENTS = [
     "devops-engineer",
     "docs-engineer",
     "feature-planner",
+    "plan-critic",
     "pr-gatekeeper",
     "repo-hygiene-auditor",
     "requirements-analyst",

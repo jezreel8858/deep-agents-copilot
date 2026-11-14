@@ -6,10 +6,18 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
-## [Unreleased] - 2026-11-13
+## [2.57.0] — 2026-11-14
+
+### Added
+- **Agente `@plan-critic` e Quality Gate Revisor Cético Universal Pré-HITL (ADR-0014 / R-064 / R-067)**:
+  - Criação do subagent consultivo read-only `.github/agents/plan-critic.agent.md` (`tier: fast`, protocolo **Two-Tier Hybrid**: *Tier 1 Inline Self-Critique* para planos simples <= 3 arquivos e *Tier 2 Dedicated Subagent* para planos >= 4 arquivos, multi-stack ou arquiteturais, com hard-cap `max_iterations: 2` anti-loop).
+  - Criação da rubrica modular sob demanda `.github/skills/plan-conformance-patterns/references/pre-hitl-skeptical-review-rubric.md` estruturada em 6 dimensões core de crítica cética + matriz de 8 categorias de planos + salvaguardas para repositórios poliglotas com adapters locais (`R-043`).
+  - Evolução de governança `R-067` no `@plan-critic`: 5 skills dedicadas (`plan-conformance-patterns`, `reflection-self-critique-patterns`, `architecture-review-patterns`, `security-review-patterns`, `risk-assessment-patterns`), **Protocolo Anti-Sycophancy / De-biasing**, **Pre-Mortem Imaginado** + **Chain-of-Verification (CoVe)** e **Matriz de Segurança Agêntica OWASP Top 10 for Agentic Applications 2026** (`ASI01`, `ASI02`, `ASI08`, `ASI09`).
+  - Registro arquitetural `docs/adr/0014-quality-gate-revisor-cetico-universal-pre-hitl-r064.md`, planos de governança R-064/R-067 e suíte determinística `tests/governance_audit/test_pre_hitl_skeptical_plan_gate.py`.
 
 ### Changed
-- **Governança, Skills, Agents, Prompts, Docs, Hooks e Runtime**: Upgrade `context-mode` v1 → v2.1.10 (`ctx_execute` com parâmetro `file`/`CTX_FILE`, `ctx_batch`, `ctx_index` com `path`/`content`/`url`, `ctx_search`, `ctx_resume`, `ctx_stats`, `ctx_doctor`, `ctx_upgrade`, `ctx_purge`, `--agent copilot-cli` e `CONTEXT_MODE_DATA_DIR`).
+- **Governança, Skills, Agents, Prompts, Docs, Hooks e Runtime**: Upgrade `context-mode` v1 -> v2.1.10 (`ctx_execute` com parâmetro `file`/`CTX_FILE`, `ctx_batch`, `ctx_index` com `path`/`content`/`url`, `ctx_search`, `ctx_resume`, `ctx_stats`, `ctx_doctor`, `ctx_upgrade`, `ctx_purge`, `--agent copilot-cli` e `CONTEXT_MODE_DATA_DIR`).
+- **Templates de Planos, Catálogos A2A e Paridade de Suítes de Auditoria**: Inclusão dos campos de gate pré-HITL (`pre_hitl_review_tier`, `pre_hitl_gate_status`, `critic_iterations`) nos 8 templates canônicos de planos, sincronização de `catalog.yaml`, `routing-graph.yaml`, `.a2a/agentcards/` (53 agentes totais) e alinhamento das suítes `tests/governance_audit/` e `tests/context_insight_visualizer/`.
 
 ## [2.56.0] — 2026-10-06
 

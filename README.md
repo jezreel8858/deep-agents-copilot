@@ -199,7 +199,7 @@ flowchart TD
     P --> E
     FP -- "Sim (Fast-Path R-050)" --> WF["Workflows Canônicos\n(Pipelines Determinísticos)"]
 
-    E & WF --> G1["🎯 Planning/Analysis\nrequirements-analyst · deep-search\nfeature-planner"]
+    E & WF --> G1["🎯 Planning/Analysis\nrequirements-analyst · deep-search\nfeature-planner · plan-critic"]
     E & WF --> G2["📐 Architecture/Design\ntech-solution-architect · codegraph-engine\nbusiness-rules-extractor · refactor-planner\nddd-bounded-context-mapper · adr-sentinel"]
     E & WF --> G3["💻 Implementation (Domain Routers & Specialists)\nangular-router · spring-boot-router · spring-reactive-router\nejb-router · python-router · database-router · database-specialist"]
     E & WF --> G4["✅ Quality/Validation\nbug-triage · debugger · test-strategy\ncode-review · code-style-enforcer · security-reviewer\nperformance-agent · devops-engineer · runtime-verifier\nrepo-hygiene-auditor"]
@@ -264,7 +264,7 @@ flowchart TB
         direction TB
         subgraph CAT1["🎯 PLANNING &amp; ANALYSIS"]
             direction TB
-            A1[requirements-analyst] ~~~ A2[deep-search] ~~~ A3[feature-planner]
+            A1[requirements-analyst] ~~~ A2[deep-search] ~~~ A3[feature-planner] ~~~ A4[plan-critic]
         end
 
         subgraph CAT2["📐 ARCHITECTURE &amp; DESIGN"]

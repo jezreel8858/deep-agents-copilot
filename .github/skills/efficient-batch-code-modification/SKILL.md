@@ -27,6 +27,11 @@ Esta skill estabelece o protocolo operacional obrigatório para execução de al
 
 ---
 
+## Protocolo Plan-Then-Batch e Regra do Limiar >= 2 (R-059 / Smell 2.26)
+
+1. **ENUMERAR**: Antes de qualquer leitura ou mutação, liste internamente todos os arquivos e comandos necessários.
+2. **Regra do Limiar >= 2**: Se a tarefa envolver 2 ou mais arquivos/comandos, consolide em chamada única no sandbox (Single-Turn MCP Batching). Comandos curtos do usuário (como `"prosseguir"` ou `"continue"`) mantêm o rigor integral do protocolo.
+
 ## Quando Usar
 
 - Ativação em cenários de efficient batch code modification, edição em lote, batch modification.

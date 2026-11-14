@@ -9,27 +9,27 @@ model: "Claude Opus 5.5"
 model_exception_reason: "R-021: Papel de arquitetura complexa, viabilidade técnica e decomposição deliberativa (§9 governance-factory-patterns)"
 tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_stats', 'context-mode/ctx_doctor', 'context-mode/ctx_upgrade', 'context-mode/ctx_purge', 'figma/get_file_nodes', 'figma/export_image', 'figma/get_styles', 'figma/get_component_sets', 'figma/get_comments', 'mcp-atlassian/jira_get_issue', 'mcp-atlassian/jira_search']
 source_docs:
-  - '.github/skills/documentation-writing-patterns/SKILL.md'
-  - '.github/skills/security-review-patterns/SKILL.md'
-  - '.github/skills/context-mode/SKILL.md'
-  - '.github/skills/integration-contract-analysis/SKILL.md'
-  - '.github/skills/mermaid-diagrams/SKILL.md'
-  - '.github/skills/task-decomposition-patterns/SKILL.md'
-  - '.github/skills/efficient-batch-code-modification/SKILL.md'
-  - '.github/skills/harness-engineering-patterns/SKILL.md'
-  - '.github/skills/requirements-engineering-patterns/SKILL.md'
-  - '.github/skills/socratic-grilling-patterns/SKILL.md'
-  - '.github/skills/handoff-governance/SKILL.md'
-  - '.github/skills/agent-contracts/SKILL.md'
-  - '.github/skills/code-tracing/SKILL.md'
-  - '.github/skills/agent-evals-lab/SKILL.md'
-  - '.github/skills/design-pattern-selection-patterns/SKILL.md'
-  - '.github/skills/figma-mcp/SKILL.md'
-  - '.github/skills/figma-design-to-code-patterns/SKILL.md'
-  - '.github/skills/jira-mcp/SKILL.md'
-  - 'docs/plans/README.md'
-  - 'CLAUDE.md'
-  - '.github/copilot-instructions.md'
+  - .github/skills/documentation-writing-patterns/SKILL.md
+  - .github/skills/security-review-patterns/SKILL.md
+  - .github/skills/context-mode/SKILL.md
+  - .github/skills/integration-contract-analysis/SKILL.md
+  - .github/skills/mermaid-diagrams/SKILL.md
+  - .github/skills/task-decomposition-patterns/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/skills/harness-engineering-patterns/SKILL.md
+  - .github/skills/requirements-engineering-patterns/SKILL.md
+  - .github/skills/socratic-grilling-patterns/SKILL.md
+  - .github/skills/handoff-governance/SKILL.md
+  - .github/skills/agent-contracts/SKILL.md
+  - .github/skills/code-tracing/SKILL.md
+  - .github/skills/agent-evals-lab/SKILL.md
+  - .github/skills/design-pattern-selection-patterns/SKILL.md
+  - .github/skills/figma-mcp/SKILL.md
+  - .github/skills/figma-design-to-code-patterns/SKILL.md
+  - .github/skills/jira-mcp/SKILL.md
+  - docs/plans/README.md
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 ---
 
 # Perfil Operacional

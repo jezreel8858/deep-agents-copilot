@@ -22,7 +22,7 @@ allowed_files:
 
 ## 1. Escopo e achados
 
-Fonte v2.1.10: `D:\workspace\public\context-mode\src\core\{store/schema.ts,contracts/constants.ts,project/config-dir.ts}`. Dados reais: `~/.context-mode/projects/1e8c9d7dc9a7925b/context.db` e `~/.config/JetBrains/context-mode/projects/{15fda5f3183577b8,1e8c9d7dc9a7925b,5f68bef7a6c66194,7bd000c8739f0783,fdf3c29fe281eebc}/context.db` (`PRAGMA user_version = 6`).
+Fonte v2.1.10: `<repo-context-mode>\src\core\{store/schema.ts,contracts/constants.ts,project/config-dir.ts}`. Dados reais: `~/.context-mode/projects/1e8c9d7dc9a7925b/context.db` e `~/.config/JetBrains/context-mode/projects/{15fda5f3183577b8,1e8c9d7dc9a7925b,5f68bef7a6c66194,7bd000c8739f0783,fdf3c29fe281eebc}/context.db` (`PRAGMA user_version = 6`).
 
 ### 1.1 Descoberta de diretórios (Bloqueador)
 | v1 (extractor.py L91-141, generate.py) | v2.1.10 |
@@ -100,7 +100,7 @@ Aplicar tudo em **um único** `ctx_execute` (javascript, fs) all-or-nothing e `g
 - `test_v2_cost.py`: estimativa de tokens a partir de bytes.
 - `test_legacy_v1.py`: fixture v1 mínima (`session_meta`/`session_events`/`stats-pid`) garantindo `--legacy-v1`.
 - `test_schema_contract.py`: payload gerado valida contra `insight-data.schema.json` (jsonschema) para v2 e v1.
-- Smoke manual: `python generator/generate.py --data-dir C:\Users\F0132808\.context-mode` e JetBrains; conferir `meta.dbCount` = 1 e 5(−3 doctor).
+- Smoke manual: `python generator/generate.py --data-dir C:\Users\<user>\.context-mode` e JetBrains; conferir `meta.dbCount` = 1 e 5(−3 doctor).
 - Manter testes atuais verdes.
 
 ## 5. Alternativas Rejeitadas

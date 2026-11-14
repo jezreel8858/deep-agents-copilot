@@ -404,3 +404,17 @@ def test_ca01_all_eight_subfolders_enforce_timestamp_hhmmss_and_forbid_plan_req_
         f"Planos em docs/plans/{sub}/ fora do padrão AAAAMMDD-HHMMSS-<slug>.md: {invalid}",
         fix_hint=f"Renomear arquivos em docs/plans/{sub}/ para seguir ^\\d{{8}}-\\d{{6}}-[a-z0-9]+(-[a-z0-9]+)*\\.md$.",
     )
+
+
+def test_ca07_specialized_templates_include_pre_hitl_skeptical_review():
+    """CA-07: Os templates especializados R-064 e plan-frontmatter-r064.md incluem metadados e seção do Revisor Cético Pré-HITL (@plan-critic)."""
+    fm_ref = (REPO_ROOT / SPECIALIZED_TEMPLATES["plan-frontmatter-r064.md"]).read_text(encoding="utf-8")
+    for field in ("review_verdict", "review_rounds", "reviewer", "review_tier1"):
+        assert field in fm_ref, f"Campo '{field}' ausente em plan-frontmatter-r064.md"
+    for name, rel_path in SPECIALIZED_TEMPLATES.items():
+        if name == "plan-frontmatter-r064.md":
+            continue
+        content = (REPO_ROOT / rel_path).read_text(encoding="utf-8")
+        assert "Parecer do Revisor Cético Pré-HITL (R-064)" in content, (
+            f"Seção 'Parecer do Revisor Cético Pré-HITL (R-064)' ausente em {rel_path}"
+        )

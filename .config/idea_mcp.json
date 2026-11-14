@@ -1,15 +1,17 @@
 {
   "servers": {
     "codegraph": {
-      "command": "cmd.exe",
+      "type": "stdio",
+      "command": "codegraph",
       "args": [
-        "/c",
-        "codegraph",
         "mcp",
-        "--multi-repo"
+        "--multi-repo",
+        "--db",
+        "%DEEP_AGENTS_COPILOT_DIR%\\.codegraph\\graph.db"
       ],
-      "env": {},
-      "disabled": false
+      "env": {
+        "DEEP_AGENTS_COPILOT_DIR": "D:\\workspace\\deep-agents-copilot"
+      }
     },
     "tavily": {
       "command": "cmd.exe",

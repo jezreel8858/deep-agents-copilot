@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "plan-critic",
+  "name": "Plan Critic",
+  "version": "1.0.0",
+  "description": "Revisor Cetico Universal Pre-HITL dos planos R-064 nas 8 categorias de docs/plans/<tipo>/ com Tier 1 deterministico e Tier 2 semantico isolado (Context Firewall), Dupla Lente (Gate 1 dominio / Gate 2 codigo), Fast-Pass e teto de iteracoes. Estritamente read-only — nunca edita planos nem implementa codigo.",
+  "domain": "Revisao cetica universal pre-HITL de planos R-064 (Two-Tier Hybrid, Dupla Lente)",
+  "role": "specialist",
+  "capabilities": [
+    "plan-critic",
+    "revisor cetico",
+    "revisao cetica pre-hitl",
+    "critica de plano",
+    "parecer do revisor",
+    "pre-hitl review"
+  ],
+  "skills": [
+    "plan-conformance-patterns",
+    "reflection-self-critique-patterns",
+    "context-mode",
+    "agent-contracts",
+    "handoff-governance",
+    "agent-safety-guardrails",
+    "security-review-patterns",
+    "code-review-patterns",
+    "confidence-fallback-policy",
+    "governance-audit-patterns"
+  ],
+  "tools": [
+    "grep_search",
+    "file_search",
+    "list_dir",
+    "ask_questions",
+    "run_subagent",
+    "context-mode/ctx_search",
+    "context-mode/ctx_batch",
+    "context-mode/ctx_index"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only"
+    ],
+    "least_privilege_level": "standard",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Claude Sonnet 5.5",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/catalog.yaml",
+    "priority": 4.75,
+    "estimated_time_minutes": 15
+  }
+}

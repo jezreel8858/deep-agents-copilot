@@ -47,7 +47,8 @@ constraints:
   - "Fallback para atualização manual com preview em caso de falha de tooling"
 
 category: process
-tools: ['read_file', 'create_file', 'list_dir', 'grep_search', 'file_search', '--']
+tools: ['read_file', 'create_file', 'list_dir', 'grep_search', 'file_search']
+---
 
 # project-context-builder — Skill de Descoberta de Projeto
 

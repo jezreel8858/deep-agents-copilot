@@ -333,3 +333,16 @@ def test_nao_deve_conter_identificador_proibido_quando_nome_de_plano():
     all_plans = sorted(p for p in (REPO_ROOT / "docs" / "plans").rglob("*.md") if p.name != "README.md")
     leaks = [p.name for p in all_plans if any(pt.search(p.name) for pt in patterns)]
     assert not leaks, f"{len(leaks)} nome(s) de plano contêm projeto local proibido (ID-LOCAL, R-038/R-044)"
+
+
+def test_templates_principais_declaram_parecer_revisor_cetico_pre_hitl():
+    """Templates de feature e implementation declaram a seção Parecer do Revisor Cético Pré-HITL (R-064)."""
+    for rel in (
+        ".github/skills/task-decomposition-patterns/references/plan-template-feature.md",
+        ".github/skills/specialist-hybrid-advisory-implementation-patterns/references/plan-template-implementation.md",
+    ):
+        tpl = REPO_ROOT / rel
+        txt = tpl.read_text(encoding="utf-8")
+        assert "Parecer do Revisor Cético Pré-HITL (R-064)" in txt, (
+            f"Template {tpl.name} sem seção 'Parecer do Revisor Cético Pré-HITL (R-064)'"
+        )

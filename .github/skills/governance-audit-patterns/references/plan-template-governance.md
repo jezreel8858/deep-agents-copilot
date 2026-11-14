@@ -12,6 +12,10 @@ author: "@agent-auditor"
 plan_type: "governance"
 created_at: "AAAA-MM-DD"
 related-planning-doc: "N/A"
+review_verdict: PASS | PASS_WITH_NITS | ESCALATED_HITL
+review_rounds: 1
+reviewer: "@plan-critic"
+review_tier1: PASS | FAIL
 allowed_files:
   - "caminho/ou/glob/**"
 ---
@@ -31,6 +35,13 @@ allowed_files:
 4. **Alternativas Rejeitadas**
 5. Reúso sistêmico (R-055: Q1/Q2/Q3) e sensores `tests/governance_audit/`
 6. Rollback e critério de pronto
+
+
+## Parecer do Revisor Cético Pré-HITL (R-064)
+
+- **Tier 1 (Determinístico)**: `PASS | FAIL`
+- **Tier 2 (`@plan-critic`)**: `PASS | PASS_WITH_NITS | ESCALATED_HITL` (`review_rounds: 1..3`, Noise Budget ≤ 5 findings `BLOCKER`/`HIGH`)
+- **Findings e Resoluções**: (resumo objetivo ou `Nenhum finding BLOCKER/HIGH`).
 
 ## Checklist
 

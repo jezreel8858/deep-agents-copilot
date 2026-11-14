@@ -44,7 +44,6 @@ Agent NÃO DEVE delegar quando:
   ❌ Criaria loop (A → B → A)
 ```
 
----
 
 ## 2) Payload Mínimo de Handoff
 
@@ -91,7 +90,6 @@ handoff_payload:
     - "Priorizar cobertura de processarPagamento() (90%+)"
 ```
 
----
 
 ### 2.1) Schema Formal — Campos Obrigatórios e Identidade do Emissor
 
@@ -113,7 +111,6 @@ handoff_payload:
 
 **Regra mínima**: todo agent que recebe um handoff deve confirmar explicitamente no início da resposta quais entradas foram recebidas e consideradas válidas.
 
----
 
 ### 2.3) Delegação Plana (Flat Delegation) vs. Aninhamento de Subagentes (Anti-Duplicação)
 
@@ -143,7 +140,6 @@ Orquestrador Raiz despacha o downstream UMA ÚNICA VEZ:
    - `@binding-initializer` (R-034) para inicialização obrigatória de contexto ausente.
 3. **Salvaguarda no Orquestrador**: Quando o orquestrador raiz recebe o retorno do `agent-router`, ele dispara o agente delegado exatamente uma vez. Se por qualquer anomalia a resposta já contiver o resultado final concluído pelo downstream (`Resultado do @<agent>:`), o orquestrador repassa diretamente ao usuário, sem re-invocar o mesmo agent.
 
----
 
 ### 2.4) Indexação Semântica de Telemetria (FTS5 / BM25)
 
@@ -183,7 +179,6 @@ telemetry_entry:
 >
 > **Consulta e Pruning**: consulte via `ctx_search(queries: ["[INTENT_DRIFT]"], source: "handoff-telemetry:<projeto>")`. O ciclo de vida desta telemetria segue a política de retenção episódica com segmentação por tag (conforme `agent-memory-policy`).
 
----
 
 ### 2.5) Intake Guardrail & Circuit Breaker em Runtime
 
@@ -215,7 +210,29 @@ telemetry_entry:
        └──→ @docs-engineer (documentar resultado)
 ```
 
----
+
+### 2.3) Schema `workflow_tracking` (v1.3) e Multi-Project Target Tracking
+
+```yaml
+workflow_tracking:
+  versao: "1.3"
+  workflow_id: "WORKFLOW-FEATURE-DELIVERY"
+  etapa_atual: 2
+  proximos_agentes_permitidos: ["@plan-critic", "@agent-router"]
+  projeto_alvo:
+    id: "[PROJETO-ALVO]"
+    root_path: "<caminho-relativo-ou-worktree>"
+  chaining:
+    modo: "fast-chaining"
+```
+
+### 2.4) Circuit Breaker de Falhas & Retry Budget e Protocolo de Rollback Atômico de Workspace
+
+- **Circuit Breaker de Falhas & Retry Budget**: limite rígido de `MAX_RETRIES_PER_STEP = 2` por etapa; excedido o orçamento, aciona-se o **Protocolo de Rollback Atômico de Workspace** e escalonamento ao `@agent-router`.
+
+### 2.5) Governança de Context Engineering & Offloading de Artefatos em Handoffs
+
+- Payloads que excedam **2 KB / 50 Linhas** DEVEM ser persistidos e referenciados via ponteiro (`tipo: "pointer"`), evitando poluição de janela de contexto.
 
 ## 4) Rastreabilidade de Contexto
 
@@ -234,7 +251,6 @@ Agent receptor confirma:
   - Tem os pré-requisitos necessários
 ```
 
----
 
 ## 5) Critérios de Escalonamento
 
@@ -254,7 +270,6 @@ Todo agent downstream em `task_mode` reavalia a cada novo turno se a solicitaç�
 
 **Visibilidade obrigatória (banner de identidade)**: para que a re-triagem seja auditável a cada turno (não só quando o `@agent-router` responde), TODO agent abre sua resposta com `Agente Ativo: <name>`; se a resposta é resultado de handoff/re-triagem recebido, uma segunda linha declara `Handoff: <origem> → <destino> (motivo: ...)`; e uma terceira linha declara `Skills Carregadas: <skill-1>, <skill-2>, ...` com a base de conhecimento efetivamente consultada nesta resposta (ver `agent-contracts/SKILL.md` § 0). Padrão de mercado: OpenAI Agents SDK (`HandoffOutputItem` — "Handed off from X to Y") e LangGraph (`active_agent` streamado ao usuário). Detalhes e checklist em `agent-contracts/SKILL.md` § 0.
 
----
 
 ### 5.1) Modo Fan-out/Fan-in (Orchestrator-Workers)
 

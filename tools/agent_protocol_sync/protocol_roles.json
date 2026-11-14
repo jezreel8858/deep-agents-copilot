@@ -32,6 +32,7 @@
   "informix-database-specialist": "STANDARD",
   "oracle-database-specialist": "STANDARD",
   "performance-agent": "STANDARD",
+  "plan-critic": "STANDARD",
   "pr-gatekeeper": "STANDARD",
   "prompt-structuring": "STANDARD",
   "python-arch-advisor": "STANDARD",

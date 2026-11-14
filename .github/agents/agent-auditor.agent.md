@@ -7,18 +7,18 @@ description: >-
   especificações e alinhamento de perfil sem mutação direta, com recomendações e
   handoff para executores.
 model: Claude Sonnet 5.5
-tools: ['grep_search', 'file_search', 'list_dir', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'context-mode/ctx_execute']
+tools: ['grep_search', 'file_search', 'list_dir', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index']
 source_docs:
-  - '.github/skills/context-mode/SKILL.md'
-  - '.github/skills/efficient-batch-code-modification/SKILL.md'
-  - '.github/skills/harness-engineering-patterns/SKILL.md'
-  - '.github/skills/handoff-governance/SKILL.md'
-  - '.github/skills/agent-contracts/SKILL.md'
-  - '.github/skills/governance-audit-patterns/SKILL.md'
-  - '.github/skills/harness-eval/SKILL.md'
-  - 'docs/plans/README.md'
-  - 'CLAUDE.md'
-  - '.github/copilot-instructions.md'
+  - .github/skills/context-mode/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/skills/harness-engineering-patterns/SKILL.md
+  - .github/skills/handoff-governance/SKILL.md
+  - .github/skills/agent-contracts/SKILL.md
+  - .github/skills/governance-audit-patterns/SKILL.md
+  - .github/skills/harness-eval/SKILL.md
+  - docs/plans/README.md
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 ---
 # Perfil Operacional
 
@@ -162,8 +162,7 @@ Próximo Passo:
 3. **Comandos curtos não suspendem a regra**: Prompts curtos ("prosseguir", "continue", "pode seguir") NÃO isentam o agente do limiar >= 2 nem do context-mode em lote — a regra vincula-se ao escopo da tarefa, nunca ao tamanho do prompt.
 4. **Teto Rígido de Tool Turns (≤ 5) e Circuit Breaker (R-060)**: O agente opera sob orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução. Turno 1: Batch Gather / Warm Start silencioso; Turno 2: Processamento aprofundado ou execução em lote consolidada; Turno 3: Validação consolidada / Quality Gate. Se atingir o 4º turno sem conclusão, aciona compulsoriamente o Circuit Breaker: consolida as evidências em ctx_index / memória de sessão e emite o parecer final conclusivo ou aciona clarificação via ask_questions (R-027: 1–4 perguntas, `header` ≤ 25 chars, `allowFreeformInput: true`, 2–4 opções reais sem espantalhos, `description` obrigatório com `[Consequência prática + Trade-off/quando escolher]` e 1ª opção `(Recomendado)` para melhor prática técnica), vedando loops investigativos de dívida de tokens O(N²).
 5. **Warm Start Compulsório & Batch Querying (R-060)**: Ferramentas locais que dependem de índices ou bases pré-computadas devem verificar e inicializar a base silenciosamente no primeiro comando (build-if-missing). É proibido disparar consultas granulares individuais para múltiplos nós — agrupe todas as pesquisas via chamadas em lote (batch_query, ctx_batch, script iterativo) com destilação semântica e truncamento na borda (Edge Truncation).
-6. **Validação Agrupada com `get_errors` (R-051)**: Aplique todas as mutações em processo único no sandbox (all-or-nothing verificado) e execute `get_errors` agrupado uma única vez ao final com a lista completa de arquivos alterados (quando aplicável).
-7. **Emissão Obrigatória de Telemetria de Handoff (R-042 / handoff-governance § 2.4)**: a cada chamada real de `run_subagent`, emitir compulsoriamente um evento `telemetry_entry` (tag `[HANDOFF]`) via `ctx_index`, incluindo `session_id` (reaproveitado do `sessionStart` do hook `context-mode`) e `sequence_index` (ordenação determinística dentro da sessão).
+6. **Emissão Obrigatória de Telemetria de Handoff (R-042 / handoff-governance § 2.4)**: a cada chamada real de `run_subagent`, emitir compulsoriamente um evento `telemetry_entry` (tag `[HANDOFF]`) via `ctx_index`, incluindo `session_id` (reaproveitado do `sessionStart` do hook `context-mode`) e `sequence_index` (ordenação determinística dentro da sessão).
 
 </execution_protocol>
 

@@ -21,7 +21,8 @@ source_docs:
   - .github/prompts/add-project-context.prompt.md
   - CLAUDE.md
   - .github/copilot-instructions.md
-tools: ['read_file', 'list_dir', 'grep_search', 'file_search', '--']
+tools: ['read_file', 'list_dir', 'grep_search', 'file_search']
+---
 
 # Project Scanner Governance
 

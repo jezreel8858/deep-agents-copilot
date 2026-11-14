@@ -7,17 +7,17 @@ description: >-
 model: Claude Sonnet 5.5
 tools: ['read_file', 'file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search']
 source_docs:
-  - '.github/skills/harness-engineering-patterns/SKILL.md'
-  - '.github/skills/prompt-engineering-patterns/SKILL.md'
-  - '.github/agents/catalog.yaml'
-  - '.github/agents/routing-graph.yaml'
-  - '.github/agents/evals/casos-roteamento.yaml'
-  - '.github/skills/agent-contracts/SKILL.md'
-  - '.github/skills/handoff-governance/SKILL.md'
-  - '.github/skills/agent-evals-lab/SKILL.md'
-  - 'CLAUDE.md'
-  - '.github/copilot-instructions.md'
-  - '.github/agents/workflows.md'
+  - .github/skills/harness-engineering-patterns/SKILL.md
+  - .github/skills/prompt-engineering-patterns/SKILL.md
+  - .github/agents/catalog.yaml
+  - .github/agents/routing-graph.yaml
+  - .github/agents/evals/casos-roteamento.yaml
+  - .github/skills/agent-contracts/SKILL.md
+  - .github/skills/handoff-governance/SKILL.md
+  - .github/skills/agent-evals-lab/SKILL.md
+  - CLAUDE.md
+  - .github/copilot-instructions.md
+  - .github/agents/workflows.md
 ---
 
 # Perfil Operacional

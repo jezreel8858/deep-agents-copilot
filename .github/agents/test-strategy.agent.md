@@ -7,19 +7,19 @@ description: >-
 model: "Claude Sonnet 5.5"
 tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_stats', 'context-mode/ctx_doctor', 'context-mode/ctx_upgrade', 'context-mode/ctx_purge']
 source_docs:
-  - '.github/skills/task-decomposition-patterns/SKILL.md'
-  - '.github/skills/confidence-fallback-policy/SKILL.md'
-  - '.github/skills/context-mode/SKILL.md'
-  - '.github/skills/mermaid-diagrams/SKILL.md'
-  - '.github/skills/efficient-batch-code-modification/SKILL.md'
-  - '.github/skills/structured-intake-patterns/SKILL.md'
-  - '.github/skills/handoff-governance/SKILL.md'
-  - '.github/skills/agent-contracts/SKILL.md'
-  - '.github/skills/test-coverage-governance/SKILL.md'
-  - '.github/skills/agent-evals-lab/SKILL.md'
-  - 'docs/plans/README.md'
-  - 'CLAUDE.md'
-  - '.github/copilot-instructions.md'
+  - .github/skills/task-decomposition-patterns/SKILL.md
+  - .github/skills/confidence-fallback-policy/SKILL.md
+  - .github/skills/context-mode/SKILL.md
+  - .github/skills/mermaid-diagrams/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/skills/structured-intake-patterns/SKILL.md
+  - .github/skills/handoff-governance/SKILL.md
+  - .github/skills/agent-contracts/SKILL.md
+  - .github/skills/test-coverage-governance/SKILL.md
+  - .github/skills/agent-evals-lab/SKILL.md
+  - docs/plans/README.md
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 ---
 
 # Perfil Operacional

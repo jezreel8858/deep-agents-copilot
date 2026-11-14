@@ -10,18 +10,18 @@ description: >
 model: "Claude Sonnet 5.5"
 tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'ask_questions', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'mcp-atlassian/jira_get_issue', 'mcp-atlassian/jira_search']
 source_docs:
-  - '.github/skills/business-rules-governance/SKILL.md'
-  - '.github/skills/documentation-writing-patterns/SKILL.md'
-  - '.github/skills/mermaid-diagrams/SKILL.md'
-  - '.github/skills/structured-intake-patterns/SKILL.md'
-  - '.github/skills/context-mode/SKILL.md'
-  - '.github/skills/efficient-batch-code-modification/SKILL.md'
-  - '.github/skills/handoff-governance/SKILL.md'
-  - '.github/skills/agent-contracts/SKILL.md'
-  - '.github/skills/code-tracing/SKILL.md'
-  - '.github/skills/jira-mcp/SKILL.md'
-  - 'CLAUDE.md'
-  - '.github/copilot-instructions.md'
+  - .github/skills/business-rules-governance/SKILL.md
+  - .github/skills/documentation-writing-patterns/SKILL.md
+  - .github/skills/mermaid-diagrams/SKILL.md
+  - .github/skills/structured-intake-patterns/SKILL.md
+  - .github/skills/context-mode/SKILL.md
+  - .github/skills/efficient-batch-code-modification/SKILL.md
+  - .github/skills/handoff-governance/SKILL.md
+  - .github/skills/agent-contracts/SKILL.md
+  - .github/skills/code-tracing/SKILL.md
+  - .github/skills/jira-mcp/SKILL.md
+  - CLAUDE.md
+  - .github/copilot-instructions.md
 ---
 
 # Perfil Operacional

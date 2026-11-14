@@ -6,8 +6,11 @@ import pytest
 
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 GEN_DIR = ROOT_DIR / "tools" / "context-insight-visualizer" / "generator"
-if str(GEN_DIR) not in sys.path:
-    sys.path.insert(0, str(GEN_DIR))
+if str(GEN_DIR) in sys.path:
+    sys.path.remove(str(GEN_DIR))
+sys.path.insert(0, str(GEN_DIR))
+for _mod in ("extractor", "insights_engine", "template_bundler"):
+    sys.modules.pop(_mod, None)
 
 from extractor import ContextDataExtractor, discover_v2_databases, _epoch_to_iso, _is_doctor_synthetic  # noqa: E402
 from insights_engine import InsightsEngine  # noqa: E402

@@ -12,6 +12,10 @@ author: "@<nome-do-agent-planejador>"
 plan_type: "feature | refactor | architecture | implementation | test-strategy | bug-triage | requirements | governance"
 created_at: "AAAA-MM-DD"
 related-planning-doc: "docs/plans/<tipo>/<arquivo>.md | N/A"
+review_verdict: PASS | PASS_WITH_NITS | ESCALATED_HITL
+review_rounds: 1
+reviewer: "@plan-critic"
+review_tier1: PASS | FAIL
 allowed_files:
   - "caminho/ou/glob/**"
 ---
@@ -90,3 +94,12 @@ allowed_files:
 - Planejadores/advisors são 100% Read-Only; emitem o plano e delegam a materialização `.md` a `@docs-engineer` (ou `@governance-maintainer`).
 ). Prefixos `PLAN-`, `REQ-` ou nomes sem timestamp são estritamente proibidos.
 - Divergência entre `allowed_files` e diff real reabre o Gate 2 (Plan Drift Detection).
+
+## Metadados de Revisão Cética Pré-HITL (R-064 / ADR-0014)
+
+Todo plano avaliado pelo Quality Gate Pré-HITL Two-Tier Hybrid registra no frontmatter:
+
+- `review_verdict`: `PASS | PASS_WITH_NITS | ESCALATED_HITL`
+- `review_rounds`: `1..3` (Fast-Pass 1x se Tier 1 = PASS e 0 BLOCKER/HIGH; teto 2x padrão ou 3x em `tier: full`)
+- `reviewer`: `"@plan-critic"` (subagente revisor cético 100% Read-Only sob Context Firewall)
+- `review_tier1`: `PASS | FAIL` (resultado da validação estrutural determinística Tier 1)

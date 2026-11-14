@@ -471,7 +471,6 @@ agents:
     - run_subagent
     - context-mode/ctx_search
     - context-mode/ctx_batch
-    - context-mode/ctx_execute
     - context-mode/ctx_index
     related_skills:
     - governance-audit-patterns
@@ -873,6 +872,64 @@ agents:
     - .github/skills/documentation-writing-patterns/SKILL.md
     - .github/skills/context-mode/SKILL.md
     estimated_time_minutes: 20
+  plan-critic:
+    id: plan-critic
+    model: Claude Sonnet 5.5
+    priority: 4.75
+    version: 1.0.0
+    domain: Revisao cetica universal pre-HITL de planos R-064 (Two-Tier Hybrid, Dupla Lente)
+    description: Revisor Cetico Universal Pre-HITL dos planos R-064 nas 8 categorias de docs/plans/<tipo>/ com Tier 1 deterministico e Tier 2 semantico isolado (Context Firewall), Dupla Lente (Gate 1 dominio / Gate 2 codigo), Fast-Pass e teto de iteracoes. Estritamente read-only — nunca edita planos nem implementa codigo.
+    keywords:
+    - plan-critic
+    - revisor cetico
+    - revisao cetica pre-hitl
+    - critica de plano
+    - parecer do revisor
+    - pre-hitl review
+    prerequisite_docs:
+    - CLAUDE.md
+    - .github/copilot-instructions.md
+    - .github/agents/README.md
+    - .github/agents/catalog.yaml
+    related_agents:
+    - agent-router
+    - docs-engineer
+    - governance-maintainer
+    - adr-sentinel
+    - agent-auditor
+    tools:
+    - grep_search
+    - file_search
+    - list_dir
+    - ask_questions
+    - run_subagent
+    - context-mode/ctx_search
+    - context-mode/ctx_batch
+    - context-mode/ctx_index
+    related_skills:
+    - plan-conformance-patterns
+    - reflection-self-critique-patterns
+    - context-mode
+    - agent-contracts
+    - handoff-governance
+    - agent-safety-guardrails
+    - security-review-patterns
+    - code-review-patterns
+    - confidence-fallback-policy
+    - governance-audit-patterns
+    source_docs:
+    - CLAUDE.md
+    - .github/copilot-instructions.md
+    - .github/agents/plan-critic.agent.md
+    - .github/skills/plan-conformance-patterns/SKILL.md
+    - .github/skills/plan-conformance-patterns/references/pre-hitl-skeptical-review-rubric.md
+    - .github/skills/context-mode/SKILL.md
+    - .github/skills/agent-safety-guardrails/SKILL.md
+    - .github/skills/security-review-patterns/SKILL.md
+    - .github/skills/code-review-patterns/SKILL.md
+    - .github/skills/confidence-fallback-policy/SKILL.md
+    - .github/skills/governance-audit-patterns/SKILL.md
+    estimated_time_minutes: 15
   repo-hygiene-auditor:
     id: repo-hygiene-auditor
     model: Claude Sonnet 5.5
@@ -2064,7 +2121,7 @@ agents:
     - .github/agents/backend/struts/struts-catalog.yaml
     estimated_time_minutes: 15
 metadata:
-  total_agents: 37
+  total_agents: 38
   last_updated: '2026-09-15T00:00:00Z'
   changelog: '2026-09-15 (49) — Restauradas 21 entradas de agents no catalog.yaml
     (37 agents catalogados na raiz + 49 especialistas em sub-catalogos de stack =

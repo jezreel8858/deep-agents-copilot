@@ -33,6 +33,7 @@ tier_map:
     - feature-planner
     - governance-factory
     - performance-agent
+    - plan-critic
     - refactor-planner
     - repo-hygiene-auditor
     - requirements-analyst
@@ -80,7 +81,7 @@ tier_map:
     - "*-test-engineer"
 
 profiles:
-  defaultt:
+  default:
     description: "Configuração canônica espelhada nos frontmatters atuais do repositório."
     tiers:
       premium: Claude Opus 5.5

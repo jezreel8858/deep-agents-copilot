@@ -12,6 +12,10 @@ author: "@feature-planner | @tech-solution-architect"
 plan_type: "feature | architecture"
 created_at: "AAAA-MM-DD"
 related-planning-doc: "docs/plans/requirements/<AAAAMMDD-HHMMSS>-<modulo>.md | N/A"
+review_verdict: PASS | PASS_WITH_NITS | ESCALATED_HITL
+review_rounds: 1
+reviewer: "@plan-critic"
+review_tier1: PASS | FAIL
 allowed_files:
   - "caminho/ou/glob/**"
 ---
@@ -40,6 +44,13 @@ allowed_files:
 6. Subtasks (DAG com [P]/[S], tracer-bullet, blocking edges — ver SKILL.md §3.1/§5)
 7. Convergência e Definition of Done
 8. Reversibility Tier (T1/T2/T3) e Rollback
+
+
+## Parecer do Revisor Cético Pré-HITL (R-064)
+
+- **Tier 1 (Determinístico)**: `PASS | FAIL`
+- **Tier 2 (`@plan-critic`)**: `PASS | PASS_WITH_NITS | ESCALATED_HITL` (`review_rounds: 1..3`, Noise Budget ≤ 5 findings `BLOCKER`/`HIGH`)
+- **Findings e Resoluções**: (resumo objetivo ou `Nenhum finding BLOCKER/HIGH`).
 
 ## Checklist
 

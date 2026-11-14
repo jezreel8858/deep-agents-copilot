@@ -28,7 +28,6 @@
     "run_subagent",
     "context-mode/ctx_batch",
     "context-mode/ctx_doctor",
-    "context-mode/ctx_execute",
     "context-mode/ctx_index",
     "context-mode/ctx_search"
   ],
