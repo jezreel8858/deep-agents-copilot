@@ -6,9 +6,7 @@ plan_type: "bug-triage"
 created_at: "2026-11-14"
 related-planning-doc: "N/A — plano raiz"
 allowed_files:
-  - 
-- 
-- ".github/workflows/ci-subprojects.yml"
+  - ".github/workflows/ci-subprojects.yml"
   - "apps/web/package-lock.json"
   - "deploy/local-chat-gateway/pyproject.toml"
   - "tools/headless-governance-runner/pyproject.toml"
