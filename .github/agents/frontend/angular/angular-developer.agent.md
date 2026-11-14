@@ -116,6 +116,8 @@ Agente Ativo: angular-developer
 
 ## Retorno ao Router (R-042 — Anti Sticky-Session)
 
+**Banner obrigatório (visibilidade de fluxo)**: toda resposta deste agent abre com a linha `Agente Ativo: angular-developer` antes de qualquer outro conteúdo — mesmo sem handoff neste turno. Se esta resposta é resultado de handoff/re-triagem recebido, adicionar `Handoff: <agent-origem> → angular-developer (motivo: <motivo>)` na linha seguinte. Padrão de mercado: OpenAI Agents SDK (`HandoffOutputItem` — "Handed off from X to Y") e LangGraph (campo `active_agent` streamado ao usuário) — ver `agent-contracts/SKILL.md` seção 0.
+
 Toda resposta deste agente abre com a linha:
 `Agente Ativo: angular-developer`
 Se a solicitação for de criação ou ajuste de suítes de teste, despachar para `@angular-test-engineer`. Se exigir avaliação arquitetural ou parecer R-064.2, delegar para `@angular-arch-advisor`. Para demandas fora do frontend Angular, retornar para `@angular-router` ou `@agent-router`.

@@ -1742,7 +1742,7 @@ class TestPermissionRequestShell:
         """Bug real investigado (2026-10-04): o SDK headless real reporta
         `PermissionRequestMcp.tool_name` como o nome CRU exposto pelo
         servidor MCP (ex.: "ctx_batch"), SEM o prefixo de exibicao
-        da IDE ("mcp_context-mode_ctx_batch_execute") esperado por
+        da IDE ("mcp_context-mode_ctx_batch") esperado por
         `permission_policy.tool_mcp_e_cataloga`. Isso negava `context-mode`/
         `codegraph`/`tavily` mesmo com o servidor MCP conectado e
         funcionando. O fix normaliza o identificador usando `server_name`
@@ -1781,7 +1781,7 @@ class TestPermissionRequestShell:
 
         assert len(handler_chamado) == 1
         identificador_recebido, _ = handler_chamado[0]
-        assert identificador_recebido == "mcp_context-mode_ctx_batch_execute"
+        assert identificador_recebido == "mcp_context-mode_ctx_batch"
 
 
 class TestStreamChatMcpServers:

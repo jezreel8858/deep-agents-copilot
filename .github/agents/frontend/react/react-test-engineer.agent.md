@@ -107,6 +107,8 @@ Agente Ativo: react-test-engineer
 
 ## Retorno ao Router (R-042 — Anti Sticky-Session)
 
+**Banner obrigatório (visibilidade de fluxo)**: toda resposta deste agent abre com a linha `Agente Ativo: react-test-engineer` antes de qualquer outro conteúdo — mesmo sem handoff neste turno. Se esta resposta é resultado de handoff/re-triagem recebido, adicionar `Handoff: <agent-origem> → react-test-engineer (motivo: <motivo>)` na linha seguinte. Padrão de mercado: OpenAI Agents SDK (`HandoffOutputItem` — "Handed off from X to Y") e LangGraph (campo `active_agent` streamado ao usuário) — ver `agent-contracts/SKILL.md` seção 0.
+
 Toda resposta deste agente abre com a linha:
 `Agente Ativo: react-test-engineer`
 Se for constatado bug no código de produção da tela, acionar handoff para `@react-developer`. Se exceder o teto de 2 tentativas de fix, escalar para `@bug-triage`. Ao sair do domínio de testes React, retornar para `@react-router` ou `@agent-router`.

@@ -19,6 +19,14 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 - **Governança, Skills, Agents, Prompts, Docs, Hooks e Runtime**: Upgrade `context-mode` v1 -> v2.1.10 (`ctx_execute` com parâmetro `file`/`CTX_FILE`, `ctx_batch`, `ctx_index` com `path`/`content`/`url`, `ctx_search`, `ctx_resume`, `ctx_stats`, `ctx_doctor`, `ctx_upgrade`, `ctx_purge`, `--agent copilot-cli` e `CONTEXT_MODE_DATA_DIR`).
 - **Templates de Planos, Catálogos A2A e Paridade de Suítes de Auditoria**: Inclusão dos campos de gate pré-HITL (`pre_hitl_review_tier`, `pre_hitl_gate_status`, `critic_iterations`) nos 8 templates canônicos de planos, sincronização de `catalog.yaml`, `routing-graph.yaml`, `.a2a/agentcards/` (53 agentes totais) e alinhamento das suítes `tests/governance_audit/` e `tests/context_insight_visualizer/`.
 
+### Fixed
+- **Pipelines GitHub Actions ( e ), Lockfile , Empacotamento PEP 639 e Paridade de Testes**:
+  - Upgrade de Node.js  para  no job  de , inclusão do gatilho  e instalação prévia do pacote local  no job .
+  - Inclusão explícita das dependências opcionais  e  em  () e  para eliminar falha de resolução WASM/N-API no  em runners Linux.
+  - Atualização de  e expressão SPDX  (PEP 639) em  e .
+  - Alinhamento de  () e  (gatilhos e aresta  para ).
+  - Sincronização da cláusula canônica de  (R-042) nos 21 agentes especialistas de stack e registro dos planos R-064 em  e .
+
 ## [2.56.0] — 2026-10-06
 
 ### Adicionado (Política Anti-Timeout, Runtime Preferencial JavaScript e Circuit Breaker Fail-Fast no Context-Mode)

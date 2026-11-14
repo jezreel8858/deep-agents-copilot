@@ -48,6 +48,7 @@ workflows:
         agent: "code-review"
   - id: WORKFLOW-TECHNICAL-ANALYSIS
     nome: "Análise Técnica"
+    gatilhos: ["analise tecnica", "arquitetura"]
     estados:
       - etapa: 1
         nome: "fan_out_analysis"
@@ -78,6 +79,13 @@ arestas:
     nivel_routing: rule-based
     condicoes:
       keywords: ["python"]
+  - de: agent-router
+    para: deep-search
+    prioridade: 1
+    threshold_score: 0.9
+    nivel_routing: rule-based
+    condicoes:
+      keywords: ["analise tecnica", "arquitetura"]
   - de: python-router
     para: code-review
     prioridade: 1

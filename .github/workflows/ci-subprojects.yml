@@ -10,11 +10,13 @@ on:
     paths:
       - 'apps/web/**'
       - 'deploy/local-chat-gateway/**'
+      - 'tools/headless-governance-runner/**'
       - '.github/workflows/ci-subprojects.yml'
   pull_request:
     paths:
       - 'apps/web/**'
       - 'deploy/local-chat-gateway/**'
+      - 'tools/headless-governance-runner/**'
       - '.github/workflows/ci-subprojects.yml'
 
 permissions:
@@ -32,7 +34,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: apps/web/package-lock.json
 
@@ -62,7 +64,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e .[dev]
+          pip install -e ../../tools/headless-governance-runner -e ".[dev]"
 
       - name: Run tests
         run: pytest -q

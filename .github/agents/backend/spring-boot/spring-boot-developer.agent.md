@@ -107,6 +107,8 @@ Agente Ativo: spring-boot-developer
 
 ## Retorno ao Router (R-042 — Anti Sticky-Session)
 
+**Banner obrigatório (visibilidade de fluxo)**: toda resposta deste agent abre com a linha `Agente Ativo: spring-boot-developer` antes de qualquer outro conteúdo — mesmo sem handoff neste turno. Se esta resposta é resultado de handoff/re-triagem recebido, adicionar `Handoff: <agent-origem> → spring-boot-developer (motivo: <motivo>)` na linha seguinte. Padrão de mercado: OpenAI Agents SDK (`HandoffOutputItem` — "Handed off from X to Y") e LangGraph (campo `active_agent` streamado ao usuário) — ver `agent-contracts/SKILL.md` seção 0.
+
 Toda resposta deste agente inicia com a linha:
 `Agente Ativo: spring-boot-developer`
 Se a demanda for de autoria de testes, transferir imediatamente para `@spring-boot-test-engineer`. Se exigir revisão arquitetural ou emissão de blueprint R-064.2, transferir para `@spring-boot-arch-advisor`. Se extrapolar o domínio Spring Boot, retornar ao `@spring-boot-router` ou `@agent-router` (motivo: `"deriva_de_intencao"`).
