@@ -127,3 +127,8 @@ allowed_files:
 ## Gate Pré-HITL Universal de Revisão Cética (`@plan-critic` / ADR-0014)
 
 Antes de acionar `ask_questions` nos Gates 1 e 2 do R-064, todo plano em `docs/plans/<tipo>/` passa pelo gate Two-Tier Hybrid descrito em [`references/pre-hitl-skeptical-review-rubric.md`](references/pre-hitl-skeptical-review-rubric.md): Tier 1 determinístico (frontmatter R-064, seções, `allowed_files`, isolamento R-043) + Tier 2 via `@plan-critic` (100% Read-Only, Context Firewall, Fast-Pass 1x, teto 2x / 3x em `tier: full`, Noise Budget ≤ 5 findings `BLOCKER`/`HIGH` R-065).
+
+## Correlação OTel e Telemetria do `@plan-critic` (Schema v2 — R-064)
+
+- Todo plano com `created_at >= "2026-11-15"` (ou opt-in explícito v2) deve declarar no frontmatter YAML comum R-064 os campos de correlação de linhagem (`session_id`, `workflow_id`, `workflow_trace_id`, `parent_plan_ref`) e de telemetria estruturada do revisor cético (`critic_rubric_gaps`, `critic_findings_summary`), conforme especificado em `references/plan-frontmatter-r064.md` e validado pelo check determinístico `T1-8` de `references/pre-hitl-skeptical-review-rubric.md`.
+- A consulta determinística por sessão de chat, execução de workflow, linhagem pai→filho e agregação de falhas de rubrica por agente autor é realizada via CLI `python -m tools.plan_lineage_query`.

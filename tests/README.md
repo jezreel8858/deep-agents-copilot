@@ -93,7 +93,7 @@ Abaixo detalha-se o escopo de cobertura e a importância crítica de cada arquiv
 - **Importância para a qualidade**: **Padronização Instrucional**. Garante que novos agentes, prompts e skills criados pela equipe ou por automações (`governance-factory`) sigam rigorosamente a arquitetura de *Progressive Disclosure* da literatura 2026, evitando prompts caóticos ou agentes sem limites negativos de atuação.
 
 #### `test_router_agents.py`
-- **O que cobre**: Validação especializada para os 6 agents com perfil de Router / Supervisor (`agent-router`, `angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `database-router`):
+- **O que cobre**: Validação especializada para os 9 agents com perfil de Router / Supervisor (`agent-router`, `angular-router`, `react-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `struts-router`, `python-router`, `database-router`):
   - Presença das 6 seções obrigatórias (`CRÍTICO: ESCOPO DE ROTEAMENTO`, `Regras Herdadas`, `Skills Associadas`, `Decision Tree`, `Formato de Saída`, `Retorno ao Router`).
   - Árvore de decisão em formato estruturado com bifurcações (`├─`, `└─`, `->`).
   - Menor privilégio: presença compulsória de `run_subagent` e proibição absoluta de ferramentas mutativas (`create_file`, `insert_edit_into_file`, `replace_string_in_file`).

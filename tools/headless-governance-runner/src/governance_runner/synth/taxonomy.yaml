@@ -1,0 +1,35 @@
+version: "1.0"
+dimensoes:
+  - id: parafrase
+    descricao: "Reescrita sinonimica preservando a intencao tecnica original sem repetir o fraseado literal da semente."
+    restricoes:
+      preservar_intencao: true
+  - id: ruido_ortografico
+    descricao: "Introducao controlada de erros de digitacao comuns, omissao de acentos e abreviacoes de teclado."
+    restricoes:
+      preservar_intencao: true
+  - id: code_switching_pt_en
+    descricao: "Mistura natural de termos tecnicos em ingles com estrutura frasal em portugues."
+    restricoes:
+      preservar_intencao: true
+  - id: omissao_palavra_chave
+    descricao: "Descricao do problema pelos sintomas ou efeito esperado omitindo o nome explicito da tecnologia/ferramenta."
+    restricoes:
+      preservar_intencao: true
+  - id: distrator_outro_agente
+    descricao: "Inclusao de contexto periferico que menciona outra stack ou dominio sem alterar a tarefa principal."
+    restricoes:
+      preservar_intencao: true
+  - id: multi_intencao
+    descricao: "Solicitacao composta em que uma intencao principal domina uma sub-tarefa secundaria."
+    restricoes:
+      preservar_intencao: true
+  - id: comprimento_extremo
+    descricao: "Variacao para prompt telegrafado muito curto (<= 8 palavras) ou detalhado longo (>= 80 palavras)."
+    restricoes:
+      curto_max_palavras: 8
+      longo_min_palavras: 80
+  - id: registro_informal
+    descricao: "Linguagem coloquial de chat de equipe mantendo o objetivo tecnico inalterado."
+    restricoes:
+      preservar_intencao: true

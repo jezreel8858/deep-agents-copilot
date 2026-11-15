@@ -87,3 +87,6 @@ traces/
 /assets/maven-mvnd-*/
 logs/dev/
 .awb/
+
+# Cache local de avaliacao sintetica SQLite
+.cache/

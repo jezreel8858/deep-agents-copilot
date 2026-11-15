@@ -26,7 +26,7 @@ Quando for estritamente necessário buscar por padrão:
 
 | Arquivo | Localização Canônica | Propósito Exclusivo | O que contém |
 |---|---|---|---|
-| **Catálogo de Agents** | `.github/agents/catalog.yaml` | Metadados dos 36 agents do ecossistema | Modelos recomendados (Gemini, Claude), prioridades, domínios, related_skills, source_docs |
+| **Catálogo de Agents** | `.github/agents/catalog.yaml` | Metadados dos 39 agents no catálogo raiz (63 totais) | Modelos recomendados (Gemini, Claude), prioridades, domínios, related_skills, source_docs |
 | **Manifest de Binding e Adapters** | `.github/instructions/README.md` | Carregamento hierárquico e stacks de tecnologia | Lista de adapters canônicos por stack, convenções e regras de binding |
 | **Overlay Local de Projetos** | `.github/projects.local.yaml` | Projetos locais conectados (gitignored, R-043) | Configurações locais privadas de repositórios do desenvolvedor |
 | **Template de Overlay Local** | `.github/projects.local.yaml.example` | Modelo rastreado para novos workspaces | Estrutura de exemplo para configuração local sem vazamento |
@@ -70,10 +70,10 @@ deep-agents-copilot/
 │   ├── projects.local.yaml                      # Overlay local de projetos (gitignored, R-043)
 │   ├── projects.local.yaml.example              # Template rastreado do overlay local (R-043)
 │   │
-│   ├── agents/                                  # 36 Agents de IA
+│   ├── agents/                                  # 39 agents no catálogo raiz (63 totais)
 │   │   ├── catalog.yaml                         # ⭐ Catálogo com modelos e metadados dos agents (ÚNICO)
 │   │   ├── routing-graph.yaml                   # ⭐ Grafo estrutural de transições (R-040)
-│   │   ├── workflows.md                         # ⭐ Especificação dos Workflows Canônicos e de Ciclo de Vida
+│   │   ├── workflows.md                         # ⭐ Especificação dos 10 Workflows Canônicos e de Ciclo de Vida
 │   │   ├── agent-router.agent.md                # Entry point obrigatório (R-037/R-042)
 │   │   ├── prompt-structuring.agent.md          # Refinamento de prompt (R-041)
 │   │   ├── bug-triage.agent.md                  # Triagem e RCA de bugs
@@ -87,7 +87,7 @@ deep-agents-copilot/
 │   │   ├── frontend/angular/                    # Domínio Frontend Angular (sub-catálogo + 8 especialistas)
 │   │   └── backend/                             # Domínios Backend (Spring Boot, Reactive, EJB, Python, DB)
 │   │
-│   ├── skills/                                  # 60 Skills Especializadas
+│   ├── skills/                                  # 81 Skills Especializadas
 │   │   ├── .index.json                          # Índice estruturado JSON de skills
 │   │   ├── README.md                            # Catálogo descritivo de skills
 │   │   └── ... (skills especializadas)

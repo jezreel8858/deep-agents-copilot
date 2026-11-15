@@ -126,3 +126,10 @@ Todo documento de planejamento DEVE incluir formalmente a análise de segurança
 - **Autenticação e Autorização**: Controles mandatórios de identidade, sessão, RBAC/ABAC e prevenção de privilégio excessivo.
 - **Dados Sensíveis e LGPD/GDPR**: Classificação de dados, mascaramento de PII em logs/traces, criptografia em trânsito e em repouso.
 - **Dependências e Validações de Borda**: Auditoria de pacotes/dependências (SCA/Reachability), validação estrita de schemas, sanitização de inputs e mitigação de injeções.
+
+## Rastreabilidade por Chat/Workflow e Telemetria do `@plan-critic` (Schema v2 — R-064)
+
+Planos emitidos a partir de `created_at >= "2026-11-15"` (ou com opt-in v2) incluem no frontmatter YAML comum R-064:
+- **Correlação OTel e Linhagem**: `session_id` (`gen_ai.conversation.id`), `workflow_id`, `workflow_trace_id` e `parent_plan_ref` (`"N/A — plano raiz"` ou caminho do plano pai).
+- **Telemetria do Revisor Cético (`@plan-critic`)**: `critic_rubric_gaps` (lista de códigos `T1-1..T1-8`, `T2-1..T2-7` / `T2-SCOPE..T2-SEC`) e `critic_findings_summary` (`{ rounds, blockers, majors, minors, nits, last_verdict, author_ref }`).
+- **Consulta CLI Canônica**: utilize `python -m tools.plan_lineage_query` para filtrar planos por `--session-id`, `--workflow-trace-id` ou `--author`, auditar estatísticas de rubrica (`--rubric-stats`) e validar conformidade determinística (`--validate-v2`).

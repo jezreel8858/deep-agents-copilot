@@ -1,4 +1,4 @@
-# Governance Audit Patterns — Catálogo Detalhado de Smells (2.1 a 2.33) e Matrizes
+# Governance Audit Patterns — Catálogo Detalhado de Smells (2.1 a 2.34 — 35 smells catalogados) e Matrizes
 
 > Documento de referência complementar (Progressive Disclosure — R-066) extraído de `.github/skills/governance-audit-patterns/SKILL.md`.
 
@@ -462,7 +462,7 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 
 ## 6) Checklist de Conformidade da Auditoria
 
-- [ ] Todo achado classificado estritamente em uma das 33 categorias de smell (2.1..2.33).
+- [ ] Todo achado classificado estritamente em um dos 35 smells catalogados (2.1 a 2.34, incluindo 2.7.1).
 - [ ] Toda solicitação de importação de skill externa passou pela avaliação de pertinência (R-067 / §2.33) antes de qualquer mutação de arquivo.
 - [ ] Severidade reaproveitada de `code-review-patterns` (Bloqueador/Alto/Sugestão).
 - [ ] Origem classificada como intrínseca ou extrínseca (TrustAgent) quando relevante.
@@ -501,7 +501,7 @@ Para riscos de segurança (excessive agency, tool sprawl, goal hijacking), refer
 - Lumenova AI, "Governance Frameworks for Multi-Agent Systems" (2026).
 - `docs/plans/20260830-090000-plano-otimizacao-catalogo-agents.md` §D — origem desta skill.
 
-### 2.32 Degradação de UX no `ask_questions` (R-027 / CA-03..CA-05)
+### 2.32.1 — Degradação de UX no `ask_questions` (R-027 / CA-03..CA-05)
 
 - **Severidade**: Médio
 - **Sintoma**: Chamadas ou instruções de `ask_questions` com `options` contendo apenas `label` (sem `description` explicando consequência prática e trade-off), ausência de `(Recomendado)` na 1ª opção quando há melhor prática técnica clara, inclusão de opções espantalho (*strawman*) ou opção artificial `"Outro (especificar)"`, `header` > 25 caracteres, mais de 4 perguntas por rodada ou omissão de `allowFreeformInput: true`.

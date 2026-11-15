@@ -61,6 +61,7 @@ jobs:
           python tools/agent_router_return_sync/sync_router_return.py --check
           python tools/agent_source_docs_sync/sync_required_source_docs.py --check
           python tools/agentcard_exporter/export_agentcards.py --check
+          python -m tools.governance_sync --check
 
       - name: Variant leak guard & Model Allowlist Parity (T-B3.5)
         run: |

@@ -245,3 +245,20 @@ def test_tier1_detects_violations(tmp_path: Path):
     found = " | ".join(tier1_validate(bad, repo_root=tmp_path))
     for code in ("T1-1", "T1-2", "T1-3", "T1-5", "T1-7"):
         assert code in found, f"violação {code} não detectada: {found}"
+
+
+
+# ---------------------------------------------------------------- Schema v2 (OTel & Telemetria @plan-critic)
+@pytest.mark.parametrize("v2_meta", [
+    "session_id",
+    "workflow_id",
+    "workflow_trace_id",
+    "parent_plan_ref",
+    "critic_rubric_gaps",
+    "critic_findings_summary",
+])
+def test_rubric_and_frontmatter_declare_v2_otel_and_asi06(v2_meta: str):
+    assert v2_meta in _read(FRONTMATTER_REF), f"campo v2 ausente em plan-frontmatter-r064.md: {v2_meta}"
+    rubric_text = _read(RUBRIC)
+    assert v2_meta in rubric_text, f"campo v2 ausente na rubrica: {v2_meta}"
+    assert "T1-8" in rubric_text and "ASI06" in rubric_text

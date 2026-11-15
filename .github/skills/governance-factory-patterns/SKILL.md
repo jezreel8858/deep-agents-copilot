@@ -102,6 +102,7 @@ Antes de importar ou adaptar qualquer skill externa (URL, repositório GitHub, m
 ### 3.5) Checklist de Genericidade (R-038) e Anonimização (R-044)
 - [ ] Zero caminhos locais de máquina, nomes de projetos reais, endpoints internos ou IDs de demandas (`R-038` / `R-044`).
 - [ ] Sincronização atômica (`R-015` / `R-040`): `catalog.yaml`, `routing-graph.yaml`, `agent-router.agent.md`, `evals/casos-roteamento.yaml`, `.index.json`, `copilot-instructions.md`, `CLAUDE.md`, `README.md` e `CHANGELOG.md`.
+- [ ] **Docs & Mermaid Sync Gate (`R-015` / `R-033` / `R-055`)**: Sincronizar contagens SSoT em `README.md`, `docs/repo-map.md`, `docs/README.md`, `docs/architecture/ARCHITECTURE_AND_GOVERNANCE_GUIDE.md`, `.github/agents/README.md`, `.github/skills/README.md`, `.github/instructions/README.md` e `tests/README.md`, atualizar blocos `mermaid` em `.github/agents/workflows.md` e `.github/agents/workflows/workflow-*.md` (preservando `@plan-critic` antes do Gate HITL R-064) e validar via `python -m tools.governance_sync --check`.
 
 ## 5) Formato de Saída — Bloco de Validações ✅/❌ (parametrizável)
 

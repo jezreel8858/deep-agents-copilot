@@ -1,6 +1,6 @@
 ---
 name: governance-audit-patterns
-description: "Define o catálogo canônico de Smells de Governança (2.1 a 2.33), matriz Perfil ↔ Tools ↔ Skills e arquitetura Two-Tier Hybrid (Quality Gate Estático + LLM Audit) para auditoria do ecossistema. Use quando auditar agents, skills, prompts, catálogos e contratos normativos. Não use para aplicar refatorações mutativas em lote (delegar a @governance-maintainer) ou criar artefatos do zero (delegar a @governance-factory)."
+description: "Define o catálogo canônico de Smells de Governança (2.1 a 2.34), matriz Perfil ↔ Tools ↔ Skills e arquitetura Two-Tier Hybrid (Quality Gate Estático + LLM Audit) para auditoria do ecossistema. Use quando auditar agents, skills, prompts, catálogos e contratos normativos. Não use para aplicar refatorações mutativas em lote (delegar a @governance-maintainer) ou criar artefatos do zero (delegar a @governance-factory)."
 tier: core
 category: governance
 triggers:
@@ -30,7 +30,7 @@ Padroniza a auditoria estática e semântica do ecossistema de governança (`.gi
 
 ### ✅ Quando Usar
 - Auditar conformidade de agents, skills, prompts e catálogos contra os templates SSOT e regras normativas (`CLAUDE.md`).
-- Detectar smells estruturais (`2.1` a `2.33`), deriva contratual, violação de Progressive Disclosure (`R-066`) ou vazamento de evidências (`R-044`).
+- Detectar smells estruturais (`2.1` a `2.34`), deriva contratual, violação de Progressive Disclosure (`R-066`) ou vazamento de evidências (`R-044`).
 
 ### ❌ Quando NÃO Usar
 - Executar modificações em lote nos arquivos auditados — delegar a `@governance-maintainer` (`R-057`).
@@ -165,7 +165,7 @@ Plano fora de `docs/plans/<tipo>/` (incl. caminhos legados `docs/plans/implement
 
 ## 5) Referências e Documentação Conexa
 
-- `references/smells-catalog-detailed.md` — Tabelas completas, exemplos contrastantes (`✅ BOM` vs `❌ RUIM`), heurísticas de detecção e matrizes detalhadas dos Smells `2.1` a `2.33` (`Progressive Disclosure` / `R-066`).
+- `references/smells-catalog-detailed.md` — Tabelas completas, exemplos contrastantes (`✅ BOM` vs `❌ RUIM`), heurísticas de detecção e matrizes detalhadas dos Smells `2.1` a `2.34` (`Progressive Disclosure` / `R-066`).
 - `references/plan-template-governance.md` — template de plano `governance` (R-064) em `docs/plans/governance/`.
 - `.github/skills/governance-factory-patterns/SKILL.md` — Padrões canônicos de criação e templates SSOT.
 - `tests/governance_audit/` — Suíte determinística de sensores e Quality Gates.

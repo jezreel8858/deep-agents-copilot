@@ -18,6 +18,7 @@
 | T1-5 | Grounding de allowed_files | Cada caminho/glob resolve para arquivo(s) existente(s) (ou é alvo declarado de criação) |
 | T1-6 | Seções do template | Todas as seções obrigatórias do template da categoria presentes |
 | T1-7 | Placeholders | Ausência de `TODO`, `TBD`, `<...>` e `...` isolado (fora de blocos de código) |
+| T1-8 | Schema v2 — Correlação OTel e Telemetria do Revisor Cético | Quando `created_at >= "2026-11-15"` (ou opt-in explícito v2), valida `session_id` (`^[a-z0-9][a-z0-9-]{7,95}$`), `workflow_id` (enum dos 10 workflows canônicos), `workflow_trace_id` (`^[a-z0-9][a-z0-9-]{7,95}$`), `parent_plan_ref` (`"N/A — plano raiz"` ou arquivo existente em `docs/plans/<tipo>/<AAAAMMDD-HHMMSS>-<slug>.md`), `critic_rubric_gaps` (`T1-1`..`T1-8`, `T2-1`..`T2-7` / `T2-SCOPE`..`T2-SEC`), `critic_findings_summary` (`{ rounds, blockers, majors, minors, nits, last_verdict, author_ref }`) e segregação estrita `reviewer != author` / `author_ref == author`. |
 
 Tier 1 FAIL => achados `BLOCKER`, `review_tier1: FAIL`, Tier 2 não é acionado.
 
@@ -26,14 +27,14 @@ Tier 1 FAIL => achados `BLOCKER`, `review_tier1: FAIL`, Tier 2 não é acionado.
 - **Independência**: `reviewer: "@plan-critic"` != `author`.
 - **Verify Before Criticize**: crítica exige evidência (seção/linha + regra, ADR, adapter ou caminho real); sem evidência => `UNKNOWN`.
 
-## 4. Núcleo Comum Inegociável
-1. Escopo coerente com R-001 e sem scope creep.
-2. YAGNI (R-011): nada especulativo.
-3. Requisitos originais rastreáveis a decisões/tarefas do plano.
-4. Alternativas Rejeitadas/riscos documentados (planejamento) ou checklist GFM (implementação).
-5. Conformidade com ADRs vigentes e regras CLAUDE.md citadas.
-6. Estratégia de testes/validação explícita e executável.
-7. Segurança e rollback considerados proporcionalmente ao Blast Radius.
+## 4. Núcleo Comum Inegociável (Códigos T2-1 a T2-7)
+1. **T2-1 (`T2-SCOPE`)**: Escopo coerente com R-001 e sem scope creep.
+2. **T2-2 (`T2-YAGNI`)**: YAGNI (R-011): nada especulativo.
+3. **T2-3 (`T2-TRACE`)**: Requisitos originais rastreáveis a decisões/tarefas do plano.
+4. **T2-4 (`T2-ALT`)**: Alternativas Rejeitadas/riscos documentados (planejamento) ou checklist GFM (implementação).
+5. **T2-5 (`T2-ADR`)**: Conformidade com ADRs vigentes e regras CLAUDE.md citadas.
+6. **T2-6 (`T2-TEST`)**: Estratégia de testes/validação explícita e executável.
+7. **T2-7 (`T2-SEC`)**: Segurança e rollback considerados proporcionalmente ao Blast Radius.
 
 ## 5. Adapters de Stack e Projeto Local (R-043)
 - Stack: `.github/instructions/*.instructions.md` (ex.: `angular-v21-frontend`, `spring-boot-backend`, `python-backend`, `react-frontend`, `database`, `devops`).
@@ -75,10 +76,16 @@ Tier 1 FAIL => achados `BLOCKER`, `review_tier1: FAIL`, Tier 2 não é acionado.
 ## 10. Metadados de Frontmatter do Parecer
 | Campo | Valores |
 |---|---|
-| `review_verdict` | `PASS` \| `PASS_WITH_NITS` \| `NEEDS_REVISION` \| `ESCALATED_HITL` |
+| `review_verdict` | `PASS` | `PASS_WITH_NITS` | `NEEDS_REVISION` | `ESCALATED_HITL` |
 | `review_rounds` | Inteiro (1..teto) |
 | `reviewer` | `"@plan-critic"` (!= `author`) |
-| `review_tier1` | `PASS` \| `FAIL` |
+| `review_tier1` | `PASS` | `FAIL` |
+| `session_id` | String (`^[a-z0-9][a-z0-9-]{7,95}$`) — correlação OTel da sessão |
+| `workflow_id` | Enum canônico dos 10 `WORKFLOW-*` |
+| `workflow_trace_id` | String (`^[a-z0-9][a-z0-9-]{7,95}$`) — instância única do workflow |
+| `parent_plan_ref` | `"N/A — plano raiz"` ou caminho existente sob `docs/plans/` |
+| `critic_rubric_gaps` | Lista de códigos da rubrica (`T1-1`..`T1-8`, `T2-1`..`T2-7`) |
+| `critic_findings_summary` | `{ rounds, blockers, majors, minors, nits, last_verdict, author_ref }` |
 
 ## 11. Template da Seção Auditável
 ```markdown
@@ -107,3 +114,4 @@ Gravação física: `@docs-engineer` ou `@governance-maintainer` (agent `@plan-c
 - **ASI02 (Least-Privilege Tool Confinement)**: manter estrito confinamento read-only (8 tools de leitura) no `@plan-critic` e auditar se o plano analisado pede ampliação indevida de privilégio ou mutação fora de `allowed_files`.
 - **ASI08 (Cascading Failure Prevention)**: auditar isolamento de falha, circuit breaker e rollback reversível entre etapas do plano para impedir propagação em cascata.
 - **ASI09 (Human-Agent Trust Calibration)**: linguagem neutra, técnica e objetiva no parecer Pré-HITL, separando fatos verificados de `UNKNOWN` sem induzir aprovação humana cega no Gate HITL.
+- **ASI06 (Memory & Context Poisoning)**: É terminantemente **PROIBIDA** qualquer mutação ou auto-ajuste automático de instruções em `.github/agents/*.agent.md` ou `.github/skills/**/SKILL.md` a partir dos dados agregados de `critic_rubric_gaps` ou `critic_findings_summary`. Toda evolução de prompt/instrução baseada em telemetria do `@plan-critic` exige recomendação consultiva auditável e aprovação humana explícita via `ask_questions` (HITL — R-027 / R-064).

@@ -19,7 +19,7 @@ ecosystem: "Multi-Agent AI Coding Governance"
 O `deep-agents-copilot` é uma infraestrutura de governança reutilizável, desacoplada e independente de plataforma, projetada para orquestrar agentes autônomos de IA (GitHub Copilot, Claude Code, Cursor) em tarefas complexas de engenharia de software corporativo.
 
 ### 1.1 Metas de Negócio e Engenharia
-1. **Orquestração Agent-First Determinística**: Substituir prompts genéricos e chatbots monolíticos por uma divisão de trabalho especializada (65 agentes de catálogo), onde cada agente possui papéis, ferramentas e restrições estritamente delimitadas.
+1. **Orquestração Agent-First Determinística**: Substituir prompts genéricos e chatbots monolíticos por uma divisão de trabalho especializada (63 Agents totais / 39 no catálogo raiz), onde cada agente possui papéis, ferramentas e restrições estritamente delimitadas.
 2. **Eficiência e Token Budget**: Eliminar context bloat e desperdício de créditos por meio do paradigma *Think-in-Code* (processamento em sandbox via `context-mode` MCP) e *Artifact Offloading*.
 3. **Resiliência e Contenção de Falhas**: Garantir que agentes nunca entrem em loops infinitos de tentativa e erro ou corrompam o workspace do desenvolvedor (Circuit Breakers com Retry Budget e Rollback Atômico).
 4. **Segurança e Menor Privilégio**: Assegurar conformidade com a taxonomia OWASP Agentic AI 2026 e aplicar zoneamento estrito de permissões MCP (separação física entre agentes de consulta e agentes de mutação de código).
@@ -54,10 +54,10 @@ flowchart TB
 
     subgraph DeepAgents["deep-agents-copilot (Governança Central)"]
         Router["@agent-router\n(Triagem & Health Check R-034)"]
-        Graph["Grafo de Roteamento\n(routing-graph.yaml)"]
-        Workflows["8 Workflows Canônicos\n(Máquinas de Estados)"]
-        Agents["Catálogo de 65 Agentes\n(Root & Stacks Especialistas)"]
-        Skills["59 Skills Operacionais\n(Tier 1, 2 e 3)"]
+        Graph["Grafo de Roteamento\n(routing-graph.yaml — 39 nós)"]
+        Workflows["10 Workflows Canônicos\n(Máquinas de Estados)"]
+        Agents["63 Agents Totais\n(39 no catalog.yaml raiz + 8 Stacks)"]
+        Skills["81 Skills Especializadas\n(15 Tier 1, 65 Tier 2, 1 Tier 3)"]
     end
 
     subgraph External["Projetos & Ferramentas Externas"]
@@ -87,7 +87,7 @@ A arquitetura do `deep-agents-copilot` apoia-se em seis pilares estratégicos va
    - O `@agent-router` atua como classificador e supervisor de alto nível, emitindo a decisão de rota para que o orquestrador raiz despache o agente downstream em nível plano.
    - *Fundamentação*: Elimina os custos de token e o risco de cascading failures decorrentes do aninhamento recursivo (`router -> subagente -> subagente`).
 2. **Workflows Determinísticos Baseados em Máquinas de Estados**:
-   - Todo ciclo de desenvolvimento segue um dos 8 Workflows Canônicos (`WORKFLOW-BUG-FIX`, `WORKFLOW-REFACTORING`, etc.), com transições estritas e Quality Gates formais.
+   - Todo ciclo de desenvolvimento segue um dos 10 Workflows Canônicos (`WORKFLOW-BUG-FIX`, `WORKFLOW-REFACTORING`, `WORKFLOW-FEATURE-DEVELOPMENT`, etc.), com transições estritas, Gate Cético Pré-HITL (`@plan-critic` / R-064) e Quality Gates formais.
 3. **Paradigma *Think-in-Code* via Sandboxing (R-008)**:
    - Toda leitura volumosa, agregação ou análise de código acontece dentro do sandbox do `context-mode` MCP (`ctx_execute`, `ctx_search`). Apenas o sumário executivo entra na janela de conversação.
 4. **Isolamento Físico de Execução via Git Worktrees**:
@@ -111,6 +111,7 @@ graph TD
 
     subgraph Camada2["Camada 2: Supervisores de Domínio (Domain Routers)"]
         FrontendR["@angular-router"]
+        ReactR["@react-router"]
         SpringR["@spring-boot-router"]
         ReactiveR["@spring-reactive-router"]
         EjbR["@ejb-router"]
@@ -131,13 +132,15 @@ graph TD
         SR["@security-reviewer (OWASP/CVE)"]
         PA["@performance-agent (CWV/N+1)"]
         TSA["@tech-solution-architect (Blueprints)"]
+        PC["@plan-critic (Gate Pré-HITL R-064)"]
         PRG["@pr-gatekeeper (Release & PR)"]
         DOCS["@docs-engineer (Documentação .md)"]
     end
 
     AR -->|Ambíguo| PS
     AR -->|Binding Ausente| BI
-    AR -->|Frontend| FrontendR
+    AR -->|Frontend Angular| FrontendR
+    AR -->|Frontend React| ReactR
     AR -->|Backend Spring| SpringR
     AR -->|Backend Reativo| ReactiveR
     AR -->|Legado EJB| EjbR
@@ -146,7 +149,7 @@ graph TD
     AR -->|Banco de Dados| DbR
     AR -->|Transversal| Camada4
 
-    FrontendR & SpringR & ReactiveR & EjbR & PythonR & StrutsR & DbR --> Camada3
+    FrontendR & ReactR & SpringR & ReactiveR & EjbR & PythonR & StrutsR & DbR --> Camada3
 ```
 
 ### 5.1 Catálogo de Domínios e Papéis dos Agentes
@@ -154,20 +157,20 @@ graph TD
 | Categoria | Componente / Router | Papéis Especialistas Contidos |
 |---|---|---|
 | **Roteamento Central** | `@agent-router` | Triagem universal, Health Check (R-034), Fast-Path (R-041/R-050) |
-| **Frontend** | `@angular-router` | angular-arch-advisor, angular-developer, angular-test-engineer |
+| **Frontend Angular / React** | `@angular-router` / `@react-router` | angular-arch-advisor, angular-developer, angular-test-engineer, react-arch-advisor, react-developer, react-test-engineer |
 | **Backend Spring Boot** | `@spring-boot-router` | spring-boot-arch-advisor, spring-boot-developer, spring-boot-test-engineer |
 | **Backend Reativo** | `@spring-reactive-router` | spring-reactive-arch-advisor, spring-reactive-developer, spring-reactive-test-engineer |
 | **Backend Legado Java** | `@ejb-router` / `@struts-router` | Especialistas canônicos para EJB (2.x/3.x, CMT/JTA) e Struts (1.x/2.x, Actions, FormBeans) |
 | **Backend Python** | `@python-router` | python-arch-advisor, python-developer, python-test-engineer |
 | **Banco de Dados** | `@database-router` | oracle-migration-dev, oracle-plsql-expert, oracle-query-tuner, informix-migration-dev, informix-spl-expert, informix-query-tuner |
-| **Qualidade & Segurança** | Transversais | `@security-reviewer`, `@performance-agent`, `@code-review`, `@compliance-guardrails` |
+| **Qualidade, Planos & Segurança** | Transversais | `@plan-critic`, `@security-reviewer`, `@performance-agent`, `@code-review`, `@compliance-guardrails` |
 | **Arquitetura & Grafo** | Transversais | `@codegraph-engine`, `@tech-solution-architect`, `@ddd-bounded-context-mapper`, `@adr-sentinel` |
 
 ---
 
 ## 6. Visão de Execução e Dinâmica — *Runtime View* (arc42 §6)
 
-### 6.1 Os 8 Workflows Canônicos Determinísticos (R-050)
+### 6.1 Os 10 Workflows Canônicos Determinísticos (R-050)
 
 Todo desenvolvimento de software é executado através de uma máquina de estados finitos que proíbe desvios informais:
 
@@ -324,11 +327,12 @@ graph LR
         G1["G1: Health Check Binding (R-034)"]
         G2["G2: Router Precedents Gate (casos-roteamento.yaml)"]
         G3["G3: Testing-First Quality Gate (Red-Green TDD)"]
+        G3b["G3b: Pre-HITL Skeptical Plan Gate (@plan-critic / R-064)"]
         G4["G4: Least-Privilege MCP Tool Gate"]
         G5["G5: PR & Governance Release Gate (@pr-gatekeeper)"]
     end
 
-    G1 --> G2 --> G3 --> G4 --> G5
+    G1 --> G2 --> G3 --> G3b --> G4 --> G5
 ```
 
 - **Cobertura de Testes**: 100% de aprovação na suíte global de testes (`pytest`), cobrindo conformidade de smells de governança, integridade de rotas, isolamento de projetos locais, rastreabilidade de incidentes e conformidade com o schema A2A AgentCard.

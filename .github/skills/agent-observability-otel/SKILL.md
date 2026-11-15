@@ -251,3 +251,15 @@ Para evitar consumo massivo de CPU/RAM em máquinas de desenvolvimento locais de
 ## Checklist de Conformidade
 
 - [ ] Diretrizes, contratos e restrições de escopo de `agent-observability-otel` verificados e atendidos.
+
+## Mapeamento entre Frontmatter R-064 (Schema v2) e OTel GenAI Semantic Conventions
+
+Os metadados persistidos no frontmatter YAML dos planos em `docs/plans/<tipo>/` (Schema v2 — R-064) seguem alinhamento bijetivo com as convenções semânticas OpenTelemetry GenAI:
+
+| Campo no Frontmatter R-064 (v2) | Atributo OTel GenAI Semconv | Semântica de Observabilidade |
+|---|---|---|
+| `session_id` | `gen_ai.conversation.id` | Agrupa todos os planos e handoffs gerados na mesma conversa/sessão de chat do usuário. |
+| `workflow_trace_id` | `trace_id` (Contexto de Workflow) | Correlaciona a árvore de planos (`requirements` → `architecture`/`feature` → `test-strategy`) dentro de uma única execução de workflow. |
+| `workflow_id` | `gen_ai.operation.name` / `workflow.name` | Identifica o fluxo canônico orquestrado pelo `@agent-router`. |
+| `author` / `reviewer` | `gen_ai.agent.name` | Identifica o agente planejador/advisor Read-Only (`author` / `author_ref`) e o revisor cético independente (`reviewer: "@plan-critic"`). |
+| `critic_rubric_gaps` / `critic_findings_summary` | `gen_ai.evaluation.*` | Telemetria de qualidade pré-HITL por código de rubrica (`T1-1..T1-8`, `T2-1..T2-7`) para auditoria via `python -m tools.plan_lineage_query`. |
