@@ -15,6 +15,9 @@ related_files:
   - tools/headless-governance-runner/src/governance_runner/synth/seeds.py
   - tools/headless-governance-runner/src/governance_runner/synth/diagnostics.py
   - tools/headless-governance-runner/src/governance_runner/synth/diagnostic_exporter.py
+  - tools/headless-governance-runner/src/governance_runner/routing/graph_models.py
+  - tools/headless-governance-runner/src/governance_runner/routing/graph_loader.py
+  - tools/headless-governance-runner/src/governance_runner/synth/evaluator.py
 ---
 
 # Guia do Usuário: Pipeline Sintético de Roteamento (`synth-*`) e GitHub Copilot SDK
@@ -32,7 +35,7 @@ flowchart LR
     G[".github/agents/evals/<br/>casos-roteamento.yaml<br/>(Golden Set — Read-Only)"] --> GEN
     RG[".github/agents/<br/>routing-graph.yaml<br/>(Grafo — Read-Only)"] --> GEN
     T["taxonomy.yaml<br/>(6 dimensões)"] --> GEN
-    GEN["1. synth-generate<br/>(template | sdk)<br/>(--graph-seeding off|gaps|all)"] --> DB[(".cache/<br/>routing_synth_history.db<br/>(SQLite WAL v2 — 6 tabelas)")]
+    GEN["1. synth-generate<br/>(template | sdk)<br/>(--graph-seeding off|gaps|all)"] --> DB[(".cache/<br/>routing_synth_history.db<br/>(SQLite WAL v3 — 6 tabelas)")]
     DB --> EVAL["2. synth-eval<br/>(Blind Evaluation via SDK)"]
     AR[".github/agents/<br/>agent-router.agent.md<br/>(Prompt — Read-Only)"] --> EVAL
     EVAL --> DB
@@ -47,6 +50,8 @@ flowchart LR
     HITL --> PROM["5. synth-promote"]
     PROM --> P[".github/agents/evals/promoted/<br/>promoted-&lt;run_id&gt;.yaml"]
 ```
+
+Além da cobertura de arestas (`--graph-seeding`), o pipeline suporta a geração de sementes por gatilhos dos **9 workflows canônicos** (`--workflow-seeds`), a captura de `observed_workflow` via `capturar_workflow()` + validação de coerência com o agente da Etapa 1 (`step1_coherent` / `workflow_route_consistent`) no `synth-eval`, a tabela `routing_graph_workflows` no **SQLite WAL v3** (`PRAGMA user_version = 3` com backup automático `.bak-v2`) e as sugestões `SUG-WF-*` no `synth-diagnose`.
 
 ### Garantias Arquiteturais
 
@@ -368,6 +373,52 @@ governance-runner \
   --seed 42
 ```
 
+#### 1.3.1 Geração de Sementes por Gatilhos de Workflows (`--workflow-seeds`)
+
+A flag `--workflow-seeds {off,gaps,all}` (default: `off`) instrui o `synth-generate` (`gerar_seeds_workflows()` em `synth/seeds.py`) a gerar candidatos a partir de cada gatilho de `workflows:` do `.github/agents/routing-graph.yaml`, preenchendo `expected_workflow` (`graph_workflow_id` / `workflow_trigger`) e `expected_route` apontando para o agente canônico da Etapa 1 do workflow (+ sementes de fronteira para pares colidentes):
+
+**PowerShell:**
+
+```powershell
+governance-runner `
+  --use-case synth-generate `
+  --generator-mode template `
+  --routing-graph .github/agents/routing-graph.yaml `
+  --graph-seeding gaps `
+  --workflow-seeds all `
+  --count 40 `
+  --rng-seed 42 `
+  --db .cache/routing_synth_history.db
+```
+
+**Windows `cmd.exe`:**
+
+```cmd
+governance-runner ^
+  --use-case synth-generate ^
+  --generator-mode template ^
+  --routing-graph .github/agents/routing-graph.yaml ^
+  --graph-seeding gaps ^
+  --workflow-seeds all ^
+  --count 40 ^
+  --rng-seed 42 ^
+  --db .cache/routing_synth_history.db
+```
+
+**Linux / macOS (`bash`):**
+
+```bash
+governance-runner \
+  --use-case synth-generate \
+  --generator-mode template \
+  --routing-graph .github/agents/routing-graph.yaml \
+  --graph-seeding gaps \
+  --workflow-seeds all \
+  --count 40 \
+  --rng-seed 42 \
+  --db .cache/routing_synth_history.db
+```
+
 #### 1.4 Valores Válidos para `--targets` e `--dimensions`
 
 ##### Dimensões Válidas para `--dimensions` (`src/governance_runner/synth/taxonomy.yaml`)
@@ -423,6 +474,23 @@ No adaptador `src/governance_runner/runner/sdk_adapter.py`, a flag `--model` é 
 > **Governança de Modelos (R-038 / R-053)**: Nunca utilize modelos fora desta tabela (como `gpt-4o`, `claude-3.5-sonnet` ou `o1`). Para evitar *self-preference bias* (RK-10), recomenda-se gerar prompts com um modelo de custo baixo/família distinta (ex.: `--model "claude-haiku-5.5"` ou `--model "gemini-3.8-flash"`) e avaliar o `@agent-router` com `--model "claude-sonnet-5.5"` ou `--model "gpt-6.1-sol"`.
 ---
 
+
+**Cobertura de `.github/agents/evals/casos-roteamento.yaml`**: **100% de cobertura das 38 arestas elegíveis** do `routing-graph.yaml`, com **55 casos em `canonicos`**, **6 em `ambiguos`** e **100 casos no total**.
+
+**Os 9 Workflows Canônicos de `.github/agents/routing-graph.yaml` (`workflows:`):**
+
+| Workflow ID | Nome | Fast-Path | Agente(s) da Etapa 1 (`etapa1_padroes`) |
+| :--- | :--- | :--- | :--- |
+| `WORKFLOW-FEATURE-DEVELOPMENT` | Desenvolvimento de Nova Funcionalidade | `false` | `requirements-analyst`, `business-rules-extractor`, `feature-planner` |
+| `WORKFLOW-BUG-FIX` | Triagem e Correção de Bug | `true` | `bug-triage` |
+| `WORKFLOW-REFACTORING` | Refatoração Estrutural e Quitação de Tech Debt | `false` | `refactor-planner` |
+| `WORKFLOW-CODE-REVIEW` | Revisão de Código Multi-Agente | `true` | `code-review` |
+| `WORKFLOW-TESTING` | Estratégia e Implementação de Testes | `true` | `test-strategy` |
+| `WORKFLOW-SECURITY-AUDIT` | Auditoria e Hardening de Segurança | `true` | `security-audit` |
+| `WORKFLOW-GOVERNANCE-EVOLUTION` | Evolução e Auditoria da Governança Multi-Agent | `false` | `agent-auditor`, `governance-factory`, `governance-maintainer` |
+| `WORKFLOW-PROMPT-SYNTHESIS` | Estruturação de Prompt sob Demanda | `true` | `prompt-structuring` |
+| `WORKFLOW-DIRECT-EXECUTION` | Execução Especialista Direta (Fast-Path) | `true` | `*` |
+
 ### Passo 2 — Avaliar Prompts em Modo Cego (`--use-case synth-eval`)
 
 Executa os prompts gerados contra o `@agent-router` (`.github/agents/agent-router.agent.md`) via GitHub Copilot SDK, capturando a rota observada via tool hook `delegar()` (`route_source = 'tool_hook'`) ou fallback de banner textual (`route_source = 'text_banner'`) e classificando cada avaliação em `synth_evaluations.verdict` como `matched`, `mismatched`, `unparseable` ou `error`.
@@ -473,7 +541,7 @@ synth-eval: run_id=a1b2c3d4e5f647898012b3c4d5e6f7a8 status=completed {'n_avaliad
 
 ### Passo 3 — Inspecionar o Histórico no SQLite (Schema v2 — `.cache/routing_synth_history.db`)
 
-O banco SQLite opera em modo WAL com **Schema v2** (`PRAGMA user_version = 2`, `schema_meta.schema_version = '2'`) e possui **6 tabelas operacionais** (`synth_runs`, `synth_prompts`, `synth_evaluations`, `synth_exports`, `routing_graph_edges` e `synth_diagnostics`) além de `schema_meta`. Bancos criados no schema v1 são migrados automaticamente de forma transacional e idempotente sem `executescript()`, adicionando as colunas `seed_source`, `graph_edge_id`, `graph_edge_resolution` (em `synth_prompts`) e `routing_graph_sha256` (em `synth_runs`).
+O banco SQLite opera em modo WAL com **Schema v2** (`PRAGMA user_version = 3`, `schema_meta.schema_version = '2'`) e possui **7 tabelas operacionais (incluindo `routing_graph_workflows`) + `schema_meta`** (`synth_runs`, `synth_prompts`, `synth_evaluations`, `synth_exports`, `routing_graph_edges` e `synth_diagnostics`) além de `schema_meta`. Bancos criados no schema v1 são migrados automaticamente de forma transacional e idempotente sem `executescript()`, adicionando as colunas `seed_source`, `graph_edge_id`, `graph_edge_resolution` (em `synth_prompts`) e `routing_graph_sha256` (em `synth_runs`).
 
 #### 3.1 Inspecionar Prompts por `seed_source`, `graph_edge_id` e `graph_edge_resolution` (`synth_prompts`)
 
@@ -536,6 +604,31 @@ python -c "import sqlite3; con=sqlite3.connect('.cache/routing_synth_history.db'
 ```
 
 ---
+
+#### Schema SQLite v3 (`PRAGMA user_version = 3`, Tabela `routing_graph_workflows` e Backup `.bak-v2`)
+
+A migração v2→v3 cria backup automático **`<db>.bak-v2`** e adiciona:
+- **Tabela `routing_graph_workflows`**: snapshots dos 9 workflows (`workflow_id`, `graph_sha256`, `nome`, `fast_path`, `gatilhos_json`, `etapa1_padroes_json`, `workflow_hash`).
+- **Colunas em `synth_prompts`**: `expected_workflow` e `graph_workflow_id` (`workflow_trigger`).
+- **Colunas em `synth_evaluations`**: `observed_workflow`, `observed_etapa`, `workflow_source`, `workflow_matched` (`expected_workflow = observed_workflow`) e `workflow_route_consistent` (`step1_coherent`).
+
+**PowerShell:**
+
+```powershell
+python -c "import sqlite3; con=sqlite3.connect('.cache/routing_synth_history.db'); print('\n'.join(str(r) for r in con.execute('SELECT p.prompt_id, p.expected_workflow, e.observed_workflow, (p.expected_workflow = e.observed_workflow) AS workflow_matched, e.workflow_route_consistent AS step1_coherent, e.observed_route FROM synth_evaluations e JOIN synth_prompts p ON p.prompt_id = e.prompt_id WHERE p.expected_workflow IS NOT NULL OR e.observed_workflow IS NOT NULL')))"
+```
+
+**Windows `cmd.exe`:**
+
+```cmd
+python -c "import sqlite3; con=sqlite3.connect('.cache/routing_synth_history.db'); print('\n'.join(str(r) for r in con.execute('SELECT p.prompt_id, p.expected_workflow, e.observed_workflow, (p.expected_workflow = e.observed_workflow) AS workflow_matched, e.workflow_route_consistent AS step1_coherent, e.observed_route FROM synth_evaluations e JOIN synth_prompts p ON p.prompt_id = e.prompt_id WHERE p.expected_workflow IS NOT NULL OR e.observed_workflow IS NOT NULL')))"
+```
+
+**Linux / macOS (`bash`):**
+
+```bash
+python -c 'import sqlite3; con=sqlite3.connect(".cache/routing_synth_history.db"); print("\n".join(str(r) for r in con.execute("SELECT p.prompt_id, p.expected_workflow, e.observed_workflow, (p.expected_workflow = e.observed_workflow) AS workflow_matched, e.workflow_route_consistent AS step1_coherent, e.observed_route FROM synth_evaluations e JOIN synth_prompts p ON p.prompt_id = e.prompt_id WHERE p.expected_workflow IS NOT NULL OR e.observed_workflow IS NOT NULL")))'
+```
 
 ### Passo 4 — Diagnosticar Divergências Offline (`--use-case synth-diagnose`)
 
@@ -635,6 +728,20 @@ sugestoes:
 | `SUG-GRAPH-PHANTOM` | `PROMPT_DRIFT` | `alta` | `.github/agents/routing-graph.yaml` | Corrigir ou remover aresta fantasma cujo destino `para` não existe em `routing-graph.yaml::nos`. |
 
 ---
+#### Diagnóstico de Workflows (`workflows` no YAML e `Diagnóstico de Workflows` no Markdown) e Códigos `SUG-WF-*`
+
+O `synth-diagnose` (`src/governance_runner/synth/diagnostics.py` e `diagnostic_exporter.py`) emite a seção `workflows` no YAML e `## Workflows` (`Diagnóstico de Workflows`) no Markdown com P/R/F1 por workflow, `workflow_macro_f1`, `workflow_route_consistency_rate`, `banner_coverage`, matriz de confusão e os **7 códigos de sugestão de workflow (`SUG-WF-*`)**:
+
+| Código em `diagnostics.py` (`CODIGOS_SUGESTAO`) | Alias de Triagem | Condição de Disparo | Ação Recomendada |
+| :--- | :--- | :--- | :--- |
+| `SUG-WF-COLLISION` | `SUG-WF-COLLISION` | Gatilho compartilhado entre 2+ workflows ou colisão cruzada gatilho×keyword fora da Etapa 1. | Desambiguar gatilho em `workflows:` de `routing-graph.yaml`. |
+| `SUG-WF-LOW-RECALL` | `SUG-WF-TRIGGER-ADD` | Workflow com `suporte >= min_support` e `recall < 0.80`. | Adicionar novos gatilhos em `workflows:<ID>.gatilhos`. |
+| `SUG-WF-LOW-PRECISION` | `SUG-WF-FASTPATH` | Workflow com `(tp + fp) >= min_support` e `precision < 0.80`. | Restringir/remover gatilho genérico que puxa falsos positivos. |
+| `SUG-WF-INCONSISTENT-ROUTE` | `SUG-WF-STEP1-DRIFT` | `observed_workflow` classificado, mas `observed_route` fora de `etapa1_padroes` (`step1_coherent = 0`, isentas `PRE_ETAPAS`). | Alinhar delegação da Etapa 1 no `@agent-router` / `routing-graph.yaml`. |
+| `SUG-WF-MISSING-BANNER` | `SUG-WF-ROUTER-DOC` | Resposta sem linha `Workflow: <ID\|N/A>` válida (`banner_coverage < 1.0`). | Reforçar emissão obrigatória de `Workflow:` no `@agent-router`. |
+| `SUG-WF-UNKNOWN-ID` | `SUG-WF-UNPARSEABLE` | Linha `Workflow:` com ID ausente de `routing-graph.yaml` (`invalid_id`). | Corrigir ID emitido no `@agent-router` ou declarar no grafo. |
+| `SUG-WF-UNCOVERABLE` | `SUG-WF-ORPHAN` | Workflow sem gatilhos geráveis em `routing-graph.yaml`. | Adicionar gatilhos acionáveis para o workflow órfão. |
+
 ### Passo 5 — Exportar Divergências (*Hard Negatives*) para Quarentena Silver (`--use-case synth-export`)
 
 Gera `.github/agents/evals/synthetic/casos-roteamento-silver-<YYYYMMDD-HHMMSS>.yaml` contendo apenas falhas (`passed = 0`, isto é, `mismatched`/`unparseable`/`error`, por padrão com `--only-failures`) e opcionalmente casos limítrofes de alta similaridade (`--include-near-boundary`, `max_similarity >= 0.75`):
@@ -805,7 +912,334 @@ regressao:
 ```
 ---
 
-## 5. Referência Completa de Flags CLI e Exit Codes
+## 5. Metas de Execução (`Bronze`, `Prata`, `Ouro`), Ciclo Iterativo em 3 Ondas e Quality Gates
+
+Para avaliar de forma estatisticamente significativa todas as **34 arestas elegíveis** de roteamento em `.github/agents/routing-graph.yaml` e os **7 workflows canônicos** (`--workflow-seeds all` + `--graph-seeding all`, totalizando **41 alvos combinados** entre arestas e fluxos), o pipeline sintético deve ser dimensionado com base no **Intervalo de Confiança Binomial de Wilson (95%)** e no suporte mínimo (`--min-support`) do `synth-diagnose`.
+
+### 5.1 Fundamento Estatístico (Intervalo de Confiança de Wilson 95% e `--min-support`)
+
+No diagnóstico offline (`--use-case synth-diagnose`), o cálculo de *Recall* por rota/aresta e por workflow utiliza o **Intervalo de Confiança de Wilson a 95%** (`wilson_ci_95`) e filtra alertas de baixa cobertura amostral através de `--min-support`. Testar apenas 1 prompt por rota (`n = 1`) não oferece poder estatístico para validar alterações em `.github/agents/agent-router.agent.md`:
+
+| Amostras por Alvo (`n`) | Acurácia Observada (`100%`) | IC de Wilson 95% (`[low; high]`) | Acurácia Observada (`80%`) | IC de Wilson 95% (`[low; high]`) | Interpretação Estatística e Uso no `--min-support` |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `n = 1` | `1/1` (`1.00`) | `[0.21; 1.00]` | N/A | N/A | **Insuficiente (ruído amostral):** mesmo acertando 100%, a precisão real da rota pode ser tão baixa quanto `21%`. Ignorado pelo filtro de suporte mínimo. |
+| `n = 5` (**Meta Bronze**) | `5/5` (`1.00`) | `[0.57; 1.00]` | `4/5` (`0.80`) | `[0.38; 0.96]` | **Triagem estrutural (`--min-support 5`):** detecta quebras grosseiras de regex/gatilho e omissões diretas nas 34 arestas e 7 workflows com baixo custo. |
+| `n = 10`–`12` (**Meta Prata — Recomendada**) | `10/10` (`1.00`) | `[0.72; 1.00]` | `8/10` (`0.80`) | `[0.49; 0.94]` | **Ponto ótimo custo-benefício (`--min-support 10`):** garante limite inferior `> 0.70` em rotas saudáveis e aciona sugestões acionáveis (`SUG-001`..`SUG-006`, `SUG-WF-*`) com alta confiança estatística. |
+| `n = 20`–`24` (**Meta Ouro**) | `20/20` (`1.00`) | `[0.84; 1.00]` | `16/20` (`0.80`) | `[0.58; 0.92]` | **Auditoria de release / regressão pesada (`--min-support 20`):** estreita a margem de erro para detectar colisões sutis de *tie-breaker* e deriva semântica multi-intenção. |
+
+### 5.2 Matriz de Metas Recomendadas (`Bronze`, `Prata` e `Ouro`) para `--workflow-seeds all` e `--graph-seeding all`
+
+Ao combinar `--graph-seeding all` (**34 arestas elegíveis**) e `--workflow-seeds all` (**7 workflows** = **41 alvos**), recomenda-se adotar a **Estratégia Híbrida (`template` + `eval SDK`)** em vez da **Estratégia Full SDK (`gen SDK` + `eval SDK`)**:
+
+- **Estratégia Híbrida (`template` + `eval SDK`) — Recomendada:** executa a geração base nas 8 dimensões em modo `--generator-mode template` (**custo zero** de requisições premium na geração) e complementa na **Onda 2** apenas as **4 dimensões adversariais difíceis** (`omissao_palavra_chave,distrator_outro_agente,multi_intencao,code_switching_pt_en`) via `--generator-mode sdk` (`claude-haiku-5.5`), reservando a maior parte do orçamento do GitHub Copilot SDK para o `synth-eval` em modo cego (`claude-sonnet-5.5`).
+- **Estratégia Full SDK (`gen SDK` + `eval SDK`):** invoca o LLM tanto na geração de 100% dos candidatos (`synth-generate --generator-mode sdk`) quanto na avaliação cega (`synth-eval`), dobrando o consumo de requisições premium sem ganho proporcional nas dimensões triviais (`parafrase`, `variacao_formato`, `injecao_contexto_ruidoso`, `pedido_implicito`).
+
+| Nível da Meta | Suporte Mínimo (`--min-support`) | Volume Total de Prompts (41 Alvos) | Composição por Alvo (Arestas + Workflows) | Orçamento Estratégia Híbrida (`template` + `eval SDK`) | Orçamento Estratégia Full SDK (`gen SDK` + `eval SDK`) | Quando Utilizar |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Bronze** *(Smoke / Baseline)* | `5` | **~205 prompts** | ~5 prompts/alvo (1 onda `template` nas dimensões essenciais) | **~205 reqs** *(teto `--max-premium-requests 240`)* | ~410 reqs *(teto `480`)* | Validação rápida pós-edição de regras em `agent-router.agent.md` ou `routing-graph.yaml`. |
+| **Prata (Recomendada)** | `10` | **~492 prompts** | ~12 prompts/alvo (**Onda 1:** 8 dims `template` = 328 + **Onda 2:** 4 dims `sdk` = 164) | **~656 reqs** *(teto `--max-premium-requests 750`)* | ~984 reqs *(teto `1100`)* | Ciclo padrão de engenharia e calibração iterativa de roteamento e workflows em 3 ondas. |
+| **Ouro** *(Release / Hardening)* | `20` | **~984 prompts** | ~24 prompts/alvo (2 rodadas completas de 8 dims `template` + 4 dims `sdk` com `--count-per-target`) | **~1.312 reqs** *(teto `--max-premium-requests 1500`)* | ~1.968 reqs *(teto `2200`)* | Fechamento de release major da fábrica de agentes ou reestruturação de domain routers. |
+
+### 5.3 Roteiro Operacional em 3 Ondas (Meta Prata)
+
+O ciclo recomendado da **Meta Prata (~492 prompts / orçamento híbrido ~656 reqs, teto 750)** divide a execução em **3 Ondas** para isolar falhas estruturais antes de gastar cota com variações semânticas complexas.
+
+#### Onda 1 — Baseline Estrutural nas 8 Dimensões (`--generator-mode template` + `synth-eval` + `synth-diagnose --min-support 5`)
+
+Gera ~328 candidatos determinísticos a custo zero cobrindo todas as 8 dimensões sobre as 34 arestas e 7 workflows, avalia em modo cego no Copilot SDK e executa o primeiro diagnóstico com `--min-support 5`.
+
+**PowerShell:**
+
+```powershell
+# 1.1 Gerar baseline estrutural (8 dimensoes, 100% offline, 0 requests premium)
+governance-runner `
+  --use-case synth-generate `
+  --generator-mode template `
+  --graph-seeding all `
+  --workflow-seeds all `
+  --routing-graph .github/agents/routing-graph.yaml `
+  --seed 42 `
+  --run-id prata-onda1-gen `
+  --db-path .cache/routing_synth_history.db
+
+# 1.2 Avaliar candidatos da Onda 1 em modo cego via Copilot SDK
+governance-runner `
+  --use-case synth-eval `
+  --model "claude-sonnet-5.5" `
+  --max-premium-requests 400 `
+  --run-id prata-onda1-eval `
+  --db-path .cache/routing_synth_history.db
+
+# 1.3 Diagnosticar quebras estruturais iniciais (--min-support 5)
+governance-runner `
+  --use-case synth-diagnose `
+  --eval-run-id prata-onda1-eval `
+  --routing-graph .github/agents/routing-graph.yaml `
+  --min-support 5 `
+  --out .github/agents/evals/synthetic `
+  --run-id prata-onda1-diag `
+  --db-path .cache/routing_synth_history.db
+```
+
+**Windows `cmd.exe`:**
+
+```bat
+REM 1.1 Gerar baseline estrutural (8 dimensoes, 100% offline, 0 requests premium)
+governance-runner ^
+  --use-case synth-generate ^
+  --generator-mode template ^
+  --graph-seeding all ^
+  --workflow-seeds all ^
+  --routing-graph .github/agents/routing-graph.yaml ^
+  --seed 42 ^
+  --run-id prata-onda1-gen ^
+  --db-path .cache/routing_synth_history.db
+
+REM 1.2 Avaliar candidatos da Onda 1 em modo cego via Copilot SDK
+governance-runner ^
+  --use-case synth-eval ^
+  --model "claude-sonnet-5.5" ^
+  --max-premium-requests 400 ^
+  --run-id prata-onda1-eval ^
+  --db-path .cache/routing_synth_history.db
+
+REM 1.3 Diagnosticar quebras estruturais iniciais (--min-support 5)
+governance-runner ^
+  --use-case synth-diagnose ^
+  --eval-run-id prata-onda1-eval ^
+  --routing-graph .github/agents/routing-graph.yaml ^
+  --min-support 5 ^
+  --out .github/agents/evals/synthetic ^
+  --run-id prata-onda1-diag ^
+  --db-path .cache/routing_synth_history.db
+```
+
+**Linux / macOS (`bash`):**
+
+```bash
+# 1.1 Gerar baseline estrutural (8 dimensoes, 100% offline, 0 requests premium)
+governance-runner \
+  --use-case synth-generate \
+  --generator-mode template \
+  --graph-seeding all \
+  --workflow-seeds all \
+  --routing-graph .github/agents/routing-graph.yaml \
+  --seed 42 \
+  --run-id prata-onda1-gen \
+  --db-path .cache/routing_synth_history.db
+
+# 1.2 Avaliar candidatos da Onda 1 em modo cego via Copilot SDK
+governance-runner \
+  --use-case synth-eval \
+  --model "claude-sonnet-5.5" \
+  --max-premium-requests 400 \
+  --run-id prata-onda1-eval \
+  --db-path .cache/routing_synth_history.db
+
+# 1.3 Diagnosticar quebras estruturais iniciais (--min-support 5)
+governance-runner \
+  --use-case synth-diagnose \
+  --eval-run-id prata-onda1-eval \
+  --routing-graph .github/agents/routing-graph.yaml \
+  --min-support 5 \
+  --out .github/agents/evals/synthetic \
+  --run-id prata-onda1-diag \
+  --db-path .cache/routing_synth_history.db
+```
+
+#### Onda 2 — Hardening Semântico e Adversarial via Copilot SDK (`--generator-mode sdk --model "claude-haiku-5.5"` nas 4 dimensões difíceis + `synth-eval --model "claude-sonnet-5.5"` + `synth-diagnose --min-support 10`)
+
+Após corrigir eventuais quebras grosseiras apontadas na Onda 1, gera ~164 candidatos adversariais via LLM (`claude-haiku-5.5`) focados nas **4 dimensões difíceis** (`omissao_palavra_chave,distrator_outro_agente,multi_intencao,code_switching_pt_en`), avalia todos os candidatos pendentes com `claude-sonnet-5.5` e executa o diagnóstico consolidado com `--min-support 10`.
+
+**PowerShell:**
+
+```powershell
+# 2.1 Gerar prompts adversariais via SDK nas 4 dimensoes dificeis
+governance-runner `
+  --use-case synth-generate `
+  --generator-mode sdk `
+  --model "claude-haiku-5.5" `
+  --max-premium-requests 200 `
+  --graph-seeding all `
+  --workflow-seeds all `
+  --routing-graph .github/agents/routing-graph.yaml `
+  --dimensions "omissao_palavra_chave,distrator_outro_agente,multi_intencao,code_switching_pt_en" `
+  --seed 43 `
+  --run-id prata-onda2-gen `
+  --db-path .cache/routing_synth_history.db
+
+# 2.2 Avaliar os novos candidatos em modo cego via Copilot SDK
+governance-runner `
+  --use-case synth-eval `
+  --model "claude-sonnet-5.5" `
+  --max-premium-requests 350 `
+  --run-id prata-onda2-eval `
+  --db-path .cache/routing_synth_history.db
+
+# 2.3 Diagnosticar com suporte estatistico Prata (--min-support 10)
+governance-runner `
+  --use-case synth-diagnose `
+  --eval-run-id prata-onda2-eval `
+  --routing-graph .github/agents/routing-graph.yaml `
+  --min-support 10 `
+  --out .github/agents/evals/synthetic `
+  --run-id prata-onda2-diag `
+  --db-path .cache/routing_synth_history.db
+```
+
+**Windows `cmd.exe`:**
+
+```bat
+REM 2.1 Gerar prompts adversariais via SDK nas 4 dimensoes dificeis
+governance-runner ^
+  --use-case synth-generate ^
+  --generator-mode sdk ^
+  --model "claude-haiku-5.5" ^
+  --max-premium-requests 200 ^
+  --graph-seeding all ^
+  --workflow-seeds all ^
+  --routing-graph .github/agents/routing-graph.yaml ^
+  --dimensions "omissao_palavra_chave,distrator_outro_agente,multi_intencao,code_switching_pt_en" ^
+  --seed 43 ^
+  --run-id prata-onda2-gen ^
+  --db-path .cache/routing_synth_history.db
+
+REM 2.2 Avaliar os novos candidatos em modo cego via Copilot SDK
+governance-runner ^
+  --use-case synth-eval ^
+  --model "claude-sonnet-5.5" ^
+  --max-premium-requests 350 ^
+  --run-id prata-onda2-eval ^
+  --db-path .cache/routing_synth_history.db
+
+REM 2.3 Diagnosticar com suporte estatistico Prata (--min-support 10)
+governance-runner ^
+  --use-case synth-diagnose ^
+  --eval-run-id prata-onda2-eval ^
+  --routing-graph .github/agents/routing-graph.yaml ^
+  --min-support 10 ^
+  --out .github/agents/evals/synthetic ^
+  --run-id prata-onda2-diag ^
+  --db-path .cache/routing_synth_history.db
+```
+
+**Linux / macOS (`bash`):**
+
+```bash
+# 2.1 Gerar prompts adversariais via SDK nas 4 dimensoes dificeis
+governance-runner \
+  --use-case synth-generate \
+  --generator-mode sdk \
+  --model "claude-haiku-5.5" \
+  --max-premium-requests 200 \
+  --graph-seeding all \
+  --workflow-seeds all \
+  --routing-graph .github/agents/routing-graph.yaml \
+  --dimensions "omissao_palavra_chave,distrator_outro_agente,multi_intencao,code_switching_pt_en" \
+  --seed 43 \
+  --run-id prata-onda2-gen \
+  --db-path .cache/routing_synth_history.db
+
+# 2.2 Avaliar os novos candidatos em modo cego via Copilot SDK
+governance-runner \
+  --use-case synth-eval \
+  --model "claude-sonnet-5.5" \
+  --max-premium-requests 350 \
+  --run-id prata-onda2-eval \
+  --db-path .cache/routing_synth_history.db
+
+# 2.3 Diagnosticar com suporte estatistico Prata (--min-support 10)
+governance-runner \
+  --use-case synth-diagnose \
+  --eval-run-id prata-onda2-eval \
+  --routing-graph .github/agents/routing-graph.yaml \
+  --min-support 10 \
+  --out .github/agents/evals/synthetic \
+  --run-id prata-onda2-diag \
+  --db-path .cache/routing_synth_history.db
+```
+
+#### Onda 3 — Validação Pós-Remediação e Promoção Silver → Golden (`synth-export` + `synth-promote --confirm`)
+
+Após aplicar as sugestões acionáveis (`SUG-001`..`SUG-006` e `SUG-WF-001`..`SUG-WF-003`) e confirmar que os Quality Gates da Seção 5.4 foram atingidos, exporte os *hard negatives* (divergências curadas) para a quarentena Silver, revise manualmente os campos `aprovado_para_promocao: true` e `revisor_humano`, e promova os casos aprovados para a suíte de regressão.
+
+**PowerShell:**
+
+```powershell
+# 3.1 Exportar divergencias para quarentena Silver
+governance-runner `
+  --use-case synth-export `
+  --out .github/agents/evals/synthetic/casos-roteamento-silver-prata-onda3.yaml `
+  --run-id prata-onda3-export `
+  --db-path .cache/routing_synth_history.db
+
+# 3.2 (Apos revisao humana no YAML Silver) Promover casos aprovados com --confirm
+governance-runner `
+  --use-case synth-promote `
+  --silver .github/agents/evals/synthetic/casos-roteamento-silver-prata-onda3.yaml `
+  --run-id prata-onda3-promote `
+  --suite regressao `
+  --confirm
+```
+
+**Windows `cmd.exe`:**
+
+```bat
+REM 3.1 Exportar divergencias para quarentena Silver
+governance-runner ^
+  --use-case synth-export ^
+  --out .github/agents/evals/synthetic/casos-roteamento-silver-prata-onda3.yaml ^
+  --run-id prata-onda3-export ^
+  --db-path .cache/routing_synth_history.db
+
+REM 3.2 (Apos revisao humana no YAML Silver) Promover casos aprovados com --confirm
+governance-runner ^
+  --use-case synth-promote ^
+  --silver .github/agents/evals/synthetic/casos-roteamento-silver-prata-onda3.yaml ^
+  --run-id prata-onda3-promote ^
+  --suite regressao ^
+  --confirm
+```
+
+**Linux / macOS (`bash`):**
+
+```bash
+# 3.1 Exportar divergencias para quarentena Silver
+governance-runner \
+  --use-case synth-export \
+  --out .github/agents/evals/synthetic/casos-roteamento-silver-prata-onda3.yaml \
+  --run-id prata-onda3-export \
+  --db-path .cache/routing_synth_history.db
+
+# 3.2 (Apos revisao humana no YAML Silver) Promover casos aprovados com --confirm
+governance-runner \
+  --use-case synth-promote \
+  --silver .github/agents/evals/synthetic/casos-roteamento-silver-prata-onda3.yaml \
+  --run-id prata-onda3-promote \
+  --suite regressao \
+  --confirm
+```
+
+### 5.4 Quality Gates Quantitativos (Critérios de Parada / "Definition of Done" do `@agent-router`)
+
+O ciclo iterativo de calibração do `@agent-router` e de `.github/agents/routing-graph.yaml` é considerado concluído (*Definition of Done*) quando o relatório emitido pelo `synth-diagnose` (`diagnostico-roteamento-<eval_run_id>.yaml`) satisfaz simultaneamente todos os limiares da meta selecionada:
+
+| Métrica / Indicador no Diagnóstico (`synth-diagnose`) | Meta Bronze (`--min-support 5`) | Meta Prata — Recomendada (`--min-support 10`) | Meta Ouro (`--min-support 20`) | Significado Operacional |
+| :--- | :--- | :--- | :--- | :--- |
+| `acuracia_global` | `>= 0.85` | **`>= 0.90`** | `>= 0.94` | Taxa global de acerto exato (`verdict = match`) em todos os prompts avaliados na rodada. |
+| `Macro-F1 de arestas` | `>= 0.80` | **`>= 0.85`** | `>= 0.90` | Média harmônica não ponderada de *Precision* e *Recall* entre todas as 34 arestas elegíveis (evita mascarar rotas minoritárias). |
+| `workflows.workflow_accuracy` | `>= 0.88` | **`>= 0.92`** | `>= 0.95` | Taxa de classificação exata do `workflow_id` esperado nos prompts semeados com `--workflow-seeds all`. |
+| `workflows.workflow_macro_f1` | `>= 0.85` | **`>= 0.90`** | `>= 0.93` | Macro-F1 equilibrado entre os 7 workflows canônicos indexados em `routing_graph_workflows`. |
+| `workflows.workflow_route_consistency_rate` | `>= 0.90` | **`>= 0.95`** | `>= 0.98` | Proporção de respostas onde o `workflow_id` inferido e o `agent_route` primeiro-salto são mutuamente consistentes segundo `routing-graph.yaml`. |
+| `workflows.banner_coverage` | `>= 0.98` | **`>= 0.99`** | `= 1.00` | Conformidade estrutural de emissão do banner obrigatório (`Agente Ativo:` + `Workflow Ativo:`) nas respostas avaliadas. |
+| `unparseable` (taxa de saídas não parseáveis) | `<= 2.0%` | **`<= 1.0%`** | `<= 0.5%` | Percentual máximo tolerado de respostas do modelo que falham na extração determinística de rota/workflow (`SUG-006` / `SUG-WF-003`). |
+| `cobertura_arestas_golden` | `= 1.00` | **`= 1.00`** | `= 1.00` | 100% das 34 arestas elegíveis do grafo representadas na avaliação (`arestas_sem_cobertura = []`). |
+| Sugestões acionáveis de severidade `alta` | `0` | **`0`** | `0` | Nenhuma sugestão crítica pendente (`SUG-001`..`SUG-006`, `SUG-WF-001`..`SUG-WF-003` com `severidade: alta`). |
+| Arestas ou workflows com `Recall < 0.70` (para `n >= min_support`) | `0` (para `n >= 5`) | **`0` (para `n >= 10`)** | `0` (para `n >= 20`) | Nenhum alvo com suporte estatístico suficiente operando abaixo do piso de *Recall* de `70%`. |
+
+---
+
+## 6. Referência Completa de Flags CLI e Exit Codes
 
 ### Tabela de Flags (`src/governance_runner/cli.py`)
 
@@ -822,6 +1256,7 @@ regressao:
 | `--golden` | `synth-generate, synth-diagnose` | `str` (`.github/agents/evals/casos-roteamento.yaml`) | Caminho do Golden Set (Read-Only). |
 | `--routing-graph` | `synth-generate, synth-diagnose` | `str` (`.github/agents/routing-graph.yaml`) | Caminho do Grafo de Roteamento (Read-Only). |
 | `--graph-seeding` | `synth-generate` | `{off, gaps, all}` (`off`) | Modo de expansão de sementes via arestas elegíveis de `routing-graph.yaml`. |
+| `--workflow-seeds` | `synth-generate` | `str` (`'off'`, escolhas: `off`, `gaps`, `all`) | Modo de geração de sementes por gatilho dos 9 workflows canônicos de `routing-graph.yaml`. |
 | `--graph-min-coverage` | `synth-generate` | `int` (`3`) | Cobertura mínima por aresta quando `--graph-seeding` é `gaps` ou `all`. |
 | `--run-id` | `synth-eval, synth-promote` | `str` (`None`) | Em `eval`: alias de `--source-run-id`; em `promote`: sufixo de `promoted-<run_id>.yaml`. |
 | `--source-run-id` | `synth-eval` | `str` (`None`) | Filtra prompts de um `run_id` de `synth-generate`. |
@@ -849,7 +1284,7 @@ regressao:
 
 ---
 
-## 6. Troubleshooting (Erros Comuns e Como Resolver)
+## 7. Troubleshooting (Erros Comuns e Como Resolver)
 
 1. **`COPILOT_SDK_TOKEN ausente ou vazio` (Exit code `2`)**: Exporte `COPILOT_SDK_TOKEN` no terminal antes de rodar `synth-eval` ou `synth-generate --generator-mode sdk`, ou utilize os modos 100% offline (`--generator-mode template`, `synth-diagnose`, `synth-export`, `synth-promote`).
 2. **`--max-premium-requests (ou GOV_MAX_PREMIUM_REQUESTS) obrigatorio e > 0` (Exit code `2`)**: Informe `--max-premium-requests <N>` (`> 0`) ou exporte `GOV_MAX_PREMIUM_REQUESTS`.

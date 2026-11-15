@@ -1,0 +1,19 @@
+version: '1.0'
+origem: synth-export
+eval_run_id: 6802cec2-dd0c-4215-89f8-c4bd636ad2e2
+casos:
+- id: silver-86a8b309a3b7
+  descricao: business-rules-extractor / code_switching_pt_en
+  input:
+    solicitacao: Extrair as business rules deste módulo, listando cada regra com o
+      seu trigger, as conditions e o resultado esperado.
+  expected:
+    agent_route: business-rules-extractor
+  silver:
+    prompt_id: 86a8b309a3b74276992820de3165ec65
+    eval_id: 302d9ca8454f460ba6fde941ccfdcacb
+    observed_route: null
+    verdict: unparseable
+    max_similarity: 0.243646
+    review_status: approved
+    corrected_route: business-rules-extractor

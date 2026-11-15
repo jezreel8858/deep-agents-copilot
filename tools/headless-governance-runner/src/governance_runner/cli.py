@@ -231,6 +231,7 @@ def _executar_synth(args: argparse.Namespace) -> int:
                     routing_graph_path=args.routing_graph,
                     graph_seeding=args.graph_seeding,
                     graph_min_coverage=args.graph_min_coverage,
+                    workflow_seeds=args.workflow_seeds,
                 )
             elif uc == "synth-eval":
                 rel = executar_synth_eval(

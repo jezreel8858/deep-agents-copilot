@@ -166,22 +166,28 @@ Arquivos criados (NESTE repositório de governança):
 └─ ./.github/projects.local.yaml.example (template do overlay local — sem dados reais)
 
 ⚠️  Nenhum arquivo foi criado ou modificado nos projetos externos.
+
 ⚠️  Projetos NUNCA vão em catalog.yaml — próximo passo cria projects.local.yaml (gitignored) automaticamente.
 
 Validações:
+
 - YAML catalog.yaml: ✅ válido
 - Ecossistema: <nome-P1>
 - Projetos registrados: 0 (adicione via /add-project-context — grava em projects.local.yaml, gitignored)
 
 Próximos passos:
   1. Execute `/add-project-context <caminho-do-projeto>` para cada projeto externo
+
      → Scanner detectará o stack automaticamente
+
      → Overlay local criado a partir de projects.local.yaml.example (se ainda não existir)
+
      → Adapter será criado em .github/instructions/local/<projeto>.instructions.md (gitignored)
+
   2. Execute `/del-project-context <nome>` para remover projetos quando necessário
   3. Execute @agent-router para qualquer tarefa de desenvolvimento
 
-Confiança: Alta
+- Confiança: Alta
 ```
 
 ### Falha
@@ -191,10 +197,10 @@ Agente Ativo: binding-initializer
 
 Inicialização: ❌ ERRO
 
-Causa: <descrição em ≤ 1 linha>
-Local: <arquivo:linha ou etapa>
-Ação sugerida: <o que fazer; usuário decide>
-Confiança: Baixa — aguardando clarificação
+- Causa: <descrição em ≤ 1 linha>
+- Local: <arquivo:linha ou etapa>
+- Ação sugerida: <o que fazer; usuário decide>
+- Confiança: Baixa — aguardando clarificação
 ```
 
 ## A Pergunta Estruturada (ask_questions)

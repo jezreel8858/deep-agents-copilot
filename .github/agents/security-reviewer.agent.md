@@ -72,33 +72,43 @@ Pedido recebido?
 
 ```markdown
 Agente Ativo: security-reviewer
+
 [Se aplicável] Handoff: <agent-origem> → security-reviewer (motivo: <motivo>)
 
 🔒 REVISÃO DE SEGURANÇA
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Superfície revisada: <código-fonte | dependências | secrets | configuração>
-Standards aplicados: OWASP Top 10:2025 | ASVS 5.0 | CVE/CVSS
+
+- Superfície revisada: <código-fonte | dependências | secrets | configuração>
+- Standards aplicados: OWASP Top 10:2025 | ASVS 5.0 | CVE/CVSS
 
 🔴 BLOQUEADORES:
+
 - [CATEGORIA] <descrição> → `arquivo:linha` (CVSS: <score>, se aplicável)
 
 🟠 ALTA PRIORIDADE:
+
 - [CATEGORIA] <descrição> → `arquivo:linha`
 
 🟡 SUGESTÕES:
+
 - [CATEGORIA] <descrição> → `arquivo:linha`
 
 ✅ APROVAÇÕES:
+
 - <controle de segurança bem implementado>
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Veredito: <APROVADO|APROVADO COM RESSALVAS|BLOQUEADO>
-Confiança: <0.00–1.00> | Rota: rule-based|semantic|llm-based
+
+- Veredito: <APROVADO|APROVADO COM RESSALVAS|BLOQUEADO>
+- Confiança: <0.00–1.00> | Rota: rule-based|semantic|llm-based
 
 Handoff sugerido:
+
 - <@compliance-guardrails — se dado pessoal/regulado, ou "nenhum">
 
 Próximo passo mínimo:
+
 - <ação curta>
 ```
 

@@ -58,18 +58,24 @@ Solicitação de Java Legado EJB recebida:
 
 ```markdown
 Agente Ativo: ejb-router
+
+- Transição: <"Triagem de domínio EJB" | "Handoff recebido de agent-router">
+- Rota EJB: <arch_advisor | developer | test_engineer>
+- [Model] Delegando para @<agent> — modelo solicitado: <model-alvo>
+- Delegado: <@ejb-arch-advisor | @ejb-developer | @ejb-test-engineer>
+- Motivo: <1 frase justificando a escolha técnica do especialista>
+- Confiança: <alta|média|baixa>
+- Confidence Score: <0.00–1.00>
+
 [CURRENT_STATE_LOCK: <ROUTER_EJB_TRIAGE | ROUTER_EJB_MIGRATION>]
-Transição: <"Triagem de domínio EJB" | "Handoff recebido de agent-router">
-Rota EJB: <arch_advisor | developer | test_engineer>
-[Model] Delegando para @<agent> — modelo solicitado: <model-alvo>
-Delegado: <@ejb-arch-advisor | @ejb-developer | @ejb-test-engineer>
-Motivo: <1 frase justificando a escolha técnica do especialista>
-Confiança: <alta|média|baixa>
-Confidence Score: <0.00–1.00>
+
 Entradas consideradas:
+
 - <item 1>
 - <item 2>
+
 Próximo passo mínimo:
+
 - <ação do especialista delegado>
 ```
 

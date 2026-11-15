@@ -45,20 +45,20 @@ DEFAULT_ROUTER_AGENT = Path(".github") / "agents" / "agent-router.agent.md"
 PRE_ETAPAS_WORKFLOW: frozenset[str] = frozenset({"binding-initializer", "prompt-structuring"})
 
 _REGEX_BANNER = {
-    "Delegado": re.compile(r"^\s*Delegado\s*:\s*(.+)$", re.IGNORECASE | re.MULTILINE),
-    "Rota": re.compile(r"^\s*Rota\s*:\s*(.+)$", re.IGNORECASE | re.MULTILINE),
-    "Agente Ativo": re.compile(r"^\s*Agente Ativo\s*:\s*(.+)$", re.IGNORECASE | re.MULTILINE),
+    "Delegado": re.compile(r"^\s*(?:[-*+]\s+)?(?:\*{1,2})?Delegado(?:\*{1,2})?\s*:(?:\*{1,2})?\s*(.+)$", re.IGNORECASE | re.MULTILINE),
+    "Rota": re.compile(r"^\s*(?:[-*+]\s+)?(?:\*{1,2})?Rota(?:\*{1,2})?\s*:(?:\*{1,2})?\s*(.+)$", re.IGNORECASE | re.MULTILINE),
+    "Agente Ativo": re.compile(r"^\s*(?:[-*+]\s+)?(?:\*{1,2})?Agente Ativo(?:\*{1,2})?\s*:(?:\*{1,2})?\s*(.+)$", re.IGNORECASE | re.MULTILINE),
 }
 _REGEX_WORKFLOW_STRICT = re.compile(
-    r"^\s*(?i:workflow)\s*:\s*(WORKFLOW-[A-Z]+(?:-[A-Z]+)*|N/A)\s*$",
+    r"^\s*(?:[-*+]\s+)?(?:\*{1,2})?(?i:workflow)(?:\*{1,2})?\s*:(?:\*{1,2})?\s*(?:\*{1,2}|`)?(WORKFLOW-[A-Z]+(?:-[A-Z]+)*|N/A)(?:\*{1,2}|`)?(?:\s*\([^)]*\))?\s*$",
     re.MULTILINE,
 )
 _REGEX_WORKFLOW_LINHA = re.compile(
-    r"^\s*(?i:workflow)\s*:\s*(.+?)\s*$",
+    r"^\s*(?:[-*+]\s+)?(?:\*{1,2})?(?i:workflow)(?:\*{1,2})?\s*:(?:\*{1,2})?\s*([A-Za-z0-9`*].*?)\s*$",
     re.MULTILINE,
 )
 _REGEX_ETAPA_WORKFLOW = re.compile(
-    r"^\s*(?i:etapa do workflow)\s*:\s*(\d+)",
+    r"^\s*(?:[-*+]\s+)?(?:\*{1,2})?(?i:etapa do workflow)(?:\*{1,2})?\s*:(?:\*{1,2})?\s*(?:\*{1,2}|`)?(\d+)",
     re.MULTILINE,
 )
 _REGEX_TOKEN = re.compile(r"@?([A-Za-z0-9][\w\-]*)")

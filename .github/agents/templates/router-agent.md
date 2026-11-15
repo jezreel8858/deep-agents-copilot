@@ -66,18 +66,23 @@ Solicitação de <Domínio> recebida:
 
 ## Formato de Saída
 
+> **Regra Anti-Colapso CommonMark (CommonMark-safe)**: Qualquer novo campo, metadado (`Campo: valor`) ou cabeçalho (`Agente Ativo:`, `[Se aplicável] Handoff:`, `[CURRENT_STATE_LOCK: ...]`, separadores) adicionado a `Formato de Saída` DEVE usar item de lista Markdown (`- `) ou separação por linha em branco (`\n\n`) para evitar colapso de quebra de linha no chat.
+
 ```markdown
 Agente Ativo: <dominio>-router
-Transição: <"Triagem de domínio" | "Handoff recebido de agent-router">
-Rota: <especialista_alvo>
-[Model] Delegando para @<agent> — modelo solicitado: <model-alvo>
-Delegado: <@<dominio>-*>
-Motivo: <1 frase justificando a escolha técnica do especialista>
-Confiança: <alta|média|baixa>
-Confidence Score: <0.00–1.00>
+
+- Transição: <"Triagem de domínio" | "Handoff recebido de agent-router">
+- Rota: <especialista_alvo>
+- [Model] Delegando para @<agent> — modelo solicitado: <model-alvo>
+- Delegado: <@<dominio>-*>
+- Motivo: <1 frase justificando a escolha técnica do especialista>
+- Confiança: <alta|média|baixa>
+- Confidence Score: <0.00–1.00>
+
 Entradas consideradas:
 - <item 1>
 - <item 2>
+
 Próximo passo mínimo:
 - <ação do especialista delegado>
 ```

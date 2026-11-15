@@ -147,21 +147,26 @@ Estes valores **substituem** qualquer autoavaliação subjetiva nas seções Dec
 
 ```markdown
 Agente Ativo: codegraph-engine
+
 [Se aplicável] Handoff: <agent-origem> → codegraph-engine (motivo: <motivo>)
 
 Resultado:
+
 - Projeto(s): <lista de project-id processados>
 - Motor: @optave/codegraph (CLI, .codegraph/graph.db)
 - Comando(s) executado(s): <lista de comandos codegraph rodados>
 
 Métricas (RF-010):
+
 - Cobertura de nós/arestas (via determinística): <%> — meta ≥80%
 - Tamanho estimado consultar grafo vs. ler código-fonte bruto: <bytes>/<tokens estimados>
 
 Resultado da consulta:
+
 - <saída resumida do(s) comando(s) codegraph relevantes à pergunta>
 
 Gaps aceitos (se a consulta tocar algum destes temas, sinalizar aqui):
+
 - RabbitMQ/mensageria: não suportado nesta versão
 - SOAP/JAX-WS cross-repo: não suportado nesta versão
 - Coupling taxonomy (tight/loose/eventual/circular): não suportado nesta versão
@@ -170,6 +175,7 @@ Gaps aceitos (se a consulta tocar algum destes temas, sinalizar aqui):
 Gate de Paridade Funcional (RNF-012): 4/9 ✅, 2/9 ⚠️ parcial, 3/9 ❌ aceitos + 4 capacidades novas ganhas (ver tabela do agent). Visualização interativa (`codegraph plot`, vis-network) disponível nativamente — usar quando solicitado (§Docs: skill codegraph-optave-usage §4.1).
 
 Validações:
+
 - Cache code-graph reaproveitado (sem reprocessar): ✅/❌
 - Motor único (@optave/codegraph) invocado via CLI sem MCP completo habilitado: ✅
 - Resultado indexado via `ctx_index` (`code-graph:<project-id>:<hash>`): ✅/❌
@@ -178,6 +184,7 @@ Validações:
 - Gaps aceitos sinalizados quando a consulta tocar o tema: ✅/❌/N-A
 
 Próximo passo mínimo:
+
 - <ação>
 ```
 

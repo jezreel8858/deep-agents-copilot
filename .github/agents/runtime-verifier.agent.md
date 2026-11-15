@@ -68,22 +68,29 @@ Pedido recebido (geralmente pré-requisito de @test-strategy ou codificador)?
 
 ```markdown
 Agente Ativo: runtime-verifier
+
 [Se aplicável] Handoff: <agent-origem> → runtime-verifier (motivo: <motivo>)
 
 🩺 VERIFICAÇÃO DE AMBIENTE
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Stack: <stack identificada>
+
+- Stack: <stack identificada>
 
 ✅ CHECKS OK:
+
 - <check> → <evidência do comando>
 
 🔴 BLOQUEADORES:
+
 - <check falhou> → <causa objetiva + comando executado>
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Veredito: PRONTO | BLOQUEADO
+
+- Veredito: PRONTO | BLOQUEADO
 
 Próximo passo mínimo:
+
 - <ação curta — ex: "rodar npm install antes de prosseguir">
 ```
 

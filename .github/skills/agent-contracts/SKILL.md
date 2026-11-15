@@ -19,6 +19,8 @@ tools: []
 
 # Agent Contracts
 
+> **Regra de Formatação do Header de Roteadores (CommonMark Line Breaks)**: Nos roteadores (`@agent-router` e domain routers `*-router`), após a 1ª linha isolada `Agente Ativo: <nome>` e uma linha em branco, os campos de metadados de transição/telemetria do header (`- Transição:`, `- Workflow:`, `- Etapa do Workflow:`, `- Rota:`, `- [Model] Delegando para...`, `- Delegado:`, `- Motivo:`, `- Confiança:`, `- Confidence Score:`, `- Nível de Routing:`) DEVEM ser formatados como itens de lista Markdown (`- `) para garantir quebra de linha automática na renderização CommonMark do chat.
+
 ## Quando Usar
 
 - Ativação em cenários de contrato de agent, agent contract, entrada agent.
@@ -42,7 +44,9 @@ Em fluxos multi-agent com handoff (R-042 — Anti Sticky-Session), o usuário pe
 
 ```markdown
 Agente Ativo: test-engineer
+
 Handoff: test-strategy → test-engineer (motivo: estratégia mapeada — pronto para implementar)
+
 Skills Carregadas: test-implementation-spring-boot, test-coverage-governance, context-mode
 
 [... restante da resposta no formato de saída do perfil do agent ...]
@@ -52,6 +56,7 @@ Quando **não** há handoff neste turno (agent continua em `task_mode`), a linha
 
 ```markdown
 Agente Ativo: spring-boot-engineer
+
 Skills Carregadas: spring-boot-implementation-patterns, test-implementation-spring-boot, terminal-governance, context-mode
 
 [... restante da resposta ...]
@@ -90,8 +95,11 @@ Quando o usuário expressar desorientação explícita ("wait what", "peraí", "
 
 Todo agent cujas `tools:` incluam `run_subagent` **DEVE emitir um evento `telemetry_entry` (tag `[HANDOFF]`)** a cada chamada real de subagent via `context-mode` (`ctx_index`), incluindo compulsoriamente os campos de rastreabilidade `session_id` e `sequence_index` (conforme especificado em `handoff-governance/SKILL.md` § 2.4). O payload indexado preserva a visibilidade e rastreabilidade da árvore de delegações sem poluir a janela de contexto conversacional do chat.
 
-### Checklist de Conformidade
+#- **Regra Anti-Colapso CommonMark em `## Formato de Saída` (CommonMark-safe)**: Cabeçalhos e metadados consecutivos (`Agente Ativo:`, `[Se aplicável] Handoff:`, `Skills Carregadas:`, `[CURRENT_STATE_LOCK: ...]`, separadores `---` e pares `Campo: valor`) NUNCA podem ficar em linhas adjacentes de texto puro sem linha em branco (`\n\n`) ou prefixo de lista Markdown (`- `).
 
+## Checklist de Conformidade
+
+- [ ] Em `## Formato de Saída`, cabeçalhos (`Agente Ativo:`, `Handoff:`, `Skills Carregadas:`, `[CURRENT_STATE_LOCK:]`) e metadados consecutivos (`Campo: valor`) são CommonMark-safe (nunca em linhas adjacentes de texto puro sem linha em branco ou prefixo `- `).
 - [ ] Todo agent com `run_subagent` emite `telemetry_entry` (tag `[HANDOFF]`) com `session_id` e `sequence_index` a cada chamada real.
 - [ ] Toda resposta abre com `Agente Ativo: <name>` — sem exceção, mesmo sem handoff.
 - [ ] Handoff/re-triagem recebido neste turno → segunda linha `Handoff: <origem> → <destino> (motivo: ...)`.

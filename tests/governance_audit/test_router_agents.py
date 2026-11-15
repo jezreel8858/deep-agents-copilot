@@ -349,3 +349,165 @@ def test_smell_2_23_router_over_empowerment_documented():
     assert "ZERO TOOL CALLS DE DISCOVERY" in content or "Zero Discovery" in content, (
         "Smell 2.23 deve documentar a regra de Zero Discovery"
     )
+
+
+def _collect_formato_de_saida_collapsible_violations(text: str, rel: str) -> list[str]:
+    """Retorna lista de violações de linhas adjacentes colapsáveis CommonMark em Formato de Saída."""
+    violations: list[str] = []
+    lines = text.splitlines()
+    in_section = False
+    in_fence = False
+    fence_marker = ""
+    block: list[str] = []
+    blocks: list[list[str]] = []
+
+    for raw_line in lines:
+        s = raw_line.strip()
+        if not in_fence:
+            if s.startswith("##"):
+                if (
+                    "Formato de Saída" in s
+                    or "Templates de Saída" in s
+                    or "Modo Advisory" in s
+                    or "Modo Implementação" in s
+                    or (rel.endswith("agent-contracts/SKILL.md") and s.startswith("## 0."))
+                ):
+                    in_section = True
+                elif s.startswith("## ") and not s.startswith("### "):
+                    in_section = False
+            m_open = re.match(r"^(`{3,}|~{3,})\s*(?:markdown|md|text)?\s*$", s, re.IGNORECASE)
+            if m_open and (in_section or "Agente Ativo:" in text):
+                in_fence = True
+                fence_marker = m_open.group(1)[0] * len(m_open.group(1))
+                block = []
+        else:
+            m_close = re.match(r"^(`{3,}|~{3,})\s*$", s)
+            if (
+                m_close
+                and m_close.group(1)[0] == fence_marker[0]
+                and len(m_close.group(1)) >= len(fence_marker)
+            ):
+                if in_section or any(l.strip().startswith("Agente Ativo:") for l in block):
+                    blocks.append(block)
+                in_fence = False
+                block = []
+            else:
+                block.append(raw_line)
+
+    for blk in blocks:
+        in_yaml_fm = False
+        in_inner_fence = False
+        for i in range(len(blk) - 1):
+            a = blk[i].strip()
+            b = blk[i + 1].strip()
+            if i == 0 and a == "---":
+                in_yaml_fm = True
+                continue
+            if in_yaml_fm:
+                if a == "---":
+                    in_yaml_fm = False
+                continue
+            if re.match(r"^(`{3,}|~{3,})", a):
+                in_inner_fence = not in_inner_fence
+                continue
+            if in_inner_fence or re.match(r"^(`{3,}|~{3,})", b):
+                continue
+            if not a or not b:
+                continue
+            is_list_a = bool(re.match(r"^([-*+]|\d+\.)\s", a))
+            is_list_b = bool(re.match(r"^([-*+]|\d+\.)\s", b))
+            is_special_a = (
+                a.startswith("#")
+                or a.startswith("|")
+                or a.startswith(">")
+                or a.startswith("<!--")
+                or a in ("---", "=== CORTE AQUI ===", "...")
+                or bool(re.match(r"^[┌├└│─]+", a))
+                or bool(re.match(r"^</?[a-zA-Z_][\w-]*>$", a))
+            )
+            is_special_b = (
+                b.startswith("#")
+                or b.startswith("|")
+                or b.startswith(">")
+                or b.startswith("<!--")
+                or b in ("---", "=== CORTE AQUI ===", "...")
+                or bool(re.match(r"^[┌├└│─]+", b))
+                or bool(re.match(r"^</?[a-zA-Z_][\w-]*>$", b))
+            )
+            if not is_list_a and not is_special_a and not is_list_b and not is_special_b:
+                violations.append(f"{rel}: '{a}' seguido sem linha em branco por '{b}'")
+            elif is_list_a and not is_list_b and not is_special_b and not blk[i + 1].startswith("  "):
+                violations.append(
+                    f"{rel}: item de lista '{a}' seguido sem linha em branco por linha plana '{b}'"
+                )
+    return violations
+
+
+def validate_formato_de_saida_commonmark_safe(text: str, rel: str) -> None:
+    """Valida que um texto Markdown (agent, prompt, template ou skill) tem Formato de Saída CommonMark-safe."""
+    violations = _collect_formato_de_saida_collapsible_violations(text, rel)
+    assert not violations, (
+        "Linhas consecutivas em Formato de Saída colapsam no CommonMark "
+        "(use linha em branco ou lista '- '):\n" + "\n".join(violations)
+    )
+
+
+def test_all_agents_and_templates_formato_de_saida_no_adjacent_collapsible_lines() -> None:
+    """Garante que nenhum agent, prompt, template ou skill de fábrica tenha linhas adjacentes colapsáveis."""
+    targets = (
+        sorted((REPO_ROOT / ".github" / "agents").rglob("*.agent.md"))
+        + sorted((REPO_ROOT / ".github" / "agents" / "templates").glob("*.md"))
+        + sorted((REPO_ROOT / ".github" / "prompts").rglob("*.prompt.md"))
+        + [
+            REPO_ROOT / ".github" / "prompts" / "templates" / "prompt-template.md",
+            REPO_ROOT / ".github" / "skills" / "agent-contracts" / "SKILL.md",
+            REPO_ROOT / ".github" / "skills" / "governance-factory-patterns" / "SKILL.md",
+            REPO_ROOT
+            / ".github"
+            / "skills"
+            / "governance-factory-patterns"
+            / "references"
+            / "artifact-specs-and-stack-topology.md",
+            REPO_ROOT
+            / ".github"
+            / "skills"
+            / "specialist-hybrid-advisory-implementation-patterns"
+            / "SKILL.md",
+        ]
+    )
+    violations: list[str] = []
+    for path in targets:
+        rel = path.relative_to(REPO_ROOT).as_posix()
+        text = path.read_text(encoding="utf-8")
+        violations.extend(_collect_formato_de_saida_collapsible_violations(text, rel))
+
+    assert not violations, (
+        "Linhas consecutivas em Formato de Saída colapsam no CommonMark "
+        "(use linha em branco ou lista '- '):\n" + "\n".join(violations)
+    )
+
+
+def test_formato_de_saida_validator_rejects_synthetic_collapsible_agent_and_prompt() -> None:
+    """Comprova com fixtures sintéticas que novos agents ou prompts com linhas adjacentes colapsáveis falham no gate."""
+    bad_agent_md = (
+        "## Formato de Saída\n\n"
+        "```markdown\n"
+        "Agente Ativo: synthetic-agent\n"
+        "[Se aplicável] Handoff: agent-router → synthetic-agent (motivo: teste)\n"
+        "**Escopo**: backend\n"
+        "**Risco**: alto\n"
+        "```\n"
+    )
+    with pytest.raises(AssertionError, match="synthetic-agent.agent.md"):
+        validate_formato_de_saida_commonmark_safe(bad_agent_md, "synthetic-agent.agent.md")
+
+    bad_prompt_md = (
+        "## 📊 Formato de Saída\n\n"
+        "```markdown\n"
+        "### Execução de `/synthetic-cmd`\n\n"
+        "**Arquivo Processado**: `src/app.py`\n"
+        "**Status de Integridade**: ✅ Sem erros\n"
+        "```\n"
+    )
+    with pytest.raises(AssertionError, match="synthetic.prompt.md"):
+        validate_formato_de_saida_commonmark_safe(bad_prompt_md, "synthetic.prompt.md")

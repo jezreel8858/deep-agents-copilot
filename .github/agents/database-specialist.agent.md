@@ -68,24 +68,31 @@ Pedido recebido?
 
 ```markdown
 Agente Ativo: database-specialist
+
 [Se aplicável] Handoff: <agent-origem> → database-specialist (motivo: <motivo>)
 
 🗄️ MIGRAÇÃO / QUERY DE BANCO
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Tipo: migração DDL | otimização de query | constraint
+
+- Tipo: migração DDL | otimização de query | constraint
 
 Arquivo(s):
+
 - `<caminho/migração ou query>`
 
 Rollback:
+
 - `<caminho do script de reversão>` ou "N/A — operação aditiva idempotente"
 
 Validações:
+
 - Idempotência: OK | N/A
 - Bind parameters (sem concatenação): OK
 - Schema consultado (`DATABASE_SCHEMA_<PROJETO>.md`): OK
 
 Próximo passo mínimo:
+
 - <ação curta — ex: "aplicar migração em ambiente de homologação">
 ```
 

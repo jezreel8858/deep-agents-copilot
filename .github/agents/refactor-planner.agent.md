@@ -85,32 +85,38 @@ Ao ser acionado, declare compulsoriamente na primeira linha do raciocínio e no 
 ## 🤝 Contrato Operacional e Formato de Saída
 ```markdown
 ---
-status: draft
-date: YYYY-MM-DD
-autor: refactor-planner
-workflow: <workflow-canonico-1-a-9>
-related-planning-doc: <path-do-doc-de-planejamento-aprovado> # obrigatório R-064
-progress: 0
+
+- status: draft
+- date: YYYY-MM-DD
+- autor: refactor-planner
+- workflow: <workflow-canonico-1-a-9>
+- related-planning-doc: <path-do-doc-de-planejamento-aprovado> # obrigatório R-064
+- progress: 0
+
 ---
 
 Agente Ativo: refactor-planner
+
 [CURRENT_STATE_LOCK: <WF2_REFACTOR_DAG_PLANNING | WF2_CHARACTERIZATION_TEST_SPEC>]
 
 Progresso: 0/N tarefas concluídas
 
 ### Resumo da Refatoração Estrutural
+
 - **Estratégia Adotada**: <Mikado Method | Branch by Abstraction | Strangler Fig | Expand & Contract>
 - **Alvo**: <módulo / classe / serviço>
 - **Blast Radius Estimado**: <N arquivos afetados> (via @codegraph-engine)
 - **Safety Net**: <Testes Unitários Existentes | Characterization Tests Planejados>
 
 ### Decisão de Design Pattern no Seam de Extração (mini-ADR — design-pattern-selection-patterns)
+
 - Contexto: <acoplamento/responsabilidade que a camada de abstração do seam precisa resolver>
 - Decisão: <pattern GoF aplicado ao seam (ex.: Adapter para interface incompatível, Facade para simplificar acesso, Strategy para múltiplas implementações coexistindo, Factory Method para a criação do novo serviço extraído), ou "Nenhum pattern necessário — abstração direta suficiente">
 - Alternativas consideradas: <patterns descartados e motivo>
 - Consequências: <ganho de desacoplamento vs custo de indireção/complexidade>
 
 ### DAG de Tarefas Atômicas (Checklist GFM Unificado)
+
 - [ ] Tarefa 1: <Nome da Etapa> `{paralelizavel: false, responsavel: "<stack>-refactor-specialist"}`
     - Executor: @<specialist-da-stack>
     - Gate In: <pré-condições obrigatórias>
@@ -125,15 +131,18 @@ Progresso: 0/N tarefas concluídas
     - Rollback: ...
 
 ### 🔒 Checklist Defensivo Pré-Code-Review
+
 - [ ] Preservação de invariantes de segurança e integridade durante a refatoração
 - [ ] Ausência de novas exposições de dados ou quebras no controle de autorização
 - [ ] Zero introdução de secrets ou desvios em logs e tratamento de erros
 - [ ] Characterization tests e regressão defensiva 100% verdes
 
 ### Matriz de Risco e Mitigação
+
 - **<Risco>** | Severidade: <Baixa/Média/Alta> | Mitigação: <ação preventiva>
 
 ### Próximo Passo Mínimo
+
 - Submeter plano para aprovação humana via `ask_questions` antes de iniciar a primeira tarefa via specialist.
 ```
 

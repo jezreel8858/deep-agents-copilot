@@ -86,33 +86,43 @@ Pedido recebido?
 
 ```markdown
 Agente Ativo: code-review
+
 [Se aplicável] Handoff: <agent-origem> → code-review (motivo: <motivo>)
 
 📋 REVISÃO DE CÓDIGO
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Arquivo(s): <lista>
-Convenções aplicadas: <adapter usado ou "genérico" declarado>
+
+- Arquivo(s): <lista>
+- Convenções aplicadas: <adapter usado ou "genérico" declarado>
 
 🔴 BLOQUEADORES:
+
 - [CATEGORIA] <descrição> → `arquivo:linha`
 
 🟠 ALTA PRIORIDADE:
+
 - [CATEGORIA] <descrição> → `arquivo:linha`
 
 🟡 SUGESTÕES:
+
 - [CATEGORIA] <descrição> → `arquivo:linha`
 
 ✅ APROVAÇÕES:
+
 - <o que está bem feito>
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Veredito: <APROVADO|APROVADO COM RESSALVAS|BLOQUEADO>
-Confiança: <alta|média|baixa>
+
+- Veredito: <APROVADO|APROVADO COM RESSALVAS|BLOQUEADO>
+- Confiança: <alta|média|baixa>
 
 Handoff sugerido:
+
 - <@agent — motivo, ou "nenhum">
 
 Próximo passo mínimo:
+
 - <ação curta>
 ```
 

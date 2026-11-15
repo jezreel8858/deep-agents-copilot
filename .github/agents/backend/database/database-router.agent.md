@@ -58,19 +58,25 @@ Solicitação de Banco de Dados recebida:
 
 ```markdown
 Agente Ativo: database-router
+
+- Transição: <"Triagem de domínio Database" | "Handoff recebido de agent-router">
+- SGBD Alvo: <Oracle | Informix | Outro>
+- Rota Database: <database_arch_advisor | oracle_specialist | informix_specialist | fallback_specialist>
+- [Model] Delegando para @<agent> — modelo solicitado: <model-alvo>
+- Delegado: <@database-arch-advisor | @oracle-database-specialist | @informix-database-specialist | @database-specialist>
+- Motivo: <1 frase justificando a escolha técnica do especialista>
+- Confiança: <alta|média|baixa>
+- Confidence Score: <0.00–1.00>
+
 [CURRENT_STATE_LOCK: <ROUTER_DATABASE_TRIAGE | ROUTER_DATABASE_FALLBACK>]
-Transição: <"Triagem de domínio Database" | "Handoff recebido de agent-router">
-SGBD Alvo: <Oracle | Informix | Outro>
-Rota Database: <database_arch_advisor | oracle_specialist | informix_specialist | fallback_specialist>
-[Model] Delegando para @<agent> — modelo solicitado: <model-alvo>
-Delegado: <@database-arch-advisor | @oracle-database-specialist | @informix-database-specialist | @database-specialist>
-Motivo: <1 frase justificando a escolha técnica do especialista>
-Confiança: <alta|média|baixa>
-Confidence Score: <0.00–1.00>
+
 Entradas consideradas:
+
 - <item 1>
 - <item 2>
+
 Próximo passo mínimo:
+
 - <ação do especialista delegado>
 ```
 

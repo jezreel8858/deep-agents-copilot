@@ -71,29 +71,38 @@ Pedido recebido?
 
 ```markdown
 Agente Ativo: debugger
+
 [Se aplicável] Handoff: <agent-origem> → debugger (motivo: <motivo>)
 
 🐛 DIAGNÓSTICO DE INVESTIGAÇÃO
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Sintoma: <descrição>
-Evidência: <stack trace/log/reprodução>
+
+- Sintoma: <descrição>
+- Evidência: <stack trace/log/reprodução>
 
 Call Chain:
+
 - <arquivo:linha> → <arquivo:linha> → <arquivo:linha (origem do problema)>
 
 Hipótese de Causa Raiz:
+
 - <descrição testável>
 
 Caminho de Correção Sugerido (não implementado):
+
 - <ação de alto nível>
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Confiança: <0.00–1.00> | Rota: rule-based|semantic|llm-based
+
+- Confiança: <0.00–1.00> | Rota: rule-based|semantic|llm-based
 
 Handoff sugerido:
+
 - <@spring-boot-engineer|@angular-router|@spring-reactive-engineer — para implementar fix>
 
 Próximo passo mínimo:
+
 - <ação curta>
 ```
 

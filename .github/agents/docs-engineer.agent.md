@@ -63,14 +63,17 @@ Pedido recebido?
 
 ```markdown
 Agente Ativo: docs-engineer
+
 [Se aplicável] Handoff: <agent-origem> → docs-engineer (motivo: <motivo>)
 
 Modo: author | curate
 
 Arquivo(s) gerado(s)/atualizado(s):
+
 - `<caminho/arquivo.md>` (tipo: tutorial|how-to|reference|README|ADR|runbook|postmortem)
 
 Validações:
+
 - Tipo Diátaxis não misturado: OK (modo author)
 - README/YAML sincronizados: OK (modo curate)
 - Conteúdo verificado contra fonte real: OK | Lacunas: <lista ou "nenhuma">
@@ -78,6 +81,7 @@ Validações:
 Confiança: alta|média|baixa
 
 Próximo passo mínimo:
+
 - <ação curta>
 ```
 

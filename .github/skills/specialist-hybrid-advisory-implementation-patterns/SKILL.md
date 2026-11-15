@@ -43,7 +43,13 @@ tools: []
 
 ## 2) Formato de Saída — Modo Advisory
 
+> **Regra Anti-Colapso CommonMark (`## Formato de Saída` CommonMark-safe)**: Cabeçalhos (`Agente Ativo:`, `[Se aplicável] Handoff:`, `[CURRENT_STATE_LOCK: ...]`) e metadados consecutivos em `## Formato de Saída` nunca podem ficar em linhas adjacentes de texto puro sem linha em branco (`\n\n`) ou prefixo `- `.
+
 ```markdown
+Agente Ativo: <stack>-<role>
+
+[Se aplicável] Handoff: <agent-origem> → <stack>-<role> (motivo: <motivo>)
+
 ## Resumo
 <1-3 linhas do que foi avaliado>
 
@@ -78,6 +84,10 @@ tools: []
 ## 3) Formato de Saída — Modo Implementação
 
 ```markdown
+Agente Ativo: <stack>-<role>
+
+[Se aplicável] Handoff: <agent-origem> → <stack>-<role> (motivo: <motivo>)
+
 ## Resultado
 <o que foi implementado, em 1-2 linhas>
 
@@ -125,6 +135,7 @@ Toda implementação de feature/bugfix no modo Implementação **deve** ser acom
 
 ## 5) Checklist Unificado — Antes de Analisar/Implementar
 
+- [ ] Cabeçalhos e metadados consecutivos em `## Formato de Saída` são CommonMark-safe (nunca em linhas adjacentes de texto puro sem linha em branco ou prefixo `- `).
 - [ ] Modo desambiguado explicitamente (Advisory vs. Implementação) — via pergunta direta ou intenção inequívoca do pedido.
 - [ ] Adapter de stack específico do projeto consultado, se existir (`.github/instructions/<projeto>-<stack>.instructions.md`).
 - [ ] Skill de análise do domínio consultada (ex.: `spring-boot-backend-patterns`) no modo Advisory.

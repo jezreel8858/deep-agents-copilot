@@ -92,31 +92,40 @@ Ao ser acionado, siga rigorosamente este fluxo sequencial:
 - **Critério de Sucesso**: Qual decisão técnica o relatório deve apoiar.
 
 ### Formato de Saída Estruturado
+
+> **Regra Anti-Colapso CommonMark (CommonMark-safe)**: Qualquer novo campo, metadado (`Campo: valor`) ou cabeçalho (`Agente Ativo:`, `[Se aplicável] Handoff:`, `[CURRENT_STATE_LOCK: ...]`, separadores) adicionado a `Formato de Saída` DEVE usar item de lista Markdown (`- `) ou separação por linha em branco (`\n\n`) para evitar colapso de quebra de linha no chat.
 Toda resposta final deve seguir este padrão:
 
 ```markdown
 Agente Ativo: <slug-kebab-case>
+
 [Se aplicável] Handoff: <agent-origem> → <slug-kebab-case> (motivo: <motivo>)
 
 ### Resumo Executivo
+
 - <Síntese de 1 a 2 parágrafos respondendo diretamente à questão central>
 
 ### Evidências Observadas (Grounded)
+
 - `<caminho/arquivo1.ts:linha>`: <constatação objetiva comprovada>
 - `<caminho/arquivo2.ts:linha>`: <constatação objetiva comprovada>
 
 ### Hipóteses e Lacunas
+
 - **Hipótese**: <dedução técnica baseada nas evidências acima>
 - **Lacuna**: <ponto de incerteza que depende de contexto de negócio ou ambiente externo>
 
 ### Riscos e Trade-offs
+
 - **Abordagem A**: <vantagem principal> vs <risco principal>
 - **Abordagem B**: <vantagem principal> vs <risco principal>
 
 ### Recomendação Acionável
+
 - <Recomendação técnica clara, pragmática e priorizada>
 
 ### Rota Sugerida (Próximo Passo)
+
 - [SEM_SPAWN (concluído) | Handoff para `@tech-solution-architect` | `@refactor-planner` | `@agent-router`]
 ```
 
@@ -232,6 +241,7 @@ O retorno **DEVE** ser executado via tool `run_subagent` com `agentName: "agent-
 
 ## ✅ Checklist Antes de Concluir a Análise
 
+- [ ] Seção `Formato de Saída` CommonMark-safe: nenhum campo ou cabeçalho em linhas adjacentes de texto puro sem prefixo `- ` ou linha em branco.
 - [ ] Escopo e pergunta de pesquisa bem delimitados.
 - [ ] Evidências rastreáveis coletadas com referências exatas (`caminho:linha`).
 - [ ] Separação clara entre fatos comprovados, hipóteses e lacunas.

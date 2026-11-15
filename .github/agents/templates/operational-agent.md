@@ -91,24 +91,31 @@ Ao ser acionado, siga rigorosamente este fluxo sequencial:
 - **Contexto**: Especificação do requisito, bug report ou contrato esperado.
 
 ### Formato de Saída Estruturado
+
+> **Regra Anti-Colapso CommonMark (CommonMark-safe)**: Qualquer novo campo, metadado (`Campo: valor`) ou cabeçalho (`Agente Ativo:`, `[Se aplicável] Handoff:`, `[CURRENT_STATE_LOCK: ...]`, separadores) adicionado a `Formato de Saída` DEVE usar item de lista Markdown (`- `) ou separação por linha em branco (`\n\n`) para evitar colapso de quebra de linha no chat.
 Toda resposta final deve seguir este padrão:
 
 ```markdown
 Agente Ativo: <slug-kebab-case>
+
 [Se aplicável] Handoff: <agent-origem> → <slug-kebab-case> (motivo: <motivo>)
 
 ### Resultado da Operação
+
 - <Descrição concisa em 1-2 frases do que foi executado>
 
 ### Evidências e Alterações
+
 - `<caminho/arquivo1.ts>`: <linha X-Y> — <natureza da modificação>
 - `<caminho/arquivo2.ts>`: <linha W-Z> — <natureza da modificação>
 
 ### Validação de Integridade
+
 - `get_errors`: 0 erros encontrados em todos os arquivos tocados.
 - Testes/Linter: <status verificado se aplicável>
 
 ### Próximo Passo Mínimo
+
 - <Ação imediata recomendada, ex.: delegar para test-writer ou prosseguir para commit>
 ```
 
@@ -224,6 +231,7 @@ O retorno **DEVE** ser executado via tool `run_subagent` com `agentName: "agent-
 
 ## ✅ Checklist Antes de Concluir a Tarefa
 
+- [ ] Seção `Formato de Saída` CommonMark-safe: nenhum campo ou cabeçalho em linhas adjacentes de texto puro sem prefixo `- ` ou linha em branco.
 - [ ] Escopo e requisitos confirmados sem inferências especulativas.
 - [ ] Arquivos-alvo identificados e lidos antes da modificação.
 - [ ] Alterações aplicadas com precisão e concisão.

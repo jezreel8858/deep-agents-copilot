@@ -75,6 +75,7 @@ Este prompt utiliza as variáveis de contexto nativas do VS Code Copilot:
 
 ## ✅ Checklist Antes de Apresentar
 
+- [ ] Seção `Formato de Saída` CommonMark-safe: nenhum campo ou cabeçalho em linhas adjacentes de texto puro sem prefixo `- ` ou linha em branco.
 - [ ] Arquivo alvo (`${file}` ou argumento) verificado antes da intervenção.
 - [ ] Transformação aplicada de forma atômica e pontual.
 - [ ] `get_errors` rodado com 0 novos erros introduzidos.
@@ -84,6 +85,8 @@ Este prompt utiliza as variáveis de contexto nativas do VS Code Copilot:
 ---
 
 ## 📊 Formato de Saída
+
+> **Regra Anti-Colapso CommonMark (CommonMark-safe)**: Qualquer novo campo, metadado (`Campo: valor`) ou cabeçalho (`Agente Ativo:`, `[Se aplicável] Handoff:`, `[CURRENT_STATE_LOCK: ...]`, separadores) adicionado a `Formato de Saída` DEVE usar item de lista Markdown (`- `) ou separação por linha em branco (`\n\n`) para evitar colapso de quebra de linha no chat.
 
 ```markdown
 ### Execução de `/<verbo>-<objeto>`

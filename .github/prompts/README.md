@@ -70,6 +70,7 @@ Prompts operacionais para workflow de execução no chat.
 | `/commit` | `.github/prompts/commit.prompt.md` | ⭐ **(v2.0)** Fluxo enxuto de 5 passos (segredos → inspeção → atomicidade → classificação → apresentação) que gera commit, título/descrição de PR (matriz de risco + plano de rollback) e entrada de CHANGELOG consumindo a SSOT `git-governance`. Nunca executa git. |
 | `/review` | `.github/prompts/review.prompt.md` | ⭐ **(v2.0)** Alias fino do agent `@code-review` — revisão de código por qualidade, convenções e impacto. Relatório compacto por severidade. |
 | `/craft-prompt` | `.github/prompts/craft-prompt.prompt.md` | ⭐ **(NEW)** Aciona o `WORKFLOW-PROMPT-SYNTHESIS` para refinar a solicitação, minerar caminhos reais e sintetizar o prompt canônico final em bloco `.md` para novo chat. |
+| `/synth-waves` | `.github/prompts/synth-waves.prompt.md` | ⭐ **(NEW)** Ciclo Prata de dados sintéticos de roteamento em 3 Ondas (estrutural → semântico/adversarial → cross-dimensão) com intake único (4 perguntas), execução autônoma e auto-promoção zero-touch (`router_bypass: slash_workflow`). |
 
 ---
 

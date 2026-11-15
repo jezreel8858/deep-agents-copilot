@@ -65,22 +65,29 @@ Pedido recebido?
 
 ```markdown
 Agente Ativo: code-style-enforcer
+
 [Se aplicável] Handoff: <agent-origem> → code-style-enforcer (motivo: <motivo>)
 
 🎨 VERIFICAÇÃO DE ESTILO/CONVENÇÃO
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Adapter aplicado: <nome do .instructions.md ou "nenhum documentado">
+
+- Adapter aplicado: <nome do .instructions.md ou "nenhum documentado">
 
 🟡 VIOLAÇÕES DE CONVENÇÃO:
+
 - [REGRA] <descrição da regra violada> → `arquivo:linha`
 
 ✅ ADERÊNCIA:
+
 - <padrão bem seguido>
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Confiança: <0.00–1.00> | Rota: rule-based|semantic|llm-based
+
+- Confiança: <0.00–1.00> | Rota: rule-based|semantic|llm-based
 
 Próximo passo mínimo:
+
 - <ação curta>
 ```
 

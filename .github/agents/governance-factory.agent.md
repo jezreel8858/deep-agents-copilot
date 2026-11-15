@@ -126,6 +126,8 @@ Retorne a síntese com citações de fontes para o solicitante 'governance-facto
 - Ordem de seções canônicas: H1 (# Perfil Operacional) → CRÍTICO (Escopo/Não-Escopo) → Decision Tree / Workflow Numerado → Padrões / Protocolo → Contrato Operacional / Formato Saída → Checklist → Anti-padrões → Quando Delegar → Retorno ao Router → Combina Com. O H1 de 100% dos agents deve ser padronizado para '# Perfil Operacional' de forma estritamente idêntica, com o nome do agente residindo exclusivamente no frontmatter YAML (name: '...'). (Proibidas seções redundantes de doc-loading no corpo).
 - Atualizar `README.md` + `catalog.yaml` na mesma entrega.
 
+  - **Formato de Saída CommonMark-safe**: exigir linha em branco após `Agente Ativo: <name>`, `[Se aplicável] Handoff: ...`, `[CURRENT_STATE_LOCK: ...]` e separadores, e lista Markdown (`- `) para campos consecutivos `Campo: valor` (zero linhas adjacentes colapsáveis).
+
 ### `type: skill`
 
 ```markdown
@@ -149,6 +151,8 @@ Seções: Quando Usar → Como Usar (máx. 8 linhas código inline) → Checklis
 - Frontmatter `name`, `description` (obrigatório), `model`, `tools` (menor privilégio; se `run_in_terminal` presente, inclusão compulsória de `terminal-governance` em `source_docs` por R-049), `source_docs`.
 - H1 com `/nome-do-comando`; body: Uso → CRÍTICO → Fluxo/Processo → Regras Críticas → Combina Com.
 - Nome de arquivo: kebab-case + verbo-objeto + `.prompt.md`. Atualizar `README.md` de prompts.
+
+  - **Formato de Saída CommonMark-safe**: exigir linha em branco após `Agente Ativo: <name>`, `[Se aplicável] Handoff: ...`, `[CURRENT_STATE_LOCK: ...]` e separadores, e lista Markdown (`- `) para campos consecutivos `Campo: valor` (zero linhas adjacentes colapsáveis).
 
 ### `type: stack` (Novo Ecossistema de Domínio)
 
@@ -185,6 +189,8 @@ Estrutura um ecossistema tecnológico completo em sua própria pasta, com isolam
    - **`.github/agents/agent-router.agent.md`**: Adicionar linha na tabela de routers de domínio, branch na Decision Tree e lista de delegação final.
    - **`.github/agents/README.md`**: Adicionar entrada nas tabelas de Catálogo de Agentes e Roteamento Rápido.
 
+  - **Formato de Saída CommonMark-safe**: exigir linha em branco após `Agente Ativo: <name>`, `[Se aplicável] Handoff: ...`, `[CURRENT_STATE_LOCK: ...]` e separadores, e lista Markdown (`- `) para campos consecutivos `Campo: valor` (zero linhas adjacentes colapsáveis).
+
 ## 🔒 Baseline R-054 — Governança Estrita de Todo Agent com Perfil de Router
 
 Todo agent com perfil de roteador (central `@agent-router`, supervisores hierárquicos `*-router` ou qualquer agent com papel de despachante) deve ser gerado ou revisado sob o template canônico `.github/agents/templates/router-agent.md` e cumprir compulsoriamente os 3 pilares normativos de R-054 (evitando o Smell 2.23):
@@ -214,20 +220,24 @@ Seguir o template parametrizável de `governance-factory-patterns` §4, com camp
 
 ```markdown
 Agente Ativo: governance-factory
+
 [Se aplicável] Handoff: <agent-origem> → governance-factory (motivo: <motivo>)
 
-Tipo de artefato: agent | skill | prompt | stack
-Ação: criação | revisão
-Pesquisa prévia via @deep-search (se criação): [executada — síntese incorporada | N/A — revisão]
-Caminho final: <caminho do arquivo ou pasta do ecossistema>
-Catálogo(s) atualizado(s): <README.md + catalog.yaml | .index.json + README.md | README.md de prompts | catalog.yaml + routing-graph.yaml + agent-router + README.md>
-Modelo escolhido (se aplicável): <tier + justificativa> | Validação get_errors: OK
-[Se type: stack] Router: <nome-router> | Sub-catálogo: <path> | Especialistas: <lista>
-[Se router] Baseline R-054 aplicado: <SIM | N/A>
+- Tipo de artefato: agent | skill | prompt | stack
+- Ação: criação | revisão
+- Pesquisa prévia via @deep-search (se criação): [executada — síntese incorporada | N/A — revisão]
+- Caminho final: <caminho do arquivo ou pasta do ecossistema>
+- Catálogo(s) atualizado(s): <README.md + catalog.yaml | .index.json + README.md | README.md de prompts | catalog.yaml + routing-graph.yaml + agent-router + README.md>
+- Modelo escolhido (se aplicável): <tier + justificativa> | Validação get_errors: OK
+- [Se type: stack] Router: <nome-router> | Sub-catálogo: <path> | Especialistas: <lista>
+- [Se router] Baseline R-054 aplicado: <SIM | N/A>
 ```
+
+- **Regra Anti-Colapso CommonMark em `## Formato de Saída`**: em `type=agent`, `type=prompt` e `type=stack`, exigir que a seção `## Formato de Saída` seja CommonMark-safe (linha em branco após `Agente Ativo: <name>`, `[Se aplicável] Handoff: ...`, `[CURRENT_STATE_LOCK: ...]` e separadores, e lista Markdown `- ` para campos consecutivos `Campo: valor`).
 
 ## Checklist Antes de Codar
 
+- [ ] Seção `## Formato de Saída` (em `type=agent`, `type=prompt` e `type=stack`) validada como CommonMark-safe: linha em branco após `Agente Ativo: <name>`, `[Se aplicável] Handoff: ...`, `[CURRENT_STATE_LOCK: ...]` e separadores, e lista Markdown (`- `) para campos consecutivos `Campo: valor`.
 Executar o checklist genérico de `governance-factory-patterns` §3, mais:
 
 - [ ] Tipo (`agent`/`skill`/`prompt`/`stack`) confirmado — via `ask_questions` se ambíguo.

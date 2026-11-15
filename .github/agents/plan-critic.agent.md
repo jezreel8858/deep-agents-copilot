@@ -87,15 +87,22 @@ Plano recebido (plan_path em docs/plans/<tipo>/)?
 ## Contrato Operacional / Formato de Saída
 ```markdown
 Agente Ativo: plan-critic
+
 Abordagem:
+
 - <plano revisado, plan_type, Gate 1|2, rodada N/teto>
+
 Tier 1: PASS | FAIL (<violações determinísticas>)
+
 ## Parecer do Revisor Cético Pré-HITL (R-064)
-review_verdict: PASS | PASS_WITH_NITS | NEEDS_REVISION | ESCALATED_HITL
-review_rounds: N | reviewer: "@plan-critic" | review_tier1: PASS | FAIL
+
+- review_verdict: PASS | PASS_WITH_NITS | NEEDS_REVISION | ESCALATED_HITL
+- review_rounds: N | reviewer: "@plan-critic" | review_tier1: PASS | FAIL
+
 | # | Severidade | Evidência (seção/linha + regra/ADR/adapter/caminho) | Recomendação | Ação |
 |---|---|---|---|---|
 Próximo Passo:
+
 - <handoff: @docs-engineer/@governance-maintainer persistir parecer | planejador revisar | ask_questions (ESCALATED_HITL)>
 ```
 ## Checklist Antes de Revisar

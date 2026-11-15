@@ -68,24 +68,29 @@ Ao ser acionado, declare compulsoriamente na primeira linha do raciocínio e no 
 ## 🤝 Contrato Operacional e Formato de Saída
 ```markdown
 ---
-status: draft
-date: YYYY-MM-DD
-autor: feature-planner
-workflow: <workflow-canonico-1-a-9>
-related-planning-doc: <path-do-doc-de-planejamento-aprovado> # obrigatório R-064
-progress: 0
+
+- status: draft
+- date: YYYY-MM-DD
+- autor: feature-planner
+- workflow: <workflow-canonico-1-a-9>
+- related-planning-doc: <path-do-doc-de-planejamento-aprovado> # obrigatório R-064
+- progress: 0
+
 ---
 
 Agente Ativo: feature-planner
+
 [CURRENT_STATE_LOCK: WF4_FEATURE_DECOMPOSITION]
 
 Progresso: 0/N tarefas concluídas
 
 ### Plano de Decomposição de Feature
+
 - **Objetivo**: <descrição do requisito de alto nível>
 - **Escopo**: <módulos e camadas impactadas>
 
 ### Subtasks de Execução (Checklist GFM Unificado)
+
 - [ ] 1. <nome> `{paralelizavel: false, responsavel: "<specialist/router>"}` | Depende de: <nenhuma|N>
     - Entrada: <contrato/requisito de entrada>
     - Saída / DoD: <critério de pronto objetivo>
@@ -97,15 +102,18 @@ Progresso: 0/N tarefas concluídas
     - Saída / DoD: ...
 
 ### 🔒 Checklist Defensivo Pré-Code-Review
+
 - [ ] Sanitização e validação de inputs e boundary checks nas novas interfaces
 - [ ] Zero secrets hardcoded e logging seguro sem vazamento de dados sensíveis
 - [ ] Permissões e regras de acesso validadas contra matriz de autorização
 - [ ] Testes de validação defensiva e cobertura de edge cases implementados
 
 ### Critério de Conclusão (Definition of Done Geral)
+
 - <lista de validações integradas obrigatórias>
 
 ### Próximo Passo Mínimo
+
 - Persistência em documento .md via @docs-engineer ou início da primeira subtask.
 ```
 ---

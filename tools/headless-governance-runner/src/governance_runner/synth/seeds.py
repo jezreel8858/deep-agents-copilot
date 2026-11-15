@@ -305,13 +305,34 @@ def gerar_seeds_grafo(
     return tuple(geradas)
 
 
-def _resolver_rota_etapa1(wf: WorkflowGrafo) -> str | None:
-    """Retorna o 1o padrao concreto da etapa 1 ou None se houver apenas coringas."""
-    for padrao in wf.etapa1_padroes:
-        p = padrao.strip()
-        if p and "*" not in p and "<stack>" not in p:
-            return p
-    return None
+def _resolver_rota_etapa1(
+    wf: WorkflowGrafo,
+    gatilho: str | None = None,
+    snapshot: GrafoSnapshot | None = None,
+) -> str | None:
+    """Retorna o padrao concreto da etapa 1 aderente ao gatilho ou o 1o padrao concreto."""
+    concretos = [
+        p.strip()
+        for p in wf.etapa1_padroes
+        if p.strip() and "*" not in p and "<stack>" not in p
+    ]
+    if not concretos:
+        return None
+    if len(concretos) > 2 and gatilho and snapshot is not None:
+        gat_norm = normalizar(gatilho)
+        concretos_set = frozenset(concretos)
+        melhor_rota: str | None = None
+        melhor_score = 0
+        for rota in rotas_validas(snapshot):
+            if rota.para.lower() not in concretos_set:
+                continue
+            score = sum(1 for kw in rota.keywords_norm if kw and (kw in gat_norm or gat_norm in kw))
+            if score > melhor_score:
+                melhor_score = score
+                melhor_rota = rota.para.lower()
+        if melhor_rota is not None:
+            return melhor_rota
+    return concretos[0]
 
 
 def gerar_seeds_workflows(
@@ -376,12 +397,13 @@ def gerar_seeds_workflows(
                 ok2, _ = sanitizar_prompt(prompt_final)
                 if not ok2:
                     continue
-            if rota_esp is not None:
-                edge_id, edge_res = resolver_aresta(rota_esp, normalizar(prompt_final), snapshot)
+            rota_gat = _resolver_rota_etapa1(wf, gat_limpo, snapshot) or rota_esp
+            if rota_gat is not None:
+                edge_id, edge_res = resolver_aresta(rota_gat, normalizar(prompt_final), snapshot)
             geradas.append(
                 SeedRef(
                     prompt=prompt_final,
-                    expected_route=rota_esp,
+                    expected_route=rota_gat,
                     seed_case_id=f"wf:{wf.workflow_id}:{idx}",
                     seed_source="routing_graph",
                     graph_edge_id=edge_id,

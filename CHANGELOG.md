@@ -6,6 +6,19 @@ Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](htt
 
 ---
 
+## [2.58.0] — 2026-11-15
+
+### Changed
+- **Roteadores (`@agent-router`, `*-router` e `templates/router-agent.md`)**: metadados do bloco `## Formato de Saída` passam a usar lista Markdown (`- Campo:`) com `Agente Ativo:` isolado na 1ª linha, evitando colapso de quebras de linha (CommonMark).
+- **Decision Tree do `@agent-router` / `routing-graph.yaml`**: Fast-Paths explícitos para `WORKFLOW-FRAMEWORK-MIGRATION`, `WORKFLOW-PROMPT-SYNTHESIS` e `WORKFLOW-TECHNICAL-ANALYSIS`; `WORKFLOW-REFACTORING` inicia na Etapa 1 com `@business-rules-extractor` (ground truth) antes de `@refactor-planner`.
+- **Agents, templates e `agent-contracts/SKILL.md`**: ajustes de contrato e `.a2a/agentcards/` sincronizados.
+- **`headless-governance-runner` (synth)**: `cli.py`, `evaluator.py` e `seeds.py` evoluídos para diagnóstico de workflows e extração B2; guia `docs/guides/synth-routing-eval-copilot-sdk-guide.md` ampliado.
+
+### Added
+- Testes em `tests/governance_audit/test_router_agents.py` (formato de saída dos roteadores) e `test_synth_workflows_b2_extraction.py`.
+
+---
+
 ## [2.57.0] — 2026-11-14
 
 ### Added

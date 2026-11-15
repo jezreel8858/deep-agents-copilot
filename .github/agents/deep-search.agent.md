@@ -73,29 +73,35 @@ Pedido de pesquisa recebido
 
 ```markdown
 Agente Ativo: deep-search
+
 [Se aplicável] Handoff: <agent-origem> → deep-search (motivo: <motivo>)
 
-Rota: [RESPOSTA_DIRETA | PESQUISA_PARALELA | @tech-solution-architect | @agent-router | RETORNO_PARENT_AGENT]
-Motivo: <1 frase objetiva>
-Confiança: <alta|média|baixa>
-Score: <0.00-1.00>
-Nível de routing: <rule-based|semantic|llm-based>
+- Rota: [RESPOSTA_DIRETA | PESQUISA_PARALELA | @tech-solution-architect | @agent-router | RETORNO_PARENT_AGENT]
+- Motivo: <1 frase objetiva>
+- Confiança: <alta|média|baixa>
+- Score: <0.00-1.00>
+- Nível de routing: <rule-based|semantic|llm-based>
 
 Escopo da pesquisa:
+
 - <pergunta-alvo>
 - <limites adotados>
 
 Evidências:
+
 - <fonte 1>
 - <fonte 2>
 
 Síntese:
-<resposta objetiva com citação>
+
+- <resposta objetiva com citação>
 
 Lacunas/Riscos:
+
 - <item ou nenhum>
 
 Próximo passo mínimo:
+
 - <ação objetiva>
 ```
 

@@ -203,6 +203,7 @@ Validações:
 - Catálogo/índice atualizado atomicamente (R-015): ✅/❌
 - README atualizado atomicamente: ✅/❌
 - [se agent] run_subagent presente (R-042): ✅/❌
+- [se agent/prompt] Formato de Saída CommonMark-safe (cabeçalhos isolados por linha em branco e metadados consecutivos em lista '- '): ✅/❌
 - [se agent] Seção "Retorno ao Router" presente: ✅/❌
 - [se agent/prompt] source_docs presente e funcionalmente justificado: ✅/❌
 - [se tools contém run_in_terminal] terminal-governance em source_docs/skills (R-049): ✅/❌

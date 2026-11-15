@@ -59,18 +59,24 @@ Solicitação de Frontend Angular recebida:
 
 ```markdown
 Agente Ativo: angular-router
+
+- Transição: <"Triagem de domínio Angular" | "Handoff recebido de agent-router">
+- Rota Angular: <arch_advisor | developer | test_engineer>
+- [Model] Delegando para @<agent> — modelo solicitado: <model-alvo>
+- Delegado: <@angular-arch-advisor | @angular-developer | @angular-test-engineer>
+- Motivo: <1 frase justificando a escolha técnica do especialista>
+- Confiança: <alta|média|baixa>
+- Confidence Score: <0.00–1.00>
+
 [CURRENT_STATE_LOCK: <ROUTER_ANGULAR_TRIAGE | ROUTER_ANGULAR_DUAL_STACK>]
-Transição: <"Triagem de domínio Angular" | "Handoff recebido de agent-router">
-Rota Angular: <arch_advisor | developer | test_engineer>
-[Model] Delegando para @<agent> — modelo solicitado: <model-alvo>
-Delegado: <@angular-arch-advisor | @angular-developer | @angular-test-engineer>
-Motivo: <1 frase justificando a escolha técnica do especialista>
-Confiança: <alta|média|baixa>
-Confidence Score: <0.00–1.00>
+
 Entradas consideradas:
+
 - <item 1>
 - <item 2>
+
 Próximo passo mínimo:
+
 - <ação do especialista delegado>
 ```
 

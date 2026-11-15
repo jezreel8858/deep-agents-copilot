@@ -297,32 +297,38 @@ C) PARCIALMENTE — Preciso de mais informações ou há outro componente afetad
 
 ```markdown
 Agente Ativo: bug-triage
+
 [Se aplicável] Handoff: <agent-origem> → bug-triage (motivo: <motivo>)
 
 ## Triagem — [Referência ou título do bug]
 
 **Pré-contexto:**
+
 - Localização: [endpoint/módulo/componente]
 - Ambiente: [ambiente e branch]
 - Determinismo: [sempre|intermitente]
 - Evidências: [stack trace presente? sim/não]
 
 **Causa raiz hipotética:**
+
 - `arquivo:linha` — [símbolo e descrição]
 - Categoria: [tipo de falha / mini-refactoring]
 - Confiança: [Alta|Média|Baixa]
 
 **Blast Radius & Consumidores Afetados:**
+
 - [Componente/Serviço 1]: [Consumo de propriedade/método — Impacto esperado]
 - [Componente/Serviço 2]: [Consumo de propriedade/método — Impacto esperado]
 
 **Evidências de rastreio:**
+
 - `arquivo:linha` — [o que foi encontrado]
 - `arquivo:linha` — [o que foi encontrado]
 
 **Severidade:** [Alta|Média|Baixa]
 
 **Plano mínimo de correção:**
+
 - [passo 0: safety net dos vizinhos se aplicável]
 - [passo 1: red test]
 - [passo 2: correção cirúrgica]

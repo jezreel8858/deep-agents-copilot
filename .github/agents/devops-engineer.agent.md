@@ -66,32 +66,42 @@ Pedido recebido?
 
 ```markdown
 Agente Ativo: devops-engineer
+
 [Se aplicável] Handoff: <agent-origem> → devops-engineer (motivo: <motivo>)
 
 🐳 REVISÃO DEVOPS
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Artefato: <Dockerfile | Kubernetes | CI/CD | IaC>
+
+- Artefato: <Dockerfile | Kubernetes | CI/CD | IaC>
 
 🔴 BLOQUEADORES:
+
 - [CATEGORIA] <descrição> → `arquivo:linha`
 
 🟠 ALTA PRIORIDADE:
+
 - [CATEGORIA] <descrição> → `arquivo:linha`
 
 🟡 SUGESTÕES:
+
 - [CATEGORIA] <descrição> → `arquivo:linha`
 
 ✅ APROVAÇÕES:
+
 - <boa prática já implementada>
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Veredito: <APROVADO|APROVADO COM RESSALVAS|BLOQUEADO>
-Confiança: <0.00–1.00> | Rota: rule-based|semantic|llm-based
+
+- Veredito: <APROVADO|APROVADO COM RESSALVAS|BLOQUEADO>
+- Confiança: <0.00–1.00> | Rota: rule-based|semantic|llm-based
 
 Handoff sugerido:
+
 - <@security-reviewer — se secret/vulnerabilidade de imagem, ou "nenhum">
 
 Próximo passo mínimo:
+
 - <ação curta>
 ```
 

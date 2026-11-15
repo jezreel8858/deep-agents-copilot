@@ -870,6 +870,15 @@ ambiguos:
     nao_deve: rotear para test-engineer (mode fix) sem o relatório
   critico: false
   threshold: 0.7
+- id: promoted-silver-86a8b309a3b7
+  descricao: business-rules-extractor / code_switching_pt_en
+  input:
+    solicitacao: Extrair as business rules deste módulo, listando cada regra com o
+      seu trigger, as conditions e o resultado esperado.
+  expected:
+    agent_route: business-rules-extractor
+  critico: false
+  threshold: 0.7
 regressao:
 - id: regr-001
   descricao: 'REGRESSÃO: ''bug em produção'' não deve rotear para test-strategy'

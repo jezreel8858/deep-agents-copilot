@@ -152,3 +152,14 @@ Guia rápido para usar os prompts do Copilot Chat.
 - [ ] Usa `/add-project-context` uma vez POR PROJETO?
 
 Se **TODOS SIM**: ✅ Você está usando correto!
+
+---
+
+## 🧪 Ciclo Prata Sintético — `/synth-waves`
+
+```bash
+/synth-waves
+```
+
+**Resultado**: 1 carrossel de intake (perfil, seeding, modelo SDK, auto-promoção) → 3 Ondas autônomas → relatório executivo (acurácia, workflow_macro_f1, banner_coverage) e casos promovidos.
+**Nota**: Sem interação após o intake; rollback automático via `git checkout --` se `pytest` falhar.

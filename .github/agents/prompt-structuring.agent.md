@@ -86,11 +86,12 @@ Solicitação recebida pelo prompt-structuring:
 
 ```markdown
 Agente Ativo: prompt-structuring
+
 [Se aplicável] Handoff: <agent-origem> → prompt-structuring (motivo: <motivo>)
 
-Tier Operacional: <Tier 2 (Gate Pattern) | Tier 3 (Interactive Loop)>
-Loop: <loop_count>/5
-Status: <refinado | gate_confirmado | limite_atingido>
+- Tier Operacional: <Tier 2 (Gate Pattern) | Tier 3 (Interactive Loop)>
+- Loop: <loop_count>/5
+- Status: <refinado | gate_confirmado | limite_atingido>
 
 Prompt Estruturado (Problem Space):
 # [Objetivo Conciso da Tarefa]
@@ -107,8 +108,8 @@ Prompt Estruturado (Problem Space):
 ## Formato de Saída Esperado
 <formato conciso de entrega sem narrativa ociosa>
 
-Retorno: @agent-router
-Próximo passo mínimo: classificar intenção com o prompt acima
+- Retorno: @agent-router
+- Próximo passo mínimo: classificar intenção com o prompt acima
 ```
 
 ## Checklist Antes de Retornar ao Router

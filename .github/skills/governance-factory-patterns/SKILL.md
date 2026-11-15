@@ -67,6 +67,9 @@ Solicitação (create / update / review de agent | skill | prompt | stack)
 ### 3.2) `type: prompt` (`.github/prompts/templates/prompt-template.md`)
 - **Frontmatter YAML obrigatório**: `name`, `description`, `agent`, `model`, `tools` (estritamente inline `tools: ['...']`, proibido `tools:\n  - ...`), `argument-hint`, `source_docs`, `source_docs_lazy`.
 - **Seções obrigatórias**: `## 🎯 Invocação e Variáveis Nativas` (`${file}`, `${selection}`, `${workspaceFolder}`), `## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO`, `## 📋 Fluxo de Execução Passo a Passo`, `## ✅ Checklist Antes de Apresentar`, `## 📊 Formato de Saída` e `## ⚙️ Protocolo de Execução Obrigatório` (`<execution_protocol>` com `R-059`/`R-060`).
+- [ ] Seção `## Formato de Saída` de novo agent ou prompt validada como CommonMark-safe (linha em branco após `Agente Ativo: <name>`, `[Se aplicável] Handoff: ...`, `[CURRENT_STATE_LOCK: ...]` e separadores, e lista Markdown `- ` para campos consecutivos `Campo: valor`).
+
+- **Formato de Saída CommonMark-Safe (Obrigatório)**: Em qualquer novo `agent` ou `prompt`, a seção `## Formato de Saída` DEVE isolar cabeçalhos (`Agente Ativo: <name>`, `[Se aplicável] Handoff: ...`, `Skills Carregadas: ...`, `[CURRENT_STATE_LOCK: ...]`) e separadores (`---`) com linha em branco (`\n\n`) e formatar campos consecutivos `Campo: valor` como lista Markdown (`- `), evitando colapso de quebra de linha (*lazy paragraph continuation*) no chat.
 
 ### 3.3) `type: skill` (`.github/skills/templates/skill-template.md`)
 - **Frontmatter YAML obrigatório**: `name` e `description` em 3ª pessoa com gatilhos explícitos (`Fornece/Define... Use quando... Não use para...`, `≤ 400` chars), `tools` (estritamente em sintaxe inline `tools: ['...']` ou `tools: []` — proibido formato multilinha `tools:\n  - ...`), além de metadados de proveniência quando adaptada (`R-067`).

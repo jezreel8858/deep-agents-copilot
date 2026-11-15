@@ -305,3 +305,32 @@ def test_cli_generate_com_workflow_seeds_all_exit_0(tmp_path: Path) -> None:
     rc = cli.main(["--use-case", "synth-generate", "--db", str(tmp_path / "c.db"), "--per-stratum", "1",
                    "--dimensions", "parafrase", "--workflow-seeds", "all"])
     assert rc == 0
+
+def test_capturar_workflow_e_rota_com_prefixo_lista_markdown() -> None:
+    from governance_runner.synth.evaluator import _REGEX_BANNER, _REGEX_ETAPA_WORKFLOW, capturar_rota, capturar_workflow
+    texto_banner = (
+        "Agente Ativo: @bug-triage\n\n"
+        "- Transição: Nova triagem (1º turno)\n"
+        "Workflow: WORKFLOW-BUG-FIX\n"
+        "- Etapa do Workflow: 2\n"
+        "- Rota: bug_fix\n"
+        "- [Model] Delegando para @bug-triage — modelo solicitado: Claude Sonnet 4.6\n"
+        "- Delegado: @bug-triage\n"
+        "- Motivo: Triagem inicial de bug\n"
+        "- Confiança: alta\n"
+        "- Confidence Score: 0.95\n"
+        "- Nível de Routing: rule-based"
+    )
+    wf_id, etapa, wf_source = capturar_workflow(texto_banner, IDS)
+    assert wf_id == WF_BF
+    assert etapa == 2
+    assert wf_source == "text_banner"
+
+    assert _REGEX_ETAPA_WORKFLOW.search("- **Etapa do Workflow**: 3") is not None
+    assert _REGEX_BANNER["Delegado"].search(texto_banner).group(1).strip() == "@bug-triage"
+    assert _REGEX_BANNER["Rota"].search(texto_banner).group(1).strip() == "bug_fix"
+    assert _REGEX_BANNER["Agente Ativo"].search("- Agente Ativo: @bug-triage").group(1).strip() == "@bug-triage"
+
+    rota, fonte = capturar_rota(SDKResponse(achados=(), premium_requests_consumidos=1, texto=texto_banner))
+    assert rota == "bug-triage"
+    assert fonte == "text_banner"

@@ -58,18 +58,24 @@ Solicitação de Java Legado Struts recebida:
 
 ```markdown
 Agente Ativo: struts-router
+
+- Transição: <"Triagem de domínio Struts" | "Handoff recebido de agent-router">
+- Rota Struts: <arch_advisor | developer | test_engineer>
+- [Model] Delegando para @<agent> — modelo solicitado: <model-alvo>
+- Delegado: <@struts-arch-advisor | @struts-developer | @struts-test-engineer>
+- Motivo: <1 frase justificando a escolha técnica do especialista>
+- Confiança: <alta|média|baixa>
+- Confidence Score: <0.00–1.00>
+
 [CURRENT_STATE_LOCK: <ROUTER_STRUTS_TRIAGE | ROUTER_STRUTS_MIGRATION>]
-Transição: <"Triagem de domínio Struts" | "Handoff recebido de agent-router">
-Rota Struts: <arch_advisor | developer | test_engineer>
-[Model] Delegando para @<agent> — modelo solicitado: <model-alvo>
-Delegado: <@struts-arch-advisor | @struts-developer | @struts-test-engineer>
-Motivo: <1 frase justificando a escolha técnica do especialista>
-Confiança: <alta|média|baixa>
-Confidence Score: <0.00–1.00>
+
 Entradas consideradas:
+
 - <item 1>
 - <item 2>
+
 Próximo passo mínimo:
+
 - <ação do especialista delegado>
 ```
 

@@ -282,17 +282,21 @@ Próximo passo mínimo:
 
 ```markdown
 Agente Ativo: business-rules-extractor
+
 [Se aplicável] Handoff: <agent-origem> → business-rules-extractor (motivo: <motivo>)
 
 Resultado:
+
 - <modo executado> em <módulo>
 - <contagem de regras>
 
 Evidências:
+
 - `docs/business-rules/business-rules-<modulo>.md`: <ação>
 - `src/arquivo:linha`: BR-NNN documentada
 
 Próximo passo mínimo:
+
 - <ação objetiva>
 ```
 

@@ -58,18 +58,24 @@ Solicitação de Spring Boot recebida:
 
 ```markdown
 Agente Ativo: spring-boot-router
+
+- Transição: <"Triagem de domínio Spring Boot" | "Handoff recebido de agent-router">
+- Rota Spring Boot: <arch_advisor | developer | test_engineer>
+- [Model] Delegando para @<agent> — modelo solicitado: <model-alvo>
+- Delegado: <@spring-boot-arch-advisor | @spring-boot-developer | @spring-boot-test-engineer>
+- Motivo: <1 frase justificando a escolha técnica do especialista>
+- Confiança: <alta|média|baixa>
+- Confidence Score: <0.00–1.00>
+
 [CURRENT_STATE_LOCK: <ROUTER_SPRING_BOOT_TRIAGE | ROUTER_SPRING_BOOT_DUAL_STACK>]
-Transição: <"Triagem de domínio Spring Boot" | "Handoff recebido de agent-router">
-Rota Spring Boot: <arch_advisor | developer | test_engineer>
-[Model] Delegando para @<agent> — modelo solicitado: <model-alvo>
-Delegado: <@spring-boot-arch-advisor | @spring-boot-developer | @spring-boot-test-engineer>
-Motivo: <1 frase justificando a escolha técnica do especialista>
-Confiança: <alta|média|baixa>
-Confidence Score: <0.00–1.00>
+
 Entradas consideradas:
+
 - <item 1>
 - <item 2>
+
 Próximo passo mínimo:
+
 - <ação do especialista delegado>
 ```
 

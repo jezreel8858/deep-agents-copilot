@@ -58,17 +58,23 @@ Solicitação de Python Backend recebida:
 
 ```markdown
 Agente Ativo: python-router
+
+- Transição: <transição ou "Delegando internamente no domínio Python">
+- [Model] Delegando para @<agent> — modelo solicitado: <model-alvo>
+- Delegado: <@python-arch-advisor | @python-developer | @python-test-engineer>
+- Motivo: <justificativa objetiva em 1 linha>
+- Confiança: <alta|média|baixa>
+- Confidence Score: <0.00–1.00>
+
 [CURRENT_STATE_LOCK: <ROUTER_PYTHON_TRIAGE | ROUTER_PYTHON_DUAL_STACK>]
-Transição: <transição ou "Delegando internamente no domínio Python">
-[Model] Delegando para @<agent> — modelo solicitado: <model-alvo>
-Delegado: <@python-arch-advisor | @python-developer | @python-test-engineer>
-Motivo: <justificativa objetiva em 1 linha>
-Confiança: <alta|média|baixa>
-Confidence Score: <0.00–1.00>
+
 Entradas consideradas:
+
 - <item 1>
 - <item 2>
+
 Próximo passo mínimo:
+
 - <ação do especialista delegado>
 ```
 

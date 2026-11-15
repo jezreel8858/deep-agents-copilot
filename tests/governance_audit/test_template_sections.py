@@ -434,12 +434,12 @@ def test_homologation_gate_blocks_unhomologated_injections(tmp_path: Path):
 
 
 # ─────────────────────────────────────────────────────────────
-# 7. ONDA 5 (CA-06) — Contratos Estritos de Prompts (22), Skills (81) e Blindagem @governance-factory
+# 7. ONDA 5 (CA-06) — Contratos Estritos de Prompts (23), Skills (81) e Blindagem @governance-factory
 # ─────────────────────────────────────────────────────────────
 
 def test_ca06_all_prompts_have_6_canonical_sections_and_native_variables():
     """
-    Valida que todos os 22 prompts (.github/prompts/*.prompt.md) possuem:
+    Valida que todos os 23 prompts (.github/prompts/*.prompt.md) possuem:
     - '🎯 Invocação e Variáveis Nativas' com '${file}', '${selection}', '${workspaceFolder}'
     - '🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO'
     - '📋 Fluxo de Execução Passo a Passo'
@@ -448,7 +448,7 @@ def test_ca06_all_prompts_have_6_canonical_sections_and_native_variables():
     - '⚙️ Protocolo de Execução Obrigatório' e bloco '<execution_protocol>'
     """
     prompt_files = sorted(p for p in PROMPTS_DIR.glob("*.prompt.md") if "templates" not in p.parts)
-    assert len(prompt_files) == 22, f"Esperado 22 prompts em {PROMPTS_DIR}, encontrado {len(prompt_files)}"
+    assert len(prompt_files) == 23, f"Esperado 23 prompts em {PROMPTS_DIR}, encontrado {len(prompt_files)}"
 
     required_markers = [
         "🎯 Invocação e Variáveis Nativas",
@@ -471,7 +471,7 @@ def test_ca06_all_prompts_have_6_canonical_sections_and_native_variables():
         if missing:
             violations.append(f"[{pf.relative_to(REPO_ROOT)}] marcadores ausentes: {missing}")
 
-    assert not violations, f"Violações de contrato nos 22 prompts:\n" + "\n".join(violations)
+    assert not violations, f"Violações de contrato nos 23 prompts:\n" + "\n".join(violations)
 
 
 def test_ca06_all_skills_have_5_canonical_sections_and_frontmatter_triggers():
@@ -525,3 +525,45 @@ def test_ca06_governance_factory_references_official_templates():
     ]
     missing = [ref for ref in expected_refs if ref not in content]
     assert not missing, f"governance-factory.agent.md não referencia os templates oficiais: {missing}"
+
+def test_templates_and_factory_enforce_commonmark_safe_formato_de_saida() -> None:
+    """Garante que todos os templates SSOT (agents e prompt) e a fábrica exigem Formato de Saída CommonMark-safe."""
+    template_paths = [
+        REPO_ROOT / ".github" / "agents" / "templates" / "agent-template.md",
+        REPO_ROOT / ".github" / "agents" / "templates" / "operational-agent.md",
+        REPO_ROOT / ".github" / "agents" / "templates" / "research-agent.md",
+        REPO_ROOT / ".github" / "agents" / "templates" / "router-agent.md",
+        REPO_ROOT / ".github" / "prompts" / "templates" / "prompt-template.md",
+    ]
+    for tpl in template_paths:
+        content = tpl.read_text(encoding="utf-8")
+        rel = tpl.relative_to(REPO_ROOT).as_posix()
+        assert "CommonMark" in content and "Formato de Saída" in content, (
+            f"[{rel}] deve conter nota/diretriz explícita CommonMark-safe na seção Formato de Saída"
+        )
+        assert "(`- `)" in content or "lista Markdown" in content, (
+            f"[{rel}] deve orientar uso de lista Markdown ('- ') ou linha em branco para campos em Formato de Saída"
+        )
+
+    governance_docs = [
+        REPO_ROOT / ".github" / "agents" / "governance-factory.agent.md",
+        REPO_ROOT / ".github" / "skills" / "governance-factory-patterns" / "SKILL.md",
+        REPO_ROOT
+        / ".github"
+        / "skills"
+        / "governance-factory-patterns"
+        / "references"
+        / "artifact-specs-and-stack-topology.md",
+        REPO_ROOT / ".github" / "skills" / "agent-contracts" / "SKILL.md",
+        REPO_ROOT
+        / ".github"
+        / "skills"
+        / "specialist-hybrid-advisory-implementation-patterns"
+        / "SKILL.md",
+    ]
+    for doc in governance_docs:
+        content = doc.read_text(encoding="utf-8")
+        rel = doc.relative_to(REPO_ROOT).as_posix()
+        assert "CommonMark-safe" in content or "CommonMark-Safe" in content, (
+            f"[{rel}] deve exigir validação CommonMark-safe para Formato de Saída"
+        )

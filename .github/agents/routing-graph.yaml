@@ -291,7 +291,7 @@ workflows:
     estados:
       - etapa: 1
         nome: "ground_truth_rules_extraction"
-        agent: "business-rules-extractor"
+        agent: "business-rules-extractor | refactor-planner"
       - etapa: 2
         nome: "blast_radius_and_graph_mapping"
         agent: "codegraph-engine"
@@ -333,7 +333,7 @@ workflows:
     regra: "R-050"
     fast_path: true
     gatilhos:
-      - "analisar"
+      - "analisar arquitetura e impacto tecnico"
       - "diagnosticar"
       - "como funciona"
       - "mapear arquitetura"

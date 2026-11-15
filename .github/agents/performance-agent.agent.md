@@ -67,30 +67,39 @@ Pedido recebido?
 
 ```markdown
 Agente Ativo: performance-agent
+
 [Se aplicável] Handoff: <agent-origem> → performance-agent (motivo: <motivo>)
 
 ⚡ REVISÃO DE PERFORMANCE
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Camada revisada: <frontend | backend | banco de dados>
-Métricas aplicadas: <Core Web Vitals | latência/throughput | plano de query>
+
+- Camada revisada: <frontend | backend | banco de dados>
+- Métricas aplicadas: <Core Web Vitals | latência/throughput | plano de query>
 
 🔴 BLOQUEADORES:
+
 - [PADRÃO] <descrição> → `arquivo:linha` (impacto: <métrica atual vs. esperada>)
 
 🟠 ALTA PRIORIDADE:
+
 - [PADRÃO] <descrição> → `arquivo:linha`
 
 🟡 SUGESTÕES:
+
 - [PADRÃO] <descrição> → `arquivo:linha`
 
 ✅ APROVAÇÕES:
+
 - <padrão de performance bem implementado>
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Veredito: <APROVADO|APROVADO COM RESSALVAS|BLOQUEADO>
-Confiança: <0.00–1.00> | Rota: rule-based|semantic|llm-based
+
+- Veredito: <APROVADO|APROVADO COM RESSALVAS|BLOQUEADO>
+- Confiança: <0.00–1.00> | Rota: rule-based|semantic|llm-based
 
 Próximo passo mínimo:
+
 - <ação curta>
 ```
 

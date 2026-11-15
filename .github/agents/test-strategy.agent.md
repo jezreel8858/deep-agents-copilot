@@ -69,19 +69,30 @@ Ao ser acionado, declare compulsoriamente na primeira linha do raciocínio e no 
 ## 🤝 Contrato Operacional e Formato de Saída
 ```markdown
 Agente Ativo: test-strategy
+
 [CURRENT_STATE_LOCK: <WF4_TEST_STRATEGY_GATEWAY | DOMAIN_TEST_STRATEGY_CONSULT>]
+
 ### Resumo da Estratégia de Testes
+
 - **Abordagem**: <estratégia por risco e cobertura da pirâmide de testes>
 - **Escopo**: <módulos e serviços analisados>
+
 ### Matriz de Cenários — Backend / APIs
+
 - **Cenário 1** | Tipo: <unit/integ> | Prioridade: <P1/P2/P3> | Risco: <descrição do risco / caso de borda>
 - **Cenário 2** | Tipo: <unit/integ> | Prioridade: <P1/P2/P3> | Risco: <exceção tratada>
+
 ### Matriz de Cenários — Frontend / UI (se aplicável)
+
 - **Cenário 1** | Tipo: <unit/component/e2e> | Prioridade: <P1/P2/P3> | Risco: <interação de UI>
 - **Cenário 2 (Navegabilidade)** | Tipo: <component/e2e> | Prioridade: P1 | Risco: <rota exposta no menu/sidenav>
+
 ### Critérios de Aceitação & Guardrails
+
 - <critérios objetivos para os test-writers da stack>
+
 ### Próximo Passo Mínimo
+
 - Despacho aos Domain Routers (@spring-boot-router, @angular-router, etc.) para codificação dos testes.
 ```
 ---

@@ -327,9 +327,11 @@ Geração de Adapters: ✅ OK
 └─ ... (lista completa)
 
 ⚠️  Nenhum arquivo foi criado ou modificado nos projetos externos.
+
 ⚠️  Estes arquivos NUNCA são commitados — vivem apenas nesta máquina (R-043).
 
 ✅ Validações:
+
 - Frontmatter YAML: ✅ válido
 - Padrão applyTo: ✅ preenchido conforme detected_stack
 - Idempotência: ✅ respeitada (nenhum sobrescrito)
@@ -342,7 +344,7 @@ Próximos passos mínimos:
   3. Use `/add-project-context` para adicionar mais projetos
   4. Use `/del-project-context` para remover projetos quando necessário
 
-Confiança: Alta
+- Confiança: Alta
 ```
 
 ### Falha
@@ -352,11 +354,11 @@ Agente Ativo: adapter-generator
 
 Geração de Adapters: ❌ ERRO
 
-Causa: <descrição em ≤ 1 linha>
-Local: <arquivo:linha ou etapa>
-Ação sugerida: <o que fazer>
+- Causa: <descrição em ≤ 1 linha>
+- Local: <arquivo:linha ou etapa>
+- Ação sugerida: <o que fazer>
 
-Confiança: Baixa — aguardando correção manual
+- Confiança: Baixa — aguardando correção manual
 ```
 
 ## Quando Disparar Este Agent

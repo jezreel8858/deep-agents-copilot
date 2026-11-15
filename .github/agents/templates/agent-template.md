@@ -109,20 +109,27 @@ Ao receber uma solicitação, execute ordenadamente os seguintes passos:
 - **Contexto Adicional**: <Restrições ou contexto complementar>
 
 ### Formato de Saída Estruturado
+
+> **Regra Anti-Colapso CommonMark (CommonMark-safe)**: Qualquer novo campo, metadado (`Campo: valor`) ou cabeçalho (`Agente Ativo:`, `[Se aplicável] Handoff:`, `[CURRENT_STATE_LOCK: ...]`, separadores) adicionado a `Formato de Saída` DEVE usar item de lista Markdown (`- `) ou separação por linha em branco (`\n\n`) para evitar colapso de quebra de linha no chat.
 ```markdown
 Agente Ativo: <slug-kebab-case>
+
 [Se aplicável] Handoff: <agent-origem> → <slug-kebab-case> (motivo: <motivo>)
 
 ### Resumo da Entrega
+
 - <Síntese concisa em 1-2 frases do que foi entregue>
 
 ### Evidências e Rastreabilidade
+
 - `<caminho/arquivo>`: <detalhes verificáveis>
 
 ### Validações Executadas
+
 - <Resultado de validações e verificações técnicas>
 
 ### Próximo Passo Mínimo
+
 - <Ação recomendada para continuidade do fluxo>
 ```
 
@@ -195,6 +202,7 @@ Retorne IMEDIATAMENTE para `@agent-router` caso a solicitação fuja do escopo d
 
 ## ✅ Checklist Antes de Concluir a Tarefa
 
+- [ ] Seção `Formato de Saída` CommonMark-safe: nenhum campo ou cabeçalho em linhas adjacentes de texto puro sem prefixo `- ` ou linha em branco.
 - [ ] Escopo e não-escopo validados no início do turno.
 - [ ] Alterações ou análises executadas com rastreabilidade comprovada.
 - [ ] Validação de integridade realizada com sucesso.

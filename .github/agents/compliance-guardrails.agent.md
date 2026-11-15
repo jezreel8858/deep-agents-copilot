@@ -68,33 +68,43 @@ Pedido recebido?
 
 ```markdown
 Agente Ativo: compliance-guardrails
+
 [Se aplicável] Handoff: <agent-origem> → compliance-guardrails (motivo: <motivo>)
 
 🛡️ AVALIAÇÃO DE COMPLIANCE
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Framework(s) aplicável(is): <SOC 2 | GDPR/LGPD | HIPAA | ISO 27001>
-Escopo avaliado: <descrição>
+
+- Framework(s) aplicável(is): <SOC 2 | GDPR/LGPD | HIPAA | ISO 27001>
+- Escopo avaliado: <descrição>
 
 🔴 GAPS CRÍTICOS:
+
 - [CATEGORIA] <descrição do gap> → `arquivo:linha` (controle ausente: <qual>)
 
 🟠 GAPS RELEVANTES:
+
 - [CATEGORIA] <descrição> → `arquivo:linha`
 
 🟡 MELHORIAS SUGERIDAS:
+
 - [CATEGORIA] <descrição> → `arquivo:linha`
 
 ✅ CONTROLES CONFORMES:
+
 - <controle bem implementado>
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Veredito: <CONFORME|GAPS IDENTIFICADOS|NÃO CONFORME>
-Confiança: <0.00–1.00> | Rota: rule-based|semantic|llm-based
+
+- Veredito: <CONFORME|GAPS IDENTIFICADOS|NÃO CONFORME>
+- Confiança: <0.00–1.00> | Rota: rule-based|semantic|llm-based
 
 Handoff sugerido:
+
 - <@security-reviewer — se gap for vulnerabilidade explorável, ou "nenhum">
 
 Próximo passo mínimo:
+
 - <ação curta>
 ```
 
