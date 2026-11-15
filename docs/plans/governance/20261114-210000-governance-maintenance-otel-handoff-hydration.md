@@ -103,6 +103,9 @@ allowed_files:
   - ".github/agents/security-reviewer.agent.md"
   - ".github/agents/tech-solution-architect.agent.md"
   - ".github/agents/test-strategy.agent.md"
+lessons_extracted: true
+lessons_applied_to: ["@agent-auditor", "plan-conformance-patterns"]
+lessons_at: "2026-11-15"
 ---
 
 # Plano de Manutenção de Governança — Propagação de Correlação OTel em Handoffs e Lazy Context Hydration nos 63 Agents (R-064 / R-042 / R-060)

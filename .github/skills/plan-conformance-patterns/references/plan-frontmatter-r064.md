@@ -43,6 +43,9 @@ allowed_files:
 | `created_at` | Data ISO `AAAA-MM-DD` |
 | `related-planning-doc` | Plano antecedente (ex.: blueprint → implementation) ou `N/A` |
 | `allowed_files` | Allowlist de arquivos/globs usada pelo Nível 1 da conformidade |
+| `lessons_extracted` | *(Opcional)* `bool` (`false \| true`); ausente ou `false` indica plano elegível na Fase 1 do `/plan-lessons-harvester`; `true` indica plano já processado e ignorado em execuções futuras |
+| `lessons_applied_to` | *(Opcional)* Lista de `str` com os agents/skills blindados a partir das lições do plano (`[]` quando analisado sem ação necessária) |
+| `lessons_at` | *(Opcional)* Data ISO `AAAA-MM-DD` da selagem de idempotência (gravada exclusivamente após suíte `pytest tests/governance_audit/` 100% verde) |
 
 ## Taxonomia das 8 Subpastas
 

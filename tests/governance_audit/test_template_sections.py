@@ -434,12 +434,12 @@ def test_homologation_gate_blocks_unhomologated_injections(tmp_path: Path):
 
 
 # ─────────────────────────────────────────────────────────────
-# 7. ONDA 5 (CA-06) — Contratos Estritos de Prompts (23), Skills (81) e Blindagem @governance-factory
+# 7. ONDA 5 (CA-06) — Contratos Estritos de Prompts (24), Skills (81) e Blindagem @governance-factory
 # ─────────────────────────────────────────────────────────────
 
 def test_ca06_all_prompts_have_6_canonical_sections_and_native_variables():
     """
-    Valida que todos os 23 prompts (.github/prompts/*.prompt.md) possuem:
+    Valida que todos os 24 prompts (.github/prompts/*.prompt.md) possuem:
     - '🎯 Invocação e Variáveis Nativas' com '${file}', '${selection}', '${workspaceFolder}'
     - '🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO'
     - '📋 Fluxo de Execução Passo a Passo'
@@ -448,7 +448,7 @@ def test_ca06_all_prompts_have_6_canonical_sections_and_native_variables():
     - '⚙️ Protocolo de Execução Obrigatório' e bloco '<execution_protocol>'
     """
     prompt_files = sorted(p for p in PROMPTS_DIR.glob("*.prompt.md") if "templates" not in p.parts)
-    assert len(prompt_files) == 23, f"Esperado 23 prompts em {PROMPTS_DIR}, encontrado {len(prompt_files)}"
+    assert len(prompt_files) == 24, f"Esperado 24 prompts em {PROMPTS_DIR}, encontrado {len(prompt_files)}"
 
     required_markers = [
         "🎯 Invocação e Variáveis Nativas",

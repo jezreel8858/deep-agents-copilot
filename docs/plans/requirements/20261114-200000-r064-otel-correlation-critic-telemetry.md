@@ -51,6 +51,9 @@ review_verdict: PASS_WITH_NITS
 review_rounds: 2
 reviewer: "@plan-critic"
 review_tier1: PASS
+lessons_extracted: true
+lessons_applied_to: ["@requirements-analyst", "plan-conformance-patterns"]
+lessons_at: "2026-11-15"
 ---
 
 # Especificação de Requisitos — Correlação OTel e Telemetria Estruturada do `@plan-critic` no Frontmatter R-064

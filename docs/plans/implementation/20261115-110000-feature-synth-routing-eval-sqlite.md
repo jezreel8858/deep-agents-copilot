@@ -34,6 +34,9 @@ allowed_files:
   - docs/plans/architecture/20261115-100000-synth-routing-eval-sqlite.md
   - docs/plans/implementation/20261115-110000-feature-synth-routing-eval-sqlite.md
 progress: 100
+lessons_extracted: true
+lessons_applied_to: ["@python-arch-advisor", "plan-conformance-patterns"]
+lessons_at: "2026-11-15"
 ---
 
 Progresso: 6/26 tarefas concluídas

@@ -116,3 +116,8 @@ prompts:
     description: "Gera e abre a visualização interativa do grafo de conhecimento multi-repo em Angular Material 3 (2D/3D), integrando AST de código, classificação de acoplamento, filtros arquiteturais (isolados/órfãos, papéis, camadas, multi-select de repositórios) e pontes de integração REST."
     model: "Gemini 3.8 Flash"
     router_bypass: slash_workflow
+  - name: plan-lessons-harvester
+    path: .github/prompts/plan-lessons-harvester.prompt.md
+    description: "Extrai achados do @plan-critic em planos docs/plans/** não selados, propõe blindagem via HITL e delega mutação e selo de idempotência ao @governance-maintainer pós-pytest verde."
+    model: "Gemini 4 Argon"
+    router_bypass: slash_workflow

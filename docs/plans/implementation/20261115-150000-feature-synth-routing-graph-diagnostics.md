@@ -26,6 +26,9 @@ review_rounds: 2
 reviewer: "@plan-critic"
 review_tier1: PASS
 review_verdict: PASS_WITH_NITS
+lessons_extracted: true
+lessons_applied_to: ["@python-arch-advisor", "plan-conformance-patterns"]
+lessons_at: "2026-11-15"
 ---
 
 Progresso: 8/11 tarefas concluídas

@@ -38,6 +38,9 @@ allowed_files:
   - "tools/headless-governance-runner/tests/synth_unit/test_synth_workflows_b2_extraction.py"
   - "tests/governance_audit/test_router_agents.py"
   - "docs/plans/governance/20260420-183000-router-header-line-breaks.md"
+lessons_extracted: true
+lessons_applied_to: ["@agent-auditor", "plan-conformance-patterns"]
+lessons_at: "2026-11-15"
 ---
 
 # Plano de Manutenção de Governança — Quebras de Linha no Header do Formato de Saída dos Routers

@@ -163,3 +163,7 @@ Se **TODOS SIM**: ✅ Você está usando correto!
 
 **Resultado**: 1 carrossel de intake (perfil, seeding, modelo SDK, auto-promoção) → 3 Ondas autônomas → relatório executivo (acurácia, workflow_macro_f1, banner_coverage) e casos promovidos.
 **Nota**: Sem interação após o intake; rollback automático via `git checkout --` se `pytest` falhar.
+
+### `/plan-lessons-harvester [tipo-de-plano | all]`
+- **Fase 1 (Read-Only)**: Varre `docs/plans/**` onde `lessons_extracted != true`, agrupa achados do `@plan-critic` por `author` e classe (`C1`–`C9`), deduplica contra `planner-preflight-checklist.md` e apresenta opções via `ask_questions`.
+- **Fase 2 (Pós-HITL)**: Delega ao `@governance-maintainer` a blindagem em lote e a gravação do selo (`lessons_extracted: true`, `lessons_applied_to`, `lessons_at`) exclusivamente após `pytest tests/governance_audit/` 100% verde.

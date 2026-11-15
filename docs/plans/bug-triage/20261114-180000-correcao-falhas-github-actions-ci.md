@@ -36,6 +36,9 @@ review_verdict: "PASS_WITH_NITS"
 review_rounds: 2
 reviewer: "plan-critic"
 review_tier1: "PASS"
+lessons_extracted: true
+lessons_applied_to: ["@bug-triage", "plan-conformance-patterns"]
+lessons_at: "2026-11-15"
 ---
 
 # Plano de Bug-Triage — Correcao de Falhas nos Workflows de GitHub Actions CI

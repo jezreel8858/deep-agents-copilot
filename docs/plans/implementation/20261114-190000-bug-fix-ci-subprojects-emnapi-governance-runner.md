@@ -19,6 +19,9 @@ review_verdict: "PASS_WITH_NITS"
 review_rounds: 2
 reviewer: "plan-critic"
 review_tier1: "PASS"
+lessons_extracted: true
+lessons_applied_to: ["@agent-auditor", "plan-conformance-patterns"]
+lessons_at: "2026-11-15"
 ---
 
 # Plano de Implementação Técnica — Correção do Workflow CI de Sub-projetos (@emnapi/* e governance-runner)

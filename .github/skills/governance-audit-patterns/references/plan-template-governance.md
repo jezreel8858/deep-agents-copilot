@@ -62,3 +62,6 @@ allowed_files:
 - [ ] Persistência por `@governance-maintainer`/`@docs-engineer`; auditor permanece Read-Only (R-057).
 - [ ] Conformidade com `docs/plans/<tipo>/` auditada (Smell 2.34).
 
+## Idempotência Pós-Revisão (`/plan-lessons-harvester`)
+
+- Chaves opcionais no frontmatter YAML: `lessons_extracted` (`bool`), `lessons_applied_to` (`list[str]`, `[]` quando analisado sem ação) e `lessons_at` (`AAAA-MM-DD` ISO), gravadas somente após `pytest tests/governance_audit/` verde.

@@ -23,6 +23,9 @@ allowed_files:
   - ".github/prompts/README.md"
   - ".github/prompts/QUICK-START.md"
   - "tests/governance_audit/test_utility_slash_prompts_bypass.py"
+lessons_extracted: true
+lessons_applied_to: ["@governance-factory", "plan-conformance-patterns"]
+lessons_at: "2026-11-15"
 ---
 
 # Plano de Governança — Slash Prompt /synth-waves (Ciclo Prata em 3 Ondas, Zero-Touch)

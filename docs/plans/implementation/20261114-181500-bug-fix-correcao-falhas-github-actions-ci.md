@@ -58,6 +58,9 @@ allowed_files:
   - ".a2a/agentcards/react-developer.agentcard.json"
   - ".a2a/agentcards/react-test-engineer.agentcard.json"
   - ".a2a/agentcards/agentcards.index.json"
+lessons_extracted: true
+lessons_applied_to: ["@agent-auditor", "plan-conformance-patterns"]
+lessons_at: "2026-11-15"
 ---
 
 # Plano de Implementação (Gate 2) — Correção das Falhas dos Workflows GitHub Actions CI

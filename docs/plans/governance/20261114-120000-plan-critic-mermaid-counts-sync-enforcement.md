@@ -29,6 +29,9 @@ allowed_files:
   - "tools/governance_sync/sync_docs_counts_and_mermaid.py"
   - "tools/governance_sync/README.md"
   - "tests/governance_audit/test_markdown_ssot_counts_and_mermaid_sync.py"
+lessons_extracted: true
+lessons_applied_to: ["@agent-auditor", "plan-conformance-patterns"]
+lessons_at: "2026-11-15"
 ---
 
 # Plano de Governança: Sincronização Canônica de Contagens SSoT, Diagramas Mermaid (@plan-critic) e Enforcement Automatizado

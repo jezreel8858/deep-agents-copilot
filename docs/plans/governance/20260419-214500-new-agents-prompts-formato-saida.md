@@ -36,6 +36,9 @@ allowed_files:
   - ".github/prompts/templates/prompt-template.md"
   - "tests/governance_audit/test_router_agents.py"
   - "tests/governance_audit/test_template_sections.py"
+lessons_extracted: true
+lessons_applied_to: ["@agent-auditor", "plan-conformance-patterns"]
+lessons_at: "2026-11-15"
 ---
 
 # Plano de Manutenção de Governança — Blindagem Preventiva CommonMark-Safe de `Formato de Saída` para Novos Agents e Prompts (Factory, Templates, Contratos e Testes)

@@ -267,6 +267,7 @@ def _workflow_slugs() -> set[str]:
     """Deriva slugs de workflow dos arquivos `workflow-<slug>.md` (sem hardcode), incluindo alias 'governance'."""
     slugs = {p.stem.removeprefix("workflow-") for p in WORKFLOWS_DIR.glob("workflow-*.md")}
     slugs.add("governance")
+    slugs.add("feature")
     return slugs
 
 
@@ -346,3 +347,34 @@ def test_templates_principais_declaram_parecer_revisor_cetico_pre_hitl():
         assert "Parecer do Revisor Cético Pré-HITL (R-064)" in txt, (
             f"Template {tpl.name} sem seção 'Parecer do Revisor Cético Pré-HITL (R-064)'"
         )
+
+
+def test_lessons_idempotency_frontmatter_optional_keys():
+    """Valida que as chaves opcionais lessons_extracted, lessons_applied_to e lessons_at estão documentadas e têm tipos válidos nos planos."""
+    import yaml
+    r064_ref = (REPO_ROOT / ".github" / "skills" / "plan-conformance-patterns" / "references" / "plan-frontmatter-r064.md").read_text(encoding="utf-8")
+    gov_tmpl = (REPO_ROOT / ".github" / "skills" / "governance-audit-patterns" / "references" / "plan-template-governance.md").read_text(encoding="utf-8")
+    for key in ("lessons_extracted", "lessons_applied_to", "lessons_at"):
+        assert key in r064_ref, f"Chave opcional {key} ausente em plan-frontmatter-r064.md"
+        assert key in gov_tmpl, f"Chave opcional {key} ausente em plan-template-governance.md"
+
+    plans_root = REPO_ROOT / "docs" / "plans"
+    iso_date_re = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+    for plan_file in sorted(plans_root.rglob("*.md")):
+        if plan_file.name == "README.md":
+            continue
+        text = plan_file.read_text(encoding="utf-8")
+        m = re.match(r"^---\s*\n(.*?)\n---", text, re.DOTALL)
+        if not m:
+            continue
+        fm = yaml.safe_load(m.group(1)) or {}
+        if "lessons_extracted" in fm:
+            assert isinstance(fm["lessons_extracted"], bool), f"{plan_file}: lessons_extracted deve ser bool"
+        if "lessons_applied_to" in fm:
+            assert isinstance(fm["lessons_applied_to"], list) and all(
+                isinstance(x, str) and x.strip() for x in fm["lessons_applied_to"]
+            ), f"{plan_file}: lessons_applied_to deve ser list[str]"
+        if "lessons_at" in fm:
+            assert isinstance(fm["lessons_at"], str) and iso_date_re.match(fm["lessons_at"]), (
+                f"{plan_file}: lessons_at deve ser string ISO AAAA-MM-DD"
+            )

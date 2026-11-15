@@ -31,6 +31,9 @@ allowed_files:
 read_only_dependencies:
   - ".github/agents/routing-graph.yaml"
   - ".github/agents/agent-router.agent.md"
+lessons_extracted: true
+lessons_applied_to: ["@python-arch-advisor", "plan-conformance-patterns"]
+lessons_at: "2026-11-15"
 ---
 
 # Blueprint — Diagnóstico de Gatilhos de Workflows no CLI `synth` (rev. 2)

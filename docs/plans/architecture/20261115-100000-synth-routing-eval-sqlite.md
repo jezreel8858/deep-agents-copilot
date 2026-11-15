@@ -25,6 +25,9 @@ allowed_files:
   - ".github/agents/evals/synthetic/**"
   - ".github/agents/evals/synthetic/promoted-*.yaml"
   - ".gitignore"
+lessons_extracted: true
+lessons_applied_to: ["@tech-solution-architect", "plan-conformance-patterns"]
+lessons_at: "2026-11-15"
 ---
 
 # Blueprint Técnico — Geração Sintética, Deduplicação SQLite e Avaliação em Lote do `agent-router`

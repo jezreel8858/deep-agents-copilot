@@ -16,6 +16,9 @@ allowed_files:
   - ".github/agents/catalog.yaml"
   - ".github/skills/plan-conformance-patterns/references/pre-hitl-skeptical-review-rubric.md"
   - "tests/governance_audit/test_pre_hitl_skeptical_plan_gate.py"
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-15"
 ---
 
 # Plano de Governança: Evolução de Skills, Calibração LLM-as-a-Judge e Guardrails OWASP Agentic no `@plan-critic` (R-067)

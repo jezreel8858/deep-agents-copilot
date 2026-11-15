@@ -46,6 +46,7 @@ ALLOWED_SLASH_WORKFLOW_PROMPTS = {
     "eval-workflows.prompt.md",
     "implement.prompt.md",
     "init-context.prompt.md",
+    "plan-lessons-harvester.prompt.md",
     "plan.prompt.md",
     "review.prompt.md",
     "strategic-review.prompt.md",
@@ -112,7 +113,7 @@ def test_utility_prompts_declare_router_bypass_and_no_mutation_or_terminal_tools
 
 def test_slash_workflow_prompts_declare_router_bypass_and_forbid_initial_router_triage():
     """b) Os 13 prompts slash_workflow declaram router_bypass: slash_workflow e proíbem invocar @agent-router na triagem inicial."""
-    assert len(ALLOWED_SLASH_WORKFLOW_PROMPTS) == 14
+    assert len(ALLOWED_SLASH_WORKFLOW_PROMPTS) == 15
     for filename in sorted(ALLOWED_SLASH_WORKFLOW_PROMPTS):
         prompt_path = PROMPTS_DIR / filename
         assert prompt_path.exists(), f"Prompt slash_workflow ausente: {filename}"

@@ -184,6 +184,7 @@ Agente Ativo: requirements-analyst
 - **Subpasta Canônica Alvo**: `docs/plans/requirements/` (padrão `docs/plans/requirements/<AAAAMMDD-HHMMSS>-<modulo>.md`).
 - **Handoff Obrigatório de Materialização Física**: Após estruturar o plano em memória segundo o template da skill, este agent DEVE acionar o handoff para que `@docs-engineer` (ou `@governance-maintainer` em fluxos de governança) materialize fisicamente o arquivo `.md` em `docs/plans/requirements/` **antes** da coleta do Gate de Aprovação Humana R-064 via `ask_questions`.
 - **Regra Específica de Fluxo**: Toda especificação de requisitos estruturada (`plan_type: requirements`) tem como destino canônico `docs/plans/requirements/<AAAAMMDD-HHMMSS>-<modulo>.md` (ou `docs/plans/requirements/<AAAAMMDD-HHMMSS>-<workflow>-<slug>.md`), sendo materializada fisicamente via handoff para `@docs-engineer` antes do Gate de Aprovação Humana R-064.
+- **Checklist Pré-Voo (C1–C9)**: Antes do Gate `@plan-critic`, validar `.github/skills/plan-conformance-patterns/references/planner-preflight-checklist.md`.
 
 ## ⚙️ Protocolo de Execução Obrigatório
 

@@ -24,6 +24,9 @@ read_only_files:
   - ".github/agents/agent-router.agent.md"
   - ".github/agents/evals/casos-roteamento.yaml"
   - "tools/headless-governance-runner/src/governance_runner/routing/**"
+lessons_extracted: true
+lessons_applied_to: ["@tech-solution-architect", "plan-conformance-patterns"]
+lessons_at: "2026-11-15"
 ---
 
 # Blueprint Técnico (Delta) — Integração do `routing-graph.yaml` ao Pipeline `synth` (Geração + Diagnóstico de Assertividade)

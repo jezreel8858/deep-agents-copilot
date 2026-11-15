@@ -404,6 +404,7 @@ Agente Ativo: bug-triage
 - **Subpasta Canônica Alvo**: `docs/plans/bug-triage/` (padrão `docs/plans/bug-triage/<AAAAMMDD-HHMMSS>-bugfix-<slug>.md`).
 - **Handoff Obrigatório de Materialização Física**: Após estruturar o plano em memória segundo o template da skill, este agent DEVE acionar o handoff para que `@docs-engineer` (ou `@governance-maintainer` em fluxos de governança) materialize fisicamente o arquivo `.md` em `docs/plans/bug-triage/` **antes** da coleta do Gate de Aprovação Humana R-064 via `ask_questions`.
 - **Regra Específica de Fluxo**: No Gate 1 (`WORKFLOW-BUG-FIX`), o diagnóstico de causa raiz, blast radius e plano de ação (`plan_type: bug-triage`) é materializado em `docs/plans/bug-triage/` via handoff para `@docs-engineer` antes da aprovação humana R-064 (e eventuais planos de implementação de Gate 2 residem em `docs/plans/implementation/`).
+- **Checklist Pré-Voo (C1–C9)**: Antes do Gate `@plan-critic`, validar `.github/skills/plan-conformance-patterns/references/planner-preflight-checklist.md`.
 
 ## ⚙️ Protocolo de Execução Obrigatório
 

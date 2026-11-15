@@ -61,6 +61,9 @@ allowed_files:
   - ".github/agents/templates/research-agent.md"
   - ".github/skills/agent-contracts/SKILL.md"
   - "tests/governance_audit/test_router_agents.py"
+lessons_extracted: true
+lessons_applied_to: ["@agent-auditor", "plan-conformance-patterns"]
+lessons_at: "2026-11-15"
 ---
 
 # Plano de Manutenção de Governança — Padronização Anti-Colapso CommonMark do Bloco `Formato de Saída` em Todos os Agents, Templates e Contratos

@@ -116,6 +116,7 @@ Progresso: 0/N tarefas concluídas
 - **Subpasta Canônica Alvo**: `docs/plans/implementation/` (padrão `docs/plans/implementation/<AAAAMMDD-HHMMSS>-<workflow>-<slug>.md` e `docs/plans/architecture/` para `plan_type: architecture`).
 - **Handoff Obrigatório de Materialização Física**: Após estruturar o plano em memória segundo o template da skill, este agent DEVE acionar o handoff para que `@docs-engineer` (ou `@governance-maintainer` em fluxos de governança) materialize fisicamente o arquivo `.md` em `docs/plans/implementation/` **antes** da coleta do Gate de Aprovação Humana R-064 via `ask_questions`.
 - **Regra Específica de Fluxo**: Opera em duplo escopo de planejamento R-064: (1) **Gate 2 de Implementação Técnica (`plan_type: implementation`)** com destino `docs/plans/implementation/` e template `.github/skills/specialist-hybrid-advisory-implementation-patterns/references/plan-template-implementation.md`; e (2) **Parecer / Plano Arquitetural (`plan_type: architecture`)** com destino `docs/plans/architecture/` quando acionado em análise arquitetural pura.
+- **Checklist Pré-Voo (C1–C9)**: Antes do Gate `@plan-critic`, validar `.github/skills/plan-conformance-patterns/references/planner-preflight-checklist.md`.
 
 ## ⚙️ Protocolo de Execução Obrigatório
 

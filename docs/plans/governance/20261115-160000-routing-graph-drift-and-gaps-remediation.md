@@ -24,6 +24,9 @@ allowed_files:
   - "tools/headless-governance-runner/tests/routing_unit/test_state_machine_idempotency.py"
   - ".github/agents/evals/synthetic/diagnostic-52e57357-a4e7-4034-8a6e-7bc56047597d.yaml"
   - ".github/agents/evals/synthetic/diagnostic-52e57357-a4e7-4034-8a6e-7bc56047597d.md"
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-15"
 ---
 
 # Plano de Manutenção de Governança — Remediação de Drift e Cobertura de Arestas (`diag-fca52925eb24`)

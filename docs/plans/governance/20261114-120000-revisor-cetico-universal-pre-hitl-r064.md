@@ -31,6 +31,9 @@ allowed_files:
   - "tests/governance_audit/test_pre_hitl_skeptical_plan_gate.py"
   - "tests/governance_audit/test_universal_plan_materialization_governance.py"
   - "tests/governance_audit/test_planning_doc_template_governance.py"
+lessons_extracted: true
+lessons_applied_to: ["@tech-solution-architect", "plan-conformance-patterns"]
+lessons_at: "2026-11-15"
 ---
 
 # Plano de Governança Arquitetural: Quality Gate Universal de Revisão Cética Pré-HITL (R-064)
