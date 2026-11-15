@@ -1,4 +1,6 @@
-"""generator — Geracao de prompts sinteticos (B2-03 / B2-02 delta): template offline e SDK."""
+"""
+generator — Motor de geracao sintetica controlada (template e SDK) com funil de deduplicacao.
+"""
 
 from __future__ import annotations
 
@@ -33,15 +35,19 @@ DEFAULT_MAX_ATTEMPTS = 3
 
 
 class OrcamentoEsgotadoError(RuntimeError):
-    """Orcamento de premium requests esgotado: o SDK nao deve ser chamado."""
+    """Lancada quando o orcamento de premium requests se esgota durante a geracao."""
 
 
 class GeradorSintetico(Protocol):
-    """Porta de geracao de um prompt sintetico para (seed, dimensao)."""
-
     nome: str
 
-    def gerar(self, seed: GoldenSeed | SeedLike, dimensao: str, tentativa: int, rng: random.Random) -> str: ...
+    def gerar(
+        self,
+        seed: GoldenSeed | SeedLike,
+        dimensao: str,
+        tentativa: int,
+        rng: random.Random,
+    ) -> str: ...
 
 
 _ACENTOS = str.maketrans("áàâãéêíóôõúçÁÀÂÃÉÊÍÓÔÕÚÇ", "aaaaeeioooucAAAAEEIOOOUC")
@@ -58,11 +64,17 @@ _PREENCHIMENTO = "considere o contexto atual do projeto e as restricoes de quali
 
 
 class GeradorTemplate:
-    """Gerador offline deterministico por seed (sem rede/token)."""
+    """Gerador deterministico baseado em templates textuais locais (zero chamadas LLM)."""
 
     nome = "template"
 
-    def gerar(self, seed: GoldenSeed | SeedLike, dimensao: str, tentativa: int, rng: random.Random) -> str:
+    def gerar(
+        self,
+        seed: GoldenSeed | SeedLike,
+        dimensao: str,
+        tentativa: int,
+        rng: random.Random,
+    ) -> str:
         base = seed.prompt.strip()
         palavras = base.split()
         var = rng.randint(0, 999) + tentativa
@@ -89,17 +101,29 @@ class GeradorTemplate:
 
 
 class GeradorSDK:
-    """Gerador via Copilot SDK (strict_empty_scope=True, Budget obrigatorio)."""
+    """Gerador assistido por LLM via CopilotSDKClient com controle de Budget."""
 
     nome = "sdk"
 
-    def __init__(self, cliente: CopilotSDKClient, budget: Budget, *, modelo: str | None = None) -> None:
+    def __init__(
+        self,
+        cliente: CopilotSDKClient,
+        budget: Budget,
+        *,
+        modelo: str | None = None,
+    ) -> None:
         self._cliente = cliente
         self._budget = budget
         self._modelo = modelo
         self._handler = construir_permission_handler_read_only([], strict_empty_scope=True)
 
-    def gerar(self, seed: GoldenSeed | SeedLike, dimensao: str, tentativa: int, rng: random.Random) -> str:
+    def gerar(
+        self,
+        seed: GoldenSeed | SeedLike,
+        dimensao: str,
+        tentativa: int,
+        rng: random.Random,
+    ) -> str:
         if (
             self._budget.max_premium_requests <= 0
             or self._budget.custo_atual["premium_requests"] >= self._budget.max_premium_requests
@@ -162,19 +186,21 @@ def gerar_sinteticos(
     routing_graph_sha256: str | None = None,
     snapshot_grafo: GrafoSnapshot | None = None,
 ) -> RelatorioGeracao:
-    """Gera, filtra (override -> L1 -> L2) e persiste prompts sinteticos."""
     persistir = repo is not None and not dry_run
     rel = RelatorioGeracao(run_id=None)
     rng = random.Random(rng_seed)
-    sha_grafo_efetivo = routing_graph_sha256 or (snapshot_grafo.sha256 if snapshot_grafo is not None else None)
+    sha_grafo_efetivo = routing_graph_sha256 or (
+        snapshot_grafo.sha256 if snapshot_grafo is not None else None
+    )
     if persistir:
         assert repo is not None
         try:
             golden_sha: str | None = calcular_sha256_golden(golden_path)
-        except Exception:  # noqa: BLE001 - sha do golden e metadado best-effort
+        except Exception:  # noqa: BLE001
             golden_sha = None
         if snapshot_grafo is not None:
             repo.registrar_arestas_grafo(snapshot_grafo)
+            repo.registrar_workflows_grafo(snapshot_grafo)
         rel.run_id = repo.criar_run(
             kind="generate",
             generator=generator_mode,
@@ -205,7 +231,12 @@ def gerar_sinteticos(
                     else:
                         rel.n_rejected_similarity += 1
                     rel.rejeitados.append(
-                        {"text": texto, "motivo": res.status, "estrato": item.estrato, "nearest_ref": res.nearest_ref}
+                        {
+                            "text": texto,
+                            "motivo": res.status,
+                            "estrato": item.estrato,
+                            "nearest_ref": res.nearest_ref,
+                        }
                     )
                     continue
                 sha = calcular_sha256_normalizado(res.text_norm, ja_normalizado=True)
@@ -215,28 +246,32 @@ def gerar_sinteticos(
                     seed_src = str(getattr(item.seed, "seed_source", "manual") or "manual")
                     edge_id: str | None = getattr(item.seed, "graph_edge_id", None)
                     edge_res: str | None = getattr(item.seed, "graph_edge_resolution", None)
-                    if edge_id is None and snapshot_grafo is not None:
+                    rota_esp = item.seed.expected_route
+                    if edge_id is None and snapshot_grafo is not None and rota_esp:
                         edge_id, edge_res = resolver_aresta(
-                            item.seed.expected_route,
+                            rota_esp,
                             normalizar(item.seed.prompt),
                             snapshot_grafo,
                         )
                     elif edge_id is not None and edge_res is None:
                         edge_res = "keyword" if seed_src == "routing_graph" else "unique_target"
-
                     seed_cid = str(getattr(item.seed, "seed_case_id", getattr(item.seed, "id", "")))
+                    exp_wf: str | None = getattr(item.seed, "expected_workflow", None)
+                    graph_wf: str | None = getattr(item.seed, "graph_workflow_id", exp_wf)
                     ref = repo.inserir_prompt(
                         run_id=rel.run_id,
                         text=texto,
                         text_norm=res.text_norm,
                         sha256=sha,
-                        expected_route=item.seed.expected_route,
+                        expected_route=rota_esp or item.estrato.agente_alvo,
                         agente_alvo=item.estrato.agente_alvo,
                         dimensao_perturbacao=item.estrato.dimensao,
                         seed_case_id=seed_cid,
                         seed_source=seed_src,
                         graph_edge_id=edge_id,
                         graph_edge_resolution=edge_res,
+                        expected_workflow=exp_wf,
+                        graph_workflow_id=graph_wf,
                         max_similarity=res.max_similarity,
                         nearest_ref=res.nearest_ref,
                     )

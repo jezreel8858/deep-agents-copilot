@@ -164,7 +164,7 @@ def _fmt_float_opt(val: float | None) -> float | None:
 
 def serializar_diagnostico_dict(diag: DiagnosticoAssertividade) -> dict[str, Any]:
     """Converte DiagnosticoAssertividade em dicionario canonico pronto para YAML/JSON."""
-    return {
+    _payload: dict[str, Any] = {
         "aviso": diag.aviso,
         "colisoes": [
             {
@@ -235,6 +235,45 @@ def serializar_diagnostico_dict(diag: DiagnosticoAssertividade) -> dict[str, Any
             for s in diag.sugestoes
         ],
     }
+    payload = _payload
+    if diag.por_workflow or diag.colisoes_workflow:
+        payload["resumo"].update(
+            {
+                "banner_coverage": _fmt_float_opt(diag.resumo.banner_coverage),
+                "workflow_accuracy": _fmt_float_opt(diag.resumo.workflow_accuracy),
+                "workflow_macro_f1": _fmt_float_opt(diag.resumo.workflow_macro_f1),
+                "workflow_route_consistency_rate": _fmt_float_opt(diag.resumo.workflow_route_consistency_rate),
+            }
+        )
+        payload["workflows"] = {
+            "colisoes": [
+                {
+                    "edges": list(c.edges),
+                    "gatilho_norm": c.gatilho_norm,
+                    "tipo": c.tipo,
+                    "workflows": list(c.workflows),
+                }
+                for c in diag.colisoes_workflow
+            ],
+            "matriz_confusao": {
+                k: {o: int(v) for o, v in sorted(sub.items())}
+                for k, sub in sorted(diag.matriz_confusao_workflow.items())
+            },
+            "metricas": [
+                {
+                    "f1": _fmt_float_opt(m.f1),
+                    "fn": int(m.fn),
+                    "fp": int(m.fp),
+                    "precision": _fmt_float_opt(m.precision),
+                    "recall": _fmt_float_opt(m.recall),
+                    "suporte": int(m.suporte),
+                    "tp": int(m.tp),
+                    "workflow_id": m.workflow_id,
+                }
+                for m in diag.por_workflow
+            ],
+        }
+    return payload
 
 
 def renderizar_diagnostico_yaml(diag: DiagnosticoAssertividade) -> str:
@@ -301,6 +340,34 @@ def renderizar_diagnostico_md(diag: DiagnosticoAssertividade) -> str:
         for col in diag.colisoes:
             kw_s = sanitizar_excerto_md(col.keyword_norm)
             linhas.append(f"- `{kw_s}` ({col.tipo}): {list(col.edges)}")
+
+    if diag.por_workflow or diag.colisoes_workflow:
+        linhas.extend(
+            [
+                "",
+                "## Workflows",
+                f"- **Macro-F1**: {_fmt_num_md(diag.resumo.workflow_macro_f1)}",
+                f"- **Acurácia**: {_fmt_num_md(diag.resumo.workflow_accuracy)}",
+                f"- **Consistência workflow×rota**: {_fmt_num_md(diag.resumo.workflow_route_consistency_rate)}",
+                f"- **Banner coverage**: {_fmt_num_md(diag.resumo.banner_coverage)}",
+                "",
+                "| workflow_id | suporte | tp | fp | fn | precision | recall | f1 |",
+                "| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+            ]
+        )
+        for m in diag.por_workflow:
+            linhas.append(
+                f"| {sanitizar_excerto_md(m.workflow_id)} | {m.suporte} | {m.tp} | {m.fp} | {m.fn} | "
+                f"{_fmt_num_md(m.precision)} | {_fmt_num_md(m.recall)} | {_fmt_num_md(m.f1)} |"
+            )
+        linhas.extend(["", "### Colisões de Gatilhos de Workflows"])
+        if not diag.colisoes_workflow:
+            linhas.append("- Nenhuma colisão detectada.")
+        else:
+            for c in diag.colisoes_workflow:
+                linhas.append(
+                    f"- `{sanitizar_excerto_md(c.gatilho_norm)}` ({c.tipo}): {list(c.workflows)} {list(c.edges)}"
+                )
 
     linhas.extend(["", "## Divergências `routing-graph.yaml` × `agent-router.agent.md`"])
     linhas.append(f"- `nos_nao_citados`: {list(diag.divergencias_router_md.nos_nao_citados)}")

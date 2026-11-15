@@ -112,17 +112,17 @@ class TestStateMachineIdempotency:
         self, tabela_real: TabelaTransicao
     ) -> None:
         """Evento de conclusão aplicado repetidamente produz idêntica transição para router."""
-        # Arrange - etapa 5 é a última do BUG_FIX
+        # Arrange - etapa 6 é a última do BUG_FIX
         sessao = Sessao(
             fase=Fase.EM_WORKFLOW,
             workflow=Workflow.BUG_FIX,
-            etapa=5,
+            etapa=6,
             agente_ativo="code-review",
         )
         evento_conclusao = Evento(
             origem="usuario",
             tipo=TipoEvento.CONCLUSAO_WORKFLOW,
-            etapa_solicitada=5,
+            etapa_solicitada=6,
             agente_solicitado="code-review",
         )
 

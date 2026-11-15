@@ -98,6 +98,7 @@ def construir_parser() -> argparse.ArgumentParser:
     sg.add_argument("--router-agent", default=None)
     sg.add_argument("--routing-graph", default=None, help="Caminho para routing-graph.yaml (default: .github/agents/routing-graph.yaml).")
     sg.add_argument("--graph-seeding", choices=("off", "gaps", "all"), default="off", help="Modo de expansao via grafo (default: off).")
+    sg.add_argument("--workflow-seeds", choices=("off", "gaps", "all"), default="off", help="Modo de geracao de seeds por gatilho de workflow (default: off).")
     sg.add_argument("--graph-min-coverage", type=int, default=3, help="Cobertura minima por aresta em --graph-seeding gaps|all (default: 3).")
     sg.add_argument("--run-id", default=None, help="eval: id do run; promote: id do arquivo promoted-<run_id>.yaml.")
     sg.add_argument("--source-run-id", default=None)

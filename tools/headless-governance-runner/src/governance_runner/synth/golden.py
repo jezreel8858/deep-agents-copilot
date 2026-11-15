@@ -1,5 +1,5 @@
 """
-golden — Carregador somente-leitura do dataset Golden casos-roteamento.yaml (B1-03 / CA-01).
+golden — Leitura read-only das suites canonicas casos-roteamento.yaml.
 """
 
 from __future__ import annotations
@@ -26,7 +26,7 @@ __all__ = [
 GOLDEN_REL_PATH = Path(".github") / "agents" / "evals" / "casos-roteamento.yaml"
 SUITES_GOLDEN_ORDEM: tuple[str, ...] = ("canonicos", "ambiguos", "regressao", "seguranca")
 CONTAGENS_ESPERADAS_POR_SUITE: dict[str, int] = {
-    "canonicos": 45,
+    "canonicos": 55,
     "ambiguos": 5,
     "regressao": 35,
     "seguranca": 4,
@@ -35,7 +35,7 @@ CONTAGENS_ESPERADAS_POR_SUITE: dict[str, int] = {
 
 @dataclass(frozen=True)
 class GoldenSeed:
-    """Representa um caso semente extraido em modo somente-leitura do Golden Set."""
+    """Semente individual extraida do golden set casos-roteamento.yaml."""
 
     id: str
     suite: str
@@ -48,6 +48,8 @@ class GoldenSeed:
     graph_edge_id: str | None = None
     graph_edge_resolution: str | None = None
     keywords: tuple[str, ...] = ()
+    expected_workflow: str | None = None
+    graph_workflow_id: str | None = None
 
     @property
     def prompt(self) -> str:
@@ -67,7 +69,6 @@ def resolver_caminho_golden(
     *,
     repo_root: Path | None = None,
 ) -> Path:
-    """Resolve o caminho do arquivo casos-roteamento.yaml."""
     if golden_path is not None:
         caminho = Path(golden_path)
         if caminho.is_absolute():
@@ -75,10 +76,8 @@ def resolver_caminho_golden(
         if repo_root is not None:
             return (repo_root / caminho).resolve()
         return caminho.resolve()
-
     if repo_root is not None:
         return (repo_root / GOLDEN_REL_PATH).resolve()
-
     candidato_repo = Path(__file__).resolve().parents[5] / GOLDEN_REL_PATH
     if candidato_repo.exists():
         return candidato_repo
@@ -90,7 +89,6 @@ def calcular_sha256_golden(
     *,
     repo_root: Path | None = None,
 ) -> str:
-    """Calcula o SHA-256 hexadecimal do arquivo casos-roteamento.yaml."""
     caminho = resolver_caminho_golden(golden_path, repo_root=repo_root)
     with open(caminho, "rb") as stream_bin:
         conteudo = stream_bin.read()
@@ -102,7 +100,6 @@ def carregar_golden_bruto(
     *,
     repo_root: Path | None = None,
 ) -> dict[str, Any]:
-    """Carrega a arvore YAML completa do Golden Set em modo somente-leitura."""
     caminho = resolver_caminho_golden(golden_path, repo_root=repo_root)
     with open(caminho, "r", encoding="utf-8") as stream_txt:
         dados = yaml.safe_load(stream_txt)
@@ -116,7 +113,6 @@ def contagens_por_suite(
     *,
     repo_root: Path | None = None,
 ) -> dict[str, int]:
-    """Retorna a contagem de casos por suite no arquivo casos-roteamento.yaml."""
     dados = carregar_golden_bruto(golden_path, repo_root=repo_root)
     suites_bruto = dados.get("suites")
     suites_container = suites_bruto if isinstance(suites_bruto, dict) else dados
@@ -135,17 +131,12 @@ def carregar_seeds_golden(
     targets: Sequence[str] | None = None,
     include_security: bool = False,
 ) -> tuple[GoldenSeed, ...]:
-    """Extrai as sementes de roteamento do Golden Set em modo somente-leitura."""
     dados = carregar_golden_bruto(golden_path, repo_root=repo_root)
     suites_bruto = dados.get("suites")
     suites_container = suites_bruto if isinstance(suites_bruto, dict) else dados
-
     alvos_normalizados: frozenset[str] | None = None
     if targets:
-        alvos_normalizados = frozenset(
-            t.strip().lstrip("@") for t in targets if t and t.strip()
-        )
-
+        alvos_normalizados = frozenset(t.strip().lstrip("@") for t in targets if t and t.strip())
     seeds: list[GoldenSeed] = []
     for nome_suite in SUITES_GOLDEN_ORDEM:
         if nome_suite == "seguranca" and not include_security:
@@ -160,20 +151,20 @@ def carregar_seeds_golden(
             bloco_input = item.get("input") or {}
             bloco_expected = item.get("expected") or {}
             solicitacao = str(
-                bloco_input.get("solicitacao", "")
-                if isinstance(bloco_input, dict)
-                else ""
+                bloco_input.get("solicitacao", "") if isinstance(bloco_input, dict) else ""
             ).strip()
             rota = ""
+            wf_esp: str | None = None
             if isinstance(bloco_expected, dict):
                 rota_bruta = bloco_expected.get("agent_route") or bloco_expected.get("comportamento") or ""
                 rota = str(rota_bruta).strip().lstrip("@")
-
+                wf_raw = bloco_expected.get("workflow")
+                if wf_raw and str(wf_raw).strip():
+                    wf_esp = str(wf_raw).strip()
             if not case_id or not solicitacao or not rota:
                 continue
             if alvos_normalizados is not None and rota not in alvos_normalizados:
                 continue
-
             seeds.append(
                 GoldenSeed(
                     id=case_id,
@@ -183,6 +174,8 @@ def carregar_seeds_golden(
                     descricao=str(item.get("descricao", "")),
                     critico=bool(item.get("critico", False)),
                     threshold=float(item.get("threshold", 0.8)),
+                    expected_workflow=wf_esp,
+                    graph_workflow_id=wf_esp,
                 )
             )
     return tuple(seeds)

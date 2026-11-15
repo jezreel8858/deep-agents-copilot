@@ -1,0 +1,255 @@
+aviso: Artefato consultivo (HITL). Nenhum arquivo-alvo é modificado automaticamente.
+colisoes: []
+diagnostic_id: diag-99b99b5d86f8
+diagnostic_version: 1
+divergencias_router_md:
+  citados_fora_do_grafo: []
+  nos_nao_citados: []
+  rotas_fantasma:
+  - feature-planner
+eval_run_id: run-wf
+finished_at: '2026-11-15T15:00:00+00:00'
+hashes:
+  golden_set_sha256: '3333333333333333333333333333333333333333333333333333333333333333'
+  router_agent_sha256: '2222222222222222222222222222222222222222222222222222222222222222'
+  routing_graph_sha256: '1111111111111111111111111111111111111111111111111111111111111111'
+matriz_confusao:
+  bug-triage:
+    bug-triage: 2
+    business-rules-extractor: 2
+    feature-planner: 2
+  business-rules-extractor:
+    business-rules-extractor: 2
+orfas:
+  sem_avaliacao: []
+  sem_golden:
+  - e-aaaa00000001
+  - e-bbbb00000002
+  uncoverable: []
+por_aresta:
+- edge_id: e-aaaa00000001
+  f1: 0.5
+  fn: 4
+  fp: 0
+  para: bug-triage
+  precision: 1.0
+  recall: 0.333333
+  suporte:
+    manual: 0
+    routing_graph: 6
+  tipo: keyword_based
+  tp: 2
+  unparseable: 0
+- edge_id: e-bbbb00000002
+  f1: 0.666667
+  fn: 0
+  fp: 2
+  para: business-rules-extractor
+  precision: 0.5
+  recall: 1.0
+  suporte:
+    manual: 0
+    routing_graph: 2
+  tipo: keyword_based
+  tp: 2
+  unparseable: 0
+resumo:
+  acuracia_global: 0.5
+  banner_coverage: 0.714286
+  cobertura_arestas_golden: 0.0
+  cobertura_arestas_total: 1.0
+  total_avaliacoes: 8
+  workflow_accuracy: 0.428571
+  workflow_macro_f1: 0.485714
+  workflow_route_consistency_rate: 0.6
+sugestoes:
+- alvo_ancora: arestas[e-aaaa00000001:bug-triage]
+  alvo_arquivo: .github/agents/routing-graph.yaml
+  codigo: SUG-KW-ADD
+  evidencias:
+  - p-01
+  - p-02
+  - p-03
+  - p-04
+  id: SUG-0001
+  proposta_texto: Adicionar keywords candidatas ['prompt'] na aresta 'e-aaaa00000001'
+    (para=bug-triage).
+  severidade: media
+- alvo_ancora: disambig:bug-triage->business-rules-extractor
+  alvo_arquivo: .github/agents/agent-router.agent.md
+  codigo: SUG-DISAMBIG
+  evidencias:
+  - p-01
+  - p-02
+  id: SUG-0002
+  proposta_texto: Adicionar regra de desambiguacao explicita entre '@bug-triage' e
+    '@business-rules-extractor' (2 ocorrencias) e calibrar prioridade no routing-graph.yaml.
+  severidade: alta
+- alvo_ancora: disambig:bug-triage->feature-planner
+  alvo_arquivo: .github/agents/agent-router.agent.md
+  codigo: SUG-DISAMBIG
+  evidencias:
+  - p-03
+  - p-04
+  id: SUG-0003
+  proposta_texto: Adicionar regra de desambiguacao explicita entre '@bug-triage' e
+    '@feature-planner' (2 ocorrencias) e calibrar prioridade no routing-graph.yaml.
+  severidade: alta
+- alvo_ancora: arestas[e-aaaa00000001:bug-triage]
+  alvo_arquivo: .github/agents/evals/casos-roteamento.yaml
+  codigo: SUG-GOLDEN-GAP
+  evidencias: []
+  id: SUG-0004
+  proposta_texto: Curar e promover caso Silver via synth-export/synth-promote para
+    cobrir a aresta orfa 'e-aaaa00000001' (para=bug-triage).
+  severidade: baixa
+- alvo_ancora: arestas[e-bbbb00000002:business-rules-extractor]
+  alvo_arquivo: .github/agents/evals/casos-roteamento.yaml
+  codigo: SUG-GOLDEN-GAP
+  evidencias: []
+  id: SUG-0005
+  proposta_texto: Curar e promover caso Silver via synth-export/synth-promote para
+    cobrir a aresta orfa 'e-bbbb00000002' (para=business-rules-extractor).
+  severidade: baixa
+- alvo_ancora: phantom:feature-planner
+  alvo_arquivo: .github/agents/agent-router.agent.md
+  codigo: SUG-GRAPH-PHANTOM
+  evidencias:
+  - p-03
+  - p-04
+  id: SUG-0006
+  proposta_texto: Rota fantasma observada 'feature-planner' nao pertence a routing-graph.yaml::nos;
+    restringir delegacao no prompt.
+  severidade: alta
+- alvo_ancora: gatilho:erro
+  alvo_arquivo: .github/agents/routing-graph.yaml
+  codigo: SUG-WF-COLLISION
+  evidencias: []
+  id: SUG-0007
+  proposta_texto: Resolver colisao exata do gatilho 'erro' entre workflows ['WORKFLOW-BUG-FIX',
+    'WORKFLOW-REFACTORING'].
+  severidade: media
+- alvo_ancora: gatilho:erro
+  alvo_arquivo: .github/agents/routing-graph.yaml
+  codigo: SUG-WF-COLLISION
+  evidencias: []
+  id: SUG-0008
+  proposta_texto: Resolver colisao gatilho_aresta do gatilho 'erro' entre workflows
+    ['WORKFLOW-REFACTORING'] e arestas ['e-aaaa00000001'].
+  severidade: baixa
+- alvo_ancora: workflows[WORKFLOW-BUG-FIX].gatilhos
+  alvo_arquivo: .github/agents/routing-graph.yaml
+  codigo: SUG-WF-LOW-RECALL
+  evidencias: []
+  id: SUG-0009
+  proposta_texto: Recall 0.400000 do workflow 'WORKFLOW-BUG-FIX' abaixo de 0.7; revisar
+    gatilhos.
+  severidade: media
+- alvo_ancora: workflows[WORKFLOW-REFACTORING].gatilhos
+  alvo_arquivo: .github/agents/routing-graph.yaml
+  codigo: SUG-WF-LOW-RECALL
+  evidencias: []
+  id: SUG-0010
+  proposta_texto: Recall 0.500000 do workflow 'WORKFLOW-REFACTORING' abaixo de 0.7;
+    revisar gatilhos.
+  severidade: media
+- alvo_ancora: workflows[WORKFLOW-REFACTORING].gatilhos
+  alvo_arquivo: .github/agents/routing-graph.yaml
+  codigo: SUG-WF-LOW-PRECISION
+  evidencias: []
+  id: SUG-0011
+  proposta_texto: Precisao 0.333333 do workflow 'WORKFLOW-REFACTORING' abaixo de 0.7;
+    restringir gatilhos.
+  severidade: media
+- alvo_ancora: wf-route:WORKFLOW-BUG-FIX->feature-planner
+  alvo_arquivo: .github/agents/agent-router.agent.md
+  codigo: SUG-WF-INCONSISTENT-ROUTE
+  evidencias:
+  - p-03
+  - p-04
+  id: SUG-0012
+  proposta_texto: Rota observada incoerente com a etapa 1 do workflow (WORKFLOW-BUG-FIX->feature-planner);
+    alinhar delegacao com etapa 1.
+  severidade: media
+- alvo_ancora: banner:workflow
+  alvo_arquivo: .github/agents/agent-router.agent.md
+  codigo: SUG-WF-MISSING-BANNER
+  evidencias:
+  - p-06
+  - p-07
+  id: SUG-0013
+  proposta_texto: Respostas sem linha 'Workflow:' valida; reforcar o banner obrigatorio
+    no agent-router.
+  severidade: baixa
+- alvo_ancora: banner:workflow-id
+  alvo_arquivo: .github/agents/agent-router.agent.md
+  codigo: SUG-WF-UNKNOWN-ID
+  evidencias:
+  - p-07
+  id: SUG-0014
+  proposta_texto: Workflow com ID fora do snapshot do grafo; alinhar IDs do banner
+    aos workflows de routing-graph.yaml.
+  severidade: media
+- alvo_ancora: workflows[WORKFLOW-NOGATILHO]
+  alvo_arquivo: .github/agents/routing-graph.yaml
+  codigo: SUG-WF-UNCOVERABLE
+  evidencias: []
+  id: SUG-0015
+  proposta_texto: Workflow 'WORKFLOW-NOGATILHO' sem gatilhos validos ou sem padroes
+    de etapa 1; nao eh possivel gerar seeds.
+  severidade: baixa
+workflows:
+  colisoes:
+  - edges: []
+    gatilho_norm: erro
+    tipo: exata
+    workflows:
+    - WORKFLOW-BUG-FIX
+    - WORKFLOW-REFACTORING
+  - edges:
+    - e-aaaa00000001
+    gatilho_norm: erro
+    tipo: gatilho_aresta
+    workflows:
+    - WORKFLOW-REFACTORING
+  matriz_confusao:
+    WORKFLOW-BUG-FIX:
+      <none>: 1
+      WORKFLOW-BUG-FIX: 2
+      WORKFLOW-REFACTORING: 2
+    WORKFLOW-REFACTORING:
+      <none>: 1
+      WORKFLOW-REFACTORING: 1
+  metricas:
+  - f1: 0.571429
+    fn: 3
+    fp: 0
+    precision: 1.0
+    recall: 0.4
+    suporte: 5
+    tp: 2
+    workflow_id: WORKFLOW-BUG-FIX
+  - f1: null
+    fn: 0
+    fp: 0
+    precision: null
+    recall: null
+    suporte: 0
+    tp: 0
+    workflow_id: WORKFLOW-FEATURE-DEVELOPMENT
+  - f1: null
+    fn: 0
+    fp: 0
+    precision: null
+    recall: null
+    suporte: 0
+    tp: 0
+    workflow_id: WORKFLOW-NOGATILHO
+  - f1: 0.4
+    fn: 1
+    fp: 2
+    precision: 0.333333
+    recall: 0.5
+    suporte: 2
+    tp: 1
+    workflow_id: WORKFLOW-REFACTORING

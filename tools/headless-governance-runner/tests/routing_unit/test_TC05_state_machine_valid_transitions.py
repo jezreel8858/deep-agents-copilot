@@ -53,47 +53,58 @@ class TestTC05StateMachineValidTransitions:
         assert s2.etapa == 2
         assert s2.agente_ativo == "<stack>-test-engineer"
 
-        # 3. Avanço para etapa 3 (<stack>-developer)
+        # 3. Avanço para etapa 3 (<stack>-arch-advisor)
         ev_3 = Evento(
             origem="usuario",
             tipo=TipoEvento.AVANCO_ETAPA,
             etapa_solicitada=3,
-            agente_solicitado="<stack>-developer",
+            agente_solicitado="<stack>-arch-advisor",
         )
         s3 = transicionar(s2, ev_3, tabela_real)
         assert s3.etapa == 3
-        assert s3.agente_ativo == "<stack>-developer"
+        assert s3.agente_ativo == "<stack>-arch-advisor"
 
-        # 4. Avanço para etapa 4 (runtime-verifier)
+        # 4. Avanço para etapa 4 (<stack>-developer)
         ev_4 = Evento(
             origem="usuario",
             tipo=TipoEvento.AVANCO_ETAPA,
             etapa_solicitada=4,
-            agente_solicitado="runtime-verifier",
+            agente_solicitado="<stack>-developer",
         )
         s4 = transicionar(s3, ev_4, tabela_real)
         assert s4.etapa == 4
-        assert s4.agente_ativo == "runtime-verifier"
+        assert s4.agente_ativo == "<stack>-developer"
 
-        # 5. Avanço para etapa 5 (code-review)
+        # 5. Avanço para etapa 5 (runtime-verifier)
         ev_5 = Evento(
             origem="usuario",
             tipo=TipoEvento.AVANCO_ETAPA,
             etapa_solicitada=5,
-            agente_solicitado="code-review",
+            agente_solicitado="runtime-verifier",
         )
         s5 = transicionar(s4, ev_5, tabela_real)
         assert s5.etapa == 5
-        assert s5.agente_ativo == "code-review"
+        assert s5.agente_ativo == "runtime-verifier"
 
-        # 6. Conclusão da última etapa reseta mandatoriamente para o router (R-052)
+        # 6. Avanço para etapa 6 (code-review)
+        ev_6 = Evento(
+            origem="usuario",
+            tipo=TipoEvento.AVANCO_ETAPA,
+            etapa_solicitada=6,
+            agente_solicitado="code-review",
+        )
+        s6 = transicionar(s5, ev_6, tabela_real)
+        assert s6.etapa == 6
+        assert s6.agente_ativo == "code-review"
+
+        # 7. Conclusão da última etapa reseta mandatoriamente para o router (R-052)
         ev_fim = Evento(
             origem="usuario",
             tipo=TipoEvento.CONCLUSAO_WORKFLOW,
-            etapa_solicitada=5,
+            etapa_solicitada=6,
             agente_solicitado="code-review",
         )
-        s_fim = transicionar(s5, ev_fim, tabela_real)
+        s_fim = transicionar(s6, ev_fim, tabela_real)
         assert s_fim.fase is Fase.ROUTER
         assert s_fim.workflow is None
         assert s_fim.etapa == 0
@@ -136,34 +147,44 @@ class TestTC05StateMachineValidTransitions:
         s3 = transicionar(s2, ev_3, tabela_real)
         assert s3.etapa == 3
 
-        # 4. Etapa 4 (<stack>-developer)
+        # 4. Etapa 4 (<stack>-arch-advisor)
         ev_4 = Evento(
             origem="usuario",
             tipo=TipoEvento.AVANCO_ETAPA,
             etapa_solicitada=4,
-            agente_solicitado="<stack>-developer",
+            agente_solicitado="<stack>-arch-advisor",
         )
         s4 = transicionar(s3, ev_4, tabela_real)
         assert s4.etapa == 4
 
-        # 5. Etapa 5 (business-rules-extractor)
+        # 5. Etapa 5 (<stack>-developer)
         ev_5 = Evento(
             origem="usuario",
             tipo=TipoEvento.AVANCO_ETAPA,
             etapa_solicitada=5,
-            agente_solicitado="business-rules-extractor",
+            agente_solicitado="<stack>-developer",
         )
         s5 = transicionar(s4, ev_5, tabela_real)
         assert s5.etapa == 5
 
-        # 6. Conclusão
+        # 6. Etapa 6 (business-rules-extractor)
+        ev_6 = Evento(
+            origem="usuario",
+            tipo=TipoEvento.AVANCO_ETAPA,
+            etapa_solicitada=6,
+            agente_solicitado="business-rules-extractor",
+        )
+        s6 = transicionar(s5, ev_6, tabela_real)
+        assert s6.etapa == 6
+
+        # 7. Conclusão
         ev_fim = Evento(
             origem="usuario",
             tipo=TipoEvento.CONCLUSAO_WORKFLOW,
-            etapa_solicitada=5,
+            etapa_solicitada=6,
             agente_solicitado="business-rules-extractor",
         )
-        s_fim = transicionar(s5, ev_fim, tabela_real)
+        s_fim = transicionar(s6, ev_fim, tabela_real)
         assert s_fim.fase is Fase.ROUTER
         assert s_fim.workflow is None
 

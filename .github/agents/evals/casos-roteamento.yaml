@@ -667,6 +667,146 @@ canonicos:
     - governance
   critico: true
   threshold: 0.9
+- id: canon-051
+  descricao: Desenho de integração entre sistemas com contratos OpenAPI, AsyncAPI, gRPC e fluxo cross-sistema
+  input:
+    solicitacao: Desenhar a integração entre sistemas definindo contrato de API OpenAPI, AsyncAPI e gRPC com análise de acoplamento entre serviços, fluxo de dados cross-sistema e divisão de tarefas por stack
+    contexto_disponivel: múltiplos microsserviços integrados
+  expected:
+    agent_route: tech-solution-architect
+    nivel_routing: keyword_based
+    confianca: alta
+    score_minimo: 0.9
+    output_contains:
+    - 'Delegado: @tech-solution-architect'
+  critico: true
+  threshold: 0.9
+- id: canon-052
+  descricao: Implementação de serviço Python com FastAPI, Pydantic, SQLAlchemy, Uvicorn, Celery e pytest
+  input:
+    solicitacao: Implementar endpoint assíncrono em Python com FastAPI, Pydantic, SQLAlchemy e Uvicorn rodando workers Celery e testes em pytest
+    contexto_disponivel: serviço backend Python
+  expected:
+    agent_route: python-router
+    nivel_routing: keyword_based
+    confianca: alta
+    score_minimo: 0.9
+    output_contains:
+    - 'Delegado: @python-router'
+  critico: true
+  threshold: 0.9
+- id: canon-053
+  descricao: Manutenção de componente Java EE legado com EJB Stateless, MDB, JTA CMT, EAR e Arquillian
+  input:
+    solicitacao: Refatorar bean EJB Stateless e Message Driven Bean (MDB) com transações JTA CMT empacotado em EAR e testado com OpenEJB e Arquillian
+    contexto_disponivel: módulo corporativo Java EE com EJB
+  expected:
+    agent_route: ejb-router
+    nivel_routing: keyword_based
+    confianca: alta
+    score_minimo: 0.9
+    output_contains:
+    - 'Delegado: @ejb-router'
+  critico: true
+  threshold: 0.9
+- id: canon-054
+  descricao: Preparação de Pull Request com mensagem de commit semântico, changelog e matriz de risco de PR
+  input:
+    solicitacao: Código aprovado no review, preciso preparar PR para abertura do pull request com mensagem de commit semântico, atualização do changelog e matriz de risco de PR
+    contexto_disponivel: branch pronta e aprovada no quality gate
+  expected:
+    agent_route: pr-gatekeeper
+    nivel_routing: keyword_based
+    confianca: alta
+    score_minimo: 0.9
+    output_contains:
+    - 'Delegado: @pr-gatekeeper'
+  critico: true
+  threshold: 0.9
+- id: canon-055
+  descricao: Revisão cética pré-HITL de plano R-064 com parecer estruturado do plan-critic antes do gate humano
+  input:
+    solicitacao: Executar revisão cética e emitir parecer pré-HITL de crítica de plano com o revisor cético plan-critic para revisar plano antes do gate humano
+    contexto_disponivel: plano R-064 recém-materializado em docs/plans/
+  expected:
+    agent_route: plan-critic
+    nivel_routing: keyword_based
+    confianca: alta
+    score_minimo: 0.9
+    output_contains:
+    - 'Delegado: @plan-critic'
+  critico: true
+  threshold: 0.9
+- id: canon-056
+  descricao: Análise técnica genérica cross-sistema para evolução macro entre módulos corporativos
+  input:
+    solicitacao: Estruturar a visão macro de evolução técnica entre os módulos corporativos de faturamento e cobrança
+    contexto_disponivel: múltiplos sistemas sem stack única definida
+  expected:
+    agent_route: tech-solution-architect
+    nivel_routing: keyword_based
+    confianca: alta
+    score_minimo: 0.9
+    output_contains:
+    - 'Delegado: @tech-solution-architect'
+  critico: true
+  threshold: 0.9
+- id: canon-057
+  descricao: Migração de schema de banco com Flyway/Liquibase, EXPLAIN ANALYZE, índices e rollback
+  input:
+    solicitacao: Criar migração de schema no Flyway e Liquibase com análise de EXPLAIN ANALYZE, ajuste de índice de banco, integridade referencial e script de rollback de migração
+    contexto_disponivel: banco relacional PostgreSQL com Flyway
+  expected:
+    agent_route: database-specialist
+    nivel_routing: keyword_based
+    confianca: alta
+    score_minimo: 0.9
+    output_contains:
+    - 'Delegado: @database-specialist'
+  critico: true
+  threshold: 0.9
+- id: canon-058
+  descricao: Verificação de sanidade do ambiente de execução, build limpo, dependências íntegras e portas
+  input:
+    solicitacao: Preciso verificar ambiente de execução para garantir build limpo, sandbox saudável, dependências íntegras e checar se há porta ocupada antes dos testes
+    contexto_disponivel: workspace local antes de rodar a suíte
+  expected:
+    agent_route: runtime-verifier
+    nivel_routing: keyword_based
+    confianca: alta
+    score_minimo: 0.9
+    output_contains:
+    - 'Delegado: @runtime-verifier'
+  critico: true
+  threshold: 0.9
+- id: canon-059
+  descricao: Pesquisa interna aprofundada combinada com benchmark de mercado e referências externas
+  input:
+    solicitacao: Realizar pesquisa interna aprofundada no repositório combinada com benchmark de mercado e referências externas sobre arquiteturas de mensageria
+    contexto_disponivel: investigação técnica exploratória
+  expected:
+    agent_route: deep-search
+    nivel_routing: keyword_based
+    confianca: alta
+    score_minimo: 0.9
+    output_contains:
+    - 'Delegado: @deep-search'
+  critico: true
+  threshold: 0.9
+- id: canon-060
+  descricao: Arquitetura de vinculação de credencial e autenticação federada com provedor de identidade
+  input:
+    solicitacao: Definir a arquitetura para vincular credencial de provedor de identidade externo com login federado, auth linking e autenticação federada no serviço de autenticação
+    contexto_disponivel: múltiplos provedores OAuth2/OIDC
+  expected:
+    agent_route: tech-solution-architect
+    nivel_routing: keyword_based
+    confianca: alta
+    score_minimo: 0.9
+    output_contains:
+    - 'Delegado: @tech-solution-architect'
+  critico: true
+  threshold: 0.9
 ambiguos:
 - id: ambig-006
   descricao: Ambiguidade entre security-reviewer e agent-safety-guardrails (skill, não agent) — pedido menciona 'segurança

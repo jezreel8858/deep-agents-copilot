@@ -222,6 +222,8 @@ class WorkflowSpec:
     id: Workflow
     nome: str
     etapas: tuple[EtapaSpec, ...]
+    gatilhos: tuple[str, ...] = ()
+    fast_path: bool = False
 
 
 @dataclass(frozen=True)

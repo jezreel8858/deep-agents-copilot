@@ -1,4 +1,6 @@
--- Schema DDL SQLite do historico de geracao, avaliacao e diagnostico sintetico de roteamento (v2)
+-- Schema SQLite v3 para o pipeline de geração e avaliação sintética (synth-*).
+-- Aplicado via migrar_conexao() sem executescript().
+
 PRAGMA foreign_keys = ON;
 PRAGMA journal_mode = WAL;
 
@@ -6,8 +8,7 @@ CREATE TABLE IF NOT EXISTS schema_meta (
   key   TEXT PRIMARY KEY,
   value TEXT NOT NULL
 );
-
-INSERT OR IGNORE INTO schema_meta (key, value) VALUES ('schema_version', '2');
+INSERT OR IGNORE INTO schema_meta (key, value) VALUES ('schema_version', '3');
 
 CREATE TABLE IF NOT EXISTS synth_runs (
   run_id                 TEXT PRIMARY KEY,
@@ -46,6 +47,8 @@ CREATE TABLE IF NOT EXISTS synth_prompts (
   seed_source            TEXT NOT NULL DEFAULT 'manual',
   graph_edge_id          TEXT NULL,
   graph_edge_resolution  TEXT NULL,
+  expected_workflow      TEXT NULL,
+  graph_workflow_id      TEXT NULL,
   max_similarity         REAL NOT NULL,
   nearest_ref            TEXT,
   created_at             TEXT NOT NULL
@@ -57,19 +60,26 @@ CREATE INDEX IF NOT EXISTS ix_prompts_stratum
 CREATE INDEX IF NOT EXISTS ix_prompts_graph_edge
   ON synth_prompts(graph_edge_id);
 
+CREATE INDEX IF NOT EXISTS ix_synth_prompts_graph_workflow
+  ON synth_prompts(graph_workflow_id);
+
 CREATE TABLE IF NOT EXISTS synth_evaluations (
-  eval_id                TEXT PRIMARY KEY,
-  run_id                 TEXT NOT NULL REFERENCES synth_runs(run_id),
-  prompt_id              TEXT NOT NULL REFERENCES synth_prompts(prompt_id),
-  observed_route         TEXT,
-  route_source           TEXT CHECK (verdict = 'unparseable' OR route_source IN ('tool_hook', 'text_banner')),
-  verdict                TEXT NOT NULL CHECK (verdict IN ('matched','mismatched','unparseable','error')),
-  passed                 INTEGER NOT NULL CHECK (passed IN (0,1)),
-  response_excerpt       TEXT,
-  latency_ms             INTEGER,
-  premium_requests       INTEGER NOT NULL DEFAULT 0,
-  error                  TEXT,
-  created_at             TEXT NOT NULL,
+  eval_id                    TEXT PRIMARY KEY,
+  run_id                     TEXT NOT NULL REFERENCES synth_runs(run_id),
+  prompt_id                  TEXT NOT NULL REFERENCES synth_prompts(prompt_id),
+  observed_route             TEXT,
+  route_source               TEXT CHECK (verdict = 'unparseable' OR route_source IN ('tool_hook', 'text_banner')),
+  observed_workflow          TEXT,
+  observed_etapa             INTEGER,
+  workflow_source            TEXT,
+  workflow_route_consistent  INTEGER,
+  verdict                    TEXT NOT NULL CHECK (verdict IN ('matched','mismatched','unparseable','error')),
+  passed                     INTEGER NOT NULL CHECK (passed IN (0,1)),
+  response_excerpt           TEXT,
+  latency_ms                 INTEGER,
+  premium_requests           INTEGER NOT NULL DEFAULT 0,
+  error                      TEXT,
+  created_at                 TEXT NOT NULL,
   UNIQUE (run_id, prompt_id)
 );
 
@@ -103,6 +113,17 @@ CREATE TABLE IF NOT EXISTS routing_graph_edges (
   PRIMARY KEY (snapshot_sha256, edge_id)
 );
 
+CREATE TABLE IF NOT EXISTS routing_graph_workflows (
+  workflow_id            TEXT NOT NULL,
+  graph_sha256           TEXT NOT NULL,
+  nome                   TEXT NOT NULL,
+  fast_path              INTEGER NOT NULL DEFAULT 0,
+  gatilhos_json          TEXT NOT NULL DEFAULT '[]',
+  etapa1_padroes_json    TEXT NOT NULL DEFAULT '[]',
+  workflow_hash          TEXT NOT NULL,
+  PRIMARY KEY (workflow_id, graph_sha256)
+);
+
 CREATE TABLE IF NOT EXISTS synth_diagnostics (
   diagnostic_id          TEXT PRIMARY KEY,
   eval_run_id            TEXT NOT NULL REFERENCES synth_runs(run_id),
@@ -116,4 +137,4 @@ CREATE TABLE IF NOT EXISTS synth_diagnostics (
   n_suggestions          INTEGER NOT NULL DEFAULT 0
 );
 
-PRAGMA user_version = 2;
+PRAGMA user_version = 3;

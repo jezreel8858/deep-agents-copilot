@@ -277,7 +277,30 @@ def _construir_workflows(bruto: list[dict[str, Any]], nos_ids: frozenset[str]) -
                     proxima=proxima,
                 )
             )
-        workflows.append(WorkflowSpec(id=workflow_id, nome=item.get("nome", ""), etapas=tuple(etapas)))
+        gatilhos_bruto = item.get("gatilhos", ())
+        if gatilhos_bruto is None:
+            gatilhos_bruto = ()
+        if not isinstance(gatilhos_bruto, (list, tuple)) or any(
+            not isinstance(g, str) or not g.strip() for g in gatilhos_bruto
+        ):
+            raise GraphValidationError(
+                f"Workflow '{workflow_id_bruto}' possui 'gatilhos' inválido: esperado lista de strings não vazias."
+            )
+        gatilhos_tup = tuple(g.strip() for g in gatilhos_bruto)
+        fast_path_bruto = item.get("fast_path", False)
+        if not isinstance(fast_path_bruto, bool):
+            raise GraphValidationError(
+                f"Workflow '{workflow_id_bruto}' possui 'fast_path' inválido: esperado booleano."
+            )
+        workflows.append(
+            WorkflowSpec(
+                id=workflow_id,
+                nome=item.get("nome", ""),
+                etapas=tuple(etapas),
+                gatilhos=gatilhos_tup,
+                fast_path=fast_path_bruto,
+            )
+        )
     return tuple(workflows)
 
 

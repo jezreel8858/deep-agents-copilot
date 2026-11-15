@@ -1,10 +1,5 @@
 """
-normalize — Normalizacao canonica de texto e sanitizacao anti-override (B1-01).
-
-Implementa a normalizacao deterministica e idempotente usada pelas camadas L1 e L2
-de deduplicacao (NFKC, casefold, remocao de diacriticos, remocao de pontuacao e
-colapso de espacos) e o filtro de seguranca que rejeita prompts sinteticos contendo
-diretivas explicitas de override de rota (CA-03).
+normalize — Normalizacao de texto e guarda anti-override para prompts sinteticos (B1 / B2 / §3.4).
 """
 
 from __future__ import annotations
@@ -23,25 +18,24 @@ __all__ = [
 ]
 
 OVERRIDE_DIRECTIVE_REASON = "override_directive_detected"
-
 DIRETIVAS_OVERRIDE: tuple[str, ...] = (
     "Rota:",
     "Delegado:",
     "Agente Ativo:",
+    "Workflow:",
+    "Etapa do Workflow:",
     "expected_agent_route",
 )
-
 _REGEX_OVERRIDE = re.compile(
-    r"(?:\brota\s*:|\bdelegado\s*:|\bagente\s+ativo\s*:|\bexpected_agent_route\b)",
+    r"(?:\brota\s*:|\bdelegado\s*:|\bagente\s+ativo\s*:|\bworkflow\s*:|\betapa\s+do\s+workflow\s*:|\bexpected_agent_route\b)",
     re.IGNORECASE,
 )
-
 _REGEX_NAO_ALFANUM = re.compile(r"[^\w\s]", re.UNICODE)
 _REGEX_ESPACOS = re.compile(r"\s+", re.UNICODE)
 
 
 def normalizar(texto: str) -> str:
-    """Normaliza um texto de forma deterministica e idempotente para deduplicacao."""
+    """Normaliza texto aplicando NFKC, casefold, remocao de acentos e colapso de espacos."""
     if not texto:
         return ""
     etapa_nfkc = unicodedata.normalize("NFKC", texto).casefold()
@@ -59,11 +53,7 @@ normalizar_texto = normalizar
 
 
 def detectar_override(texto: str) -> str | None:
-    """Detecta diretivas de override de roteamento no texto candidato.
-
-    Rejeita Rota:, Delegado:, Agente Ativo: e expected_agent_route (case-insensitive),
-    retornando override_directive_detected.
-    """
+    """Retorna motivo se o texto contiver diretivas de override de rota ou workflow."""
     if not texto:
         return None
     if _REGEX_OVERRIDE.search(texto) is not None:
@@ -72,11 +62,11 @@ def detectar_override(texto: str) -> str | None:
 
 
 def contem_override(texto: str) -> bool:
-    """Retorna True se o texto contiver diretiva de override proibida."""
+    """Retorna True se o texto contiver diretiva de override."""
     return detectar_override(texto) is not None
 
 
 def sanitizar_prompt(texto: str) -> tuple[bool, str | None]:
-    """Valida se o prompt sintetico esta livre de diretivas de override."""
+    """Valida se o prompt esta livre de diretivas de override."""
     motivo = detectar_override(texto)
     return (motivo is None, motivo)

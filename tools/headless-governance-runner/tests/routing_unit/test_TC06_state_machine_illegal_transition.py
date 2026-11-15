@@ -170,17 +170,17 @@ class TestTC06StateMachineIllegalTransition:
         self, tabela_real: TabelaTransicao
     ) -> None:
         """Avanço para etapa inexistente na tabela compilada deve ser rejeitado."""
-        # Arrange - BUG_FIX só tem 5 etapas
+        # Arrange - BUG_FIX tem 6 etapas
         sessao = Sessao(
             fase=Fase.EM_WORKFLOW,
             workflow=Workflow.BUG_FIX,
-            etapa=5,
+            etapa=6,
             agente_ativo="code-review",
         )
         evento = Evento(
             origem="usuario",
             tipo=TipoEvento.AVANCO_ETAPA,
-            etapa_solicitada=6,
+            etapa_solicitada=7,
             agente_solicitado="code-review",
         )
 

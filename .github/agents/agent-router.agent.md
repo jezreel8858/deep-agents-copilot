@@ -222,6 +222,12 @@ Pedido recebido (já refinado por @prompt-structuring ou via Fast-Path)?
 |- Código já aprovado por code-review e pedido é preparar PR (diff, commit semântico, changelog, matriz de risco)?
 |  |- Sim -> @pr-gatekeeper
 |  \- Não
+|- É revisão cética pré-HITL de plano R-064 em `docs/plans/<tipo>/`, parecer adversário pré-HITL, crítica de plano ou validação de plano contra os 8 critérios de conformidade antes do gate humano? (Mesmo se o caminho estiver truncado como `docs/pl` ou omitido, NÃO busque arquivos no disco nem faça perguntas — emita imediatamente `Delegado: @plan-critic`)
+|  |- Sim -> @plan-critic
+|  \- Não
+|- É migração de schema (Flyway, Liquibase, Alembic), tuning SQL (EXPLAIN ANALYZE), índice de banco, integridade referencial ou rollback de migração? (Delegue SEMPRE para `@database-specialist` — NUNCA use `@database-router`, que não existe, e NUNCA responda dúvidas técnicas de Flyway/banco diretamente sem emitir `Delegado: @database-specialist`)
+|  |- Sim -> @database-specialist
+|  \- Não
 |- É autoria ou curadoria de documentação técnica (.md) de projeto ou governança?
 |  |- Sim -> @docs-engineer
 |  \- Não
@@ -293,7 +299,7 @@ Pedido recebido (já refinado por @prompt-structuring ou via Fast-Path)?
 ```markdown
 Agente Ativo: <@agent delegado nesta resposta — auditoria de R-042>
 Transição: <"Nova triagem (1º turno)" | "<agent-anterior> → <agent-atual> (motivo: deriva_de_intencao)" | "Sem mudança — mesmo agent do turno anterior">
-Workflow: <WORKFLOW-BUG-FIX|WORKFLOW-REFACTORING|WORKFLOW-TECHNICAL-ANALYSIS|WORKFLOW-FEATURE-DEVELOPMENT|WORKFLOW-GOVERNANCE-MAINTENANCE|WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION|WORKFLOW-FRAMEWORK-MIGRATION|WORKFLOW-RELEASE-READINESS>
+Workflow: <WORKFLOW-BUG-FIX|WORKFLOW-REFACTORING|WORKFLOW-TECHNICAL-ANALYSIS|WORKFLOW-FEATURE-DEVELOPMENT|WORKFLOW-GOVERNANCE-MAINTENANCE|WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION|WORKFLOW-FRAMEWORK-MIGRATION|WORKFLOW-RELEASE-READINESS|WORKFLOW-REQUIREMENTS-ELICITATION|N/A>
 Etapa do Workflow: <1..N — nome da etapa inicial conforme workflows.md>
 Rota: <bug_fix|environment_check|root_cause_analysis|code_review|security_review|performance_review|compliance|devops|code_style|requirements|feature_planning|code_summarization|codegraph_engine|specialist_advisory|specialist_implementation|database_migration|test_strategy|test_implementation|business_rules|refactor_plan|refactor_execution|pr_preparation|documentation|governance|memory_management|impact_analysis|deep_search|integration_fallback>
 [Model] Delegando para @<agent> — modelo solicitado: <model-alvo>
@@ -415,6 +421,7 @@ Próximo passo mínimo:
 - [@business-rules-extractor](business-rules-extractor.agent.md) para extração de regras de negócio e validação de refatorações.
 - [@refactor-planner](refactor-planner.agent.md) para planejamento e decomposição macro de refactor estrutural (deve delegar mapeamento de blast radius/dependências ao `@codegraph-engine` — R-045).
 - [@pr-gatekeeper](pr-gatekeeper.agent.md) para preparação de PR pós-aprovação do quality gate (diff, mensagem de commit semântico, matriz de risco e CHANGELOG.md).
+- [@plan-critic](plan-critic.agent.md) para revisão cética pré-HITL de planos R-064 em `docs/plans/<tipo>/`, emissão de parecer adversário estruturado (`PASS`, `PASS_WITH_NITS`, `NEEDS_REVISION`) e validação contra os 8 critérios de conformidade antes do checkpoint humano.
 - [@docs-engineer](docs-engineer.agent.md) para autoria de documentação técnica nova e curadoria/padronização de documentação existente exclusivamente em `.md`.
 - [@governance-factory](governance-factory.agent.md) para criação, padronização e revisão de agents (`.agent.md`), skills (`SKILL.md`), prompts (`.prompt.md`) ou novas stacks de domínio. Toda solicitação de IMPORTAÇÃO de skill externa aciona compulsoriamente o Protocolo de Avaliação de Pertinência (R-067) antes de qualquer criação de arquivo.
 - [@agent-auditor](agent-auditor.agent.md) para auditoria semântica/estrutural do catálogo de governança (agents, skills, prompts), detecção de gaps, smells, redundância/verbosidade de saída e conformidade (read-only) — sempre o primeiro passo antes de qualquer correção.

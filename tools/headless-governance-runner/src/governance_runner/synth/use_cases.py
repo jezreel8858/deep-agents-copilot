@@ -1,4 +1,6 @@
-"""use_cases — Casos de uso synth-generate / synth-eval / synth-export / synth-promote / synth-diagnose (B2-05 / B2-02 / B3-03)."""
+"""
+use_cases — Orquestracao dos casos de uso synth-generate, synth-eval, synth-export, synth-promote e synth-diagnose.
+"""
 
 from __future__ import annotations
 
@@ -36,11 +38,15 @@ from governance_runner.synth.routing_graph import (
 )
 from governance_runner.synth.seeds import (
     MODOS_GRAPH_SEEDING,
+    MODOS_WORKFLOW_SEEDING,
     ModoGraphSeeding,
+    ModoWorkflowSeeding,
     SeedLike,
     calcular_cobertura_golden,
+    calcular_cobertura_workflows_golden,
     enriquecer_seeds_golden,
     gerar_seeds_grafo,
+    gerar_seeds_workflows,
 )
 from governance_runner.synth.storage import SynthRepository
 from governance_runner.synth.taxonomy import alocar_estratos
@@ -62,8 +68,6 @@ MODOS_GERADOR = ("sdk", "template")
 
 
 class SynthOrcamentoInvalidoError(ValueError):
-    """Orcamento ausente/invalido; a CLI deve sair com exit code 2."""
-
     exit_code = EXIT_ORCAMENTO_INVALIDO
 
 
@@ -75,6 +79,9 @@ class RelatorioSynth:
     motivo: str | None = None
     contadores: dict[str, int] = field(default_factory=dict)
     exit_code: int = 0
+    n_colisoes_workflow: int = 0
+    workflow_macro_f1: float | None = None
+    workflow_route_consistency_rate: float | None = None
 
 
 def validar_orcamento_synth(
@@ -83,7 +90,6 @@ def validar_orcamento_synth(
     generator_mode: str | None = None,
     env: Mapping[str, str] | None = None,
 ) -> int | None:
-    """Fail-fast: valida o orcamento ANTES de qualquer chamada/token SDK."""
     ambiente = os.environ if env is None else env
     if comando not in ("synth-eval", "synth-generate"):
         raise SynthOrcamentoInvalidoError(f"comando desconhecido: {comando}")
@@ -130,28 +136,41 @@ def executar_synth_generate(
     routing_graph_path: str | Path | None = None,
     graph_seeding: ModoGraphSeeding = "off",
     graph_min_coverage: int = 3,
+    workflow_seeds: ModoWorkflowSeeding = "off",
     repo_root: Path | None = None,
     env: Mapping[str, str] | None = None,
 ) -> RelatorioSynth:
     if graph_seeding not in MODOS_GRAPH_SEEDING:
-        raise ValueError(f"--graph-seeding invalido: {graph_seeding!r}. Esperado um de {MODOS_GRAPH_SEEDING}.")
+        raise ValueError(
+            f"--graph-seeding invalido: {graph_seeding!r}. Esperado um de {MODOS_GRAPH_SEEDING}."
+        )
+    if workflow_seeds not in MODOS_WORKFLOW_SEEDING:
+        raise ValueError(
+            f"--workflow-seeds invalido: {workflow_seeds!r}. Esperado um de {MODOS_WORKFLOW_SEEDING}."
+        )
     teto = validar_orcamento_synth("synth-generate", max_premium_requests, generator_mode, env)
-
     snapshot: GrafoSnapshot | None = None
-    if routing_graph_path is not None or graph_seeding != "off":
+    if routing_graph_path is not None or graph_seeding != "off" or workflow_seeds != "off":
         snapshot = carregar_snapshot_grafo(routing_graph_path, repo_root=repo_root)
     else:
         try:
             snapshot = carregar_snapshot_grafo(None, repo_root=repo_root)
-        except Exception:  # noqa: BLE001 - best-effort quando --routing-graph nao foi informado em modo off
+        except Exception:  # noqa: BLE001
             snapshot = None
 
-    seeds_golden = carregar_seeds_golden(repo_root=repo_root, targets=targets, include_security=include_security)
+    seeds_golden = carregar_seeds_golden(
+        repo_root=repo_root,
+        targets=targets,
+        include_security=include_security,
+    )
     if snapshot is not None:
         seeds_golden = enriquecer_seeds_golden(seeds_golden, snapshot)
 
     seeds_totais: list[GoldenSeed | SeedLike] = list(seeds_golden)
     n_graph_seeds = 0
+    n_workflow_seeds = 0
+    todas_golden: tuple[GoldenSeed, ...] | None = None
+
     if graph_seeding != "off" and snapshot is not None:
         todas_golden = carregar_seeds_golden(repo_root=repo_root, include_security=include_security)
         cov_golden = calcular_cobertura_golden(todas_golden, snapshot)
@@ -165,6 +184,21 @@ def executar_synth_generate(
         )
         n_graph_seeds = len(seeds_grafo)
         seeds_totais.extend(seeds_grafo)
+
+    if workflow_seeds != "off" and snapshot is not None:
+        if todas_golden is None:
+            todas_golden = carregar_seeds_golden(repo_root=repo_root, include_security=include_security)
+        cov_wf = calcular_cobertura_workflows_golden(todas_golden, snapshot)
+        seeds_wf = gerar_seeds_workflows(
+            snapshot,
+            workflow_seeds,
+            cobertura=cov_wf,
+            golden_seeds=todas_golden,
+            min_cobertura=1,
+            rng_seed=rng_seed,
+        )
+        n_workflow_seeds = len(seeds_wf)
+        seeds_totais.extend(seeds_wf)
 
     alocacoes = alocar_estratos(
         seeds_totais,
@@ -188,6 +222,7 @@ def executar_synth_generate(
         gerador = GeradorSDK(cliente_factory(), budget, modelo=modelo)
     else:
         gerador = GeradorTemplate()
+
     params: dict[str, Any] = {
         "per_stratum": per_stratum,
         "targets": list(targets or []),
@@ -197,6 +232,9 @@ def executar_synth_generate(
         "graph_seeding": graph_seeding,
         "graph_min_coverage": graph_min_coverage,
     }
+    if workflow_seeds != "off":
+        params["workflow_seeds"] = workflow_seeds
+
     rel = gerar_sinteticos(
         repo=repo,
         gerador=gerador,
@@ -212,19 +250,22 @@ def executar_synth_generate(
         routing_graph_sha256=snapshot.sha256 if snapshot is not None else None,
         snapshot_grafo=snapshot,
     )
+    contadores: dict[str, int] = {
+        "n_candidates": rel.n_candidates,
+        "n_accepted": rel.n_accepted,
+        "n_rejected_hash": rel.n_rejected_hash,
+        "n_rejected_similarity": rel.n_rejected_similarity,
+        "n_rejected_override": rel.n_rejected_override,
+        "n_graph_seeds": n_graph_seeds,
+    }
+    if workflow_seeds != "off":
+        contadores["n_workflow_seeds"] = n_workflow_seeds
     return RelatorioSynth(
         comando="synth-generate",
         run_id=rel.run_id,
         status=rel.status,
         motivo=rel.motivo,
-        contadores={
-            "n_candidates": rel.n_candidates,
-            "n_accepted": rel.n_accepted,
-            "n_rejected_hash": rel.n_rejected_hash,
-            "n_rejected_similarity": rel.n_rejected_similarity,
-            "n_rejected_override": rel.n_rejected_override,
-            "n_graph_seeds": n_graph_seeds,
-        },
+        contadores=contadores,
     )
 
 
@@ -244,7 +285,7 @@ def executar_synth_eval(
 ) -> RelatorioSynth:
     teto = validar_orcamento_synth("synth-eval", max_premium_requests, None, env)
     assert teto is not None
-    cliente = cliente_factory()  # somente APOS validar o orcamento
+    cliente = cliente_factory()
     rel = avaliar_lote(
         repo=repo,
         cliente=cliente,
@@ -340,18 +381,16 @@ def executar_synth_diagnose(
     allow_root: bool | Path | str = False,
     repo_root: Path | None = None,
 ) -> RelatorioSynth:
-    """Executa o diagnostico offline deterministico (zero chamadas LLM/SDK) sobre um eval_run_id."""
     snapshot = carregar_snapshot_grafo(routing_graph_path, repo_root=repo_root)
     repo.registrar_arestas_grafo(snapshot)
-
+    repo.registrar_workflows_grafo(snapshot)
     run_info = repo.obter_run(eval_run_id)
     avaliacoes = repo.listar_avaliacoes(eval_run_id)
-
     router_texto, router_sha = carregar_router_agent(router_agent_path, repo_root=repo_root)
     try:
         golden_seeds = carregar_seeds_golden(golden_path, repo_root=repo_root, include_security=True)
         golden_sha = calcular_sha256_golden(golden_path, repo_root=repo_root)
-    except Exception:  # noqa: BLE001 - best-effort em ambientes isolados de teste
+    except Exception:  # noqa: BLE001
         golden_seeds = ()
         golden_sha = str((run_info or {}).get("golden_set_sha256") or "")
 
@@ -366,7 +405,6 @@ def executar_synth_diagnose(
         golden_set_sha256=golden_sha,
         min_support=min_support,
     )
-
     res_exp = exportar_diagnostico(
         diag,
         out_dir=out_dir,
@@ -374,7 +412,6 @@ def executar_synth_diagnose(
         repo_root=repo_root,
         allow_root=allow_root,
     )
-
     repo.inserir_diagnostico(
         diagnostic_id=diag.diagnostic_id,
         eval_run_id=eval_run_id,
@@ -387,7 +424,6 @@ def executar_synth_diagnose(
         metrics=serializar_diagnostico_dict(diag)["resumo"],
         n_suggestions=len(diag.sugestoes),
     )
-
     motivo_path = str(res_exp.yaml_path or res_exp.md_path or "")
     return RelatorioSynth(
         comando="synth-diagnose",
@@ -398,5 +434,9 @@ def executar_synth_diagnose(
             "total_avaliacoes": diag.resumo.total_avaliacoes,
             "n_suggestions": len(diag.sugestoes),
             "n_colisoes": len(diag.colisoes),
+            "n_colisoes_workflow": len(diag.colisoes_workflow),
         },
+        n_colisoes_workflow=len(diag.colisoes_workflow),
+        workflow_macro_f1=diag.resumo.workflow_macro_f1,
+        workflow_route_consistency_rate=diag.resumo.workflow_route_consistency_rate,
     )

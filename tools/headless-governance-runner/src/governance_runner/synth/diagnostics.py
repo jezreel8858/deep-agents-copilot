@@ -11,8 +11,9 @@ from __future__ import annotations
 
 import hashlib
 import re
+from fnmatch import fnmatchcase
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Literal, Sequence
 
 from governance_runner.synth.golden import GoldenSeed
@@ -20,12 +21,14 @@ from governance_runner.synth.normalize import normalizar
 from governance_runner.synth.routing_graph import (
     GrafoSnapshot,
     RotaGrafo,
+    WorkflowGrafo,
     resolver_aresta,
     rotas_validas,
 )
 from governance_runner.synth.seeds import (
     calcular_cobertura_golden,
     identificar_arestas_uncoverable,
+    identificar_workflows_uncoverable,
 )
 
 __all__ = [
@@ -41,6 +44,8 @@ __all__ = [
     "MetricaAresta",
     "RotasOrfas",
     "ColisaoKws",
+    "MetricaWorkflow",
+    "ColisaoWorkflow",
     "DivergenciaRouterMd",
     "SugestaoAcionavel",
     "DiagnosticoAssertividade",
@@ -58,7 +63,16 @@ CODIGOS_SUGESTAO: tuple[str, ...] = (
     "SUG-GOLDEN-GAP",
     "SUG-ROUTER-DOC",
     "SUG-GRAPH-PHANTOM",
+    "SUG-WF-COLLISION",
+    "SUG-WF-LOW-RECALL",
+    "SUG-WF-LOW-PRECISION",
+    "SUG-WF-INCONSISTENT-ROUTE",
+    "SUG-WF-MISSING-BANNER",
+    "SUG-WF-UNKNOWN-ID",
+    "SUG-WF-UNCOVERABLE",
 )
+
+LIMIAR_F1_WORKFLOW = 0.7
 
 CATEGORIAS_DIVERGENCIA: tuple[str, ...] = (
     "KEYWORD_COLLISION",
@@ -102,6 +116,10 @@ class ResumoDiagnostico:
     acuracia_global: float
     cobertura_arestas_golden: float
     cobertura_arestas_total: float
+    workflow_macro_f1: float | None = None
+    workflow_accuracy: float | None = None
+    workflow_route_consistency_rate: float | None = None
+    banner_coverage: float | None = None
 
 
 @dataclass(frozen=True)
@@ -123,6 +141,26 @@ class MetricaAresta:
     recall: float | None
     f1: float | None
     unparseable: int
+
+
+@dataclass(frozen=True)
+class MetricaWorkflow:
+    workflow_id: str
+    suporte: int
+    tp: int
+    fp: int
+    fn: int
+    precision: float | None
+    recall: float | None
+    f1: float | None
+
+
+@dataclass(frozen=True)
+class ColisaoWorkflow:
+    gatilho_norm: str
+    workflows: tuple[str, ...]
+    tipo: Literal["exata", "substring", "gatilho_aresta"]
+    edges: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -173,6 +211,9 @@ class DiagnosticoAssertividade:
     divergencias_router_md: DivergenciaRouterMd
     sugestoes: tuple[SugestaoAcionavel, ...]
     aviso: str = AVISO_HITL
+    por_workflow: tuple[MetricaWorkflow, ...] = ()
+    matriz_confusao_workflow: dict[str, dict[str, int]] = field(default_factory=dict)
+    colisoes_workflow: tuple[ColisaoWorkflow, ...] = ()
 
 
 def _r6(valor: float) -> float:
@@ -234,6 +275,167 @@ def _detectar_colisoes_estaticas(rotas: Sequence[RotaGrafo]) -> tuple[ColisaoKws
     return tuple(colisoes)
 
 
+def _casa_padroes(rota: str, padroes: Sequence[str]) -> bool:
+    alvo = (rota or "").strip().lstrip("@").lower()
+    return any(fnmatchcase(alvo, p) for p in padroes)
+
+
+def _detectar_colisoes_workflow(
+    workflows: Sequence[WorkflowGrafo],
+    rotas: Sequence[RotaGrafo],
+) -> tuple[ColisaoWorkflow, ...]:
+    """Detecta colisoes entre gatilhos de workflows distintos e entre gatilho x keyword de aresta incoerente."""
+    colisoes: list[ColisaoWorkflow] = []
+    vistos: set[tuple[str, tuple[str, ...], str]] = set()
+    por_gatilho: dict[str, set[str]] = {}
+    for wf in workflows:
+        for g in wf.gatilhos_norm:
+            if g:
+                por_gatilho.setdefault(g, set()).add(wf.workflow_id)
+
+    for g in sorted(por_gatilho):
+        wfs = tuple(sorted(por_gatilho[g]))
+        if len(wfs) >= 2 and (g, wfs, "exata") not in vistos:
+            vistos.add((g, wfs, "exata"))
+            colisoes.append(ColisaoWorkflow(gatilho_norm=g, workflows=wfs, tipo="exata"))
+
+    for curto in sorted(g for g in por_gatilho if len(g) >= 4):
+        wfs_sub: set[str] = set(por_gatilho[curto])
+        tem_super = False
+        for longo, ids in por_gatilho.items():
+            if len(longo) > len(curto) and curto in longo and not ids <= por_gatilho[curto]:
+                tem_super = True
+                wfs_sub |= ids
+        wfs_t = tuple(sorted(wfs_sub))
+        if tem_super and len(wfs_t) >= 2 and (curto, wfs_t, "exata") not in vistos:
+            if (curto, wfs_t, "substring") not in vistos:
+                vistos.add((curto, wfs_t, "substring"))
+                colisoes.append(ColisaoWorkflow(gatilho_norm=curto, workflows=wfs_t, tipo="substring"))
+
+    for wf in workflows:
+        for g in wf.gatilhos_norm:
+            if len(g) < 4:
+                continue
+            edges: set[str] = set()
+            for r in rotas:
+                if _casa_padroes(r.para, wf.etapa1_padroes):
+                    continue
+                for kw in r.keywords_norm:
+                    if len(kw) >= 4 and (kw == g or kw in g or g in kw):
+                        edges.add(r.edge_id)
+                        break
+            if edges:
+                colisoes.append(
+                    ColisaoWorkflow(
+                        gatilho_norm=g,
+                        workflows=(wf.workflow_id,),
+                        tipo="gatilho_aresta",
+                        edges=tuple(sorted(edges)),
+                    )
+                )
+
+    colisoes.sort(key=lambda c: (c.gatilho_norm, c.tipo, c.workflows, c.edges))
+    return tuple(colisoes)
+
+
+def _calcular_metricas_workflow(
+    avaliacoes: Sequence[dict[str, Any]],
+    snapshot: GrafoSnapshot,
+) -> tuple[
+    tuple[MetricaWorkflow, ...],
+    dict[str, dict[str, int]],
+    dict[str, float | None],
+    dict[str, list[str]],
+]:
+    """Calcula P/R/F1 por workflow, macro-F1, acuracia, consistencia e banner_coverage (secao 4)."""
+    ids = sorted({w.workflow_id for w in snapshot.workflows})
+    tp: Counter[str] = Counter()
+    fp: Counter[str] = Counter()
+    fn: Counter[str] = Counter()
+    sup: Counter[str] = Counter()
+    matriz: dict[str, Counter[str]] = {}
+    escopo = 0
+    acertos = 0
+    banner_validos = 0
+    consist_validos = 0
+    consist_ok = 0
+    pids: dict[str, list[str]] = {
+        "missing_banner": [],
+        "unknown_id": [],
+    }
+    inconsistentes: dict[str, list[str]] = {}
+
+    for ev in avaliacoes:
+        pid = str(ev.get("prompt_id", ""))
+        exp_raw = ev.get("expected_workflow")
+        exp = str(exp_raw).strip() if exp_raw else ""
+        obs_raw = ev.get("observed_workflow")
+        obs = str(obs_raw).strip() if obs_raw else ""
+        origem = str(ev.get("workflow_source") or "")
+        cons = ev.get("workflow_route_consistent")
+        if cons is not None:
+            consist_validos += 1
+            if int(cons) == 1:
+                consist_ok += 1
+            elif obs:
+                chave = f"{obs}->{str(ev.get('observed_route') or '').strip().lstrip('@').lower()}"
+                inconsistentes.setdefault(chave, []).append(pid)
+        if origem == "invalid_id":
+            pids["unknown_id"].append(pid)
+        if not exp:
+            continue
+        escopo += 1
+        sup[exp] += 1
+        if obs:
+            banner_validos += 1
+        else:
+            pids["missing_banner"].append(pid)
+        matriz.setdefault(exp, Counter())[obs or "<none>"] += 1
+        if obs == exp:
+            tp[exp] += 1
+            acertos += 1
+        else:
+            fn[exp] += 1
+            if obs:
+                fp[obs] += 1
+
+    metricas: list[MetricaWorkflow] = []
+    f1s: list[float] = []
+    for wid in ids:
+        prec = _div_segura(tp[wid], tp[wid] + fp[wid])
+        rec = _div_segura(tp[wid], tp[wid] + fn[wid])
+        f1: float | None = None
+        if prec is not None and rec is not None and (prec + rec) > 0:
+            f1 = _r6(2.0 * prec * rec / (prec + rec))
+        if sup[wid] > 0 or fp[wid] > 0:
+            f1s.append(f1 if f1 is not None else 0.0)
+        metricas.append(
+            MetricaWorkflow(
+                workflow_id=wid,
+                suporte=int(sup[wid]),
+                tp=int(tp[wid]),
+                fp=int(fp[wid]),
+                fn=int(fn[wid]),
+                precision=prec,
+                recall=rec,
+                f1=f1,
+            )
+        )
+    matriz_ord = {
+        k: {o: int(matriz[k][o]) for o in sorted(matriz[k])} for k in sorted(matriz)
+    }
+    agregados: dict[str, float | None] = {
+        "macro_f1": _r6(sum(f1s) / len(f1s)) if f1s else None,
+        "accuracy": _div_segura(acertos, escopo),
+        "consistency": _div_segura(consist_ok, consist_validos),
+        "banner_coverage": _div_segura(banner_validos, escopo),
+    }
+    pids_out: dict[str, list[str]] = {k: sorted(set(v)) for k, v in pids.items()}
+    for chave, lista in inconsistentes.items():
+        pids_out[f"inconsistent:{chave}"] = sorted(set(lista))
+    return tuple(metricas), matriz_ord, agregados, pids_out
+
+
 def _analisar_divergencia_router_md(
     snapshot: GrafoSnapshot,
     router_md_texto: str,
@@ -287,6 +489,116 @@ def _extrair_ngrams_candidatos(textos: Sequence[str], kws_existentes: set[str]) 
 
     ordenados = sorted(contagem.items(), key=lambda par: (-par[1], par[0]))
     return [termo for termo, freq in ordenados if freq >= 1][:3]
+
+
+_SugBruta = tuple[str, Literal["alta", "media", "baixa"], str, str, tuple[str, ...], str, str]
+
+
+def _sugestoes_workflow(
+    *,
+    snapshot: GrafoSnapshot,
+    colisoes: Sequence[ColisaoWorkflow],
+    metricas: Sequence[MetricaWorkflow],
+    pids: dict[str, list[str]],
+    min_support: int,
+) -> list[_SugBruta]:
+    """Gera SUG-WF-* deterministicas em ordem estavel de codigo e ancora (secao 4)."""
+    graph = ".github/agents/routing-graph.yaml"
+    router = ".github/agents/agent-router.agent.md"
+    saida: list[_SugBruta] = []
+    limiar = max(1, int(min_support))
+
+    for c in colisoes:
+        saida.append(
+            (
+                "SUG-WF-COLLISION",
+                "media" if c.tipo == "exata" else "baixa",
+                graph,
+                f"gatilho:{c.gatilho_norm}",
+                (),
+                f"Resolver colisao {c.tipo} do gatilho '{c.gatilho_norm}' entre workflows {list(c.workflows)}"
+                + (f" e arestas {list(c.edges)}." if c.edges else "."),
+                "KEYWORD_COLLISION",
+            )
+        )
+    for m in metricas:
+        if m.recall is not None and (m.tp + m.fn) >= limiar and m.recall < LIMIAR_F1_WORKFLOW:
+            saida.append(
+                (
+                    "SUG-WF-LOW-RECALL",
+                    "media",
+                    graph,
+                    f"workflows[{m.workflow_id}].gatilhos",
+                    (),
+                    f"Recall {m.recall:.6f} do workflow '{m.workflow_id}' abaixo de {LIMIAR_F1_WORKFLOW}; revisar gatilhos.",
+                    "CONFIDENCE_CALIBRATION",
+                )
+            )
+    for m in metricas:
+        if m.precision is not None and (m.tp + m.fp) >= limiar and m.precision < LIMIAR_F1_WORKFLOW:
+            saida.append(
+                (
+                    "SUG-WF-LOW-PRECISION",
+                    "media",
+                    graph,
+                    f"workflows[{m.workflow_id}].gatilhos",
+                    (),
+                    f"Precisao {m.precision:.6f} do workflow '{m.workflow_id}' abaixo de {LIMIAR_F1_WORKFLOW}; restringir gatilhos.",
+                    "CONFIDENCE_CALIBRATION",
+                )
+            )
+    for chave in sorted(k for k in pids if k.startswith("inconsistent:")):
+        lista = pids[chave]
+        if len(lista) >= limiar:
+            par = chave.split(":", 1)[1]
+            saida.append(
+                (
+                    "SUG-WF-INCONSISTENT-ROUTE",
+                    "media",
+                    router,
+                    f"wf-route:{par}",
+                    tuple(lista[:5]),
+                    f"Rota observada incoerente com a etapa 1 do workflow ({par}); alinhar delegacao com etapa 1.",
+                    "PROMPT_DRIFT",
+                )
+            )
+    if pids.get("missing_banner"):
+        saida.append(
+            (
+                "SUG-WF-MISSING-BANNER",
+                "baixa",
+                router,
+                "banner:workflow",
+                tuple(pids["missing_banner"][:5]),
+                "Respostas sem linha 'Workflow:' valida; reforcar o banner obrigatorio no agent-router.",
+                "PROMPT_DRIFT",
+            )
+        )
+    if pids.get("unknown_id"):
+        saida.append(
+            (
+                "SUG-WF-UNKNOWN-ID",
+                "media",
+                router,
+                "banner:workflow-id",
+                tuple(pids["unknown_id"][:5]),
+                "Workflow com ID fora do snapshot do grafo; alinhar IDs do banner aos workflows de routing-graph.yaml.",
+                "PROMPT_DRIFT",
+            )
+        )
+    for wid in identificar_workflows_uncoverable(snapshot):
+        saida.append(
+            (
+                "SUG-WF-UNCOVERABLE",
+                "baixa",
+                graph,
+                f"workflows[{wid}]",
+                (),
+                f"Workflow '{wid}' sem gatilhos validos ou sem padroes de etapa 1; nao eh possivel gerar seeds.",
+                "COVERAGE_GAP",
+            )
+        )
+    return saida
 
 
 def diagnosticar_avaliacao(
@@ -429,11 +741,18 @@ def diagnosticar_avaliacao(
         1 for m in metricas_aresta if (m.suporte.manual + m.suporte.routing_graph) > 0
     )
 
+    por_wf, matriz_wf, agg_wf, pids_wf = _calcular_metricas_workflow(avs_ordenadas, snapshot)
+    macro_f1_wf = agg_wf["macro_f1"]
+
     resumo = ResumoDiagnostico(
         total_avaliacoes=total_avaliacoes,
         acuracia_global=_div_segura(total_passed, total_avaliacoes) or 0.0,
         cobertura_arestas_golden=_div_segura(arestas_com_golden, total_arestas_validas) or 0.0,
         cobertura_arestas_total=_div_segura(arestas_com_aval, total_arestas_validas) or 0.0,
+        workflow_macro_f1=macro_f1_wf,
+        workflow_accuracy=agg_wf["accuracy"],
+        workflow_route_consistency_rate=agg_wf["consistency"],
+        banner_coverage=agg_wf["banner_coverage"],
     )
 
     matriz_ordenada: dict[str, dict[str, int]] = {
@@ -448,6 +767,7 @@ def diagnosticar_avaliacao(
     )
 
     colisoes = _detectar_colisoes_estaticas(validas)
+    colisoes_wf = _detectar_colisoes_workflow(snapshot.workflows, validas)
     divergencias = _analisar_divergencia_router_md(snapshot, router_md_texto, rotas_observadas_set)
 
     sugestoes_brutas: list[tuple[str, Literal["alta", "media", "baixa"], str, str, tuple[str, ...], str, str]] = []
@@ -555,6 +875,15 @@ def diagnosticar_avaliacao(
             )
         )
 
+    sugestoes_brutas.extend(
+        _sugestoes_workflow(
+            snapshot=snapshot,
+            colisoes=colisoes_wf,
+            metricas=por_wf,
+            pids=pids_wf,
+            min_support=min_support,
+        )
+    )
     sugestoes_ordenadas: list[SugestaoAcionavel] = []
     for idx, item in enumerate(sugestoes_brutas, start=1):
         cod, sev, alvo_arq, alvo_anc, evs, prop, cat = item
@@ -592,4 +921,7 @@ def diagnosticar_avaliacao(
         divergencias_router_md=divergencias,
         sugestoes=tuple(sugestoes_ordenadas),
         aviso=AVISO_HITL,
+        por_workflow=por_wf,
+        matriz_confusao_workflow=matriz_wf,
+        colisoes_workflow=colisoes_wf,
     )

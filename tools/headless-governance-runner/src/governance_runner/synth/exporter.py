@@ -1,7 +1,5 @@
-"""exporter — synth-export (Silver) e synth-promote (candidato promoted-<run_id>.yaml) (B3-01/B3-02).
-
-Invariantes: JAMAIS escreve em casos-roteamento.yaml (Golden); toda escrita fica sob
-`allow_root` (traversal/symlink => SynthExportPathError, exit code 2).
+"""
+exporter — Exportacao Silver e promocao controlada para suites de regressao (§3.3).
 """
 
 from __future__ import annotations
@@ -34,12 +32,11 @@ SILVER_PREFIX = "casos-roteamento-silver-"
 PROMOTED_PREFIX = "promoted-"
 GOLDEN_NOME = "casos-roteamento.yaml"
 EXIT_CAMINHO_INVALIDO = 2
+
 _REPO_ROOT = Path(__file__).resolve().parents[5]
 
 
 class SynthExportPathError(ValueError):
-    """Caminho fora de allow_root, traversal, symlink ou nome proibido; exit code 2."""
-
     exit_code = EXIT_CAMINHO_INVALIDO
 
 
@@ -52,7 +49,12 @@ class ResultadoExport:
 
 class ResultadoPromote:
     def __init__(
-        self, path: Path | None, n_promovidos: int, n_duplicados: int, conteudo: str, gravado: bool
+        self,
+        path: Path | None,
+        n_promovidos: int,
+        n_duplicados: int,
+        conteudo: str,
+        gravado: bool,
     ) -> None:
         self.path = path
         self.n_promovidos = n_promovidos
@@ -66,7 +68,6 @@ def _allow_root_padrao() -> Path:
 
 
 def _validar_sob_root(caminho: Path, allow_root: Path) -> Path:
-    """Resolve `caminho` (seguindo symlinks) e exige que fique sob allow_root."""
     raiz = allow_root.resolve()
     if ".." in caminho.parts:
         raise SynthExportPathError(f"traversal rejeitado: {caminho}")
@@ -89,11 +90,13 @@ def exportar_silver(
 ) -> ResultadoExport:
     raiz = allow_root if allow_root is not None else _allow_root_padrao()
     avaliacoes = repo.listar_avaliacoes(
-        eval_run_id, only_failures=only_failures, include_near_boundary=include_near_boundary
+        eval_run_id,
+        only_failures=only_failures,
+        include_near_boundary=include_near_boundary,
     )
     momento = agora or datetime.now(timezone.utc)
     nome = f"{SILVER_PREFIX}{momento.strftime('%Y%m%d-%H%M%S')}.yaml"
-    if nome.startswith(PROMOTED_PREFIX):  # defesa em profundidade
+    if nome.startswith(PROMOTED_PREFIX):
         raise SynthExportPathError("prefixo promoted-* proibido no Silver")
     destino = _validar_sob_root(Path(nome), raiz)
     if destino.exists() and destino.is_symlink():
@@ -101,23 +104,38 @@ def exportar_silver(
     casos: list[dict[str, Any]] = []
     for ev in avaliacoes:
         case_id = f"silver-{str(ev['prompt_id'])[:12]}"
-        casos.append(
-            {
-                "id": case_id,
-                "descricao": f"{ev['agente_alvo']} / {ev['dimensao_perturbacao']}",
-                "input": {"solicitacao": ev["prompt_text"]},
-                "expected": {"agent_route": ev["expected_route"]},
-                "silver": {
-                    "prompt_id": ev["prompt_id"],
-                    "eval_id": ev["eval_id"],
-                    "observed_route": ev["observed_route"],
-                    "verdict": ev["verdict"],
-                    "max_similarity": ev["max_similarity"],
-                    "review_status": "pending",
-                    "corrected_route": None,
-                },
+        expected_bloco: dict[str, Any] = {"agent_route": ev["expected_route"]}
+        exp_wf = ev.get("expected_workflow")
+        if exp_wf is not None and str(exp_wf).strip():
+            expected_bloco["workflow"] = str(exp_wf).strip()
+
+        silver_bloco: dict[str, Any] = {
+            "prompt_id": ev["prompt_id"],
+            "eval_id": ev["eval_id"],
+            "observed_route": ev["observed_route"],
+            "verdict": ev["verdict"],
+            "max_similarity": ev["max_similarity"],
+            "review_status": "pending",
+            "corrected_route": None,
+        }
+        obs_wf = ev.get("observed_workflow")
+        if obs_wf is not None and str(obs_wf).strip():
+            silver_bloco["observed_workflow"] = str(obs_wf).strip()
+
+        item_caso: dict[str, Any] = {
+            "id": case_id,
+            "descricao": f"{ev['agente_alvo']} / {ev['dimensao_perturbacao']}",
+            "input": {"solicitacao": ev["prompt_text"]},
+            "expected": expected_bloco,
+            "silver": silver_bloco,
+        }
+        if obs_wf is not None and str(obs_wf).strip():
+            item_caso["observed"] = {
+                "observed_route": ev["observed_route"],
+                "observed_workflow": str(obs_wf).strip(),
             }
-        )
+        casos.append(item_caso)
+
     raiz.mkdir(parents=True, exist_ok=True)
     doc = {"version": "1.0", "origem": "synth-export", "eval_run_id": eval_run_id, "casos": casos}
     destino.write_text(yaml.safe_dump(doc, allow_unicode=True, sort_keys=False), encoding="utf-8")
@@ -156,7 +174,8 @@ def promover_silver(
     dados = yaml.safe_load(entrada.read_text(encoding="utf-8")) or {}
     seeds = carregar_seeds_golden(repo_root=repo_root)
     funnel = DedupFunnel(
-        sim_threshold=sim_threshold, documentos_iniciais=[(f"golden:{s.id}", s.prompt) for s in seeds]
+        sim_threshold=sim_threshold,
+        documentos_iniciais=[(f"golden:{s.id}", s.prompt) for s in seeds],
     )
     aprovados: list[dict[str, Any]] = []
     duplicados = 0
@@ -169,12 +188,16 @@ def promover_silver(
         if not funnel.avaliar(texto, registrar_se_aceito=True, ref_se_aceito=str(caso["id"])).aceito:
             duplicados += 1
             continue
+        expected_prom: dict[str, Any] = {"agent_route": rota}
+        wf_corr = meta.get("corrected_workflow") or (caso.get("expected") or {}).get("workflow")
+        if wf_corr and str(wf_corr).strip():
+            expected_prom["workflow"] = str(wf_corr).strip()
         aprovados.append(
             {
                 "id": f"promoted-{caso['id']}",
                 "descricao": caso.get("descricao", ""),
                 "input": {"solicitacao": texto},
-                "expected": {"agent_route": rota},
+                "expected": expected_prom,
             }
         )
     conteudo = yaml.safe_dump({suite: aprovados}, allow_unicode=True, sort_keys=False)
