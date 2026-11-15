@@ -471,6 +471,7 @@ agents:
     - run_subagent
     - context-mode/ctx_search
     - context-mode/ctx_batch
+    - context-mode/ctx_execute
     - context-mode/ctx_index
     related_skills:
     - governance-audit-patterns
