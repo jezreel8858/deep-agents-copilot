@@ -170,6 +170,14 @@ Próximo Passo:
 
 </execution_protocol>
 
+
+### Avaliador Crítico e Regressivo de Guardrails (Agency Score 0–3 / OWASP ASI01..ASI10:2026)
+
+- **Gate de Criação/Revisão e Auditoria Regressiva**: Validar que todo agent do catálogo (`.github/agents/**/*.agent.md`) possui guardrails estritamente proporcionais ao seu **Agency Score (0–3)** conforme a matriz canônica [`.github/skills/agent-safety-guardrails/references/agency-score-matrix.md`](../skills/agent-safety-guardrails/references/agency-score-matrix.md).
+- **Validação Two-Tier**:
+  1. **Tier 1 (Determinístico — `pytest`)**: Executar `tests/governance_audit/test_agent_guardrails_regression.py` para garantir classificação exaustiva (Score 0: Read-Only, Score 1: Router, Score 2: Retriever Web `deep-search`, Score 3: Executor) e invariantes de `tools:` e seções sem órfãos.
+  2. **Tier 2 (Semântico — Crítica de Proporcionalidade)**: Rejeitar tanto *Under-Guardrailing* (ausência de travas `OWASP ASI01..ASI10:2026`, `dado inerte` em Score 2 ou `<execution_protocol>`/HITL em Score 3) quanto *Over-Guardrailing / Context Bloat* (injeção de regras de mutação em perfis Score 0/1).
+
 ## Retorno ao Router (R-042 — Anti Sticky-Session)
 
 **Banner obrigatório (visibilidade de fluxo)**: toda resposta deste agent abre com a linha `Agente Ativo: agent-auditor` antes de qualquer outro conteúdo — mesmo sem handoff neste turno. Se esta resposta é resultado de handoff/re-triagem recebido, adicionar `Handoff: <agent-origem> → agent-auditor (motivo: <motivo>)` na linha seguinte. Padrão de mercado: OpenAI Agents SDK (`HandoffOutputItem` — "Handed off from X to Y") e LangGraph (campo `active_agent` streamado ao usuário) — ver `agent-contracts/SKILL.md` seção 0.

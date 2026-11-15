@@ -172,3 +172,8 @@ Plano fora de `docs/plans/<tipo>/` (incl. caminhos legados `docs/plans/implement
 - `CLAUDE.md` e `.github/copilot-instructions.md` — Regras normativas do repositório.
 
 | 2.32 | **Degradação de UX no `ask_questions` (R-027 / CA-03..CA-05)**: opções sem `description` estruturado (`[Consequência prática] + [Trade-off]`), omissão de `(Recomendado)` na 1ª opção em decisão técnica, opções espantalho (*strawman*) / dummy `"Outro"` ou violação dos limites ergonômicos (2–4 opções, 1–4 perguntas, `header` ≤ 25 chars, `allowFreeformInput: true`). | Médio | Exigir `description` com consequência + trade-off, 1ª opção `(Recomendado)` (salvo decisão puramente de negócio), 2–4 opções reais mutuamente exclusivas, 1–4 perguntas, `header` ≤ 25 chars e `allowFreeformInput: true` (`structured-intake-patterns`). |
+
+### Validação de Guardrails Proporcionais por Agency Score (0–3) e OWASP ASI01..ASI10:2026
+
+- **Tier 1 (Determinístico — `pytest`)**: Executar `tests/governance_audit/test_agent_guardrails_regression.py` para validar que 100% dos agents possuem classificação unívoca em **Agency Score (0–3)** e cumprem os invariantes de tools e cláusulas obrigatórias sem órfãos.
+- **Tier 2 (Semântico — `@agent-auditor`)**: Auditar a proporcionalidade dos guardrails contra [`.github/skills/agent-safety-guardrails/references/agency-score-matrix.md`](../agent-safety-guardrails/references/agency-score-matrix.md), prevenindo *Under-Guardrailing* (`ASI01..ASI10:2026`) e *Over-Guardrailing / Context Bloat*.

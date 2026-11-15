@@ -216,3 +216,5 @@ Retorne IMEDIATAMENTE para `@agent-router` caso a solicitação fuja do escopo d
 - **Upstream**: `@agent-router`, `<agente-anterior>`.
 - **Downstream**: `<agente-posterior>`, `@agent-router`.
 - **Commands**: `/plan`, `/implement`, `/validate`.
+
+- ✅ Calibrar guardrails proporcionalmente ao **Agency Score (0–3)** e cobertura **OWASP ASI01..ASI10:2026** conforme `.github/skills/agent-safety-guardrails/references/agency-score-matrix.md` (validado por `tests/governance_audit/test_agent_guardrails_regression.py`).

@@ -18,7 +18,6 @@ AGENTS_DIR = BASE_DIR / ".github" / "agents"
 # Lista canônica dos 26 agentes classificados formalmente como "Gather-only"
 # aprovada no WORKFLOW-GOVERNANCE-MAINTENANCE (Etapa 4 / R-064)
 GATHER_ONLY_AGENTS = [
-    "agent-auditor",
     "adr-sentinel",
     "bug-triage",
     "code-review",
@@ -28,7 +27,6 @@ GATHER_ONLY_AGENTS = [
     "debugger",
     "deep-search",
     "devops-engineer",
-    "docs-engineer",
     "feature-planner",
     "plan-critic",
     "pr-gatekeeper",
@@ -36,7 +34,6 @@ GATHER_ONLY_AGENTS = [
     "requirements-analyst",
     "runtime-verifier",
     "security-reviewer",
-    "tech-solution-architect",
     "test-strategy",
     "database-arch-advisor",
     "ejb-arch-advisor",

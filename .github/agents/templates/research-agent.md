@@ -256,3 +256,5 @@ O retorno **DEVE** ser executado via tool `run_subagent` com `agentName: "agent-
 - **Upstream**: `@agent-router`, `@deep-search`, `@tech-solution-architect`.
 - **Downstream**: `@refactor-planner`, `@tech-solution-architect`, `@agent-router`.
 - **Commands**: `/plan`, `/deep-search`.
+
+- ✅ Calibrar guardrails proporcionalmente ao **Agency Score (0–3)** e cobertura **OWASP ASI01..ASI10:2026** conforme `.github/skills/agent-safety-guardrails/references/agency-score-matrix.md` (validado por `tests/governance_audit/test_agent_guardrails_regression.py`).
