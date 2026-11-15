@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "governance-runner"
 version = "0.1.0"
-description = "Motor determinístico de roteamento/governança (routing/) e runner headless (CI) do Copilot SDK. Ver docs/architecture/BLUEPRINT_COPILOT_SDK_HEADLESS_RUNNER.md."
+description = "Motor determinístico de roteamento/governança (routing/), geração/avaliação sintética (synth/) e runner headless (CI) do Copilot SDK. Ver docs/architecture/BLUEPRINT_COPILOT_SDK_HEADLESS_RUNNER.md."
 readme = "README.md"
 requires-python = ">=3.11"
 license = "LicenseRef-Proprietary"
@@ -15,11 +15,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Extra "sdk": pacote real do Copilot SDK (confirmado via @deep-search —
-# github/copilot-sdk, PyPI `github-copilot-sdk`, modulo importavel `copilot`).
-# Requer runtime baixado apos a instalacao: `python -m copilot download-runtime`.
 sdk = ["github-copilot-sdk>=1.0.0"]
-# Extra "otel": instrumentação de telemetria OTel GenAI do runner (subtasks futuras, Bloco C+).
 otel = []
 dev = [
     "pytest>=8.0",
@@ -32,16 +28,11 @@ governance-runner = "governance_runner.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
-# Sem esta secao, o setuptools empacota apenas arquivos `.py` por padrao --
-# `routing-graph.schema.json` (schema padrao embutido, Q-03) ficava ausente
-# em `site-packages` apos `pip install`, causando
-# `FileNotFoundError`/`GraphValidationError` em runtime (bug real encontrado
-# ao subir `docker compose --profile lobe --profile otel up`, 2026-10-01).
 [tool.setuptools.package-data]
-governance_runner = ["routing/*.json"]
+governance_runner = ["routing/*.json", "synth/*.sql", "synth/*.yaml"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests/routing_unit", "tests/runner_unit"]
+testpaths = ["tests/routing_unit", "tests/runner_unit", "tests/synth_unit", "tests/synth_e2e"]
 
 [tool.mypy]
 strict = true

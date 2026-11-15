@@ -194,6 +194,7 @@ O catálogo de agentes e a topologia de roteamento são geridos como dados estru
 - **Perfis de Modelo e Allowlist**: [`model-profiles.yaml`](model-profiles.yaml) e [`model-allowlist.yaml`](model-allowlist.yaml) (guia em [`docs/guides/model-profiles.md`](docs/guides/model-profiles.md)).
 - **Ferramentas de Automação Determinística**:
   - `tools/agent_protocol_sync/sync_execution_protocol.py` — Sincronização determinística do protocolo `<execution_protocol>` em lote (R-059/R-060).
+  - `tools/governance_sync/sync_docs_counts_and_mermaid.py` — Sincronizador e validador determinístico de contagens SSoT e diagramas Mermaid de workflows (`python -m tools.governance_sync --check` / `--apply`, R-015/R-033/R-055).
   - `tools/agentcard_exporter/export_agentcards.py` — Validador e exportador de conformidade A2A AgentCard v1.0.0 (R-051).
 
 ## 7) Política de Mudança
@@ -207,7 +208,7 @@ Toda entrega de governança é considerada concluída quando satisfaz:
 - [ ] Checklist de Genericidade (R-038) cumprido: vide [governance-factory-patterns/SKILL.md § 3.5](.github/skills/governance-factory-patterns/SKILL.md).
 - [ ] Checklist de Anonimização de Evidência Real (R-044) cumprido: vide [governance-factory-patterns/SKILL.md § 3.6](.github/skills/governance-factory-patterns/SKILL.md).
 - [ ] Portão de Reúso Sistêmico (R-055 / Q1-Q2-Q3) avaliado e propagado para templates canônicos e artefatos análogos.
-- [ ] Sincronização atômica (R-015) realizada em `catalog.yaml`, `routing-graph.yaml` e documentações conexas.
+- [ ] Sincronização atômica (R-015 / R-033 / R-055 — Docs & Mermaid Sync Gate) realizada em `catalog.yaml`, `routing-graph.yaml`, diagramas `mermaid` de workflows (`@plan-critic` no Gate Pré-HITL R-064) e contagens SSoT nas documentações vivas (`python -m tools.governance_sync --check`).
 - [ ] Suíte de testes `pytest tests/governance_audit` executada com 100% de aprovação.
 
 ### Política Anti-Timeout, Runtime Preferencial JavaScript (`fs` nativo) e Circuit Breaker Fail-Fast (`ctx_execute` / `ctx_batch`)

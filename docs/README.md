@@ -41,7 +41,7 @@ APRENDIZADO ────────────────────┼─�
 *Procedimentos operacionais focados em objetivos concretos e problemas específicos do dia a dia de engenharia.*
 
 - **Como Rodar Workflows Canônicos**:
-  - [Workflows Operacionais Determinísticos](../.github/agents/workflows.md): Especificação dos 8 workflows canônicos, com endurecimento determinístico e paridade de rigor entre Migração (6 etapas, Symbol Exhaustion e Tríplice Redundância), Bug-Fix (RCA estruturado 5 Whys/Fishbone com dupla evidência observável, classificação flaky vs regressão real, pré-declaração de blast radius e rollback plan, mini mutation-check anti falso-verde e observação pós-fix/canary) e Refatoração (Contract Testing Pact-style / consumer-driven, camada de redundância proporcional com auditoria reversa de símbolos, mini mutation gate e differential replay leve, e rollback com registro de blast_radius_revertido).
+  - [Workflows Operacionais Determinísticos](../.github/agents/workflows.md): Especificação dos 10 workflows canônicos (incluindo Gate Cético Pré-HITL via `@plan-critic` / R-064), com endurecimento determinístico e paridade de rigor entre Migração (6 etapas, Symbol Exhaustion e Tríplice Redundância), Bug-Fix (RCA estruturado 5 Whys/Fishbone com dupla evidência observável, classificação flaky vs regressão real, pré-declaração de blast radius e rollback plan, mini mutation-check anti falso-verde e observação pós-fix/canary) e Refatoração (Contract Testing Pact-style / consumer-driven, camada de redundância proporcional com auditoria reversa de símbolos, mini mutation gate e differential replay leve, e rollback com registro de blast_radius_revertido).
 - **Como Elaborar Planos de Workflow (R-064 — Taxonomia Unificada `docs/plans/<tipo>/`)**:
   - [Planos de Planejamento e Taxonomia `docs/plans/<tipo>/`](plans/README.md): Convenção das 8 subpastas canônicas (`feature/`, `refactor/`, `architecture/`, `implementation/`, `test-strategy/`, `bug-triage/`, `requirements/`, `governance/`), frontmatter R-064 e delegação de escrita.
   - [Planos de Implementação Técnica](plans/implementation/README.md): Convenção e template do Plano de Implementação técnica (`docs/plans/implementation/`).
@@ -50,7 +50,7 @@ APRENDIZADO ────────────────────┼─�
 - **Como Operar em Modo Context Mode**:
   - [Context Mode MCP Guide](agent-context/context-mode.md): Boas práticas de execução no sandbox, Think-in-Code e prevenção de saturação da janela de contexto (R-056).
 - **Como Auditar e Corrigir Smells de Agentes**:
-  - [Catálogo de Smells de Governança](../.github/skills/governance-audit-patterns/SKILL.md): Como identificar e sanar os 24 smells canônicos de governança.
+  - [Catálogo de Smells de Governança](../.github/skills/governance-audit-patterns/SKILL.md): Como identificar e sanar os 35 smells canônicos de governança (2.1 a 2.34, incluindo 2.7.1).
 
 ---
 
@@ -62,9 +62,9 @@ APRENDIZADO ────────────────────┼─�
   - [Instruções Copilot](../.github/copilot-instructions.md): Diretrizes operacionais e fast-paths do GitHub Copilot.
   - [Mapa do Repositório (Repo Map)](repo-map.md): Fonte de verdade para navegação determinística de arquivos (Zero Blind Searches).
 - **Catálogos Estruturados de Agentes e Skills**:
-  - [Catálogo Central de Agents](../.github/agents/catalog.yaml): Metadados, modelos, ferramentas e restrições dos 36 agentes.
+  - [Catálogo Central de Agents](../.github/agents/catalog.yaml): Metadados, modelos, ferramentas e restrições dos 39 agents no catálogo raiz (63 totais).
   - [Grafo de Roteamento Estrutural](../.github/agents/routing-graph.yaml): Grafo declarativo de nós, arestas e regras de transição (R-040).
-  - [Índice Geral de Skills](../.github/skills/.index.json): Mapeamento de 58 skills por tier e categoria.
+  - [Índice Geral de Skills](../.github/skills/.index.json): Mapeamento de 81 skills (15 Tier 1, 65 Tier 2, 1 Tier 3) por tier e categoria.
   - [Catálogo de Prompts Workflow](../.github/prompts/README.md): Prompts padronizados de orquestração.
 - **Schemas Canônicos de Validação (JSON Schema)**:
   - [`agentcard.schema.json`](schemas/agentcard.schema.json): Schema de especificação de identidade e capacidades de agentes (A2A Protocol / IETF Draft).
@@ -97,3 +97,5 @@ Ao adicionar ou editar documentação neste repositório:
 2. **Genericidade Absoluta (R-038)**: Nunca vincule nomes de projetos privados, classes de negócio ou dados proprietários em documentos compartilhados.
 3. **Headings Hierárquicos**: Mantenha sequência estrita de títulos (`#` → `##` → `###`) para garantir chunking limpo por ferramentas de IA e RAG.
 4. **Living Documentation (R-033)**: Toda alteração arquitetural, de regra ou de workflow exige atualização sincronizada dos documentos correlatos na mesma entrega.
+- **Como Operar o Pipeline Sintético de Roteamento (`synth-*`) com Copilot SDK**:
+  - [Guia do Pipeline Sintético de Roteamento (`synth-*`) e GitHub Copilot SDK](guides/synth-routing-eval-copilot-sdk-guide.md): Passo a passo completo de autenticação (`COPILOT_SDK_AUTH_TOKEN`), uso de `synth-generate`, `synth-eval`, `synth-export`, `synth-promote`, inspeção SQLite e troubleshooting.

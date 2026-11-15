@@ -17,9 +17,9 @@ Toda skill deve declarar no topo:
 
 ## 2) Tiers (uso recomendado)
 
-- **Tier 1 (Core):** uso frequente e transversal.
-- **Tier 2 (Support):** uso condicionado por cenário.
-- **Tier 3 (Experimental):** uso restrito e validado caso a caso.
+- **Tier 1 (Core — 15 skills):** uso frequente e transversal.
+- **Tier 2 (Support — 65 skills):** uso condicionado por cenário.
+- **Tier 3 (Experimental — 1 skill):** uso restrito e validado caso a caso (total: 81 skills indexadas em `.index.json`).
 
 ## 3) Skills Atuais (estado verificado)
 

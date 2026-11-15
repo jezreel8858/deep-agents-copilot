@@ -14,7 +14,7 @@ Instructions registram convenções e padrões específicos de um projeto, domí
 - **SSOT de Binding de Adapters**: Centralizar as instruções específicas por projeto/stack sem contaminar a governança global.
 - **Descoberta Nativa do Copilot**: Facilitar discovery automático via IDE com suporte nativo ao frontmatter YAML `applyTo`.
 - **Zero Duplicação (R-003)**: Regras globais vivem em `CLAUDE.md`; convenções específicas de tech/framework vivem aqui.
-- **Desacoplamento Total de Projetos (R-043)**: Adapters genéricos são commitados; adapters por-projeto e registros de repositórios locais vivem em overlays gitignored.
+- **Desacoplamento Total de Projetos (R-043)**: Os 6 adapters genéricos na raiz de `.github/instructions/*.instructions.md` são commitados; adapters por-projeto e registros de repositórios locais vivem em overlays gitignored (`local/`).
 
 ---
 

@@ -114,6 +114,7 @@ class SDKRequest:
     ferramentas_permitidas: tuple[str, ...]
     permission_handler: Callable[[str, Mapping[str, Any]], PermissaoDecisao]
     modelo: str | None = None
+    system_prompt: str | None = None
 
 
 @dataclass(frozen=True)
@@ -128,6 +129,10 @@ class SDKResponse:
     achados: tuple[dict[str, Any], ...]
     premium_requests_consumidos: int
     turnos_consumidos: int = 1
+    # Texto bruto da resposta (retrocompativel: default vazio) e eventos de
+    # ferramenta capturados da sessao (ex.: {"tool": "delegar", "para": "x"}).
+    texto: str = ""
+    tool_events: tuple[dict[str, Any], ...] = ()
 
 
 class CopilotSDKClient(Protocol):
@@ -187,6 +192,7 @@ def criar_delegar_tool(
 
 def construir_permission_handler_read_only(
     arquivos_em_escopo: Sequence[str],
+    strict_empty_scope: bool = False,
 ) -> Callable[[str, Mapping[str, Any]], PermissaoDecisao]:
     """Constrói o permission handler read-only estrito do caso de uso `agent-audit`.
 
@@ -197,6 +203,9 @@ def construir_permission_handler_read_only(
     Args:
         arquivos_em_escopo: Caminhos (relativos ao repositório) dos arquivos
             do diff auditado — únicos alvos de leitura permitidos.
+        strict_empty_scope: Quando `True`, nega toda leitura se o escopo for
+            vazio (uso: geracao/avaliacao sintetica). Default `False` mantem
+            o comportamento legado de `agent-audit`.
 
     Returns:
         Callable(tool_name, parametros) -> PermissaoDecisao.
@@ -214,6 +223,8 @@ def construir_permission_handler_read_only(
 
         if nome_normalizado in _TOOLS_LEITURA_PERMITIDAS:
             caminho = str(parametros.get("path") or parametros.get("arquivo") or "")
+            if strict_empty_scope and not escopo:
+                return PermissaoDecisao(False, "leitura negada: escopo vazio em modo strict_empty_scope")
             if caminho and escopo and caminho not in escopo:
                 return PermissaoDecisao(False, f"arquivo '{caminho}' fora do escopo do diff auditado")
             return PermissaoDecisao(True, "leitura de arquivo em escopo permitida")
@@ -291,6 +302,7 @@ class _ClienteSDKReal:
             return {"permissionDecision": "allow" if decisao.permitido else "deny"}
 
         fragmentos_resposta: list[str] = []
+        eventos_ferramenta: list[dict[str, Any]] = []
         concluido = asyncio.Event()
 
         def _on_event(event: Any) -> None:
@@ -299,6 +311,15 @@ class _ClienteSDKReal:
                 fragmentos_resposta.append(str(dado.content))
             elif isinstance(dado, SessionIdleData):
                 concluido.set()
+            elif dado is not None and "tool" in type(dado).__name__.lower():
+                # Best-effort: API de eventos de ferramenta nao documentada; se
+                # ausente, tool_events fica vazio (fallback text_banner no evaluator).
+                nome = getattr(dado, "tool_name", None) or getattr(dado, "name", None)
+                args = getattr(dado, "arguments", None) or getattr(dado, "args", None)
+                evento: dict[str, Any] = {"tool": str(nome or "")}
+                if isinstance(args, Mapping):
+                    evento.update({str(k): v for k, v in args.items()})
+                eventos_ferramenta.append(evento)
 
         async with copilot.CopilotClient(github_token=self._token) as client:
             async with await client.create_session(
@@ -306,7 +327,7 @@ class _ClienteSDKReal:
                 model=request.modelo or self._modelo,
             ) as session:
                 session.on(_on_event)
-                await session.send(request.prompt)
+                await session.send(_compor_prompt(request))
                 try:
                     await asyncio.wait_for(concluido.wait(), timeout=_TIMEOUT_SESSAO_SEGUNDOS)
                 except asyncio.TimeoutError as exc:
@@ -315,11 +336,30 @@ class _ClienteSDKReal:
                         "(timeout de seguranca — possivel travamento de rede/runtime)."
                     ) from exc
 
+        texto_resposta = "\n".join(fragmentos_resposta)
         return SDKResponse(
-            achados=_parsear_achados("\n".join(fragmentos_resposta)),
+            achados=_parsear_achados(texto_resposta),
             premium_requests_consumidos=1,
             turnos_consumidos=1,
+            texto=texto_resposta,
+            tool_events=tuple(eventos_ferramenta),
         )
+
+
+_DELIM_SYSTEM_INICIO = "<<<SYSTEM_PROMPT>>>"
+_DELIM_SYSTEM_FIM = "<<<END_SYSTEM_PROMPT>>>"
+
+
+def _compor_prompt(request: SDKRequest) -> str:
+    """Compoe o prompt enviado a sessao.
+
+    Fallback documentado: a API `system_message` da sessao nao esta confirmada
+    no SDK; `system_prompt` vai como prefixo delimitado deterministico.
+    Sem `system_prompt`, retorna `request.prompt` inalterado (retrocompativel).
+    """
+    if not request.system_prompt:
+        return request.prompt
+    return f"{_DELIM_SYSTEM_INICIO}\n{request.system_prompt}\n{_DELIM_SYSTEM_FIM}\n\n{request.prompt}"
 
 
 def _parsear_achados(resposta_bruta: str) -> tuple[dict[str, Any], ...]:

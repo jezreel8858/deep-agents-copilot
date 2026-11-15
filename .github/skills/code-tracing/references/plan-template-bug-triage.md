@@ -12,10 +12,23 @@ author: "@bug-triage"
 plan_type: "bug-triage"
 created_at: "AAAA-MM-DD"
 related-planning-doc: "N/A"
-review_verdict: PASS | PASS_WITH_NITS | ESCALATED_HITL
+review_verdict: PASS | PASS_WITH_NITS | NEEDS_REVISION | ESCALATED_HITL
 review_rounds: 1
 reviewer: "@plan-critic"
 review_tier1: PASS | FAIL
+session_id: "sess-20261115-exemplo"
+workflow_id: "WORKFLOW-BUG-FIX"
+workflow_trace_id: "wf-trace-20261115-000001"
+parent_plan_ref: "N/A — plano raiz"
+critic_rubric_gaps: []
+critic_findings_summary:
+  rounds: 1
+  blockers: 0
+  majors: 0
+  minors: 0
+  nits: 0
+  last_verdict: "PASS"
+  author_ref: "@code-tracer"
 allowed_files:
   - "caminho/ou/glob/**"
 ---

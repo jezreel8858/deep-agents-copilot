@@ -418,3 +418,20 @@ def test_ca07_specialized_templates_include_pre_hitl_skeptical_review():
         assert "Parecer do Revisor Cético Pré-HITL (R-064)" in content, (
             f"Seção 'Parecer do Revisor Cético Pré-HITL (R-064)' ausente em {rel_path}"
         )
+
+
+
+def test_ca08_r064_v2_otel_correlation_and_critic_telemetry_schema():
+    """CA-08: plan-frontmatter-r064.md e templates especializados declaram os 6 atributos v2 de correlação OTel e telemetria do @plan-critic."""
+    v2_fields = (
+        "session_id",
+        "workflow_id",
+        "workflow_trace_id",
+        "parent_plan_ref",
+        "critic_rubric_gaps",
+        "critic_findings_summary",
+    )
+    for name, rel_path in SPECIALIZED_TEMPLATES.items():
+        content = (REPO_ROOT / rel_path).read_text(encoding="utf-8")
+        for field in v2_fields:
+            assert field in content, f"Atributo R-064 v2 '{field}' ausente em {rel_path}"

@@ -54,7 +54,7 @@ Exemplos:
 
 Centraliza todo o conhecimento técnico em quatro quadrantes Diátaxis:
 - 🎓 **Tutoriais**: Primeiros passos, setup de ambiente e motor de grafo.
-- 🛠️ **Guias Práticos (How-To)**: Execução dos 8 workflows determinísticos, scanner de projetos e context-mode.
+- 🛠️ **Guias Práticos (How-To)**: Execução dos 10 workflows determinísticos, scanner de projetos e context-mode.
 - 📖 **Referência Técnica**: Catálogos de agentes/skills, regras normativas R-001..R-057 e Schemas JSON (AgentCard, Semantic IR).
 - 💡 **Conceitos & Arquitetura**: [Guia de Arquitetura arc42](docs/architecture/ARCHITECTURE_AND_GOVERNANCE_GUIDE.md) e [Guia de Documentação em Governança de IA](docs/architecture/AI_GOVERNANCE_DOCUMENTATION_GUIDE.md) (alinhado a NIST AI RMF, ISO 42001 e OWASP Agentic AI).
 
@@ -73,10 +73,10 @@ deep-agents-copilot/
 │   ├── projects.local.yaml                      # Overlay local de projetos (gitignored, R-043)
 │   ├── projects.local.yaml.example              # Template rastreado do overlay local (R-043)
 │   │
-│   ├── agents/                                  # 36 Agents de IA
+│   ├── agents/                                  # 63 Agents de IA (31 raiz + 32 em 8 stacks; 39 no catalog.yaml raiz)
 │   │   ├── catalog.yaml                         # ⭐ Catálogo com modelos e metadados dos agents (ÚNICO)
-│   │   ├── routing-graph.yaml                   # ⭐ Grafo estrutural de transições
-│   │   ├── workflows.md                         # ⭐ Especificação dos 8 Workflows Canônicos e de Ciclo de Vida
+│   │   ├── routing-graph.yaml                   # ⭐ Grafo estrutural de transições (39 nós)
+│   │   ├── workflows.md                         # ⭐ Especificação dos 10 Workflows Canônicos e de Ciclo de Vida
 │   │   ├── agent-router.agent.md                # Entry point obrigatório (R-037/R-042)
 │   │   ├── prompt-structuring.agent.md          # Refinamento de prompt (R-041)
 │   │   ├── bug-triage.agent.md                  # Triagem de bugs
@@ -89,7 +89,7 @@ deep-agents-copilot/
 │   │   ├── frontend/angular/                    # Domínio Frontend Angular (sub-catálogo + 8 especialistas)
 │   │   └── backend/                             # Domínios Backend (Spring Boot, Reactive, EJB, Python, DB)
 │   │
-│   ├── skills/                                  # 60 Skills Especializadas
+│   ├── skills/                                  # 81 Skills Especializadas
 │   │   ├── .index.json                          # Índice estruturado JSON de skills
 │   │   ├── README.md                            # Catálogo descritivo de skills
 │   │   └── ... (skills especializadas)
@@ -201,7 +201,7 @@ flowchart TD
 
     E & WF --> G1["🎯 Planning/Analysis\nrequirements-analyst · deep-search\nfeature-planner · plan-critic"]
     E & WF --> G2["📐 Architecture/Design\ntech-solution-architect · codegraph-engine\nbusiness-rules-extractor · refactor-planner\nddd-bounded-context-mapper · adr-sentinel"]
-    E & WF --> G3["💻 Implementation (Domain Routers & Specialists)\nangular-router · spring-boot-router · spring-reactive-router\nejb-router · python-router · database-router · database-specialist"]
+    E & WF --> G3["💻 Implementation (Domain Routers & Specialists)\nangular-router · react-router · spring-boot-router · spring-reactive-router\nejb-router · struts-router · python-router · database-router · database-specialist"]
     E & WF --> G4["✅ Quality/Validation\nbug-triage · debugger · test-strategy\ncode-review · code-style-enforcer · security-reviewer\nperformance-agent · devops-engineer · runtime-verifier\nrepo-hygiene-auditor"]
     E & WF --> G5["📚 Documentation/Learning\ndocs-engineer"]
     E & WF --> G6["🔄 Governance/Orchestration\ngovernance-factory · governance-maintainer\nagent-auditor · binding-initializer\nadapter-generator · compliance-guardrails · pr-gatekeeper"]
@@ -211,7 +211,7 @@ flowchart TD
     K -.->|"turno N+1: deriva de intenção (R-042)"| E
 ```
 
-> 36 agents catalogados, agrupados em 6 perfis de mercado — ver [§ Cobertura de Mercado](#cobertura-de-mercado--perfis-de-agents) para o diagrama detalhado por agent e a análise de aderência às práticas consolidadas.
+> 39 agents no catálogo raiz (63 totais com especialistas de stack), agrupados em 6 perfis de mercado — ver [§ Cobertura de Mercado](#cobertura-de-mercado--perfis-de-agents) para o diagrama detalhado por agent e a análise de aderência às práticas consolidadas.
 
 ### Para Adicionar Novo Adapter
 
@@ -247,14 +247,14 @@ Frameworks de referência (Claude Code/Agent SDK da Anthropic, Microsoft Agent F
 
 | Categoria de Mercado | Perfis Esperados | Cobertos Neste Projeto | Cobertura |
 |---|---|---|---|
-| 🎯 Planning & Analysis | Planner, PM/Analyst, Researcher | `requirements-analyst`, `deep-search`, `feature-planner` | ✅ 100% |
+| 🎯 Planning & Analysis | Planner, PM/Analyst, Researcher, Plan Critic | `requirements-analyst`, `deep-search`, `feature-planner`, `plan-critic` | ✅ 100% |
 | 📐 Architecture & Design | Architect, Impact Analyzer, Rules Extractor, Refactor Planner, DDD, ADR | `tech-solution-architect`, `codegraph-engine`, `business-rules-extractor`, `refactor-planner`, `ddd-bounded-context-mapper`, `adr-sentinel` | ✅ 100% |
-| 💻 Implementation | Coder por stack, Debugger, DB Specialist | `angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `python-router`, `database-router`, `database-specialist` | ✅ 100% |
+| 💻 Implementation | Coder por stack, Debugger, DB Specialist | `angular-router`, `react-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `struts-router`, `python-router`, `database-router`, `database-specialist` | ✅ 100% |
 | ✅ Quality & Validation | Test Strategy/Impl, Reviewer, Security, Performance, QA, Runtime | `bug-triage`, `debugger`, `test-strategy`, `code-review`, `code-style-enforcer`, `security-reviewer`, `performance-agent`, `devops-engineer`, `runtime-verifier`, `repo-hygiene-auditor` | ✅ 100% |
 | 📚 Documentation & Learning | Docs Engineer, Context Builder | `docs-engineer` | ✅ 100% |
 | 🔄 Governance & Orchestration | Router, Memory Manager, Guardrails, Factories, Gatekeeper, Maintainer | `agent-router`, `prompt-structuring`, `governance-factory`, `governance-maintainer`, `agent-auditor`, `binding-initializer`, `adapter-generator`, `compliance-guardrails`, `pr-gatekeeper` | ✅ 100% |
 
-**Resultado**: **36 agents ativos**, cobrindo **~95% dos 22 perfis consolidados de mercado** — nível de maturidade comparável ao modelo de referência SpecWeave (11 agents core, expandido aqui com granularidade enterprise adicional em segurança/performance/compliance/banco de dados).
+**Resultado**: **39 agents no catálogo raiz (63 totais)**, cobrindo **~95% dos 22 perfis consolidados de mercado** — nível de maturidade comparável ao modelo de referência SpecWeave (11 agents core, expandido aqui com granularidade enterprise adicional em segurança/performance/compliance/banco de dados).
 
 ### Mapa de Agents por Perfil (Mermaid)
 
@@ -365,7 +365,7 @@ flowchart TB
 - ✅ **Precedência Mandatória e Blindagem Universal de Context Mode (R-008 e R-056 / Smell 2.24)**: Primazia absoluta de sandboxing para leitura, modificação e criação de arquivos (Think-in-Code) blindada em 100% dos 49 agentes mutadores de todas as stacks, templates canônicos e fábrica (`governance-factory`), com proibição estrita de ferramentas nativas de editor e terminal quando context-mode disponível (rebaixadas a fallback exclusivo de indisponibilidade).
 - ✅ **Proibição Estrita de Terceirização de Edição Manual ao Usuário (R-057 / Smell 2.25 — Anti-Manual User Delegation)**: Erradicação de becos sem saída onde agentes analíticos e de triagem (read-only) instruíam o usuário a editar código por falta de tools; avanço determinístico de workflow e delegação plana obrigatória para executores downstream.
 - ✅ **Single-Turn MCP Batching Compulsório (R-008, R-046, R-056 / Smell 2.26)**: Erradicação do MCP Tool Chaining sequencial no chat; exigência de consolidação em chamada única via `ctx_batch` ou script síncrono único em `ctx_execute` para análises multi-arquivo, diffs e comandos, com paridade de tooling em 100% dos agentes do catálogo.
-- ✅ **Workflows Canônicos Determinísticos (R-050)**: 8 workflows operacionais com State Machines rígidas e banners visuais anti-cegueira.
+- ✅ **Workflows Canônicos Determinísticos (R-050)**: 10 workflows operacionais com State Machines rígidas e banners visuais anti-cegueira.
 - ✅ **Endurecimento Determinístico e Paridade de Governança em Bugfix e Refatoração (`WORKFLOW-BUG-FIX` e `WORKFLOW-REFACTORING`)**: Paridade estrita de rigor determinístico equivalente à migração de frameworks, erradicando intuições causais e efeitos colaterais silenciosos:
   - **`WORKFLOW-BUG-FIX`**: RCA estruturado (5 Whys / Fishbone) sob a regra inegociável *evidence before hypothesis* (mínimo de 2 fontes independentes de evidência técnica observável: stack trace, runtime log, payload de rede, APM ou teste isolado); classificação determinística compulsória entre falha `flaky` (instabilidade intermitente por concorrência/ambiente/poluição de estado) vs `regressao_real`; pré-requisito mandatório de declaração antecipada de `blast_radius_estimado` (callers e módulos afetados) e `rollback_plan` no `workflow_state` antes de emitir diff cirúrgico; **Mini Mutation-Check** proporcional ao risco no Estado 4 (injeção de 1 a 3 mutantes sintéticos eliminados pelo Red Test, erradicando falsos-verdes); e **Observação Pós-Fix / Canary Gate** no Estado 5 com métricas de telemetria e janela de observação definidas para defeitos críticos (P0/P1, segurança, autenticação e integridade de dados).
   - **`WORKFLOW-REFACTORING`**: **Contract Testing** formal (**Pact-style / consumer-driven** contract tests ou OpenAPI / JSON Schema Diff) no gate de contratos (Estado 2a) para proteção de APIs públicas e contratos entre múltiplos módulos; **Camada de Redundância Proporcional ao Blast Radius** no Estado 5 para blast radius moderado ou alto, composta por: (1) Auditoria Reversa de Símbolos (`reverse_symbol_audit` via grafo determinístico), (2) Mini Mutation Gate (`mini_mutation_gate` na Golden Master) e (3) Differential Replay Leve (`differential_replay_leve` comparando snapshots de entrada e saída pré/pós refatoração); e governança de Rollback fortalecida no Estado 5b com cálculo, registro e reporte quantitativo do **`blast_radius_revertido`** (nós Mikado revertidos, arquivos e callers restaurados) no `workflow_state`.
@@ -380,31 +380,31 @@ flowchart TB
 - ✅ `database.instructions.md` — Banco de dados / Migrações
 - ✅ `devops.instructions.md` — Docker, Kubernetes, CI/CD
 
-### Agents (35 catalogados — ver [§ Cobertura de Mercado](#cobertura-de-mercado--perfis-de-agents) para o mapa completo)
-- ✅ `agent-router` v1.5.0 — PASSO 0.3 de re-triagem por deriva de intenção (R-042), output com campo `Agente Ativo`, roteamento direto para todos os 32 agents downstream
+### Agents (39 catalogados na raiz / 63 totais — ver [§ Cobertura de Mercado](#cobertura-de-mercado--perfis-de-agents) para o mapa completo)
+- ✅ `agent-router` v1.5.0 — PASSO 0.3 de re-triagem por deriva de intenção (R-042), output com campo `Agente Ativo`, roteamento direto para todos os 37 agents downstream
 - ✅ `prompt-structuring` — passo mandatório pós-Health Check (R-041), loop de auto-refinamento (máx. 5 iterações)
-- ✅ 34 agents downstream especializados, agrupados por função:
-  - **Planejamento/Análise:** `requirements-analyst`, `deep-search`, `feature-planner`
+- ✅ 37 agents downstream especializados no catálogo raiz (mais 24 especialistas em 8 stacks), agrupados por função:
+  - **Planejamento/Análise:** `requirements-analyst`, `deep-search`, `feature-planner`, `plan-critic`
   - **Arquitetura/Design:** `tech-solution-architect`, `codegraph-engine`, `business-rules-extractor`, `refactor-planner`, `ddd-bounded-context-mapper`, `adr-sentinel`
-  - **Implementação (Domain Routers & Specialists):** `angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `python-router`, `database-router`, `database-specialist`
+  - **Implementação (Domain Routers & Specialists):** `angular-router`, `react-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `struts-router`, `python-router`, `database-router`, `database-specialist`
   - **Qualidade/Validação:** `bug-triage`, `debugger`, `test-strategy`, `code-review`, `code-style-enforcer`, `security-reviewer`, `performance-agent`, `devops-engineer`, `runtime-verifier`
   - **Documentação:** `docs-engineer` (modos `author`/`curate`)
   - **Governança de Agents/Skills/Prompts/Memória/Entrega:** `governance-factory`, `governance-maintainer`, `agent-auditor`, `binding-initializer`, `adapter-generator`, `compliance-guardrails`, `pr-gatekeeper`
 
-### Skills (58 indexadas)
-- ✅ Tier 1 (Core): `context-mode`, `efficient-batch-code-modification`, `agent-contracts`, `handoff-governance`, `confidence-fallback-policy`, `agent-safety-guardrails`, `terminal-governance`, `code-tracing`, `business-rules-governance`, `java-jdk-backend-governance`
-- ✅ Tier 2 (Support): 42 skills cobrindo testing (backend/frontend/Spring Boot/Angular/Python), observability, quality, tooling, research, frontend patterns, backend patterns, **documentation** (`documentation-writing-patterns`), **requisitos** (`requirements-engineering-patterns`), **segurança** (`security-review-patterns`), **performance** (`performance-engineering-patterns`), **compliance** (`compliance-governance-patterns`), **decomposição de tarefas** (`task-decomposition-patterns`) e **DevOps** (`devops-agent-patterns`)
-- ✅ Tier 3 (Experimental): `agent-memory-policy` — memória episódica/semântica/procedimental
+### Skills (81 indexadas)
+- ✅ Tier 1 (Core — 15 Tier 1): `context-mode`, `efficient-batch-code-modification`, `agent-contracts`, `handoff-governance`, `confidence-fallback-policy`, `agent-safety-guardrails`, `terminal-governance`, `code-tracing`, `business-rules-governance`, `java-jdk-backend-governance`, entre outras
+- ✅ Tier 2 (Support — 65 Tier 2): 65 skills cobrindo testing (backend/frontend/Spring Boot/Angular/React/Python), observability, quality, tooling, research, frontend patterns, backend patterns, **documentation** (`documentation-writing-patterns`), **requisitos** (`requirements-engineering-patterns`), **segurança** (`security-review-patterns`), **performance** (`performance-engineering-patterns`), **compliance** (`compliance-governance-patterns`), **decomposição de tarefas** (`task-decomposition-patterns`), **conformidade de planos R-064** (`plan-conformance-patterns`) e **DevOps** (`devops-agent-patterns`)
+- ✅ Tier 3 (Experimental — 1 Tier 3): `agent-memory-policy` — memória episódica/semântica/procedimental
 
 ### Consolidações e Gaps de Mercado Fechados (2026-09-02)
 - ✅ Fusões canônicas para redução de redundância semântica: `test-strategy` (estratégia e matriz de risco), `docs-engineer` (unifica author/curate) e `governance-factory` (unifica agent/skill/prompt factory).
 - ✅ Novos perfis especializados enterprise integrados: `runtime-verifier` (read-only pre-flight), `pr-gatekeeper` (preparação de PR pós quality gate blindado contra quebra de fences de markdown) e `database-specialist` (migrações de schema e integridade).
-- ✅ 9 agents de maturidade enterprise adicionados anteriormente: `security-reviewer`, `performance-agent`, `compliance-guardrails`, `feature-planner`, `devops-engineer`, `debugger`, `code-style-enforcer`, `refactor-executor`.
-- ✅ Governança sincronizada atomicamente (R-015/R-040): `catalog.yaml`, `README.md` (raiz e agents), `routing-graph.yaml` (42 nós) e `casos-roteamento.yaml`.
+- ✅ Agents de maturidade enterprise e governança adicionados: `security-reviewer`, `performance-agent`, `compliance-guardrails`, `feature-planner`, `plan-critic`, `devops-engineer`, `debugger`, `code-style-enforcer`, `refactor-planner`.
+- ✅ Governança sincronizada atomicamente (R-015/R-040): `catalog.yaml` (39 agents na raiz / 63 totais), `README.md` (raiz e agents), `routing-graph.yaml` (39 nós) e `casos-roteamento.yaml`.
 - ✅ Cobertura de perfis de mercado: **~95% dos 22 perfis consolidados**.
 
 ### Artefatos Estruturais de Orquestração
-- ✅ `.github/agents/routing-graph.yaml` — grafo de roteamento declarado (R-040): 42 nós, arestas condicionais e política de cascata rule-based→semantic→LLM; aresta reversa universal `*downstream → agent-router` (R-042)
+- ✅ `.github/agents/routing-graph.yaml` — grafo de roteamento declarado (R-040): 39 nós, arestas condicionais e política de cascata rule-based→semantic→LLM; aresta reversa universal `*downstream → agent-router` (R-042)
 - ✅ `.github/agents/evals/casos-roteamento.yaml` — suíte de testes de regressão de roteamento (canônicos, ambíguos, regressão, segurança + variantes)
 - ✅ `.github/instructions/README.md` v1.2 — seção `governance_artefacts` com os artefatos estruturais
 - ✅ `docs/plans/architecture/20260830-090000-agent-profiles-taxonomy.md` — análise consolidada de mercado + gaps + recomendações
