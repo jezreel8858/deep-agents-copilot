@@ -1,0 +1,91 @@
+{
+  "servers": {
+    "codegraph": {
+      "type": "stdio",
+      "command": "cmd.exe",
+      "args": [
+        "/c",
+        "codegraph",
+        "mcp",
+        "--multi-repo",
+        "--db",
+        "${workspaceFolder}/.codegraph/graph.db"
+      ],
+      "env": {}
+    },
+    "tavily": {
+      "type": "stdio",
+      "command": "cmd.exe",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "tavily-mcp@latest"
+      ],
+      "env": {
+        "TAVILY_API_KEY": "your_tavily_api_key"
+      }
+    },
+    "context-mode": {
+      "type": "stdio",
+      "command": "cmd.exe",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "context-mode",
+        "server",
+        "--agent",
+        "copilot-cli"
+      ],
+      "env": {
+        "CONTEXT_MODE_DATA_DIR": "${userHome}/.config/vscode/context-mode"
+      }
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "cmd.exe",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@playwright/mcp@0.0.83",
+        "--isolated",
+        "--storage-state=playwright/.auth/user.json",
+        "--output-dir=.playwright-mcp"
+      ],
+      "env": {}
+    },
+    "mcp-atlassian": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "-q",
+        "mcp-atlassian"
+      ],
+      "env": {
+        "JIRA_URL": "https://your-company.atlassian.net",
+        "JIRA_USERNAME": "your.email@company.com",
+        "JIRA_API_TOKEN": "your_api_token",
+        "CONFLUENCE_URL": "https://your-company.atlassian.net/wiki",
+        "CONFLUENCE_USERNAME": "your.email@company.com",
+        "CONFLUENCE_API_TOKEN": "your_api_token"
+      }
+    },
+    "figma": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "-q",
+        "--offline",
+        "--with",
+        "mcp==1.30.0",
+        "mcp-figma==0.0.2"
+      ],
+      "env": {
+        "FIGMA_ACCESS_TOKEN": "your_figma_access_token",
+        "SSL_CERT_FILE": "${userHome}/certs/corporate-ca.pem"
+      }
+    }
+  }
+}
