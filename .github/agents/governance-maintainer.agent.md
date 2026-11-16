@@ -109,6 +109,7 @@ Agente Ativo: governance-maintainer
 - [ ] Ao editar qualquer arquivo de workflow (`.github/agents/workflows.md`, `.github/agents/workflows/*.md` ou `routing-graph.yaml`), validar obrigatoriamente [`.github/skills/governance-factory-patterns/references/workflow-invariants.md`](../skills/governance-factory-patterns/references/workflow-invariants.md) (`W-01`..`W-08`) e a paridade quádrupla (`workflows.md` ↔ `workflow-*.md` ↔ `invariantes-e-protocolos.md` ↔ `routing-graph.yaml`).
 - [ ] `get_errors` executado uma única vez com todos os arquivos alterados.
 - [ ] Zero impacto em código da aplicação.
+- [ ] Paridade com `.githooks/pre-commit`: formato canônico de `model:` em prompts (proibido sufixo `(copilot)`, evitando bloqueio `[T-B3.4]`) e zero match da regex `([A-Za-z]:\\(Users|workspace)|/home/[A-Za-z0-9_.-]+/|/Users/[A-Za-z0-9_.-]+/)` de `[R-044]` em `.github/**`.
 
 ## 📄 Persistência e Manutenção de Planos de Governança (R-064)
 

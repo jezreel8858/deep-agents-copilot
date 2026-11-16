@@ -228,3 +228,95 @@ def test_v2_arestas_grafo_e_diagnosticos(repo: SynthRepository) -> None:
     assert obtido is not None
     assert obtido["eval_run_id"] == ev_run
     assert obtido["n_suggestions"] == 3
+
+
+def test_deve_configurar_busy_timeout_e_wal_ao_abrir_repositorio(tmp_path: Path) -> None:
+    repo = SynthRepository(tmp_path / "synth.db", repo_root=tmp_path)
+    try:
+        assert repo._conn.execute("PRAGMA busy_timeout;").fetchone()[0] == 30000
+        assert str(repo._conn.execute("PRAGMA journal_mode;").fetchone()[0]).lower() == "wal"
+    finally:
+        repo.close()
+
+
+def test_deve_reconciliar_runs_orfaos_em_status_running(repo: SynthRepository) -> None:
+    # Cenario A: run generate em running com prompts persistidos
+    run_gen_ok = _novo_run(repo, "generate")
+    pid_1 = repo.inserir_prompt(
+        run_id=run_gen_ok,
+        text="prompt orfao 1",
+        text_norm="prompt orfao 1",
+        sha256="sha-orfao-1",
+        expected_route="python-developer",
+        agente_alvo="python-developer",
+        dimensao_perturbacao="parafrase",
+        max_similarity=0.15,
+    )
+    repo.inserir_prompt(
+        run_id=run_gen_ok,
+        text="prompt orfao 2",
+        text_norm="prompt orfao 2",
+        sha256="sha-orfao-2",
+        expected_route="python-developer",
+        agente_alvo="python-developer",
+        dimensao_perturbacao="parafrase",
+        max_similarity=0.20,
+    )
+
+    # Cenario B: run eval em running com avaliacao persistida
+    run_eval_ok = _novo_run(repo, "eval")
+    repo.inserir_avaliacao(
+        run_id=run_eval_ok,
+        prompt_id=pid_1,
+        observed_route="python-developer",
+        route_source="tool_hook",
+        verdict="matched",
+        passed=True,
+        premium_requests=2,
+    )
+
+    # Cenario C: run eval em running vazio (sem prompts/avaliacoes)
+    run_vazio = _novo_run(repo, "eval")
+
+    # Cenario D: run ja completed (deve permanecer intocado)
+    run_concluido = _novo_run(repo, "generate")
+    repo.finalizar_run(run_concluido, status="completed", n_accepted=5, premium_requests_used=3)
+    estado_concluido_antes = repo.obter_run(run_concluido)
+    assert estado_concluido_antes is not None
+
+    # Verifica filtro run_id: reconcilia apenas o run_id informado
+    assert repo.reconciliar_runs_orfaos(run_id=run_gen_ok) == 1
+    gen_apos = repo.obter_run(run_gen_ok)
+    assert gen_apos is not None
+    assert gen_apos["status"] == "completed"
+    assert gen_apos["n_accepted"] == 2
+    assert gen_apos["finished_at"] is not None
+
+    # Os demais runs em running continuam aguardando reconciliacao geral
+    eval_antes = repo.obter_run(run_eval_ok)
+    vazio_antes = repo.obter_run(run_vazio)
+    assert eval_antes is not None and eval_antes["status"] == "running"
+    assert vazio_antes is not None and vazio_antes["status"] == "running"
+
+    # Reconciliacao geral dos runs restantes (Cenarios B, C e D)
+    assert repo.reconciliar_runs_orfaos() == 2
+
+    eval_apos = repo.obter_run(run_eval_ok)
+    assert eval_apos is not None
+    assert eval_apos["status"] == "completed"
+    assert eval_apos["n_candidates"] == 1
+    assert eval_apos["n_accepted"] == 1
+    assert eval_apos["premium_requests_used"] == 2
+    assert eval_apos["finished_at"] is not None
+
+    vazio_apos = repo.obter_run(run_vazio)
+    assert vazio_apos is not None
+    assert vazio_apos["status"] == "failed"
+    assert vazio_apos["motivo"] == "interrompido_timeout_orfandade"
+    assert vazio_apos["finished_at"] is not None
+
+    concluido_apos = repo.obter_run(run_concluido)
+    assert concluido_apos == estado_concluido_antes
+
+    # Verifica idempotencia: 2a chamada consecutiva retorna 0
+    assert repo.reconciliar_runs_orfaos() == 0

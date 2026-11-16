@@ -1,0 +1,33 @@
+regressao:
+- id: promoted-silver-c945168f0dda
+  descricao: governance-maintainer / registro_informal
+  input:
+    solicitacao: e ai, bora resolver isso? atualizar catálogos e regras de governança
+      em .github/ vlw 104
+  expected:
+    agent_route: governance-maintainer
+    workflow: WORKFLOW-GOVERNANCE-MAINTENANCE
+- id: promoted-silver-cd7073f7d1c8
+  descricao: governance-maintainer / registro_informal
+  input:
+    solicitacao: e ai, bora resolver isso? preciso de apoio tecnico na aplicacao sobre
+      sincronizar agents e atualizar catálogo considerando é manutenção/sincronização/refatoração
+      em lote de artefatos existentes de govern. vlw 692
+  expected:
+    agent_route: governance-maintainer
+- id: promoted-silver-f97feb346f6e
+  descricao: governance-maintainer / ruido_ortografico
+  input:
+    solicitacao: Atualizar catalogos e regras de governanca em .github/ pf rapido
+      758
+  expected:
+    agent_route: governance-maintainer
+    workflow: WORKFLOW-GOVERNANCE-MAINTENANCE
+- id: promoted-silver-5da305855ba8
+  descricao: governance-maintainer / ruido_ortografico
+  input:
+    solicitacao: Solicito analise detalhada envolvendo batch modification governanca
+      e manutencoa de governanca considerando e manutencao/sincronizacao/refatoracao
+      em lote de artefatos existentes de govern. pf rapido 913
+  expected:
+    agent_route: governance-maintainer

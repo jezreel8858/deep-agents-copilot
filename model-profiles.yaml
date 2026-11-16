@@ -58,7 +58,9 @@ tier_map:
     - templates/operational-agent
     - prompt:craft-prompt
     - prompt:eval-workflows
+    - prompt:plan-lessons-harvester
     - prompt:review
+    - prompt:synth-waves
     - prompt:validate
   utility:
     - prompt:add-project-context

@@ -1,0 +1,18 @@
+version: '1.0'
+origem: synth-export
+eval_run_id: 1f5e4ea6-0797-4b2a-9173-901ee1e78dc2
+casos:
+- id: silver-0d00b0e0b8ca
+  descricao: test-strategy / ruido_ortografico
+  input:
+    solicitacao: Planejar estratégía de tests pra o modulo de pagamentos
+  expected:
+    agent_route: test-strategy
+  silver:
+    prompt_id: 0d00b0e0b8ca4e8993acbfcc1a5d77bd
+    eval_id: a8a5e66efb06498c997e6afc654688a9
+    observed_route: test-strategy
+    verdict: matched
+    max_similarity: 0.738658
+    review_status: pending
+    corrected_route: null

@@ -95,6 +95,7 @@ Nunca `--abort` como fuga (só base errada ou pedido humano); diagnosticar hunk 
 - [ ] Matriz de Risco + Plano de Rollback preenchidos
 - [ ] CHANGELOG atualizado conforme orçamento de concisão (`references/changelog.md` §4 e §5: bullets `<= 200 chars`, `<= 12 bullets/release`, teto `<= 1.000 linhas`)
 - [ ] Nenhuma execução autônoma de `git commit`/`git push` (R-031)
+- [ ] **Pré-Voo de Paridade com `.githooks/pre-commit` (`[R-043]` / `[R-044]` / `[T-B3.4]`)**: Verificar zero arquivos `.local.`/`local/` staged (`[R-043]`), zero match da regex `([A-Za-z]:\\(Users|workspace)|/home/[A-Za-z0-9_.-]+/|/Users/[A-Za-z0-9_.-]+/)` de `[R-044]` em `.github/**` (exigindo `${workspaceFolder}`), e zero diff `^\+[ ]*model:` ou sufixo `(copilot)` em `model:` nos prompts (`[T-B3.4]`)
 
 ## 10) Referências
 

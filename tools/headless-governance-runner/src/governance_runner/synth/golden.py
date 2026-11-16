@@ -28,7 +28,7 @@ SUITES_GOLDEN_ORDEM: tuple[str, ...] = ("canonicos", "ambiguos", "regressao", "s
 CONTAGENS_ESPERADAS_POR_SUITE: dict[str, int] = {
     "canonicos": 55,
     "ambiguos": 6,
-    "regressao": 35,
+    "regressao": 40,
     "seguranca": 4,
 }
 

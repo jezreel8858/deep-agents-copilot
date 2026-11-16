@@ -160,6 +160,8 @@ EOF
 
 - **Guardrail Pré-Commit R-043/R-044**: Antes de emitir a mensagem/comando de commit ou PR para o repositório `deep-agents-copilot`, verificar obrigatoriamente (além do guardrail de segredos) que nenhum arquivo staged pertence a `.github/instructions/local/**` ou `projects.local.yaml` e que nenhuma linha adicionada no diff staged do `deep-agents-copilot` contém referência nominal aos slugs de projetos locais externos (R-044, exigindo `[PROJETO-ALVO]`).
 
+- **Paridade com `.githooks/pre-commit` (`[R-043]` / `[R-044]` / `[T-B3.4]`)**: Validar antes da entrega zero artefatos locais staged (`[R-043]`), zero ocorrências da regex `([A-Za-z]:\\(Users|workspace)|/home/[A-Za-z0-9_.-]+/|/Users/[A-Za-z0-9_.-]+/)` de `[R-044]` em `.github/**` e zero mutação acidental `^\+[ ]*model:` ou sufixo `(copilot)` em `model:` de prompts (`[T-B3.4]`).
+
 ## ⚙️ Protocolo de Execução Obrigatório
 
 <execution_protocol>

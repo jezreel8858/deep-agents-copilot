@@ -314,6 +314,13 @@ def resolver_caminho_db(
     return caminho_resolvido
 
 
+def _configurar_conexao(conn: sqlite3.Connection) -> None:
+    """Configura PRAGMAs de concorrência (WAL, busy_timeout e foreign_keys) na conexão."""
+    conn.execute("PRAGMA foreign_keys = ON;")
+    conn.execute("PRAGMA journal_mode = WAL;")
+    conn.execute("PRAGMA busy_timeout = 30000;")
+
+
 class SynthRepository:
     """Repositorio SQLite para execucoes, prompts, avaliacoes, workflows e diagnosticos synth."""
 
@@ -328,8 +335,9 @@ class SynthRepository:
         self._db_target: str | Path = resolved
         if isinstance(resolved, Path) and criar_diretorio:
             resolved.parent.mkdir(parents=True, exist_ok=True)
-        self._conn = sqlite3.connect(str(resolved))
+        self._conn = sqlite3.connect(str(resolved), timeout=30.0)
         self._conn.row_factory = sqlite3.Row
+        _configurar_conexao(self._conn)
         self.migrar()
 
     @property
@@ -466,6 +474,99 @@ class SynthRepository:
         cur = self._conn.execute("SELECT * FROM synth_runs WHERE run_id = ?", (run_id,))
         row = cur.fetchone()
         return dict(row) if row is not None else None
+
+    def reconciliar_runs_orfaos(self, run_id: str | None = None) -> int:
+        """Reconcilia runs órfãos em status 'running' interrompidos por timeout externo.
+
+        Args:
+            run_id: Identificador opcional de um run específico a reconciliar.
+
+        Returns:
+            Quantidade de runs efetivamente reconciliados.
+        """
+        if run_id is not None:
+            cur = self._conn.execute(
+                "SELECT run_id, kind, n_candidates FROM synth_runs WHERE status = 'running' AND run_id = ?",
+                (run_id,),
+            )
+        else:
+            cur = self._conn.execute(
+                "SELECT run_id, kind, n_candidates FROM synth_runs WHERE status = 'running'"
+            )
+        rows = cur.fetchall()
+        if not rows:
+            return 0
+
+        reconciliados = 0
+        agora = _utc_now_iso()
+        with self._conn:
+            for row in rows:
+                r_id = str(row["run_id"])
+                kind = str(row["kind"])
+                if kind == "generate":
+                    count_row = self._conn.execute(
+                        "SELECT COUNT(*) FROM synth_prompts WHERE run_id = ?",
+                        (r_id,),
+                    ).fetchone()
+                    count_prompts = int(count_row[0]) if count_row is not None else 0
+                    if count_prompts > 0:
+                        n_cand = max(int(row["n_candidates"] or 0), count_prompts)
+                        self._conn.execute(
+                            """
+                            UPDATE synth_runs
+                               SET status = 'completed',
+                                   n_accepted = ?,
+                                   n_candidates = ?,
+                                   finished_at = COALESCE(finished_at, ?)
+                             WHERE run_id = ? AND status = 'running'
+                            """,
+                            (count_prompts, n_cand, agora, r_id),
+                        )
+                    else:
+                        self._conn.execute(
+                            """
+                            UPDATE synth_runs
+                               SET status = 'failed',
+                                   motivo = 'interrompido_timeout_orfandade',
+                                   finished_at = COALESCE(finished_at, ?)
+                             WHERE run_id = ? AND status = 'running'
+                            """,
+                            (agora, r_id),
+                        )
+                else:
+                    eval_row = self._conn.execute(
+                        "SELECT COUNT(*), COALESCE(SUM(passed), 0), COALESCE(SUM(premium_requests), 0) FROM synth_evaluations WHERE run_id = ?",
+                        (r_id,),
+                    ).fetchone()
+                    count_evals = int(eval_row[0]) if eval_row is not None else 0
+                    sum_passed = int(eval_row[1]) if eval_row is not None else 0
+                    sum_premium = int(eval_row[2]) if eval_row is not None else 0
+                    if count_evals > 0:
+                        self._conn.execute(
+                            """
+                            UPDATE synth_runs
+                               SET status = 'completed',
+                                   n_candidates = ?,
+                                   n_accepted = ?,
+                                   premium_requests_used = ?,
+                                   finished_at = COALESCE(finished_at, ?)
+                             WHERE run_id = ? AND status = 'running'
+                            """,
+                            (count_evals, sum_passed, sum_premium, agora, r_id),
+                        )
+                    else:
+                        self._conn.execute(
+                            """
+                            UPDATE synth_runs
+                               SET status = 'failed',
+                                   motivo = 'interrompido_timeout_orfandade',
+                                   finished_at = COALESCE(finished_at, ?)
+                             WHERE run_id = ? AND status = 'running'
+                            """,
+                            (agora, r_id),
+                        )
+                reconciliados += 1
+        return reconciliados
 
     def inserir_prompt(
         self,

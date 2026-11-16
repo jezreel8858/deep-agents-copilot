@@ -207,12 +207,27 @@ def test_r043_gitignore_isolation_rules():
 # 3. Detecção de Caminhos Absolutos de Máquina Local (R-044)
 # ─────────────────────────────────────────────────────────────
 
+_WINDOWS_USER_PATH_RE = re.compile(
+    r'C:\\Users\\(?!\{username\}|<user>|Public|Default)[a-zA-Z0-9_-]+\\',
+    re.IGNORECASE,
+)
+_PRECOMMIT_R044_PATH_RE = re.compile(
+    r"([A-Za-z]:\\(Users|workspace)|/home/[A-Za-z0-9_.-]+/|/Users/[A-Za-z0-9_.-]+/)"
+)
+_REGEX_DOC_EXEMPT_TOKENS = (
+    "([A-Za-z]:\\\\(Users|workspace)",
+    "[LETRA_DRIVE]",
+    "{username}",
+    "<user>",
+    "<path",
+    "<caminho",
+    "<...>",
+)
+
+
 def test_no_machine_specific_paths_in_tracked_files():
     """Valida R-044: nenhum arquivo rastreado pode conter caminhos de máquina reais ou IDs de usuário."""
     tracked_files = get_git_tracked_files()
-
-    # Regex para caminhos de máquina específicos não-genéricos
-    user_id_pattern = re.compile(r'C:\\Users\\(?!\{username\}|<user>|Public|Default)[a-zA-Z0-9_-]+\\', re.IGNORECASE)
 
     media_extensions = {".png", ".jpg", ".jpeg", ".ico", ".svg", ".pyc", ".db", ".sqlite", ".jar"}
     leaks: list[str] = []
@@ -224,21 +239,29 @@ def test_no_machine_specific_paths_in_tracked_files():
             continue
 
         rel_path = fpath.relative_to(REPO_ROOT)
+        rel_posix = rel_path.as_posix()
+        in_github = rel_posix.startswith(".github/")
         lines = fpath.read_text(encoding="utf-8", errors="ignore").splitlines()
 
         for idx, line in enumerate(lines, 1):
+            if in_github and not any(tok in line for tok in _REGEX_DOC_EXEMPT_TOKENS):
+                if _PRECOMMIT_R044_PATH_RE.search(line):
+                    leaks.append(
+                        f"[{rel_path}:{idx}] Caminho absoluto local em .github/ bloqueado pelo pre-commit (R-044): {line.strip()}"
+                    )
+                    continue
+
             line_lower = line.lower()
             if any(term in line_lower for term in ["regex", "padrao", "placeholder", "removidos", "exemplo ilustrativo", "exemplos ilustrativos", "pre-commit"]):
                 continue
 
-            if user_id_pattern.search(line):
+            if _WINDOWS_USER_PATH_RE.search(line):
                 leaks.append(f"[{rel_path}:{idx}] Caminho de usuário real de máquina: {line.strip()}")
 
     assert not leaks, (
         f"Foram detectados {len(leaks)} caminhos absolutos de máquina real (violação R-044):\n"
         + "\n".join(f"  - {leak}" for leak in leaks)
     )
-
 
 # ─────────────────────────────────────────────────────────────
 # 4. Desacoplamento SSOT e Catálogo Único (Cenário 2 & R-043)

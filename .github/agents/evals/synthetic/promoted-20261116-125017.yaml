@@ -1,0 +1,7 @@
+regressao:
+- id: promoted-silver-0d00b0e0b8ca
+  descricao: test-strategy / ruido_ortografico
+  input:
+    solicitacao: Planejar estratégía de tests pra o modulo de pagamentos
+  expected:
+    agent_route: test-strategy

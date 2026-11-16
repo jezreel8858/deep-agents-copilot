@@ -1,0 +1,80 @@
+version: '1.0'
+origem: synth-export
+eval_run_id: 5410b519-8b32-41f0-a500-49b2b2290bbb
+casos:
+- id: silver-c945168f0dda
+  descricao: governance-maintainer / registro_informal
+  input:
+    solicitacao: e ai, bora resolver isso? atualizar catálogos e regras de governança
+      em .github/ vlw 104
+  expected:
+    agent_route: governance-maintainer
+    workflow: WORKFLOW-GOVERNANCE-MAINTENANCE
+  silver:
+    prompt_id: c945168f0dda44828c3b60529773a365
+    eval_id: 38e908169af840b0a9201daccfdbd470
+    observed_route: null
+    verdict: unparseable
+    max_similarity: 0.746659
+    review_status: pending
+    corrected_route: null
+- id: silver-cd7073f7d1c8
+  descricao: governance-maintainer / registro_informal
+  input:
+    solicitacao: e ai, bora resolver isso? preciso de apoio tecnico na aplicacao sobre
+      sincronizar agents e atualizar catálogo considerando é manutenção/sincronização/refatoração
+      em lote de artefatos existentes de govern. vlw 692
+  expected:
+    agent_route: governance-maintainer
+  silver:
+    prompt_id: cd7073f7d1c84631bb1131155cf986da
+    eval_id: 00abfa528c63410c9473202ab58faee7
+    observed_route: agent-auditor
+    verdict: mismatched
+    max_similarity: 0.522084
+    review_status: pending
+    corrected_route: null
+    observed_workflow: WORKFLOW-GOVERNANCE-MAINTENANCE
+  observed:
+    observed_route: agent-auditor
+    observed_workflow: WORKFLOW-GOVERNANCE-MAINTENANCE
+- id: silver-f97feb346f6e
+  descricao: governance-maintainer / ruido_ortografico
+  input:
+    solicitacao: Atualizar catalogos e regras de governanca em .github/ pf rapido
+      758
+  expected:
+    agent_route: governance-maintainer
+    workflow: WORKFLOW-GOVERNANCE-MAINTENANCE
+  silver:
+    prompt_id: f97feb346f6e49af93afcb70ae3a7d31
+    eval_id: 9e1f5db06e7449e88346707c1a1715d0
+    observed_route: agent-auditor
+    verdict: mismatched
+    max_similarity: 0.801668
+    review_status: pending
+    corrected_route: null
+    observed_workflow: WORKFLOW-GOVERNANCE-MAINTENANCE
+  observed:
+    observed_route: agent-auditor
+    observed_workflow: WORKFLOW-GOVERNANCE-MAINTENANCE
+- id: silver-5da305855ba8
+  descricao: governance-maintainer / ruido_ortografico
+  input:
+    solicitacao: Solicito analise detalhada envolvendo batch modification governanca
+      e manutencoa de governanca considerando e manutencao/sincronizacao/refatoracao
+      em lote de artefatos existentes de govern. pf rapido 913
+  expected:
+    agent_route: governance-maintainer
+  silver:
+    prompt_id: 5da305855ba8433ba3fc8c6558baa35a
+    eval_id: eae782ccb2094a77950a5252eab5aac8
+    observed_route: agent-auditor
+    verdict: mismatched
+    max_similarity: 0.584176
+    review_status: pending
+    corrected_route: null
+    observed_workflow: WORKFLOW-GOVERNANCE-MAINTENANCE
+  observed:
+    observed_route: agent-auditor
+    observed_workflow: WORKFLOW-GOVERNANCE-MAINTENANCE

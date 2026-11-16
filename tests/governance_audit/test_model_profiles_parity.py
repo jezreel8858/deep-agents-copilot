@@ -16,6 +16,7 @@ Quality Gate determinístico que garante:
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 import pytest
 import yaml
@@ -348,3 +349,79 @@ def test_yaml_loader_fails_on_duplicate_keys():
     with pytest.raises(yaml.constructor.ConstructorError) as exc_info:
         safe_load_yaml_unique(dup_yaml)
     assert "Chave duplicada encontrada no YAML: 'key1'" in str(exc_info.value)
+
+
+def test_no_provider_suffix_and_canonical_double_quotes_in_model_frontmatter():
+    """Garante ausencia de sufixo '(copilot)' e paridade com o perfil default em todos os agents e prompts (TB-34)."""
+    data = load_profiles(REPO_ROOT)
+    tier_map = data["tier_map"]
+    profiles = data["profiles"]
+    default_resolved = resolve_profile("default", profiles)
+
+    agent_files = sorted(AGENTS_DIR.glob("*.agent.md"))
+    prompt_files = sorted(PROMPTS_DIR.glob("*.prompt.md"))
+    all_files = agent_files + prompt_files
+    assert agent_files, "Nenhum arquivo .agent.md encontrado em .github/agents/"
+    assert prompt_files, "Nenhum arquivo .prompt.md encontrado em .github/prompts/"
+
+    entity_files: dict[str, Path] = {}
+    for fpath in all_files:
+        if fpath.name.endswith(".agent.md"):
+            entity_files[fpath.name[: -len(".agent.md")]] = fpath
+        elif fpath.name.endswith(".prompt.md"):
+            entity_files[f"prompt:{fpath.name[: -len('.prompt.md')]}"] = fpath
+
+    key_to_tier = build_key_to_tier_map(set(entity_files.keys()), tier_map)
+    model_line_re = re.compile(r"^model:\s*(.+?)\s*$", re.MULTILINE)
+    provider_suffix_re = re.compile(r"\([^)]+\)\s*$")
+    canonical_double_quoted_re = re.compile(r'^model:\s*"([^"]+)"\s*$', re.MULTILINE)
+    violations: list[str] = []
+
+    for fpath in all_files:
+        rel = fpath.relative_to(REPO_ROOT).as_posix()
+        is_prompt = fpath.name.endswith(".prompt.md")
+        entity_key = (
+            f"prompt:{fpath.name[: -len('.prompt.md')]}"
+            if is_prompt
+            else fpath.name[: -len(".agent.md")]
+        )
+        text = fpath.read_text(encoding="utf-8")
+        if not text.startswith("---"):
+            violations.append(f"{rel}: frontmatter ausente")
+            continue
+        parts = text.split("---", 2)
+        if len(parts) < 3:
+            violations.append(f"{rel}: frontmatter malformado")
+            continue
+        frontmatter_raw = parts[1]
+        m = model_line_re.search(frontmatter_raw)
+        if not m:
+            violations.append(f"{rel}: campo 'model:' ausente no frontmatter")
+            continue
+        raw_val = m.group(1).strip()
+        unquoted_val = raw_val.strip('"').strip("'")
+
+        if "(copilot)" in raw_val.lower() or provider_suffix_re.search(unquoted_val):
+            violations.append(
+                f"{rel}: sufixo de provedor proibido em model: {raw_val}"
+            )
+
+        if is_prompt and not canonical_double_quoted_re.search(frontmatter_raw):
+            violations.append(
+                f'{rel}: prompt deve usar aspas duplas canonicas em model: "{unquoted_val}" (atual: model: {raw_val})'
+            )
+
+        if entity_key not in key_to_tier:
+            violations.append(
+                f"{rel}: chave '{entity_key}' nao registrada em tier_map de model-profiles.yaml"
+            )
+            continue
+
+        tier = get_tier_for_key(entity_key, key_to_tier)
+        expected_model = resolve_target_model(entity_key, tier, default_resolved)
+        if unquoted_val != expected_model:
+            violations.append(
+                f'{rel}: valor de model: "{unquoted_val}" diverge do perfil default "{expected_model}"'
+            )
+
+    assert not violations, "Violacoes TB-34 de formatacao/paridade em model::\n" + "\n".join(violations)

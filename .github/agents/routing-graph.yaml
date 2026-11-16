@@ -214,6 +214,10 @@ workflows:
       - "CSS quebrado"
       - "NullPointerException"
       - "regressão"
+      - "corrigir exceção em produção"
+      - "investigar crash da aplicação"
+      - "resolver stack trace inesperado"
+      - "comportamento quebrado após deploy"
     rca_estruturado:
       metodologia: "5_whys | fishbone"
       regra_evidencia: "evidence_before_hypothesis_2_fontes_independentes"
@@ -279,6 +283,10 @@ workflows:
       - "modularizar"
       - "remover duplicação"
       - "extrair interface"
+      - "reduzir dívida técnica estrutural"
+      - "extrair camada de domínio"
+      - "simplificar acoplamento entre módulos"
+      - "reestruturar pacote legado"
     contract_testing:
       pact_consumer_driven: true
       openapi_diff: true
@@ -344,6 +352,10 @@ workflows:
       - "analisar tela"
       - "analisar fluxo"
       - "identificar melhorias"
+      - "elaborar parecer arquitetural"
+      - "mapear gargalos e riscos técnicos"
+      - "avaliar trade-offs da arquitetura"
+      - "inspecionar acoplamento e coesão"
     estados:
       - etapa: 1
         nome: "specialist_analyst_dispatch"
@@ -388,6 +400,10 @@ workflows:
       - "adicionar tela"
       - "novo módulo"
       - "evoluir fluxo"
+      - "desenvolver nova capacidade de negócio"
+      - "construir fluxo completo ponta a ponta"
+      - "entregar história de usuário completa"
+      - "implementar caso de uso inédito"
     estados:
       - etapa: 1
         nome: "prompt_structuring_refinement"
@@ -458,6 +474,10 @@ workflows:
       - "manutenção de catálogo"
       - "corrigir smell de agent"
       - "higiene de repositório"
+      - "sincronizar contratos de governança"
+      - "evoluir regras normativas do catálogo"
+      - "auditar conformidade de prompts e skills"
+      - "sanear artefatos declarativos de ia"
     estados:
       - etapa: 1
         nome: "read_only_audit_and_diagnosis"
@@ -508,6 +528,10 @@ workflows:
       - "npm audit fix"
       - "upgrade lib"
       - "cve remediation"
+      - "corrigir vulnerabilidade crítica de biblioteca"
+      - "mitigar cve apontado no scanner"
+      - "aplicar patch de segurança em dependências"
+      - "elevar versão de pacote vulnerável"
     estados:
       - etapa: 1
         nome: "vulnerability_scan_and_advisory_triage"
@@ -560,6 +584,10 @@ workflows:
       - "continuar migração"
       - "gaps de migração"
       - "paridade de migração"
+      - "atualizar versão major do framework"
+      - "planejar transição de plataforma legada"
+      - "converter arquitetura legada para versão atual"
+      - "executar upgrade estrutural de runtime"
     colaboracao_dual_stack:
       obrigatorio_quando: "stack_origem != stack_destino (migracao_cross_stack, ex: ejb->spring_boot, struts->spring_boot, angularjs->angular)"
       papel_domain_router_origem: "co-agente consultivo obrigatorio em TODAS as etapas (nao apenas etapa 1) — oraculo de comportamento legado, extracao de regras de negocio via business-rules-extractor, validacao de paridade e corresponsavel pela Matriz De-Para"
@@ -623,6 +651,10 @@ workflows:
       - "prontidão de entrega"
       - "validar versão"
       - "tagging de release"
+      - "executar checklist de fechamento de release"
+      - "validar qualidade pré-publicação"
+      - "homologar pacote para subida em produção"
+      - "certificar entrega antes do merge final"
     estados:
       - etapa: 1
         nome: "contract_and_api_compatibility_audit"
@@ -655,6 +687,10 @@ workflows:
       - "gerar prompt perfeito"
       - "preparar prompt novo chat"
       - "/craft-prompt"
+      - "estruturar prompt detalhado para engenharia"
+      - "consolidar especificação de prompt reutilizável"
+      - "otimizar instruções de entrada para agente"
+      - "formatar prompt canônico de handoff"
     estados:
       - etapa: 1
         nome: "elicitation_and_problem_space"

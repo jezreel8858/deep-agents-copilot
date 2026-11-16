@@ -37,14 +37,17 @@ Você atua como orquestrador autônomo de geração, avaliação e curadoria de 
 - **Variáveis Nativas Suportadas**:
   - `${file}`: arquivo de referência opcional focado no editor para orientar o domínio da geração sintética.
   - `${selection}`: trecho selecionado para restringir ou exemplificar o escopo das ondas.
-  - `${workspaceFolder}`: diretório raiz do repositório (`D:\workspace\deep-agents-copilot`) onde os artefatos e curadoria são processados.
+  - `${workspaceFolder}`: diretório raiz do repositório (`${workspaceFolder}`) onde os artefatos e curadoria são processados.
 
 ## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO
 
 - ❌ **NÃO** invocar `@agent-router` — este Slash Prompt possui `router_bypass: slash_workflow` (exceção canônica a R-037/R-063); o Orquestrador Raiz executa diretamente este fluxo.
 - ❌ **NÃO** usar `run_terminal`/`run_in_terminal` nem `run_subagent`; toda execução ocorre via `context-mode/ctx_execute` (R-008/R-056).
 - ❌ **NÃO** interagir com o usuário após o Passo 1 (Zero Interação Pós-Intake); falhas viram relatório, não perguntas.
-- ❌ **NÃO** agrupar 2+ Ondas em uma chamada: **1 Onda por turno**, máx. 1 tool call `ctx_execute` (`language: "javascript"`, `child_process`/`fs` nativos) por turno — Particionamento Anti-Timeout (Smell 2.26 / R-060).
+- ❌ **NÃO** agrupar 2+ Ondas em uma chamada nem avaliar lotes grandes síncronos: **1 Onda por turno**, máx. 1 tool call `ctx_execute` (`language: "javascript"`, `child_process`/`fs` nativos) por turno. Como cada chamada ao Copilot SDK em `synth-eval` leva ~9–15s e o cliente MCP do host JetBrains corta requisições síncronas em ~60s (mesmo com `timeoutMs: 600000`), a avaliação `synth-eval` DEVE usar **micro-lotes incrementais** (`--pending --limit 3` com `timeout: 45000` por subprocesso `spawnSync`) ou execução assíncrona (`background: true`) com polling leve no SQLite, garantindo retorno em < 50s — Particionamento Anti-Timeout (Smell 2.26 / R-060).
+- ✅ **Exigir `cwd` explícito**: definir `const cwd = '${workspaceFolder}'` / `${workspaceFolder}` (`${workspaceFolder}`), pois o `process.cwd()` padrão do servidor MCP `context-mode` no Windows cai no diretório home do usuário (`<HOME_DO_USUARIO>`).
+- ✅ **Resolução explícita de `COPILOT_SDK_TOKEN` e flags reais do CLI**: se `process.env.COPILOT_SDK_TOKEN` estiver ausente, resolver via `gh auth token` (`spawnSync('gh', ['auth', 'token'], { cwd, encoding: 'utf8', timeout: 8000 })`) e injetar em `env.COPILOT_SDK_TOKEN`, além de usar as flags reais do CLI (`--generator-mode`, `--db`, `--eval-run-id`).
+- ✅ **Reconciliação de runs `running` órfãos (`reconciliar_runs_orfaos`) antes de `synth-diagnose`**: após o término (ou eventual `ETIMEDOUT`) dos subprocessos síncronos de geração/avaliação da Onda e **imediatamente antes** de invocar `--use-case synth-diagnose`, executar o helper `SynthRepository(resolver_caminho_db(dbPath)).reconciliar_runs_orfaos(runId)` para consolidar runs interrompidos em `status='running'` e liberar o diagnóstico.
 - ❌ **NÃO** usar modelo fora de `.github/agents/evals/model-allowlist.yaml` (Governança de Modelos); abortar a Onda se o modelo SDK escolhido não constar.
 - ❌ **NÃO** promover caso se `pytest` falhar: rollback automático via `git checkout --` nos arquivos tocados.
 - ✅ Circuit Breaker (R-060): 1 retry com troca de estratégia por timeout; 2º timeout → abortar e reportar (R-020).
@@ -83,6 +86,18 @@ Cada Onda = 1 turno = 1 `ctx_execute` (`language: "javascript"`) acionando o CLI
 3. Incorporar casos promovidos em `.github/agents/evals/casos-roteamento.yaml` (suíte `regressao` ou `ambiguos`) e atualizar `CONTAGENS_ESPERADAS_POR_SUITE` em `tools/headless-governance-runner/src/governance_runner/synth/golden.py`.
 4. Rodar `pytest tools/headless-governance-runner/tests/synth_unit tools/headless-governance-runner/tests/evals`; se falhar → `git checkout --` de `casos-roteamento.yaml`, `golden.py` e artefatos promovidos, e reportar o rollback.
 
+
+#### Contrato Resiliente de Execução por Onda (Anti-Timeout, Token SDK e Reconciliação de Órfãos)
+
+1. **Particionamento Anti-Timeout (~60s RPC Cap no JetBrains IDE)**:
+   - Cada chamada ao Copilot SDK em `synth-eval` leva ~9–15s, e o cliente MCP do host JetBrains corta requisições síncronas em ~60s (mesmo com `timeoutMs: 600000`).
+   - Portanto, no `ctx_execute` (`language: "javascript"`), a avaliação `synth-eval` DEVE usar **micro-lotes incrementais** (`--pending --limit 3` com `timeout: 45000` por subprocesso `spawnSync`) ou execução assíncrona (`background: true`) com polling leve no SQLite, garantindo que cada chamada `ctx_execute` retorne em < 50s sem atingir o corte de 60s do cliente MCP.
+2. **Diretório de Trabalho (`cwd`) Explícito**:
+   - Exigir `cwd` explícito (`const cwd = '${workspaceFolder}'` / `${workspaceFolder}`), pois o `process.cwd()` padrão do servidor MCP `context-mode` no Windows cai no diretório home do usuário (`<HOME_DO_USUARIO>`).
+3. **Resolução Explícita de `COPILOT_SDK_TOKEN` e Flags Reais do CLI**:
+   - Se `process.env.COPILOT_SDK_TOKEN` estiver ausente, resolver via `gh auth token` (`spawnSync('gh', ['auth', 'token'], { cwd, encoding: 'utf8', timeout: 8000 })`) e injetar em `env.COPILOT_SDK_TOKEN`, além de usar as flags reais do CLI (`--generator-mode`, `--db`, `--eval-run-id`).
+4. **Reconciliação de Runs `running` Órfãos (`reconciliar_runs_orfaos`) antes de `synth-diagnose`**:
+   - Após o término (ou eventual `ETIMEDOUT`) dos subprocessos síncronos de geração/avaliação da Onda e **imediatamente antes** de invocar `--use-case synth-diagnose`, executar o helper `SynthRepository(resolver_caminho_db(dbPath)).reconciliar_runs_orfaos(runId)` via one-liner Python no `spawnSync(pyBin, ['-c', 'from governance_runner.synth.storage import SynthRepository, resolver_caminho_db; SynthRepository(resolver_caminho_db(dbPath)).reconciliar_runs_orfaos(runId)'], { cwd, env, encoding: 'utf8', timeout: 15000 })` para consolidar runs interrompidos em `status='running'` e liberar o diagnóstico.
 ### Passo 3 — Relatório Executivo Consolidado
 
 Emitir (sem perguntas):

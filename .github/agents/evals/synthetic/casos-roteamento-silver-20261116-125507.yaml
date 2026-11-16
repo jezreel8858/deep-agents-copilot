@@ -1,0 +1,23 @@
+version: '1.0'
+origem: synth-export
+eval_run_id: fca7a2bb-13fe-46a5-85ed-76fd9b142079
+casos:
+- id: silver-e3761dde5054
+  descricao: database-router / omissao_palavra_chave
+  input:
+    solicitacao: 'Algo esta estranho no comportamento e quero entender o efeito: e
+      uma Stored Procedure em PL/SQL com bulk collect (654)'
+  expected:
+    agent_route: database-router
+  silver:
+    prompt_id: e3761dde5054476080e9fce490dd1303
+    eval_id: 9bbd4ea8d98249d0ae158b4b8f9ad701
+    observed_route: bug-triage
+    verdict: mismatched
+    max_similarity: 0.555527
+    review_status: pending
+    corrected_route: null
+    observed_workflow: WORKFLOW-BUG-FIX
+  observed:
+    observed_route: bug-triage
+    observed_workflow: WORKFLOW-BUG-FIX

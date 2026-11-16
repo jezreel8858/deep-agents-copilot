@@ -53,6 +53,10 @@ Este prompt utiliza as variáveis de contexto nativas do VS Code Copilot:
 
 ---
 
+> **Nota para Prompts Avaliadores / Read-Only**: (1) Quando existir simulador CLI determinístico para o domínio avaliado, adote arquitetura **Two-Tier** (Tier 1 CLI determinístico via `ctx_execute` + Tier 2 julgamento semântico sobre 1 cenário por turno); (2) exija declaração explícita da **Fonte de Evidência Observada** (sessão, `${file}` ou `ctx_search`), emitindo veredito `INCONCLUSIVO` na ausência de evidência empírica (proibido emitir `APROVADO` em dry-run teórico); (3) em prompts estritamente read-only, o passo de mutação no Protocolo de Execução Obrigatório opera exclusivamente como verificação estrutural da resposta formatada.
+
+---
+
 ## 📋 Fluxo de Execução Passo a Passo
 
 ### Passo 1 — Coleta de Contexto e Linha de Base
@@ -143,3 +147,5 @@ Este prompt utiliza as variáveis de contexto nativas do VS Code Copilot:
 
 </execution_protocol>
 <!-- END:STANDARD -->
+
+- **Guarda Pre-Commit de Frontmatter e Portabilidade (`[T-B3.4]` / `[R-044]`)**: Em `model:`, use sempre o identificador canônico entre aspas idêntico a `model-profiles.yaml` (ex.: `model: "Gemini 4 Argon"`), sendo **proibido** incluir o sufixo `(copilot)` injetado pela UI do VS Code (evita bloqueio `[T-B3.4]` em `.githooks/pre-commit`). No corpo do prompt, é **proibido** usar caminhos absolutos locais que casem com a regex `([A-Za-z]:\\(Users|workspace)|/home/[A-Za-z0-9_.-]+/|/Users/[A-Za-z0-9_.-]+/)` de `[R-044]` — use sempre `${workspaceFolder}` ou placeholders neutros (`<WORKSPACE_ROOT>`, `<HOME_DO_USUARIO>`).
