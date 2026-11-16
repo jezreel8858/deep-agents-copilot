@@ -296,6 +296,7 @@ Ao criar ou revisar qualquer agent com papel de **planejamento, consultoria arqu
 4. **Contrato de Handoff de Materialização Física**: Determinar explicitamente que o agent emite o plano estruturado segundo o template e aciona handoff para `@docs-engineer` (ou `@governance-maintainer` em fluxos de governança) materializar fisicamente o arquivo `.md` em `docs/plans/<tipo>/` antes do Gate de Aprovação Humana R-064.
 
 - **Checklist Pré-Voo (C1–C9)**: Antes do Gate `@plan-critic`, validar `.github/skills/plan-conformance-patterns/references/planner-preflight-checklist.md`.
+- **RCA Upstream (Q0, planos corretivos)**: investigar `tools/**`, templates SSOT, instruções conflitantes e sensores antes de propor correções; ver `plan-template-governance.md` §1/§5.
 
 
 ### Gate Obrigatório de Síntese e Crítica de Guardrails por Agency Score (0–3)

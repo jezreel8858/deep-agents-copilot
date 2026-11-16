@@ -153,7 +153,7 @@ Para que o usuário nunca fique no escuro quanto ao fluxo em andamento, o `@agen
 #### WORKFLOW 5: `WORKFLOW-GOVERNANCE-MAINTENANCE` (5 etapas)
 ```markdown
 ### 🗺️ Pipeline de Execução: WORKFLOW-GOVERNANCE-MAINTENANCE (5 etapas)
-- [▶] **Etapa 1: Diagnóstico Read-Only ou Pesquisa Prévia** → `@agent-auditor` / `@repo-hygiene-auditor` / `@docs-engineer` / `@deep-search` *(Em Andamento: auditoria estrutural, documental e pesquisa prévia)*
+- [▶] **Etapa 1: Diagnóstico Read-Only ou Pesquisa Prévia (+ RCA Upstream Q0 se corretivo)** → `@agent-auditor` / `@repo-hygiene-auditor` / `@docs-engineer` / `@deep-search` *(Em Andamento: auditoria estrutural, documental e pesquisa prévia)*
 - [⏳] **Etapa 2: Materialização Física do Plano R-064 & Revisão Cética Pré-HITL (§ 10.7)** → `@docs-engineer` / `@governance-maintainer` (`status: DRAFT` em `docs/plans/governance/`) + `@plan-critic` (`Two-Tier Hybrid Gate`) *(Pendente: persistência do plano e revisão cética pré-HITL)*
 - [⏳] **Etapa 3: Checkpoint Humano R-064** → `ask_questions` *(Pendente: aprovação humana explícita sobre `plan_ref`)*
 - [⏳] **Etapa 4: Execução Governada em Lote** → `@governance-maintainer` / `@governance-factory` / `@docs-engineer` *(Pendente: sincronização atômica SSOT R-015/R-046 e documentação técnica com `status: APPROVED`)*

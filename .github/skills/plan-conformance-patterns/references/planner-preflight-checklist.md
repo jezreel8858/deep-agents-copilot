@@ -3,7 +3,7 @@
 > Referência lazy (N3, R-066) de `plan-conformance-patterns`.
 
 1. **C1 (Grounding Físico)**: Verificar via `ctx_batch`/`ctx_execute` existência física de arquivos, scripts, tools e contagens.
-2. **C2 (Seções e Rollback)**: Incluir `Alternativas Rejeitadas`, `Teste de Regressão`, `Rollback`, `Blast Radius` e `rollback_plan` (sem `git clean -f`/`rm -f` no plano R-064 em `docs/plans/<tipo>/`, preservando auditoria).
+2. **C2 (Seções e Rollback)**: Incluir `Alternativas Rejeitadas`, `Teste de Regressão`, `Rollback`, `Blast Radius`, RCA Q0 (se corretivo) e `rollback_plan` (sem `git clean -f`/`rm -f` no plano R-064 em `docs/plans/<tipo>/`, preservando auditoria).
 3. **C3 (Allowlist Estrita)**: `allowed_files` restrito aos arquivos mutados/criados, sem globs/fora de escopo (R-001/R-011); sob `@governance-maintainer`, vedar `*.py` em `allowed_files` (Q3 R-055: delegar à Tríade Python via `@python-router`).
 4. **C4 (Testabilidade e Borda)**: Declarar teste determinístico e Gherkin (`Dado/Quando/Então`) para regex/parser/borda, e validar Matriz Perfil ↔ Tools (`test_ctx_execute_capability_profile.py`/`test_agent_guardrails_regression.py`, vedando `ctx_execute` em Gather-Only/Read-Only como `@deep-search`).
 5. **C5 (Sem Autoatestado / SSoT)**: Proibido autoatestar `approved: true`/`PASS` pré-HITL; manter SSoT e sincronizar `review_*` com `critic_findings_summary` (T1-8).

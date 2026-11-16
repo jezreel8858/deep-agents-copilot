@@ -70,6 +70,7 @@ Plano recebido (plan_path em docs/plans/<tipo>/)?
 6. **Escalada**: restando BLOCKER/HIGH após o teto -> `review_verdict: ESCALATED_HITL` com tabela de divergências para decisão humana via `ask_questions` (R-027).
 7. **Rubrica Modular Ciente de Contexto (R-043)**: Núcleo Comum + critérios da categoria + adapters de stack/projeto local ativos; adapter ausente é lacuna reportada, nunca assumida.
 8. **Topologia Plana (R-047 / R-054)**: encerra o turno retornando ao `@agent-router`/Orquestrador com o parecer; a persistência da seção no plano é delegada por handoff.
+9. **RCA Upstream (`plan_type: governance`)**: reprovar (`BLOCKER` `T2-RCA`) plano corretivo/remediativo/hibrido sem Origem Upstream, Análise de Escape e Neutralização na Fonte (rubrica §6).
 ## Guardrails Cognitivos de De-biasing (LLM-as-a-Judge Calibration)
 - **Anti-Verbosity / Length Bias**: avaliar densidade de requisitos atendidos e fatos verificáveis, nunca volume de texto.
 - **Anti-Formatting & Mermaid Immunity**: diagramas Mermaid e tabelas não substituem grounding textual e caminhos reais em disco.
@@ -156,3 +157,4 @@ Ao concluir (qualquer `review_verdict`) ou se o pedido pivotar para "corrigir o 
 - `/plan` → revisão cética do plano antes do Gate R-064.
 - `/review` → complementa `@code-review` no nível de plano.
 - `/validate` → confirma Tier 1 verde antes do Gate Humano.
+- [ ] Plano `governance` corretivo: RCA Upstream (Origem + Escape + Neutralização na Fonte) presente; só sintoma tratado => `BLOCKER` `T2-RCA` / `NEEDS_REVISION`; evolutivo com `N/A` justificado => sem finding.

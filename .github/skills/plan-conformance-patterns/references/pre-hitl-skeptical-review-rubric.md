@@ -51,7 +51,13 @@ Tier 1 FAIL => achados `BLOCKER`, `review_tier1: FAIL`, Tier 2 não é acionado.
 | `test-strategy` | 1 | Pirâmide de testes, riscos cobertos, dados/mocks, critérios de saída |
 | `bug-triage` | 1 | Causa raiz com evidência rastreável, reprodução, hipóteses descartadas, fix mínimo |
 | `requirements` | 1 | Requisitos verificáveis, não ambíguos, rastreáveis, premissas explícitas |
-| `governance` | 1 | Reúso sistêmico R-055 (Q1/Q2/Q3), catálogos R-015, testes determinísticos, rollback |
+| `governance` | 1 | RCA Upstream (Q0: Origem + Escape + Neutralização na Fonte para planos corretivos; isenção justificada para evolutivos), Reúso sistêmico R-055 (Q0/Q1/Q2/Q3), catálogos R-015, testes determinísticos, rollback |
+
+### Extensão `governance` — RCA Upstream (`T2-RCA`)
+
+- **Escopo**: exclusiva para `plan_type: governance` no `WORKFLOW-GOVERNANCE-MAINTENANCE`.
+- **Regra**: se o plano for `corretivo`, `remediativo` ou `hibrido` e atuar apenas sobre o sintoma (sem Origem Upstream, Análise de Escape e Neutralização na Fonte), emitir finding `BLOCKER` (código `T2-RCA`) e veredito `NEEDS_REVISION`.
+- **Isenção**: planos `evolutivo` (greenfield) com `N/A — plano puramente evolutivo/greenfield` explícito e fundamentado não sofrem bloqueio.
 
 ## 7. Dupla Lente
 - **Gate 1 (Lente de Domínio)** — todas as categorias exceto `implementation`: Escopo R-001, YAGNI R-011, Requisitos, Viabilidade Arquitetural e ADRs.

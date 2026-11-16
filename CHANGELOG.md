@@ -4,6 +4,14 @@ Todas as mudanças significativas nesta base de governança são documentadas aq
 
 Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](https://www.conventionalcommits.org/)
 
+## [2.60.0] — 2026-11-16
+### Added
+- **R-055 Q0 (RCA Upstream)**: planos de governança corretivos exigem Origem Upstream, Análise de Escape e Neutralização na Fonte; evolutivos isentos com `N/A` justificado.
+- Teste `tests/governance_audit/test_upstream_rca_gate.py` validando Q0 em template, rubrica, `@plan-critic` e planejadores.
+### Changed
+- `plan-template-governance.md`, rubrica pré-HITL (`T2-RCA`), `@plan-critic`, `@agent-auditor`, `@governance-factory` e `planner-preflight-checklist.md` (C2).
+- Redação de R-055 em `CLAUDE.md`, `copilot-instructions.md`, `workflows.md` e `invariantes-e-protocolos.md`.
+
 ## [2.59.0] — 2026-11-16
 
 ### Changed

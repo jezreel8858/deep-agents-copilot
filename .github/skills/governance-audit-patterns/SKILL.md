@@ -170,7 +170,7 @@ Plano fora de `docs/plans/<tipo>/` (incl. caminhos legados `docs/plans/implement
 ## 5) Referências e Documentação Conexa
 
 - `references/smells-catalog-detailed.md` — Tabelas completas, exemplos contrastantes (`✅ BOM` vs `❌ RUIM`), heurísticas de detecção e matrizes detalhadas dos Smells `2.1` a `2.34` (`Progressive Disclosure` / `R-066`).
-- `references/plan-template-governance.md` — template de plano `governance` (R-064) em `docs/plans/governance/`.
+- `references/plan-template-governance.md` — template de plano `governance` (R-064) em `docs/plans/governance/`; exige RCA Upstream (Q0) em planos corretivos.
 - `.github/skills/governance-factory-patterns/SKILL.md` — Padrões canônicos de criação e templates SSOT.
 - `tests/governance_audit/` — Suíte determinística de sensores e Quality Gates.
 - `CLAUDE.md` e `.github/copilot-instructions.md` — Regras normativas do repositório.

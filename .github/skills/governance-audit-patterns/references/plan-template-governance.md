@@ -42,13 +42,24 @@ allowed_files:
 
 ## Estrutura do Corpo
 
-1. Escopo da manutenção e achados (smells 2.x com severidade)
+1. Escopo da manutenção e achados (smells 2.x com severidade) + **Diagnóstico Forense (Q0)**: `intencao_plano: corretivo | remediativo | hibrido | evolutivo`
 2. Artefatos afetados e `allowed_files`
 3. Plano de correção em lote (Plan-Then-Batch)
 4. **Alternativas Rejeitadas**
-5. Reúso sistêmico (R-055: Q1/Q2/Q3) e sensores `tests/governance_audit/`
+5. Reúso sistêmico (R-055: **Q0**/Q1/Q2/Q3) e sensores `tests/governance_audit/`
 6. Rollback e critério de pronto
 
+
+## Diagnóstico Forense — RCA Upstream (R-055 Q0)
+
+- **Classificação de Intenção**: `corretivo | remediativo | hibrido | evolutivo`
+- **Isenção Greenfield** (somente se `evolutivo`): `N/A — plano puramente evolutivo/greenfield` (com justificativa de 1 linha).
+
+| Dimensão Q0 | Análise Obrigatória (planos `corretivo`, `remediativo` ou `hibrido`) |
+|---|---|
+| Origem Upstream (Fonte Geradora) | Qual script (`tools/**`), template SSOT, instrução conflitante ou agente gerou/induziu o defeito |
+| Análise de Escape (Falha de Contenção) | Qual sensor (`tests/governance_audit/`), pre-commit hook ou gate falhou em bloquear antes do disco |
+| Neutralização na Fonte | Tarefa explícita do plano que corrige o mecanismo gerador/indutor (não apenas o artefato onde o sintoma apareceu) |
 
 ## Parecer do Revisor Cético Pré-HITL (R-064)
 
