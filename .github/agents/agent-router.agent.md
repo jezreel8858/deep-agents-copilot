@@ -204,8 +204,8 @@ Pedido recebido (já refinado por @prompt-structuring ou via Fast-Path)?
 |- É análise/recomendação, implementação OU testes em Java Legado EJB?
 |  |- Sim -> @ejb-router (supervisor hierárquico Java Legado EJB)
 |  \- Não
-|- É análise/recomendação, implementação OU testes em Python (FastAPI/Flask/Django/SQLAlchemy/pytest)?
-|  |- Sim -> @python-router (supervisor hierárquico backend Python)
+|- É análise/recomendação, implementação OU testes em Python (FastAPI/Flask/Django/SQLAlchemy/pytest, ou automação/scripts em tools/**/*.py, scripts/**/*.py e suítes de testes em tests/**/*.py / tests/governance_audit/**/*.py / R-055 Q3)?
+|  |- Sim -> @python-router (supervisor hierárquico Python: 1º Passo @python-arch-advisor elabora plano em docs/plans/implementation/ com related-planning-doc -> 2º Passo @python-developer / @python-test-engineer executam código e pytest)
 |  \- Não
 |- É análise/recomendação, implementação OU testes em Java Legado Struts (Struts 1.x/2.x, Actions, FormBeans, ActionServlet, Tiles)?
 |  |- Sim -> @struts-router (supervisor hierárquico Java Legado Struts)
@@ -246,8 +246,8 @@ Pedido recebido (já refinado por @prompt-structuring ou via Fast-Path)?
 |- É auditoria/diagnóstico de smells, redundância de saída/diretrizes, gaps de conformidade com template ou verbosidade excessiva em QUALQUER artefato de governança (agents, skills, prompts, grafo de roteamento) — SEM aplicar correção ainda?
 |  |- Sim -> @agent-auditor (read-only; @governance-maintainer só entra DEPOIS de aprovação do diagnóstico, para aplicar o fix em lote)
 |  \- Não
-|- É manutenção atômica, refatoração estrutural, renomeação ou sincronização em lote de artefatos de governança existentes?
-|  |- Sim -> @governance-maintainer
+|- É manutenção atômica, refatoração estrutural, renomeação ou sincronização em lote de artefatos declarativos de governança existentes (.github/** exceto *.py, CLAUDE.md, README.md, CHANGELOG.md)?
+|  |- Sim -> @governance-maintainer (Veto Fail-Closed a *.py/pytest: alterações ou execuções em tools/**/*.py, scripts/**/*.py, tests/**/*.py, conftest.py e pyproject.toml exigem handoff obrigatório para @python-router -> 1º @python-arch-advisor -> 2º @python-developer / @python-test-engineer)
 |  \- Não
 |- É geração automática de arquivos adapter (.instructions.md) via scanner de convenções de projeto?
 |  |- Sim -> @adapter-generator

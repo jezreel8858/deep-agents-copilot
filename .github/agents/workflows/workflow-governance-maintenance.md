@@ -21,7 +21,7 @@ flowchart TD
 
     PreSearch --> Factory["<b>2a. Modelagem de Artefato / Stack</b><br/>Agente: @governance-factory<br/>Ação: Geração com templates canônicos (R-015)"]
 
-    Auditor & Hygiene --> PlanReport["<b>2. Relatório de Gaps & Plano em Lote</b><br/>Apresentação do plano de remediação"]
+    Auditor & Hygiene --> PlanReport["<b>2. Relatório de Gaps & Plano em Lote</b><br/>Revisão Pré-HITL via @plan-critic (R-064)"]
 
     PlanReport --> HumanGate{"<b>2b. Checkpoint de Aprovação</b><br/>Humana via ask_questions"}
 
@@ -44,7 +44,7 @@ flowchart TD
 - **Portão de Reúso e Generalização Sistêmica (R-055 — Prioritário & Mandatório)**: Toda demanda de manutenção, revisão, novo padrão ou correção técnica que envolva agents, prompts ou skills DEVE obrigatoriamente responder às 3 perguntas de generalização antes de codificar, eliminando o anti-padrão de correções em silo (*one-off fixes*):
   - **Q1 (Impacto Horizontal / Peers)**: *Esta melhoria ou correção se aplica a outros artefatos do mesmo perfil, camada ou família (ex.: outros routers, outros testers, outros advisors)?* Se sim, expandir compulsoriamente o escopo em lote único (*Single-Turn Batching*, R-046) para cobrir todos os artefatos análogos na mesma entrega.
   - **Q2 (Prevenção Futura / Templates)**: *O template canônico em `templates/` (`router-agent.md`, `operational-agent.md`, etc.) reflete essa nova exigência?* Se não, o template correspondente DEVE ser atualizado na mesma entrega para que futuros artefatos gerados pelo `@governance-factory` já nasçam em conformidade.
-  - **Q3 (Blindagem por Teste / Quality Gate)**: *A suíte determinística em `tests/governance_audit/` já valida essa regra?* Se não, uma asserção ou teste específico no pytest DEVE ser criado ou expandido para garantir não-regressão contínua.
+  - **Q3 (Blindagem por Teste / Quality Gate — Regra de Fronteira Híbrida com Tríade Python)**: *A suíte determinística em `tests/governance_audit/` já valida essa regra?* Se não, o requisito de teste DEVE ser especificado no plano de governança e delegado via handoff ao `@python-router` (visto que o `@governance-maintainer` possui veto Fail-Closed contra editar `*.py`, `conftest.py`, `pyproject.toml` ou rodar `pytest`), que aciona **1º `@python-arch-advisor`** (elabora o Plano de Implementação e Testes em `docs/plans/implementation/` vinculado via `related-planning-doc`) e **2º `@python-developer` / `@python-test-engineer`** (implementam código/testes em `tools/**/*.py`, `scripts/**/*.py`, `tests/**/*.py` e executam `pytest`).
 - **Protocolo de Avaliação de Pertinência de Importação de Skills (R-067 — Prioritário em Pedidos de Importação Externa)**: Toda solicitação de importação de skill externa aciona compulsoriamente, no Estado 1, a avaliação de pertinência do `@governance-factory` (domínio, duplicidade, aderência estrutural e guardrails R-031/R-038) ANTES de qualquer pesquisa de mercado ou materialização de arquivo. Resultado não pertinente → reporta impacto negativo e aguarda orientação via `ask_questions`; conceito útil mas importação literal inadequada → propõe solução alternativa (retrofit em skill existente, adaptação, modularização).
 1. **Estado 1 — Diagnóstico Read-Only ou Pesquisa Prévia**:
    - *Diagnóstico de Smells & Reúso*: O `@agent-auditor` executa auditoria estática e comportamental contra os smells canônicos de governança e avalia compulsoriamente Q1, Q2 e Q3.
@@ -55,7 +55,7 @@ flowchart TD
 3. **Estado 3 — Checkpoint Humano R-064 (`ask_questions` sobre `plan_ref`)**:
    - Toda manutenção estrutural ou criação de stack exige aprovação humana explícita via `ask_questions` referenciando o `plan_ref` já gravado em `docs/plans/governance/` antes de qualquer mutação na malha (modo **Fail-Closed**).
 3. **Estado 3 — Execução e Sincronização em Lote por Tipo de Artefato (R-015 / R-046 — requires_plan: true)**:
-   - O `@governance-maintainer` aplica as alterações em lote único (*Single-Turn Batching*) utilizando o `context-mode` MCP no sandbox para zero desperdício de tokens, atuando em conjunto com o `@docs-engineer` para atualização e consolidação formal de documentação técnica, manuais e guias de governança.
+   - O `@governance-maintainer` aplica as alterações declarativas (`.github/**` exceto `*.py`, `CLAUDE.md`, `README.md`, `CHANGELOG.md`) em lote único (*Single-Turn Batching*) utilizando o `context-mode` MCP no sandbox para zero desperdício de tokens, atuando em conjunto com o `@docs-engineer`. Quando o plano incluir arquivos Python (`tools/**/*.py`, `scripts/**/*.py`, `tests/**/*.py`, `conftest.py`, `pyproject.toml`), realiza-se o split híbrido R-064 despachando para `@python-router` → 1º `@python-arch-advisor` (plano em `docs/plans/implementation/` com `related-planning-doc`) → 2º `@python-developer` / `@python-test-engineer`.
    - **Sincronização Atômica por Tipo (R-015 — gap corrigido)**: o conjunto de arquivos sincronizados depende do tipo de artefato, nunca uma lista fixa de 4 arquivos:
      - **Novo Agent**: `catalog.yaml` + `routing-graph.yaml` (nós/arestas) + **novo caso em `.github/agents/evals/casos-roteamento.yaml`** (exigência formal de R-040, antes omitida desta lista) + `agent-router.agent.md` (Decision Tree derivada) + `.github/agents/README.md`.
      - **Nova Skill**: `.github/skills/.index.json` + `.github/skills/README.md` + `source_docs:` dos agents consumidores.

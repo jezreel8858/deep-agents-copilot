@@ -1,13 +1,13 @@
 version: "3.0"
 domain: "backend-python"
 description: >-
-  Sub-catálogo hierárquico consolidado de agentes especializados em Python Backend (FastAPI, Flask, Django, Pydantic, SQLAlchemy, pytest).
+  Sub-catálogo hierárquico consolidado de agentes especializados em Python Backend (FastAPI, Flask, Django, Pydantic, SQLAlchemy, pytest) e automação/testes Python do repositório (tools/**/*.py, scripts/**/*.py, tests/**/*.py).
   Estruturado no Padrão Triádico 3+1 (1 supervisor hierárquico + 3 especialistas consolidados: python-arch-advisor, python-developer e python-test-engineer).
 
 router:
   id: "python-router"
   role: "supervisor"
-  description: "Roteador central do domínio Python Backend — tria e despacha para os 3 especialistas backend"
+  description: "Roteador central do domínio Python Backend e ferramental/testes Python do repositório — tria e despacha para os 3 especialistas (1º python-arch-advisor -> 2º python-developer / python-test-engineer)"
   tools:
     - "read_file"
     - "file_search"
@@ -27,8 +27,8 @@ agents:
     id: "python-arch-advisor"
     model: "Claude Sonnet 5.5"
     role: "advisory"
-    domain: "Arquitetura Python Backend, Clean Architecture, FastAPI, Flask, Django, Pydantic, tipagem estrita, performance analítica e planos de modernização"
-    description: "Especialista analítico read-only: arquitetura Python 3.11+, Clean Architecture, design de APIs REST/async, tipagem PEP 484/mypy strict, auditoria de dependências, mitigação de N+1 queries, profiling e estratégias de modernização."
+    domain: "Arquitetura Python Backend, Clean Architecture, FastAPI, Flask, Django, Pydantic, tipagem estrita, performance analítica, planos de modernização e planejamento técnico de implementação/testes (docs/plans/implementation/) para aplicações e ferramental/testes do repositório (tools/**/*.py, scripts/**/*.py, tests/**/*.py)"
+    description: "Especialista analítico e planejador read-only (1º passo da Tríade Python): arquitetura Python 3.11+, Clean Architecture, design de APIs REST/async, tipagem PEP 484/mypy strict, Plano de Implementação e Testes R-064 em docs/plans/implementation/ (incluindo demandas híbridas de governança via related-planning-doc), auditoria de dependências, mitigação de N+1 queries, profiling e estratégias de modernização."
     keywords:
       - "arquitetura python"
       - "auditoria python"
@@ -62,8 +62,8 @@ agents:
     id: "python-developer"
     model: Grok 4.7
     role: "implementer"
-    domain: "Desenvolvimento de features, correção cirúrgica de bugs e otimização de performance para Python Backend (FastAPI, Flask, Django, Pydantic, SQLAlchemy, asyncio)"
-    description: "Especialista consolidador mutativo: constrói endpoints REST, schemas Pydantic, repositórios SQLAlchemy e services sob TDD estrito; diagnostica e resolve runtime errors (TypeError, AttributeError, deadlocks) com diffs mínimos; e otimiza event loop e pools de conexão."
+    domain: "Desenvolvimento de features, automação/tooling do repositório (tools/**/*.py, scripts/**/*.py), correção cirúrgica de bugs e otimização de performance para Python Backend (FastAPI, Flask, Django, Pydantic, SQLAlchemy, asyncio)"
+    description: "Especialista consolidador mutativo (2º passo da Tríade Python): constrói endpoints REST, schemas Pydantic, repositórios SQLAlchemy, services e utilitários/CLIs em tools/**/*.py e scripts/**/*.py sob TDD estrito e plano R-064 do python-arch-advisor; diagnostica e resolve runtime errors com diffs mínimos; e otimiza event loop e pools de conexão."
     keywords:
       - "python developer"
       - "feature python"
@@ -103,8 +103,8 @@ agents:
     id: "python-test-engineer"
     model: Grok 4.7
     role: "tester"
-    domain: "Engenharia de testes e qualidade para Python Backend: testes unitários (pytest), testes de integração (TestClient, Testcontainers) e reparo de suítes de testes quebradas"
-    description: "Especialista consolidador de testes: constrói testes unitários puros isolados com fixtures e mocks estritos; implementa testes de integração com TestClient e Testcontainers; e diagnostica e corrige falhas na suíte de testes com retry cap estrito sob R-053."
+    domain: "Engenharia de testes e qualidade para Python Backend e suítes determinísticas do repositório (tests/**/*.py, tests/governance_audit/**/*.py): testes unitários (pytest), testes de integração (TestClient, Testcontainers) e reparo de suítes de testes quebradas"
+    description: "Especialista consolidador de testes (2º passo da Tríade Python): constrói testes unitários puros isolados e sensores determinísticos de governança (tests/governance_audit/**/*.py sob R-055 Q3) mediante plano R-064 do python-arch-advisor; implementa testes de integração com TestClient e Testcontainers; e diagnostica e corrige falhas na suíte pytest com retry cap estrito sob R-053."
     keywords:
       - "python test engineer"
       - "teste unitario python"

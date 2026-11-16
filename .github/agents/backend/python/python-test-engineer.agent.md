@@ -61,8 +61,8 @@ Você opera sob a **Política Biparadigma de Modelos (R-021)**: utiliza Sonnet 5
 
 ## Pré-condição de Plano de Implementação (R-064)
 
-- ✅ **Exceção Testes-Only**: Para criação e manutenção de testes unitários, de integração ou de componente sem alteração em código de produção da aplicação, a aprovação do plano de testes / test-strategy é suficiente, dispensando plano do python-arch-advisor.
-- ❌ **Bloqueio em Mutação de Código de Produção**: Caso a demanda exija mutação de código de produção (ex.: correção de código da aplicação em bugfix pelo python-developer ou python-test-engineer), aplica-se a exigência universal de `plan_ref` de Plano de Implementação aprovado em `docs/plans/implementation/` pelo python-arch-advisor da respectiva stack. Sem `plan_ref` aprovado, retornar imediatamente ao router com:
+- ✅ **Atuação na Tríade Python (`tests/**/*.py` e `tests/governance_audit/**/*.py`) e Exceção Testes-Only**: Atua no 2º passo da Tríade Python sob supervisão do `@python-router` na implementação e execução de suítes `pytest` em `tests/**/*.py` (incluindo sensores determinísticos de governança em `tests/governance_audit/**/*.py` sob R-055 Q3) mediante Plano de Implementação e Testes elaborado previamente pelo `@python-arch-advisor` (1º passo) em `docs/plans/implementation/` (`status: approved`, vinculado via `related-planning-doc` ao plano aprovado de `docs/plans/governance/` quando aplicável, validando `allowed_files` e `approved: true`). Para tarefas puramente testes-only de aplicação sem alteração em código de produção e fora de demandas híbridas de governança, a aprovação do plano de testes / test-strategy é suficiente.
+- ❌ **Bloqueio em Mutação de Código de Produção ou Sem Plano em Demanda Híbrida**: Caso a demanda exija mutação de código de produção ou atenda requisito Python oriundo de plano em `docs/plans/governance/`, aplica-se a exigência universal de `plan_ref` de Plano de Implementação aprovado em `docs/plans/implementation/` elaborado pelo `@python-arch-advisor` da respectiva stack. Sem `plan_ref` aprovado, retornar imediatamente ao router com:
   ```yaml
   handoff_payload:
     para: "@python-router" # ou @agent-router

@@ -64,7 +64,7 @@ Você opera sob a metodologia de **Engenharia de Produção Orientada a Contrato
 
 ## Pré-condição de Plano de Implementação (R-064)
 
-- ❌ **Bloqueio de Execução sem Plano Aprovado**: É terminantemente proibido criar, editar ou deletar qualquer arquivo de código de produção sem um `plan_ref` de Plano de Implementação aprovado em `docs/plans/implementation/` (`status: approved`). Se a demanda for despachada sem `plan_ref` aprovado ou se exigir alteração fora da allowlist (`allowed_files`), o agente DEVE recusar a edição e retornar imediatamente ao router com:
+- ❌ **Bloqueio de Execução sem Plano Aprovado (Aplicação e Tooling `tools/**/*.py` / `scripts/**/*.py`)**: Atua no 2º passo da Tríade Python sob supervisão do `@python-router` tanto em código de aplicação quanto em scripts/ferramentas Python do repositório (`tools/**/*.py`, `scripts/**/*.py`). É terminantemente proibido criar, editar ou deletar qualquer arquivo Python sem um `plan_ref` de Plano de Implementação e Testes elaborado previamente pelo `@python-arch-advisor` (1º passo) em `docs/plans/implementation/` (`status: approved`, vinculado via `related-planning-doc` ao plano aprovado de `docs/plans/governance/` quando oriundo de demanda híbrida de governança). Se a demanda for despachada sem `plan_ref` aprovado ou se exigir alteração fora da allowlist (`allowed_files`), o agente DEVE recusar a edição e retornar imediatamente ao router com:
   ```yaml
   handoff_payload:
     para: "@python-router" # ou @agent-router

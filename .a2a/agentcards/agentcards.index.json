@@ -179,7 +179,7 @@
     "governance-maintainer": {
       "name": "Governance Maintainer",
       "role": "implementer",
-      "domain": "Manutenção atômica, refatoração e sincronização em lote da governanca",
+      "domain": "Manutenção atômica, refatoração e sincronização em lote de artefatos declarativos da governanca",
       "version": "1.0.0"
     },
     "informix-database-specialist": {
@@ -221,25 +221,25 @@
     "python-arch-advisor": {
       "name": "Python Arch Advisor",
       "role": "advisor",
-      "domain": "Arquitetura Python Backend, Clean Architecture, FastAPI, Flask, Django, Pydantic, tipagem estrita, performance analítica e planos de modernização",
+      "domain": "Arquitetura Python Backend, Clean Architecture, FastAPI, Flask, Django, Pydantic, tipagem estrita, performance analítica, planos de modernização e planejamento técnico de implementação/testes (docs/plans/implementation/) para aplicações e ferramental/testes do repositório (tools/**/*.py, scripts/**/*.py, tests/**/*.py)",
       "version": "1.0.0"
     },
     "python-developer": {
       "name": "Python Developer",
       "role": "implementer",
-      "domain": "Desenvolvimento de features, correção cirúrgica de bugs e otimização de performance para Python Backend (FastAPI, Flask, Django, Pydantic, SQLAlchemy, asyncio)",
+      "domain": "Desenvolvimento de features, automação/tooling do repositório (tools/**/*.py, scripts/**/*.py), correção cirúrgica de bugs e otimização de performance para Python Backend (FastAPI, Flask, Django, Pydantic, SQLAlchemy, asyncio)",
       "version": "1.0.0"
     },
     "python-router": {
       "name": "Python Router",
       "role": "router",
-      "domain": "Supervisor hierarquico e roteador do dominio Python Backend",
-      "version": "2.0.0"
+      "domain": "Supervisor hierarquico e roteador do dominio Python Backend e automacao/testes Python do repositorio",
+      "version": "3.0.0"
     },
     "python-test-engineer": {
       "name": "Python Test Engineer",
       "role": "tester",
-      "domain": "Engenharia de testes e qualidade para Python Backend: testes unitários (pytest), testes de integração (TestClient, Testcontainers) e reparo de suítes de testes quebradas",
+      "domain": "Engenharia de testes e qualidade para Python Backend e suítes determinísticas do repositório (tests/**/*.py, tests/governance_audit/**/*.py): testes unitários (pytest), testes de integração (TestClient, Testcontainers) e reparo de suítes de testes quebradas",
       "version": "1.0.0"
     },
     "react-arch-advisor": {

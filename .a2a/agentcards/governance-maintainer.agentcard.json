@@ -4,8 +4,8 @@
   "id": "governance-maintainer",
   "name": "Governance Maintainer",
   "version": "1.0.0",
-  "description": "Especialista executor em manutenção atômica, refatoração estrutural e sincronização em lote de artefatos de governanca (.github/agents, .github/skills, .github/prompts, catálogos e grafo de roteamento). Aplica rigorosamente efficient-batch-code-modification, priorizando context-mode em batch sobre terminal para zero desperdício de créditos.",
-  "domain": "Manutenção atômica, refatoração e sincronização em lote da governanca",
+  "description": "Especialista executor em manutenção atômica, refatoração estrutural e sincronização em lote de artefatos declarativos de governanca (.github/** exceto *.py, CLAUDE.md, README.md, CHANGELOG.md e docs/plans/governance/*.md). Possui veto Fail-Closed contra editar *.py/conftest.py/pyproject.toml ou rodar pytest, delegando demandas Python ao python-router (1º python-arch-advisor -> 2º python-developer / python-test-engineer).",
+  "domain": "Manutenção atômica, refatoração e sincronização em lote de artefatos declarativos da governanca",
   "role": "implementer",
   "capabilities": [
     "manutenção de governanca",

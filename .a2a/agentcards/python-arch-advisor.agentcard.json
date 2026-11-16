@@ -4,8 +4,8 @@
   "id": "python-arch-advisor",
   "name": "Python Arch Advisor",
   "version": "1.0.0",
-  "description": "Especialista analítico read-only: arquitetura Python 3.11+, Clean Architecture, design de APIs REST/async, tipagem PEP 484/mypy strict, auditoria de dependências, mitigação de N+1 queries, profiling e estratégias de modernização.",
-  "domain": "Arquitetura Python Backend, Clean Architecture, FastAPI, Flask, Django, Pydantic, tipagem estrita, performance analítica e planos de modernização",
+  "description": "Especialista analítico e planejador read-only (1º passo da Tríade Python): arquitetura Python 3.11+, Clean Architecture, design de APIs REST/async, tipagem PEP 484/mypy strict, Plano de Implementação e Testes R-064 em docs/plans/implementation/ (incluindo demandas híbridas de governança via related-planning-doc), auditoria de dependências, mitigação de N+1 queries, profiling e estratégias de modernização.",
+  "domain": "Arquitetura Python Backend, Clean Architecture, FastAPI, Flask, Django, Pydantic, tipagem estrita, performance analítica, planos de modernização e planejamento técnico de implementação/testes (docs/plans/implementation/) para aplicações e ferramental/testes do repositório (tools/**/*.py, scripts/**/*.py, tests/**/*.py)",
   "role": "advisor",
   "capabilities": [
     "arquitetura python",

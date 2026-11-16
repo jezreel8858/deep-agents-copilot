@@ -112,7 +112,7 @@ nos:
 
   - id: python-router
     tipo: domain_router
-    descricao: "Supervisor hierárquico do domínio Python Backend — despacha para os 3 especialistas registrados em .github/agents/backend/python/python-catalog.yaml"
+    descricao: "Supervisor hierárquico do domínio Python Backend e ferramental/testes Python do repositório (tools/**/*.py, scripts/**/*.py, tests/**/*.py) — supervisiona a Tríade Python (1º @python-arch-advisor -> 2º @python-developer / @python-test-engineer) registrada em .github/agents/backend/python/python-catalog.yaml"
 
   - id: struts-router
     tipo: domain_router
@@ -359,6 +359,7 @@ workflows:
           - "spring-boot-arch-advisor"
           - "spring-reactive-arch-advisor"
           - "ejb-arch-advisor"
+          - "python-arch-advisor"
           - "struts-arch-advisor"
           - "database-arch-advisor"
           - "devops-engineer"
@@ -1321,7 +1322,12 @@ arestas:
         - "asyncio"
         - "uvicorn"
         - "celery"
-      sinal_r006: "É qualquer solicitação do ecossistema Python Backend? (despacha para o catálogo de 3 especialistas backend em .github/agents/backend/python/python-catalog.yaml)"
+        - "tools/"
+        - "scripts/"
+        - "tests/governance_audit"
+        - "conftest.py"
+        - "pyproject.toml"
+      sinal_r006: "É qualquer solicitação do ecossistema Python Backend ou automação/testes Python do repositório (tools/**/*.py, scripts/**/*.py, tests/**/*.py, conftest.py, pyproject.toml, R-055 Q3)? (despacha para os 3 especialistas em .github/agents/backend/python/python-catalog.yaml iniciando obrigatoriamente por @python-arch-advisor)"
 
   # Supervisor e roteador de domínio Java Legado Struts (Hierarchical Sub-Router)
   - de: agent-router

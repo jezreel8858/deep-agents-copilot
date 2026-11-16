@@ -552,11 +552,12 @@ agents:
     model: Gemini 4 Argon
     priority: 8.9
     version: 1.0.0
-    domain: Manutenção atômica, refatoração e sincronização em lote da governanca
+    domain: Manutenção atômica, refatoração e sincronização em lote de artefatos declarativos da governanca
     description: Especialista executor em manutenção atômica, refatoração estrutural
-      e sincronização em lote de artefatos de governanca (.github/agents, .github/skills,
-      .github/prompts, catálogos e grafo de roteamento). Aplica rigorosamente efficient-batch-code-modification,
-      priorizando context-mode em batch sobre terminal para zero desperdício de créditos.
+      e sincronização em lote de artefatos declarativos de governanca (.github/** exceto *.py,
+      CLAUDE.md, README.md, CHANGELOG.md e docs/plans/governance/*.md). Possui veto Fail-Closed
+      contra editar *.py/conftest.py/pyproject.toml ou rodar pytest, delegando demandas Python
+      ao python-router (1º python-arch-advisor -> 2º python-developer / python-test-engineer).
     keywords:
     - manutenção de governanca
     - refatorar governanca
@@ -1952,12 +1953,14 @@ agents:
     id: python-router
     model: Claude Sonnet 5.5
     priority: 8.92
-    version: 2.0.0
-    domain: Supervisor hierarquico e roteador do dominio Python Backend
+    version: 3.0.0
+    domain: Supervisor hierarquico e roteador do dominio Python Backend e automacao/testes Python do repositorio
     description: Roteador de domínio Python Backend e supervisor hierárquico — recebe
       solicitações de backend Python (FastAPI, Flask, Django, Pydantic, SQLAlchemy,
-      pytest) do agent-router central e despacha para os 7 especialistas do catálogo
-      Python (python-arch-advisor, python-developer e python-test-engineer).
+      pytest), automação/ferramental Python do repositório (tools/**/*.py, scripts/**/*.py)
+      e suítes de testes/auditoria (tests/**/*.py, incluindo tests/governance_audit/**/*.py)
+      do agent-router central e despacha para os 3 especialistas da tríade consolidada
+      Python (1º python-arch-advisor -> 2º python-developer e python-test-engineer).
     keywords:
     - python
     - python router
