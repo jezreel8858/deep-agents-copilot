@@ -182,7 +182,7 @@ nos:
 
 # ─────────────────────────────────────────────
 # WORKFLOWS — Máquinas de Estado Canônicas (R-050)
-# Define os 5 workflows operacionais determinísticos e suas sequências estritas
+# Define os 9 workflows canônicos (+ 3.A auxiliar) operacionais determinísticos e suas sequências estritas
 # ─────────────────────────────────────────────
 convencao_papeis_genericos:
   descricao: >
@@ -464,16 +464,18 @@ workflows:
         agents_permitidos: ["agent-auditor", "repo-hygiene-auditor", "governance-factory"]
         sub_rotinas_permitidas: ["deep-search"]
       - etapa: 2
+        nome: "governance_plan_materialization_and_pre_hitl_review"
+        agent: "docs-engineer | governance-maintainer | plan-critic"
+        resolvido_por: "docs-engineer"
+        regra: "R-064"
+        entregavel: "docs/plans/governance/<AAAAMMDD-HHMMSS>-governance-maintenance-<slug>.md"
+        bloqueia_proxima_etapa: true
+        descricao: "Materializacao fisica do Plano R-064 (status: DRAFT) em docs/plans/governance/ por @docs-engineer seguida de revisao cetica pre-HITL obrigatoria por @plan-critic (Two-Tier Hybrid Gate, § 10.7)"
+      - etapa: 3
         nome: "human_approval_checkpoint"
         mecanismo: "ask_questions"
-      - etapa: 3
-        nome: "implementation_plan_authoring"
-        agent: "governance-maintainer | agent-auditor"
-        resolvido_por: "governance-maintainer"
         regra: "R-064"
-        entregavel: "docs/plans/implementation/<AAAAMMDD-HHMMSS>-<wf>-<id>.md"
-        bloqueia_proxima_etapa: true
-        descricao: "Autoria do Plano de Implementacao tipo governance pelo specialist/auditor antes da execucao em lote (R-064)"
+        descricao: "Checkpoint humano Fail-Closed sobre plan_ref apos veredito PASS/PASS_WITH_WARNINGS do @plan-critic"
       - etapa: 4
         nome: "governed_batch_execution"
         agents_permitidos: ["governance-maintainer", "governance-factory"]

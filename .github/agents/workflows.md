@@ -97,7 +97,7 @@ quality_review_loop:
     - "achado de qualidade ou estilo"
   veredito: "em_andamento | aprovado | escalado_para_humano"
 ```
-7. **Aplicabilidade Restrita**: Mecanismo opt-in por workflow, com aplicação formalizada nos seguintes Estados: `WORKFLOW-BUG-FIX` (Estado 5), `WORKFLOW-REFACTORING` (Estado 5), `WORKFLOW-FEATURE-DEVELOPMENT` (Estado 6), `WORKFLOW-GOVERNANCE-MAINTENANCE` (Estado 4), `WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION` (Estado 5) e `WORKFLOW-FRAMEWORK-MIGRATION` (Estado 6).
+7. **Aplicabilidade Restrita**: Mecanismo opt-in por workflow, com aplicação formalizada nos seguintes Estados: `WORKFLOW-BUG-FIX` (Estado 5), `WORKFLOW-REFACTORING` (Estado 5), `WORKFLOW-FEATURE-DEVELOPMENT` (Estado 6), `WORKFLOW-GOVERNANCE-MAINTENANCE` (Estado 5), `WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION` (Estado 5) e `WORKFLOW-FRAMEWORK-MIGRATION` (Estado 6 — 7 etapas no grafo com Gate 2 R-064).
 
 ---
 
@@ -115,7 +115,7 @@ flowchart TD
     IntentEval -- "Governança / Auditoria de Agents" --> WF5["⚡ WORKFLOW-GOVERNANCE-MAINTENANCE\nFast-Path direto para @agent-auditor"]
     IntentEval -- "CVE / Atualizar Dependência" --> WF6["⚡ WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION\nFast-Path direto para @security-reviewer"]
     IntentEval -- "Pre-Flight Release / Deploy" --> WF8["⚡ WORKFLOW-RELEASE-READINESS\nFast-Path direto para @tech-solution-architect"]
-    IntentEval -- "Migração de Framework / Major Version" --> WF7["🚀 WORKFLOW-FRAMEWORK-MIGRATION\nDireto para @tech-solution-architect (6 etapas)"]
+    IntentEval -- "Migração de Framework / Major Version" --> WF7["🚀 WORKFLOW-FRAMEWORK-MIGRATION\nDireto para @tech-solution-architect (6 estados / 7 etapas com Gate R-064)"]
     IntentEval -- "Síntese / Refino de Prompt / Novo Chat" --> WF9["⚡ WORKFLOW-PROMPT-SYNTHESIS\nDireto para @prompt-structuring (5 etapas)"]
     IntentEval -- "Feature Nova / Pedido Ambíguo" --> Structuring["@prompt-structuring\n(R-041 — loop máx. 5x)"]
 
@@ -131,9 +131,9 @@ flowchart TD
 | `WORKFLOW-REFACTORING` | `⚡ Sim` | `1. Ground Truth -> 2. Blast Radius & Contratos -> 3. Plano Mikado -> [Plano de Implementação R-064] -> 4. Execução em Lote -> [5. Validação & Quality Review Loop (§ 1.5)]` |
 | `WORKFLOW-TECHNICAL-ANALYSIS` | `⚡ Sim` | `1. Despacho Especialista -> 2. Coleta Read-Only -> 3. Síntese Técnica & Propostas` |
 | `WORKFLOW-FEATURE-DEVELOPMENT` | `❌ Não (R-041)` | `1. Prompt Structuring -> 2. Requisitos -> 3. Blueprint -> 4. Estratégia Testes -> [Plano de Implementação R-064] -> 5. TDD -> [6. Duplo Gate & Quality Review Loop (§ 1.5)]` |
-| `WORKFLOW-GOVERNANCE-MAINTENANCE` | `⚡ Sim` | `1. Diagnóstico (@agent-auditor) -> 2. Materialização Física do Plano R-064 em docs/plans/governance/ (@docs-engineer / @governance-maintainer, status: DRAFT) -> 3. Checkpoint Humano R-064 (ask_questions sobre plan_ref) -> 4. Execução em Lote (@governance-maintainer / @governance-factory, status: APPROVED) -> [5. QG (@agent-auditor)]` |
+| `WORKFLOW-GOVERNANCE-MAINTENANCE` | `⚡ Sim` | `1. Diagnóstico (@agent-auditor) -> 2. Materialização R-064 em docs/plans/governance/ (@docs-engineer, status: DRAFT) + Revisão Pré-HITL (@plan-critic § 10.7) -> 3. Checkpoint Humano R-064 (ask_questions sobre plan_ref) -> 4. Execução em Lote (@governance-maintainer / @governance-factory, status: APPROVED) -> [5. QG (@agent-auditor)]` |
 | `WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION` | `⚡ Sim` | `1. Triagem SCA -> 2. Blast Radius -> [Plano de Implementação R-064] -> 3. Bump & Lockfile -> 4. Adaptação Breaking -> [5. Quality Gate SCA & Quality Review Loop (§ 1.5)]` |
-| `WORKFLOW-FRAMEWORK-MIGRATION` | `⚡ Sim` | `1. 5D & Símbolos -> 2. Blueprint & De-Para -> 3. Plano de Implementação R-064 -> 4. Codemod Lote -> 5. Paridade Dual -> 6. Baseline Gate -> [7. Redundancy Gate & Quality Review Loop (§ 1.5)]` |
+| `WORKFLOW-FRAMEWORK-MIGRATION` | `⚡ Sim` | `1. 5D & Símbolos (Estado 0/1/1b) -> 2. Blueprint & De-Para -> [2b/Etapa 3. Plano de Implementação R-064] -> 3. Codemod Lote (Etapa 4) -> 4. Paridade Dual (Etapa 5) -> 5. Baseline Gate (Etapa 6) -> [6. Redundancy Gate & Quality Review Loop (§ 1.5 / R-065 — Etapa 7)]` |
 | `WORKFLOW-RELEASE-READINESS` | `⚡ Sim` | `1. Contratos OpenAPI -> 2. Rollout DDL -> 3. Segredos & Higiene -> 4. Changelog & SemVer -> 5. Veredito Go/No-Go` |
 | `WORKFLOW-PROMPT-SYNTHESIS` | `⚡ Sim` | `1. Elicitação -> 2. Context Grounding -> 3. Restrições -> 4. Síntese Estruturada -> 5. Quality Gate (.md)` |
 
@@ -196,4 +196,4 @@ Conteúdo movido para [`workflows/invariantes-e-protocolos.md`](workflows/invari
 > via `context-mode/ctx_search` sob demanda pelo workflow ativo — nunca via `read_file`
 > integral de todos os workflows de uma vez.
 
-> **Árvore Universal R-064**: Subpastas tipadas canônicas de `docs/plans/<tipo>/`: `docs/plans/feature/`, `docs/plans/refactor/`, `docs/plans/architecture/`, `docs/plans/implementation/`, `docs/plans/test-strategy/`, `docs/plans/bug-triage/`, `docs/plans/requirements/` e `docs/plans/governance/`. O campo `author` registra sempre o `@<agente-planejador>` autor intelectual real (100% Read-Only), a persistência física ocorre via handoff para `@docs-engineer` / `@governance-maintainer`, `@tech-solution-architect` é proibido de materializar documentos no `WORKFLOW-BUG-FIX`, e todo plano exige `plan_type`, `allowed_files`, `status: APPROVED` e `approved: true`. Antes de qualquer checkpoint HITL (`ask_questions`) nos Gates 1 e 2, todo plano `DRAFT` passa pelo Quality Gate Pré-HITL Two-Tier Hybrid via `@plan-critic` (Tier 1 determinístico + Tier 2 cético Read-Only sob Context Firewall, Fast-Pass 1x, teto 2x / 3x em `tier: full`, Noise Budget ≤ 5 `BLOCKER`/`HIGH` R-065 e escalada `ESCALATED_HITL`).
+> **Árvore Universal R-064**: Subpastas tipadas canônicas de `docs/plans/<tipo>/`: `docs/plans/feature/`, `docs/plans/refactor/`, `docs/plans/architecture/`, `docs/plans/implementation/`, `docs/plans/test-strategy/`, `docs/plans/bug-triage/`, `docs/plans/requirements/` e `docs/plans/governance/`. O campo `author` registra sempre o `@<agente-planejador>` autor intelectual real (100% Read-Only), a persistência física ocorre via handoff para `@docs-engineer` / `@governance-maintainer`, `@tech-solution-architect` é proibido de materializar documentos no `WORKFLOW-BUG-FIX`, e todo plano exige `plan_type`, `allowed_files`, `status: APPROVED` e `approved: true`. Antes de qualquer checkpoint HITL (`ask_questions`) nos Gates 1 e 2, todo plano `DRAFT` passa pelo Quality Gate Pré-HITL Two-Tier Hybrid via `@plan-critic` (Tier 1 determinístico + Tier 2 cético Read-Only sob Context Firewall, Fast-Pass 1x, teto 2x / 3x em `tier: full`, Noise Budget ≤ 5 `BLOCKER`/`HIGH` sob R-064 § 10.7 e escalada `ESCALATED_HITL`; desambiguação canônica: **R-065** designa exclusivamente o Guard de Severidade Arquitetural no Loop de Qualidade da § 1.5, enquanto a proibição de prefixos `PLAN-`/`REQ-` em arquivos de `docs/plans/` pertence a **R-064 § 10.6**).

@@ -150,13 +150,14 @@ Para que o usuário nunca fique no escuro quanto ao fluxo em andamento, o `@agen
 - [⏳] **Etapa 6: Duplo Quality Gate, Quality Review Loop (§ 1.5) & PR Preparation** → `Gate 1 (Lógica/Sec) + Gate 2 (UI Parity) → @pr-gatekeeper` *(Pendente: validação dupla, loop de qualidade até 3x se achados não-bloqueantes e PR)*
 ```
 
-#### WORKFLOW 5: `WORKFLOW-GOVERNANCE-MAINTENANCE` (4 etapas)
+#### WORKFLOW 5: `WORKFLOW-GOVERNANCE-MAINTENANCE` (5 etapas)
 ```markdown
-### 🗺️ Pipeline de Execução: WORKFLOW-GOVERNANCE-MAINTENANCE (4 etapas)
+### 🗺️ Pipeline de Execução: WORKFLOW-GOVERNANCE-MAINTENANCE (5 etapas)
 - [▶] **Etapa 1: Diagnóstico Read-Only ou Pesquisa Prévia** → `@agent-auditor` / `@repo-hygiene-auditor` / `@docs-engineer` / `@deep-search` *(Em Andamento: auditoria estrutural, documental e pesquisa prévia)*
-- [⏳] **Etapa 2: Checkpoint de Aprovação Humana** → `ask_questions` *(Pendente: aprovação explícita do plano)*
-- [⏳] **Etapa 3: Execução Governada em Lote** → `@governance-maintainer` / `@governance-factory` / `@docs-engineer` *(Pendente: sincronização atômica SSOT R-015/R-046 e documentação técnica)*
-- [⏳] **Etapa 4: Quality Gate de Governança & Quality Review Loop (§ 1.5)** → `pytest (Tier 1)` / `@agent-auditor` *(Pendente: validação determinística de smells, routing, isolamento e loop de qualidade até 3x)*
+- [⏳] **Etapa 2: Materialização Física do Plano R-064 & Revisão Cética Pré-HITL (§ 10.7)** → `@docs-engineer` / `@governance-maintainer` (`status: DRAFT` em `docs/plans/governance/`) + `@plan-critic` (`Two-Tier Hybrid Gate`) *(Pendente: persistência do plano e revisão cética pré-HITL)*
+- [⏳] **Etapa 3: Checkpoint Humano R-064** → `ask_questions` *(Pendente: aprovação humana explícita sobre `plan_ref`)*
+- [⏳] **Etapa 4: Execução Governada em Lote** → `@governance-maintainer` / `@governance-factory` / `@docs-engineer` *(Pendente: sincronização atômica SSOT R-015/R-046 e documentação técnica com `status: APPROVED`)*
+- [⏳] **Etapa 5: Quality Gate de Governança & Quality Review Loop (§ 1.5)** → `pytest (Tier 1)` / `@agent-auditor` *(Pendente: validação determinística de smells, routing, isolamento e loop de qualidade até 3x)*
 ```
 
 #### WORKFLOW 6: `WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION` (5 etapas)
@@ -169,12 +170,13 @@ Para que o usuário nunca fique no escuro quanto ao fluxo em andamento, o `@agen
 - [⏳] **Etapa 5: Verificação de Regressão, SCA & Quality Review Loop (§ 1.5)** → `runtime-verifier` + `@code-review` + `@security-reviewer` *(Pendente: 100% testes verdes, scan SCA limpo e loop de qualidade até 3x)*
 ```
 
-#### WORKFLOW 7: `WORKFLOW-FRAMEWORK-MIGRATION` (6 etapas — Cross-Stack exige Router Origem + Destino + Grafo)
+#### WORKFLOW 7: `WORKFLOW-FRAMEWORK-MIGRATION` (6 estados / 7 etapas no grafo com Gate R-064 — Cross-Stack exige Router Origem + Destino + Grafo)
 ```markdown
-### 🗺️ Pipeline de Execução: WORKFLOW-FRAMEWORK-MIGRATION (6 etapas)
-- [▶] **Etapa 1: Pre-Flight Assessment, 5D & Symbol Exhaustion** → `@tech-solution-architect` + `@codegraph-engine` (obrigatório) + `@domain-router-ORIGEM` (ex.: `@ejb-router`) + `@business-rules-extractor` *(Em Andamento: inventário 100% de símbolos/AST + blast radius/ciclos do legado + extração 5D)*
-- [⏳] **Etapa 2: Migration Phasing & Blueprint com Matriz De-Para** → `@tech-solution-architect` + `@domain-router-ORIGEM` + `@domain-router-DESTINO` (ex.: `@spring-boot-router`) *(Pendente: mapeamento de 100% dos símbolos na matriz + fases B1..BN + checkpoint humano)*
-- [⏳] **Etapa 3: Codemod & Transformação em Lote com Anti-Omission** → `@domain-router-DESTINO` (executor) + `@domain-router-ORIGEM` (oráculo consultivo contínuo) + `@codegraph-engine` (obrigatório, blast radius por lote) *(Pendente: codemods no sandbox R-046 + validação anti-omissão AST)*
+### 🗺️ Pipeline de Execução: WORKFLOW-FRAMEWORK-MIGRATION (6 estados / 7 etapas no grafo com Gate R-064)
+- [▶] **Etapa 1 (Estado 0/1/1b): Pre-Flight Assessment, 5D & Symbol Exhaustion** → `@tech-solution-architect` + `@codegraph-engine` (obrigatório) + `@domain-router-ORIGEM` (ex.: `@ejb-router`) + `@business-rules-extractor` *(Em Andamento: inventário 100% de símbolos/AST + blast radius/ciclos do legado + extração 5D)*
+- [⏳] **Etapa 2 (Estado 2/2b): Migration Phasing & Blueprint com Matriz De-Para** → `@tech-solution-architect` + `@domain-router-ORIGEM` + `@domain-router-DESTINO` + `@docs-engineer` + `@plan-critic` (§ 10.7) *(Pendente: mapeamento de 100% dos símbolos na matriz + fases B1..BN + revisão pré-HITL + checkpoint humano)*
+- [⏳] **Etapa 2b / Etapa 3 (Gate 2 R-064): Plano de Implementação Técnica** → `<stack>-arch-advisor` + `@docs-engineer` + `@plan-critic` (§ 10.7) + `ask_questions` *(Pendente: plano R-064 em `docs/plans/implementation/` aprovado antes do codemod)*
+- [⏳] **Etapa 3 / Etapa 4 (Estado 3): Codemod & Transformação em Lote com Anti-Omission** → `@domain-router-DESTINO` (executor) + `@domain-router-ORIGEM` (oráculo consultivo contínuo) + `@codegraph-engine` (obrigatório, blast radius por lote) *(Pendente: codemods no sandbox R-046 + validação anti-omissão AST)*
 - [⏳] **Etapa 4: Refinamento & Paridade Funcional (Dual-Verification Expandido)** → `@domain-router-DESTINO` + `@domain-router-ORIGEM` + `@business-rules-extractor` + `@codegraph-engine` (obrigatório, find_cycles/dead-code) *(Pendente: Golden Master + 100% regras de negócio cobertas + zero ciclos/dead-code novos)*
 - [⏳] **Etapa 5: Baseline & Quality Gate de Migração** → `runtime-verifier` + `@code-review` + sign-off de `@domain-router-ORIGEM` + sign-off de `@codegraph-engine` *(Pendente: build limpo, testes verdes e PR preliminar)*
 - [⏳] **Etapa 6: Post-Migration Verification, Redundancy Gate & Quality Review Loop (§ 1.5)** → `@code-review` + `@test-strategy` + `@business-rules-extractor` + `@runtime-verifier` *(Pendente: tríplice auditoria: reverse orphan audit + mutation parity resilience + differential shadow replay e loop de qualidade até 3x)*
@@ -458,4 +460,4 @@ Quando o usuário invocar explicitamente qualquer Slash Prompt (`.github/prompts
 ### 10.7 Quality Gate Universal de Revisão Cética Pré-HITL (`@plan-critic` / ADR-0014)
 
 - **Two-Tier Hybrid Gate antes de `ask_questions` (Gate 1 e Gate 2)**: Todo plano persistido como `DRAFT` nas 8 categorias de `docs/plans/<tipo>/` DEVE passar por: **(Tier 1)** validação estrutural determinística (frontmatter R-064, seções do template, `allowed_files`, isolamento R-043) e **(Tier 2)** revisão cética independente por `@plan-critic` (100% Read-Only sob Context Firewall, recebendo apenas caminho/conteúdo do plano, rubrica `pre-hitl-skeptical-review-rubric.md` e saída do Tier 1).
-- **Política de Iteração e Noise Budget**: Fast-Pass 1x quando Tier 1 = `PASS` e 0 findings `BLOCKER`/`HIGH`; teto máximo de 2 rodadas (3 em `tier: full`); Noise Budget ≤ 5 findings acionáveis (`BLOCKER`/`HIGH` apenas, R-065). Se persistir `BLOCKER` após o teto, marca `review_verdict: ESCALATED_HITL` e apresenta ao humano os bloqueios residuais no `ask_questions`.
+- **Política de Iteração e Noise Budget**: Fast-Pass 1x quando Tier 1 = `PASS` e 0 findings `BLOCKER`/`HIGH`; teto máximo de 2 rodadas (3 em `tier: full`); Noise Budget ≤ 5 findings acionáveis (`BLOCKER`/`HIGH` apenas, sob **R-064 § 10.7**; nota de desambiguação: **R-065** designa exclusivamente o **Guard de Severidade Arquitetural no Quality Review Loop** em `workflows.md` § 1.5 / § 10.2, enquanto a proibição de prefixos `PLAN-`/`REQ-` em caminhos de `docs/plans/` integra a convenção de persistência física de **R-064 § 10.6**). Se persistir `BLOCKER` após o teto, marca `review_verdict: ESCALATED_HITL` e apresenta ao humano os bloqueios residuais no `ask_questions`.

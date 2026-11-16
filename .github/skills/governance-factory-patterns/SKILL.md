@@ -107,6 +107,7 @@ Antes de importar ou adaptar qualquer skill externa (URL, repositório GitHub, m
 - [ ] Zero caminhos locais de máquina, nomes de projetos reais, endpoints internos ou IDs de demandas (`R-038` / `R-044`).
 - [ ] Sincronização atômica (`R-015` / `R-040`): `catalog.yaml`, `routing-graph.yaml`, `agent-router.agent.md`, `evals/casos-roteamento.yaml`, `.index.json`, `copilot-instructions.md`, `CLAUDE.md`, `README.md` e `CHANGELOG.md`.
 - [ ] **Docs & Mermaid Sync Gate (`R-015` / `R-033` / `R-055`)**: Sincronizar contagens SSoT em `README.md`, `docs/repo-map.md`, `docs/README.md`, `docs/architecture/ARCHITECTURE_AND_GOVERNANCE_GUIDE.md`, `.github/agents/README.md`, `.github/skills/README.md`, `.github/instructions/README.md` e `tests/README.md`, atualizar blocos `mermaid` em `.github/agents/workflows.md` e `.github/agents/workflows/workflow-*.md` (preservando `@plan-critic` antes do Gate HITL R-064) e validar via `python -m tools.governance_sync --check`.
+- [ ] **Criação ou evolução estrutural de Workflows (`.github/agents/workflows*.md`)**: carregar obrigatoriamente [references/workflow-invariants.md](references/workflow-invariants.md) e validar as 8 invariantes de origem (`W-01`..`W-08`: paridade quádrupla com `routing-graph.yaml`, gate `@plan-critic` R-064 e guard R-065).
 
 ## 5) Formato de Saída — Bloco de Validações ✅/❌ (parametrizável)
 
@@ -130,6 +131,7 @@ Antes de importar ou adaptar qualquer skill externa (URL, repositório GitHub, m
 ## 7) Referências e Documentação Conexa
 
 - `references/artifact-specs-and-stack-topology.md` — Tabelas completas de campos, exemplos antes/depois, validação de modelos e topologia detalhada de stacks (`Progressive Disclosure` / `R-066`).
+- `references/workflow-invariants.md` — As 8 Regras Invariantes de Origem de Workflow (`W-01`..`W-08`) e Checklist Pré-Commit de Paridade Quádrupla (`R-050` / `R-064` / `R-065`).
 - `.github/agents/templates/agent-template.md`, `operational-agent.md`, `research-agent.md`, `router-agent.md` — Templates SSOT de Agents.
 - `.github/prompts/templates/prompt-template.md` — Template SSOT de Prompts.
 - `.github/skills/templates/skill-template.md` — Template SSOT de Skills.

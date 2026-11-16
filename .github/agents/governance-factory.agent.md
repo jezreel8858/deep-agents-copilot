@@ -94,9 +94,7 @@ Solicitação de Criação (agent, prompt, skill ou stack)
    - Atualização atômica de catálogos (R-015)
    - Emissão do Formato de Saída com bloco de validações (§4)
 ```
-
 ### Template de Invocação do `@deep-search`
-
 Ao criar qualquer artefato ou stack, invocar via `run_subagent`:
 
 ```typescript
@@ -125,9 +123,7 @@ Retorne a síntese com citações de fontes para o solicitante 'governance-facto
 - **Detecção de Perfil Router**: Se o `name` terminar em `-router` OU a `description` indicar papel de supervisor/despachante hierárquico, aplicar compulsoriamente o Baseline R-054 (7 tools de roteamento, Zero Pre-Routing Discovery e Delegação Plana), mesmo fora do fluxo `type: stack`.
 - Ordem de seções canônicas: H1 (# Perfil Operacional) → CRÍTICO (Escopo/Não-Escopo) → Decision Tree / Workflow Numerado → Padrões / Protocolo → Contrato Operacional / Formato Saída → Checklist → Anti-padrões → Quando Delegar → Retorno ao Router → Combina Com. O H1 de 100% dos agents deve ser padronizado para '# Perfil Operacional' de forma estritamente idêntica, com o nome do agente residindo exclusivamente no frontmatter YAML (name: '...'). (Proibidas seções redundantes de doc-loading no corpo).
 - Atualizar `README.md` + `catalog.yaml` na mesma entrega.
-
-  - **Formato de Saída CommonMark-safe**: exigir linha em branco após `Agente Ativo: <name>`, `[Se aplicável] Handoff: ...`, `[CURRENT_STATE_LOCK: ...]` e separadores, e lista Markdown (`- `) para campos consecutivos `Campo: valor` (zero linhas adjacentes colapsáveis).
-
+- **Formato de Saída CommonMark-safe**: exigir linha em branco após `Agente Ativo: <name>`, `[Se aplicável] Handoff: ...`, `[CURRENT_STATE_LOCK: ...]` e separadores, e lista Markdown (`- `) para campos consecutivos `Campo: valor` (zero linhas adjacentes colapsáveis).
 ### `type: skill`
 
 ```markdown
@@ -253,6 +249,7 @@ Executar o checklist genérico de `governance-factory-patterns` §3, mais:
 - [ ] Se artefato for analítico ou read-only (sem ferramentas mutativas): inclusão compulsória da cláusula de proibição de terceirização de edição manual ao usuário (R-057 / Smell 2.25) no bloco CRÍTICO de Não-Escopo.
 - [ ] Portão de Reúso Sistêmico (R-055 / Q1-Q2-Q3) avaliado: checado se a melhoria deve ser propagada para artefatos irmãos (Q1), templates canônicos (Q2) e testes determinísticos (Q3).
 - [ ] Catálogo(s) correspondente(s) ao tipo mapeado para atualização atômica (R-015).
+- [ ] Se a demanda envolver criação ou evolução estrutural de **Workflow** (`.github/agents/workflows*.md` / `.github/agents/workflows/*.md`): carregar sob demanda [`.github/skills/governance-factory-patterns/references/workflow-invariants.md`](../skills/governance-factory-patterns/references/workflow-invariants.md) e cumprir as 8 invariantes (`W-01`..`W-08`: paridade quádrupla com `routing-graph.yaml`, gate `@plan-critic` R-064 e guard `R-065`, sem criar `type: workflow` separado).
 - [ ] Se CRIAÇÃO de nova skill: varrer `catalog.yaml` e `.github/prompts/` por aderência temática e aplicar imediatamente o retrofit de `source_docs`/`source_docs_lazy` nos agents e prompts aptos identificados (R-015/R-055).
 - [ ] Se a solicitação for IMPORTAÇÃO de skill externa: Protocolo de Avaliação de Pertinência (R-067 / `governance-factory-patterns` §3.4) executado ANTES de qualquer mutação — resultado pertinente, não pertinente (com impacto negativo reportado) ou solução alternativa proposta.
 - [ ] `model:` (quando presente) validado via `get_errors`.

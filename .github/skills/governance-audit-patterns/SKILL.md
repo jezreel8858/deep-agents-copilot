@@ -42,7 +42,7 @@ Padroniza a auditoria estática e semântica do ecossistema de governança (`.gi
 - **Tier 1 (Determinístico / `pytest tests/governance_audit/`)**: Valida invariantes sintáticas, frontmatter, seções de templates SSOT (`test_template_sections.py`), orçamento de Progressive Disclosure (`R-066` / `≤ 300 linhas`) e paridade de catálogos (`R-015` / `R-040`).
 - **Tier 2 (Semântico / `@agent-auditor`)**: Avalia coerência de escopo, sobreposição semântica (`R-003`), qualidade de exemplos contrastantes (`✅ BOM` vs `❌ RUIM`) e aderência de perfis.
 
-> **Progressive Disclosure (`R-066`)**: As tabelas completas de detecção, exemplos detalhados e matrizes estendidas dos Smells `2.1` a `2.34` residem em `references/smells-catalog-detailed.md`. Abaixo está o índice normativo canônico obrigatório:
+> **Progressive Disclosure (`R-066`)**: As tabelas completas de detecção, exemplos detalhados e matrizes estendidas dos Smells `2.1` a `2.35` residem em `references/smells-catalog-detailed.md`. Abaixo está o índice normativo canônico obrigatório:
 
 ### 2.1 — Anti-padrão Estrutural (Duplicação sem Skill Equivalente)
 Instruções técnicas repetidas em múltiplos agents sem extração para `SKILL.md` compartilhada (`R-003`).
@@ -152,9 +152,13 @@ Materializar ou copiar skill externa sem executar os 4 critérios do gate `R-067
 ### 2.34 — Violação da Árvore `docs/plans/<tipo>/` e Escrita Direta por Planejador Read-Only (R-064)
 Plano fora de `docs/plans/<tipo>/` (incl. caminhos legados `docs/plans/implementation/`, `docs/plans/requirements/`), frontmatter R-064 comum ausente/incompleto, `plan_type` divergente da subpasta, ou agent planejador/advisor (`*-arch-advisor`, `tech-solution-architect`, `test-strategy`, `bug-triage`, `requirements-analyst`) com tools mutativas/escrita direta do `.md` em vez de handoff a `@docs-engineer`/`@governance-maintainer`.
 
+### 2.35 — Drift de Paridade e Invariantes de Workflow (R-050 / R-064 / R-065)
+- **Sintoma**: Divergência de contagem/numeração de etapas entre `.github/agents/workflows.md`, sub-arquivos `.github/agents/workflows/workflow-*.md`, `invariantes-e-protocolos.md` e `routing-graph.yaml`; repetição de números de estado (ex.: dois `Estado 3`); omissão do passo pré-HITL do `@plan-critic` (§ 10.7) antes de `ask_questions` em workflows com plano R-064; ou omissão/colisão semântica de `R-065` (Guard de Severidade Arquitetural) nos estados de `quality_review_loop`.
+- **Remediação**: Aplicar sincronia quádrupla conforme [`.github/skills/governance-factory-patterns/references/workflow-invariants.md`](../governance-factory-patterns/references/workflow-invariants.md) (`W-01`..`W-08`) e validar via `pytest tests/governance_audit/test_workflows_parity_and_gates.py`.
+
 ## 3) Severidade e Formato de Saída Recomendado
 
-- **Severidades**: `CRITICAL` (violação de segurança, `R-044`, `R-062`, `R-063`, quebra de catálogo `R-015`), `HIGH` (smells `2.7`, `2.9`–`2.12`, `2.24`–`2.33`), `MEDIUM` (redundância `2.4`, `2.13`), `LOW` (ajustes cosméticos).
+- **Severidades**: `CRITICAL` (violação de segurança, `R-044`, `R-062`, `R-063`, quebra de catálogo `R-015`), `HIGH` (smells `2.7`, `2.9`–`2.12`, `2.24`–`2.35`), `MEDIUM` (redundância `2.4`, `2.13`), `LOW` (ajustes cosméticos).
 - **Formato de Saída**: Tabela estruturada com `[ID do Smell | Severidade | Arquivo:Linha | Evidência | Remediação Acionável]`.
 
 ## 4) Checklist de Conformidade da Auditoria

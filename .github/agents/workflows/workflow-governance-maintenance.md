@@ -28,8 +28,8 @@ flowchart TD
     HumanGate -- "Aprovado" --> Maintainer["<b>3. Execução em Lote no Sandbox</b><br/>Agente: @governance-maintainer / @docs-engineer<br/>Ação: Batching atômico via context-mode (R-046)"]
     HumanGate -- "Rejeitado" --> EndCancel(["🛑 Ajuste de Escopo / Cancelado"])
 
-    Factory --> MaintainerSync["<b>3b. Sincronização Quádrupla SSOT</b><br/>Atualização atômica de catálogos e grafos (R-015)"]
-    MaintainerSync --> GateGov["<b>4. Quality Gate de Governança (Tier 1)</b><br/>Validação via pytest: smells, routing e isolamento"]
+    Factory --> MaintainerSync["<b>4b. Sincronização Quádrupla SSOT</b><br/>Atualização atômica de catálogos e grafos (R-015)"]
+    MaintainerSync --> GateGov["<b>5. Quality Gate de Governança (Tier 1)</b><br/>Validação via pytest: smells 2.1..2.35, routing e isolamento"]
     Maintainer --> GateGov
 
     GateGov --> CheckGov{"Suíte de Governança<br/>100% verde?"}
@@ -37,7 +37,7 @@ flowchart TD
     CheckGov -- "Falha (tentativa N/3)" --> CheckAutoFixCap{"Tentativas<br/>autofix < 3?"}
     CheckAutoFixCap -- "Sim" --> AutoFix["Autocorreção cirúrgica pelo @governance-maintainer"]
     AutoFix --> GateGov
-    CheckAutoFixCap -- "Não (teto esgotado)" --> GovEscalate["<b>4b. Escalonamento</b><br/>ask_questions: revisão manual do diff"]
+    CheckAutoFixCap -- "Não (teto esgotado)" --> GovEscalate["<b>5b. Escalonamento</b><br/>ask_questions: revisão manual do diff"]
 ```
 
 #### Cadeia Sequencial e Papéis:
@@ -50,24 +50,26 @@ flowchart TD
    - *Diagnóstico de Smells & Reúso*: O `@agent-auditor` executa auditoria estática e comportamental contra os smells canônicos de governança e avalia compulsoriamente Q1, Q2 e Q3.
    - *Auditoria de Higiene & Documentação*: O `@repo-hygiene-auditor` audita a saúde do repositório, licença e segurança de versionamento; o `@docs-engineer` mapeia a integridade documental, alinhamento técnico de manuais e conformidade de guias de governança.
    - *Pesquisa Prévia Compulsória (Criação de Artefatos / Stack)*: O `@governance-factory` delega compulsoriamente ao `@deep-search` a investigação de mercado antes de escrever novos prompts, skills ou agents.
-2. **Estado 2 — Materialização Física do Plano R-064 em `docs/plans/governance/` (`status: DRAFT`)**:
-   - *Autoria e Persistência Pré-Checkpoint*: O `@agent-auditor` estrutura o plano (`plan_type: "governance"`) e aciona `@docs-engineer` ou `@governance-maintainer` para materializá-lo fisicamente em `docs/plans/governance/<AAAAMMDD-HHMMSS>-governance-maintenance-<slug>.md` com `status: DRAFT` e `approved: false` **ANTES** do Checkpoint Humano R-064.
+2. **Estado 2 — Materialização Física do Plano R-064 em `docs/plans/governance/` (`status: DRAFT`) & Revisão Cética Pré-HITL (`@plan-critic` — § 10.7)**:
+   - *Autoria e Persistência Pré-Checkpoint*: O `@agent-auditor` estrutura o plano (`plan_type: "governance"`) e aciona `@docs-engineer` (ou `@governance-maintainer`) para materializá-lo fisicamente em `docs/plans/governance/<AAAAMMDD-HHMMSS>-governance-maintenance-<slug>.md` com `status: "DRAFT"` e `approved: false`.
+   - *Revisão Cética Pré-HITL Obrigatória (`@plan-critic` — Two-Tier Hybrid Gate, ref. `invariantes-e-protocolos.md § 10.7`)*: Antes de acionar `ask_questions`, o plano `DRAFT` é submetido obrigatoriamente ao `@plan-critic` (Tier 1 determinístico + Tier 2 cético Read-Only sob Context Firewall, máx. 2 rodadas), que valida a completude de `allowed_files`, a matriz R-055 (Q1/Q2/Q3) e a estratégia de rollback.
 3. **Estado 3 — Checkpoint Humano R-064 (`ask_questions` sobre `plan_ref`)**:
-   - Toda manutenção estrutural ou criação de stack exige aprovação humana explícita via `ask_questions` referenciando o `plan_ref` já gravado em `docs/plans/governance/` antes de qualquer mutação na malha (modo **Fail-Closed**).
-3. **Estado 3 — Execução e Sincronização em Lote por Tipo de Artefato (R-015 / R-046 — requires_plan: true)**:
-   - O `@governance-maintainer` aplica as alterações declarativas (`.github/**` exceto `*.py`, `CLAUDE.md`, `README.md`, `CHANGELOG.md`) em lote único (*Single-Turn Batching*) utilizando o `context-mode` MCP no sandbox para zero desperdício de tokens, atuando em conjunto com o `@docs-engineer`. Quando o plano incluir arquivos Python (`tools/**/*.py`, `scripts/**/*.py`, `tests/**/*.py`, `conftest.py`, `pyproject.toml`), realiza-se o split híbrido R-064 despachando para `@python-router` → 1º `@python-arch-advisor` (plano em `docs/plans/implementation/` com `related-planning-doc`) → 2º `@python-developer` / `@python-test-engineer`.
+   - Somente após veredito `PASS` ou `PASS_WITH_WARNINGS` do `@plan-critic` (ou `ESCALATED_HITL` após `max_critic_rounds = 2`), toda manutenção estrutural ou criação de stack exige aprovação humana explícita via `ask_questions` referenciando o `plan_ref` já gravado em `docs/plans/governance/` antes de qualquer mutação na malha (modo **Fail-Closed**).
+4. **Estado 4 — Execução e Sincronização em Lote por Tipo de Artefato (R-015 / R-046 — requires_plan: true)**:
+   - O `@governance-maintainer` aplica as alterações declarativas (`.github/**` exceto `*.py`, `CLAUDE.md`, `README.md`, `CHANGELOG.md`) em lote único (*Single-Turn Batching*) utilizando o `context-mode` MCP no sandbox para múltiplos arquivos, promovendo o plano em `docs/plans/governance/` para `status: "APPROVED"` e `approved: true`. Quando houver criação/atualização de testes Python (`tests/governance_audit/**/*.py`), a execução é particionada em Onda 4B via handoff para `@python-router` → `@python-arch-advisor` → `@python-test-engineer`.
    - **Sincronização Atômica por Tipo (R-015 — gap corrigido)**: o conjunto de arquivos sincronizados depende do tipo de artefato, nunca uma lista fixa de 4 arquivos:
-     - **Novo Agent**: `catalog.yaml` + `routing-graph.yaml` (nós/arestas) + **novo caso em `.github/agents/evals/casos-roteamento.yaml`** (exigência formal de R-040, antes omitida desta lista) + `agent-router.agent.md` (Decision Tree derivada) + `.github/agents/README.md`.
+     - **Novo Agent**: `catalog.yaml` + `routing-graph.yaml` (nós/arestas) + **novo caso em `.github/agents/evals/casos-roteamento.yaml`** (exigência formal de R-040) + `agent-router.agent.md` (Decision Tree, se rota primária) + `README.md`.
      - **Nova Skill**: `.github/skills/.index.json` + `.github/skills/README.md` + `source_docs:` dos agents consumidores.
      - **Novo Prompt**: `.github/prompts/README.md`.
      - **Nova Stack**: todos os itens acima aplicados ao sub-catálogo de domínio (`*-catalog.yaml`) + domain router correspondente.
-4. **Estado 4 — Quality Gate de Governança (Tier 1 Automático)**:
+     - **Workflow**: validar as 8 Invariantes de Origem em `.github/skills/governance-factory-patterns/references/workflow-invariants.md` e paridade quádrupla (`workflows.md` ↔ `workflow-*.md` ↔ `invariantes-e-protocolos.md` ↔ `routing-graph.yaml`).
+5. **Estado 5 — Quality Gate de Governança (Tier 1 Automático)**:
    - Execução determinística dos testes de governança:
-     - `test_governance_smells.py` (conformidade com templates e 17 smells).
+     - `test_governance_smells.py` e `test_workflows_parity_and_gates.py` — executa checklist C1–C9 e varredura do catálogo canônico de Smells (Smells 2.1 a 2.35) sobre os arquivos alterados.
      - `test_local_project_isolation.py` (100% isolamento de projetos locais — R-038/R-043/R-044).
      - `test_routing_quality_gate.py` (integridade do grafo e alcançabilidade).
-   - **Suíte de Evals Comportamental**: para nova rota/agent, valida adicionalmente contra os 60 casos de `.github/agents/evals/casos-roteamento.yaml` (`agent-evals-lab`) — regressão estrutural (pytest) não substitui regressão comportamental de roteamento.
-   - **Circuit Breaker (Estado 4b)**: teto de **3 tentativas** de autocorreção. Havendo regressão, o `@governance-maintainer` executa autocorreção cirúrgica; se a 3ª tentativa ainda falhar, escala via `ask_questions` para revisão manual do diff — nunca autocorreção indefinida.
+   - **Suíte de Evals Comportamental**: para nova rota/agent, valida adicionalmente contra a suíte canônica vigente em `.github/agents/evals/casos-roteamento.yaml` (`agent-evals-lab`) e `tests/governance_audit/` — regressão estrutural (pytest) não substitui regressão comportamental de roteamento.
+   - **Circuit Breaker (Estado 5b)**: teto de **3 tentativas** de autocorreção. Havendo regressão, o `@governance-maintainer` executa autocorreção cirúrgica; se a 3ª tentativa ainda falhar, escala via `ask_questions` para revisão manual do diff.
    - *Loop de Revisão de Qualidade*: Se o Avaliador Cético reprovar por achados de qualidade não-bloqueantes, aplica-se o Loop de Revisão de Qualidade (§ 1.5), teto de 3 iterações.
 
 #### Typed State Bag (`workflow_state`):
