@@ -33,6 +33,9 @@ rollback_plan:
 allowed_files:
   - "tests/governance_audit/test_systemic_reuse_gate.py"
 progress: "8/8 (100%)"
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-16"
 ---
 
 # Plano de Implementação e Testes — Systemic Reuse Gate (R-055 Q3 & Veto Fail-Closed Python)

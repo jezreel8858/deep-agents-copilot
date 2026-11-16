@@ -74,6 +74,9 @@ allowed_files:
   - ".github/agents/pr-gatekeeper.agent.md"
   - "docs/plans/bug-triage/20261114-180000-correcao-falhas-github-actions-ci.md"
   - "tests/governance_audit/test_local_project_isolation.py"
+lessons_extracted: true
+lessons_applied_to: ["@agent-auditor", "plan-conformance-patterns"]
+lessons_at: "2026-11-16"
 ---
 
 # Plano de Manutencao de Governanca: Unificacao da Cadeia Pos-Plano dos Consultores Arquiteturais (R-064 + R-065)

@@ -26,6 +26,9 @@ allowed_files:
 rollback_plan:
   - git checkout -- .github/skills/agent-safety-guardrails/SKILL.md .github/skills/governance-audit-patterns/SKILL.md .github/agents/agent-auditor.agent.md .github/agents/governance-factory.agent.md .github/agents/deep-search.agent.md .github/agents/templates/agent-template.md .github/agents/templates/research-agent.md tests/governance_audit/test_ctx_execute_capability_profile.py
   - rm -f .github/skills/agent-safety-guardrails/references/agency-score-matrix.md tests/governance_audit/test_agent_guardrails_regression.py
+lessons_extracted: true
+lessons_applied_to: ["@agent-auditor", "plan-conformance-patterns"]
+lessons_at: "2026-11-16"
 ---
 
 # Plano de Governança: Consolidação de Guardrails Proporcionais por Agency Score (0-3) e Suíte Regressiva Two-Tier (OWASP ASI 2026)

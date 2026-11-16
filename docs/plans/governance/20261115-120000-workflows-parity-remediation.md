@@ -33,6 +33,9 @@ allowed_files:
   - ".github/agents/governance-maintainer.agent.md"
   - ".github/skills/governance-audit-patterns/SKILL.md"
   - "tests/governance_audit/test_workflows_parity_and_gates.py"
+lessons_extracted: true
+lessons_applied_to: ["@agent-auditor", "plan-conformance-patterns"]
+lessons_at: "2026-11-16"
 ---
 
 # Plano de Governança: Remediação de Paridade de Workflows, Gates R-064/R-065 e Sincronia com Routing Graph

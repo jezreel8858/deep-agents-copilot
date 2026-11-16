@@ -46,6 +46,9 @@ allowed_files:
   - ".github/copilot-instructions.md"
   - "tests/governance_audit/test_systemic_reuse_gate.py"
 progress: "5/5 (100%)"
+lessons_extracted: true
+lessons_applied_to: ["@agent-auditor", "plan-conformance-patterns"]
+lessons_at: "2026-11-16"
 ---
 
 # Plano de Manutenção de Governança — Separação de Fronteira entre `@governance-maintainer` e `@python-router` (`*.py` / `pytest` / R-055 Q3 / R-064)

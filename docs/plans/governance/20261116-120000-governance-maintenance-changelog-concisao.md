@@ -25,6 +25,9 @@ review_tier1: PASS
 review_rounds: 2
 critic_rubric_gaps: []
 critic_findings_summary: "Rodada 1 (NEEDS_REVISION): 5 achados estruturais saneados. Rodada 2 (PASS pós-correção factual): saneadas referências de índice negativo oriundas de findIndex em changelog.md (H2 reais nas linhas 3, 19 e 32; arquivo nas linhas 1-41), nome real test_changelog_minimum_volume_and_release_count (linha 48, literal 400 na linha 55, novas constantes na Onda 4B) e contagens exatas wc -l / UTF-16 code units sem CR (1.700 linhas em CHANGELOG.md, 491 linhas em test_changelog_integrity.py, 1498, 122 e 560 chars nas linhas 320, 721 e 797)."
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-16"
 ---
 
 # Plano de Manutenção de Governança — Concisão, Teto Anti-Bloat e Simetria de Enforcement do `CHANGELOG.md`

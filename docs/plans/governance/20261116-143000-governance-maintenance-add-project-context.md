@@ -30,6 +30,9 @@ allowed_files:
   - ".github/agents/codegraph-engine.agent.md"
   - ".github/skills/project-context-builder/SKILL.md"
   - ".github/skills/project-scanner/SKILL.md"
+lessons_extracted: true
+lessons_applied_to: ["@agent-auditor", "plan-conformance-patterns"]
+lessons_at: "2026-11-16"
 ---
 
 # Plano de Manutenção de Governança — `add-project-context` e Artefatos Correlatos

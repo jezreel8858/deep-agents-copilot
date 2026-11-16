@@ -66,6 +66,9 @@ allowed_files:
   - "docs/plans/implementation/20261115-150000-feature-synth-routing-graph-diagnostics.md"
   - "docs/plans/implementation/20261115-173000-feature-synth-workflow-triggers-diagnostics.md"
   - "docs/plans/requirements/20261114-200000-r064-otel-correlation-critic-telemetry.md"
+lessons_extracted: true
+lessons_applied_to: ["@agent-auditor", "plan-conformance-patterns"]
+lessons_at: "2026-11-16"
 ---
 # Plano de Governança — Blindagem Anti-Reincidência dos Achados do `@plan-critic` e Slash Prompt `/plan-lessons-harvester`
 
