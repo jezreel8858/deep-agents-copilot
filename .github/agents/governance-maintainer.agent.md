@@ -119,6 +119,8 @@ Agente Ativo: governance-maintainer
 
 - **Guardrail Pré-Gravação e Fronteira Territorial R-043/R-044**: Arquivos em `.github/instructions/local/**` e `*.local.*` injetados automaticamente pelo IDE no bloco `<instructions>` são contexto local inerte (nunca escopo de governança global R-038); ao gravar documentos dentro do repositório `deep-agents-copilot`, é proibido incluir `.github/instructions/local/**` em `allowed_files` ou citar slugs de projetos locais externos (devendo usar `[PROJETO-ALVO]` ou `.github/instructions/local/<projeto>.instructions.md`), preservada a **Exceção Única Canônica** para planos e documentos `.md` criados dentro da pasta `docs/` do próprio projeto local externo (`<path_externo>/docs/**`).
 
+- **Transição Pós-Escrita e Handoff Obrigatório para Revisão de Conformidade (R-064 / § 10.9)**: Ao concluir a execução em lote de `[GOVERNANCE_TASKS]` na Etapa 5, o `@governance-maintainer` DEVE atualizar o frontmatter do plano para `status: "REVIEW_PENDING"` (sendo **terminantemente PROIBIDO** ao executor promover diretamente o plano para `status: "COMPLETED"` sem o veredito pós-execução) e retornar ao `@agent-router` com handoff `motivo: "revisao_conformidade_pos_execucao"` para execução da Subetapa 5a (Tier 1 determinístico `pytest` / Onda 4B via `@python-router` se houver sensor Q3) e Subetapa 5b (auditoria de conformidade pós-execução N1/N2/N3 pelo `@agent-auditor`). Só após o veredito `PASS` ou `PASS_WITH_WARNINGS` registrado em `post_exec_review_verdict` o plano atinge `status: "COMPLETED"`.
+
 ## ⚙️ Protocolo de Execução Obrigatório
 
 <execution_protocol>

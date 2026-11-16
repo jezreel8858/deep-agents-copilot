@@ -13,6 +13,9 @@ plan_type: "governance"
 created_at: "AAAA-MM-DD"
 related-planning-doc: "N/A"
 review_verdict: PASS | PASS_WITH_NITS | NEEDS_REVISION | ESCALATED_HITL
+post_exec_review_verdict: null # PASS | PASS_WITH_WARNINGS | FAIL (preenchido na Etapa 5b por @agent-auditor)
+post_exec_reviewer: "@agent-auditor"
+post_exec_reviewed_at: null # YYYY-MM-DD
 review_rounds: 1
 reviewer: "@plan-critic"
 review_tier1: PASS | FAIL
@@ -66,6 +69,19 @@ allowed_files:
 - **Tier 1 (Determinístico)**: `PASS | FAIL`
 - **Tier 2 (`@plan-critic`)**: `PASS | PASS_WITH_NITS | ESCALATED_HITL` (`review_rounds: 1..3`, Noise Budget ≤ 5 findings `BLOCKER`/`HIGH`)
 - **Findings e Resoluções**: (resumo objetivo ou `Nenhum finding BLOCKER/HIGH`).
+
+
+---
+
+## Parecer de Conformidade Pós-Execução (R-064 / § 10.9)
+
+- **Post-Exec Reviewer**: `@agent-auditor`
+- **Post-Exec Review Verdict**: `PENDING | PASS | PASS_WITH_WARNINGS | FAIL`
+- **Post-Exec Reviewed At**: `YYYY-MM-DD`
+- **Auditoria em 3 Níveis (`plan-conformance-patterns`)**:
+  - **N1 (Escopo Territorial `allowed_files` e Frontmatter R-064)**: Pendente de execução.
+  - **N2 (Completude 1:1 de Tasks `[GOVERNANCE_TASKS]` e Sensor Q3)**: Pendente de execução.
+  - **N3 (Aderência Semântica, Paridade de Catálogos e Invariantes)**: Pendente de execução.
 
 ## Checklist
 

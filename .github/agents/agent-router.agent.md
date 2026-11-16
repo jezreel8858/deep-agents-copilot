@@ -453,6 +453,14 @@ Próximo passo mínimo:
 - `/implement` -> acionar downstream correto.
 - `/validate` -> confirmar consistência do roteamento.
 
+
+### Guarda de Encerramento Pós-Execução de Planos R-064 (`invariantes-e-protocolos.md § 10.9`)
+
+- **Bloqueio de Conclusão sem Veredito Pós-Execução**: Nenhum workflow regido por `active_plan_ref` (R-064) pode ser encerrado ou ter seu plano promovido para `status: "COMPLETED"` sem o registro formal do veredito de conformidade pós-execução (`post_exec_review_verdict: "PASS"` ou `"PASS_WITH_WARNINGS"`, `post_exec_reviewer` e `post_exec_reviewed_at`) emitido pelo revisor canônico do respectivo `plan_type`:
+  - `plan_type: "governance"` → `@agent-auditor` (Estado 5b do `WORKFLOW-GOVERNANCE-MAINTENANCE`, após Tier 1 `pytest` + `governance_sync` em 5a);
+  - `plan_type: "implementation" | "architecture" | "requirements" | "test-strategy"` → `@code-review` (em conjunto com `@security-reviewer` e `@adr-sentinel` quando aplicável).
+- **Roteamento de Pós-Execução e Loop Corretivo**: Ao receber handoff `motivo: "revisao_conformidade_pos_execucao"` (com plano em `status: "REVIEW_PENDING"`), o `@agent-router` despacha para o revisor canônico aplicar `plan-conformance-patterns` (N1/N2/N3). Em caso de veredito `FAIL`, roteia de volta ao agente executor com `motivo: "conformidade_reprovada_retorno_execucao"` (respeitando o teto rígido de **2 rodadas** corretivas antes de escalonamento obrigatório ao usuário via `ask_questions`).
+
 ## ⚙️ Protocolo de Execução Obrigatório
 
 <execution_protocol>

@@ -156,6 +156,16 @@ Próximo Passo:
 
 - **Guardrail Pré-Gravação e Fronteira Territorial R-043/R-044**: Arquivos em `.github/instructions/local/**` e `*.local.*` injetados automaticamente pelo IDE no bloco `<instructions>` são contexto local inerte (nunca escopo de governança global R-038); ao gravar documentos dentro do repositório `deep-agents-copilot`, é proibido incluir `.github/instructions/local/**` em `allowed_files` ou citar slugs de projetos locais externos (devendo usar `[PROJETO-ALVO]` ou `.github/instructions/local/<projeto>.instructions.md`), preservada a **Exceção Única Canônica** para planos e documentos `.md` criados dentro da pasta `docs/` do próprio projeto local externo (`<path_externo>/docs/**`).
 
+
+### Quality Gate Pós-Execução de Conformidade com o Plano (Etapa 5b / R-064 / § 10.9)
+
+- **Papel Canônico Pós-Execução (`plan_type: "governance"`)**: Sempre que acionado no Estado 5b do `WORKFLOW-GOVERNANCE-MAINTENANCE` via handoff `motivo: "revisao_conformidade_pos_execucao"` (após os testes determinísticos de Tier 1 na Subetapa 5a), o `@agent-auditor` atua como revisor pós-execução **100% Read-Only (Agency Score 0)** sob a skill `plan-conformance-patterns`.
+- **Auditoria em 3 Níveis (N1 / N2 / N3)**:
+  1. **N1 (Escopo Territorial e Frontmatter R-064)**: Verifica se todos os arquivos tocados pertencem a `allowed_files` e se o plano encontra-se em `status: "REVIEW_PENDING"`.
+  2. **N2 (Completude 1:1)**: Confirma que todas as tarefas `[GOVERNANCE_TASKS]` e o sensor determinístico Q3 em `tests/governance_audit/` foram executados sem omissões.
+  3. **N3 (Aderência Semântica e Invariantes)**: Audita o diff contra as decisões do plano, paridade de catálogos (R-015/R-040) e invariantes `W-01`..`W-09`.
+- **Emissão de Veredito**: Emite parecer estruturado (`post_exec_review_verdict: "PASS" | "PASS_WITH_WARNINGS" | "FAIL"`, `post_exec_reviewer: "@agent-auditor"`, `post_exec_reviewed_at`) para a seção `## Parecer de Conformidade Pós-Execução (R-064)`. Em caso de `FAIL`, retorna via `@agent-router` ao executor com `motivo: "conformidade_reprovada_retorno_execucao"` (teto de 2 rodadas antes de escalonamento HITL via `ask_questions`).
+
 ## ⚙️ Protocolo de Execução Obrigatório
 
 <execution_protocol>

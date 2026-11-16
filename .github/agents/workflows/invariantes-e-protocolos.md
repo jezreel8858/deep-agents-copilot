@@ -423,7 +423,14 @@ A autoria do Plano de Implementação pelo `<stack>-arch-advisor` divide-se em d
 1. **Codificadores Fora de Stack de Domínio (Fail-Closed R-064)**: Em fluxos de governança (`WORKFLOW-GOVERNANCE-MAINTENANCE`), o plano (`plan_type: "governance"`) é estruturado pelo `@agent-auditor` e obrigatoriamente materializado fisicamente em `docs/plans/governance/<AAAAMMDD-HHMMSS>-governance-maintenance-<slug>.md` (via `@docs-engineer` ou `@governance-maintainer` em modo `DRAFT`) ANTES do checkpoint `ask_questions`. O fluxo opera em modo **Fail-Closed**: nenhuma mutação de lote pode iniciar sem `plan_ref` físico existente em `docs/plans/<tipo>/` com `approved: true`.
 2. **Stack sem Arch-Advisor Dedicado**: Caso uma stack tecnológica do projeto não possua ainda um `<stack>-arch-advisor` especializado no catálogo, adota-se o mesmo fallback explícito: o plano técnico é elaborado pelo especialista analítico disponível ou router de stack, validado por humano e persistido sob o contrato de `docs/plans/implementation/`.
 
-### 10.7 Invariante para Novos Workflows com Etapa de Código
+### 10.7 Quality Gate Universal de Revisão Cética Pré-HITL (`@plan-critic` / ADR-0014)
+
+- **Two-Tier Hybrid Gate antes de `ask_questions` (Gate 1 e Gate 2)**: Todo plano persistido como `DRAFT` nas 8 categorias de `docs/plans/<tipo>/` DEVE passar por: **(Tier 1)** validação estrutural determinística (frontmatter R-064, seções do template, `allowed_files`, isolamento R-043) e **(Tier 2)** revisão cética independente por `@plan-critic` (100% Read-Only sob Context Firewall, recebendo apenas caminho/conteúdo do plano, rubrica `pre-hitl-skeptical-review-rubric.md` e saída do Tier 1).
+- **Política de Iteração e Noise Budget**: Fast-Pass 1x quando Tier 1 = `PASS` e 0 findings `BLOCKER`/`HIGH`; teto máximo de 2 rodadas (3 em `tier: full`); Noise Budget ≤ 5 findings acionáveis (`BLOCKER`/`HIGH` apenas, sob **R-064 § 10.7**; nota de desambiguação: **R-065** designa exclusivamente o **Guard de Severidade Arquitetural no Quality Review Loop** em `workflows.md` § 1.5 / § 10.2, enquanto a proibição de prefixos `PLAN-`/`REQ-` em caminhos de `docs/plans/` integra a convenção de persistência física de **R-064 § 10.6**). Se persistir `BLOCKER` após o teto, marca `review_verdict: ESCALATED_HITL` e apresenta ao humano os bloqueios residuais no `ask_questions`.
+
+---
+
+### 10.8 Invariante para Novos Workflows com Etapa de Código
 
 Qualquer novo workflow canônico ou customizado adicionado ao ecossistema que envolva mutação de arquivos de código de aplicação DEVE cumprir compulsoriamente:
 1. Declarar a etapa `implementation_plan_authoring` posicionada estritamente antes de qualquer etapa de codificação no `routing-graph.yaml`.
@@ -457,7 +464,39 @@ Qualquer novo workflow canônico ou customizado adicionado ao ecossistema que en
 
 Quando o usuário invocar explicitamente qualquer Slash Prompt (`.github/prompts/<nome>.prompt.md` com `router_bypass: utility` ou `router_bypass: slash_workflow` no frontmatter — todos os Slash Prompts exceto `/agent-router`), o comando já foi selecionado pelo usuário e possui fluxo determinístico próprio; portanto, o Orquestrador Raiz **NUNCA deve invocar `@agent-router`** na triagem inicial, devendo executar diretamente as instruções/fluxo do `.prompt.md` (ou despachar diretamente para o subagente previsto no próprio `.prompt.md`). Para solicitações em chat livre (ou via `/agent-router`), a passagem inicial por `@agent-router` permanece 100% obrigatória (R-037 / R-063).
 
-### 10.7 Quality Gate Universal de Revisão Cética Pré-HITL (`@plan-critic` / ADR-0014)
+---
 
-- **Two-Tier Hybrid Gate antes de `ask_questions` (Gate 1 e Gate 2)**: Todo plano persistido como `DRAFT` nas 8 categorias de `docs/plans/<tipo>/` DEVE passar por: **(Tier 1)** validação estrutural determinística (frontmatter R-064, seções do template, `allowed_files`, isolamento R-043) e **(Tier 2)** revisão cética independente por `@plan-critic` (100% Read-Only sob Context Firewall, recebendo apenas caminho/conteúdo do plano, rubrica `pre-hitl-skeptical-review-rubric.md` e saída do Tier 1).
-- **Política de Iteração e Noise Budget**: Fast-Pass 1x quando Tier 1 = `PASS` e 0 findings `BLOCKER`/`HIGH`; teto máximo de 2 rodadas (3 em `tier: full`); Noise Budget ≤ 5 findings acionáveis (`BLOCKER`/`HIGH` apenas, sob **R-064 § 10.7**; nota de desambiguação: **R-065** designa exclusivamente o **Guard de Severidade Arquitetural no Quality Review Loop** em `workflows.md` § 1.5 / § 10.2, enquanto a proibição de prefixos `PLAN-`/`REQ-` em caminhos de `docs/plans/` integra a convenção de persistência física de **R-064 § 10.6**). Se persistir `BLOCKER` após o teto, marca `review_verdict: ESCALATED_HITL` e apresenta ao humano os bloqueios residuais no `ask_questions`.
+### 10.9 Quality Gate Universal Pós-Execução de Conformidade com o Plano (R-064)
+
+Todo workflow regido por um plano físico R-064 (`active_plan_ref` em `docs/plans/<tipo>/`) **DEVE** executar obrigatoriamente um **Quality Gate Pós-Execução de Conformidade com o Plano** após a conclusão das ondas de mutação/implementação e **antes** de promover o plano para `status: "COMPLETED"` ou encerrar o fluxo no `@agent-router`.
+
+#### 1. Matriz Canônica de Revisores Pós-Execução por `plan_type`
+
+| `plan_type` | Diretório Canônico | Agente Executor Primário | Revisor Pós-Execução Canônico (Read-Only, Agency Score 0) | Co-Revisores Especializados (Quando Aplicável) |
+| :--- | :--- | :--- | :--- | :--- |
+| `governance` | `docs/plans/governance/` | `@governance-maintainer` / `@governance-factory` | `@agent-auditor` | `@python-test-engineer` (Tier 1 determinístico `pytest` em 5a) |
+| `implementation` | `docs/plans/implementation/` | Developers de stack (`@python-developer`, `@java-developer`, `@react-developer`, etc.) | `@code-review` | `@security-reviewer` (superfície de segurança/auth/CWE), `@adr-sentinel` (invariantes de ADRs) |
+| `architecture` | `docs/plans/architecture/` | Developers de stack / `@docs-engineer` | `@code-review` | `@adr-sentinel` (obrigatório), `@security-reviewer` |
+| `requirements` | `docs/plans/requirements/` | Developers de stack | `@code-review` | `@requirements-analyst` (rastreabilidade EARS `REQ-NN`) |
+| `test-strategy` | `docs/plans/test-strategy/` | Test Engineers (`@python-test-engineer`, `@java-test-engineer`, `@qa-automation`) | `@code-review` | `@agent-auditor` (quando envolver `tests/governance_audit/`) |
+
+#### 2. Protocolo de Verificação em 3 Níveis (`plan-conformance-patterns` N1 / N2 / N3)
+
+Ao concluir a escrita, o agente executor promove o plano de `status: "APPROVED"` para `status: "REVIEW_PENDING"` (sendo **terminantemente vedado** ao executor autodeclarar `status: "COMPLETED"`) e aciona handoff com `motivo: "revisao_conformidade_pos_execucao"`. O revisor pós-execução audita o diff real contra o `active_plan_ref` nos três níveis da skill `plan-conformance-patterns`:
+
+1. **N1 — Escopo Territorial e Frontmatter R-064**:
+   - Verificar que 100% dos arquivos efetivamente criados/modificados pertencem à allowlist `allowed_files` aprovada no Gate HITL (zero *scope creep* ou mutação fora de escopo);
+   - Validar a integridade do frontmatter YAML R-064 (`status: "REVIEW_PENDING"`, `approved: true`, linhagem OTel e metadados pós-execução).
+2. **N2 — Completude 1:1 da Matriz De-Para e Checklist**:
+   - Auditar que todas as tarefas planejadas (`T-01..T-NN` / `[GOVERNANCE_TASKS]` / requisitos EARS `REQ-NN`) foram efetivamente cumpridas e marcadas (`[x]`), sem omissões silenciosas, stubs incompletos ou placeholders;
+   - Em planos de governança com requisito Q3 (R-055), confirmar que a Onda 4B (`@python-router` → `@python-arch-advisor` → `@python-test-engineer`) materializou e validou o sensor determinístico em `tests/governance_audit/` (Estado 5a).
+3. **N3 — Aderência Semântica e Invariantes de Governança/Arquitetura**:
+   - Inspecionar cirurgicamente o conteúdo semântico do diff contra as especificações do plano aprovado, invariantes de workflow (`W-01`..`W-09`), regras globais (`R-001`..`R-065`) e ADRs vigentes;
+   - Confirmar que os portões determinísticos de Tier 1 (`pytest`, `python -m tools.governance_sync --check`, `get_errors`) passaram sem regressões.
+
+#### 3. Vereditos Pós-Execução, Ciclo de Vida e Escalonamento HITL
+
+- **`PASS`**: Conformidade integral em N1, N2 e N3. O plano recebe `post_exec_review_verdict: "PASS"`, `post_exec_reviewer`, `post_exec_reviewed_at`, preenchimento da seção `## Parecer de Conformidade Pós-Execução (R-064)` e promoção final para `status: "COMPLETED"`.
+- **`PASS_WITH_WARNINGS`**: Conformidade integral em N1 e N2, com observações cosméticas ou não-bloqueantes em N3 registradas na seção `## Parecer de Conformidade Pós-Execução (R-064)`. Promove para `status: "COMPLETED"`.
+- **`FAIL`**: Violação de escopo em N1, tarefa omitida/incompleta em N2 ou desvio semântico/invariante em N3. O plano permanece em `status: "REVIEW_PENDING"` (`post_exec_review_verdict: "FAIL"`) e o fluxo retorna obrigatoriamente ao agente executor com `motivo: "conformidade_reprovada_retorno_execucao"` contendo a lista determinística de desvios a corrigir.
+- **Teto de Iterações e Circuit Breaker (Máx. 2 Rodadas)**: O loop corretivo pós-execução (`Executor ⇄ Revisor Pós-Execução`) possui teto rígido de **2 rodadas**. Se o veredito permanecer `FAIL` após a 2ª rodada corretiva (ou se for detectada violação estrutural grave R-065), o fluxo é suspenso e escalado obrigatoriamente ao usuário humano via `ask_questions` (R-027).

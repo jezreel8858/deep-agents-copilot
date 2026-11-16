@@ -133,3 +133,24 @@ Antes de acionar `ask_questions` nos Gates 1 e 2 do R-064, todo plano em `docs/p
 - Todo plano com `created_at >= "2026-11-15"` (ou opt-in explícito v2) deve declarar no frontmatter YAML comum R-064 os campos de correlação de linhagem (`session_id`, `workflow_id`, `workflow_trace_id`, `parent_plan_ref`) e de telemetria estruturada do revisor cético (`critic_rubric_gaps`, `critic_findings_summary`), conforme especificado em `references/plan-frontmatter-r064.md` e validado pelo check determinístico `T1-8` de `references/pre-hitl-skeptical-review-rubric.md`.
 - A consulta determinística por sessão de chat, execução de workflow, linhagem pai→filho e agregação de falhas de rubrica por agente autor é realizada via CLI `python -m tools.plan_lineage_query`.
 - Pré-voo obrigatório para agentes planejadores em [`references/planner-preflight-checklist.md`](references/planner-preflight-checklist.md) (classes `C1`–`C9`) e chaves opcionais de idempotência pós-revisão (`lessons_extracted`, `lessons_applied_to`, `lessons_at`) para `/plan-lessons-harvester`. — **Cadeia Pós-Plano R-064/R-065**: retorno `motivo: "plano_materializacao_pendente"` (`plan_gate_status: "pending_materialization"`) → `@docs-engineer` (materializador canônico único das 8 subpastas de `docs/plans/<tipo>/` em `DRAFT`) → `@plan-critic` (teto 2x R-065, `review_verdict: "PASS" | "PASS_WITH_NITS"`) → Gate HITL (`ask_questions`) → executor (`status: "APPROVED"`, `approved: true`; Q&A consultivo puro isento).
+
+## Matriz Canônica de Revisores Pós-Execução por plan_type (R-064 / § 10.9)
+
+Todo plano regido por R-064 (`active_plan_ref`) exige auditoria pós-execução em 3 níveis (**N1** Escopo Territorial `allowed_files` e Frontmatter, **N2** Completude 1:1 da Matriz De-Para/Tasks e **N3** Aderência Semântica e Invariantes) antes de transicionar de `status: "REVIEW_PENDING"` para `status: "COMPLETED"`.
+
+| `plan_type` | Caminho Canônico | Agente Executor | Revisor Pós-Execução Canônico (Read-Only, Agency Score 0) | Co-Revisores Especializados | Handoff de Entrada / Retorno |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `governance` | `docs/plans/governance/` | `@governance-maintainer` / `@governance-factory` | `@agent-auditor` (Estado 5b, após Tier 1 `pytest` + `governance_sync` em 5a) | `@python-test-engineer` (validação de sensores Q3 em `tests/governance_audit/`) | `revisao_conformidade_pos_execucao` / `conformidade_reprovada_retorno_execucao` |
+| `implementation` | `docs/plans/implementation/` | Developers de linguagem (`@python-developer`, `@java-developer`, `@react-developer`, etc.) | `@code-review` | `@security-reviewer` (segurança/CWE), `@adr-sentinel` (ADRs) | `revisao_conformidade_pos_execucao` / `conformidade_reprovada_retorno_execucao` |
+| `architecture` | `docs/plans/architecture/` | Developers de linguagem / `@docs-engineer` | `@code-review` | `@adr-sentinel` (obrigatório), `@security-reviewer` | `revisao_conformidade_pos_execucao` / `conformidade_reprovada_retorno_execucao` |
+| `requirements` | `docs/plans/requirements/` | Developers de linguagem | `@code-review` | `@requirements-analyst` (rastreabilidade EARS `REQ-NN`) | `revisao_conformidade_pos_execucao` / `conformidade_reprovada_retorno_execucao` |
+| `test-strategy` | `docs/plans/test-strategy/` | Test Engineers (`@python-test-engineer`, `@java-test-engineer`, `@qa-automation`) | `@code-review` | `@agent-auditor` (se tocar `tests/governance_audit/`) | `revisao_conformidade_pos_execucao` / `conformidade_reprovada_retorno_execucao` |
+
+### Ciclo de Vida Pós-Execução e Vereditos (`invariantes-e-protocolos.md § 10.9`)
+
+1. **Transição Pós-Escrita (`APPROVED -> REVIEW_PENDING`)**: Ao finalizar as tarefas do plano, o agente executor marca os itens concluídos (`[x]`), atualiza `status: "REVIEW_PENDING"` (vedado declarar `COMPLETED` unilateralmente) e emite handoff com `motivo: "revisao_conformidade_pos_execucao"`.
+2. **Vereditos Formais (`post_exec_review_verdict`)**:
+   - `PASS`: Aprovado sem ressalvas em N1, N2 e N3 -> promove `status: "COMPLETED"`.
+   - `PASS_WITH_WARNINGS`: Aprovado em N1 e N2 com ressalvas não-bloqueantes documentadas em N3 -> promove `status: "COMPLETED"`.
+   - `FAIL`: Reprovado por violação de `allowed_files` (N1), tarefa/critério omitido (N2) ou desvio semântico/invariante (N3) -> mantém `status: "REVIEW_PENDING"` e retorna ao executor via `motivo: "conformidade_reprovada_retorno_execucao"` (máximo de **2 rodadas** antes de escalonamento HITL via `ask_questions`).
+3. **Metadados Obrigatórios Pós-Execução**: `post_exec_review_verdict`, `post_exec_reviewer` e `post_exec_reviewed_at` no frontmatter YAML, além da seção `## Parecer de Conformidade Pós-Execução (R-064)` no corpo do plano.

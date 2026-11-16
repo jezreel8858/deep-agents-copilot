@@ -141,3 +141,15 @@ Para eliminar pontos cegos de rastreabilidade entre sessões de chat, execuçõe
 ### Isolamento de Projetos Locais (R-043/R-044) e Fronteira Territorial (C10)
 - **Planos dentro do repositório `deep-agents-copilot`** (`docs/**`, `.github/**`, `tests/**`, `README.md`, `AGENTS.md`, `CLAUDE.md`): o Tier 1 determinístico **DEVE bloquear com `review_tier1: "FAIL"` (`BLOCKER` — C10)** caso `allowed_files` contenha qualquer caminho `.github/instructions/local/**` ou `*.local.*` (R-043) ou caso o corpo/frontmatter mencione nominalmente qualquer slug de projeto local externo extraído dinamicamente de `.github/projects.local.yaml` e `.github/instructions/local/` (R-044, exigindo genericização para `[PROJETO-ALVO]` ou `[PROJETO-EXEMPLO]`).
 - **Exceção Única Canônica à R-044 (`<path_externo>/docs/**` do Projeto Local)**: Se o plano ou documento `.md` reside **dentro da pasta `docs/` do próprio projeto local externo** (`<path_externo>/docs/plans/<tipo>/...` ou `<path_externo>/docs/...`, cujo `path_externo` foi resolvido em `.github/projects.local.yaml`), é **100% permitido, válido e esperado** referenciar nominalmente o próprio projeto local dono da pasta e listar seus arquivos reais em `allowed_files` e no corpo do documento.
+
+### Metadados do Quality Gate Pós-Execução de Conformidade (`invariantes-e-protocolos.md § 10.9`)
+
+Após a execução das tarefas de um plano `APPROVED`, o executor deve atualizar `status: "REVIEW_PENDING"` e acionar o revisor pós-execução canônico (`motivo: "revisao_conformidade_pos_execucao"`). Nenhum plano R-064 pode transicionar para `status: "COMPLETED"` sem o preenchimento dos campos abaixo pelo revisor pós-execução (`@agent-auditor` para `plan_type: "governance"`; `@code-review` para `implementation | architecture | requirements | test-strategy`):
+
+```yaml
+post_exec_review_verdict: "PASS | PASS_WITH_WARNINGS | FAIL"
+post_exec_reviewer: "@agent-auditor | @code-review"
+post_exec_reviewed_at: "YYYY-MM-DD"
+```
+
+- **Ciclo de Vida Canônico de `status`**: `DRAFT` → `APPROVED` (Gate HITL) → `REVIEW_PENDING` (pós-escrita pelo executor) → `COMPLETED` (após veredito `PASS` ou `PASS_WITH_WARNINGS` na auditoria N1/N2/N3). Em caso de `FAIL`, permanece em `REVIEW_PENDING` e retorna ao executor via `motivo: "conformidade_reprovada_retorno_execucao"` (teto de 2 rodadas antes de escalonamento HITL).

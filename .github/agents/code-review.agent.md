@@ -160,6 +160,16 @@ Próximo passo mínimo:
 - [`@codegraph-engine`](codegraph-engine.agent.md) quando precisar de blast radius/diff-impact estrutural do PR antes de aprovar (`diff-impact`, `check`).
 - [`@agent-router`](agent-router.agent.md) entry point obrigatório (R-037).
 
+
+### Quality Gate Pós-Execução de Conformidade com o Plano (`plan-conformance-patterns` N1/N2/N3 — R-064 / § 10.9)
+
+- **Papel Canônico Pós-Execução (`plan_type: "implementation" | "architecture" | "requirements" | "test-strategy"`)**: Quando acionado via handoff `motivo: "revisao_conformidade_pos_execucao"` (com `active_plan_ref` em `status: "REVIEW_PENDING"`), o `@code-review` atua como revisor pós-execução **100% Read-Only (Agency Score 0)** sob a skill `plan-conformance-patterns` (em conjunto com `@security-reviewer` e `@adr-sentinel` quando aplicável).
+- **Auditoria Obrigatória em 3 Níveis (N1 / N2 / N3)**:
+  1. **N1 (Escopo Territorial e Frontmatter R-064)**: Audita o `git diff` contra `allowed_files` do plano aprovado (bloqueando *scope creep*).
+  2. **N2 (Completude 1:1 da Matriz De-Para e Requisitos EARS)**: Verifica que 100% das tarefas planejadas e requisitos `REQ-NN` foram implementados e testados sem stubs ou omissões silenciosas.
+  3. **N3 (Aderência Semântica, Arquitetura e R-065)**: Avalia a qualidade técnica, segurança, invariantes arquiteturais e fidelidade às decisões aprovadas no plano.
+- **Veredito e Retorno**: Emite `post_exec_review_verdict` (`PASS`, `PASS_WITH_WARNINGS` ou `FAIL`), `post_exec_reviewer: "@code-review"` e `post_exec_reviewed_at`. Se `FAIL`, retorna ao developer executor com `motivo: "conformidade_reprovada_retorno_execucao"` (máx. 2 rodadas táticas antes de escalonamento HITL via `ask_questions`; ou retorno imediato ao advisor se violação arquitetural `CRITICAL`/`HIGH` sob R-065).
+
 ## ⚙️ Protocolo de Execução Obrigatório
 
 <execution_protocol>

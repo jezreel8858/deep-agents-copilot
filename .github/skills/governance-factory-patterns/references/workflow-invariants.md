@@ -39,6 +39,12 @@ Toda regra estrutural de workflow deve possuir cobertura automatizada correspond
 
 ---
 
+
+### W-09 (Invariante 9) — Quality Gate Pós-Execução de Conformidade com o Plano Obrigatório (R-064 / § 10.9)
+Todo workflow que execute planos físicos R-064 (`active_plan_ref` em `docs/plans/<tipo>/`) deve exigir transição pós-escrita para `status: "REVIEW_PENDING"` e handoff `motivo: "revisao_conformidade_pos_execucao"` para auditoria Read-Only (Agency Score 0) sob `plan-conformance-patterns` (N1/N2/N3) pelo revisor canônico do `plan_type` (`@agent-auditor` na Subetapa 5b de `governance`, após Tier 1 `pytest` + `governance_sync` em 5a; `@code-review` nos workflows de código, co-revisado por `@security-reviewer` / `@adr-sentinel` quando aplicável), vedando `status: "COMPLETED"` sem `post_exec_review_verdict` (`PASS` ou `PASS_WITH_WARNINGS`) e limitando o retorno corretivo (`motivo: "conformidade_reprovada_retorno_execucao"`) a no máximo 2 rodadas antes de escalonamento HITL.
+
+---
+
 ## Checklist Rápido Pré-Commit de Paridade Quádrupla
 - [ ] **W-01**: `workflows.md`, `workflow-<id>.md`, `invariantes-e-protocolos.md` (§ 6.2) e `routing-graph.yaml` possuem a mesma contagem e semântica de etapas?
 - [ ] **W-02**: Numeração de estados em `workflow-<id>.md` é monotônica crescente sem duplicatas?
@@ -47,3 +53,4 @@ Toda regra estrutural de workflow deve possuir cobertura automatizada correspond
 - [ ] **W-05**: Zero caminhos em `docs/plans/` com prefixos `PLAN-` ou `REQ-`?
 - [ ] **W-06**: Mutações em `*.py` isoladas em onda separada via `@python-router`?
 - [ ] **W-07 & W-08**: Ranges de smells (`2.1 a 2.35`), cabeçalho do `routing-graph.yaml` e testes em `test_workflows_parity_and_gates.py` sincronizados?
+- [ ] **W-09**: Quality Gate Pós-Execução (`§ 10.9` / `plan-conformance-patterns` N1/N2/N3, `status: "REVIEW_PENDING"` e motivos `revisao_conformidade_pos_execucao` / `conformidade_reprovada_retorno_execucao`) documentado em todos os workflows regidos por plano R-064?
