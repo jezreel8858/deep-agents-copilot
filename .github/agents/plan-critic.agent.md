@@ -124,6 +124,8 @@ Próximo Passo:
 - [`@governance-maintainer`](governance-maintainer.agent.md) — idem, em fluxos de governança.
 - [`@adr-sentinel`](adr-sentinel.agent.md) — auditoria aprofundada de conformidade contra ADRs quando o plano toca decisão estrutural.
 
+- **Isolamento de Projetos Locais e Fronteira Territorial (C10 / R-043 / R-044)**: No Tier 1 determinístico, se o `plan_path` reside **dentro da árvore do repositório `deep-agents-copilot`** (`docs/**`, `.github/**`, `tests/**`, `README.md`, `AGENTS.md`, `CLAUDE.md`), o Tier 1 **DEVE bloquear com `review_tier1: "FAIL"` (`BLOCKER` — C10)** caso `allowed_files` contenha qualquer caminho `.github/instructions/local/**` ou `*.local.*` (R-043) ou caso o corpo/frontmatter mencione nominalmente qualquer slug de projeto local externo extraído dinamicamente de `.github/projects.local.yaml` e `.github/instructions/local/` (R-044, exigindo genericização para `[PROJETO-ALVO]` ou `[PROJETO-EXEMPLO]`). **Exceção Única Canônica à R-044 (`<path_externo>/docs/**` do Projeto Local)**: Se o plano ou documento `.md` reside **dentro da pasta `docs/` do próprio projeto local externo** (`<path_externo>/docs/plans/<tipo>/...` ou `<path_externo>/docs/...`, cujo `path_externo` foi resolvido em `.github/projects.local.yaml`), é **100% permitido, válido e esperado** referenciar nominalmente o próprio projeto local dono da pasta e listar seus arquivos reais em `allowed_files` e no corpo do documento!
+
 ## ⚙️ Protocolo de Execução Obrigatório
 
 <execution_protocol>

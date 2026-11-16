@@ -338,3 +338,6 @@ Se a solicitação pivotar de "criar/revisar artefato de governança" para "impl
 - `/plan` → definir tipo e escopo do novo artefato.
 - `/implement` → materializar o artefato e atualizar catálogo correspondente.
 - `/validate` → checar aderência estrutural e consistência com catálogo.
+
+### Detecção de Perfil Arch-Advisor / Planejador R-064
+Sempre que o artefato criado/atualizado for um `<stack>-arch-advisor`, planejador Score 0 Read-Only (R-025) ou `<stack>-router`, injetar compulsoriamente o contrato pós-plano R-064/R-065: retorno ao router com `motivo: "plano_materializacao_pendente"` (`plan_gate_status: "pending_materialization"`) → `@docs-engineer` (materializador canônico único em `docs/plans/<tipo>/` com `status: "DRAFT"`) → `@plan-critic` (`review_verdict: "PASS" | "PASS_WITH_NITS"`, teto 2x R-065) → Gate de Aprovação Humana (`ask_questions`) antes de qualquer handoff para executor (isentando o Modo Consultivo Q&A Puro).

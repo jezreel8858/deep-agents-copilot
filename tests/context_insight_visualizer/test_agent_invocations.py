@@ -220,3 +220,70 @@ def test_jira_mcp_capability_matrix_and_catalog_parity():
     for aid in expected_jira_agents:
         assert f"@{aid}" in router_text, f"agent-router deve documentar @{aid} na Matriz Jira-MCP"
 
+# --- P-01: Invariantes de Governanca Pos-Plano (R-064 / R-065) ---
+def test_p01_arch_advisors_and_planners_post_plan_materialization_contract() -> None:
+    """
+    Garante por descoberta dinamica que todos os agentes *-arch-advisor,
+    tech-solution-architect e os 5 planejadores transversais Score 0 contem
+    referencia explicita a @docs-engineer, @plan-critic e plano_materializacao_pendente,
+    alem da isencao do Modo Consultivo Q&A Puro nos consultores de arquitetura.
+    """
+    root = Path(__file__).resolve().parents[2]
+    agents_dir = root / ".github" / "agents"
+
+    arch_advisors = sorted(agents_dir.rglob("*-arch-advisor.agent.md"))
+    assert len(arch_advisors) >= 8, f"Esperados >= 8 arch-advisors, encontrados: {len(arch_advisors)}"
+
+    tech_arch = agents_dir / "architecture" / "tech-solution-architect.agent.md"
+    transversal_planners = [
+        agents_dir / "feature-planner.agent.md",
+        agents_dir / "refactor-planner.agent.md",
+        agents_dir / "test-strategy.agent.md",
+        agents_dir / "bug-triage.agent.md",
+        agents_dir / "requirements-analyst.agent.md",
+    ]
+
+    for advisor_path in [*arch_advisors, tech_arch]:
+        text = advisor_path.read_text(encoding="utf-8")
+        name = advisor_path.name
+        assert "@docs-engineer" in text, f"[{name}] Deve referenciar @docs-engineer"
+        assert "@plan-critic" in text, f"[{name}] Deve referenciar @plan-critic"
+        assert "plano_materializacao_pendente" in text, f"[{name}] Deve declarar motivo plano_materializacao_pendente"
+        assert ("Q&A" in text or "Consultivo" in text or "consultivo" in text), (
+            f"[{name}] Deve explicitar isencao para Modo Consultivo / Q&A Puro"
+        )
+
+    for planner_path in transversal_planners:
+        text = planner_path.read_text(encoding="utf-8")
+        name = planner_path.name
+        assert "@docs-engineer" in text, f"[{name}] Deve referenciar @docs-engineer"
+        assert "@plan-critic" in text, f"[{name}] Deve referenciar @plan-critic"
+        assert "plano_materializacao_pendente" in text, f"[{name}] Deve declarar motivo plano_materializacao_pendente"
+
+
+def test_p01_all_routers_enforce_docs_engineer_and_plan_critic_before_hitl_and_executors() -> None:
+    """
+    Garante por descoberta dinamica que todos os *-router.agent.md exigem a passagem
+    por @docs-engineer e @plan-critic (PASS / PASS_WITH_NITS) antes do Gate Humano
+    e antes da delegacao para agentes executores, e que agent-router e docs-engineer
+    atribuem exclusivamente ao @docs-engineer a persistencia fisica em docs/plans/governance/.
+    """
+    root = Path(__file__).resolve().parents[2]
+    agents_dir = root / ".github" / "agents"
+
+    routers = sorted(agents_dir.rglob("*-router.agent.md"))
+    assert len(routers) >= 9, f"Esperados >= 9 routers (agent-router + 8 stacks), encontrados: {len(routers)}"
+
+    for router_path in routers:
+        text = router_path.read_text(encoding="utf-8")
+        name = router_path.name
+        assert "@docs-engineer" in text, f"[{name}] Deve exigir passagem por @docs-engineer"
+        assert "@plan-critic" in text, f"[{name}] Deve exigir passagem por @plan-critic"
+        assert "plano_materializacao_pendente" in text, f"[{name}] Deve tratar motivo plano_materializacao_pendente"
+        assert "PASS_WITH_NITS" in text, f"[{name}] Deve validar veredito PASS / PASS_WITH_NITS do @plan-critic"
+
+    agent_router_text = (agents_dir / "agent-router.agent.md").read_text(encoding="utf-8")
+    docs_eng_text = (agents_dir / "docs-engineer.agent.md").read_text(encoding="utf-8")
+    assert "docs/plans/governance/" in agent_router_text
+    assert "docs/plans/governance/" in docs_eng_text
+    assert "Agente Materializador Canônico Único" in docs_eng_text or "Materializador Canônico Único" in docs_eng_text

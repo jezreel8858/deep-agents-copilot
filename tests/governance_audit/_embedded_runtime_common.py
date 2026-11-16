@@ -51,3 +51,13 @@ def git_mode(rel: str) -> str | None:
     return r.stdout.split()[0] if r.stdout.strip() else None
 def run_bash(args: list[str], timeout: int = 30) -> subprocess.CompletedProcess:
     return subprocess.run([BASH, *args], cwd=REPO, capture_output=True, text=True, timeout=timeout)
+
+# --- Dynamic Discovery Helpers (P-01 / R-064) ---
+def discover_arch_advisor_files() -> list[Path]:
+    """Descoberta dinamica de todos os agentes *-arch-advisor.agent.md."""
+    return sorted((REPO / ".github" / "agents").rglob("*-arch-advisor.agent.md"))
+
+
+def discover_router_files() -> list[Path]:
+    """Descoberta dinamica de todos os agentes *-router.agent.md."""
+    return sorted((REPO / ".github" / "agents").rglob("*-router.agent.md"))

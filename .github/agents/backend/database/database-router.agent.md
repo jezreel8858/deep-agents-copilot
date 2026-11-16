@@ -35,6 +35,9 @@ Você é o supervisor de domínio e roteador especializado em Banco de Dados (Or
 - ✅ Se o SGBD for outro relacional (PostgreSQL, MySQL, SQL Server), delega para `@database-specialist` (fallback genérico).
 - ✅ Se a solicitação envolver alterações em services Java/Spring Boot ou EJB que consumam essas tabelas, faz handoff para `@spring-boot-router` ou `@ejb-router`.
 
+
+- ✅ **Cadeia Pós-Plano Obrigatória (R-064 + R-065)**: Distinguir **Modo Consultivo Q&A Puro** (dúvidas arquiteturais sem geração de plano, isento de R-064/R-065) de **Modo Emissão de Blueprint/Plano (Gate 2 / Architecture Plan)**. Ao receber retorno do `*-arch-advisor` com `motivo: "plano_materializacao_pendente"` (`plan_gate_status: "pending_materialization"`), escalar ao `@agent-router` para acionar `@docs-engineer` (materializador único em `docs/plans/implementation/` ou `docs/plans/architecture/` com `status: "DRAFT"`) → `@plan-critic` (`review_verdict: "PASS" | "PASS_WITH_NITS"`, teto 2x R-065) → Gate Humano (`ask_questions`) e somente após `status: "APPROVED"` (`approved: true`) despachar ao developer/executor com `active_plan_ref` preenchido.
+
 ## Decision Tree
 
 ```text

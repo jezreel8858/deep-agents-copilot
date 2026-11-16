@@ -222,3 +222,146 @@ def test_agency_score_matrix_and_cross_references_and_r066_budget():
     for path_item in must_reference:
         txt = path_item.read_text(encoding="utf-8")
         assert "agency-score-matrix.md" in txt, f"{path_item.name} deve referenciar agency-score-matrix.md"
+
+# --- P-01: Descoberta Dinamica e Shift-Left do Gate Pos-Plano (R-064 / R-065) ---
+TRANSVERSAL_PLANNER_AGENTS = [
+    "feature-planner",
+    "refactor-planner",
+    "test-strategy",
+    "bug-triage",
+    "requirements-analyst",
+]
+
+
+def test_dynamic_discovery_arch_advisors_and_score0_planners_post_plan_gate(all_agents):
+    """
+    Substitui listas estaticas por descoberta dinamica via rglob('*-arch-advisor.agent.md'):
+    valida que 100% dos arch-advisors (atuais e futuras stacks), tech-solution-architect
+    e os 5 planejadores transversais Score 0 declaram plano_materializacao_pendente,
+    @docs-engineer como Agente Materializador Canonico Unico e @plan-critic (PASS / PASS_WITH_NITS),
+    alem da isencao de Modo Consultivo Q&A Puro nos consultores de arquitetura.
+    """
+    discovered_advisors = sorted(AGENTS_DIR.rglob("*-arch-advisor.agent.md"))
+    assert len(discovered_advisors) >= 8, (
+        f"Descoberta dinamica deve encontrar >= 8 *-arch-advisor.agent.md, encontrou {len(discovered_advisors)}"
+    )
+
+    tech_arch_path = all_agents["tech-solution-architect"]
+    violations = []
+
+    for advisor_path in [*discovered_advisors, tech_arch_path]:
+        txt = advisor_path.read_text(encoding="utf-8")
+        label = advisor_path.stem
+        for token in ("plano_materializacao_pendente", "@docs-engineer", "@plan-critic"):
+            if token not in txt:
+                violations.append(f"{label}: ausente token obrigatorio '{token}'")
+        if "PASS_WITH_NITS" not in txt:
+            violations.append(f"{label}: ausente referencia ao veredito 'PASS_WITH_NITS' do @plan-critic")
+        if "Q&A" not in txt and "Consultivo" not in txt and "consultivo" not in txt:
+            violations.append(f"{label}: ausente isencao explicita do Modo Consultivo Q&A Puro")
+
+    for planner_name in TRANSVERSAL_PLANNER_AGENTS:
+        planner_path = all_agents[planner_name]
+        txt = planner_path.read_text(encoding="utf-8")
+        for token in ("plano_materializacao_pendente", "@docs-engineer", "@plan-critic"):
+            if token not in txt:
+                violations.append(f"{planner_name}: ausente token obrigatorio '{token}'")
+
+    assert not violations, "Violacoes no contrato pos-plano (Arch-Advisors / Planejadores Score 0):\n" + "\n".join(violations)
+
+
+def test_dynamic_discovery_all_routers_post_plan_gate_and_canonical_materializer():
+    """
+    Valida via descoberta dinamica rglob('*-router.agent.md') que 100% dos roteadores
+    exigem a sequencia plano_materializacao_pendente -> @docs-engineer -> @plan-critic
+    (PASS | PASS_WITH_NITS) antes do Gate Humano e antes da delegacao para executores.
+    """
+    discovered_routers = sorted(AGENTS_DIR.rglob("*-router.agent.md"))
+    assert len(discovered_routers) >= 9, (
+        f"Descoberta dinamica deve encontrar >= 9 *-router.agent.md, encontrou {len(discovered_routers)}"
+    )
+
+    violations = []
+    for router_path in discovered_routers:
+        txt = router_path.read_text(encoding="utf-8")
+        label = router_path.stem
+        for token in ("plano_materializacao_pendente", "@docs-engineer", "@plan-critic", "PASS_WITH_NITS"):
+            if token not in txt:
+                violations.append(f"{label}: ausente token obrigatorio '{token}'")
+        if router_path.name != "agent-router.agent.md":
+            if "Q&A" not in txt and "Consultivo" not in txt and "consultivo" not in txt:
+                violations.append(f"{label}: ausente isencao do Modo Consultivo Q&A Puro")
+
+    assert not violations, "Violacoes no contrato pos-plano dos Routers:\n" + "\n".join(violations)
+
+
+def test_shift_left_templates_and_governance_factory_post_plan_clauses():
+    """
+    Valida que os 3 templates SSOT (.github/agents/templates/{agent-template,research-agent,router-agent}.md)
+    e a fabrica (governance-factory.agent.md, governance-factory-patterns/SKILL.md e
+    references/artifact-specs-and-stack-topology.md) contem a clausula pos-plano
+    (plano_materializacao_pendente, @docs-engineer, @plan-critic) e a regra de Deteccao
+    de Perfil Arch-Advisor / Planejador R-064.
+    """
+    template_paths = [
+        AGENTS_DIR / "templates" / "agent-template.md",
+        AGENTS_DIR / "templates" / "research-agent.md",
+        AGENTS_DIR / "templates" / "router-agent.md",
+    ]
+    factory_paths = [
+        AGENTS_DIR / "governance-factory.agent.md",
+        SKILLS_DIR / "governance-factory-patterns" / "SKILL.md",
+        SKILLS_DIR / "governance-factory-patterns" / "references" / "artifact-specs-and-stack-topology.md",
+    ]
+
+    violations = []
+    for tpl in template_paths:
+        assert tpl.exists(), f"Template ausente: {tpl}"
+        txt = tpl.read_text(encoding="utf-8")
+        for token in ("plano_materializacao_pendente", "@docs-engineer", "@plan-critic", "PASS_WITH_NITS"):
+            if token not in txt:
+                violations.append(f"Template {tpl.name}: ausente token '{token}'")
+
+    for fpath in factory_paths:
+        assert fpath.exists(), f"Artefato da factory ausente: {fpath}"
+        txt = fpath.read_text(encoding="utf-8")
+        for token in ("plano_materializacao_pendente", "@docs-engineer", "@plan-critic", "R-064"):
+            if token not in txt:
+                violations.append(f"Factory {fpath.name}: ausente token '{token}'")
+
+    assert not violations, "Violacoes Shift-Left em Templates / Factory:\n" + "\n".join(violations)
+
+
+
+def test_r043_r044_pre_write_and_pre_commit_guardrails_in_core_agents():
+    """R-043/R-044: Agentes core de revisão, documentação, manutenção, auditoria e PR gatekeeper possuem guardrails de isolamento e Fronteira Territorial."""
+    doc_and_plan_agents = [
+        AGENTS_DIR / "plan-critic.agent.md",
+        AGENTS_DIR / "docs-engineer.agent.md",
+        AGENTS_DIR / "governance-maintainer.agent.md",
+    ]
+    audit_and_gate_agents = [
+        AGENTS_DIR / "agent-auditor.agent.md",
+        AGENTS_DIR / "pr-gatekeeper.agent.md",
+    ]
+
+    violations: list[str] = []
+
+    for agent_path in doc_and_plan_agents:
+        assert agent_path.exists(), f"Agente obrigatório ausente: {agent_path}"
+        txt = agent_path.read_text(encoding="utf-8")
+        for token in ("R-043", "R-044", "<path_externo>/docs/**"):
+            if token not in txt:
+                violations.append(f"{agent_path.name}: ausente token '{token}'")
+
+    for agent_path in audit_and_gate_agents:
+        assert agent_path.exists(), f"Agente obrigatório ausente: {agent_path}"
+        txt = agent_path.read_text(encoding="utf-8")
+        for token in ("R-043", "R-044", ".github/instructions/local/"):
+            if token not in txt:
+                violations.append(f"{agent_path.name}: ausente token '{token}'")
+
+    assert not violations, (
+        "Violações de guardrails R-043/R-044 nos agentes core:\n"
+        + "\n".join(f"  - {v}" for v in violations)
+    )

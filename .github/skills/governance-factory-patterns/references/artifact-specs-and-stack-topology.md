@@ -78,7 +78,8 @@ Reportar no Formato de Saída (§4 desta skill)
 | Source_docs | ✅ obrigatório | ✅ | ✅ obrigatório | ✅ |
 | Registro em índice/catálogo | `catalog.yaml` + `README.md` | `.index.json` + `README.md` | `README.md` de prompts | `catalog.yaml` + `routing-graph.yaml` + `agent-router.agent.md` + `README.md` |
 
-### 2.1) Agents de Planejamento — Enforcement R-064 (CA-04)
+### 2.1) Agents de Planejamento — Enforcement R-064 (CA-04) e Detecção de Perfil Arch-Advisor / Planejador R-064
+- **Cadeia Pós-Plano Obrigatória (`plano_materializacao_pendente`)**: Todo `<stack>-arch-advisor.agent.md`, planejador Score 0 e `<stack>-router.agent.md` instanciado pela factory DEVE declarar retorno pós-plano com `motivo: "plano_materializacao_pendente"` (`plan_gate_status: "pending_materialization"`) encadeando `@docs-engineer` (materializador único em `docs/plans/<tipo>/`) → `@plan-critic` (`review_verdict: "PASS" | "PASS_WITH_NITS"`) → Gate HITL (`ask_questions`) antes do executor (isentando Modo Consultivo Q&A Puro).
 
 | Perfil | `plan_type` / destino | Skill com template |
 |---|---|---|

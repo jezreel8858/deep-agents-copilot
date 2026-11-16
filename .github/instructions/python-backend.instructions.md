@@ -142,3 +142,5 @@ testpaths = ["tests"]
 - `test-implementation-python` para padrões detalhados de testes.
 - Adapter específico do projeto (ex.: `.github/instructions/<projeto>-python-backend.instructions.md`) para customizações de framework e estrutura de projeto.
 
+<!-- R-064/R-065: Cadeia pós-plano unificada: *-arch-advisor / planejador retorna motivo: "plano_materializacao_pendente" -> @docs-engineer (materializador único docs/plans/<tipo>/ DRAFT) -> @plan-critic (R-065) -> Gate HITL -> executor (Q&A consultivo isento). -->
+

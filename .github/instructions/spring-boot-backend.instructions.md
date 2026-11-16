@@ -75,3 +75,5 @@ applyTo: ["**/*.java"]
 - Este documento para as convenções genéricas de backend Java/Spring Boot.
 - `docs/database/DATABASE_SCHEMA_<PROJETO>.md` para regras de persistência e consultas (nomenclatura definida pelo projeto).
 - Adapter específico do projeto (ex.: `.github/instructions/<projeto>-spring-boot-backend.instructions.md`) para customizações como transaction managers, typos legados e schemas nomeados.
+
+<!-- R-064/R-065: Cadeia pós-plano unificada: *-arch-advisor / planejador retorna motivo: "plano_materializacao_pendente" -> @docs-engineer (materializador único docs/plans/<tipo>/ DRAFT) -> @plan-critic (R-065) -> Gate HITL -> executor (Q&A consultivo isento). -->

@@ -40,6 +40,9 @@ Você é o supervisor de domínio e roteador especializado em backend Python (Fa
 - ✅ Se a solicitação sair do domínio Python, retorne ao `@agent-router` (R-042, `motivo: "deriva_de_intencao"`).
 - ✅ Ao especificar ou orientar execução de testes, referenciar `scripts/dev/py-test.sh` (skill `embedded-runtime-governance` § Python/uv, consulta via `context-mode/ctx_search`); sem lógica nova.
 
+
+- ✅ **Cadeia Pós-Plano Obrigatória (R-064 + R-065)**: Distinguir **Modo Consultivo Q&A Puro** (dúvidas arquiteturais sem geração de plano, isento de R-064/R-065) de **Modo Emissão de Blueprint/Plano (Gate 2 / Architecture Plan)**. Ao receber retorno do `*-arch-advisor` com `motivo: "plano_materializacao_pendente"` (`plan_gate_status: "pending_materialization"`), escalar ao `@agent-router` para acionar `@docs-engineer` (materializador único em `docs/plans/implementation/` ou `docs/plans/architecture/` com `status: "DRAFT"`) → `@plan-critic` (`review_verdict: "PASS" | "PASS_WITH_NITS"`, teto 2x R-065) → Gate Humano (`ask_questions`) e somente após `status: "APPROVED"` (`approved: true`) despachar ao developer/executor com `active_plan_ref` preenchido.
+
 ## Decision Tree
 
 ```text

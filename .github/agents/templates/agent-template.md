@@ -145,6 +145,8 @@ Agente Ativo: <slug-kebab-case>
 
 - **Clarificação e UX do `ask_questions` (R-027 / CA-03..CA-05)**: Em ambiguidades ou checkpoints HITL, usar `ask_questions` com 1–4 perguntas/chamada, `header` ≤ 25 chars, `allowFreeformInput: true`, 2–4 opções reais sem espantalhos (Anti-Strawman), `description` obrigatório (`[Consequência prática / O que faz] + [Trade-off principal ou quando escolher]`) e 1ª opção `(Recomendado)` quando houver melhor prática técnica (exceção: decisão puramente de negócio) — SSOT: `structured-intake-patterns`.
 
+- **Guardrail Pré-Gravação e Fronteira Territorial R-043/R-044**: Arquivos em `.github/instructions/local/**` e `*.local.*` injetados automaticamente pelo IDE no bloco `<instructions>` são contexto local inerte (nunca escopo de governança global R-038); ao gravar documentos dentro do repositório `deep-agents-copilot`, é proibido incluir `.github/instructions/local/**` em `allowed_files` ou citar slugs de projetos locais externos (devendo usar `[PROJETO-ALVO]` ou `.github/instructions/local/<projeto>.instructions.md`), preservada a **Exceção Única Canônica** para planos e documentos `.md` criados dentro da pasta `docs/` do próprio projeto local externo (`<path_externo>/docs/**`).
+
 ## ⚙️ Protocolo de Execução Obrigatório
 
 <execution_protocol>
@@ -218,3 +220,5 @@ Retorne IMEDIATAMENTE para `@agent-router` caso a solicitação fuja do escopo d
 - **Commands**: `/plan`, `/implement`, `/validate`.
 
 - ✅ Calibrar guardrails proporcionalmente ao **Agency Score (0–3)** e cobertura **OWASP ASI01..ASI10:2026** conforme `.github/skills/agent-safety-guardrails/references/agency-score-matrix.md` (validado por `tests/governance_audit/test_agent_guardrails_regression.py`).
+
+- **Cadeia Pós-Plano Obrigatória (Detecção de Perfil Arch-Advisor / Planejador R-064 + R-065)**: Em Modo Planejamento/Blueprint, retornar ao router com `motivo: "plano_materializacao_pendente"` (`plan_gate_status: "pending_materialization"`) para acionar `@docs-engineer` (`status: "DRAFT"` em `docs/plans/<tipo>/`) → `@plan-critic` (`review_verdict: "PASS" | "PASS_WITH_NITS"`) → Gate HITL (`ask_questions`) → executor após `status: "APPROVED"` (Modo Consultivo Q&A Puro é isento).

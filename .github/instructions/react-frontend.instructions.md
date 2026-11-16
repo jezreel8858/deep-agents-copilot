@@ -97,3 +97,5 @@ Fontes selecionadas
 - React Testing Library: https://testing-library.com/docs/react-testing-library/intro/
 - Playwright Docs: https://playwright.dev/
 - WCAG 2.2: https://www.w3.org/TR/WCAG22/
+
+<!-- R-064/R-065: Cadeia pós-plano unificada: *-arch-advisor / planejador retorna motivo: "plano_materializacao_pendente" -> @docs-engineer (materializador único docs/plans/<tipo>/ DRAFT) -> @plan-critic (R-065) -> Gate HITL -> executor (Q&A consultivo isento). -->

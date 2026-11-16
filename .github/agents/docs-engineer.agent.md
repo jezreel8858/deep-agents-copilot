@@ -117,7 +117,7 @@ Substitui `docs-writer` + `docs-curator`, que já se referenciavam mutuamente pa
 
 ## 📄 Persistência Física Universal de Planos em `docs/plans/<tipo>/` (R-064)
 
-- **Executor Canônico de Materialização Física**: Como os 14 agents planejadores, consultores arquiteturais (`*-arch-advisor`), analistas de requisitos e agentes de triagem operam em perfil estritamente **100% Read-Only (R-025)**, cabe ao `@docs-engineer` materializar fisicamente em disco os arquivos `.md` de planos por eles estruturados antes do Gate de Aprovação Humana (R-064).
+- **Executor Canônico de Materialização Física (Agente Materializador Canônico Único das 8 Subpastas `docs/plans/<tipo>/`)**: Usando sempre caminho absoluto do workspace no sandbox `ctx_execute`, após retorno `motivo: "plano_materializacao_pendente"` e antes da revisão cética do `@plan-critic`, Como os 14 agents planejadores, consultores arquiteturais (`*-arch-advisor`), analistas de requisitos e agentes de triagem operam em perfil estritamente **100% Read-Only (R-025)**, cabe ao `@docs-engineer` materializar fisicamente em disco os arquivos `.md` de planos por eles estruturados antes do Gate de Aprovação Humana (R-064).
 - **Árvore Canônica de 8 Subpastas (`docs/plans/<tipo>/`)**:
   - `docs/plans/feature/` (`plan_type: feature` — emitido por `@feature-planner`)
   - `docs/plans/refactor/` (`plan_type: refactor` — emitido por `@refactor-planner`)
@@ -126,8 +126,10 @@ Substitui `docs-writer` + `docs-curator`, que já se referenciavam mutuamente pa
   - `docs/plans/test-strategy/` (`plan_type: test-strategy` — emitido por `@test-strategy`)
   - `docs/plans/bug-triage/` (`plan_type: bug-triage` — emitido por `@bug-triage`)
   - `docs/plans/requirements/` (`plan_type: requirements` — `docs/plans/requirements/<AAAAMMDD-HHMMSS>-<modulo>.md` emitido por `@requirements-analyst`)
-  - `docs/plans/governance/` (`plan_type: governance` — emitido por `@agent-auditor`, persistido por `@governance-maintainer` ou `@docs-engineer`)
+  - `docs/plans/governance/` (`plan_type: governance` — emitido por `@agent-auditor` com `motivo: "plano_materializacao_pendente"`, persistido exclusivamente por `@docs-engineer` na Etapa 2 em `status: "DRAFT"` antes de `@plan-critic` e Gate Humano; `@governance-maintainer` atua apenas na Etapa 5 pós-aprovação HITL)
 - **Validação Obrigatória de Frontmatter R-064**: Antes de gravar qualquer plano em `docs/plans/<tipo>/`, validar a presença de todos os campos obrigatórios do frontmatter YAML comum R-064 (`.github/skills/plan-conformance-patterns/references/plan-frontmatter-r064.md`): `status`, `approved`, `author` (mantendo o `@<agente-planejador>` autor intelectual real, nunca sobrescrevendo com `@docs-engineer`), `plan_type`, `created_at`, `allowed_files` e `related-planning-doc`.
+
+- **Guardrail Pré-Gravação e Fronteira Territorial R-043/R-044**: Arquivos em `.github/instructions/local/**` e `*.local.*` injetados automaticamente pelo IDE no bloco `<instructions>` são contexto local inerte (nunca escopo de governança global R-038); ao gravar documentos dentro do repositório `deep-agents-copilot`, é proibido incluir `.github/instructions/local/**` em `allowed_files` ou citar slugs de projetos locais externos (devendo usar `[PROJETO-ALVO]` ou `.github/instructions/local/<projeto>.instructions.md`), preservada a **Exceção Única Canônica** para planos e documentos `.md` criados dentro da pasta `docs/` do próprio projeto local externo (`<path_externo>/docs/**`).
 
 ## ⚙️ Protocolo de Execução Obrigatório
 

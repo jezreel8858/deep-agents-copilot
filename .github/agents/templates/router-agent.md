@@ -87,6 +87,9 @@ Próximo passo mínimo:
 - <ação do especialista delegado>
 ```
 
+
+- **Cadeia Pós-Plano Obrigatória (Detecção de Perfil Arch-Advisor / Planejador R-064 + R-065)**: Em Modo Planejamento/Blueprint, retornar ao router com `motivo: "plano_materializacao_pendente"` (`plan_gate_status: "pending_materialization"`) para acionar `@docs-engineer` (`status: "DRAFT"` em `docs/plans/<tipo>/`) → `@plan-critic` (`review_verdict: "PASS" | "PASS_WITH_NITS"`) → Gate HITL (`ask_questions`) → executor após `status: "APPROVED"` (Modo Consultivo Q&A Puro é isento).
+
 ## Retorno ao Router (R-042 — Anti Sticky-Session)
 
 **Banner obrigatório**: toda resposta abre com `Agente Ativo: <dominio>-router`.  

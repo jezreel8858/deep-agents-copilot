@@ -220,3 +220,24 @@ def load_profiles(repo_root: Path) -> dict[str, Any]:
     data = safe_load_yaml_unique(content)
     assert isinstance(data, dict), "model-profiles.yaml deve ser um dicionário YAML válido"
     return data
+
+# --- Post-Plan Materialization & R-064 Discovery Helpers (P-01) ---
+TRANSVERSAL_SCORE_0_PLANNERS: tuple[str, ...] = (
+    "feature-planner",
+    "refactor-planner",
+    "test-strategy",
+    "bug-triage",
+    "requirements-analyst",
+)
+
+
+def discover_arch_advisors(agents_root: Path | None = None) -> list[Path]:
+    """Retorna todos os arquivos *-arch-advisor.agent.md descobertos dinamicamente."""
+    base = agents_root or (Path(__file__).resolve().parents[2] / ".github" / "agents")
+    return sorted(base.rglob("*-arch-advisor.agent.md"))
+
+
+def discover_routers(agents_root: Path | None = None) -> list[Path]:
+    """Retorna todos os arquivos *-router.agent.md descobertos dinamicamente."""
+    base = agents_root or (Path(__file__).resolve().parents[2] / ".github" / "agents")
+    return sorted(base.rglob("*-router.agent.md"))

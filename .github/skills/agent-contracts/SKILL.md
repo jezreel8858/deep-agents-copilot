@@ -283,4 +283,4 @@ Já normatizado por R-016/R-020 e pelas seções 1-4 desta skill: banner de iden
 
 ## Referências
 
-- Detalhamento estendido em `references/` e documentação normativa em `CLAUDE.md`.
+- Detalhamento estendido em `references/` e documentação normativa em `CLAUDE.md`. — **Cadeia Pós-Plano R-064/R-065**: retorno `motivo: "plano_materializacao_pendente"` (`plan_gate_status: "pending_materialization"`) → `@docs-engineer` (materializador canônico único das 8 subpastas de `docs/plans/<tipo>/` em `DRAFT`) → `@plan-critic` (teto 2x R-065, `review_verdict: "PASS" | "PASS_WITH_NITS"`) → Gate HITL (`ask_questions`) → executor (`status: "APPROVED"`, `approved: true`; Q&A consultivo puro isento).

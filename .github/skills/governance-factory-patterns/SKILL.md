@@ -76,7 +76,8 @@ Solicitação (create / update / review de agent | skill | prompt | stack)
 - **Seções obrigatórias**: `## Quando Usar`, `## Quando NÃO Usar`, `## Diretrizes` / `## Padrões` (com exemplos contrastantes `✅ BOM` vs `❌ RUIM`), `## Checklist` e `## Referências`.
 - **Progressive Disclosure (`R-066`)**: teto estrito de `≤ 300 linhas` no `SKILL.md` principal, extraindo tabelas/catálogos/exemplos extensos para `references/`.
 
-### 3.6) Enforcement de Agents de Planejamento (R-064 / CA-04 — mandatório)
+### 3.6) Enforcement de Agents de Planejamento e Detecção de Perfil Arch-Advisor / Planejador R-064 (CA-04 — mandatório)
+Injetar em todo `<stack>-arch-advisor`, planejador Score 0 e `<stack>-router` a cadeia pós-plano: `motivo: "plano_materializacao_pendente"` → `@docs-engineer` (`status: "DRAFT"`, materializador único das 8 subpastas de `docs/plans/<tipo>/`) → `@plan-critic` (`review_verdict: "PASS" | "PASS_WITH_NITS"`, teto 2x R-065) → Gate Humano (`ask_questions`) → executor (isentando Q&A consultivo puro).
 
 Todo agent criado ou revisado que atue em planejamento, arquitetura (`*-arch-advisor`, `tech-solution-architect`), estratégia de testes (`test-strategy`), triagem (`bug-triage`) ou requisitos (`requirements-analyst`) DEVE: (a) manter perfil **100% Read-Only**; (b) vincular-se ao template de plano da sua skill com frontmatter R-064; (c) apontar para `docs/plans/<tipo>/`; (d) declarar handoff de materialização física `.md` para `@docs-engineer` (ou `@governance-maintainer`). Detalhes em `references/artifact-specs-and-stack-topology.md` §2.1.
 

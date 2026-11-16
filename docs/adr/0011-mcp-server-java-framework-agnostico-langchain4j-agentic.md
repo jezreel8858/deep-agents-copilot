@@ -133,3 +133,5 @@ Em caso de inviabilidade técnica, instabilidade dos módulos beta ou necessidad
 2. **Model Context Protocol Specification**: Revisão `2025-11-25` e release notes do SDK Java oficial (`github.com/modelcontextprotocol/java-sdk`).
 3. **Governança de Observabilidade do Repositório**: Alinhamento com `docs/architecture/BLUEPRINT_AGENT_OBSERVABILITY.md` e stack `tools/mcp-otel-proxy`.
 4. **Arize Phoenix Semantic Conventions**: Suporte nativo a OTLP `gen_ai.*` desde a versão 15.10.0 (`arize.com/docs/phoenix`).
+
+<!-- R-064/R-065: Cadeia pós-plano unificada: *-arch-advisor / planejador retorna motivo: "plano_materializacao_pendente" -> @docs-engineer (materializador único docs/plans/<tipo>/ DRAFT) -> @plan-critic (R-065) -> Gate HITL -> executor (Q&A consultivo isento). -->

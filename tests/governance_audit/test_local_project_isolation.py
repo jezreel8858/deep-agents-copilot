@@ -640,3 +640,103 @@ def test_deve_mascarar_mensagem_quando_vazamento_de_workspace(repo_git_temporari
     _escrever(repo_git_temporario, "docs/nota.md", "cd D:/workspace/empresa-ficticia/app\n")
     (mensagem,) = find_workspace_and_env_leaks(repo_git_temporario)
     assert "empresa-ficticia" not in mensagem
+
+
+# ---------------------------------------------------------------------------
+# P-02 (R-043 / R-044 / R-064) — Fronteira Territorial & Isolamento em Planos
+# ---------------------------------------------------------------------------
+
+
+def _extract_frontmatter_allowed_files(md_text: str) -> list[str]:
+    """Extrai os itens de allowed_files do frontmatter YAML sem depender de libs externas."""
+    if not md_text.startswith("---"):
+        return []
+    parts = md_text.split("---", 2)
+    if len(parts) < 3:
+        return []
+    frontmatter = parts[1]
+    in_allowed = False
+    items: list[str] = []
+    for raw_line in frontmatter.splitlines():
+        stripped = raw_line.strip()
+        if re.match(r"^allowed_files\s*:", stripped):
+            in_allowed = True
+            inline = stripped.split(":", 1)[1].strip()
+            if inline.startswith("[") and inline.endswith("]"):
+                for token in inline[1:-1].split(","):
+                    clean = token.strip().strip("'\"")
+                    if clean:
+                        items.append(clean)
+                in_allowed = False
+            continue
+        if in_allowed:
+            if stripped.startswith("-"):
+                val = stripped.lstrip("-").strip().strip("'\"")
+                if val:
+                    items.append(val)
+            elif stripped and not stripped.startswith("#") and ":" in stripped:
+                in_allowed = False
+    return items
+
+
+def test_no_plan_in_repo_contains_local_instructions_or_local_yaml_in_allowed_files():
+    """R-043/R-044: Nenhum plano em docs/plans/**/*.md pode listar .github/instructions/local/ ou *.local.* em allowed_files."""
+    plans_dir = REPO_ROOT / "docs" / "plans"
+    assert plans_dir.exists(), f"Diretório de planos não encontrado: {plans_dir}"
+    plan_files = sorted(plans_dir.rglob("*.md"))
+    assert plan_files, "Nenhum plano encontrado em docs/plans/**/*.md"
+
+    # Baseline histórica única anterior à criação do item C10 (R-064) que listou .github/projects.local.yaml
+    historical_local_yaml_exempt = {
+        "docs/plans/implementation/20261008-090300-governance-maintenance-playwright-mcp-frontend-consolidation.md",
+    }
+
+    local_instr_patterns = (
+        re.compile(r"(^|/)\.github/instructions/local(/|$)", re.IGNORECASE),
+        re.compile(r"\.instructions\.local\.md$", re.IGNORECASE),
+    )
+    local_any_pattern = re.compile(r"\.local\.(yaml|yml|md|json)$", re.IGNORECASE)
+
+    violations: list[str] = []
+    for plan_path in plan_files:
+        rel_plan = plan_path.relative_to(REPO_ROOT).as_posix()
+        text = plan_path.read_text(encoding="utf-8", errors="replace")
+        allowed_files = _extract_frontmatter_allowed_files(text)
+        for entry in allowed_files:
+            norm_entry = entry.replace("\\", "/").strip()
+            if any(pat.search(norm_entry) for pat in local_instr_patterns):
+                violations.append(f"{rel_plan} -> allowed_files contém instrução local proibida (R-043): {norm_entry}")
+            elif local_any_pattern.search(norm_entry) and rel_plan not in historical_local_yaml_exempt:
+                violations.append(f"{rel_plan} -> allowed_files contém artefato *.local.* proibido (R-043): {norm_entry}")
+
+    assert not violations, (
+        "Violação R-043/R-044 em allowed_files de planos versionados:\n"
+        + "\n".join(f"  - {v}" for v in violations)
+    )
+
+
+def test_r044_territorial_boundary_and_external_docs_exception_documented():
+    """R-043/R-044: Referências de conformidade de planos documentam o bloqueio no repo público e a Exceção Única Canônica (<path_externo>/docs/**)."""
+    refs_dir = REPO_ROOT / ".github" / "skills" / "plan-conformance-patterns" / "references"
+    frontmatter_ref = refs_dir / "plan-frontmatter-r064.md"
+    checklist_ref = refs_dir / "planner-preflight-checklist.md"
+    rubric_ref = refs_dir / "pre-hitl-skeptical-review-rubric.md"
+
+    for ref_path in (frontmatter_ref, checklist_ref, rubric_ref):
+        assert ref_path.exists(), f"Referência obrigatória ausente: {ref_path}"
+
+    fm_text = frontmatter_ref.read_text(encoding="utf-8")
+    cl_text = checklist_ref.read_text(encoding="utf-8")
+    rb_text = rubric_ref.read_text(encoding="utf-8")
+
+    # 1. plan-frontmatter-r064.md
+    for token in ("R-043", "R-044", "<path_externo>/docs/**", ".github/instructions/local/"):
+        assert token in fm_text, f"plan-frontmatter-r064.md ausente token obrigatório: {token}"
+
+    # 2. planner-preflight-checklist.md (item C10)
+    for token in ("C10", "R-043", "R-044", "<path_externo>/docs/**", "Exceção Única Canônica"):
+        assert token in cl_text, f"planner-preflight-checklist.md ausente token obrigatório: {token}"
+
+    # 3. pre-hitl-skeptical-review-rubric.md
+    for token in ("R-043", "R-044", "<path_externo>/docs/**", "Exceção Única Canônica"):
+        assert token in rb_text, f"pre-hitl-skeptical-review-rubric.md ausente token obrigatório: {token}"

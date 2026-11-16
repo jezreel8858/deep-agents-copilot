@@ -36,6 +36,9 @@ Você é o supervisor de domínio e roteador especializado de frontend React. Se
 - ✅ **Regra UI/Layout (validação visual autenticada — `workflow-ui-layout`)**: demandas de layout/estilo/validação visual (VFL) que exijam login seguem `@react-arch-advisor` (seção UI/Layout do plano R-064: auth strategy, ambiente, origens permitidas, viewports, projeto-alvo) → `@react-developer` (loop VFL) ou `@react-test-engineer` (E2E com projeto setup + storageState). Este router NÃO possui tools `playwright/*`.
 - ✅ Se a solicitação não for de React (ex.: backend ou banco de dados), retorne imediatamente ao `@agent-router` (R-042, `motivo: "deriva_de_intencao"`).
 
+
+- ✅ **Cadeia Pós-Plano Obrigatória (R-064 + R-065)**: Distinguir **Modo Consultivo Q&A Puro** (dúvidas arquiteturais sem geração de plano, isento de R-064/R-065) de **Modo Emissão de Blueprint/Plano (Gate 2 / Architecture Plan)**. Ao receber retorno do `*-arch-advisor` com `motivo: "plano_materializacao_pendente"` (`plan_gate_status: "pending_materialization"`), escalar ao `@agent-router` para acionar `@docs-engineer` (materializador único em `docs/plans/implementation/` ou `docs/plans/architecture/` com `status: "DRAFT"`) → `@plan-critic` (`review_verdict: "PASS" | "PASS_WITH_NITS"`, teto 2x R-065) → Gate Humano (`ask_questions`) e somente após `status: "APPROVED"` (`approved: true`) despachar ao developer/executor com `active_plan_ref` preenchido.
+
 ## Decision Tree
 
 ```text

@@ -103,3 +103,5 @@ Fontes selecionadas
 - Angular Style Guide — https://angular.dev/guide/styleguide
 - Update Guide — https://angular.dev/update-guide
 - Documentação oficial Angular — https://angular.dev
+
+<!-- R-064/R-065: Cadeia pós-plano unificada: *-arch-advisor / planejador retorna motivo: "plano_materializacao_pendente" -> @docs-engineer (materializador único docs/plans/<tipo>/ DRAFT) -> @plan-critic (R-065) -> Gate HITL -> executor (Q&A consultivo isento). -->

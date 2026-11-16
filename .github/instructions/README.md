@@ -132,3 +132,5 @@ cp .github/projects.local.yaml.example .github/projects.local.yaml
 - **Adapters de Projetos Locais**: `.github/instructions/local/*.instructions.md` (gitignored)
 - **Overlay Local de Projetos**: `.github/projects.local.yaml` (gitignored, R-043)
 - **Template Rastreado do Overlay**: `.github/projects.local.yaml.example` (tracked, R-043)
+
+<!-- R-064/R-065: Cadeia pós-plano unificada: *-arch-advisor / planejador retorna motivo: "plano_materializacao_pendente" -> @docs-engineer (materializador único docs/plans/<tipo>/ DRAFT) -> @plan-critic (R-065) -> Gate HITL -> executor (Q&A consultivo isento). -->

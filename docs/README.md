@@ -99,3 +99,5 @@ Ao adicionar ou editar documentação neste repositório:
 4. **Living Documentation (R-033)**: Toda alteração arquitetural, de regra ou de workflow exige atualização sincronizada dos documentos correlatos na mesma entrega.
 - **Como Operar o Pipeline Sintético de Roteamento (`synth-*`) com Copilot SDK**:
   - [Guia do Pipeline Sintético de Roteamento (`synth-*`) e GitHub Copilot SDK](guides/synth-routing-eval-copilot-sdk-guide.md): Passo a passo completo de autenticação (`COPILOT_SDK_AUTH_TOKEN`), uso de `synth-generate`, `synth-eval`, `synth-export`, `synth-promote`, inspeção SQLite e troubleshooting.
+
+<!-- R-064/R-065: Cadeia pós-plano unificada: *-arch-advisor / planejador retorna motivo: "plano_materializacao_pendente" -> @docs-engineer (materializador único docs/plans/<tipo>/ DRAFT) -> @plan-critic (R-065) -> Gate HITL -> executor (Q&A consultivo isento). -->

@@ -96,3 +96,5 @@ SELECT * FROM usuario WHERE id = '" + id + "'
 - `docs/schema/DATABASE_SCHEMA_<PROJETO>.md` para schema real do projeto.
 - Adapter específico do projeto para transaction managers, schemas nomeados e customizações.
 
+<!-- R-064/R-065: Cadeia pós-plano unificada: *-arch-advisor / planejador retorna motivo: "plano_materializacao_pendente" -> @docs-engineer (materializador único docs/plans/<tipo>/ DRAFT) -> @plan-critic (R-065) -> Gate HITL -> executor (Q&A consultivo isento). -->
+

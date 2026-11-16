@@ -47,7 +47,7 @@ lessons_at: "2026-11-15"
 
 - **Autor Intelectual**: `@bug-triage` (`author: "bug-triage"`, conforme R-064 e regex de `tier1_validate`).
 - **Documento Relacionado**: `N/A — plano raiz` (plano raiz do `WORKFLOW-BUG-FIX`, Gate 1 Pre-HITL).
-- **Conformidade com Instrucoes Locais**: Elaborado e revisado em conformidade com `.github/instructions/local/deep-agents-chat.instructions.md` (stack Next.js + CopilotKit em `apps/web/`, governanca declarativa em `.github/agents/` e sincronizacao obrigatoria via `tools/agent_router_return_sync/sync_router_return.py`).
+- **Conformidade com Instrucoes Locais**: Elaborado e revisado em conformidade com `.github/instructions/local/[PROJETO-ALVO].instructions.md` (stack Next.js + CopilotKit em `apps/web/`, governanca declarativa em `.github/agents/` e sincronizacao obrigatoria via `tools/agent_router_return_sync/sync_router_return.py`).
 
 ## Sintoma Observado e Reproducao
 
@@ -117,7 +117,7 @@ npm error Invalid: lock file @vitest/spy@4.1.11 does not satisfy @vitest/spy@4.1
   3. **HIGH (Resolvido)**: Removidos `.github/workflows/governance-agent-audit.yml` e `.github/workflows/model-allowlist-refresh.yml` de `allowed_files` (R-001/R-011).
   4. **HIGH (Resolvido)**: Inspecionado `git log -p -n 3 -- apps/web/package.json apps/web/package-lock.json` (commits `898ef803` e `1ef58bf0`) e definido `vitest: "4.1.12"` + `npm install --package-lock-only` validado com `npm ci --dry-run`.
   5. **MEDIUM (Resolvido)**: Mantido `author: "bug-triage"` (compativel com `tier1_validate`) e registrado parecer da Rodada 1/2 e espaco para Rodada 2/2.
-  6. **LOW (Resolvido)**: Ajustado `related-planning-doc: "N/A — plano raiz"` e citada conformidade com `.github/instructions/local/deep-agents-chat.instructions.md`.
+  6. **LOW (Resolvido)**: Ajustado `related-planning-doc: "N/A — plano raiz"` e citada conformidade com `.github/instructions/local/[PROJETO-ALVO].instructions.md`.
 
 ### Rodada 2/2 — Veredito: `PASS_WITH_NITS` (`@plan-critic`)
 
