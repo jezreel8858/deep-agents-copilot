@@ -16,6 +16,11 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 CHANGELOG_PATH = REPO_ROOT / "CHANGELOG.md"
 PRE_COMMIT_HOOK_PATH = REPO_ROOT / ".githooks" / "pre-commit"
 
+MIN_LINE_COUNT: int = 400
+MAX_LINE_COUNT: int = 1000
+MAX_BULLET_LENGTH: int = 200
+MAX_BULLETS_PER_RELEASE: int = 12
+
 # Versões marcos obrigatórias que jamais podem desaparecer do histórico
 HISTORICAL_ANCHOR_VERSIONS = [
     "1.0.0",
@@ -489,3 +494,246 @@ def test_anti_truncation_hook_blocks_duplicate_header_removal_safe_by_default(tm
     assert "Anti-Truncamento" in combined_output
     assert "## [2.51.5] — 2026-10-04" in combined_output
 
+
+# ============================================================================
+# Sensores Determinísticos de Concisão e Teto Anti-Bloat (Onda 4B — R-055 Q3)
+# ============================================================================
+
+BULLET_LINE_PATTERN = re.compile(r"^\s*-\s+")
+NESTED_BULLET_PATTERN = re.compile(r"^ {2,}-\s+")
+
+
+def _extract_release_sections(text: str) -> dict[str, list[tuple[int, str]]]:
+    """
+    Extrai as linhas pertencentes a cada seção de release `## [X.Y.Z]` do CHANGELOG.md.
+    Retorna um dicionário mapeando a versão `X.Y.Z` para uma lista de tuplas `(line_number, line_text)`.
+    """
+    sections: dict[str, list[tuple[int, str]]] = {}
+    current_version: str | None = None
+
+    for idx, line in enumerate(text.splitlines(), start=1):
+        header_match = re.match(r"^##\s+\[(\d+\.\d+\.\d+)\]", line)
+        if header_match:
+            current_version = header_match.group(1)
+            sections.setdefault(current_version, [])
+            continue
+        if line.startswith("## ["):
+            current_version = None
+            continue
+        if current_version is not None:
+            sections[current_version].append((idx, line))
+
+    return sections
+
+
+def _find_bullet_length_violations(
+    text: str, max_length: int = MAX_BULLET_LENGTH
+) -> list[tuple[str, int, int]]:
+    r"""
+    Inspeciona todos os bullets (`^\s*-\s+`) dentro das seções de release e retorna
+    as violações como tuplas `(version, line_number, length)` onde `len(line) > max_length`.
+    """
+    violations: list[tuple[str, int, int]] = []
+    for version, lines in _extract_release_sections(text).items():
+        for line_no, line in lines:
+            if BULLET_LINE_PATTERN.match(line) and len(line) > max_length:
+                violations.append((version, line_no, len(line)))
+    return violations
+
+
+def _find_release_bullet_count_and_nesting_violations(
+    text: str, max_bullets: int = MAX_BULLETS_PER_RELEASE
+) -> tuple[dict[str, int], list[tuple[str, int]]]:
+    r"""
+    Verifica por seção de release `## [X.Y.Z]`:
+    1) Se a contagem total de bullets (`^\s*-\s+`) excede `max_bullets`;
+    2) Se existem sub-bullets aninhados (`^ {2,}-\s+`).
+    """
+    count_violations: dict[str, int] = {}
+    nested_violations: list[tuple[str, int]] = []
+
+    for version, lines in _extract_release_sections(text).items():
+        bullet_count = 0
+        for line_no, line in lines:
+            if BULLET_LINE_PATTERN.match(line):
+                bullet_count += 1
+            if NESTED_BULLET_PATTERN.match(line):
+                nested_violations.append((version, line_no))
+        if bullet_count > max_bullets:
+            count_violations[version] = bullet_count
+
+    return count_violations, nested_violations
+
+
+def test_changelog_maximum_line_ceiling_anti_bloat(changelog_text: str):
+    """
+    Gate de Teto Máximo de Linhas (Anti-Bloat):
+    Valida que o CHANGELOG.md possui <= MAX_LINE_COUNT (1000) linhas,
+    prevenindo regressão de Context Bloat e garantindo concisão histórica.
+    """
+    lines = changelog_text.splitlines()
+    assert len(lines) <= MAX_LINE_COUNT, (
+        f"CHANGELOG.md excedeu o teto máximo anti-bloat! "
+        f"Encontradas {len(lines)} linhas (máximo permitido: {MAX_LINE_COUNT}). "
+        "Execute compactação semântica in-place preservando todas as versões históricas."
+    )
+
+
+def test_changelog_does_not_exceed_max_line_count(changelog_text: str):
+    """
+    Alias de conformidade com especificação Gherkin S1 da Onda 4B:
+    Assegura que o total de linhas do CHANGELOG.md permanece <= MAX_LINE_COUNT (1000).
+    """
+    test_changelog_maximum_line_ceiling_anti_bloat(changelog_text)
+
+
+def test_changelog_bullet_conciseness_budget(changelog_text: str):
+    r"""
+    Gate de Concisão de Bullets:
+    Valida que todo bullet (`^\s*-\s+`) dentro das seções de release do CHANGELOG.md
+    possui `len(line) <= MAX_BULLET_LENGTH` (200 caracteres Unicode).
+    """
+    violations = _find_bullet_length_violations(changelog_text, MAX_BULLET_LENGTH)
+    assert not violations, (
+        f"Bullets no CHANGELOG.md excedem o limite de {MAX_BULLET_LENGTH} caracteres: "
+        f"{violations}"
+    )
+
+
+def test_changelog_bullets_respect_max_length(changelog_text: str):
+    """
+    Alias de conformidade com especificação Gherkin S2 da Onda 4B:
+    Garante que nenhum bullet nas seções de release ultrapassa MAX_BULLET_LENGTH (200).
+    """
+    test_changelog_bullet_conciseness_budget(changelog_text)
+
+
+def test_changelog_max_bullets_per_release_budget(changelog_text: str):
+    """
+    Gate de Densidade Máxima por Release:
+    Valida que nenhuma seção de release `## [X.Y.Z]` do CHANGELOG.md possui mais de
+    `MAX_BULLETS_PER_RELEASE` (12) bullets nem sub-bullets aninhados.
+    """
+    count_violations, nested_violations = _find_release_bullet_count_and_nesting_violations(
+        changelog_text, MAX_BULLETS_PER_RELEASE
+    )
+    assert not count_violations, (
+        f"Seções de release no CHANGELOG.md excedem o teto de {MAX_BULLETS_PER_RELEASE} bullets: "
+        f"{count_violations}"
+    )
+    assert not nested_violations, (
+        f"Sub-bullets aninhados ('  - ') detectados nas seções de release do CHANGELOG.md: "
+        f"{nested_violations}"
+    )
+
+
+def test_changelog_releases_respect_max_bullets_per_section(changelog_text: str):
+    """
+    Alias de conformidade com especificação Gherkin S3 da Onda 4B:
+    Garante que cada seção `## [X.Y.Z]` respeita o limite de MAX_BULLETS_PER_RELEASE (12) bullets.
+    """
+    test_changelog_max_bullets_per_release_budget(changelog_text)
+
+
+def test_changelog_preserves_all_historical_version_headers(changelog_text: str):
+    """
+    Alias de conformidade com especificação Gherkin S3 da Onda 4B:
+    Confirma a preservação integral de todas as versões em HISTORICAL_ANCHOR_VERSIONS.
+    """
+    test_changelog_preserves_all_historical_anchor_versions(changelog_text)
+
+
+def test_changelog_preserves_r060_architecture_milestone(changelog_text: str):
+    """
+    Gate de Marco Arquitetural R-060:
+    Garante que a seção `## [2.33.0]` preserva explicitamente a referência ao marco `R-060`.
+    """
+    sections = _extract_release_sections(changelog_text)
+    assert "2.33.0" in sections, "Seção histórica ## [2.33.0] não encontrada no CHANGELOG.md!"
+    section_body = "\n".join(line for _, line in sections["2.33.0"])
+    assert "R-060" in section_body, (
+        "A seção ## [2.33.0] deve preservar explicitamente a referência ao marco arquitetural 'R-060'."
+    )
+
+
+@pytest.mark.parametrize(
+    ("bullet_body_len", "should_violate"),
+    [
+        (MAX_BULLET_LENGTH - 2, False),  # Exatamente 198 chars + "- " (2 chars) = 200 (limite exato permitido)
+        (MAX_BULLET_LENGTH - 1, True),   # Exatamente 199 chars + "- " (2 chars) = 201 (violação de fronteira)   # Exatamente 199 chars + "- " (2 chars) = 201 (violação de fronteira)
+        (350, True),                     # Violação severa (> 200 chars)
+    ],
+)
+def test_synthetic_bullet_conciseness_boundary_detection(bullet_body_len: int, should_violate: bool):
+    """
+    Teste Unitário Sintético (Boundary Value Analysis para MAX_BULLET_LENGTH):
+    Valida que o detector acusa falha determinística quando um bullet sintético excede
+    200 caracteres (ex.: 201 chars) e aceita exatamente 200 caracteres.
+    """
+    synthetic_bullet = "- " + ("a" * bullet_body_len)
+    synthetic_changelog = (
+        "# CHANGELOG\n\n"
+        "## [2.99.0] — 2026-11-16\n"
+        "### Added\n"
+        f"{synthetic_bullet}\n"
+    )
+    violations = _find_bullet_length_violations(synthetic_changelog, MAX_BULLET_LENGTH)
+    if should_violate:
+        assert len(violations) == 1
+        version, line_no, length = violations[0]
+        assert version == "2.99.0"
+        assert line_no == 5
+        assert length == bullet_body_len + 2
+    else:
+        assert violations == []
+
+
+@pytest.mark.parametrize(
+    ("num_bullets", "should_violate"),
+    [
+        (1, False),
+        (MAX_BULLETS_PER_RELEASE, False),      # 12 bullets (no limite exato permitido)
+        (MAX_BULLETS_PER_RELEASE + 1, True),   # 13 bullets (violação de fronteira)
+        (20, True),                            # Violação severa
+    ],
+)
+def test_synthetic_max_bullets_per_release_boundary_detection(num_bullets: int, should_violate: bool):
+    """
+    Teste Unitário Sintético (Boundary Value Analysis para MAX_BULLETS_PER_RELEASE):
+    Valida que o detector acusa falha quando uma release sintética excede 12 bullets
+    (ex.: 13 bullets) e aceita até 12 bullets, além de detectar sub-bullets aninhados.
+    """
+    bullets_block = "\n".join(f"- Item sintético {i}." for i in range(1, num_bullets + 1))
+    synthetic_changelog = (
+        "# CHANGELOG\n\n"
+        "## [2.99.0] — 2026-11-16\n"
+        "### Changed\n"
+        f"{bullets_block}\n\n"
+        "## [1.0.0] — 2026-01-01\n"
+        "- Release inicial enxuta.\n"
+    )
+    count_violations, nested_violations = _find_release_bullet_count_and_nesting_violations(
+        synthetic_changelog, MAX_BULLETS_PER_RELEASE
+    )
+    assert nested_violations == []
+    if should_violate:
+        assert count_violations == {"2.99.0": num_bullets}
+    else:
+        assert count_violations == {}
+
+
+def test_synthetic_nested_bullet_detection():
+    """
+    Teste Unitário Sintético (Anti-Aninhamento):
+    Valida que sub-bullets indentados ('  - ') dentro de uma seção de release são detectados.
+    """
+    synthetic_changelog = (
+        "# CHANGELOG\n\n"
+        "## [2.99.0] — 2026-11-16\n"
+        "- Bullet principal válido.\n"
+        "  - Sub-bullet aninhado proibido.\n"
+    )
+    _, nested_violations = _find_release_bullet_count_and_nesting_violations(
+        synthetic_changelog, MAX_BULLETS_PER_RELEASE
+    )
+    assert nested_violations == [("2.99.0", 5)]

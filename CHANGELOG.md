@@ -4,1697 +4,715 @@ Todas as mudanças significativas nesta base de governança são documentadas aq
 
 Formato: [Semantic Versioning](https://semver.org/) | [Conventional Commits](https://www.conventionalcommits.org/)
 
----
+## [2.59.0] — 2026-11-16
+
+### Changed
+- **Governança de Concisão do `CHANGELOG.md` (`git-governance` §4/§5)**: instituído orçamento normativo (`<= 200 chars/bullet`, `<= 12 bullets/release`, teto `<= 1.000 linhas`) em 8 artefatos.
+- **Compactação Semântica In-Place do `CHANGELOG.md`**: saneamento integral de sub-bullets prolixos e listas exaustivas, preservando 100% dos cabeçalhos SemVer e âncoras históricas.
 
 ## [2.58.0] — 2026-11-15
 
 ### Changed
-- **Roteadores (`@agent-router`, `*-router` e `templates/router-agent.md`)**: metadados do bloco `## Formato de Saída` passam a usar lista Markdown (`- Campo:`) com `Agente Ativo:` isolado na 1ª linha, evitando colapso de quebras de linha (CommonMark).
-- **Decision Tree do `@agent-router` / `routing-graph.yaml`**: Fast-Paths explícitos para `WORKFLOW-FRAMEWORK-MIGRATION`, `WORKFLOW-PROMPT-SYNTHESIS` e `WORKFLOW-TECHNICAL-ANALYSIS`; `WORKFLOW-REFACTORING` inicia na Etapa 1 com `@business-rules-extractor` (ground truth) antes de `@refactor-planner`.
+- **Roteadores**: metadados do bloco `## Formato de Saída` passam a usar lista Markdown (`- Campo:`) com `Agente Ativo:` isolado na 1ª linha, evitando colapso de quebras de linha (CommonMark).
+- **Decision Tree do `@agent-router` / `routing-graph.yaml`**: Fast-Paths explícitos para `WORKFLOW-FRAMEWORK-MIGRATION`, `WORKFLOW-PROMPT-SYNTHESIS` e `WORKFLOW-TECHNICAL-ANALYSIS`.
 - **Agents, templates e `agent-contracts/SKILL.md`**: ajustes de contrato e `.a2a/agentcards/` sincronizados.
-- **`headless-governance-runner` (synth)**: `cli.py`, `evaluator.py` e `seeds.py` evoluídos para diagnóstico de workflows e extração B2; guia `docs/guides/synth-routing-eval-copilot-sdk-guide.md` ampliado.
-
+- **`headless-governance-runner` (synth)**: `cli.py`, `evaluator.py` e `seeds.py` evoluídos para diagnóstico de workflows e extração B2.
 ### Added
 - Testes em `tests/governance_audit/test_router_agents.py` (formato de saída dos roteadores) e `test_synth_workflows_b2_extraction.py`.
-
----
 
 ## [2.57.0] — 2026-11-14
 
 ### Added
-- **Agente `@plan-critic` e Quality Gate Revisor Cético Universal Pré-HITL (ADR-0014 / R-064 / R-067)**:
-  - Criação do subagent consultivo read-only `.github/agents/plan-critic.agent.md` (`tier: fast`, protocolo **Two-Tier Hybrid**: *Tier 1 Inline Self-Critique* para planos simples <= 3 arquivos e *Tier 2 Dedicated Subagent* para planos >= 4 arquivos, multi-stack ou arquiteturais, com hard-cap `max_iterations: 2` anti-loop).
-  - Criação da rubrica modular sob demanda `.github/skills/plan-conformance-patterns/references/pre-hitl-skeptical-review-rubric.md` estruturada em 6 dimensões core de crítica cética + matriz de 8 categorias de planos + salvaguardas para repositórios poliglotas com adapters locais (`R-043`).
-  - Evolução de governança `R-067` no `@plan-critic`: 5 skills dedicadas (`plan-conformance-patterns`, `reflection-self-critique-patterns`, `architecture-review-patterns`, `security-review-patterns`, `risk-assessment-patterns`), **Protocolo Anti-Sycophancy / De-biasing**, **Pre-Mortem Imaginado** + **Chain-of-Verification (CoVe)** e **Matriz de Segurança Agêntica OWASP Top 10 for Agentic Applications 2026** (`ASI01`, `ASI02`, `ASI08`, `ASI09`).
-  - Registro arquitetural `docs/adr/0014-quality-gate-revisor-cetico-universal-pre-hitl-r064.md`, planos de governança R-064/R-067 e suíte determinística `tests/governance_audit/test_pre_hitl_skeptical_plan_gate.py`.
-
+- **Agente `@plan-critic` e Quality Gate Revisor Cético Universal Pré-HITL**: Criação do subagent consultivo read-only `.github/agents/plan-critic.agent.md`.
 ### Changed
-- **Governança, Skills, Agents, Prompts, Docs, Hooks e Runtime**: Upgrade `context-mode` v1 -> v2.1.10 (`ctx_execute` com parâmetro `file`/`CTX_FILE`, `ctx_batch`, `ctx_index` com `path`/`content`/`url`, `ctx_search`, `ctx_resume`, `ctx_stats`, `ctx_doctor`, `ctx_upgrade`, `ctx_purge`, `--agent copilot-cli` e `CONTEXT_MODE_DATA_DIR`).
-- **Templates de Planos, Catálogos A2A e Paridade de Suítes de Auditoria**: Inclusão dos campos de gate pré-HITL (`pre_hitl_review_tier`, `pre_hitl_gate_status`, `critic_iterations`) nos 8 templates canônicos de planos, sincronização de `catalog.yaml`, `routing-graph.yaml`, `.a2a/agentcards/` (53 agentes totais) e alinhamento das suítes `tests/governance_audit/` e `tests/context_insight_visualizer/`.
-
+- **Governança, Skills, Agents, Prompts, Docs, Hooks e Runtime**: Upgrade `context-mode` v1 -> v2.1.10.
+- **Templates de Planos, Catálogos A2A e Paridade de Suítes de Auditoria**: Inclusão dos campos de gate pré-HITL nos 8 templates canônicos de planos, sincronização de `catalog.yaml`.
 ### Fixed
-- **Pipelines GitHub Actions ( e ), Lockfile , Empacotamento PEP 639 e Paridade de Testes**:
-  - Upgrade de Node.js  para  no job  de , inclusão do gatilho  e instalação prévia do pacote local  no job .
-  - Inclusão explícita das dependências opcionais  e  em  () e  para eliminar falha de resolução WASM/N-API no  em runners Linux.
-  - Atualização de  e expressão SPDX  (PEP 639) em  e .
-  - Alinhamento de  () e  (gatilhos e aresta  para ).
-  - Sincronização da cláusula canônica de  (R-042) nos 21 agentes especialistas de stack e registro dos planos R-064 em  e .
+- **Pipelines GitHub Actions ( e ), Lockfile , Empacotamento PEP 639 e Paridade de Testes**: Upgrade de Node.js para no job de , inclusão do gatilho e instalação prévia do pacote local no job .
 
 ## [2.56.0] — 2026-10-06
 
 ### Adicionado (Política Anti-Timeout, Runtime Preferencial JavaScript e Circuit Breaker Fail-Fast no Context-Mode)
-- **Runtime Obrigatório `language: "javascript"` (`fs`/`path` nativos) no `ctx_execute`**: instituída a obrigatoriedade do runtime JavaScript nativo no `ctx_execute` para leitura, inspeção, parsing e mutação em lote de arquivos, proibindo `language: "python"`, `python -c` e subshells aninhados para I/O a fim de eliminar bloqueios e timeouts causados pela interceptação de `python.exe` pelo Windows Defender (`MsMpEng.exe` / AMSI).
-- **Higiene de Comandos em `ctx_batch_execute`**: exigência de comandos shell leves, atômicos e com escopo de diretório restrito, vedando `python -c` inline em lote e varreduras recursivas irrestritas na raiz do workspace.
-- **Circuit Breaker Fail-Fast de Timeout (Máx. 1 Retry com Troca de Estratégia)**: tolerância zero para repetição da mesma chamada/runtime após timeout (`ETIMEDOUT`, `timed out`, `taskkill`); permitido no máximo 1 retry mediante troca obrigatória de estratégia (migração para `language: "javascript"` puro com `fs` ou redução do lote), abrindo o Circuit Breaker no 2º timeout com relato via Compact Error Reporting (R-020).
-- **Propagação Determinística e Testes de Auditoria**: atualização de `tools/agent_protocol_sync/_execution-protocol-fragment.md`, `tools/agent_protocol_sync/sync_execution_protocol.py` (preservando `CLAUSE_BATCH_OR_EXEC`, `CLAUSE_EXEC_ONLY` e `CLAUSE_GATHER_ONLY` sem vazamento da literal `ctx_execute` nos 27 `GATHER_ONLY_AGENTS`), `docs/agent-context/templates/agent-template.md`, sincronização dos 52 agents e 21 prompts e novos testes em `tests/governance_audit/`.
+- **Runtime Obrigatório `language: "javascript"` no `ctx_execute`**: instituída a obrigatoriedade do runtime JavaScript nativo no `ctx_execute` para leitura, inspeção.
+- **Higiene de Comandos em `ctx_batch_execute`**: exigência de comandos shell leves, atômicos e com escopo de diretório restrito, vedando `python -c` inline em lote e varreduras recursivas.
+- **Circuit Breaker Fail-Fast de Timeout**: tolerância zero para repetição da mesma chamada/runtime após timeout.
 ### Adicionado / Modificado — GOVERNANCE-PROTOCOL-REFACTOR: Composição Dinâmica por Capabilities e Formatação H2 CommonMark do Execution Protocol (Opção C + Opção 3)
-- **Refatoração Estrutural do Protocolo de Execução (Opção C — Composição Dinâmica por Capabilities)**:
-  - Decomposição modular do fragmento canônico em cláusulas atômicas (`CORE`, `CLAUSE_MUTATION`, `CLAUSE_HANDOFF`, `CLAUSE_LAZY_DOCS`) em `tools/agent_protocol_sync/_execution-protocol-fragment.md`.
-  - Injeção contextual condicional em `tools/agent_protocol_sync/sync_execution_protocol.py` baseada nas capabilities de frontmatter de cada agent e prompt:
-    - `CLAUSE_MUTATION` (R-051 — Validação agrupada com `get_errors`): restrita a executores com ferramentas mutativas.
-    - `CLAUSE_HANDOFF` (R-042 — Telemetria de handoff): restrita a agentes com delegação hierárquica (`run_subagent`).
-    - `CLAUSE_LAZY_DOCS` (R-066 — Progressive disclosure): restrita a agentes com declaração explícita de `source_docs_lazy:`.
-- **Padronização Visual e Tipográfica (Opção 3 — Cabeçalho H2 + Tag XML)**:
-  - Adicionado cabeçalho CommonMark `## ⚙️ Protocolo de Execução Obrigatório` imediatamente antes da tag `<execution_protocol>`.
-  - Inserção padronizada antes da seção `## Retorno ao Router` com espaçamento estrito CommonMark.
-  - Sincronização automatizada e idempotente propagada para todos os agents e prompts elegíveis.
-- **Auditoria de Governança e Testes Automatizados**:
-  - Adicionado teste `test_execution_protocol_option3_h2_header_and_commonmark_formatting` e `test_dynamic_composition_by_capabilities` em `tests/governance_audit/test_sync_execution_protocol_invariants.py`.
-  - Drift check zerado e 100% de conformidade com a suíte de testes.
+- **Refatoração Estrutural do Protocolo de Execução**: Decomposição modular do fragmento canônico em cláusulas atômicas em `tools/agent_protocol_sync/_execution-protocol-fragment.md`.
+- **Padronização Visual e Tipográfica (Opção 3 — Cabeçalho H2 + Tag XML)**: Adicionado cabeçalho CommonMark `## ⚙️ Protocolo de Execução Obrigatório` imediatamente antes da tag `<execution_protocol>`.
+- **Auditoria de Governança e Testes Automatizados**: Adicionado teste `test_execution_protocol_option3_h2_header_and_commonmark_formatting` e `test_dynamic_composition_by_capabilities` em.
 
 ## [2.55.0] — 2026-10-06
+
 ### Adicionado / Modificado — WORKFLOW-GOVERNANCE-MAINTENANCE: Consolidação Global de Agents das 8 Stacks (Fases 1 a 5)
-- **Consolidação Global do Ecossistema de Stacks (56 → 24 Especialistas + 8 Routers = 32 Agentes de Domínio)**:
-  - Implementação universal do **Padrão Triádico 3+1** (1 supervisor hierárquico + 3 especialistas canônicos: `<stack>-arch-advisor` [Read-Only], `<stack>-developer` [Mutativo Core], `<stack>-test-engineer` [Mutativo Qualidade/Testes]) em todas as 8 stacks tecnológicas:
-    - **Fase 1 (Piloto Core — Spring Boot & React)**:
-      - `spring-boot`: Consolidados os especialistas legados em `spring-boot-developer` (features, correções cirúrgicas e performance backend), `spring-boot-test-engineer` (testes unitários com JUnit 5/Mockito, integração com Testcontainers/rollback e retry cap R-053) e preservado `spring-boot-arch-advisor` (Read-Only). Router atualizado com decision tree triádica e 7 tools R-054.
-      - `react`: Consolidados os especialistas legados em `react-developer` (componentes React 19, hooks, micro-frontends, Tailwind, TDD e bug fixing), `react-test-engineer` (Vitest, React Testing Library, mocks e E2E Playwright) e preservado `react-arch-advisor` (Read-Only). Router atualizado com decision tree triádica e 7 tools R-054.
-    - **Fase 2 (Expansão Modern — Angular & Spring Reactive)**:
-      - `angular`: Consolidados em `angular-developer` (Angular 20/21+, Signals, NgRx/RxJS, SCSS e reparo de bugs), `angular-test-engineer` (Vitest, Karma/Jasmine legacy e Playwright E2E sob exceção test-last) e preservado `angular-arch-advisor`.
-      - `spring-reactive`: Consolidados em `spring-reactive-developer` (Spring WebFlux, Project Reactor, R2DBC e non-blocking I/O), `spring-reactive-test-engineer` (StepVerifier, WebTestClient e resiliência) e preservado `spring-reactive-arch-advisor`.
-    - **Fase 3 (Enterprise & Multi-Engine — EJB, Struts & Database)**:
-      - `ejb`: Consolidados em `ejb-developer`, `ejb-test-engineer` e preservado `ejb-arch-advisor` (Read-Only).
-      - `struts`: Consolidados em `struts-developer`, `struts-test-engineer` e preservado `struts-arch-advisor` (Read-Only).
-      - `database`: Unificados query tuners no consultivo `database-arch-advisor` (Read-Only) e especialistas procedurais/DDL em `oracle-database-specialist` (Oracle PL/SQL) e `informix-database-specialist` (Informix 4GL/SPL).
-    - **Fase 4 & 5 (Python Core & Conclusão do Roadmap Global)**:
-      - `python`: Consolidados em `python-developer` (FastAPI/Flask/Django/Pydantic v2/SQLAlchemy 2.0), `python-test-engineer` (pytest, conftest, mocks, HTTPX AsyncClient, retry cap R-053) e preservado `python-arch-advisor` (Read-Only). Router atualizado para decision tree triádica e baseline canônica R-054.
-  - Extirpação completa de 32 agentes especialistas legados por absorção de escopo funcional sem perda de cobertura ou regressão funcional.
-- **Sincronização Atômica Global (R-015 / R-040)**:
-  - Atualização estrutural de `catalog.yaml`, sub-catálogos `<stack>-catalog.yaml`, `routing-graph.yaml`, `agent-router.agent.md`, `workflows.md`, `README.md` e `tools/agent_protocol_sync/protocol_roles.json`.
-  - Regeneração completa com drift zero de todos os AgentCards A2A em `.a2a/agentcards/` via `tools/agentcard_exporter/export_agentcards.py`, expurgando todos os 32 cards obsoletos.
-- **Quality Gates Globais e Suítes Determinísticas de Governança**:
-  - Criadas e validadas 8 suítes dedicadas de conformidade por stack: `test_spring_boot_consolidation.py`, `test_react_consolidation.py`, `test_angular_consolidation_governance.py`, `test_spring_reactive_consolidation_governance.py`, `test_ejb_consolidation_governance.py`, `test_struts_consolidation_governance.py`, `test_database_consolidation_governance.py`, `test_python_consolidation_governance.py`.
-  - Criado `test_agent_count_per_stack_governance.py`: prova estática formal do teto de exatamente 3 especialistas por router para todas as 8 stacks (24 especialistas + 8 routers = 32 agentes totais de stack).
-  - 100% verde com 573 testes passando na suíte de auditoria de governança (`tests/governance_audit/`).
----
+- **Consolidação Global do Ecossistema de Stacks**: Implementação universal do **Padrão Triádico 3+1** em todas as 8 stacks tecnológicas:.
+- **Sincronização Atômica Global (R-015 / R-040)**: Atualização estrutural de `catalog.yaml`, sub-catálogos `<stack>-catalog.yaml`, `routing-graph.yaml`, `agent-router.agent.md`, `workflows.md`.
+- **Quality Gates Globais e Suítes Determinísticas de Governança**: Criadas e validadas 8 suítes dedicadas de conformidade por stack: `test_spring_boot_consolidation.py`.
+
 ## [2.54.0] — 2026-10-05
 
 ### Modificado — Consolidação de Skills e Decomposição de Outliers
-
-- **Decomposição da Skill Outlier `test-implementation-angular-vitest`**: Refatorado o arquivo da skill para focar exclusivamente nas particularidades do Angular 20/21+ com Vitest, eliminando redundâncias conceituais e delegando padrões agnósticos para `test-implementation-frontend`.
-- **Cross-References Canônicas de Skills**: Estabelecidas referências cruzadas bidirecionais entre a skill central `test-implementation-frontend` e seus runners específicos (Angular Vitest, Jasmine, React Vitest, Python, Spring Boot), bem como entre `performance-engineering-patterns` e skills de performance por stack.
+- **Decomposição da Skill Outlier `test-implementation-angular-vitest`**: Refatorado o arquivo da skill para focar exclusivamente nas particularidades do Angular 20/21+ com Vitest.
+- **Cross-References Canônicas de Skills**: Estabelecidas referências cruzadas bidirecionais entre a skill central `test-implementation-frontend` e seus runners específicos.
 - **Atualização de Catálogos e Metadados A2A**: Sincronizados `.github/skills/.index.json`, `.github/skills/README.md`, catálogos de agentes e arquivos `.a2a/agentcards/*.agentcard.json`.
-
 ### Adicionado — Gates Automatizados de Auditoria de Governança
-
-- **Gate de Tamanho e Cross-References de Skills**: Adicionada a suíte `tests/governance_audit/test_stack_skills_cross_reference_and_size_outlier.py` para impedir crescimento desmedido de skills individuais e garantir rastreabilidade dos links canônicos.
+- **Gate de Tamanho e Cross-References de Skills**: Adicionada a suíte `tests/governance_audit/test_stack_skills_cross_reference_and_size_outlier.py` para impedir crescimento desmedido de skills.
 - **Suítes de Conformidade e Viabilidade**: Adicionados testes em `test_plan_conformance_skill_boundaries.py` e `test_skill_import_viability_gate.py`.
-
----
 
 ## [2.53.0] — 2026-10-04
 
 ### Adicionado — Integração do MCP Playwright (`microsoft/playwright-mcp`) e Skill Canônica para Agentes Frontend
-
-- **Nova Skill Canônica `playwright-mcp` (Tier 1)**: Criada a skill `.github/skills/playwright-mcp/SKILL.md` fornecendo diretrizes de automação de navegador real orientada a Accessibility Tree (`browser_snapshot`), seletores semânticos por role/nome, ciclo de vida de abas, inspeção de rede/console e guardrails rígidos de segurança (prevenção a RCE, prompt injection e vazamento de sessão).
-- **Integração de Tooling MCP em Agentes Frontend**: Habilitada a ferramenta MCP `playwright` no frontmatter de 10 agentes especializados de frontend (Angular e React):
-  - Angular: `angular-e2e-writer`, `angular-component-test-writer`, `angular-feature-developer`, `angular-bug-fixer`, `angular-ui-stylist`.
-  - React: `react-e2e-writer`, `react-component-test-writer`, `react-feature-developer`, `react-bug-fixer`, `react-ui-stylist`.
-- **Configuração de MCP no Host IDE (`.config/idea_mcp.json`)**: Adicionado o servidor MCP `@playwright/mcp` via `npx -y @playwright/mcp@latest` com configuração padronizada para suporte a automação interativa no IDE.
-- **Sincronização de Contratos e Metadados A2A**:
-  - Atualizados os 10 arquivos `.a2a/agentcards/*.agentcard.json` correspondentes com as novas capacidades de ferramentas de automação visual/E2E.
-  - Atualizados os catálogos `.github/agents/frontend/angular/angular-catalog.yaml` e `.github/agents/frontend/react/react-catalog.yaml`.
-  - Atualizado `.github/skills/.index.json` e `.github/skills/README.md` com a catalogação formal da nova skill.
-  - Atualizados `tools/agent_source_docs_sync/required_source_docs_rules.json`, `.github/agents/templates/agent-template.md` e `docs/plan/agent-profiles-taxonomy.md`.
-
----
+- **Nova Skill Canônica `playwright-mcp` (Tier 1)**: Criada a skill `.github/skills/playwright-mcp/SKILL.md` fornecendo diretrizes de automação de navegador real orientada a Accessibility Tree.
+- **Integração de Tooling MCP em Agentes Frontend**: Habilitada a ferramenta MCP `playwright` no frontmatter de 10 agentes especializados de frontend (Angular e React): Angular.
+- **Configuração de MCP no Host IDE (`.config/idea_mcp.json`)**: Adicionado o servidor MCP `@playwright/mcp` via `npx -y @playwright/mcp@latest` com configuração padronizada para suporte a automação.
+- **Sincronização de Contratos e Metadados A2A**: Atualizados os 10 arquivos `.a2a/agentcards/*.agentcard.json` correspondentes com as novas capacidades de ferramentas de automação visual/E2E.
 
 ## [2.52.4] — 2026-10-03
 
 ### Modificado — Poda de Capacidade de Ferramentas de Context-Mode em Agentes Gather-Only (R-055 / R-056 / R-059)
-- **Classificação Canônica de Capacidade**: Formalizada a separação objetiva entre perfis **"Gather-only"** vs **"Gather+Process"** sob o critério de corte aprovado de três condições: (a) agregação computacional multi-arquivo, (b) estrutura derivada de N variável em runtime, ou (c) geração/transformação condicional de código-fonte (codegen/mutação).
-- **Remoção de `ctx_execute` e `ctx_execute_file` em 26 Agentes**: Poda cirúrgica realizada em lote no frontmatter `tools:` de 26 agentes puramente analíticos/consultivos (`agent-auditor`, `adr-sentinel`, `bug-triage`, `code-review`, `code-style-enforcer`, `compliance-guardrails`, `database-specialist`, `debugger`, `deep-search`, `devops-engineer`, `docs-engineer`, `feature-planner`, `pr-gatekeeper`, `repo-hygiene-auditor`, `requirements-analyst`, `runtime-verifier`, `security-reviewer`, `tech-solution-architect`, `test-strategy` e os 7 `*-arch-advisor` de stacks backend e frontend), mantendo compulsoriamente `context-mode/ctx_batch_execute`.
-- **Prevenção de Bypass de Hook em Subagents**: A poda estática fecha a lacuna de runtime em que subagents gerados via `run_subagent` não eram interceptados pelo hook `preToolUse` do IDE, eliminando chamadas sequenciais indevidas de `ctx_execute` no chat (Smell 2.26).
+- **Classificação Canônica de Capacidade**: Formalizada a separação objetiva entre perfis **"Gather-only"** vs **"Gather+Process"** sob o critério de corte aprovado de três condições: (a) agregação.
+- **Remoção de `ctx_execute` e `ctx_execute_file` em 26 Agentes**: Poda cirúrgica realizada em lote no frontmatter `tools:` de 26 agentes puramente analíticos/consultivos.
+- **Prevenção de Bypass de Hook em Subagents**: A poda estática fecha a lacuna de runtime em que subagents gerados via `run_subagent` não eram interceptados pelo hook `preToolUse` do IDE.
 - **Novo Teste Determinístico (R-055 Q3)**: Criado `tests/governance_audit/test_ctx_execute_capability_profile.py` garantindo não-regressão e conformidade estática contínua dos 26 agentes.
-- **Atualização de Templates e Smells (R-055 Q2)**: Incorporada a pergunta de corte de capacidade no Checklist Estrutural de `governance-factory-patterns/SKILL.md` (§3) e catalogado o **Smell 2.32** em `governance-audit-patterns/SKILL.md`.
-- **Documentação de Governança (R-064)**: Criados os planos versionados `docs/plans/20261003-governance-maintenance-ctx-execute-profile-classification.md` e `docs/implementation-plans/20261003-governance-maintenance-ctx-execute-profile-classification.md`.
-
----
+- **Atualização de Templates e Smells (R-055 Q2)**: Incorporada a pergunta de corte de capacidade no Checklist Estrutural de `governance-factory-patterns/SKILL.md` (§3) e catalogado o **Smell 2.32**.
+- **Documentação de Governança (R-064)**: Criados os planos versionados `docs/plans/20261003-governance-maintenance-ctx-execute-profile-classification.md` e.
 
 ## [2.52.3] — 2026-10-03
 
 ### Corrigido — Hook `PreToolUse` do Circuit Breaker Mecânico Nunca Executava (Templating de `$` pelo Host JetBrains)
-
-- **Gap identificado** (usuário, validação empírica em sessão real): o Circuit Breaker mecânico do `ctx-sequence-guard` (introduzido para dar enforcement determinístico ao Anti Tool-Chaining Sequencial do `context-mode/SKILL.md` § 4.1) nunca produzia efeito observável — nenhuma entrada em `.github/hooks/.state/ctx-sequence-guard.debug.log` mesmo após múltiplas chamadas sequenciais de `ctx_execute` em sessão nova pós-restart do IDE.
-- **Causa raiz confirmada via `idea.log`** (trace `#com.github.copilot:trace`): o host JetBrains Copilot aplica *template expansion* na string do campo `"powershell"` do hook, apagando silenciosamente qualquer token `$variável` não reconhecido — o bootstrap inline do fix anterior (leitura de `cwd` via `$in`/`$root`/`$j`) nunca chegou a executar, pois virava PowerShell sintaticamente inválido no momento do spawn (`stderr`: `Uma expressão era esperada após '('`).
-- **Correção aplicada**: `.github/hooks/context-mode.json` — os 4 campos `"powershell"` (`preToolUse`/`PreToolUse`/`sessionStart`/`SessionStart`) migrados de comando inline com `$variável` crua para `-EncodedCommand <Base64 UTF-16LE>`, imune ao templating do host (string final não contém `$` literal). Validado via simulação real (`echo payload | powershell -EncodedCommand ...`): sequência `allow → deny` reproduzida com sucesso, `.state/ctx-sequence-guard.debug.log` populado corretamente.
-- **Documentação atualizada**: `.github/hooks/README.md` (causa raiz real + fix + checklist de diagnóstico item 7), `docs/context/setup-context-mode-intellij.md` (§5.4 novo), `.github/skills/context-mode/SKILL.md` § 4.1.1 condensado para regra genérica acionável (removida narrativa forense específica de host, realocada para os documentos técnicos acima — ver R-038 Genericidade Obrigatória).
-
----
+- **Gap identificado**: o Circuit Breaker mecânico do `ctx-sequence-guard` nunca produzia efeito observável.
+- **Causa raiz confirmada via `idea.log`**: o host JetBrains Copilot aplica *template expansion* na string do campo `"powershell"` do hook.
+- **Correção aplicada**: `.github/hooks/context-mode.json`.
+- **Documentação atualizada**: `.github/hooks/README.md`, `docs/context/setup-context-mode-intellij.md` (§5.4 novo), `.github/skills/context-mode/SKILL.md` § 4.1.1 condensado para regra genérica.
 
 ## [2.52.2] — 2026-10-03
 
 ### Corrigido — Gap Irmão: Nenhum dos 22 Prompts Possuía `<execution_protocol>`
-
-- **Gap identificado** (usuário, revisão de `test-strategy.agent.md`): confirmado via `ctx_execute` que **100% dos 22 `*.prompt.md` declaram `source_docs_lazy:`** (migrados em [2.52.0]), mas **nenhum** possuía o bloco `<execution_protocol>` — a mesma lacuna corrigida para agents em [2.52.1], nunca propagada para prompts porque `sync_execution_protocol.py` só varria `.github/agents/`.
-- **Correção aplicada**: `tools/agent_protocol_sync/sync_execution_protocol.py` estendido com `get_prompt_files()` + `sync_prompts()` — reaproveita a mesma fonte canônica (`_execution-protocol-fragment.md`) e insere o bloco STANDARD completo (8 itens, incl. item 8/R-066) ao final do corpo de cada prompt (prompts não têm distinção STANDARD/CUSTOM nem seção fixa de ancoragem como os agents). Aplicado via `--apply` nos **22 prompts**; `--check` agora valida agents + prompts em uma única chamada.
-- **Conflito de nomenclatura resolvido**: `test_prompt_synthesis_output_format_governance.py::test_no_residual_xml_prompt_synthesis` tratava `<execution_protocol>` como tag XML residual proibida (conceito histórico do antigo formato de *saída* do `WORKFLOW-PROMPT-SYNTHESIS`, não-relacionado). Corrigido para remover o bloco operacional legítimo do texto antes de escanear por XML residual, preservando a proteção original contra regressão do formato antigo.
+- **Gap identificado**: confirmado via `ctx_execute` que **100% dos 22 `*.prompt.md` declaram `source_docs_lazy:`** (migrados em [2.52.0]), mas **nenhum** possuía o bloco `<execution_protocol>`.
+- **Correção aplicada**: `tools/agent_protocol_sync/sync_execution_protocol.py` estendido com `get_prompt_files()` + `sync_prompts()`.
+- **Conflito de nomenclatura resolvido**: `test_prompt_synthesis_output_format_governance.py::test_no_residual_xml_prompt_synthesis` tratava `<execution_protocol>` como tag XML residual proibida.
 - **Template canônico atualizado**: `prompts/templates/prompt-template.md` já nasce com o bloco `<execution_protocol>` (consistência total de F6 — todo novo artefato já nasce em conformidade).
-- **2 novos testes determinísticos**: `test_all_prompts_contain_execution_protocol_block` (valida diretamente que 100% dos prompts têm o bloco com a instrução de `source_docs_lazy`) — complementa `test_standard_agents_execution_protocol_propagated_with_source_docs_lazy_item`, que agora cobre prompts transitivamente via `sync_execution_protocol.py --check`.
+- **2 novos testes determinísticos**: `test_all_prompts_contain_execution_protocol_block`.
 - **Validação de regressão**: 540/541 testes passando (toda a suíte, exceto a falha pré-existente e não-relacionada já conhecida).
-
----
 
 ## [2.52.1] — 2026-10-03
 
 ### Corrigido — Gap de Discovery de `source_docs_lazy:` (Nenhuma Instrução Operacional no Corpo do Agent)
-
-- **Gap identificado**: a migração R-066/[2.52.0] moveu `CLAUDE.md`/`.github/copilot-instructions.md`/`workflows.md` para `source_docs_lazy:` em 188 artefatos, mas **nenhum texto no corpo** desses artefatos explicava ao próprio agente o que fazer com essa chave. A única explicação textual completa (R-066 em `CLAUDE.md`) estava, ironicamente, dentro do próprio arquivo que a migração classificou como lazy — e `agent-contracts/SKILL.md` (skill "banner", full-loaded por dezenas de agents) só tinha a chave no seu próprio frontmatter, sem nenhuma explicação no corpo. Resultado prático: um agente recém-migrado não tinha, no seu próprio prompt de sistema, nenhum gatilho real para saber que devia usar `context-mode/ctx_search` em vez de `read_file` nesses documentos.
-- **Correção aplicada**: adicionado o item 8 ao bloco canônico `<execution_protocol>` em `tools/agent_protocol_sync/_execution-protocol-fragment.md` (fonte única), explicando a semântica de `source_docs_lazy:` diretamente no corpo do agente (não em documentação externa que o próprio agente talvez nunca carregue). Propagado via `python tools/agent_protocol_sync/sync_execution_protocol.py --apply` para os **84 agents STANDARD** (85 mapeados, 1 CUSTOM/`code-knowledge-graph` inalterado por design).
-- **2 novos testes determinísticos** em `test_r066_progressive_disclosure_budget.py`: `test_execution_protocol_fragment_instructs_source_docs_lazy_semantics` (valida que o fragmento canônico contém a instrução) e `test_standard_agents_execution_protocol_propagated_with_source_docs_lazy_item` (valida drift=0 de `sync_execution_protocol.py --check`, confirmando a propagação ponta a ponta).
-- **Lacuna residual reconhecida**: routers (`agent-router`, domain routers) e `code-knowledge-graph` (CUSTOM) não recebem este bloco — aceitável, pois routers operam sob R-054 (Zero Discovery) e não leem `source_docs_lazy` na prática. Skills/prompts herdam a instrução do agent executor hospedeiro no momento em que são ativados.
+- **Gap identificado**: a migração R-066/[2.52.0] moveu `CLAUDE.md`/`.github/copilot-instructions.md`/`workflows.md` para `source_docs_lazy:` em 188 artefatos.
+- **Correção aplicada**: adicionado o item 8 ao bloco canônico `<execution_protocol>` em `tools/agent_protocol_sync/_execution-protocol-fragment.md` (fonte única).
+- **2 novos testes determinísticos** em `test_r066_progressive_disclosure_budget.py`: `test_execution_protocol_fragment_instructs_source_docs_lazy_semantics` e.
+- **Lacuna residual reconhecida**: routers e `code-knowledge-graph` (CUSTOM) não recebem este bloco; aceitável, pois routers operam sob R-054 (Zero Discovery) e não leem `source_docs_lazy` na prática.
 - **Validação de regressão**: 539/540 testes passando (toda a suíte, exceto a falha pré-existente e não-relacionada já conhecida).
-
----
 
 ## [2.52.0] — 2026-10-03
 
 ### Adicionado — R-066 Progressive Disclosure Compulsória de `source_docs:` (Anti Context Bloat Inicial)
-
-- **Nova regra normativa R-066** (`CLAUDE.md` § 3, espelhada em `.github/copilot-instructions.md` § 2): diferencia `source_docs:` (full-load, <500 linhas) de `source_docs_lazy:` (full-load proibido — `CLAUDE.md`, `.github/copilot-instructions.md`, `.github/agents/workflows.md`; consumo exclusivo via `context-mode/ctx_search`). Enforcement declarado explicitamente como **textual/CI-estático**, não mecânico-runtime (campos sem reconhecimento nativo de plataforma, confirmado via pesquisa de mercado).
+- **Nova regra normativa R-066**: diferencia `source_docs:` (full-load, <500 linhas) de `source_docs_lazy:`. Enforcement declarado explicitamente como **textual/CI-estático**, não mecânico-runtime.
 - **Novo Smell 2.31** em `.github/skills/governance-audit-patterns/SKILL.md` § 2 ("Progressive Disclosure Violation / Full-Load Forçado de Documento Lazy").
-- **Nova ferramenta determinística** `tools/agent_source_docs_sync/sync_lazy_source_docs.py` (`--check`/`--dry-run`/`--apply`): migra cirurgicamente `CLAUDE.md`/`.github/copilot-instructions.md`/`.github/agents/workflows.md` de `source_docs:` para `source_docs_lazy:` em `.agent.md`/`SKILL.md`/`*.prompt.md`, preservando formatação (R-051).
-- **Migração em lote aplicada**: 188 artefatos (95 `.agent.md`, 71 `SKILL.md`, 22 `*.prompt.md`) tiveram as referências de alto fan-in realocadas para `source_docs_lazy:`, eliminando full-load redundante de até ~76k tokens por spawn de agent em workflows multi-handoff (R-050).
-- **Novo teste determinístico** `tests/governance_audit/test_r066_progressive_disclosure_budget.py` — valida drift=0 da migração, documentação de R-066/Smell 2.31 e ausência de `CLAUDE.md`/`copilot-instructions.md`/`workflows.md` em `source_docs:` (full).
-- **Teste Smell 2.9 corrigido** (`test_governance_smells.py`) para aceitar `source_docs` **e/ou** `source_docs_lazy` como satisfazendo a obrigatoriedade de referência normativa em skills/prompts.
-- **F6 — Templates canônicos migrados**: os 4 templates de agent (`agent-template.md`, `operational-agent.md`, `research-agent.md`, `router-agent.md`) + `skills/templates/skill-template.md` + `prompts/templates/prompt-template.md` já nascem com o contrato de 2 camadas (`source_docs:`/`source_docs_lazy:`).
-- **F7 — Sub-catálogos stack-specific verificados**: os 8 `*-catalog.yaml` de domínio (spring-boot, spring-reactive, ejb, python, struts, database, angular, react) não replicam o padrão de full-load de `CLAUDE.md` — nenhuma migração necessária.
-- **F3 — Fatiamento de `.github/agents/workflows.md` concluído**: arquivo monolítico (1473 linhas/174k chars) fatiado em 10 arquivos dedicados sob `.github/agents/workflows/` (9 workflows canônicos + `invariantes-e-protocolos.md`), com `workflows.md` reduzido a índice leve (199 linhas, full-load seguro). As 5 referências de produção (`agent-router.agent.md`, `code-knowledge-graph.agent.md`, `README.md`, `routing-graph.yaml`, `runtime-verifier.agent.md`) e os **11 testes de CI** com acoplamento estrutural fino (`test_anti_manual_user_delegation_governance.py`, `test_architectural_blueprint_gate_governance.py`, `test_catalog_agents_referenced_in_canonical_workflows.py`, `test_local_project_isolation.py`, `test_migration_engine_governance.py`, `test_prompt_synthesis_output_format_governance.py`, `test_systemic_reuse_gate.py`, `test_operational_workflows.py` com 13 funções) foram atualizados — novo helper `tests/governance_audit/_helpers.py::read_workflows_full_content()` reconstrói o conteúdo equivalente ao monólito original para assertions de substring.
-- **Validação de regressão**: 508/509 testes passando (`tests/governance_audit` + `tests/operational_flow` + `tests/routing_unit` + `tests/evals` + `tests/routing_gate`), 1 falha pré-existente e não-relacionada (`test_no_local_projects_referenced_in_git_tracked_files`).
-
-### Nota Técnica — Tentativa de Classificação Dinâmica por Linha Revertida
-
-Uma iteração intermediária da migração tentou classificar como lazy qualquer documento referenciado com >300 linhas (não apenas a allowlist fixa de 3 documentos). Isso moveu skills mandatoriamente exigidas em `source_docs:` (ex. `handoff-governance`, `agent-contracts`, `terminal-governance`, por força de R-042/R-049) para lazy, quebrando 6 testes existentes. Revertido cirurgicamente para a allowlist fixa. Generalizar o teto de linhas para todo o universo de documentos permanece como item de um ciclo de governança futuro e separado.
-
+- **Nova ferramenta determinística** `tools/agent_source_docs_sync/sync_lazy_source_docs.py`: migra cirurgicamente `CLAUDE.md`/`.github/copilot-instructions.md`/`.github/agents/workflows.md` de.
 ### Pendente (fora de escopo desta rodada)
-
 - Resolução da duplicação `prerequisite_docs:`/`source_docs:` em `.github/agents/catalog.yaml` (campo manualmente mantido, sem gerador automático confirmado — `tools/agent_protocol_sync` não o gera).
-
----
 
 ## [2.51.5] — 2026-10-04
 
-- **Unwrap de Shell Wrapper e Segurança no Encadeamento (`permission_policy.py`)**:
-  - **Causa raiz (RC1)**: Comandos de terminal despachados pelo Copilot SDK envolvidos em wrappers interativos (`powershell -Command "..."`, `cmd.exe /c "..."`, `bash -c "..."`) eram avaliados na íntegra contra a allowlist em vez de inspecionar o subcomando embutido, resultando em falsos positivos de negação e bloqueio persistente de ferramentas de inspeção read-only. Implementada função de unwrap iterativo para extrair o comando interno real antes da validação.
-  - **Correção de Segurança pós-Quality Gate**: Adicionado o operador `"&"` a `_SEPARADORES_ENCADEAMENTO` e introduzida verificação estrita via `_bate_subcomando` com delimitadores de palavra/argumento, eliminando vulnerabilidades de prefix-match ambíguo onde comandos maliciosos podiam simular prefixos permitidos (ex.: `git-malicious` ou `dir&&calc`).
-- **Detecção Fail-Fast de Porta Ocupada (`dev_watch.py`)**:
-  - Implementada função `_porta_ocupada(host, port)` utilizando `socket.create_connection` para abortar a inicialização imediatamente com código de erro 1 e mensagem descritiva caso a porta configurada (default `8000`) já esteja em uso por outro processo zumbi ou instância prévia, prevenindo loops de reinicialização silenciosos do watcher.
-- **Sistema de Logging Aditivo em Arquivo Rotativo (`logging_config.py`)**:
-  - Adicionado novo módulo com suporte a `RotatingFileHandler` gravando logs estruturados em formato texto legível em `.tmp/gateway.log` (com rotação configurável de 10 MB e até 5 backups).
-  - Configuração idempotente com guardrail para evitar acúmulo duplicado de handlers ao recarregar a aplicação (`app.py` e `config.py`).
-  - Governança de arquivos: `.tmp/` e `.tmp/*.log` adicionados a `.gitignore`, `Dockerfile.dockerignore` e documentados em `.env.example` e `README.md`.
-- **Testes e Cobertura**:
-  - Adicionados 24+ novos testes unitários (`test_permission_policy.py`, `test_dev_watch_port_check.py`, `test_logging_config.py`).
-  - Suíte de permissões: 78/78 passed; suíte combinada do gateway: 114/115 passed (1 falha ambiental pré-existente e não-relacionada).
-- **Ressalva do Quality Gate (Backlog)**:
-  - Identificada oportunidade de hardening futuro para operadores de redirecionamento de shell (`>`, `>>`, `<`) fora do escopo estrito deste bugfix, recomendada para issue separada.
-- **Planos**:
-  - `docs/plans/20261004-bugfix-shell-permission-persistente-logging-arquivo.md`
-  - `docs/implementation-plans/20261004-bugfix-shell-permission-persistente-logging-arquivo.md`
-
----
+- **Unwrap de Shell Wrapper e Segurança no Encadeamento (`permission_policy.py`)**: **Causa raiz (RC1)**: Comandos de terminal despachados pelo Copilot SDK envolvidos em wrappers interativos eram.
+- **Detecção Fail-Fast de Porta Ocupada (`dev_watch.py`)**: Implementada função `_porta_ocupada(host, port)` utilizando `socket.create_connection` para abortar a inicialização imediatamente com.
+- **Sistema de Logging Aditivo em Arquivo Rotativo (`logging_config.py`)**: Adicionado novo módulo com suporte a `RotatingFileHandler` gravando logs estruturados em formato texto legível em.
+- **Testes e Cobertura**: Adicionados 24+ novos testes unitários (`test_permission_policy.py`, `test_dev_watch_port_check.py`, `test_logging_config.py`).
+- **Ressalva do Quality Gate (Backlog)**: Identificada oportunidade de hardening futuro para operadores de redirecionamento de shell (`>`, `>>`, `<`) fora do escopo estrito deste bugfix.
+- **Planos**: `docs/plans/20261004-bugfix-shell-permission-persistente-logging-arquivo.md`
 
 ## [2.51.4] — 2026-10-02
 
 ### Corrigido — MCP servers (context-mode/tavily/codegraph) e tools de IDE nunca registrados no Copilot SDK Headless Runner
-
-- **Causa raiz (complementar à `[2.51.3]`)**: agentes servidos via Copilot SDK Headless Runner no `deep-agents-gateway` (`deploy/local-chat-gateway`) não tinham acesso a `ask_questions`, `run_in_terminal`, `run_subagent` nem aos servidores MCP (`context-mode`, `tavily`, `codegraph`) porque (RC1) `_ALIAS_TOOLS_SDK_HEADLESS` (`agent_catalog.py`) só traduzia `ask_questions`→`ask_user`, deixando as demais tools de convenção de IDE sem mapeamento para os nomes nativos do SDK (`bash`, `powershell`, `shell`, `grep`, `create`, `str_replace_editor`, `task`, `web_fetch`, `ask_user`); e (RC2) nenhuma das duas chamadas `client.create_session(...)` (`sdk_session.py`) passava o parâmetro `mcp_servers=`, apesar de o SDK suportá-lo nativamente. `.vscode/mcp.json` só é lido pelo VS Code/Agent Host, nunca pelo processo Python headless do gateway.
-- **Catálogo e Configuração MCP**: novo módulo `mcp_servers_catalog.py` com lista fechada dos 3 servidores MCP homologados (context-mode, tavily, codegraph), variáveis de ambiente isoladas via `_env_minimo()` (nunca herda `os.environ` completo) e credenciais lidas exclusivamente por referência de variável de ambiente (nunca hardcoded); 8 novos campos em `config.py` (`Settings`); injeção de `mcp_servers=` em `stream_chat` e `stream_chat_ag_ui`.
-- **Mapeamento de aliases e allowlist de shell nativo**: `_ALIAS_TOOLS_SDK_HEADLESS` expandido com o mapeamento completo IDE→SDK nativo; nova `_agent_autorizado_para_shell_nativo` em `agent_catalog.py` — allowlist deny-by-default que só libera `bash`/`powershell`/`shell` para agents que declarem `run_in_terminal` em `tools:` **e** vinculem `terminal-governance/SKILL.md` em `source_docs:` (R-049), fail-closed por padrão.
-- **Hardening de Segurança em `permission_policy.py` (4 camadas, Quality Gate com 3 iterações do loop R-050.4 + 1 correção pontual aprovada pelo usuário)**:
-  1. Integração das novas tools MCP/shell ao fluxo existente de validação (`tool_call_nao_escrita_e_segura`), sem caminho paralelo de bypass.
-  2. Denylist estendida para o payload real `code`/`language` das tools `ctx_execute`/`ctx_execute_file` (fechou bypass em que o payload de execução de código não era reconhecido pela heurística de comando perigoso).
-  3. `_PADROES_PERIGOSOS_MULTI_LINGUAGEM` (17 padrões destrutivos/exfiltração em Python/JS/TS, ex. `shutil.rmtree`, `fs.rmSync`, `requests.post`) + heurística de `path`/`cwd` suspeito (travessia `..`, diretórios sensíveis); risco residual documentado explicitamente no código para `mcp_codegraph_*` (confirmado 100% read-only/offline via `@code-knowledge-graph`) e `mcp_tavily_*` extract/crawl/map (mitigado via allowlist de agente, não denylist de conteúdo).
-  4. Fechamento de fail-open no parâmetro `commands` (array) da tool `ctx_batch_execute` — `_extrair_comandos_batch`/`_comando_batch_item_e_seguro` validam cada item do lote individualmente, negando o lote inteiro se qualquer item for inseguro ou malformado.
-- **Testes**: ~32 novos testes unitários distribuídos em `test_agent_catalog.py`, `test_mcp_servers_catalog.py` (novo), `test_config.py`, `test_sdk_session.py` e `test_permission_policy.py`. Suíte completa do gateway revalidada ao final: 331 passed (1 falha ambiental pré-existente e não-relacionada, já conhecida desde `[2.51.3]`).
-- **Planos aprovados**: `docs/plans/20261002-bugfix-mcp-tools-headless-sdk.md` e `docs/implementation-plans/20261002-bugfix-mcp-tools-headless-sdk.md` (Security Checkpoint do `@tech-solution-architect` + Quality Gate do `@code-review`, ambos documentados nos arquivos).
-
----
+- **Causa raiz (complementar à `[2.51.3]`)**: agentes servidos via Copilot SDK Headless Runner no `deep-agents-gateway` (`deploy/local-chat-gateway`) não tinham acesso a `ask_questions`.
+- **Catálogo e Configuração MCP**: novo módulo `mcp_servers_catalog.py` com lista fechada dos 3 servidores MCP homologados, variáveis de ambiente isoladas via `_env_minimo()` e credenciais lidas.
+- **Mapeamento de aliases e allowlist de shell nativo**: `_ALIAS_TOOLS_SDK_HEADLESS` expandido com o mapeamento completo IDE→SDK nativo.
+- **Hardening de Segurança em `permission_policy.py` (4 camadas, Quality Gate com 3 iterações do loop R-050.4 + 1 correção pontual aprovada pelo usuário)**:.
+- **Testes**: ~32 novos testes unitários distribuídos em `test_agent_catalog.py`, `test_mcp_servers_catalog.py` (novo), `test_config.py`, `test_sdk_session.py` e `test_permission_policy.py`.
+- **Planos aprovados**: `docs/plans/20261002-bugfix-mcp-tools-headless-sdk.md` e `docs/implementation-plans/20261002-bugfix-mcp-tools-headless-sdk.md`.
 
 ## [2.51.3] — 2026-10-02
 
 ### Corrigido — Causa raiz real do bloqueio de `run_in_terminal`/git: `PermissionRequestShell` nunca reconhecida pelo SDK
-
-- **Investigação via `ctx_execute` (sandbox)**: introspecção real do pacote `github-copilot-sdk` instalado no `.venv` do gateway (`copilot.session_events`) revelou que comandos de terminal/PowerShell chegam como uma classe **distinta e dedicada** — `PermissionRequestShell` (campos `full_command_text`, `commands: list[PermissionRequestShellCommand]`, cada um com `identifier` + `read_only: bool` **nativo do próprio SDK**) — e **NÃO** como `PermissionRequestCustomTool`/`PermissionRequestMcp`. A correção anterior (`[2.51.1]`), que atuava via `tool_name`/`params["command"]`, nunca chegava a ser consultada: `_identificador_e_seguro_nativo` (`sdk_session.py`) não reconhecia `PermissionRequestShell`, caindo sempre no branch genérico (`seguro_nativo=False`) — por isso `pr-gatekeeper` continuava recebendo "bloqueado pela política local" mesmo após o fix anterior, inclusive para `git --no-pager status`/`diff` 100% read-only.
-- **Regressão adicional encontrada e corrigida durante a investigação**: uma edição anterior (ferramenta de merge automático) havia reintroduzido acidentalmente uma chamada `await _bridge_edicao_arquivo(...)` dentro da versão **síncrona** de `_bridge_permissao` (função `stream_chat`, endpoint legado `/v1/chat/completions`) — código que só existe na versão `async` de `stream_chat_ag_ui`. Isso quebrava `SyntaxError: 'await' outside async function` na importação do módulo inteiro (derrubando o gateway por completo). Revertido cirurgicamente ao comportamento correto (aprovação direta após os 2 guards de segurança, sem pausa adicional nesse endpoint legado), com verificação estrita de conteúdo antes da escrita (R-051) via `ctx_execute`.
-- **Correção definitiva**: `PermissionRequestShell` agora é reconhecida nativamente em `_identificador_e_seguro_nativo` (ambas as variantes, `stream_chat` e `stream_chat_ag_ui`) via nova função `_comando_shell_e_seguro()`, que exige **dois sinais concordantes** (defesa em profundidade): (1) o flag `read_only` nativo do SDK em **todos** os comandos identificados, e (2) `permission_policy.comando_terminal_e_seguro()` (heurística própria já introduzida em `[2.51.1]`) sobre o texto completo do comando. Comandos git mutantes (`commit`/`push`/`add`/...) ou destrutivos continuam bloqueados mesmo que o SDK os marque erroneamente como `read_only`.
-- **Testes**: 1 nova classe `TestPermissionRequestShell` em `test_sdk_session.py` (4 testes unitários puros + 1 teste de integração fim-a-fim via `stream_chat`) + placeholder de `PermissionRequestShell` registrado na fixture compartilhada `_registrar_placeholders_novos_eventos_turn_recorder` (necessário para os 24 testes pré-existentes que mockam `copilot.session_events` não quebrarem com `ImportError`). Suíte completa revalidada: 237/238 (1 falha ambiental pré-existente e não-relacionada, dependente de `/workspaces` real).
+- **Investigação via `ctx_execute` (sandbox)**: introspecção real do pacote `github-copilot-sdk` instalado no `.venv` do gateway (`copilot.session_events`) revelou que comandos de.
+- **Regressão adicional encontrada e corrigida durante a investigação**: uma edição anterior havia reintroduzido acidentalmente uma chamada `await _bridge_edicao_arquivo(...)` dentro da versão.
+- **Correção definitiva**: `PermissionRequestShell` agora é reconhecida nativamente em `_identificador_e_seguro_nativo` via nova função `_comando_shell_e_seguro()`.
+- **Testes**: 1 nova classe `TestPermissionRequestShell` em `test_sdk_session.py` + placeholder de `PermissionRequestShell` registrado na fixture compartilhada.
 - **Validação**: `black`/`isort`/`flake8` 100% limpos nos arquivos alterados (avisos remanescentes de `flake8` confirmados pré-existentes via comparação linha a linha do diff).
-
----
 
 ## [2.51.2] — 2026-10-02
 
 ### Corrigido — `POST /v1/ask-user/{id}/respond` (e irmãos `elicitation`/`file-edit`) 404 silencioso em modo dev
-
-- **Sintoma real reportado em sessão de desenvolvimento**: logo após a correção de permissão acima, o usuário reportou um NOVO sintoma ao responder um diálogo de pergunta (`ask_questions`/`pr-gatekeeper`) na UI: `POST /v1/ask-user/{id}/respond` retornou `404 Not Found`, e o modal fechou como se a resposta tivesse sido entregue — mas o chat ficou parado, sem nenhum feedback visível.
-- **Causa raiz**: `deploy/local-chat-gateway/dev_watch.py` sobe o uvicorn com `--reload` e `reload_dirs=["src"]`; qualquer edição de arquivo `.py` sob `src/` (inclusive a correção acima, feita enquanto a sessão do usuário estava aberta) reinicia o processo do gateway, descartando o `asyncio.Future` pendente em memória (`_PERGUNTAS_PENDENTES`/equivalentes de elicitation/file-edit). O endpoint responde corretamente com `404` nesse caso (`resolver_pergunta_usuario` retorna `False` por design), mas os 3 componentes de ponte do frontend (`AskUserBridge.tsx`, `ElicitationBridge.tsx`, `FileEditBridge.tsx`) nunca checavam `response.ok` do `fetch` — fechavam o diálogo silenciosamente em qualquer resultado, inclusive falha.
-- **Correção**: os 3 componentes agora checam o status HTTP da resposta (e capturam falha de rede via `try/catch`) e, quando a entrega falha em uma ação que o usuário esperava ver refletida no agente (responder pergunta/aceitar elicitation/aplicar diff), exibem um banner `role="alert"` explicando a causa provável (reinício do gateway em modo dev) e orientando a reenviar a mensagem no chat — em vez de fechar silenciosamente deixando a conversa travada sem explicação. Ações de "fechar/cancelar/rejeitar" (onde a falha de entrega é inofensiva à intenção do usuário) permanecem silenciosas.
-- **Não-escopo desta correção**: a perda do `asyncio.Future` em si após um reload é uma limitação arquitetural inerente ao estado em memória + `--reload` em dev (fora do Docker, onde não há reload); não há persistência cross-processo implementada nesta correção — o foco foi eliminar o **silêncio** da falha, não a possibilidade dela ocorrer.
+- **Sintoma real reportado em sessão de desenvolvimento**: logo após a correção de permissão acima, o usuário reportou um NOVO sintoma ao responder um diálogo de pergunta na UI.
+- **Causa raiz**: `deploy/local-chat-gateway/dev_watch.py` sobe o uvicorn com `--reload` e `reload_dirs=["src"]`.
+- **Correção**: os 3 componentes agora checam o status HTTP da resposta e, quando a entrega falha em uma ação que o usuário esperava ver refletida no agente.
+- **Não-escopo desta correção**: a perda do `asyncio.Future` em si após um reload é uma limitação arquitetural inerente ao estado em memória + `--reload` em dev.
 - **Validação**: `tsc --noEmit` e `eslint` 100% limpos nos 3 arquivos alterados.
-
----
 
 ## [2.51.1] — 2026-10-02
 
 ### Corrigido — Negação de `run_in_terminal`/comandos de shell mesmo em `GATEWAY_PERMISSION_MODE=apply`
-
-- **Sintoma real reportado em sessão de desenvolvimento** (Deep Agents Chat + Deep Agents Gateway em modo dev): o agent `pr-gatekeeper` reportou no chat "Não tenho permissão para executar comandos git nesta sessão (bloqueado pela política local do gateway)" mesmo com `GATEWAY_PERMISSION_MODE=apply` definido em `deploy/local-chat-gateway/.env` — impedindo qualquer agent de inspecionar o repositório via `git --no-pager diff/log/status` (leitura pura, sem escrita) para montar mensagem de commit/PR.
-- **Causa raiz**: `GATEWAY_PERMISSION_MODE` só era consultado para tools nativas `PermissionRequestWrite` (escrita de arquivo por caminho). Qualquer outra tool (ex.: `run_in_terminal`/Shell, MCP custom tools) passava por `_conservative_permission_handler` (`api/routes.py`), que liberava **apenas** nomes de tool com prefixo `read_`/`ler_`/`grep_`/`list_`/`file_search` — nunca inspecionava o COMANDO efetivamente executado, bloqueando até operações 100% read-only (`git status`, `git diff`, `ls`, `cat`).
-- **Correção**: centralizada em `local_chat_gateway/permission_policy.py` (fonte única, evitando duplicação entre `_conservative_permission_handler` e `_governance_permission_handler`) a função `comando_terminal_e_seguro()` — classifica heuristicamente comandos de shell como seguros (git read-only: `status`/`diff`/`log`/`show`/`fetch`/`rev-parse`/...; utilitários inócuos: `ls`/`pwd`/`cat`/`mkdir`/instaladores) e **sempre** bloqueia subcomandos git mutantes (`commit`/`push`/`add`/`reset`/`rebase`/...) e padrões destrutivos (`rm -rf`, `sudo`, `curl`/`wget` com pipe para shell), reforçando na infraestrutura do gateway o mesmo princípio de nenhum agent executar commit/push autônomo (R-031) já aplicado via instrução de prompt.
-- **Benefício sistêmico**: a correção é aplicada nos 2 handlers de permissão do gateway (`_conservative_permission_handler` e `_governance_permission_handler`), beneficiando **todos** os agents do catálogo que dependam de `run_in_terminal` para operações read-only (não apenas `pr-gatekeeper`) — ex.: `runtime-verifier`, `debugger`, specialists `*-test-fixer`.
-- **Testes**: 12 novos casos em `tests/unit/test_permission_policy.py` cobrindo comandos git read-only/mutantes, comandos destrutivos, encadeamento (`&&`/`;`/`|`) e a decisão central `tool_call_nao_escrita_e_segura()`; suíte completa revalidada (232/233 — 1 falha pré-existente e não-relacionada em `test_sdk_session.py`, dependente de `/workspaces` real no ambiente local).
-
----
+- **Sintoma real reportado em sessão de desenvolvimento**: o agent `pr-gatekeeper` reportou no chat "Não tenho permissão para executar comandos git nesta sessão" mesmo com.
+- **Causa raiz**: `GATEWAY_PERMISSION_MODE` só era consultado para tools nativas `PermissionRequestWrite`.
+- **Correção**: centralizada em `local_chat_gateway/permission_policy.py` a função `comando_terminal_e_seguro()`.
+- **Benefício sistêmico**: a correção é aplicada nos 2 handlers de permissão do gateway, beneficiando **todos** os agents do catálogo que dependam de `run_in_terminal` para operações read-only (não.
 
 ## [2.51.0] — 2026-10-02
 
 ### Alterado — Consolidação de Nomenclatura (Deep Agents Chat / Deep Agents Gateway)
-
-- **Nome de exibição consolidado**: o frontend em `apps/web` (Next.js 16 + CopilotKit v2) agora se identifica como **"Deep Agents Chat"** (`package.json#name = "deep-agents-chat"`, títulos de UI, README, `STORAGE_KEY` do localStorage de threads) e o backend em `deploy/local-chat-gateway` (FastAPI) como **"Deep Agents Gateway"** (`pyproject.toml#name = "deep-agents-gateway"`, título do FastAPI/OpenAPI docs, README, `docker-compose.yml` — `image`/`container_name`/rede, `Dockerfile`, `dev_watch.py`, atributo OTel `telemetry.sdk.name`).
-- **Escopo deliberadamente limitado a metadados de exibição**: o pacote Python importável `local_chat_gateway` (namespace de módulos) e os caminhos de pasta (`apps/web/`, `deploy/local-chat-gateway/`) permanecem **intocados** — confirmado via `@code-knowledge-graph` (blast radius estrutural zero: nenhum import/dependência real de código quebrado). Nomes de pacote em `package.json`/`pyproject.toml` seguem kebab-case (`deep-agents-chat`/`deep-agents-gateway`) por exigência das especificações npm/PEP 621 (proíbem espaços/maiúsculas), reservando "Deep Agents Chat"/"Deep Agents Gateway" para títulos e strings de exibição.
-
-6-09-29
-
+- **Nome de exibição consolidado**: o frontend em `apps/web` (Next.js 16 + CopilotKit v2) agora se identifica como **"Deep Agents Chat"** e o backend em `deploy/local-chat-gateway` (FastAPI) como.
 ### Removido — Consolidação Exclusiva no Lobe Chat
-
-- **Consolidação Exclusiva no Lobe Chat**: eliminação de serviços e profiles visuais alternativos de `deploy/local-chat-gateway/docker-compose.yml`, remoção de dependências de imagens desnecessárias e sincronização dos diagramas Mermaid, blueprints de arquitetura, planos de implementação e documentação de deploy. Lobe Chat consolidado como interface visual local exclusiva (`--profile lobe`), alinhando o ecossistema com a Decisão de Design D4.
-
+- **Consolidação Exclusiva no Lobe Chat**: eliminação de serviços e profiles visuais alternativos de `deploy/local-chat-gateway/docker-compose.yml`.
 ### Adicionado — Local Chat Gateway MVP (FastAPI OpenAI-Compatible com Governança em Código)
-
-- **Pacote `local_chat_gateway` (`deploy/local-chat-gateway/`)**: esqueleto MVP de gateway local opt-in (1 dev = 1 token pessoal do Copilot, nunca multi-tenant — mesmo espírito do Local Overlay Pattern R-043) expondo contratos OpenAI-compatible (`/v1/models`, `/v1/chat/completions`, `/healthz`) para consumo por Lobe Chat (MVP, consolidado como interface exclusiva). Cline e outras UIs alternativas foram explicitamente descartados do escopo desta iniciativa.
-- **Governança em Código (Zero Cópia)**: integração com `governance_runner` (`tools/headless-governance-runner/`) via dependência editável local — `checkpoint_engine` (gramática R-027 + Invariante 11 de respostas vagas), `permission_policy` (stub `read_only`/`propose`/`apply` com as 4 guardas de escrita), `session_store` (SQLAlchemy Core/SQLite), `event_mapper` (3 eventos confirmados pelo spike RT-01), `auth` (Bearer local com `hmac.compare_digest`), sem duplicar `rotear`/`transicionar`/`detectar_deriva`/`Budget`.
-- **Camada de Segurança e Auditoria**: comparação de token em tempo constante, recusa de startup com segredo placeholder (`GATEWAY_API_KEY=change-me`), logging estruturado (`logger.warning`/`logger.info`) nas decisões de autenticação e nas 6 decisões de `autorizar_escrita`, sem nunca logar segredo/token/conteúdo de arquivo.
-- **Infraestrutura Docker (Fase 2)**: `Dockerfile` multi-stage não-root (`python:3.12-slim`, `USER 10001`, `HEALTHCHECK` via stdlib) e `docker-compose.yml` com profiles (`lobe` ativo por padrão conforme D4, `otel` opcional), hardening completo (`read_only`, `cap_drop: [ALL]`, `no-new-privileges`, Docker secret para o token do Copilot, binds em `127.0.0.1`). Tags de imagem fixadas (`lobehub/lobe-chat:v1.19.13`, `otel/opentelemetry-collector-contrib:0.111.0`) após revisão `@devops-engineer`.
-- **Spike RT-01 Resolvido (2/3 gaps)**: inspeção real de runtime do `github-copilot-sdk==1.0.15` confirmou as classes de evento (`ToolExecutionStartData`, `ToolExecutionCompleteData`, `AssistantMessageDeltaData`) e a ausência de suporte nativo a `"ask"`/composição de múltiplos `on_permission_request` — validando as decisões conservadoras já tomadas no blueprint. Gap de tamanho de imagem Docker permanece aberto (ambiente sem Docker daemon disponível para medição).
-- **Documentação Técnica**: blueprint canônico [`docs/architecture/BLUEPRINT_LOCAL_CHAT_GATEWAY.md`](docs/architecture/BLUEPRINT_LOCAL_CHAT_GATEWAY.md) (Mermaid, contrato OpenAPI, matriz de risco RT-01..RT-09, spike de viabilidade do SDK) e plano de implementação [`docs/implementation-plans/20260929-feature-development-local-chat-gateway-mvp.md`](docs/implementation-plans/20260929-feature-development-local-chat-gateway-mvp.md).
-- **Blindagem por Testes**: 91 testes (unitários + integração) 100% aprovados, cobertura 100% em `checkpoint_engine.py`/`permission_policy.py`, conformidade `mypy --strict`/`black`/`isort`/`flake8`; `docker compose config` validado sintaticamente (build real não executado neste ambiente).
-- **Não-escopo desta entrega (Fase 1-2 de N)**: sem integração real do SDK do Copilot no `event_mapper` (classes confirmadas, wiring de sessão real ainda pendente), sem streaming SSE real no endpoint (stub determinístico), sem build/deploy real de imagem.
-
+- **Pacote `local_chat_gateway` (`deploy/local-chat-gateway/`)**: esqueleto MVP de gateway local opt-in expondo contratos OpenAI-compatible para consumo por Lobe Chat.
 ### Corrigido — 2 Bugs Reais de Build Descobertos em Teste Manual do Usuário
-
-- **`pull access denied for local-chat-gateway`**: `docker compose up` (sem `--build`) tentava fazer `pull` da imagem `local-chat-gateway:local` como se fosse de um registry, mesmo com `build:` declarado. Corrigido com `pull_policy: build` no serviço `gateway` (`docker-compose.yml`) — o Compose agora nunca tenta pull dessa imagem, sempre constrói localmente.
-- **`No matching distribution found for governance-runner`**: o `Dockerfile` instalava `governance-runner` e `local-chat-gateway` em 2 comandos `pip install` separados (mesmo com `--prefix=/install` idêntico); o resolver de dependências do 2º comando não enxergava o pacote instalado pelo 1º (caminho `--prefix` fora do `sys.path` de resolução) e tentava buscar `governance-runner` no PyPI público, onde não existe. Corrigido unindo os 2 pacotes locais em uma única invocação de `pip install` — validado com `docker build` real e completo (`Successfully installed ... governance-runner-0.1.0 ... local-chat-gateway-0.1.0`).
-- **`Automatic OpenTelemetry export requires fastapi[opentelemetry]...`**: o FastAPI 0.142.0 (resolvido no build) introduziu auto-configuração nativa de OpenTelemetry no startup, que falha sem o extra opcional instalado (não instalado deliberadamente — imagem mínima). Corrigido passando `telemetry={"auto_configure": False}` em `FastAPI()` (`app.py`), já que o gateway tem sua própria camada OTel opcional (Seção 9 do blueprint, via `OTEL_EXPORTER_OTLP_ENDPOINT`/`otel-collector`). Validado com smoke test real (`docker run` isolado): `Application startup complete`, `GET /healthz → 200 OK`, container `Up ... (healthy)`. Suíte completa revalidada (91/91 verde, zero regressão).
-- **Streaming SSE real no endpoint (era stub HTTP 501)**: Lobe Chat envia `stream=true` por padrão; o endpoint `/v1/chat/completions` rejeitava com HTTP 501 (não-escopo declarado da entrega anterior), quebrando o fluxo padrão de UI. Implementado streaming SSE real (role-chunk → content-chunk(s) → stop-chunk → `[DONE]`) com `response_model=None` (necessário pois `ChatCompletion | StreamingResponse` não é um tipo Pydantic válido para geração automática de response model).
-- **`OPENAI_MODEL_LIST` ausente no Lobe Chat**: sem essa variável, o seletor de modelos do Lobe exibe o catálogo padrão OpenAI/Ollama (não reconhecido pelo gateway). Corrigido com `OPENAI_MODEL_LIST: "-all,+deep-agents/router=Deep Agents Router"` no serviço `lobe-chat` (`docker-compose.yml`), injetando exclusivamente o modelo do gateway.
-
+- **`pull access denied for local-chat-gateway`**: `docker compose up` (sem `--build`) tentava fazer `pull` da imagem `local-chat-gateway:local` como se fosse de um registry.
 ### Adicionado — Fase 3 (Integração Real com o SDK do Copilot)
-
-- **Módulo `sdk_session.py`**: wrapper de import tardio (lazy) do pacote opcional `copilot` (extra `[sdk]`), leitura de token (`read_sdk_token`) e `stream_chat()` (async generator) conectando a uma sessão real do Copilot SDK, com fallback determinístico via `SDKUnavailableError` quando o extra não está instalado ou o token está ausente/vazio — nunca quebra a resposta HTTP.
-- **`routes.py` rewired**: ambos os caminhos (streaming e non-streaming) tentam a sessão real primeiro (`_real_or_stub_stream`/`_real_or_stub_completion`), com fallback silencioso ao stub em qualquer `SDKUnavailableError`.
-- **`pyproject.toml`**: novo extra opcional `[sdk]` (`github-copilot-sdk>=1.0.15`), mantendo a imagem mínima por padrão (extra só instalado explicitamente no `Dockerfile`).
-- **`permission_handler` conservador**: função simples que só permite tools com prefixo `read_`/`ler_`/`grep_`/`list_`/`file_search`, como non-escopo explícito desta fase (o `PermissionPolicyStub` já existente com os 3 modos/4 guardas de escrita ainda não foi religado ao handler de permissão real do SDK — fica para fase futura).
-- **Testes**: `test_sdk_session.py` com módulo `copilot` falso injetado via `sys.modules` (token ausente/vazio, SDK não instalado, sequência completa de chunks incluindo tool-start/tool-complete).
-
+- **Módulo `sdk_session.py`**: wrapper de import tardio (lazy) do pacote opcional `copilot` (extra `[sdk]`), leitura de token (`read_sdk_token`) e `stream_chat()` (async generator) conectando a uma.
 ### Corrigido — Fase 3 — 4 Bugs Descobertos em Teste Real com Token do Usuário
-
-- **Extra `[sdk]` não instalado no Dockerfile**: o `pip install` do estágio `builder` só instalava `local-chat-gateway` (sem o extra), então o pacote `copilot` nunca existia na imagem — o gateway sempre caía no stub, mesmo com token real montado. Corrigido para `"/build/deploy/local-chat-gateway[sdk]"`.
-- **`OSError: [Errno 30] Read-only file system: '/home/gateway'`**: o usuário `gateway` era criado com `useradd --no-create-home`; combinado com `read_only: true` no container, não havia `$HOME` gravável algum para o SDK cachear o runtime CLI baixado no primeiro uso real. Corrigido com `useradd --create-home`, `ENV HOME=/home/gateway` e um volume nomeado montado sobre esse diretório.
-- **Nomes de evento do SDK errados (conteúdo chegava vazio)**: o spike RT-01 (inspeção estática via `dir()`) identificou corretamente os NOMES de classe existentes no pacote `copilot.session_events`, mas a hipótese de QUAL classe carrega o texto e QUAL sinaliza fim de turno estava errada. `AssistantMessageDeltaData` (hipotetizado para conteúdo) e `SessionIdleData` (hipotetizado para fim de turno) nunca disparam nessa sessão real; os eventos reais são `AssistantMessageData` (campo `.content`) e `AssistantIdleData`. Diagnosticado com logging temporário de qualquer evento não mapeado em uma sessão real (`docker logs` capturando o catálogo completo: `SessionStartData`, `UserMessageData`, `AssistantTurnStartData`, `ModelCallStartData`, `AssistantMessageData`, `AssistantUsageData`, `AssistantTurnEndData`, `AssistantIdleData`, `SessionShutdownData`, entre ~15 outros). Corrigido em `sdk_session.py` (docstring atualizada com a correção e proveniência); teste final real retornou `"content": "teste ok"`.
-- **`EROFS: Read-only file system` na criação da sessão (via Lobe Chat/docker-compose, não reproduzia em `docker run` isolado sem `read_only`)**: o volume gravável cobria apenas `/home/gateway/.cache`, mas o SDK grava logs do processo nativo e estado adicional em outros subdiretórios de `$HOME` (fora do `.cache`); qualquer escrita fora do subdiretório montado caía no filesystem raiz `read_only: true` e falhava. Corrigido montando o volume nomeado sobre `/home/gateway` inteiro (renomeado `gateway-sdk-cache` → `gateway-home` em `docker-compose.yml`, comentários atualizados no `Dockerfile`). Validado com teste isolado replicando `--read-only --tmpfs /tmp` + volume cobrindo todo o `$HOME`: resposta real `"content": "teste read-only ok"`, zero traceback nos logs.
-
+- **Extra `[sdk]` não instalado no Dockerfile**: o `pip install` do estágio `builder` só instalava `local-chat-gateway` (sem o extra), então o pacote `copilot` nunca existia na imagem.
 ### Corrigido — Fase 3 — 2 Bugs Adicionais Descobertos em 2º Teste Real via Lobe Chat
-
-- **Agente reportava "não tenho acesso ao diretório `/app`"/"nenhum repositório carregado"**: `stream_chat()` não repassava `working_directory` ao `create_session()` do SDK real, então a sessão usava o CWD do processo (`/app`, o `WORKDIR` da imagem, read-only e sem o repositório do usuário) em vez do bind mount `/workspace`. Corrigido adicionando o parâmetro `working_directory: str = "/workspace"` a `stream_chat()`, repassado a `client.create_session(...)`. Adicionalmente, identificado que `WORKSPACE_PATH` no `.env` do usuário estava vazio (fallback documentado para o placeholder vazio) — configurado para o path real do repositório-alvo (`projects.local.yaml`).
-- **`AttributeError: 'dict' object has no attribute 'to_dict'` em toda chamada de tool (permission handler quebrava silenciosamente)**: `_bridge_permissao` retornava um dict puro (`{"permissionDecision": "allow"/"deny"}`), mas a API real do SDK (`on_permission_request`) exige uma instância tipada de `PermissionRequestResult` (`PermissionDecisionApproveOnce`/`PermissionDecisionReject`, de `copilot.generated.rpc`) — o dict quebrava internamente ao tentar `.to_dict()`. Descoberto também que `PermissionRequest` é uma união de 12 classes (`PermissionRequestShell`/`Write`/`Read`/`Mcp`/`CustomTool`/...) sem campo `tool_name` unificado (confirmado via `dataclasses.fields()`: só `Mcp`/`CustomTool` têm `tool_name`; `Read` é sempre seguro por natureza). Corrigido com `_identificador_e_seguro_nativo()` (resolve identificador + sinal de leitura segura por tipo real de request) e retorno tipado (`PermissionDecisionApproveOnce()`/`PermissionDecisionReject(feedback=...)`). Bônus: corrigido também o `"tool: ? concluido"` no log (evento `ToolExecutionCompleteData` não possui campo `tool_name`; corrigido com cache `tool_call_id -> tool_name` populado no evento de start). Validado com teste isolado (repo real montado em `/workspace`): resposta real e correta sobre o projeto, `tool: view` executando/concluindo sem traceback. Suíte revalidada (98/98 verde, incluindo 2 novos testes: `working_directory` repassado corretamente e `PermissionRequestRead` aprovado nativamente sem consultar o handler).
-
+- **Agente reportava "não tenho acesso ao diretório `/app`"/"nenhum repositório ca**: `stream_chat()` não repassava `working_directory` ao `create_session()` do SDK real.
 ### Adicionado — Fase 4 (Governança Runtime, Multi-Turno, Checkpoints & SQLite)
-
-- **Causa Raiz do 401 Unauthenticated no Langfuse Cloud — Poluição de Variáveis de Ambiente no Shell**:
-  - Diagnosticado que o `.env` do gateway já continha o token Base64 correto de `LANGFUSE_OTLP_AUTH`, mas o Docker Compose resolvia o valor **antigo/placeholder** mesmo após `--force-recreate`. Causa raiz: variáveis `LANGFUSE_OTLP_AUTH`/`LANGFUSE_ENDPOINT`/`LANGFUSE_PUBLIC_KEY`/`LANGFUSE_SECRET_KEY`/`LANGFUSE_HOST` **exportadas diretamente no ambiente do shell** (de testes manuais anteriores nesta sessão), que têm precedência sobre o arquivo `.env` na resolução de variáveis do `docker compose` (comportamento documentado do Compose: env do processo pai > `.env`).
-  - Corrigido com `unset` das variáveis poluídas no shell; `docker compose config` passou a resolver corretamente o token real (reaproveitado do container `otel-proxy` legado, já validado em produção).
-  - Validado com teste real: trace exportado com sucesso ao Langfuse Cloud (`us.cloud.langfuse.com`) — zero erros de `Unauthenticated` nos logs do `otel-collector` após a correção.
-
-- **Emissão Ativa de Telemetria GenAI OTel (`telemetry.py`)**:
-  - Implementado emissor assíncrono não-bloqueante (`emit_chat_trace`) no gateway conforme GenAI Semconv v1.41+ (`invoke_agent`, `chat`, `execute_tool`).
-  - Resolução inteligente de endpoints em containers (`_resolve_candidate_endpoints`), permitindo que configurações com `127.0.0.1` ou `localhost` encontrem automaticamente o coletor na rede interna (`http://otel-collector:4318`) ou no host (`http://host.docker.internal:4318`), eliminando falhas silenciosas de `Connection refused`.
-  - Parametrização dinâmica do endpoint Langfuse (`LANGFUSE_ENDPOINT`) com suporte nativo às regiões EU (`cloud.langfuse.com`) e US (`us.cloud.langfuse.com`).
-
-- **Correção no Coletor OpenTelemetry (`--profile otel`)**:
-  - Ajustada a sintaxe do exporter OTLP HTTP de `otlp_http/langfuse` para `otlphttp/langfuse` em `tools/otel-langfuse/otel-collector-config.yaml` e `docs/architecture/BLUEPRINT_AGENT_OBSERVABILITY.md` (o Collector v0.111+ rejeitava `otlp_http` com erro fatal de parsing).
-  - Repasse da variável `LANGFUSE_OTLP_AUTH` no `environment` do serviço `otel-collector` no `docker-compose.yml`, eliminando warnings de variável não definida e habilitando a autenticação Basic OTLP com o Langfuse Cloud.
-  - Documentação atualizada em `deploy/local-chat-gateway/.env.example` e `.env`.
-
-- **Fiação do `SessionStore` SQLite em `/v1/chat/completions`**:
-  - `session_id` extraído do cabeçalho `x-session-id` / `x-conversation-id` ou gerado via hash determinístico da primeira mensagem.
-  - Reuso e touch de sessão em `SessionStore` (SQLite persistido no volume `gateway-data`), repassando `session_id` nativamente ao `client.create_session(...)` do SDK.
-- **Enforcement de Teto Diário (`GATEWAY_MAX_PREMIUM_PER_DAY`)**:
-  - Bloqueio automático com HTTP 429 (`rate_limit_error`) se o consumo do dia ultrapassar o limite configurado (default: 100 requests).
-  - Registro atômico de consumo no SQLite por dia (`budget_daily`).
-- **Enforcement da Invariante 11 nos Endpoints**:
-  - Se houver checkpoint pendente na sessão, respostas vagas ("ok", "prossiga", "sim") ou fora da gramática reemitem a pergunta localmente via streaming SSE ou JSON com custo zero (zero chamadas de rede ou LLM).
-  - Respostas válidas resolvem o checkpoint no SQLite e liberam o fluxo normal.
-- **Bridge de Permissões com as 4 Guardas**:
-  - `PermissionRequestWrite` integrado: negado em `read_only` e `propose`; em `apply`, bloqueado se houver checkpoint pendente ou se o arquivo for sensível (`.git`, `secrets`, `.env`, `.pem` — Guarda 4).
-- **Cobertura de Testes**: 119 testes automatizados (103 unitários + 16 de integração) cobrindo todos os cenários da Fase 4.
-
----
+- **Causa Raiz do 401 Unauthenticated no Langfuse Cloud — Poluição de Variáveis de**: Diagnosticado que o `.env` do gateway já continha o token Base64 correto de `LANGFUSE_OTLP_AUTH`.
 
 ## [2.49.0] — 2026-09-28
 
 ### Adicionado — Salvaguardas de Mercado 2025/2026, Model Tiering e Blindagem por Testes
-
-- **R-064 Gate & Model Tiering em Domain Routers**: adicionada etapa obrigatória `implementation_plan_authoring` para `<stack>-arch-advisor` antes de codemod em `WORKFLOW-FRAMEWORK-MIGRATION` (`routing-graph.yaml`). Elevação do `model` para `Claude Sonnet 5.5` nos 6 domain routers (`ejb`, `spring-boot`, `spring-reactive`, `python`, `struts`, `angular`) por alinhamento à orquestração de fan-out (R-021.1).
-- **Fronteiras de Autoria de Testes & Paridade Test-Last**: barreira explícita proibindo autoria de testes por `*-feature-developer` em todas as 6 stacks com handoff obrigatório para test-writers. Preservação formal e blindada por teste do desvio `Test-Last` do ecossistema Angular (`excecao_dominio_frontend`). Inclusão da etapa `e2e_journey_validation` em `WORKFLOW-FEATURE-DEVELOPMENT`.
-- **Salvaguardas Operacionais 2025/2026**:
-  - `*-bug-fixer` (6 stacks): verificação obrigatória de blast radius antes do diff cirúrgico.
-  - `*-perf-tuner` (5 stacks backend): medição de baseline antes/depois e safety gate proibindo push direto sem canary/staging e aprovação humana.
-  - `*-test-fixer` (6 stacks): heurística binária (defeito real vs flakiness/drift) com cap rígido de 2 tentativas antes de escalar para o bug-fixer.
-  - `*-test-writer` (12 especialistas): mutation testing awareness e foco em boundary values / edge cases.
-  - `angular-e2e-writer`: cap de 2 tentativas de self-healing.
-- **Consolidação do Domínio Spring Reactive**: remoção do agente fora de padrão `spring-reactive-resilience-tuner`, absorvendo escopo (Resilience4j / Circuit Breaker) em `spring-reactive-perf-tuner` e restaurando a topologia canônica de 7 especialistas por stack backend (86 agentes ativos no total).
-- **Blindagem por Testes de Governança**: 10 novas suítes de testes determinísticos em `tests/governance_audit/` cobrindo todas as novas regras e topologias (suíte completa: 373 passed, 1 skipped).
-
----
+- **R-064 Gate & Model Tiering em Domain Routers**: adicionada etapa obrigatória `implementation_plan_authoring` para `<stack>-arch-advisor` antes de codemod em `WORKFLOW-FRAMEWORK-MIGRATION`.
+- **Fronteiras de Autoria de Testes & Paridade Test-Last**: barreira explícita proibindo autoria de testes por `*-feature-developer` em todas as 6 stacks com handoff obrigatório para test-writers.
+- **Salvaguardas Operacionais 2025/2026**: `*-bug-fixer` (6 stacks): verificação obrigatória de blast radius antes do diff cirúrgico.
+- **Consolidação do Domínio Spring Reactive**: remoção do agente fora de padrão `spring-reactive-resilience-tuner`, absorvendo escopo em `spring-reactive-perf-tuner` e restaurando a topologia.
 
 ## [2.48.0] — 2026-09-28
 
 ### Adicionado / Resolvido — Fechamento das Pendências Não-Bloqueantes da Fase PoC (Runner Headless)
-
-- **Wiring completo dos reporters (`cli.py::main()`)**: o canal `--report checks,pr-comment` agora efetivamente publica o resultado da auditoria via Checks API (`reporters/checks.py`) e comentário sticky de PR (`reporters/pr_comment.py`), antes apenas impresso em stdout. Publicação é **fail-open**: falha em qualquer canal de reporting emite aviso em stderr mas nunca altera o exit code da auditoria (a auditoria read-only permanece sempre concluída).
+- **Wiring completo dos reporters (`cli.py::main()`)**: o canal `--report checks,pr-comment` agora efetivamente publica o resultado da auditoria via Checks API (`reporters/checks.py`) e comentário.
 - **Novos argumentos do CLI**: `--repo` (default `$GITHUB_REPOSITORY`), `--sha` (default `$GITHUB_SHA`), `--pr-number` — necessários para os reporters identificarem onde publicar.
-- **Escopo de execução restrito por custo/credits (`governance-agent-audit.yml`)**: o workflow agora dispara **exclusivamente** em Pull Requests de `develop` para `main` (filtro duplo: `branches: [main]` no gatilho + `head.ref == 'develop'` na condição do job) — nunca mais em PRs de feature branch para `develop`.
-- **Feature-flag de ativação sem editar o workflow**: variável de repositório `vars.GOVERNANCE_AGENT_AUDIT_ENABLED` controla se o job roda. Default (variável ausente) é **desativado** — modelo opt-in seguro que garante zero consumo de premium requests até ativação explícita via Settings > Actions > Variables, sem exigir novo commit para ligar/desligar.
-- **Pendência remanescente (não bloqueante)**: confirmação manual do painel de billing/quota da conta associada ao PAT — ação humana fora do escopo de automação.
-
----
+- **Escopo de execução restrito por custo/credits (`governance-agent-audit.yml`)**: o workflow agora dispara **exclusivamente** em Pull Requests de `develop` para `main`.
+- **Feature-flag de ativação sem editar o workflow**: variável de repositório `vars.GOVERNANCE_AGENT_AUDIT_ENABLED` controla se o job roda; Default (variável ausente) é **desativado**.
 
 ## [2.47.0] — 2026-09-28
 
 ### Resolvido — Q-01 Validado Empiricamente em CI Real + Correções de Integração do Runner Headless
-
-- **Gate PoC → Piloto (subtask 26/27) APROVADO**: primeira execução real e autenticada do `governance-agent-audit.yml` contra o Copilot SDK verdadeiro em GitHub Actions (PR #55, run #6) — autenticação bem-sucedida via PAT dedicado (`COPILOT_SDK_TOKEN`, escopo "Copilot Requests: Read-only"), `veredito='neutral'`, custo `{premium_requests:1, turnos:1}` (dentro do teto `GOV_MAX_PREMIUM_REQUESTS=15`), fail-open do OTel Collector confirmado em produção (não apenas em mock).
+- **Gate PoC → Piloto (subtask 26/27) APROVADO**: primeira execução real e autenticada do `governance-agent-audit.yml` contra o Copilot SDK verdadeiro em GitHub Actions (PR #55, run #6).
 - **Correção de path de resolução do grafo (`cli.py`)**: `_GRAFO_PADRAO` usava `Path(__file__).parents[3]` (resolvia para `tools/`); corrigido para `parents[4]` (raiz do repositório).
-- **Integração real com o Copilot SDK implementada (`sdk_adapter.py`)**: substituída a implementação-placeholder (`NotImplementedError` pendente de confirmação de API) por uma ponte síncrona real (`_ClienteSDKReal`) sobre a API assíncrona confirmada via pesquisa externa (pacote PyPI `github-copilot-sdk`, módulo importável `copilot`, `CopilotClient(github_token=...)`, eventos `AssistantMessageData`/`SessionIdleData`), com timeout de segurança (120s), bridge do permission handler read-only e classificação heurística de falha de autenticação (`SDKAuthenticationError`).
-- **Dependência real do SDK declarada**: extra `sdk` do `pyproject.toml` (antes vazio) agora fixa `github-copilot-sdk>=1.0.0`; workflow atualizado com o passo obrigatório `python -m copilot download-runtime` e extra `dev` (pytest/mypy) incluído na instalação de CI.
-- **Correção crítica de governança de hooks (`.github/hooks/context-mode.json`)**: achado descoberto pela própria execução real do SDK — o hook `preToolUse` invocava o binário `context-mode` sem guarda de existência, causando falha do hook e **deny categórico de todo tool call** (incluindo leituras) em qualquer ambiente sem o binário instalado (ex.: runners `ubuntu-latest` de CI). Aplicada guarda defensiva (`command -v context-mode || exit 0` / `Get-Command context-mode`) nas 12 entradas de hook, tornando-as no-op silencioso fora do ambiente de desenvolvimento local, sem alterar o comportamento em máquinas com a extensão instalada.
-- **Correção de permissão inválida em workflow**: `copilot-requests: write-all` (valor inválido por-escopo, causava falha instantânea de parsing do workflow) corrigido para `copilot-requests: write`.
-- **Gaps não-bloqueantes registrados para a Fase Piloto**: confirmação manual do painel de billing/quota da conta; wiring de `--report checks,pr-comment` em `cli.py::main()` (reporters implementados mas ainda não invocados pelo entrypoint).
-- **Documentação**: `RUNBOOK_VALIDACAO_Q01_COPILOT_SDK_CI.md` §6/§7 preenchidos com evidências reais (run id, custo, trace_id, achado do hook); `PLANO_DECOMPOSICAO_COPILOT_SDK_HEADLESS_RUNNER.md` subtasks 26/27 marcadas ✅.
-
----
+- **Integração real com o Copilot SDK implementada (`sdk_adapter.py`)**: substituída a implementação-placeholder por uma ponte síncrona real (`_ClienteSDKReal`) sobre a API assíncrona confirmada via.
+- **Dependência real do SDK declarada**: extra `sdk` do `pyproject.toml` (antes vazio) agora fixa `github-copilot-sdk>=1.0.0`.
 
 ## [2.46.0] — 2026-09-28
 
 ### Adicionado — Runner Headless Copilot SDK e Roteamento Determinístico em Código
-
-- **Motor Determinístico de Roteamento (`governance_runner.routing`)**:
-  - Implementação em código puro Python da máquina de estados finita e guard clauses das regras normativas R-037 (agent-router first), R-042 (detecção de deriva de intenção com short-circuit de continuidade), R-050 (9 workflows canônicos e avanço sequencial estrito), R-052 (reset mandatório pós-conclusão) e R-064 (checkpoint humano).
-  - Parser e validador de `routing-graph.yaml` contra JSON Schema Draft-07 (`graph_loader.py`), com compilação imutável para `TabelaTransicao` e resolução resiliente dos gaps RG-01 a RG-04.
-  - Algoritmo de scoring rule-based determinístico (`router.py`) com política de cascata de 4 níveis (0.9 / 0.7 / 0.5 / 0.0) e desempate por prioridade na zona de ambiguidade ($\Delta \le 0.05$).
-  - Validador estrito de payload de handoff v1.3 (`handoff.py`) conforme `handoff-governance/SKILL.md`, com verificação fail-closed contra vazamento de segredos e credenciais (PX-08).
-- **Runner Headless para CI/CD (`governance_runner.runner`)**:
-  - Protocol abstrato `CopilotSDKClient` desacoplado da dependência direta de runtime, com Permission Handler restrito a operações read-only para o caso de uso `agent-audit`.
-  - Controle orçamentário de execução (`budget.py`) com teto configurável de requisições premium (`GOV_MAX_PREMIUM_REQUESTS`) e teto rígido de 5 turnos (R-060), retornando conclusão `neutral` com motivo `budget_exhausted` sem quebrar o processo.
-  - Reporters para GitHub Checks API e comentários estruturados em PR (`reporters/`).
-  - Observabilidade OpenTelemetry com política fail-open (`telemetry/otel.py`).
-  - Entrypoint CLI `governance-runner` para automação headless via terminal e CI.
-- **Suíte Canônica de Testes de Roteamento (`tests/routing_unit/` e `tests/runner_unit/`)**:
-  - 161 testes unitários e de integração (110 em `routing_unit` cobrindo TC01 a TC08, integridade referencial cruzada e idempotência; 51 em `runner_unit` cobrindo TC09 a TC13 e smoke tests E2E).
-  - Verificação de zero flakiness com 10 execuções consecutivas 100% verdes e conformidade estrita de tipagem (`mypy --strict`).
-- **Pipeline de Auditoria Automatizada em CI**:
-  - Workflow `.github/workflows/governance-agent-audit.yml` disparado em PRs que tocam `.github/{agents,skills,prompts}/**`, executando gate mecânico prévio via `pytest` e conclusão `neutral` na fase PoC.
-- **Documentação Técnica e Governança**:
-  - Blueprint Técnico C4 e Matriz de Requisitos: `docs/architecture/BLUEPRINT_COPILOT_SDK_HEADLESS_RUNNER.md`.
-  - Plano de Decomposição em 46 Subtasks: `docs/architecture/PLANO_DECOMPOSICAO_COPILOT_SDK_HEADLESS_RUNNER.md`.
-  - Runbook Operacional para Validação de Autenticação/Billing Q-01 em CI Real: `docs/architecture/RUNBOOK_VALIDACAO_Q01_COPILOT_SDK_CI.md`.
-
----
+- **Motor Determinístico de Roteamento (`governance_runner.routing`)**: Implementação em código puro Python da máquina de estados finita e guard clauses das regras normativas R-037 (agent-router.
+- **Runner Headless para CI/CD (`governance_runner.runner`)**: Protocol abstrato `CopilotSDKClient` desacoplado da dependência direta de runtime, com Permission Handler restrito a operações.
+- **Suíte Canônica de Testes de Roteamento**: 161 testes unitários e de integração.
+- **Pipeline de Auditoria Automatizada em CI**: Workflow `.github/workflows/governance-agent-audit.yml` disparado em PRs que tocam `.github/{agents,skills,prompts}/**`.
 
 ## [2.45.0] — 2026-09-27
 
 ### Adicionado / Modificado — Roteamento Híbrido de Modelo e Política Zero-Noise de Testes
-
-- **Roteamento Híbrido de Modelo (18 Agents Promovidos)**: Promoção dos executores centrais de desenvolvimento e reparo (`*-feature-developer`, `*-bug-fixer`, `*-test-fixer`) nas stacks Angular, Spring Boot, Spring Reactive, EJB, Python e Struts de "Gemini 3.8 Flash" para "Claude Sonnet 5.5" em seus frontmatters e catálogos de stack (`*-catalog.yaml`), mantendo os 12 `*-test-writer` em "Gemini 3.8 Flash".
-- **Nova Regra Normativa R-021.2 (Retry-Rate Model Escalation)**: Formalizada em `.github/copilot-instructions.md` (§3) a exigência de escalonamento pontual para modelo superior (🧠) quando o mesmo teste ou ciclo TDD falhar 2 vezes consecutivas na sessão, evitando queima agregada de retries em modelos de menor capacidade.
-- **Reforço Textual da Zero-Noise Test Policy**: Padronização literal da menção a `Zero-Noise Test Policy (terminal-governance/SKILL.md §3.1)` em todos os 30 agents executores e nos templates canônicos (`agent-template.md` e `operational-agent.md`), garantindo execução filtrada sem poluição de contexto.
-- **Quality Gate Determinístico de Roteamento de Modelo**: Novo teste de auditoria estática em `tests/governance_audit/test_hybrid_model_routing_and_zero_noise_governance.py` garantindo que desvios de modelo em executores, ausência de `terminal-governance` ou omissões textuais de Zero-Noise causem falha imediata no CI.
+- **Roteamento Híbrido de Modelo (18 Agents Promovidos)**: Promoção dos executores centrais de desenvolvimento e reparo nas stacks Angular, Spring Boot, Spring Reactive, EJB.
+- **Nova Regra Normativa R-021.2 (Retry-Rate Model Escalation)**: Formalizada em `.github/copilot-instructions.md` (§3) a exigência de escalonamento pontual para modelo superior (🧠) quando o mesmo.
+- **Reforço Textual da Zero-Noise Test Policy**: Padronização literal da menção a `Zero-Noise Test Policy` em todos os 30 agents executores e nos templates canônicos.
+- **Quality Gate Determinístico de Roteamento de Modelo**: Novo teste de auditoria estática em `tests/governance_audit/test_hybrid_model_routing_and_zero_noise_governance.py` garantindo que desvios.
 
 ## [2.44.0] — 2026-09-27
 
 ### Adicionado / Modificado — Persistência de Estado de Sessão e Recuperação de Crash (Terminal Hang)
-
-- **Watchdog de Comando Bloqueante (`terminal-governance/SKILL.md` § 5.2)**: nova seção normativa exigindo wrapper `timeout -k <graça> <limite> <cmd>` (Linux/WSL/Git Bash) ou `Start-Job`+`Wait-Job -Timeout`+`Stop-Job` (PowerShell) para qualquer script/processo sem timeout nativo; correção do antipadrão anterior ("aguardar output completo do comando anterior") que causava hang indefinido de `run_in_terminal` no client JetBrains — agora exige `isBackground:true` + redirect a arquivo + leitura via `read_file`/`ctx_execute_file`.
-- **Checkpoint Automático Pré-Risco (`agent-memory-policy/SKILL.md` § 3.2)**: formalização de checkpoint via `ctx_index` (formato híbrido reaproveitado de `/ctx-checkpoint`) obrigatório antes de qualquer comando classificado como risco; documentada a limitação do schema de `.github/hooks/context-mode.json` (sem matcher condicional por conteúdo de tool) — disparo permanece responsabilidade do agent.
-- **Fallback de Retomada Sem Checkpoint (`ctx-resume.prompt.md`)**: novo protocolo de reconstrução best-effort via `git --no-pager status`/`git --no-pager diff --stat` + inspeção de arquivos modificados para cenário de crash/trava sem checkpoint prévio salvo.
-- **Nota de Reúso Sistêmico (R-055)**: a correção em `terminal-governance/SKILL.md` é referenciada (não duplicada) pelos ~61 agents que declaram `run_in_terminal` em seu frontmatter — propagação automática via skill compartilhada, sem necessidade de edição individual por agent.
-- Pendente para Etapa 4 (`@governance-maintainer`): criação de teste determinístico em `tests/governance_audit/` validando presença dos termos normativos `timeout -k` / `isBackground` em `terminal-governance/SKILL.md`.
-
+- **Watchdog de Comando Bloqueante**: nova seção normativa exigindo wrapper `timeout -k <graça> <limite> <cmd>` (Linux/WSL/Git Bash) ou `Start-Job`+`Wait-Job -Timeout`+`Stop-Job` (PowerShell) para.
+- **Checkpoint Automático Pré-Risco**: formalização de checkpoint via `ctx_index` obrigatório antes de qualquer comando classificado como risco.
+- **Fallback de Retomada Sem Checkpoint (`ctx-resume.prompt.md`)**: novo protocolo de reconstrução best-effort via `git --no-pager status`/`git --no-pager diff --stat` + inspeção de arquivos.
+- **Nota de Reúso Sistêmico (R-055)**: a correção em `terminal-governance/SKILL.md` é referenciada (não duplicada) pelos ~61 agents que declaram `run_in_terminal` em seu frontmatter.
 
 ## [2.43.0] — 2026-09-27
 
 ### Modificado / Manutenção de Governança
-- **Migração Global XML → Markdown e Redesenho do `WORKFLOW-PROMPT-SYNTHESIS` (R-055 / R-064)**:
-  - Substituição global do formato de tags XML (`<task>/<context>/<constraints>/<output_format>`) pelo template Markdown estruturado (`## Tarefa`, `## Contexto`, `## Restrições e Não-Escopo`, `## Formato de Saída Esperado`) em todo o catálogo (`prompt-structuring.agent.md`, `prompt-engineering-patterns/SKILL.md`, `harness-engineering-patterns/SKILL.md`, `catalog.yaml`, `routing-graph.yaml`, `CLAUDE.md` § R-041).
-  - Redesenho do `WORKFLOW-PROMPT-SYNTHESIS` e comando `/craft-prompt`: criação do template canônico reutilizável `templates/prompt-synthesis-output.md`.
-  - Quality Gate ativo com Red-Teaming analítico de Solution Space baseado em 4 critérios de corte excludentes no Estado 5 e Invariante 17(c) desdobrado com cláusula impeditiva de bloqueio.
-  - Finalidade explícita de consumo exclusivo downstream por outros agents e workflows canônicos em novas sessões limpas, vedada a apresentação como entrega final de negócio direta ao usuário.
-  - Elicitação ampliada no Estado 1 e Invariante 19 para ciclo aprofundado de 5 a 10 rodadas estruturadas de `ask_questions` com cláusula de teto na 10ª rodada (declaração de lacunas residuais em `## Restrições e Não-Escopo`).
-  - Typed State Bag atualizado com paridade total: `rodadas_elicitacao_realizadas`, `lacunas_residuais_declaradas`, `red_teaming_solution_space`, `consumo_exclusivo_agents: true` e `formato_saida: "markdown_code_block"`.
-  - Nova suíte de testes determinísticos de governança: `tests/governance_audit/test_prompt_synthesis_output_format_governance.py`.
+- **Migração Global XML → Markdown e Redesenho do `WORKFLOW-PROMPT-SYNTHESIS`**: Substituição global do formato de tags XML pelo template Markdown estruturado em todo o catálogo.
 
 ## [2.42.0] — 2026-09-27
 
 ### Adicionado
-- **R-064 (Duplo Gate Documental de Planejamento e Implementação)**: Norma que estabelece a obrigatoriedade de versionamento e aprovação humana prévia de dois planos em workflows de código: Plano de Planejamento (`docs/plans/`) e Plano de Implementação (`docs/implementation-plans/`), autorados por especialistas analíticos e `<stack>-arch-advisor`. Diretórios de convenção criados com READMEs explicativos.
-- **Mapa do Repositório Canônico (`docs/repo-map.md`)**: Atualização e consolidação da infraestrutura determinística de arquivos (Zero Blind Searches), incorporando as novas pastas de planos (`docs/plans/` e `docs/implementation-plans/`) e sincronizando `README.md` e `docs/README.md` (R-015).
-
+- **R-064**: Norma que estabelece a obrigatoriedade de versionamento e aprovação humana prévia de dois planos em workflows de código: Plano de Planejamento (`docs/plans/`) e Plano de Implementação.
+- **Mapa do Repositório Canônico (`docs/repo-map.md`)**: Atualização e consolidação da infraestrutura determinística de arquivos (Zero Blind Searches).
 
 ## [2.41.2] — 2026-09-26
 
 ### Adicionado
-- **Auditoria de Contradição de Tools e Paridade de Modelos (Smell 2.7 & R-015)**:
-  - Teste determinístico `test_smell_2_7_no_internal_tool_contradiction_in_body` para garantir que nenhum agente negue no corpo possuir ferramentas ativas no frontmatter.
-  - Teste determinístico `test_r015_catalog_and_agent_model_parity` garantindo paridade estrita de modelo (`model:`) entre `catalog.yaml` e as definições dos agentes.
-- **Hermeticidade de Testes de Observabilidade**:
-  - Fixture `isolate_env` em `tests/otel_langfuse/conftest.py` para isolamento e hermeticidade contra variáveis OTLP/Langfuse nos testes unitários.
-
+- **Auditoria de Contradição de Tools e Paridade de Modelos (Smell 2.7 & R-015)**: Teste determinístico `test_smell_2_7_no_internal_tool_contradiction_in_body` para garantir que nenhum agente negue.
+- **Hermeticidade de Testes de Observabilidade**: Fixture `isolate_env` em `tests/otel_langfuse/conftest.py` para isolamento e hermeticidade contra variáveis OTLP/Langfuse nos testes unitários.
 ### Modificado
-- **Alinhamento de Modelos Recomendados (Claude Sonnet 5.5)**:
-  - Atualização do modelo para `Claude Sonnet 5.5` em `test-strategy.agent.md`, `repo-hygiene-auditor.agent.md`, `catalog.yaml` e cards A2A correspondentes (`.a2a/agentcards/`).
-- **Resolução de Contradição de Tools (Smell 2.7)**:
-  - Ajuste de redação em `refactor-planner.agent.md` e `test-strategy.agent.md` esclarecendo operação analítica/read-only sem negação contraditória do catálogo de ferramentas.
-- **Configuração de Autenticação OTLP/Langfuse**:
-  - Em `tools/otel-langfuse/otel_langfuse/config.py`, geração consistente e sobrescrita de `langfuse_otlp_auth` em base64 a partir de chaves pública e secreta.
-
----
+- **Alinhamento de Modelos Recomendados (Claude Sonnet 5.5)**: Atualização do modelo para `Claude Sonnet 5.5` em `test-strategy.agent.md`, `repo-hygiene-auditor.agent.md`.
+- **Resolução de Contradição de Tools (Smell 2.7)**: Ajuste de redação em `refactor-planner.agent.md` e `test-strategy.agent.md` esclarecendo operação analítica/read-only sem negação contraditória.
 
 ## [2.41.1] — 2026-09-26
 
 ### Adicionado
-- **Auditoria de Linhas Duplicadas (Smell 2.1)**:
-  - Teste determinístico `test_smell_2_1_no_verbatim_consecutive_duplicate_lines` em `tests/governance_audit/test_governance_smells.py` para prevenir regressões de linhas duplicadas consecutivas em `.agent.md` e `.prompt.md`.
-
+- **Auditoria de Linhas Duplicadas (Smell 2.1)**: Teste determinístico `test_smell_2_1_no_verbatim_consecutive_duplicate_lines` em `tests/governance_audit/test_governance_smells.py` para prevenir.
 ### Modificado
-- **Higiene e Deduplicação de Prompts de Governança**:
-  - Remoção em lote de linha duplicada de diretriz do `context-mode` (Single-Turn MCP / Smell 2.26) em 33 agentes (`.github/agents/**/*.agent.md`) e no prompt `.github/prompts/add-project-context.prompt.md`.
-  - Sincronização do modelo recomendado em `.a2a/agentcards/bug-triage.agentcard.json` para `"Claude Sonnet 5.5"`, mantendo paridade com o catálogo e o frontmatter do agente.
-
----
+- **Higiene e Deduplicação de Prompts de Governança**: Remoção em lote de linha duplicada de diretriz do `context-mode` (Single-Turn MCP / Smell 2.26) em 33 agentes e no prompt.
 
 ## [2.41.0] — 2026-09-26
 
 ### Adicionado (Telemetria Zero-Footprint, SDK Langfuse, MCP Proxy & Framework de Evals)
-- **Topologia de Telemetria OTel Proxy para Langfuse Cloud**:
-  - Arquitetura de observabilidade leve (~45MB RAM, zero banco local) despachando para Langfuse Cloud via HTTPS OTLP com Basic Auth.
-  - Guia de configuração e diagnóstico de limitação conhecida no IntelliJ IDEA em `docs/context/setup-telemetry-copilot.md`.
-  - Processadores de mascaramento de credenciais (`transform/redact-secrets`) e conformidade Semconv v1.41+ em `tools/otel-langfuse/otel-collector-config.yaml`.
-  - Scripts de teste sintético de traces e métricas GenAI (`test-trace.js` e `test_trace.py`).
-- **SDK Python de Observabilidade e Sanitização (`tools/otel-langfuse/otel_langfuse`)**:
-  - Cliente OTel/Langfuse assíncrono com ciclo de vida de traces, spans, validação Pydantic e retry exponencial com backoff.
-  - Sanitizador de payloads e mascaramento automático de credenciais (GitHub tokens, Langfuse keys, OpenAI/Anthropic keys, AWS IAM keys e Bearer tokens).
-  - Cobertura de testes unitários em `tests/otel_langfuse/` (`test_client.py`, `test_models.py`, `test_sanitizer.py`).
-- **Proxy MCP Instrumentado com OpenTelemetry (`tools/mcp-otel-proxy`)**:
-  - Interceptor stdio para servidores MCP com injeção automática de contexto de trace W3C e exportação OTLP.
-  - Redação de dados sensíveis em chamadas de ferramentas e telemetria de latência/erros.
-- **Framework e Estratégia de Avaliações (Evals)**:
-  - Documentação arquitetural: `docs/architecture/BLUEPRINT_AGENT_OBSERVABILITY.md` e `docs/architecture/EVALS_TEST_STRATEGY.md`.
-  - Suíte de evals em `tests/evals/` cobrindo acurácia de roteamento de agentes (`test_routing_accuracy_evals.py`), seleção de ferramentas (`test_tool_selection_evals.py`) e integridade de telemetria (`test_telemetry_integrity.py`).
-- **Nova Skill e Governança de Observabilidade**:
-  - `langfuse-observability` (Tier 2): Especialização Langfuse cobrindo tracing, prompt management, evals/datasets e integração com coding assistants.
-  - Atualização de `agent-observability-otel` para GenAI Semconv v1.41+ com migração de `gen_ai.system` para `gen_ai.provider.name`.
-
+- **Topologia de Telemetria OTel Proxy para Langfuse Cloud**: Arquitetura de observabilidade leve (~45MB RAM, zero banco local) despachando para Langfuse Cloud via HTTPS OTLP com Basic Auth.
+- **SDK Python de Observabilidade e Sanitização**: Cliente OTel/Langfuse assíncrono com ciclo de vida de traces, spans, validação Pydantic e retry exponencial com backoff.
 ### Modificado
-- **Sanitização e Segurança de Variáveis de Ambiente**:
-  - Sanitização de `tools/otel-langfuse/.env.example` com placeholders genéricos (`pk-lf-seu-public-key-aqui`, `sk-lf-seu-secret-key-aqui`) e token Base64 demonstrativo.
-  - Documentação atualizada em `tools/otel-langfuse/README.md` refletindo o pipeline SaaS gerenciado.
-- **Configuração de Execução de Testes e Catálogo de Agentes**:
-  - Ajuste de `pythonpath` em `pytest.ini` para incluir `tools/otel-langfuse` resolvendo importações de módulo sem colisões de namespace.
-  - Atualização de `source_docs` no `.github/agents/catalog.yaml` para alinhamento com os novos blueprints de arquitetura e observabilidade.
-
+- **Sanitização e Segurança de Variáveis de Ambiente**: Sanitização de `tools/otel-langfuse/.env.example` com placeholders genéricos e token Base64 demonstrativo.
 ### Removido
 - `tools/otel-langfuse/docker-compose.yml`: Remoção do stack monolítico pesado local (PostgreSQL, ClickHouse, MinIO, Redis) em favor do Langfuse Cloud SaaS.
-- Remoção de arquivo colidente `tests/otel_langfuse/__init__.py` para evitar conflito de importação do pacote `otel_langfuse`.
-
----
 
 ## [2.40.0] — 2026-09-24
 
 ### Adicionado (Incorporação de Patterns do mattpocock/skills — Fases 1, 2 e 3)
-- **Fase 1 — Novas Skills Autônomas**:
-  - `interactive-wizard-patterns` (Tier 2): Padrões para criação de scripts interativos e wizards passo a passo para operações que exigem intervenção humana (HITL), configuração de infraestrutura, credenciais, segredos de CI e migrações manuais de cutover.
-  - `prototype-patterns` (Tier 2): Padrão formalizado de prototipagem descartável para responder perguntas de design, validar modelos de estado e testar viabilidade de UI/API antes de implementar em produção (spikes, POCs rápidos e alinhamento HITL).
-- **Fase 2 — Reforços em Skills Core Existentes**:
-  - `code-review-patterns` (§ 3.1): Taxonomia de Code Smells Clássicos (Data Clumps, Primitive Obsession, Feature Envy, Long Parameter List, Divergent Change, Shotgun Surgery).
-  - `git-governance` (§ 6): Procedimento determinístico de resolução de conflitos de merge/rebase (regra de ouro anti-abort, auditoria hunk-a-hunk e reconciliação semântica).
-  - `structured-intake-patterns` (§ 2.2): State machine de triagem formal orientada a rótulos (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`).
-  - `task-decomposition-patterns` (§ 3.1): Padrão Tracer-Bullet (fatias verticais ponta a ponta), arestas de bloqueio (*blocking edges*) e estratégia Expand-Migrate-Contract para refatorações amplas.
-  - `refactoring-planning-patterns` (§ 1.1): Vocabulário arquitetural de Deep Module (Ousterhout), Seams (Feathers), Adapters e Leverage Points para refatorações estruturadas.
-  - `code-tracing` (§ 0.1): Metodologia Feedback Loop First (construir reprodução determinística com tempo de ciclo < 5s antes de formular hipóteses) e política de Security Redaction em artefatos de depuração.
-- **Fase 3 — Reforços Finais em Skills & Integrações Transversais**:
-  - `test-coverage-governance` (§ 1 e 1.1): Diretrizes de uso e Regra de Seams Pré-Acordados (Testing-First + Refactor Fora do Loop), desacoplando testes unitários de refatorações de dependências.
-  - `business-rules-governance` (§ 4.2) & `project-context-builder`: Mapeamento canônico de Bounded Contexts (`CONTEXT-MAP.md`), relações upstream/downstream (ACL, Shared Kernel, Published Language) e capability `generate_context_map`.
-  - `README.md` & `.index.json`: Atualização do catálogo oficial de 64 skills e sincronização de metadados expandidos (`triggers`, `source_docs`, `related_skills`).
-
----
+- **Fase 1 — Novas Skills Autônomas**: `interactive-wizard-patterns` (Tier 2): Padrões para criação de scripts interativos e wizards passo a passo para operações que exigem intervenção humana.
+- **Fase 2 — Reforços em Skills Core Existentes**: `code-review-patterns` (§ 3.1): Taxonomia de Code Smells Clássicos.
+- **Fase 3 — Reforços Finais em Skills & Integrações Transversais**: `test-coverage-governance` (§ 1 e 1.1): Diretrizes de uso e Regra de Seams Pré-Acordados.
 
 ## [2.39.0] — 2026-09-24
 
 ### Adicionado (Governança de Batching Context-Mode, Fan-Out Signal & Quality Review Loop)
-- **Context-Mode Circuit Breaker & Few-Shot (§ 4.1 a 4.3 em context-mode/SKILL.md)**:
-  - Seção 4.1: Circuit Breaker de Tool-Chaining Sequencial (Regra dos 3 Tool Turns — Smell 2.26) para barrar loops degradantes de MCP tools.
-  - Seção 4.2: Mitigação de cwd explícito no `ctx_batch_execute`, prevenindo falhas de resolução do diretório raiz em sandboxes temporários.
-  - Seção 4.3: Exemplo concreto Few-Shot de Anti-Padrão (chamadas sequenciais) vs Padrão Correto (script consolidado em lote).
-  - Remissão de reforço na skill `efficient-batch-code-modification/SKILL.md`.
-- **R-021.1 (Model Routing Signal por Volume de Alvos / Fan-Out)**:
-  - Formalização no SSOT `CLAUDE.md` e na tabela de sinais de `.github/copilot-instructions.md` recomendando escalonamento pontual para modelo 1× ou superior em tarefas com ≥ 10 alvos/arquivos homogêneos.
-- **Sincronização de Templates Canônicos**:
-  - Atualização dos templates `agent-template.md` e `operational-agent.md` com parâmetro `cwd` explícito em `ctx_batch_execute`.
-- **Loop de Revisão de Qualidade (R-050.4 e § 1.5 de workflows.md)**:
-  - Formalização do padrão Evaluator-Optimizer com teto rígido de 3 iterações para achados não-bloqueantes nos 6 workflows operacionais.
-  - Atualização dos diagramas e fluxos em `docs/architecture/ARCHITECTURE_AND_GOVERNANCE_GUIDE.md`.
-- **Quality Gate Determinístico**:
-  - Testes `test_context_mode_circuit_breaker_and_explicit_cwd_governance()` e `test_context_mode_few_shot_batching_and_model_routing_fan_out_signal()` em `test_context_mode_precedence_governance.py`.
-  - Teste `test_workflows_support_quality_review_loop_r050_4()` em `test_operational_workflows.py`.
-
----
+- **Context-Mode Circuit Breaker & Few-Shot**: Seção 4.1: Circuit Breaker de Tool-Chaining Sequencial para barrar loops degradantes de MCP tools.
+- **R-021.1**: Formalização no SSOT `CLAUDE.md` e na tabela de sinais de `.github/copilot-instructions.md` recomendando escalonamento pontual para modelo 1× ou superior em tarefas com ≥ 10.
+- **Sincronização de Templates Canônicos**: Atualização dos templates `agent-template.md` e `operational-agent.md` com parâmetro `cwd` explícito em `ctx_batch_execute`.
+- **Loop de Revisão de Qualidade**: Formalização do padrão Evaluator-Optimizer com teto rígido de 3 iterações para achados não-bloqueantes nos 6 workflows operacionais.
 
 ## [2.38.0] — 2026-09-24
 
 ### Adicionado (Governança Anti Root-Agent-Impersonation & Anti Silent Bypass: R-062 e R-063)
-- **R-062 (Zero Impersonation pelo Orquestrador Raiz — Anti Root-Agent-Impersonation) e Smell 2.29**:
-  - Proibição terminante do modelo raiz ler, resumir ou parafrasear arquivos `.agent.md` para usurpar o papel de subagentes especializados sem dispatch real via `run_subagent`.
-  - Propagação normativa no SSOT `CLAUDE.md`, `.github/copilot-instructions.md`, `agent-router.agent.md`, `templates/router-agent.md`, 7 domain routers (`engineering-router`, `architecture-router`, `quality-router`, `security-governance-router`, `data-router`, `devops-router`, `research-router`) e na skill `governance-audit-patterns/SKILL.md`.
-  - Implementação de suíte de testes determinísticos em `tests/governance_audit/test_root_agent_impersonation_governance.py`.
-- **R-063 (Zero Execução Direta pelo Orquestrador Raiz sem Router — Anti Silent Bypass) e Smell 2.30**:
-  - Proibição terminante do modelo raiz executar ferramentas genéricas nativas (terminal, read_file, grep, edit) sem triagem prévia obrigatória via `@agent-router` (inclusive em turnos subsequentes, após encerramento de workflow ou em resposta a prompts curtos/informais).
-  - Complemento formal da regra R-042 em `CLAUDE.md` e ajuste do diagrama de fluxo no prompt de sistema `.github/copilot-instructions.md`.
-  - Propagação de blindagem nos 7 domain routers e no template de router (`templates/router-agent.md`).
-  - Implementação de suíte de testes determinísticos em `tests/governance_audit/test_root_orchestrator_silent_execution_governance.py`.
-
----
+- **R-062 e Smell 2.29**: Proibição terminante do modelo raiz ler, resumir ou parafrasear arquivos `.agent.md` para usurpar o papel de subagentes especializados sem dispatch real via `run_subagent`.
+- **R-063 e Smell 2.30**: Proibição terminante do modelo raiz executar ferramentas genéricas nativas (terminal, read_file, grep, edit) sem triagem prévia obrigatória via `@agent-router`.
 
 ## [2.37.0] — 2026-09-24
 
 ### Adicionado (Wiring Sistêmico de Harness/Prompt/Context Engineering & Anti-Silo Fix)
-- **Fechamento de Gaps de Wiring (Plano de Ação do @agent-auditor pós-2.36.0)**:
-  - **Wiring 1 (`harness-engineering-patterns/SKILL.md`)**: formalizada dependência operacional em `source_docs:` para agentes chave de orquestração, auditoria e arquitetura (`@agent-router`, `@agent-auditor`, `@governance-maintainer`, `@tech-solution-architect`).
-  - **Wiring 2 (`agent-evals-lab/SKILL.md`)**: referenciada em `source_docs:` de agentes que elaboram ou avaliam arquiteturas e fábricas de governança (`@governance-factory`, `@tech-solution-architect`, `@agent-router`).
-  - **Wiring 3 (`prompt-engineering-patterns/SKILL.md`)**: vinculada ao `source_docs:` de agentes criadores de diretrizes e roteamento (`@governance-factory`, `@agent-router`).
-  - **Wiring 4 (`structured-intake-patterns/SKILL.md`)**: adicionada ao `source_docs:` de `@test-strategy` e consolidação formal de SSOT de frontmatter em `@business-rules-extractor` e `@requirements-analyst`.
-  - **Wiring 5 (`requirements-engineering-patterns/SKILL.md`)**: adicionada ao `source_docs:` de `@tech-solution-architect` para suporte a elicitação e refinamento não-funcional.
-  - **Wiring 6 (`docs/agent-context/templates/CONTEXT.template.md`)**: vinculado formalmente em `source_docs:` de `@docs-engineer` e `@adapter-generator`, com orientações nos corpos de `/add-project-context` (proposição de criação de `CONTEXT.md` ao gerar adapter) e `/init-context` (opção de bootstrap de glossário de domínio).
-- **Quality Gate Determinístico**:
-  - Novo teste restrito `test_wiring_of_new_skills_in_consumer_agents()` em `tests/governance_audit/test_harness_engineering_governance.py` validando deterministamente a presença de todos os 6 wirings nos frontmatters dos agentes consumidores.
-- **Governança & Portão de Reúso Sistêmico (R-055 / Q1)**:
-  - Registrada recomendação (não implementada nesta release para evitar quebras em wirings pré-existentes não relacionados) para futura auditoria sistêmica global automatizada `.index.json` × `source_docs:` em todo o catálogo de agentes.
-
----
+- **Fechamento de Gaps de Wiring**: **Wiring 1**: formalizada dependência operacional em `source_docs:` para agentes chave de orquestração, auditoria e arquitetura.
+- **Quality Gate Determinístico**: Novo teste restrito `test_wiring_of_new_skills_in_consumer_agents()` em `tests/governance_audit/test_harness_engineering_governance.py` validando deterministamente.
+- **Governança & Portão de Reúso Sistêmico (R-055 / Q1)**: Registrada recomendação para futura auditoria sistêmica global automatizada `.index.json` × `source_docs:` em todo o catálogo de agentes.
 
 ## [2.36.0] — 2026-09-23
 
 ### Adicionado (Harness Engineering Patterns & Sincronização Normativa R-061)
-- **Pesquisa de Mercado 2026**: consolidação de práticas de Harness Engineering a partir de referências públicas de mercado (Matt Pocock / AI Hero — *Harness Engineering & Ralph Loop*, HumanLayer — *Context Engineering & Agent Tooling*, Martin Fowler / Anthropic / OpenAI):
-  - Diagnóstico sistemático de causa-raiz: segregação entre falhas de infraestrutura do agente (harness) e limitações cognitivas da LLM (modelo).
-  - Heurística da "zona inteligente" (~100k tokens) e descarte profilático de sessões com handoffs portáteis (*Write/Select/Compress/Isolate*).
-  - Poda contínua de instrução via "delete e observe" e progressive disclosure em arquivos de diretrizes persistentes (`AGENTS.md` / `CLAUDE.md`).
-  - Modo de execução autônoma tipo "Ralph Loop" documentado estritamente como técnica de execução contínua em workflows existentes (sem criação de workflow anômalo, respeitando R-050).
-- **Governança & Cascata Normativa (R-015 / R-046 / R-055 / R-061)**:
-  - `CLAUDE.md`: formalização da regra normativa **R-061** (Diagnóstico de Harness-vs-Modelo e Poda Anti-Bloat de Instrução).
-  - Nova skill canônica `.github/skills/harness-engineering-patterns/SKILL.md` (Tier 1, category `process`).
-  - Atualização atômica de catálogo em `.github/skills/README.md` e `.github/skills/.index.json`.
-  - Atualização cruzada em `.github/skills/agent-evals-lab/SKILL.md` (seção 2.4 — Métricas de Qualidade do Harness vs. Métricas do Modelo).
-  - Atualização cruzada em `.github/skills/prompt-engineering-patterns/SKILL.md` (Escrever para Agentes vs. Prompts de Tarefa efêmeros).
-  - Alinhamento de governança de handoffs em `.github/skills/handoff-governance/SKILL.md` (§ 2.5).
-  - Atualização do catálogo rápido em `.github/copilot-instructions.md`.
-  - Suíte de testes determinística `tests/governance_audit/test_harness_engineering_governance.py` com remediações acionáveis (`remediation()`).
-  - **Padrões Complementares de Context Engineering & AI Hero (Matt Pocock)**:
-    - **Protocolo de Grilling Cético ("Grill Me")**: formalizado em `.github/skills/structured-intake-patterns/SKILL.md` (§ 2.1) estabelecendo que o agente interroga ativamente premissas, falhas e trade-offs (mantendo humanos como responsáveis finais), com nota cruzada em `.github/skills/requirements-engineering-patterns/SKILL.md` (§ 6).
-    - **Padrão `CONTEXT.md` (Glossário de Domínio Compartilhado para Compressão Semântica)**: criação do template canônico `docs/agent-context/templates/CONTEXT.template.md` (termos canônicos, invariantes não-negociáveis, siglas e anti-termos) e recomendação de consumo em `.github/skills/context-mode/SKILL.md` (§ 3.3) via `ctx_search`.
-    - **Estratégia Tracer Bullets (Vertical Slicing)**: formalizada em `.github/skills/task-decomposition-patterns/SKILL.md` (§ 1) instruindo fatiamento vertical ponta a ponta (UI → API → Banco com teste funcional na primeira subtask) para validação precoce de arquitetura.
-    - **Quality Gate determinístico**: 3 novos testes em `tests/governance_audit/test_harness_engineering_governance.py` garantindo a integridade dos 3 novos padrões com remediações determinísticas (`remediation()`).
-- **Correção Pós-Cascata (Integridade Estrutural de Catálogo, R-051)**: a primeira aplicação da cascata pelo `governance-maintainer` converteu inadvertidamente a chave `skills` de `.github/skills/.index.json` de **array** (schema canônico usado por todo o catálogo) para **objeto/dict** com chaves numéricas — regressão estrutural silenciosa que teria quebrado qualquer consumidor externo do índice. Corrigido reconstruindo `skills` como array, com a nova entrada `harness-engineering-patterns` reposicionada em ordem alfabética (entre `handoff-governance` e `integration-contract-analysis`); o teste determinístico correspondente foi ajustado para validar o schema de array (não dict). Suíte completa revalidada: 317/317 testes aprovados.
-
+- **Pesquisa de Mercado 2026**: consolidação de práticas de Harness Engineering a partir de referências públicas de mercado: Diagnóstico sistemático de causa-raiz: segregação entre falhas de.
+- **Governança & Cascata Normativa (R-015 / R-046 / R-055 / R-061)**: `CLAUDE.md`: formalização da regra normativa **R-061** (Diagnóstico de Harness-vs-Modelo e Poda Anti-Bloat de Instrução).
+- **Correção Pós-Cascata**: a primeira aplicação da cascata pelo `governance-maintainer` converteu inadvertidamente a chave `skills` de `.github/skills/.index.json` de **array** para **objeto/dict**.
 
 ## [2.35.0] — 2026-09-23
 
 ### Adicionado (Harness Engineering — Sensores, Padrão Gerador–Avaliador Cético & Garbage Collection Contínuo)
-- **Pesquisa de base**: síntese das descobertas de mercado 2026 sobre Engenharia de Harness (Anthropic — *Harness design for long-running application development*; OpenAI — *Harness engineering: leveraging Codex in an agent-first world*; Martin Fowler/Thoughtworks — *Harness engineering for coding agent users*) aplicadas ao ecossistema `deep-agents-copilot`.
-- **[PROPOSTA-1] Positive Prompt Injection em Sensores Computacionais**:
-  - Novo helper `tests/governance_audit/_helpers.py` (`remediation(message, fix_hint=...)`) formatando mensagens de `assert` com bloco `REMEDIATION:` acionável, fechando o ciclo de auto-correção sem exigir raciocínio inferencial extra.
-  - Refatoração completa de `tests/governance_audit/test_governance_smells.py` (todas as asserções) para usar o novo helper.
-  - Novo **Smell 2.28** (Mensagem de Sensor Sem Remediação Acionável) documentado em `governance-audit-patterns/SKILL.md`, com atualização de contadores (26→28 categorias) e checklist de conformidade.
-  - `tests/README.md` atualizado com a convenção obrigatória para novos asserts em `tests/governance_audit/`.
-- **[PROPOSTA-2] Padrão Gerador–Avaliador Cético (Generator-Evaluator Skeptical Pattern)**:
-  - Nova seção `§ 1.4` em `.github/agents/workflows.md` formalizando o padrão (Sprint Contract pré-negociado, rubrica de corte objetiva, independência de avaliação).
-  - Aplicado a `WORKFLOW-BUG-FIX` (Estado 2 = Gerador do Red Test; Estado 5 = Avaliador Cético) e `WORKFLOW-FEATURE-DEVELOPMENT` (Estado 2 = negociação do contrato; Estado 6 = Avaliador Cético), incluindo novos campos `sprint_contract` e `avaliacao_cetica` nos respectivos Typed State Bags.
-- **[PROPOSTA-3] Continuous Garbage Collection & Drift Detection**:
-  - Nova skill `.github/skills/continuous-garbage-collection-patterns/SKILL.md` cobrindo 5 categorias de drift (documental, referência órfã, duplicação não consolidada, sincronização de catálogo R-015, skill órfã) e o protocolo de execução de varredura periódica ("Janitor Run").
-  - Registrada em `.github/skills/.index.json` (61 skills) e `.github/skills/README.md`; referenciada em `source_docs:` de `repo-hygiene-auditor.agent.md` e `governance-maintainer.agent.md`.
-- **Quality Gate**: 313/313 testes determinísticos aprovados (pytest).
-
----
+- **Pesquisa de base**: síntese das descobertas de mercado 2026 sobre Engenharia de Harness aplicadas ao ecossistema `deep-agents-copilot`.
+- **[PROPOSTA-1] Positive Prompt Injection em Sensores Computacionais**: Novo helper `tests/governance_audit/_helpers.py` (`remediation(message, fix_hint=...)`) formatando mensagens de `assert` com.
+- **[PROPOSTA-2] Padrão Gerador–Avaliador Cético**: Nova seção `§ 1.4` em `.github/agents/workflows.md` formalizando o padrão.
+- **[PROPOSTA-3] Continuous Garbage Collection & Drift Detection**: Nova skill `.github/skills/continuous-garbage-collection-patterns/SKILL.md` cobrindo 5 categorias de drift e o protocolo de.
 
 ## [2.34.1] — 2026-09-23
 
 ### Refatorado & Otimizado
-- **Desduplicação e Redução de Instruction Bloat em `.github/copilot-instructions.md`**:
-  - **Consolidação de SSOT e Remoção de Redundâncias**: Redução das seções de Think-in-Code (R-008), Single-Turn Batching (R-046), precedência de context-mode (R-056), Protocolo Plan-Then-Batch e Teto de Tool Turns (R-060) para formulações concisas com ponteiros diretos para `CLAUDE.md` e skills canônicas (`context-mode`, `efficient-batch-code-modification`, `terminal-governance`).
-  - **Otimização de Janela de Contexto**: Economia líquida de 51 linhas no system prompt base, diminuindo a pegada de tokens e eliminando duplicações sem relaxar nenhum guardrail mandatório.
+- **Desduplicação e Redução de Instruction Bloat em `.github/copilot-instructions.md`**: **Consolidação de SSOT e Remoção de Redundâncias**: Redução das seções de Think-in-Code (R-008) (R-060).
 
 ## [2.34.0] — 2026-09-23
 
 ### Padronizado & Refatorado
-- **Padronização Universal do Cabeçalho H1 (`# Perfil Operacional`) em 100% dos Agentes e Templates**:
-  - **Eliminação de Inconsistência Estrutural e Duplicação de Nomes**: Unificação do H1 de todos os 86 arquivos de agents (`.github/agents/**/*.agent.md`) e dos 4 templates canônicos (`.github/agents/templates/*.md`) para a linha exata `# Perfil Operacional`.
-  - **Single Source of Truth (SSOT) para Identificadores de Agentes**: O nome e identificador do agente reside agora EXCLUSIVAMENTE no campo `name: '...'` do frontmatter YAML, eliminando a duplicação nominal no corpo textual.
-  - **Governança da Fábrica (R-055 Systemic Reuse Gate)**: Atualização de `.github/agents/governance-factory.agent.md` e `.github/skills/governance-factory-patterns/SKILL.md` estipulando `# Perfil Operacional` como regra inegociável na criaç��o e revisão de agentes.
-  - **Guardrail Determinístico de Testes**: Implementada a suíte `tests/governance_audit/test_agent_headings_standardization.py` parametrizada sobre os 86 agents e 4 templates, garantindo que o H1 seja único, obrigatório e estritamente padronizado.
-  - **Quality Gate**: 248/248 testes aprovados no pytest com 100% de sucesso.
+- **Padronização Universal do Cabeçalho H1 em 100% dos Agentes e Templates**: **Eliminação de Inconsistência Estrutural e Duplicação de Nomes**: Unificação do H1 de todos os 86 arquivos de agents e.
 
 ## [2.33.4] — 2026-09-23
 
 ### Corrigido (Unificacao MUTATING/READONLY em execution_protocol)
-- **Gap identificado**: a fonte canonica introduzida em [2.33.3] mantinha 2 blocos quase identicos (MUTATING/READONLY), diferindo apenas em 3 palavras cosmeticas no item 3 ("mutacoes" vs "mutacoes ou leituras... quando aplicavel") - a redacao READONLY ja era universalmente compativel com ambos os perfis.
+- **Gap identificado**: a fonte canonica introduzida em [2.33.3] mantinha 2 blocos quase identicos (MUTATING/READONLY), diferindo apenas em 3 palavras cosmeticas no item 3 - a redacao READONLY ja.
 - **Correcao**: unificado em um unico bloco canonico `STANDARD` em `tools/agent_protocol_sync/_execution-protocol-fragment.md`. Papel `CUSTOM` (`code-knowledge-graph`) mantido como excecao pinada.
-- **Sincronizacao Aplicada**: `protocol_roles.json` convertido (50 MUTATING + 26 READONLY -> 76 STANDARD); `sync_execution_protocol.py --apply` corrigiu automaticamente os 50 agents que ainda tinham a redacao antiga (sem "ou leituras"/"quando aplicavel").
-- **Estado Final**: 0 drift confirmado via `--check` nos 77 agents; suite de testes atualizada (comentarios de `test_execution_protocol_sync_tool_reports_zero_drift` refletem o modelo STANDARD/CUSTOM).
-- **Quality Gate**: 258/258 testes deterministicos aprovados.
+- **Sincronizacao Aplicada**: `protocol_roles.json` convertido; `sync_execution_protocol.py --apply` corrigiu automaticamente os 50 agents que ainda tinham a redacao antiga.
+- **Estado Final**: 0 drift confirmado via `--check` nos 77 agents; suite de testes atualizada.
 
 ## [2.33.3] — 2026-09-23
 
 ### Adicionado (Fonte Unica para execution_protocol — Fim da Duplicacao Manual de R-059/R-060)
-- **Diagnostico**: o bloco `<execution_protocol>` (Protocolo Plan-Then-Batch R-059 + Teto de Tool Turns/Warm Start R-060) estava duplicado manualmente em 77 dos 86 agents (~159 KB de texto redundante, 3 variantes quase identicas), com guardrail de teste fraco (checagem de substring "R-060", nao de fidelidade). Isso causou reincidencia de corrupcao de caracteres de controle durante propagacoes manuais em lote.
-- **Solucao**: replicado o padrao ja usado por `tools/agentcard_exporter` (fonte unica -> artefatos derivados) para o execution_protocol:
-  - Nova fonte canonica `tools/agent_protocol_sync/_execution-protocol-fragment.md` com 2 blocos nomeados (MUTATING / READONLY).
-  - Novo mapa de papeis `tools/agent_protocol_sync/protocol_roles.json` (77 agents classificados).
-  - Novo script `tools/agent_protocol_sync/sync_execution_protocol.py` (--check para CI, --apply para corrigir drift).
-  - Agent `code-knowledge-graph` mantido como excecao pinada (CUSTOM) com validacao minima de presenca de R-060.
-- **Guardrail Fortalecido**: novo teste `test_execution_protocol_sync_tool_reports_zero_drift` substitui a checagem fraca de substring por comparacao byte-a-byte via o proprio script de sync; novo teste `test_protocol_roles_map_covers_all_non_router_agents` garante que agents futuros nao fiquem fora do mecanismo.
+- **Diagnostico**: o bloco `<execution_protocol>` estava duplicado manualmente em 77 dos 86 agents, com guardrail de teste fraco (R-060).
+- **Solucao**: replicado o padrao ja usado por `tools/agentcard_exporter` para o execution_protocol: Nova fonte canonica `tools/agent_protocol_sync/_execution-protocol-fragment.md` com 2 blocos.
+- **Guardrail Fortalecido**: novo teste `test_execution_protocol_sync_tool_reports_zero_drift` substitui a checagem fraca de substring por comparacao byte-a-byte via o proprio script de sync.
 - **Estado Validado**: 0 drift detectado nos 77 agents na execucao inicial do script (textos ja estavam consistentes; ferramenta agora formaliza e protege essa consistencia).
-- **Racional de Design**: o protocolo permanece INLINE em cada agent (nao virou referencia/pointer) para preservar o viés de proximidade/recência do LLM e evitar leitura extra de arquivo em runtime — a mudanca ataca o custo de MANUTENCAO (77 edicoes manuais -> 1 edicao na fonte + 1 execucao do script), nao o custo de execucao.
-- **Quality Gate**: 258/258 testes deterministicos aprovados (`tests/governance_audit/` + `tests/routing_gate/`).
 
 ## [2.33.2] — 2026-09-23
 
 ### Alterado (Consolidacao de Model Routing por Perfil de Agent)
-- **Correcao de Drift de Deteccao (Transparencia)**: Auditoria inicial reportou 21 agents "sem modelo declarado" devido a regex sensivel a quebra de linha CRLF que falhou ao ler o frontmatter de `.agent.md`. Revalidacao confirmou que **100% dos 86 agents ja possuiam `model` declarado no proprio frontmatter** (fonte autoritativa); a tabela real de mudancas necessarias foi reduzida de 24 para **13 upgrades genuinos**.
-- **Upgrade Gemini 3.8 Flash -> Claude Sonnet 5.5 (13 agents)**: Aplicado a agents cujo perfil exige julgamento de alto risco ou raciocinio multi-arquivo profundo, com evidencia de sessao real onde a versao economica nao capturou gaps criticos:
-  - `agent-auditor` (auditoria meta-nivel do proprio catalogo de governanca).
-  - `governance-factory` (design de novos artefatos de governanca, nao e batch mecanico).
-  - `database-specialist` (migracoes/queries genericas de schema - mesmo risco de DDL dos especialistas Oracle/Informix).
-  - `security-reviewer`, `compliance-guardrails`, `code-review`, `devops-engineer` (julgamento de severidade/risco).
-  - `requirements-analyst` ja estava correto em Sonnet (nao alterado).
-  - `debugger`, `business-rules-extractor`, `feature-planner`, `performance-agent` (raciocinio de causa raiz, nuance semantica e planejamento critico).
-  - `oracle-migration-dev`, `informix-migration-dev` (correcao de drift: `catalog.yaml` ja indicava Claude Sonnet 5.5, mas o frontmatter `.agent.md` real estava em Gemini 3.8 Flash).
-- **Sincronizacao Multi-Fonte**: Atualizados em lote via `ctx_execute` (all-or-nothing): 13 arquivos `.agent.md`, 3 entradas em `.github/agents/catalog.yaml` (`agent-auditor`, `database-specialist`, `governance-factory`), e 5 `.a2a/agentcards/*.json` correspondentes (`model_preferences.recommended_model`).
+- **Correcao de Drift de Deteccao (Transparencia)**: Auditoria inicial reportou 21 agents "sem modelo declarado" devido a regex sensivel a quebra de linha CRLF que falhou ao ler o frontmatter de.
+- **Upgrade Gemini 3.8 Flash -> Claude Sonnet 5.5 (13 agents)**: Aplicado a agents cujo perfil exige julgamento de alto risco ou raciocinio multi-arquivo profundo.
+- **Sincronizacao Multi-Fonte**: Atualizados em lote via `ctx_execute` (all-or-nothing): 13 arquivos `.agent.md`, 3 entradas em `.github/agents/catalog.yaml`.
 - **Estado Final do Ecossistema**: 30 agents em `Claude Sonnet 5.5` (antes: 17) / 56 agents em `Gemini 3.8 Flash` (antes: 69) - 100% sem drift entre `catalog.yaml` e `.agent.md`.
-- **Gap Identificado (fora de escopo desta entrega)**: 21 agents (incluindo os 7 routers de dominio e agents mais recentes como `security-reviewer`, `debugger`, `feature-planner`) nao possuem entrada em `.a2a/agentcards/` nem em `catalog.yaml` - modelo e definido exclusivamente no frontmatter do proprio `.agent.md`. Recomenda-se rodar `agentcard_exporter` para fechar essa lacuna de sincronizacao em entrega futura.
-- **Quality Gate**: 256/256 testes deterministicos aprovados (`tests/governance_audit/` + `tests/routing_gate/`).
 
 ## [2.33.1] — 2026-09-23
 
 ### Corrigido (Auto-Auditoria Pos-Implementacao de R-060)
-- **Propagacao Sistemica de R-060 para 100% dos Agentes Executores (Gap Critico Corrigido)**:
-  - **Gap Identificado**: A regra R-060 havia sido formalizada apenas em CLAUDE.md, copilot-instructions.md, agent-template.md e no agent code-knowledge-graph.agent.md, mas NAO havia sido propagada para os demais 76 agentes executores nao-roteadores, violando o requisito de solucao geral para todos os agents do projeto.
-  - **Correcao Aplicada**: Propagacao em lote unico via ctx_batch_execute do bloco de Teto Rigido de Tool Turns (<= 5) e Warm Start Compulsorio no <execution_protocol> de 100% dos 77 agentes executores nao-roteadores (confirmado via teste determinístico test_all_non_router_agents_declare_r060_turn_budget).
-- **Correcao de Corrupcao de Caracteres de Controle (BELL/BACKSPACE/FORMFEED) em Arquivos de Governanca**:
-  - **Causa Raiz**: Sequencias de escape Python (\a, \b, \f) presentes em palavras como ask_questions, build-if-missing, batch_query e find_cycles foram interpretadas como caracteres de controle (BEL/BS/FF) pela camada de shell do sandbox durante a escrita em lote, corrompendo 7 arquivos normativos e reincidindo apos a propagacao em lote para os 76 agentes.
-  - **Correcao Aplicada**: Substituicao sistematica dos caracteres de controle pelos textos originais em todos os arquivos afetados (CLAUDE.md, copilot-instructions.md, agent-template.md, code-knowledge-graph.agent.md, codegraph-optave-usage/SKILL.md, efficient-batch-code-modification/SKILL.md, CHANGELOG.md e nos 76 agentes executores), incluindo normalizacao de notacao matematica quebrada (O(N^2)) e remocao de blocos LaTeX brutos substituidos por notacao textual simples.
-  - **Guardrail de Regressao**: Novo teste test_no_control_character_corruption_in_governance_files em tests/governance_audit/test_turn_budget_and_warm_start_governance.py varre 100% dos arquivos de governanca versionados contra reincidencia de corrupcao.
+- **Propagacao Sistemica de R-060 para 100% dos Agentes Executores**: **Gap Identificado**: A regra R-060 havia sido formalizada apenas em CLAUDE.md, copilot-instructions.md.
+- **Correcao de Corrupcao de Caracteres de Controle em Arquivos de Governanca**: **Causa Raiz**: Sequencias de escape Python (\a, \b, \f) presentes em palavras como ask_questions, build-if-missing.
 - **Quality Gate**: 165/165 testes deterministicos aprovados (tests/governance_audit/ + tests/routing_gate/), incluindo os 2 novos testes de guardrail (propagacao R-060 e anti-corrupcao).
 
 ## [2.33.0] — 2026-09-24
 
 ### Adicionado & Formalizado
-- **Teto Rígido de Tool Turns (≤ 5), Warm Start Compulsório e Consolidação de Queries em Lote (R-060 / Anti-Token Debt)**:
-  - **Mitigação da Dívida de Tokens Quadrática O(N^2)**: Introduzida a regra normativa **R-060** para eliminar sessões infladas por encadeamento de dezenas de turnos de ferramentas onde todo o histórico é reenviado recursivamente.
-  - **Teto de 5 Tool Turns & Circuit Breaker no 4º Turno**: Limite rígido de 5 turnos de ferramentas para qualquer agente executor, com interrupção e condensação mandatória no 4º turno para prevenir loops investigativos redundantes.
-  - **Warm Start Compulsório (Build-if-Missing)**: Obrigatoriedade de ferramentas e subsistemas locais baseados em índices (como .codegraph/graph.db) construírem ou validarem suas bases silenciosamente no comando inicial, vedando quebras por cold start que consumiam turnos de depuração do LLM.
-  - **Consolidação de Queries & Edge Truncation**: Exigência de que consultas a múltiplos nós/símbolos sejam feitas via chamadas em lote (batch_query, ctx_batch_execute ou script SQLite em sandbox) com destilação semântica e truncamento na borda.
-- **Atualização Sistêmica de Artefatos**:
-  - CLAUDE.md: Adição de R-060 e atualização do índice normativo para R-001..R-060.
-  - .github/copilot-instructions.md: Inclusão de R-059 e R-060 no corpo de regras e detalhamento de turn budgeting e warm start na Seção 2.1.
-  - .github/agents/templates/agent-template.md: Incorporação do Teto Rígido de 5 turnos e Warm Start no bloco <execution_protocol>.
-  - .github/skills/codegraph-optave-usage/SKILL.md: Formalização de Warm Start (build-if-missing), Batch Querying e Turn Budget ≤ 3 para o @code-knowledge-graph.
-  - .github/skills/efficient-batch-code-modification/SKILL.md: Nova Seção 6 detalhando a matemática da dívida de tokens, destilação na borda e Circuit Breaker.
-  - .github/agents/code-knowledge-graph.agent.md: Incorporação de salvaguardas de Warm Start e teto de turnos.
+- **Teto Rígido de Tool Turns, Warm Start Compulsório e Consolidação de Queries em**: **Mitigação da Dívida de Tokens Quadrática O(N^2)**: Introduzida a regra normativa **R-060** para eliminar.
+- **Atualização Sistêmica de Artefatos**: CLAUDE.md: Adição de R-060 e atualização do índice normativo para R-001..R-060.
 
 ## [2.32.0] — 2026-09-24
 
 ### Adicionado & Formalizado
-- **Universalização do Protocolo Plan-Then-Batch (Smell 2.26 / Smell 2.13 / R-059) em 100% dos Agentes Não-Routers**:
-  - **Extensão Holística do Escopo**: Ampliação do protocolo para todos os 27 agentes analíticos, advisory, arquitetos, auditores, reviewers e especialistas restantes (totalizando 78 agentes não-routers no ecossistema).
-  - **Saneamento Total de Editor Tools (R-056 / Smell 2.24)**: Remoção integral de `read_file`, `create_file`, `insert_edit_into_file` e `replace_string_in_file` de todos os frontmatters `tools:` e sub-catálogos de domínio.
-  - **Conjunto Completo de Context-Mode Mandatório**: Inclusão garantida das 5 ferramentas context-mode (`context-mode/ctx_batch_execute`, `context-mode/ctx_execute`, `context-mode/ctx_execute_file`, `context-mode/ctx_index`, `context-mode/ctx_search`) em todos os agentes não-routers com escopo de arquivos.
-  - **Salvaguarda Especializada para `@code-knowledge-graph`**: Exigência expressa de que qualquer inspeção multi-arquivo para extração ou análise comparativa DEVE compulsoriamente utilizar `ctx_batch_execute` ou script iterativo consolidado em sandbox antes de queries de grafo, eliminando chamadas sequenciais unitárias de `ctx_execute`.
-- **Blindagem do Router contra Discovery de Modelos em Tempo de Execução (R-054 / Zero Discovery)**:
-  - **Eliminação de Runtime Discovery**: Formalizada a proibição inegociável de o `@agent-router` e domain routers chamarem ferramentas de busca/leitura (`read_file`, `grep_search`, `file_search`, `list_dir`) em tempo de execução para inspecionar `catalog.yaml` ou `*.agent.md` em busca de modelos de subagentes delegados.
-  - **Resolução Estática / Melhor Esforço**: Mapeamento modelo ↔ agent estabelecido como estático ou convencional (zero tool calls em runtime).
-  - **Limpeza do Formato de Saída**: Remoção da menção `(.github/agents/catalog.yaml)` na linha informativa `[Model] Delegando para...` de todos os routers centrais, supervisores de domínio e templates para prevenir alucinações de busca pelo modelo.
-- **Sincronização Atômica de Catálogos (R-015 / R-040)**:
-  - Atualização com paridade estrita em `.github/agents/catalog.yaml` e nos 7 sub-catálogos hierárquicos de domínio (`backend/database`, `backend/ejb`, `backend/python`, `backend/spring-boot`, `backend/spring-reactive`, `backend/struts`, `frontend/angular`).
-- **Quality Gates Determinísticos no Pytest (`tests/governance_audit/`)**:
-  - Atualização e expansão de `test_context_mode_precedence_governance.py` com novas asserções cobrindo 100% dos 78 agentes não-routers quanto à ausência de editor tools, presença de todas as ferramentas context-mode, obrigatoriedade do bloco `<execution_protocol>`, salvaguarda específica do `@code-knowledge-graph` e salvaguarda do `@agent-router` contra discovery de modelos em runtime.
-
----
+- **Universalização do Protocolo Plan-Then-Batch em 100% dos Agentes Não-Routers**: **Extensão Holística do Escopo**: Ampliação do protocolo para todos os 27 agentes analíticos, advisory.
+- **Blindagem do Router contra Discovery de Modelos em Tempo de Execução**: **Eliminação de Runtime Discovery**: Formalizada a proibição inegociável de o `@agent-router` e domain routers chamarem.
+- **Sincronização Atômica de Catálogos (R-015 / R-040)**: Atualização com paridade estrita em `.github/agents/catalog.yaml` e nos 7 sub-catálogos hierárquicos de domínio.
+- **Quality Gates Determinísticos no Pytest (`tests/governance_audit/`)**: Atualização e expansão de `test_context_mode_precedence_governance.py` com novas asserções cobrindo 100% dos 78 agentes.
 
 ## [2.31.0] — 2026-09-24
 
 ### Adicionado & Formalizado
-- **Instituição da Regra R-059, Regra do Limiar >= 2 e Protocolo Plan-Then-Batch (Smell 2.26 / Smell 2.13)**:
-  - **Diagnóstico e Causa-Raiz**: Identificado que agents executores mantinham chamadas unitárias sequenciais de `ctx_execute` por alvo no chat (MCP Tool Chaining / Smell 2.26) em tarefas multi-arquivo ou regrediam para ferramentas nativas de editor (`read_file`, `create_file`, `insert_edit_into_file`) em prompts curtos do usuário ("prosseguir", "continue").
-  - **Regra do Limiar >= 2 (inegociável)**: Se a tarefa exigir inspecionar, ler, comparar, editar ou executar >= 2 arquivos/comandos/alvos, é terminantemente proibido disparar `ctx_execute` isolado por alvo em turnos sucessivos; exige compulsoriamente `ctx_batch_execute(commands, queries)` OU script iterativo consolidado em `ctx_execute`.
-  - **Protocolo Plan-Then-Batch**: Protocolo em 4 etapas (1. ENUMERAR, 2. CONSOLIDAR, 3. DESPACHAR, 4. Comandos curtos não suspendem a regra) formalizado globalmente em `CLAUDE.md` (R-059), `.github/copilot-instructions.md` § 2.1, `context-mode/SKILL.md` e `efficient-batch-code-modification/SKILL.md`.
-  - **Saneamento de Frontmatter dos Agentes Executores (50 Agentes)**: Removidas as affordances de editor (`read_file`, `create_file`, `insert_edit_into_file`, `replace_string_in_file`) de 100% dos 50 agentes executores mutativos, assegurando a presença das 5 ferramentas context-mode (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_index`, `ctx_search`).
-  - **Bloco `<execution_protocol>` Canônico**: Inserido bloco estruturado `<execution_protocol>` em 100% dos 50 agentes executores e nos templates operacionais (`operational-agent.md`, `agent-template.md`), tornando o protocolo Plan-Then-Batch contratual em cada especialista.
-  - **Sincronização Atômica de Catálogos (R-015/R-040)**: `catalog.yaml` e todos os 7 sub-catálogos de domínio atualizados com paridade estrita nas ferramentas dos agentes executores.
-  - **Quality Gate Determinístico Expandido**: `tests/governance_audit/test_context_mode_precedence_governance.py` expandido para validar a presença da Regra do Limiar >= 2, o protocolo Plan-Then-Batch, a ausência de ferramentas nativas de editor nos 50 executores e a presença do bloco `<execution_protocol>`.
-
----
+- **Instituição da Regra R-059, Regra do Limiar >= 2 e Protocolo Plan-Then-Batch**: **Diagnóstico e Causa-Raiz**: Identificado que agents executores mantinham chamadas unitárias sequenciais de.
 
 ## [2.30.0] — 2026-09-23
 
 ### Adicionado & Formalizado
-- **Instituição da Regra R-058 e Invariante 20: Blueprint Técnico e Decomposição Obrigatórios em Features Complexas (Anti-Premature Implementation Bypass & Anti-Gap Dumping / Smell 2.27)**:
-  - **Diagnóstico e Causa Raiz**: Identificado que o `@agent-router`, ao despachar novas funcionalidades de stack única (ex.: frontend com BaaS/Firestore) que envolviam novos schemas de persistência, máquinas de estados (3+ transições), concorrência e push notifications, bypassava prematuramente o `@tech-solution-architect` e o `@feature-planner`, despejando lacunas de arquitetura no handoff para o implementador de código resolver no improviso.
-  - **Regra Normativa R-058**: Features que tocam novo schema de persistência, máquina de estados (3+ transições), transações/concorrência ou infra/push NUNCA podem ser despachadas diretamente para domain routers ou implementadores de código; exigem passagem compulsória pelo Estado 3 de `WORKFLOW-FEATURE-DEVELOPMENT` (`@tech-solution-architect`) com aprovação no Checkpoint 3b (`ask_questions`).
-  - **Decomposição em Subtasks (`@feature-planner`)**: Features com 3 ou mais frentes interdependentes exigem decomposição formal em subtasks sequenciais `[S]` e paralelas `[P]` com Definition of Done granular, evitando improviso na ordem de execução.
-  - **Proibição de Gap Dumping e Smell 2.27**: Veda expressamente ao roteador listar lacunas conceituais de schema/permissão em "Lacunas para handoff" para o desenvolvedor improvisar durante a codificação; havendo lacunas de arquitetura, o roteamento mandatório é para `@tech-solution-architect`.
-  - **Quality Gate e Testes Determinísticos**: Criada a suíte `tests/governance_audit/test_architectural_blueprint_gate_governance.py` com 7 testes automatizados validando a conformidade em `CLAUDE.md`, `copilot-instructions.md`, `agent-router.agent.md`, `router-agent.md`, `workflows.md`, `routing-graph.yaml` e `governance-audit-patterns/SKILL.md`.
-- **Instituição do 9º Workflow Canônico: `WORKFLOW-PROMPT-SYNTHESIS` e Comando Operacional `/craft-prompt` (R-050, R-041)**:
-  - **Propósito**: Conduzir o refinamento estrutural de solicitações, mineração determinística de contexto no codebase e síntese de prompts canônicos encapsulados em blocos Markdown (`.md`) prontos para sessões limpas com Prompt Caching otimizado.
-  - **Máquina de Estados de 5 Etapas**:
-    - *Etapa 1*: Elicitação & Problem Space (`@requirements-analyst` para demandas de negócio / `@prompt-structuring` para tarefas técnicas).
-    - *Etapa 2*: Context Grounding & AST Mining (`@code-knowledge-graph` via `run_subagent`).
-    - *Etapa 3*: Mapeamento de Restrições e Não-Escopo (`@prompt-structuring` + R-046).
-    - *Etapa 4*: Síntese Estruturada & Otimização de Caching (`@prompt-structuring`).
-    - *Etapa 5*: Quality Gate & Emissão do Bloco Markdown (`@prompt-structuring`).
-  - **Invariante 17 (Visibilidade Progressiva e Anti-Blackbox Execution)**: Veda entregas em caixa-preta; torna compulsória a renderização do Painel de Evidências por Etapa no chat antes do bloco final.
-  - **Invariante 18 (Exclusividade do Motor de Grafo & Anti-Tool Chaining / R-045)**: Torna obrigatória a chamada de `@code-knowledge-graph` via `run_subagent` na Etapa 2, proibindo varreduras manuais `fs` no sandbox e MCP Tool Chaining sequencial (Smell 2.26).
-  - **Invariante 19 (Interrupção por Ambiguidade & Anti-Alucinação / R-027)**: Proíbe alucinar regras de negócio; impõe parada obrigatória na Etapa 1 via `ask_questions` com opções estruturadas para o usuário definir premissas e regras de domínio.
-  - **Prompt Operacional `/craft-prompt`**: Criado `.github/prompts/craft-prompt.prompt.md` e registrado em `.github/prompts/README.md`.
-  - **Isolamento de Projetos Locais & Genericidade (R-038/R-043/R-044)**: Typed State Bag 100% genérico e nova asserção determinística `test_no_concrete_local_project_file_paths_in_governance_files` em `test_local_project_isolation.py`.
-  - **Quality Gate e Testes Automatizados**: Suíte de testes expandida para **195 testes determinísticos (100% verdes)**, incluindo novos cenários em `casos-roteamento.yaml` (`canon-047`) e `casos-workflows.yaml` (`WF-PROMPT-001`).
-
----
+- **Instituição da Regra R-058 e Invariante 20: Blueprint Técnico e Decomposição O**: **Diagnóstico e Causa Raiz**: Identificado que o `@agent-router`, ao despachar novas funcionalidades de stack.
+- **Instituição do 9º Workflow Canônico: `WORKFLOW-PROMPT-SYNTHESIS` e Comando Ope**: **Propósito**: Conduzir o refinamento estrutural de solicitações, mineração determinística de contexto no.
 
 ## [2.29.0] — 2026-09-21
 
 ### Adicionado & Endurecido
-- **Extensão Universal da Precedência Mandatória de Context-Mode e `ctx_batch_execute` a 100% dos Agentes e Prompts (R-008, R-056 / Smell 2.24, Smell 2.26)**:
-  - **Diagnóstico e Eliminação de Gaps**: Identificado que 13 agentes não-roteadores (especialmente os `*-arch-advisor` de todas as stacks, `adr-sentinel`, `compliance-guardrails`, `ddd-bounded-context-mapper`, `devops-engineer`, `feature-planner`, `repo-hygiene-auditor`) e múltiplos prompts (`commit.prompt.md`, `review.prompt.md`, `eval-workflows.prompt.md`, `visualize-graph.prompt.md`) não possuíam `context-mode/ctx_batch_execute` ou as diretrizes mandatórias de precedência, induzindo o uso de dezenas de `read_file` e `grep_search` sequenciais no chat.
-  - **Blindagem em 100% dos Agentes Não-Roteadores (78 Agentes)**:
-    - Habilitadas compulsoriamente as ferramentas `'context-mode/ctx_execute'`, `'context-mode/ctx_batch_execute'` e `'context-mode/ctx_search'` em 100% dos 78 agentes não-roteadores do catálogo.
-    - Inserida em 100% dos agentes a cláusula de Não-Escopo proibindo expressamente o uso de ferramentas nativas de editor (`read_file`, `insert_edit_into_file`, `replace_string_in_file`, `create_file`) e comandos de leitura em terminal quando `context-mode` estiver ativo, rebaixadas a fallback exclusivo de contingência.
-    - Inserida a diretriz positiva exigindo inspeções e varreduras no sandbox com Single-Turn MCP Batching para zero desperdício de créditos.
-  - **Blindagem de Prompts e Templates**:
-    - Atualizados `commit.prompt.md`, `review.prompt.md`, `eval-workflows.prompt.md`, `visualize-graph.prompt.md`, `del-project-context.prompt.md` e os templates `research-agent.md` e `prompt-template.md` com as ferramentas MCP em lote e a regra mandatória de context-mode.
-  - **Sincronização Atômica de Catálogos**:
-    - Atualizados `catalog.yaml`, os 7 sub-catálogos locais (`angular-catalog.yaml`, `spring-boot-catalog.yaml`, `spring-reactive-catalog.yaml`, `python-catalog.yaml`, `struts-catalog.yaml`, `ejb-catalog.yaml`, `database-catalog.yaml`) e os agentcards A2A.
-  - **Quality Gate e Testes Determinísticos (Q3)**:
-    - Adicionados testes determinísticos em `tests/governance_audit/test_context_mode_precedence_governance.py` validando que 100% dos agentes não-roteadores possuem `ctx_batch_execute`, `ctx_execute` e declaram a proibição de editor tools. Total da suíte expandido para **192 testes automatizados (100% verdes)**.
-
----
+- **Extensão Universal da Precedência Mandatória de Context-Mode e `ctx_batch_exec**: **Diagnóstico e Eliminação de Gaps**: Identificado que 13 agentes não-roteadores e múltiplos prompts não.
 
 ## [2.28.0] — 2026-09-21
 
 ### Adicionado & Endurecido
-- **Single-Turn MCP Batching Compulsório e Erradicação de MCP Tool Chaining Sequencial no Chat (R-008, R-046, R-056 / Smell 2.26)**:
-  - **Diagnóstico e Causa Raiz**: Identificado que agentes operacionais e de preparação (como `pr-gatekeeper` e outros) incorriam no anti-padrão de disparar 10+ chamadas unitárias sequenciais de `ctx_execute` turno a turno no chat para analisar diffs, arquivos, branches e categorias, reenviando todo o histórico acumulado da conversa a cada turno e drenando créditos de IA desnecessariamente.
-  - **Single-Turn MCP Batching Mandatório**: Instituída a regra normativa que exige que qualquer inspeção, levantamento ou mutação envolvendo múltiplos alvos seja consolidada em chamada única:
-    - **Via A (`ctx_batch_execute`)**: Para múltiplos comandos shell/git e queries unificadas em uma única rodada de ferramenta.
-    - **Via B (script consolidado em `ctx_execute`)**: Para múltiplos arquivos no filesystem processados em loop iterativo interno em processo único no sandbox, retornando um resumo agregado único.
-    - **Proibição Absoluta**: Terminantemente vedado o MCP Tool Chaining sequencial no chat.
-  - **Systemic Reuse Gate (R-055 / Q1, Q2, Q3)**:
-    - **Q1 (Peers e Catálogos)**: Habilitado compulsoriamente `'context-mode/ctx_batch_execute'` em 100% dos agentes do catálogo que possuíam `context-mode/ctx_execute` (`code-knowledge-graph`, `code-review`, `code-style-enforcer`, `database-specialist`, `debugger`, `performance-agent`, `pr-gatekeeper`, `runtime-verifier`, `security-reviewer`), garantindo paridade total; sincronizado `catalog.yaml` para `runtime-verifier` e `pr-gatekeeper`; atualizado `pr-gatekeeper.agent.md` com as diretrizes consolidadas de batching pré-PR.
-    - **Q2 (Templates Canônicos e Fábrica)**: Atualizados `agent-template.md`, `operational-agent.md` e `governance-factory.agent.md` com a cláusula de Single-Turn MCP Batching, proibição de encadeamento sequencial e verificação compulsória de `ctx_batch_execute` no checklist de novos agentes.
-    - **Q3 (Testes Determinísticos no pytest)**: Adicionados 4 testes determinísticos em `tests/governance_audit/test_context_mode_precedence_governance.py` (`test_smell_2_26_documented_in_governance_audit_patterns`, `test_mcp_batch_execution_and_tool_chaining_prohibition_in_normative_docs`, `test_all_agents_with_ctx_execute_declare_ctx_batch_execute`, `test_catalog_yaml_declares_ctx_batch_execute_for_all_ctx_execute_agents`), atingindo 100% de aprovação (189/189 testes verdes).
-  - **Catálogo de Smells de Governança**: Catalogado o **Smell 2.26** ("MCP Tool Chaining Sequencial no Chat / Omissão de ctx_batch_execute e Script Consolidado") em `.github/skills/governance-audit-patterns/SKILL.md` com severidade Bloqueador, critérios de detecção e remediação.
-  - **Alinhamento Normativo**: Sincronizados `CLAUDE.md` (R-008, R-046, R-056), `.github/copilot-instructions.md` (Seção 2 e 2.1), `.github/skills/efficient-batch-code-modification/SKILL.md` e `.github/skills/context-mode/SKILL.md`.
-
----
+- **Single-Turn MCP Batching Compulsório e Erradicação de MCP Tool Chaining Sequen**: **Diagnóstico e Causa Raiz**: Identificado que agentes operacionais e de preparação (como `pr-gatekeeper` e.
 
 ## [2.27.0] — 2026-09-21
 
 ### Modificado & Endurecido
-- **Blindagem Completa de Renderização de Blocos de Código e Formatação de PR no `pr-gatekeeper` e Prompts Correlatos (Anti-Fences-Corruption & Isolated Artifacts Blocks)**:
-  - **Eliminação da Corrupção por Fences Aninhados**: Identificada e corrigida a causa raiz da quebra de renderização em visualizadores de markdown (fences de mesma contagem de backticks ````text```` / ````bash```` / ````markdown```` dentro de um outer codeblock global ````markdown```` que forçava os LLMs a emitir a resposta inteira encapsulada e causava truncamento prematuro de fences).
-  - **Reestruturação Mandatória do Formato de Saída (5 Blocos Autocontidos)**:
-    - Removido o outer block markdown que encapsulava o template de saída.
-    - Estabelecida a entrega de 5 blocos copiáveis isolados e autocontidos:
-      - **Bloco 1 (Mensagem de Commit)**: emitido em bloco ````text```` isolado (Formatos A e B).
-      - **Bloco 2 (Comando Bash de Aplicação Manual)**: emitido em bloco ````bash```` isolado e autocontido com heredoc limpo (`git commit -F - << 'EOF' ... EOF`).
-      - **Bloco 3 (Título do PR)**: emitido em bloco ````text```` isolado formatado em Conventional Commits (≤72 cols).
-      - **Bloco 4 (Descrição Estruturada do PR)**: emitido em bloco delimitado estritamente por 4 backticks (` ``` ` + ` ` ) para cópia direta e sem quebras no GitHub, com instrução explícita para que comandos na seção "Como validar / testar" utilizem inline code (`pytest tests/modulo -v`).
-      - **Bloco 5 (CHANGELOG.md)**: emitido em bloco ````diff```` isolado com a entrada semver sugerida.
-  - **Guardrail Anti-Corrupção no CRÍTICO**: Adicionadas cláusulas no escopo crítico de `pr-gatekeeper.agent.md` proibindo incondicionalmente o encapsulamento de toda a resposta em markdown global e o aninhamento de fences de mesma quantidade de backticks.
-  - **Systemic Reuse Gate (R-055 / Q1, Q2, Q3)**:
-    - **Q1 (Peers e Prompts Correlatos)**: Propagadas as regras de isolamento dos 5 blocos e anti-corrupção para `.github/prompts/commit.prompt.md` (PASSO 5, checklist e regras de autonomia) e para `.github/skills/git-governance/SKILL.md` (§ 3 Pull Request Guidelines).
-    - **Q2 (Templates Canônicos)**: Atualizados `.github/agents/templates/agent-template.md` e `.github/prompts/templates/prompt-template.md` com diretrizes explícitas de não-encapsulamento global e isolamento de artefatos.
-    - **Q3 (Testes Determinísticos)**: Criada a suíte `tests/governance_audit/test_pr_gatekeeper_render_integrity.py` com 6 testes determinísticos validando o balanceamento de fences, ausência de outer fences no formato de saída, presença de guardrails anti-corrupção e paridade no prompt `/commit`.
-
----
+- **Blindagem Completa de Renderização de Blocos de Código e Formatação de PR no `**: **Eliminação da Corrupção por Fences Aninhados**: Identificada e corrigida a causa raiz da quebra de.
 
 ## [2.26.0] — 2026-09-21
 
 ### Modificado & Endurecido
-- **Blindagem Completa e Sistêmica de Precedência de Context-Mode em Todos os Agentes Mutadores (R-008, R-056 / Smell 2.24)**:
-  - **Varredura Universal e Blindagem em Lote**: Aplicada a blindagem em 100% dos 49 agentes executores/mutadores do repositório em todas as stacks (`backend/spring-boot`, `backend/spring-reactive`, `backend/python`, `backend/struts`, `backend/ejb`, `backend/database`, `frontend/angular`, raiz).
-  - **Cláusula de Proibição Incondicional (CRÍTICO / NÃO-ESCOPO)**: Inserida a proibição estrita de uso de ferramentas nativas de editor (`read_file`, `insert_edit_into_file`, `replace_string_in_file`, `create_file`) e de comandos de leitura/inspeção em terminal quando `context-mode` estiver disponível no ambiente, estabelecendo que o uso de `context-mode` (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_search`, `ctx_index`) é 100% OBRIGATÓRIO para ler e modificar arquivos (R-008 / R-056 / Smell 2.24).
-  - **Diretriz Mandatória Positiva**: Inserida a obrigatoriedade de executar modificações e leituras compulsoriamente via script no sandbox do `context-mode` (`ctx_execute` / `ctx_execute_file`), rebaixando ferramentas manuais de editor a fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
-  - **Alinhamento de Ferramentas e Skills**: Adicionado `'context-mode/ctx_execute'` em `binding-initializer` e `docs-engineer`, e declarada a skill `efficient-batch-code-modification` em `adapter-generator` e `binding-initializer`.
-  - **Templates Canônicos e Fábrica**: Templates operacionais (`operational-agent.md`, `agent-template.md`) e `governance-factory.agent.md` atualizados com as cláusulas padronizadas e checklist de herança compulsória para novos agentes gerados.
-  - **Qualidade e Não-Regressão**: Atualizado `tests/governance_audit/test_context_mode_precedence_governance.py` com o teste dinâmico e assertivo `test_all_mutating_agents_declare_r056_and_explicit_prohibition()` inspecionando todos os agentes mutadores do repositório, alcançando 100% de aprovação (179/179 testes verdes).
-
----
+- **Blindagem Completa e Sistêmica de Precedência de Context-Mode em Todos os Agen**: **Varredura Universal e Blindagem em Lote**: Aplicada a blindagem em 100% dos 49 agentes executores/mutadores do.
 
 ## [2.25.0] — 2026-09-20
 
 ### Modificado & Endurecido
-- **Endurecimento da Precedência Mandatória de Context Mode (R-008 e R-056 / Smell 2.24 — 100% Context-Mode Obligation & Editor Tool Prohibition)**:
-  - **Uso 100% Obrigatório do Context-Mode**: O uso de `context-mode` (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_index`, `ctx_search`) passa a ser **100% OBRIGATÓRIO** tanto para LEITURAS quanto para MODIFICAÇÃO/CRIAÇÃO de arquivos SEMPRE que a ferramenta context-mode estiver disponível no ambiente, eliminando a fragmentação de dezenas de tool calls no chat, prevenindo truncamentos e erradicando o vazamento de bytes para a janela de contexto.
-  - **Proibição Estrita de Ferramentas Nativas de Editor e Terminal**: Ferramentas manuais de editor (`read_file`, `replace_string_in_file`, `insert_edit_into_file`, `create_file`) e comandos de leitura no terminal são **estritamente proibidos quando o context-mode estiver disponível**, sendo rebaixados a **fallback exclusivo** única e estritamente para quando o servidor MCP context-mode estiver comprovadamente indisponível ou desconectado.
-  - **Alinhamento Normativo**: Atualizados `CLAUDE.md` (R-008, R-046, R-056) e `.github/copilot-instructions.md` (Seção 2 e Seção 2.1).
-  - **Reestruturação de Skills de Governança**:
-    - `.github/skills/efficient-batch-code-modification/SKILL.md`: Seção 0 e Seção 5 reestruturadas definindo Nível 1 como 100% Compulsório para context-mode e Nível 2 como Fallback Exclusivo de indisponibilidade de MCP.
-    - `.github/skills/governance-audit-patterns/SKILL.md`: Smell 2.24 elevado para Bloqueador ao identificar uso indevido de editor tools ou omissão de precedência mandatória de context-mode.
-  - **Systemic Reuse Gate (R-055 / Q1, Q2, Q3)**:
-    - **Q1 (Impacto em Peers)**: Propagada a regra endurecida para `.github/agents/governance-maintainer.agent.md` e 7 agentes executores/fixers (`ejb-test-fixer`, `python-test-fixer`, `spring-boot-test-fixer`, `spring-reactive-test-fixer`, `struts-test-fixer`, `database-specialist`, `angular-test-fixer`).
-    - **Q2 (Templates Canônicos)**: Atualizados `.github/agents/templates/operational-agent.md`, `.github/agents/templates/agent-template.md` e `.github/agents/governance-factory.agent.md`.
-    - **Q3 (Testes Determinísticos)**: Ampliada a suíte `tests/governance_audit/test_context_mode_precedence_governance.py` com 7 novos testes determinísticos verdes cobrindo a proibição e fallback exclusivo.
-
----
+- **Endurecimento da Precedência Mandatória de Context Mode**: **Uso 100% Obrigatório do Context-Mode**: O uso de `context-mode` passa a ser **100% OBRIGATÓRIO** tanto para LEITURAS quanto para.
 
 ## [2.24.0] — 2026-09-20
 
 ### Adicionado
-- **Proibição Estrita de Terceirização de Edição Manual ao Usuário por Agentes Analíticos / Read-Only (R-057 / Smell 2.25 — Anti-Manual User Delegation & Automated Workflow Continuity)**:
-  - Formalização da regra normativa **R-057** em `CLAUDE.md` e `.github/copilot-instructions.md`, vedando que agentes analíticos, supervisores, auditores e advisors sem ferramentas de mutação instruam o usuário a editar código manualmente sob pretexto de ausência de tools.
-  - Catalogação do **Smell 2.25 (Terceirização Indevida de Edição ao Usuário por Agentes Analíticos / Read-Only / Dead-End Analysis)** em `.github/skills/governance-audit-patterns/SKILL.md`, classificado como **Bloqueador** por violar R-047 (Anti Beco Sem Saída).
-  - Instituição do **Invariante 16** em `.github/agents/workflows.md` (Regras de Não-Desvio), blindando a transição automática da etapa diagnóstica/analítica para a etapa executora nos workflows operacionais (`WORKFLOW-GOVERNANCE-MAINTENANCE`, `WORKFLOW-BUG-FIX`, `WORKFLOW-REFACTORING`, etc.).
-  - Formalização da sub-seção 6.1 em `.github/skills/agent-contracts/SKILL.md` e anti-padrão na skill `.github/skills/handoff-governance/SKILL.md`.
-  - Injeção da cláusula preventiva de não-escopo em templates canônicos (`research-agent.md`, `agent-template.md`, `router-agent.md`) e em 12 agentes analíticos canônicos (`agent-auditor`, `code-review`, `adr-sentinel`, `repo-hygiene-auditor`, `requirements-analyst`, `test-strategy`, `bug-triage`, `refactor-planner`, `runtime-verifier`, `deep-search`, `tech-solution-architect`, `ddd-bounded-context-mapper`).
-  - Atualização do checklist de conformidade no `governance-factory.agent.md` para auditar a presença compulsória de R-057 em novos agentes analíticos.
-  - Criação da suíte determinística de testes em `tests/governance_audit/test_anti_manual_user_delegation_governance.py` (7 novos testes verdes).
-
----
+- **Proibição Estrita de Terceirização de Edição Manual ao Usuário por Agentes Ana**: Formalização da regra normativa **R-057** em `CLAUDE.md` e `.github/copilot-instructions.md`.
 
 ## [2.23.0] — 2026-09-19
 
 ### Adicionado
-- **Consolidação Determinística dos Workflows de Resolução de Bugs e Refatoração Estrutural (`WORKFLOW-BUG-FIX` e `WORKFLOW-REFACTORING`)**:
-  - **`WORKFLOW-BUG-FIX`**:
-    - Formalização de RCA estruturado via 5 Whys ou Fishbone (Ishikawa), com regra estrita de *evidence before hypothesis* exigindo no mínimo 2 fontes independentes de evidência técnica observável (stack trace, runtime log, payload de rede, APM ou teste isolado).
-    - Classificação compulsória e determinística entre falha `flaky` (instabilidade intermitente por concorrência/ambiente/poluição de estado) e `regressao_real` no Estado 1 e no baseline check.
-    - Pré-requisito mandatório no Estado 3: declaração antecipada de `blast_radius_estimado` (callers e módulos afetados) e `rollback_plan` no `workflow_state` antes de autorizar qualquer diff cirúrgico.
-    - Inclusão do **Mini Mutation-Check Proporcional ao Risco** no Estado 4 para erradicar falsos-verdes nos testes de regressão (injeção de 1 a 3 mutantes sintéticos que devem ser 100% eliminados pelo Red Test).
-    - Instituição do **Observação Pós-Fix / Canary Gate** no Estado 5 para defeitos críticos (P0/P1, segurança, autenticação e integridade de dados) com métricas de telemetria e janela de observação definidas.
-  - **`WORKFLOW-REFACTORING`**:
-    - Formalização explícita de **Contract Testing (Pact-style / consumer-driven contract tests ou OpenAPI / JSON Schema Diff)** no gate de contratos (Sub-rotina 2a / Estado 2) sempre que a refatoração atingir APIs públicas ou interfaces consumidas por múltiplos módulos.
-    - Instituição de **Camada de Redundância Proporcional ao Blast Radius** no Estado 5 para blast radius moderado ou alto, composta por: (1) **Auditoria Reversa de Símbolos** (`reverse_symbol_audit` via `@code-knowledge-graph`), (2) **Mini Mutation Gate** (`mini_mutation_gate` para testar a sensibilidade da suíte Golden Master) e (3) **Differential Replay Leve** (`differential_replay_leve` comparando snapshots de entrada e saída pré/pós refatoração).
-    - Governança de Rollback fortalecida no Estado 5b com cálculo, registro e reporte quantitativo do **`blast_radius_revertido`** (nós Mikado revertidos, arquivos e callers restaurados) no `workflow_state`.
-  - **Blindagem Sistêmica & R-055 (Q1/Q2/Q3)**:
-    - Sincronização atômica em `workflows.md` (especificações de fluxo, State Bags tipados, diagramas Mermaid, Invariantes 14 e 15, e templates visuais anti-cegueira).
-    - Sincronização estrutural em `routing-graph.yaml` (metadados estruturais de RCA, blast radius, mini mutation, contract testing, redundância e rollback).
-    - Expansão da suíte de testes determinísticos em `tests/operational_flow/test_operational_workflows.py`, adicionando validações contratuais e novo teste `test_workflow_bug_fix_and_refactoring_rigor_and_governance_parity`.
-
----
+- **Consolidação Determinística dos Workflows de Resolução de Bugs e Refatoração Estrutural (`WORKFLOW-BUG-FIX` e `WORKFLOW-REFACTORING`)**: **`WORKFLOW-BUG-FIX`**:.
 
 ## [2.22.0] — 2026-09-19
 
 ### Removido & Descomissionado
-- **Descomissionamento Definitivo e Higienização do `agentic-memory-manager`**:
-  - Remoção física do arquivo `.github/agents/agentic-memory-manager.agent.md`.
-  - Remoção do nó e arestas correspondentes em `.github/agents/routing-graph.yaml` e das rotas de despacho em `.github/agents/agent-router.agent.md`.
-  - Saneamento atômico em cascata sem deixar rastros em `.github/agents/catalog.yaml`, `.github/agents/README.md`, `.github/skills/.index.json`, `.github/skills/agent-memory-policy/SKILL.md`, `CLAUDE.md`, `README.md`, `docs/plan/` e `tools/context-insight-visualizer/`.
-  - Justificativa arquitetural: o agente era órfão dos 8 workflows canônicos, conceptualmente arriscado em relação à "memória procedimental" em tempo de execução e 100% redundante com os hooks automáticos de sessão (26 categorias de eventos), FTS5 nativo e comandos (`/ctx-resume`, `/ctx-checkpoint`) do `context-mode` MCP. A skill neutra `agent-memory-policy` foi preservada como referência de governança.
-  - Atualização do total de agentes catalogados no ecossistema de 36 para 35 agentes.
-
----
+- **Descomissionamento Definitivo e Higienização do `agentic-memory-manager`**: Remoção física do arquivo `.github/agents/agentic-memory-manager.agent.md`.
 
 ## [2.21.0] — 2026-09-19
 
 ### Adicionado
-- **Consolidação de Segurança de Aplicação (AppSec) e Gestão Holística de Vulnerabilidades (SAST, DAST, IAST, SCA, Secrets, ASPM)**:
-  - Criação do **Guia Canônico de Segurança de Aplicação e Vulnerabilidades** (`docs/architecture/APPLICATION_SECURITY_GUIDE.md`), detalhando a matriz dos 6 pilares de AppSec: SAST (análise estática e taint tracking), SCA com *Reachability Analysis*, DAST (testes dinâmicos de runtime e APIs), IAST (instrumentação de testes), Secrets Detection (análise de entropia e pre-commit) e ASPM (gestão de postura e orquestração).
-  - Alinhamento explícito com as normas e padrões globais consolidados: OWASP Top 10:2025, OWASP ASVS 5.0, OWASP API Security Top 10, CWE Top 25 e OWASP Agentic AI Security (ASI01..ASI10:2026).
-  - Formalização da taxonomia de severidade CVSS v3/v4 e definição de SLAs compulsórios de remediação (Crítico ≤ 24h, Alto ≤ 7 dias, Médio ≤ 30 dias, Baixo ≤ 90 dias) integrados aos Quality Gates dos workflows canônicos.
-  - Atualização da skill `security-review-patterns` integrando o protocolo de *Reachability Analysis* para redução drástica de falso-positivo em CVEs transitivas.
-  - Atualização do Portal de Documentação em `docs/README.md` vinculando as diretrizes de AppSec aos quadrantes de How-To e Conceitos & Arquitetura.
-
----
+- **Consolidação de Segurança de Aplicação e Gestão Holística de Vulnerabilidades**: Criação do **Guia Canônico de Segurança de Aplicação e Vulnerabilidades**.
 
 ## [2.20.0] — 2026-09-19
 
 ### Adicionado
-- **Consolidação Documental sob Framework Diátaxis & Padrões Globais de Governança de IA (NIST AI RMF, ISO 42001, OWASP Agentic AI)**:
-  - Criação do **Portal Central de Documentação** em `docs/README.md`, organizando 100% dos artefatos técnicos do ecossistema nos 4 quadrantes Diátaxis (Tutoriais, Guias Práticos / How-To, Referência Técnica e Conceitos & Arquitetura).
-  - Formalização do **Guia Canônico de Boas Práticas de Documentação em Governança de IA** (`docs/architecture/AI_GOVERNANCE_DOCUMENTATION_GUIDE.md`), integrando os pilares de governança responsável (NIST AI RMF 1.0, ISO/IEC 42001 e OWASP Agentic AI 2026).
-  - Alinhamento de documentação de agentes ao padrão aberto **Agent Card** (A2A Protocol / Linux Foundation / IETF Draft 2026) com suporte a manifestos estruturados máquina-máquina via `docs/schemas/agentcard.schema.json`.
-  - Atualização do `README.md` principal na raiz integrando o Nível 4 de documentação e sincronizando o status de governança global (169 testes determinísticos no pytest).
-
----
+- **Consolidação Documental sob Framework Diátaxis & Padrões Globais de Governança**: Criação do **Portal Central de Documentação** em `docs/README.md`, organizando 100% dos artefatos técnicos do.
 
 ## [2.19.0] — 2026-09-19
 
 ### Adicionado
-- **Blindagem Determinística do Workflow de Migração e Camada de Redundância Pós-Migração (WORKFLOW-FRAMEWORK-MIGRATION / REQ-008 / REQ-009)**:
-  - Elevação do `WORKFLOW-FRAMEWORK-MIGRATION` em `workflows.md` de 5 para **6 etapas canônicas**, adicionando o **Estado 6 (Post-Migration Verification & Redundancy Gate)** como barreira obrigatória antes de qualquer autorização de cutover.
-  - Instituição do **Symbol Exhaustion Gate (Inventário Mecânico de Símbolos)** nas Etapas 1 e 2: exige que a Matriz De-Para mapeie compulsoriamente 100% dos símbolos, métodos (públicos e privados), queries e nós da AST inventariados mecanicamente via `@code-knowledge-graph`, erradicando gaps por inferência superficial.
-  - Instituição do **Anti-Omission AST Validator** na Etapa 3: verificação no sandbox do código emitido contra a Representação Intermediária (IR) para impedir truncamento e omissão silenciosa de branches de exceção e tabelas secundárias.
-  - Instituição da **Tríplice Camada de Redundância Pós-Migração (Estado 6)**:
-    - *Sub-rotina 6a (Reverse Orphan Audit)*: Varredura reversa determinística de 100% dos símbolos, métodos, queries e arquivos legados contra a base moderna e a Matriz De-Para para detectar qualquer código legado órfão sem correspondência.
-    - *Sub-rotina 6b (Mutation Parity Resilience)*: Injeção de mutantes sintéticos em regras para comprovar que a suíte Golden Master detecta desvios e eliminar testes falsos-verdes ou frágeis.
-    - *Sub-rotina 6c (Differential Shadow Replay)*: Comparação semântica paralela de payloads de retorno, integridade de tabelas secundárias de banco de dados e eventos emitidos.
-    - Emissão compulsória do *Certificado de Paridade Total & Cutover Autorizado* em `docs/migrations/certificado-paridade-<alvo>.md`.
-  - Formalização do **Invariante 13 em `workflows.md` § 5**, e atualização dos Invariantes 8 e 9 para cobrir as 6 etapas canônicas.
-  - Especificação dos requisitos funcionais **REQ-008** e **REQ-009** em `docs/requirements/REQ-migration-engine.md` e atualização da Máquina de Estados em `docs/plan/plano-motor-migracao-agnostica.md` (Fase 6 e CORE-05).
-  - Alinhamento de governança global em `CLAUDE.md` e `.github/copilot-instructions.md`.
-  - Atualização do cenário de validação operacional `WF-MIG-001` em `tests/operational_flow/casos-workflows.yaml` com a Etapa 6.
-  - Expansão da suíte de testes em `tests/governance_audit/test_migration_engine_governance.py` validando Symbol Exhaustion Gate, Tríplice Redundância Pós-Migração e declaração das 6 etapas (169 testes verdes no pytest).
-
----
+- **Blindagem Determinística do Workflow de Migração e Camada de Redundância Pós-M**: Elevação do `WORKFLOW-FRAMEWORK-MIGRATION` em `workflows.md` de 5 para **6 etapas canônicas**.
 
 ## [2.18.0] — 2026-09-19
 
 ### Adicionado
-- **Precedência Mandatória de Context Mode em Modificação de Arquivos (R-056 / Smell 2.24 — Anti-Editor Tool Sprawl)**:
-  - Instituição da regra normativa R-056 em `CLAUDE.md` e `copilot-instructions.md`, estabelecendo o `context-mode` (`ctx_execute`, `ctx_execute_file`, `ctx_batch_execute`, `ctx_index`, `ctx_search`) como canal primário e compulsório de escrita, criação e refatoração de código e governança.
-  - Rebaixamento formal de ferramentas manuais de editor (`replace_string_in_file`, `insert_edit_into_file`) a fallbacks restritos de última instância (apenas micro-edições pontuais de 1-2 linhas ou indisponibilidade de sandbox), proibindo terminantemente encadeamento de chamadas de editor em série no chat.
-  - Catalogação do **Smell 2.24 (Omissão de Precedência de Context-Mode em Agentes Mutadores / Editor Tool Sprawl)** em `.github/skills/governance-audit-patterns/SKILL.md`.
-  - Reestruturação da Seção 0 de `.github/skills/efficient-batch-code-modification/SKILL.md` com a hierarquia de precedência Nível 1 (Context-Mode compulsório para arquivos estruturados e lote) e Nível 2 (Editor fallback).
-  - Atualização dos templates canônicos operacionais (`operational-agent.md`, `agent-template.md`) e do `governance-factory.agent.md` com trava de herança compulsória da precedência de `context-mode` para novos agentes mutadores.
-  - Criação da suíte determinística em `tests/governance_audit/test_context_mode_precedence_governance.py` (166 testes verdes no pytest).
+- **Precedência Mandatória de Context Mode em Modificação de Arquivos**: Instituição da regra normativa R-056 em `CLAUDE.md` e `copilot-instructions.md`.
 
 ## [2.17.0] — 2026-09-19
 
 ### Adicionado
-- **Metodologia Test-Last e Isenção de Testes Unitários para UI na Stack Frontend**:
-  - Instituição da abordagem **Test-Last com Verification Gate Obrigatório** (Implementation-First) para agentes especialistas de frontend (`angular-feature-developer`, `angular-bug-fixer`), eliminando os gargalos de ciclos repetitivos de inicialização de test runners e context poisoning por mocks prematuros de DOM.
-  - Isenção formal de criação e execução de testes unitários para agentes e tarefas de pura estilização e apresentação visual (`angular-ui-stylist`), consolidando que validações de UI são 100% visuais (Visual Feedback Loop, WCAG 2.2, design tokens e `get_errors` limpo).
-  - Atualização do `WORKFLOW-FEATURE-DEVELOPMENT` em `workflows.md` (Estado 5a/5b), formalizando que a escrita de testes unitários/componentes de regressão é delegada aos test-writers ao final da etapa.
-  - Sincronização em lote (R-046 / R-055) das skills `angular-implementation-patterns/SKILL.md`, `frontend-visual-feedback-loop/SKILL.md` e `test-implementation-frontend/SKILL.md`.
-  - Padronização em `governance-factory.agent.md` e `governance-factory-patterns/SKILL.md` para que futuros ecossistemas de frontend herdem compulsoriamente a isenção de UI e a metodologia Test-Last.
-  - Criação da suíte determinística de testes em `tests/governance_audit/test_frontend_test_last_governance.py` (160 testes verdes no pytest).
+- **Metodologia Test-Last e Isenção de Testes Unitários para UI na Stack Frontend**: Instituição da abordagem **Test-Last com Verification Gate Obrigatório** (Implementation-First) para agentes.
 
 ## [2.16.0] — 2026-09-19
 
 ### Adicionado
-- **Portão de Reúso e Generalização Sistêmica em Governança (R-055 / Anti-Silo Fix)**:
-  - Instituição da regra normativa R-055 em `CLAUDE.md`, `copilot-instructions.md` e `workflows.md` (`WORKFLOW-GOVERNANCE-MAINTENANCE`), tornando compulsória a avaliação prévia de reúso sistêmico antes de qualquer implementação de melhoria ou ajuste em agents, prompts e skills.
-  - Eliminação estrutural do anti-padrão de correções em silo (*one-off fixes*): todo agente de governança deve responder obrigatoriamente às 3 perguntas canônicas de generalização:
-    - **Q1 (Impacto Horizontal / Peers)**: avaliar e expandir em lote (*Single-Turn Batching*, R-046) para artefatos análogos do mesmo perfil ou camada.
-    - **Q2 (Prevenção Futura / Templates)**: atualizar compulsoriamente o template canônico em `templates/` para que futuras criações herdem a diretriz.
-    - **Q3 (Blindagem por Teste / Quality Gate)**: criar ou expandir asserções determinísticas no pytest (`tests/governance_audit/`).
-  - Criação da suíte determinística de testes em `tests/governance_audit/test_systemic_reuse_gate.py` validando R-055, workflows, skills e os 3 agentes de governança (155 testes verdes).
-
+- **Portão de Reúso e Generalização Sistêmica em Governança (R-055 / Anti-Silo Fix)**: Instituição da regra normativa R-055 em `CLAUDE.md`, `copilot-instructions.md` e `workflows.md`.
 ### Aprimorado
-- **Integração do Gate nos Agentes de Governança**:
-  - `@agent-auditor`: inclusão de avaliação compulsória de reúso sistêmico (Q1/Q2/Q3) na `Decision Tree`, `Formato de Saída` e `Checklist Antes de Auditar`.
-  - `@governance-factory`: adição da trava no bloco `CRÍTICO` e `Checklist Antes de Codar`, vedando revisões em silo.
-  - `@governance-maintainer`: adição da etapa de reúso sistêmico na Fase 1 (Dry-Run & Mapeamento em Memória) e no checklist de conclusão.
-  - `governance-factory-patterns/SKILL.md`: formalização da subseção §3.2 detalhando o protocolo de decisão para o gate de generalização.
+- **Integração do Gate nos Agentes de Governança**: `@agent-auditor`: inclusão de avaliação compulsória de reúso sistêmico (Q1/Q2/Q3) na `Decision Tree`.
 
 ## [2.15.0] — 2026-09-19
 
 ### Adicionado
-- **Prevenção Compulsória de R-054 no `@governance-factory` (v1.3.0)**:
-  - Adição da seção normativa *Baseline R-054 — Governança Estrita de Todo Agent com Perfil de Router*, exigindo esqueleto base de `templates/router-agent.md`, Least Privilege com 7 ferramentas canônicas, Zero Pre-Routing Discovery e Delegação Plana.
-  - Detecção automática de perfil router no fluxo `type: agent` (quando `name` termina em `-router` ou `description` indica papel supervisor/despachante).
-  - Gate de validação formal em `tests/governance_audit/test_router_agents.py` incorporado aos fluxos de scaffolding de router em `type: stack` e `type: agent`.
-  - Inclusão de `.github/skills/governance-audit-patterns/SKILL.md` em `source_docs`.
-
+- **Prevenção Compulsória de R-054 no `@governance-factory` (v1.3.0)**: Adição da seção normativa *Baseline R-054.
 ### Aprimorado
-- **Auditoria Dinâmica de Smells e R-054 no `@agent-auditor` (v1.2.0)**:
-  - Substituição da contagem estática ("14/13 categorias de smell") por referência dinâmica a `governance-audit-patterns/SKILL.md` § 2 (atualmente até o Smell 2.23).
-  - Adição de verificação explícita de conformidade com R-054 e Smell 2.23 na Decision Tree e Checklist ao auditar artefatos com perfil router (`*-router.agent.md` e `templates/router-agent.md`).
-- **Saneamento Documental em `@governance-factory`**:
-  - Remoção de bloco de texto corrompido/órfão remanescente no final do arquivo.
+- **Auditoria Dinâmica de Smells e R-054 no `@agent-auditor` (v1.2.0)**: Substituição da contagem estática ("14/13 categorias de smell") por referência dinâmica a.
+- **Saneamento Documental em `@governance-factory`**: Remoção de bloco de texto corrompido/órfão remanescente no final do arquivo.
 
 ## [2.14.0] — 2026-09-19
 
 ### Adicionado
-- **Governança Estrita de Routers (R-054 / Smell 2.23 — Anti-Overthinking Router & Zero Discovery)**:
-  - Instituição da regra mandatória de **Zero Pre-Routing Discovery**: proibição absoluta de tool calls de leitura exploratória de código, varredura de diretórios ou scripts de sandbox para investigar o conteúdo de solicitações ou arquivos anexados (`#file:...`) antes de rotear, prevenindo latência e consumo desproporcional de créditos em modelos topo de linha (Claude Sonnet 5.5).
-  - Formalização do **Smell 2.23 (Router Over-Empowerment e Pre-Routing Discovery Bloat)** em `.github/skills/governance-audit-patterns/SKILL.md`, baseado no consenso de mercado de 2025/2026 (*Anthropic, LangChain, Vercel, Atlan/Snowflake via arXiv:2603.17787, Patronus AI e Splunk*).
-  - Ampliação da suíte determinística de testes em `tests/governance_audit/test_router_agents.py` com validação estática de Least Privilege universal de ferramentas, presença de Zero Discovery e Delegação Plana em todos os roteadores (150 testes passando no `pytest`).
-
+- **Governança Estrita de Routers**: Instituição da regra mandatória de **Zero Pre-Routing Discovery**: proibição absoluta de tool calls de leitura exploratória de código.
 ### Aprimorado
-- **Saneamento Universal de Ferramentas em Routers**:
-  - Restrição estrita de ferramentas no `agent-router` central, nos 7 supervisores de domínio (`angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `database-router`, `python-router`, `struts-router`) e no template canônico `router-agent.md` ao baseline exclusivo de 7 ferramentas de leitura, busca, clarificação e despacho (`read_file`, `file_search`, `grep_search`, `list_dir`, `ask_questions`, `run_subagent`, `context-mode/ctx_search`).
-  - Extirpação completa de ferramentas mutativas (`create_file`, `insert_edit_into_file`, `replace_string_in_file`, `apply_patch`), comandos de terminal (`run_in_terminal`) e sandbox de código (`context-mode/ctx_execute*`) de todos os roteadores.
-- **Blindagem Total da Delegação Plana (Flat Delegation / Smell 2.20)**:
-  - Proibição expressa de invocar especialistas ou executores downstream via `run_subagent` por dentro de qualquer roteador, garantindo que o despacho seja realizado exclusivamente pelo orquestrador raiz em nível plano.
-  - Sincronização atômica de catálogos e governança em `CLAUDE.md` (R-054), `.github/copilot-instructions.md`, `.github/agents/catalog.yaml` e `.a2a/agentcards/agent-router.agentcard.json`.
+- **Saneamento Universal de Ferramentas em Routers**: Restrição estrita de ferramentas no `agent-router` central, nos 7 supervisores de domínio e no template canônico `router-agent.md` ao baseline.
+- **Blindagem Total da Delegação Plana (Flat Delegation / Smell 2.20)**: Proibição expressa de invocar especialistas ou executores downstream via `run_subagent` por dentro de qualquer roteador.
 
 ## [2.13.0] — 2026-09-19
 
 ### Aprimorado
-- **Padronização Canônica de Formato de Saída (R-042 / R-050 / agent-contracts § 0 e § 8)**:
-  - Inserção do banner universal de visibilidade `Agente Ativo: <slug>` e `[Se aplicável] Handoff: <origem> → <destino>` nos blocos de código Markdown de 20 agentes raiz (`bug-triage`, `code-review`, `debugger`, `runtime-verifier`, `code-style-enforcer`, `compliance-guardrails`, `security-reviewer`, `performance-agent`, `devops-engineer`, `pr-gatekeeper`, `database-specialist`, `agentic-memory-manager`, `business-rules-extractor`, `code-knowledge-graph`, `deep-search`, `docs-engineer`, `governance-factory`, `prompt-structuring`, `adapter-generator`, `binding-initializer`).
-  - Harmonização dos 7 Stack Routers (`angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `python-router`, `struts-router`, `database-router`) e do template `router-agent.md` com campos de especificação de modelo (`[Model] Delegando para...`), métricas de confiança (`Confiança`, `Confidence Score`) e entradas consideradas.
-  - 100% de conformidade com a suíte de testes de governança (147 testes passando no pytest).
-- **Evolução de Autonomia Delimitada (3 Tiers) & Gate Pattern no `@prompt-structuring` (R-041)**:
-  - Implementação do modelo de 3 Tiers para mitigar anti-padrões de mercado em sistemas multi-agentes (Approval Fatigue, Agency Stripping e Latency Tax): Tier 1 (Fast-Path com bypass para tarefas determinísticas), Tier 2 (Gate Pattern "Prepare, Don't Submit" com preview e confirmação de 1-clique via ask_questions em 1 turno) e Tier 3 (loop interativo multi-turno limitado a 5 iterações para ambiguidade alta).
-  - Instituição formal da fronteira Problem Space vs Solution Space: o estruturador delimita exclusivamente o *Quê*, requisitos funcionais e critérios de aceitação, sendo terminantemente vedada a prescrição de implementação técnica interna que pertence aos especialistas de stack.
-  - Sincronização do agente `prompt-structuring.agent.md`, diretriz R-041 em `CLAUDE.md` e catálogo `catalog.yaml`.
+- **Padronização Canônica de Formato de Saída**: Inserção do banner universal de visibilidade `Agente Ativo: <slug>` e `[Se aplicável] Handoff: <origem> → <destino>` nos blocos de código Markdown de.
+- **Evolução de Autonomia Delimitada & Gate Pattern no `@prompt-structuring`**: Implementação do modelo de 3 Tiers para mitigar anti-padrões de mercado em sistemas multi-agentes: Tier 1.
 
 ## [2.12.0] — 2026-09-17
 
 ### Adicionado
-- **Blindagem Determinística contra "Cleverness Trap" & State-Locking Universal (R-050 / R-054)**:
-  - Implementação compulsória do protocolo de **State-Locking** (`[CURRENT_STATE_LOCK: ...]`) e **Halting Conditions** em 28 agentes do ecossistema de governança, prevenindo iniciativas espúrias, antecipação de código e desvios de pipeline em modelos de alta capacidade (Claude Sonnet 5.5, Opus) e garantindo execução atômica em modelos leves (Gemini Flash).
-  - Mapeamento fechado de estados e saídas tipadas em 3 perfis operacionais: (A) Parecer Compacto de Gate/Checkpoint, (B) Technical Blueprint & Context Firewall e (C) Matriz De-Para 5D.
-
+- **Blindagem Determinística contra "Cleverness Trap" & State-Locking Universal**: Implementação compulsória do protocolo de **State-Locking** (`[CURRENT_STATE_LOCK: ...]`) e **Halting Conditions**.
 ### Aprimorado
-- **Endurecimento dos Agentes Planejadores / Deliberativos (Grupo 1)**:
-  - `@tech-solution-architect`, `@refactor-planner`, `@feature-planner`, `@requirements-analyst` e `@test-strategy`: saneamento de ferramentas com remoção de `ctx_execute`/`ctx_execute_file`, proibição terminante de gerar código executável e exigência de DAGs/matrizes estruturadas com pontos de parada (*STOP TOTAL*).
-- **Endurecimento dos Supervisores Hierárquicos / Domain Routers (Grupo 2)**:
-  - `@angular-router`, `@spring-boot-router`, `@spring-reactive-router`, `@ejb-router`, `@database-router`, `@python-router` e `@struts-router`: aplicação de *Delegação Plana (Flat Delegation)*, proibição absoluta de ferramentas mutativas e resolução estrita de papéis genéricos (`specialist-<papel>`) para agentes concretos do catálogo.
-- **Endurecimento dos Executores Táticos (Grupo 3)**:
-  - 17 agentes executores (`*-feature-developer`, `*-bug-fixer`, `*-ui-stylist`, `*-migration-dev`, `*-spl-expert`, `*-plsql-expert`): trava de execução em TDD estrito (Red Test prévio obrigatório, Single-Turn Batching com diff cirúrgico mínimo ≤ 20 linhas e validação agregada imediata com `get_errors`).
-- **Sincronização SSOT & Qualidade**:
-  - Atualização de versões no catálogo central `.github/agents/catalog.yaml`.
-  - Reexportação de 65 AgentCards A2A em `.a2a/agentcards/`.
-  - 100% de conformidade com 147 testes automatizados passando no `pytest`.
+- **Endurecimento dos Agentes Planejadores / Deliberativos (Grupo 1)**: `@tech-solution-architect`, `@refactor-planner`, `@feature-planner`, `@requirements-analyst` e `@test-strategy`: saneamento de.
+- **Endurecimento dos Supervisores Hierárquicos / Domain Routers (Grupo 2)**: `@angular-router`, `@spring-boot-router`, `@spring-reactive-router`, `@ejb-router`, `@database-router`.
+- **Endurecimento dos Executores Táticos (Grupo 3)**: 17 agentes executores: trava de execução em TDD estrito.
 
 ## [2.11.0] — 2026-09-16
 
 ### Adicionado
-- **Matriz De-Para Bidirecional & Prevenção Canônica de Gaps em `WORKFLOW-FRAMEWORK-MIGRATION` (R-050)**:
-  - Instituição da **Matriz De-Para de Migração & Rastreabilidade de Gaps** (`docs/migrations/matriz-de-para-<alvo>.md`) como Single Source of Truth obrigatória para qualquer migração tecnológica cross-stack ou elevação de plataforma.
-  - Taxonomia rigorosa de status de paridade com 5 estados determinísticos: `[✅ MIGRADO]`, `[⏳ PENDENTE]`, `[⚠️ DIVERGENTE]`, `[ℹ️ DESACOPLADO]` e `[🚫 OBSOLETO]`.
-  - Critério de fechamento bloqueante: zero itens `PENDENTE` ou `DIVERGENTE` no módulo ao final do pipeline.
-- **Decomposição Estrutural Exaustiva em 5 Dimensões Críticas (Estado 1)**:
-  - Eliminação de avaliações superficiais ou limitadas ao "happy path": decomposição sistemática e obrigatória em (1) Borda, Contratos de Entrada & Validações Fail-Fast; (2) Regras de Negócio e Ramificações Condicionais; (3) Pegada de Persistência Relacional & Transações (tabelas pai, filhas, rateios, snapshots, sequências, isolamento); (4) Efeitos Colaterais & Integrações Downstream (SOAP, REST, filas, PDFs/relatórios, e-mails, uploads, webhooks); e (5) Contratos de Saída & DTOs de Resposta.
-- **Protocolo Brownfield In-Flight (Reconciliação Delta & Auditoria de Gaps Pré-Existentes — Estado 1b)**:
-  - Mecanismo específico e obrigatório para migrações já iniciadas, parciais ou inacabadas no repositório de destino (prevenção do cenário real observado de dezenas de gaps descobertos tardiamente).
-  - Comparação cruzada entre a árvore 5D do legado e os artefatos existentes no destino, gerando imediatamente a Matriz De-Para com todos os GAPs catalogados (`GAP-01..GAP-NN`) antes da elaboração do plano de fases.
-- **Faseamento Orientado a Risco e Impacto Ancorado na Matriz De-Para (Estado 2)**:
-  - Fases autônomas entregáveis (B1..BN) onde cada fase possui uma lista explícita de IDs De-Para sob sua responsabilidade, com critérios de aceite determinísticos.
-  - Dashboard Executivo da Matriz De-Para exibido no chat e no Checkpoint Humano 2b para visibilidade e transparência completa a desenvolvedores humanos.
-- **Dual-Verification Gate Expandido (Quádruplo Critério de Paridade — Estado 4)**:
-  - Aprovação de fase exige simultaneamente: (1) 100% Golden Master verde; (2) 100% de resolução dos IDs De-Para da fase; (3) sign-off do domain-router de origem como oráculo; e (4) atesto estrutural de zero novos ciclos e zero dead-code pelo `@code-knowledge-graph`.
-- **Teste de Regressão e Governança**:
-  - Novo teste `test_workflow_framework_migration_depara_matrix_and_brownfield_reconciliation` adicionado à suíte operacional (`test_operational_workflows.py`), garantindo 100% de conformidade automatizada.
+- **Matriz De-Para Bidirecional & Prevenção Canônica de Gaps em `WORKFLOW-FRAMEWOR**: Instituição da **Matriz De-Para de Migração & Rastreabilidade de Gaps** como Single Source of Truth obrigatória.
+- **Decomposição Estrutural Exaustiva em 5 Dimensões Críticas (Estado 1)**: Eliminação de avaliações superficiais ou limitadas ao "happy path": decomposição sistemática e obrigatória em (1) Borda.
+- **Protocolo Brownfield In-Flight**: Mecanismo específico e obrigatório para migrações já iniciadas, parciais ou inacabadas no repositório de destino.
+- **Faseamento Orientado a Risco e Impacto Ancorado na Matriz De-Para (Estado 2)**: Fases autônomas entregáveis (B1..BN) onde cada fase possui uma lista explícita de IDs De-Para sob sua.
 
 ## [2.10.0] — 2026-09-15
 
 ### Adicionado
-- **Regra R-052 e Erradicação do Anti-Padrão Sticky Agent**:
-  - Nova regra normativa `R-052 (Reset Mandatório pós-Conclusão de Workflow / Post-Task Router Handback — Anti Sticky-Agent)` em `CLAUDE.md` e `.github/copilot-instructions.md`.
-  - Proibição absoluta de o último agente ativo reter o controle de novas solicitações do usuário no chat sob pretexto de ser a "mesma stack/tecnologia".
-  - Todo encerramento de workflow canônico (R-050) encerra formalmente o ciclo operacional e reverte compulsoriamente o controle ao `@agent-router` (`motivo: "conclusao_de_workflow_anterior"`).
-- **Catalogação do Smell 2.22 em `governance-audit-patterns`**:
-  - `Smell 2.22 — Sticky Agent e Falha de Reset de Workflow (R-042 / R-052)`: catalogado com severidade Bloqueador.
-  - Teste determinístico `test_smell_2_22_workflow_reset_and_anti_sticky_agent_rule` adicionado à suíte `tests/governance_audit/test_governance_smells.py` (100% verde).
-- **Fortalecimento da Regra R-051 e Proteção Anti-Corrupção em Markdown Estruturado**:
-  - Extensão formal da regra `R-051 (Proteção Anti-Corrupção em Edição de Arquivo Único Grande/Estruturado e Markdown com Âncoras Repetidas)` em `CLAUDE.md`, `.github/copilot-instructions.md`, `efficient-batch-code-modification` e `governance-audit-patterns` (Smell 2.16).
-  - Proibição absoluta de invocar `replace_string_in_file` com âncoras ambíguas ou sem verificação prévia de unicidade estrita em memória (`count === 1`), prevenindo o fallback de correspondência aproximada (fuzzy matching) que corrompe/trunca blocos em arquivos com tabelas e seções parecidas (incidente real documentado em `code-knowledge-graph.agent.md`).
-  - Atualização do snippet `snippets/safe-single-file-edit-pattern.js` e obrigatoriedade de validação imediata da integridade estrutural pós-escrita (frontmatter `---`, cabeçalhos canônicos e contagem de linhas).
-- **Invariantes Dual-Stack e Co-Agência Obrigatória de `@code-knowledge-graph` em `WORKFLOW-FRAMEWORK-MIGRATION` (R-050)**:
-  - Formalização das Invariantes 8 e 9 em `workflows.md` § 3.7 e § 5: em migrações cross-stack, o domain router da stack de origem legada (`@ejb-router`, `@struts-router`) e o motor de grafo (`@code-knowledge-graph`, R-045) são co-agentes obrigatórios em todas as etapas (1 a 5), nunca dispensados após o pre-flight.
-
+- **Regra R-052 e Erradicação do Anti-Padrão Sticky Agent**: Nova regra normativa `R-052` em `CLAUDE.md` e `.github/copilot-instructions.md`.
+- **Catalogação do Smell 2.22 em `governance-audit-patterns`**: `Smell 2.22 — Sticky Agent e Falha de Reset de Workflow (R-042 / R-052)`: catalogado com severidade Bloqueador.
 ### Aprimorado
-- **Ajuste Fino na Regra R-042**:
-  - Esclarecida a cláusula de perfil híbrido dos specialists, restringindo a continuidade sem handoff estritamente a refinamentos imediatos de uma mesma tarefa em andamento.
-
----
+- **Ajuste Fino na Regra R-042**: Esclarecida a cláusula de perfil híbrido dos specialists, restringindo a continuidade sem handoff estritamente a refinamentos imediatos de uma mesma tarefa em.
 
 ## [2.9.0] — 2026-09-15
 
 ### Adicionado
-- **Nova Skill Agnóstica `frontend-visual-feedback-loop`**:
-  - Padrão canônico de mercado (2025–2026) para execução do Visual Feedback Loop (VFL) desacoplado de framework (Angular, React, Vue, Svelte, Web Components).
-  - Suporte a renderização isolada em sandbox (Storybook CSF3 / rota efêmera), captura multi-viewport canônica (`375x667`, `768x1024`, `1440x900`), inspeção da Árvore de Acessibilidade (AOM) e asserções visuais Playwright.
-  - Princípio Think-in-Code para persistência de screenshots em disco sem inflar contexto de chat, e circuit breaker com limite rígido de 2 iterações no critic loop.
-- **Formalização do Smell 2.21 em `governance-audit-patterns`**:
-  - `Smell 2.21 — Cegueira Visual e Suposição de Contratos de UI (Visual Blindness & Unverified UI Contracts)`: cataloga e previne a falsa equivalência entre compilação/testes headless verdes e conformidade visual/contratual real de interface.
-  - Teste determinístico `test_smell_2_21_visual_blindness_and_ui_contracts_documented` integrado à suíte Tier 1 de auditoria estática.
-
+- **Nova Skill Agnóstica `frontend-visual-feedback-loop`**: Padrão canônico de mercado (2025–2026) para execução do Visual Feedback Loop (VFL) desacoplado de framework.
+- **Formalização do Smell 2.21 em `governance-audit-patterns`**: `Smell 2.21.
 ### Aprimorado
-- **Evolução da Regra R-033 e Erradicação do Drift Documental por Autorreflexão**:
-  - Reformulação formal de R-033 no `CLAUDE.md` e `copilot-instructions.md`: distinção entre a proibição estrita de criar arquivos .md especulativos avulsos e a **obrigatoriedade da sincronização automática de documentação viva existente** (`docs/`, README, ADRs, schemas) por autorreflexão contínua em qualquer entrega técnica relevante, eliminando a necessidade de comandos manuais do desenvolvedor.
-  - Inclusão do checkpoint de autorreflexão documental no DoD do `WORKFLOW-FEATURE-DEVELOPMENT`, `WORKFLOW-BUG-FIX` e `WORKFLOW-REFACTORING` (`workflows.md`).
-  - Atualização dos checklists e contratos operacionais de `@pr-gatekeeper`, `@angular-feature-developer`, `@angular-ui-stylist`, `@database-specialist` e da dimensão de conformidade documental em `code-review-patterns`.
-- **Tratamento Especializado de Bugs de Layout no `WORKFLOW-BUG-FIX` (`workflows.md` e agentes)**:
-  - Formalização do Cenário C no Estado 2 com o ciclo VFL (`frontend-visual-feedback-loop`), capturas multi-viewport (375px/768px/1440px) e asserções estritas de AOM.
-  - Roteamento compulsório no Estado 3 de defeitos de layout, SCSS, alinhamento de diálogos e ícones para o especialista de UI (`specialist-ui-stylist`), prevenindo que corretores de lógica pura introduzam regressões cosméticas.
-  - Exigência de validação dupla no Estado 4 para defeitos de layout: testes de componentes verdes E re-inspeção visual VFL/AOM sem texto literal vazando em ícones.
-  - Bifurcação na árvore de decisão de `angular-router` (bugs de runtime -> `angular-bug-fixer`; bugs de layout/CSS -> `angular-ui-stylist`) e atualização do intake de `bug-triage` para acolher evidências visuais.
-- **Duplo Quality Gate no `WORKFLOW-FEATURE-DEVELOPMENT` (`workflows.md`)**:
-  - Particionamento do Estado 5 para demandas com interface: 5a (Lógica reativa, stores e regras sob TDD com `angular-feature-developer`) e 5b (Handoff mandatório de apresentação visual e tokens com `angular-ui-stylist`).
-  - Implantação do Duplo Gate no Estado 6: Gate 1 (Lógica, Contratos & OWASP com `@security-reviewer`) e Gate 2 (Design System, Paridade Visual, zero hex inline e validação de contratos de componentes `shared/` com `@angular-ui-stylist` e `@code-review`).
-- **Agentes de Domínio Frontend Angular**:
-  - `@angular-feature-developer`: Proibição estrita de suposição de props em inglês, protocolo "Canonical Sibling First" e leitura obrigatória do arquivo `.ts` de componentes `shared/` para validação de `@Input()`.
-  - `@angular-ui-stylist`: Auditoria obrigatória de classes de diálogo (`.app-dialog-content`, `.form-grid`), empty-states de largura total, wrappers de ícone e proibição absoluta de cores hexadecimais inline em SCSS de features.
-  - `@angular-router`: Atualização da árvore de decisão para sequenciar demandas de UI pelo pipeline em duas fases.
-- **Skills e Adapters Compartilhados**:
-  - `angular-implementation-patterns` e `frontend-componentization-patterns`: Incorporação do protocolo "Canonical Sibling First" e leitura estrita de interfaces no passo "Reuso-First".
-  - `design-system-component-contracts`: Diretrizes de verificação de contratos no lado do consumidor e enforcement de tokens semânticos.
-  - `angular-v21-frontend.instructions.md`: Normas canônicas de layout de diálogos, classes utilitárias de scroll e proibição de hexadecimais arbitrários.
-  - Atualização atômica de catálogos: `.github/skills/.index.json` (60 skills indexadas), `.github/skills/README.md` e `.github/copilot-instructions.md`.
-- **Documentação de Arquitetura e Adapters**:
-  - `docs/architecture/ARCHITECTURE_AND_GOVERNANCE_GUIDE.md`: atualização do `WORKFLOW-FEATURE-DEVELOPMENT` com Duplo Quality Gate e inclusão da seção §8.4 sobre o Visual Feedback Loop (VFL) e mitigação do Smell 2.21.
-  - `README.md` e `.github/agents/README.md`: alinhamento da contagem para 60 skills especializadas e consolidação dos 8 workflows determinísticos.
-  - `.github/instructions/local/<projeto>.instructions.md`: inclusão da Seção 1.3 consolidando paridade visual, protocolo "Canonical Sibling First", leitura estrita de contratos de componentes compartilhados e proibição de hex inline.
-
----
+- **Evolução da Regra R-033 e Erradicação do Drift Documental por Autorreflexão**: Reformulação formal de R-033 no `CLAUDE.md` e `copilot-instructions.md`: distinção entre a proibição estrita de.
+- **Tratamento Especializado de Bugs de Layout no `WORKFLOW-BUG-FIX`**: Formalização do Cenário C no Estado 2 com o ciclo VFL, capturas multi-viewport (375px/768px/1440px) e asserções estritas de.
 
 ## [2.8.10] — 2026-09-14
 
 ### Refatorado & Saneado
-- **Limpeza Profunda de Seções Não-Homologadas e Citações em Frontmatter/Templates**:
-  - Extirpação completa das seções legadas e redundantes no corpo Markdown (`## Regras Herdadas`, `## Catálogo / Conhecimento Base`, `## Skills Associadas`) em 9 arquivos de roteadores e templates (`agent-router.agent.md`, `router-agent.md`, `angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `python-router`, `struts-router` e `database-router`).
-  - Higienização de comentários e orientações nos frontmatters de todos os templates (`agent-template.md`, `operational-agent.md`, `research-agent.md`, `router-agent.md`, `skill-template.md`, `prompt-template.md`), além de `governance-factory.agent.md`, `binding-initializer.agent.md`, `governance-factory-patterns/SKILL.md` e `agent-memory-policy/SKILL.md`, removendo quaisquer menções instrucionais remanescentes aos nomes das seções legadas.
-  - Consolidação formal de dependências documentais e de skills exclusivamente no frontmatter YAML `source_docs:` (SSOT), eliminando duplicação e acoplamento desnecessário no corpo dos agentes.
-  - Saneamento de ferramentas do frontmatter de `agent-router.agent.md` removendo referências a ferramentas `angular-cli/*` não-reconhecidas.
-- **Fortalecimento do Gate de Homologação de Seções (Smell 2.9)**:
-  - `tests/governance_audit/test_template_sections.py`: O teste de homologação foi expandido para cobrir **100% dos agentes** (incluindo todos os routers e templates), garantindo que nenhuma seção não-homologada volte a ser introduzida em qualquer `.agent.md` do repositório.
-  - `tests/governance_audit/test_router_agents.py`: Atualizadas as seções obrigatórias dos routers para as 4 seções canônicas de roteamento (`CRÍTICO: ESCOPO`, `Decision Tree`, `Formato de Saída`, `Retorno ao Router`), sem dependência de seções legadas no corpo.
-  - Suíte global de testes preservada com **136 testes**, 100% verde (`pytest` em 11.65s).
-
----
+- **Limpeza Profunda de Seções Não-Homologadas e Citações em Frontmatter/Templates**: Extirpação completa das seções legadas e redundantes no corpo Markdown em 9 arquivos de roteadores e templates.
+- **Fortalecimento do Gate de Homologação de Seções (Smell 2.9)**: `tests/governance_audit/test_template_sections.py`: O teste de homologação foi expandido para cobrir **100% dos agentes**.
 
 ## [2.8.9] — 2026-09-14
 
 ### Adicionado & Aprimorado
-- **Guia Canônico de Arquitetura e Governança (arc42 / Diátaxis / IEEE 42010)**:
-  - Criado o documento canônico `docs/architecture/ARCHITECTURE_AND_GOVERNANCE_GUIDE.md` estruturado conforme as 12 seções padrão do arc42 (v8.2), o padrão internacional IEEE 42010 e o framework Diátaxis (dimensões de *Explanation* e *Architecture Reference*).
-  - Consolidação formal do modelo estático e dinâmico da governança multi-agente:
-    - *Visão de Contexto e Fronteiras*: diagrama Mermaid delimitando IDE, host, governança central, aplicações de negócio locais e servidores MCP.
-    - *Visão de Blocos de Construção (Building Blocks)*: decomposição das 4 camadas (Entrada/Triagem, Supervisores de Domínio, Especialistas de Execução e Agentes Transversais de Qualidade) com mapeamento dos 65 agentes catalogados.
-    - *Visão de Execução e Runtime*: especificação determinística dos 8 Workflows Canônicos (R-050), banner universal de handoff (R-042/R-048) e diagrama de estados do Multi-Agent Circuit Breaker (`CLOSED` → `OPEN` → `HALF-OPEN`).
-    - *Visão de Implantação*: topologia de runtimes locais, worktrees efêmeros (`.worktrees/`), overlay privado (`projects.local.yaml`) e motor de grafo `@optave/codegraph`.
-  - Matriz de Validação de Mercado (Seção 9): mapeamento detalhado e fundamentação de 10 decisões arquiteturais centrais (ADR-01 a ADR-10) confrontadas com publicações e normas de mercado consolidadas em 2026 (Anthropic Agentic Coding Trends Report 2026, NSA CSI MCP Security 2026, Cloud Security Alliance Agentic MCP Security Best Practices v1, Linux Foundation A2A v1.0.0, IETF draft-aevum-agentcard-00, ISO/IEC 25010 e IEEE 42010).
-
----
+- **Guia Canônico de Arquitetura e Governança (arc42 / Diátaxis / IEEE 42010)**: Criado o documento canônico `docs/architecture/ARCHITECTURE_AND_GOVERNANCE_GUIDE.md` estruturado conforme as 12.
 
 ## [2.8.8] — 2026-09-14
 
 ### Adicionado & Aprimorado
-- **Context Engineering & Artifact Offloading em Handoffs (Anthropic 2026 Trends)**:
-  - Atualizada a skill `.github/skills/handoff-governance/SKILL.md` com a formalização dos 4 pilares do Context Engineering (*Write, Select, Compress, Isolate*).
-  - Estabelecido o limiar normativo de offloading de artefatos (2 KB / 50 linhas): payloads volumosos (ASTs de grafo, diffs extensos, contratos OpenAPI, logs longos) deixam de ser transmitidos como texto bruto no chat e passam a trafegar exclusivamente como ponteiros tipados (`tipo: "pointer"`, `artifact_ref`, `hash`, `resumo_executivo`) associados ao `context-mode` e workspace, prevenindo context bloat e KV-cache thrashing.
-- **Multi-Agent Circuit Breakers com Budget de Falhas e Rollback Atômico**:
-  - Implementado em `.github/skills/handoff-governance/SKILL.md` o Circuit Breaker de Falhas com Retry Budget estrito (`MAX_RETRIES_PER_STEP = 2`). Falhas repetidas na mesma etapa desarmam o circuito para `state: OPEN`, suspendendo edições autônomas e acionando escalonamento humano obrigatório (`ask_questions` / R-047).
-  - Instituído o Protocolo de Rollback Atômico de Workspace: rotina determinística de descarte de worktrees temporários isolados ou saneamento cirúrgico de arquivos parciais via `git checkout -- <arquivos>`, garantindo integridade do workspace em caso de falha de cadeia.
-- **Segurança de Ferramentas MCP e Sandboxing (NSA CSI MCP Security 2026 / CSA v1)**:
-  - Adicionada a seção 4.9 em `.github/skills/agent-safety-guardrails/SKILL.md` estabelecendo:
-    - Zoneamento e Least-Privilege Tool Scoping: Zona 1 (Read-Only) para consultivos/advisors, Zona 2 (Mutating) para implementers e Zona 3 (Execution) sob governança de terminal (R-049).
-    - Defesa contra Parameter Tampering e Tool Poisoning (ASI02): validação estrita de schemas de parâmetros JSON contra injeção indireta (CVE-2025-6514).
-    - Defesa contra Tool Squatting e Rug Pulls em servidores MCP e proibição de repasse cego de tokens de autorização (*Token Passthrough*) entre limites de confiança inter-agente.
-- **Padronização e Exportação A2A AgentCard (Linux Foundation v1.0.0 / IETF draft-aevum-agentcard-00)**:
-  - Criado o schema canônico aberto `docs/schemas/agentcard.schema.json` para interoperabilidade e especificação declarativa de agentes.
-  - Implementado o utilitário determinístico `tools/agentcard_exporter/export_agentcards.py`, mapeando os catálogos do repositório em 65 arquivos de especificação `AgentCard` em `.a2a/agentcards/*.agentcard.json` e índice consolidado `.a2a/agentcards/agentcards.index.json`.
-  - Criadas suítes de testes automatizadas em `tests/governance_audit/test_a2a_agentcard_compliance.py` e `tests/operational_flow/test_circuit_breaker_and_context_offloading.py`.
-  - Suíte global de testes expandida para **136 testes**, 100% verde (`pytest` em 12.09s).
-
----
+- **Context Engineering & Artifact Offloading em Handoffs (Anthropic 2026 Trends)**: Atualizada a skill `.github/skills/handoff-governance/SKILL.md` com a formalização dos 4 pilares do Context.
+- **Multi-Agent Circuit Breakers com Budget de Falhas e Rollback Atômico**: Implementado em `.github/skills/handoff-governance/SKILL.md` o Circuit Breaker de Falhas com Retry Budget estrito.
+- **Segurança de Ferramentas MCP e Sandboxing (NSA CSI MCP Security 2026 / CSA v1)**: Adicionada a seção 4.9 em `.github/skills/agent-safety-guardrails/SKILL.md` estabelecendo:.
+- **Padronização e Exportação A2A AgentCard**: Criado o schema canônico aberto `docs/schemas/agentcard.schema.json` para interoperabilidade e especificação declarativa de agentes.
 
 ## [2.8.7] — 2026-09-14
 
 ### Adicionado & Aprimorado
-- **Alinhamento com OWASP Top 10 for Agentic Applications 2026 (ASI01..ASI10:2026)**:
-  - Atualizada a skill `.github/skills/agent-safety-guardrails/SKILL.md` com a taxonomia formal oficial da OWASP para sistemas autônomos de agentes (ASI01:2026 a ASI10:2026), publicada em dezembro de 2025.
-  - Implementadas diretrizes operacionais de contenção para:
-    - *ASI07: Insecure Inter-Agent Communication*: Validação de schema tipado de handoff (`handoff-governance` v1.1) e não-repúdio via banner de `Agente Ativo:`.
-    - *ASI08: Cascading Agent Failures*: Circuit breaker a 3 falhas consecutivas (R-050.2) e isolamento de estado por Typed State Bags.
-    - *ASI06: Memory & Context Poisoning*: Controles contra injeção em memória de longo prazo e sanitização de chunks de context-mode.
-    - *ASI09: Human-Agent Trust Exploitation*: Neutralidade e transparência em `ask_questions`, vedando perguntas indutivas em operações sensíveis.
-- **Nova Skill de Governança: `git-worktree-governance`**:
-  - Criada a skill `.github/skills/git-worktree-governance/SKILL.md` (Tier 2, categoria governance) padronizando o ciclo de vida de 5 etapas (`setup → isolate → verify → merge → cleanup`) para agentes executores paralelos e explorações especulativas.
-  - Prevenção de colisões em lockfiles (`package.json`, `pom.xml`), locks de git index e concorrência de compilação.
-  - Sincronização atômica SSOT (R-015) em `.github/skills/.index.json` (`total_skills: 59`), `.github/skills/README.md`, `.github/copilot-instructions.md` e adição de `.worktrees/` em `.gitignore`.
-- **Evals Lab — Validação E2E e Simulação dos 8 Workflows Canônicos (R-050)**:
-  - `tests/operational_flow/workflow_eval_simulator.py`: Implementado o método `simulate_state_bag_transitions()` para simulação determinística de propagação do Typed State Bag (`workflow_state`), auditando transições entre etapas sem consumo de tokens de LLM.
-  - `tests/operational_flow/test_workflow_trajectories.py`: Adicionados os testes `test_e2e_state_bag_preservation_across_all_8_workflows` e `test_all_8_workflows_have_terminal_quality_gates`, garantindo preservação de artefatos e terminação em Quality Gate formal para todos os 8 workflows.
-  - `tests/operational_flow/casos-workflows.yaml`: Corrigido o gate de transição da etapa de implementação do `WF-FEAT-001` para autorizar avanço ao gate de segurança do `security-reviewer`.
-  - Suíte de testes expandida para **129 testes**, 100% verde (`pytest` em 13.54s).
-
----
+- **Alinhamento com OWASP Top 10 for Agentic Applications 2026 (ASI01..ASI10:2026)**: Atualizada a skill `.github/skills/agent-safety-guardrails/SKILL.md` com a taxonomia formal oficial da OWASP.
+- **Nova Skill de Governança: `git-worktree-governance`**: Criada a skill `.github/skills/git-worktree-governance/SKILL.md` (Tier 2, categoria governance) padronizando o ciclo de vida de 5 etapas.
+- **Evals Lab — Validação E2E e Simulação dos 8 Workflows Canônicos (R-050)**: `tests/operational_flow/workflow_eval_simulator.py`: Implementado o método `simulate_state_bag_transitions()` para.
 
 ## [2.8.6] — 2026-09-14
 
 ### Refatorado & Consolidado
-- **Consolidação Global de SSOT no Frontmatter (`source_docs:`) e Extirpação de Redundâncias**:
-  - Unificação de 100% das dependências normativas, contextuais e skills no frontmatter YAML `source_docs:`, eliminando a quádrupla duplicação de links documentais no catálogo de agentes e prompts.
-  - Extirpadas **1.350+ linhas de texto redundante** em 79 agentes (`.agent.md`) e 2 prompts (`.prompt.md`), removendo as seções obsoletas do corpo markdown: `## Regras Herdadas`, `## Catálogo / Conhecimento Base`, `## Skills Associadas`, `## Docs Sempre Anexadas (pre-fetch obrigatório)` e `## Source Docs (R-046)`.
-  - Preservadas integralmente as seções contratuais de roteamento dos supervisores hierárquicos (8 routers), garantindo a conformidade da máquina de estados de despacho.
-- **Refinamento e Blindagem dos Templates Canônicos (`.github/templates/`)**:
-  - `agent-template.md`, `operational-agent.md`, `research-agent.md`: Adicionada diretriz normativa de SSOT de documentação, formalizando o bloqueio estrito de seções redundantes de doc-loading no corpo markdown.
-  - `router-agent.md`: Documentado o contrato estrutural fechado para supervisores hierárquicos e alinhamento com `test_router_agents.py`.
-  - `prompt-template.md`: Consolidada a especificação oficial de Prompt Files com injeção de dependências em `source_docs:` e variáveis nativas do VS Code Copilot.
-  - `skill-template.md`: Formalizada a arquitetura de *Progressive Disclosure* em 3 níveis (Nível 1 Metadados, Nível 2 Corpo Operacional de 7 seções canônicas, Nível 3 Recursos Suplementares).
-  - Atualizados `governance-factory.agent.md`, `governance-audit-patterns/SKILL.md` (Smell 2.2 saneado) e `adapter-generator.agent.md` para eliminar referências residuais à seção descontinuada `Docs Sempre Anexadas`.
-- **Quality Gate de Governança — Gate de Homologação de Seções (Tier 1)**:
-  - `tests/governance_audit/test_template_sections.py`: Implementados 4 novos testes determinísticos (`test_homologation_gate_no_unhomologated_sections_in_agents`, `test_homologation_gate_no_unhomologated_sections_in_prompts`, `test_homologation_gate_no_unhomologated_sections_in_skills`, `test_homologation_gate_blocks_unhomologated_injections`) para barrar compulsoriamente a injeção de seções ad-hoc sem template previamente homologado. Suíte expandida para 127 testes passando com 100% verde.
-
----
+- **Consolidação Global de SSOT no Frontmatter e Extirpação de Redundâncias**: Unificação de 100% das dependências normativas, contextuais e skills no frontmatter YAML `source_docs:`.
+- **Refinamento e Blindagem dos Templates Canônicos (`.github/templates/`)**: `agent-template.md`, `operational-agent.md`, `research-agent.md`: Adicionada diretriz normativa de SSOT de documentação.
+- **Quality Gate de Governança — Gate de Homologação de Seções (Tier 1)**: `tests/governance_audit/test_template_sections.py`: Implementados 4 novos testes determinísticos para barrar.
 
 ## [2.8.5] — 2026-09-14
 
 ### Aprimorado
-- **Evolução do Agent `bug-triage` (v1.1.0 — Blast Radius Proativo & Challenge Gate de Regras)**:
-  - `.github/agents/bug-triage.agent.md`:
-    - Adicionado **Challenge Gate de Regras de Negócio & Consumidores (Fase 1.5)** obrigatório via `ask_questions`, impedindo presunção de correção pontual mesmo quando o desenvolvedor já entrega pré-análise e arquivos no prompt.
-    - Expandida a Fase C para **Fase C+ (Traçar Call Chain e Blast Radius Proativo)** com classificação em Verde (Cirúrgico), Amarelo (Mini-Refactoring) e Vermelho (Sistêmico) e integração com `@code-knowledge-graph`.
-    - Adicionada detecção e tratamento de `mini-refactoring` na classificação de falha e no plano de ação, exigindo **Passo 0: Testes de Caracterização dos Componentes Vizinhos (Safety Net)** antes de qualquer alteração de código compartilhado para evitar quebras colaterais.
-    - Vinculadas as skills `refactoring-planning-patterns`, `business-rules-governance` e `efficient-batch-code-modification` em `source_docs` e no catálogo.
-  - `.github/agents/catalog.yaml`: Atualizados metadados, `related_agents`, `related_skills` e `source_docs` de `bug-triage` (v1.1.0).
-
-- **Codificação de Diretrizes Anti-Band-Aid e Timing Reativo (`angular-bug-fixer`, `code-tracing`, `angular-implementation-patterns`)**:
-  - `code-tracing/SKILL.md`: Adicionados 4 novos anti-padrões essenciais de diagnóstico: máscara visual (desligar spinner sem resolver stream), temporizadores imperativos manuais (`setTimeout`) em código reativo, violação de contratos de consumidores vizinhos, e negligência do timing de renderização no DOM (instanciação tardia sob `@if`).
-  - `angular-bug-fixer.agent.md`: Incorporadas restrições explícitas contra flags artificiais de loading, timeouts imperativos, afrouxamento de contratos e violação de ciclo de vida de barramento de eventos.
-  - `angular-implementation-patterns/SKILL.md`: Atualizados o workflow de correção de bug e os anti-padrões para exigir rastreamento de fora para dentro e respeito aos invariantes terminais de estado.
-
----
+- **Evolução do Agent `bug-triage` (v1.1.0 — Blast Radius Proativo & Challenge Gate de Regras)**: `.github/agents/bug-triage.agent.md`:.
+- **Codificação de Diretrizes Anti-Band-Aid e Timing Reativo**: `code-tracing/SKILL.md`: Adicionados 4 novos anti-padrões essenciais de diagnóstico: máscara visual.
 
 ## [2.8.4] — 2026-09-13
 
 ### Corrigido & Sincronizado
-- **Saneamento de Referências a Agentes Descomissionados nos READMEs e Catálogo**:
-  - `README.md`: Atualizada a seção de especialistas de stack para a topologia vigente de supervisores de domínio (`angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `struts-router`, `python-router` e `database-router`), removendo menções residuais aos agentes monolíticos antigos (`angular-engineer`, `spring-boot-engineer`, `spring-reactive-engineer`).
-  - `.github/skills/README.md`: Atualizadas as descrições das skills de performance e implementação para apontar para os especialistas dos ecossistemas de domínio atuais, saneando referências a `angular-engineer`, `spring-boot-engineer`, `spring-reactive-engineer` e `docs-writer`.
-  - `.github/agents/catalog.yaml`: Atualizados os campos `related_agents` de `refactor-planner` e `runtime-verifier` para referenciar os routers de domínio e `test-strategy`.
-- **Fortalecimento da Suíte de Testes e Governança Estática (Smell 2.1)**:
-  - `tests/operational_flow/test_operational_workflows.py`: Atualizado o conjunto `LEGACY_DEPRECATED_AGENTS` para incluir `angular-engineer`, `spring-boot-engineer`, `spring-reactive-engineer` e `test-engineer`.
-  - `tests/governance_audit/test_governance_smells.py`: Implementado o teste determinístico `test_smell_2_1_no_deprecated_agents_in_live_readmes` (Smell 2.1 — Referência Órfã) com regex de fronteira de palavras, garantindo que nenhum agente descontinuado volte a ser citado na documentação viva. Suíte totalizando 123 testes (100% verde).
-
----
+- **Saneamento de Referências a Agentes Descomissionados nos READMEs e Catálogo**: `README.md`: Atualizada a seção de especialistas de stack para a topologia vigente de supervisores de domínio.
+- **Fortalecimento da Suíte de Testes e Governança Estática (Smell 2.1)**: `tests/operational_flow/test_operational_workflows.py`: Atualizado o conjunto `LEGACY_DEPRECATED_AGENTS` para incluir.
 
 ## [2.8.3] — 2026-09-12
 
 ### Adicionado & Aperfeiçoado
-- **Persistência Local e Nuvem de Incidentes de Workflows (`tools/incident_recorder`)**:
-  - **Especificação de Requisitos (`docs/requirements/REQ-workflow-incident-persistence.md`)**:
-    - Requisitos funcionais (REQ-001 a REQ-009) cobrindo captura contínua de erros, persistência local em SQLite WAL com JSON1, padrão Outbox, fail-safe operacional, aprendizado contínuo com destilação de lições aprendidas (REQ-008) e mecanismo de purge/pruning para liberação de espaço em disco e no Supabase (REQ-009).
-    - Requisitos não-funcionais (RNF-001 a RNF-004) para escrita ultrarrápida (<5ms), isolamento ACID local, interoperabilidade documental neutra e sanitização automática de credenciais e tokens (PII/Secret Scrubbing).
-  - **Technical Blueprint & Contratos (`docs/plan/plano-persistencia-incidentes-workflows.md`)**:
-    - Arquitetura Local-First Outbox Pattern com DDL SQLite local otimizado e DDL Supabase (PostgreSQL 15+ com coluna `document_payload JSONB` e índice GIN).
-    - Sub-rotina de ciclo de vida de aprendizado e mecanismo de purge para exclusão de incidentes resolvidos via PostgREST no Supabase e `VACUUM` no SQLite local.
-    - Context Firewall dividindo responsabilidades entre `[CORE_PERSISTENCE_TASKS]`, `[LOCAL_STORAGE_TASKS]` e `[CLOUD_SYNC_TASKS]`.
-  - **Schema Canônico do Incidente (`docs/schemas/workflow-incident.schema.json`)**:
-    - JSON Schema Draft 2020-12 estendido com `rootCause`, `successfulPatch`, `lessonLearned` e `prunedAt` na seção `resolution`.
-  - **Módulos de Produção (`tools/incident_recorder/`)**:
-    - `secret_scrubber.py`: sanitizador de credenciais, chaves de API (`sk-*`, `ghp_*`, `sbp_*`), Bearer JWTs e senhas.
-    - `incident_model.py`: modelo canônico de incidente com validação estrita contra o schema e suporte a lições aprendidas.
-    - `sqlite_sink.py`: repositório SQLite com modo WAL, gerenciamento estrito de conexões, métodos `resolve_incident`, busca preventiva `find_lessons` e rotina de purge com `VACUUM` (`purge_learned_incidents`).
-    - `supabase_formatter.py`: formatador compatível com PostgREST e gerador de queries de exclusão em lote (`format_supabase_delete_request`).
-  - **Suíte de Testes Automatizados (`tests/governance_audit/test_workflow_incident_persistence.py`)**:
-    - 13 testes em pytest cobrindo schema, sanitização, banco local SQLite, outbox sync, fail-safe, busca de lições e liberação de espaço (121 testes globais passando, 100% verde).
-
----
+- **Persistência Local e Nuvem de Incidentes de Workflows (`tools/incident_recorder`)**: **Especificação de Requisitos (`docs/requirements/REQ-workflow-incident-persistence.md`)**:.
 
 ## [2.8.2] — 2026-09-12
 
 ### Adicionado & Aperfeiçoado
-- **Motor Agnóstico de Migração de Tecnologias Legadas (Agnostic Legacy Migration Engine)**:
-  - **Especificação de Requisitos (`docs/requirements/REQ-migration-engine.md`)**:
-    - Requisitos funcionais (REQ-001 a REQ-007) com notação EARS e critérios de aceitação Gherkin/BDD, incluindo REQ-007 cobrindo o Bootstrapping Interativo de Novo Projeto com Human-in-the-Loop.
-    - Requisitos não-funcionais (RNF-001 a RNF-005) cobrindo desacoplamento estrutural $O(N+M)$, limiar zero de regressão via Dual-Verification, conformidade com ecossistemas de domínio, rastreabilidade e checkpoint humano obrigatório para decisões de build/runtime (RNF-005).
-  - **Technical Blueprint & Contratos (`docs/plan/plano-motor-migracao-agnostica.md`)**:
-    - Design de pipeline em 3 estágios desacoplados: Source Adapter (extração de legado) → Core Migration Engine (agnóstico) → Target Adapter (geração moderna).
-    - Máquina de estados determinística com inclusão formal da sub-rotina Fase 3a (Target Project Bootstrapping via `ask_questions` para escolha de build tool como Maven vs Gradle, versão LTS de runtime e formato de empacotamento).
-    - Context Firewall dividindo responsabilidades entre `[CORE_ENGINE_TASKS]`, `[SOURCE_STACK_TASKS]` e `[TARGET_STACK_TASKS]`.
-  - **Schema Canônico da Representação Intermediária (`docs/schemas/migration-ir.schema.json`)**:
-    - JSON Schema Draft 2020-12 definindo os contratos neutros para `metadata`, `entryPoints`, `domainEntities`, `businessRules` e `characterizationVectors`.
-  - **Governança de Workflows (`.github/agents/workflows.md`)**:
-    - Formalização do sub-padrão 3.7.1 no `WORKFLOW-FRAMEWORK-MIGRATION` integrando o pipeline agnóstico via IR, o checkpoint interativo da Fase 3a e o gate de Dual-Verification.
-  - **Suíte de Testes Automatizados (`tests/governance_audit/test_migration_engine_governance.py`)**:
-    - 16 testes unitários e de integração em pytest validando validade do schema, rejeição de payloads incompletos, aprovação de stacks registradas (`struts`, `ejb`, `spring-boot`, `angular`, `python`), rejeição de stacks não cadastradas, contrato de paridade e exigência de confirmação humana para bootstrapping green-field. 100% verde (108 testes da suíte global passando).
-
----
+- **Motor Agnóstico de Migração de Tecnologias Legadas (Agnostic Legacy Migration Engine)**: **Especificação de Requisitos (`docs/requirements/REQ-migration-engine.md`)**:.
 
 ## [2.8.1] — 2026-09-12
 
 ### Adicionado & Aperfeiçoado
-- **Geração Integrada de Título e Descrição de Pull Request (`@pr-gatekeeper` e `/commit`)**:
-  - **`pr-gatekeeper.agent.md` (v1.1.0 → v1.2.0)**:
-    - Atualização do fluxo operacional com passo dedicado para geração de Título de PR no padrão Conventional Commits (≤72 cols, imperativo em PT-BR).
-    - Inclusão formal de template estruturado de Descrição de PR contendo: resumo de entregas, tipo de mudança categorizado, matriz de risco avaliada com base no diff, instruções de validação/teste e checklist pré-PR.
-    - Sincronização de catálogo em `.github/agents/catalog.yaml` (versão e descrição).
-  - **`commit.prompt.md` (v1.3 → v1.4)**:
-    - Expansão do PASSO 5 para fornecer, junto à mensagem de commit e comando manual, o Título de PR e a Descrição estruturada de PR pronta para preenchimento na plataforma de Git.
-    - Orientações explícitas de entrada para o `CHANGELOG.md` no encerramento da entrega.
-
----
+- **Geração Integrada de Título e Descrição de Pull Request (`@pr-gatekeeper` e `/commit`)**: **`pr-gatekeeper.agent.md` (v1.1.0 → v1.2.0)**:.
 
 ## [2.8.0] — 2026-09-11
 
 ### Adicionado
-- **Consolidação de Workflows com Padrões de Mercado (ADLC / Autonomous SDLC 2026 — R-050)**:
-  - **Expansão de 5 para 8 Workflows Canônicos e de Ciclo de Vida**: Pesquisa de mercado e benchmarking com padrões corporativos (Anthropic *Building Effective Agents*, Cycode/IBM *Agentic Development Lifecycle - ADLC* e engenharia DevSecOps) identificou e supriu 3 lacunas operacionais críticas de repositórios reais:
-    - **`WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION` (WF6)**: remediação determinística de vulnerabilidades SCA e CVEs (`@security-reviewer`), mapeamento de blast radius de dependências (`@code-knowledge-graph`), bump cirúrgico em manifestos/lockfiles (`specialist-developer`), adaptação de breaking changes de bibliotecas (`specialist-bug-fixer`) e quality gate com re-scan de segurança (`runtime-verifier`).
-    - **`WORKFLOW-FRAMEWORK-MIGRATION` (WF7)**: condução de elevações estruturais de versão maior de framework ou plataforma (Angular standalone/signals, Spring Boot 2→3, Java 17→21/25, EJB→Spring), com pre-flight assessment (`@tech-solution-architect`), decomposição em fases entregáveis, codemods automatizados no sandbox (`context-mode`), testes de paridade funcional e checkpoints humanos obrigatórios.
-    - **`WORKFLOW-RELEASE-READINESS` (WF8)**: pre-flight completo de release e validação pré-deploy, auditando compatibilidade retroativa de contratos OpenAPI (`@tech-solution-architect`), rollout de banco com scripts DDL idempotentes e reversíveis (`@database-specialist`), varredura de segredos e licenças (`@security-reviewer` + `@repo-hygiene-auditor`), packaging semântico com changelog (`@pr-gatekeeper`) e decisão executiva Go/No-Go (`@code-review`).
-  - **Sincronização Atômica em Cascata (R-015/R-040/R-050)**:
-    - Atualização formal de `workflows.md` (diagrama geral, especificações detalhadas e Typed State Bags para WF6, WF7 e WF8).
-    - Inclusão dos 3 pipelines em `routing-graph.yaml` sob o bloco `workflows:`, com expansão das diretrizes de `fast_path_bypass`.
-    - Atualização de `CLAUDE.md` (§ R-050 e R-041), `.github/copilot-instructions.md` e `agent-router.agent.md`.
-    - Adição de 3 cenários declarativos E2E em `tests/operational_flow/casos-workflows.yaml` (`WF-DEP-001`, `WF-MIG-001`, `WF-REL-001`) e 3 testes específicos em `test_operational_workflows.py`.
-    - Validação total da suíte determinística: **92/92 testes passando (100%)** com cobertura de 100% dos workflows (`8/8`).
-
----
+- **Consolidação de Workflows com Padrões de Mercado**: **Expansão de 5 para 8 Workflows Canônicos e de Ciclo de Vida**: Pesquisa de mercado e benchmarking com padrões corporativos identificou e.
 
 ## [2.7.0] — 2026-09-11
 
 ### Refatorado & Simplificado
-- **Coesão em `.github/` — Simplificação Arquitetural e Desacoplamento Definitivo (Cenário 2)**:
-  - **Extinção de `docs/ai-context/catalog.yaml` e `docs/ai-context/binding.md`**: Eliminação de manifestos intermediários redundantes. Os adapters genéricos agora são 100% autodeclaratórios via frontmatter YAML nativo `applyTo` nos próprios arquivos `.instructions.md`, lidos diretamente pelo GitHub Copilot e demais IDEs.
-  - **Catálogo Único de Agents (`.github/agents/catalog.yaml`)**: Fim da colisão de nomes. O repositório passa a ter estritamente **um** arquivo `catalog.yaml`, eliminando a necessidade de desambiguações em prompts e no `repo-map.md`.
-  - **Migração do Overlay Local de Projetos**: Substituição de `docs/ai-context/catalog.local.yaml` por `.github/projects.local.yaml` (gitignored, R-043) e de seu template rastreado para `.github/projects.local.yaml.example`.
-  - **SSOT de Binding Consolidado (`.github/instructions/README.md`)**: O índice de instructions absorveu formalmente todas as definições da hierarquia de 3 camadas (Global $\rightarrow$ Stack $\rightarrow$ Projeto), discovery de IDEs e ciclo de vida de projetos locais.
-  - **Extinção do `repo-map.md` e Consolidação Nativa**: O arquivo `repo-map.md` foi integralmente absorvido e extinto. A árvore física oficial do repositório foi incorporada ao `README.md` raiz (para humanos) e os caminhos canônicos consolidados na seção 7 de `CLAUDE.md` e `.github/copilot-instructions.md` (para IAs), eliminando mais um ponto de manutenção e duplicação.
-  - **Remoção Completa do Diretório `docs/ai-context/`**: Diretório extinto por completo, concentrando toda a configuração e governança de IA sob `.github/`.
-  - **Sincronização em Cascata (R-015/R-043/R-046)**: Atualização atômica de `.gitignore`, `.githooks/pre-commit`, `CLAUDE.md` (R-034 e R-043), `.github/copilot-instructions.md`, todos os agents e prompts operacionais, scripts de tooling e suíte de testes (`test_local_project_isolation.py`, `test_governance_smells.py`, `test_routing_quality_gate.py`), mantendo 100% de conformidade e 89/89 testes aprovados no pytest.
-
----
+- **Coesão em `.github/` — Simplificação Arquitetural e Desacoplamento Definitivo**: **Extinção de `docs/ai-context/catalog.yaml` e `docs/ai-context/binding.md`**: Eliminação de manifestos.
 
 ## [2.6.2] — 2026-09-11
 
 ### Adicionado
-- **Prompt `/init-context` — Verificação de Deriva de Stack e Instruções Locais (Drift Detection)**:
-  - Adicionado novo PASSO 7 (expandindo a execução para 9 passos) para detectar discrepâncias entre os manifestos reais dos projetos locais externos (`package.json`, `pom.xml`, `build.gradle`, `pyproject.toml`) e os adapters locais em `.github/instructions/local/<projeto>.instructions.md` (R-043).
-  - Identifica automaticamente upgrades de versão major de frameworks (ex.: Angular 20 → 21, Spring Boot 2.x → 3.x) e migrações de test runners/bibliotecas (ex.: Karma/Jasmine → Vitest, JUnit 4 → JUnit 5, Jest → Vitest).
-  - Adiciona remediação guiada interativa via `ask_questions` (R-009) para sincronização do adapter local, linha dedicada na tabela de checklist consolidada, recomendações e troubleshooting.
-  - Inclusão da tool `ask_questions` em `tools:` e de `.github/skills/project-scanner/SKILL.md` em `source_docs:` do prompt.
-
----
+- **Prompt `/init-context` — Verificação de Deriva de Stack e Instruções Locais**: Adicionado novo PASSO 7 para detectar discrepâncias entre os manifestos reais dos projetos locais externos e os.
 
 ## [2.6.1] — 2026-09-11
 
 ### Refatorado
-- **Desacoplamento de Cardinalidade Normativa (Herança Aberta de Governança)**:
-  - Substituição da referência rígida ao contador fechado (`R-001..R-051`) pela herança aberta desacoplada (`regras normativas globais em CLAUDE.md`) em 45 agents/templates e todos os prompts e catálogos.
-  - Eliminação definitiva do problema de *Shotgun Surgery* (manutenção em cascata e gasto desnecessário de créditos Copilot a cada nova regra adicionada ao `CLAUDE.md`).
-- **Redefinição do Smell 2.15 (`governance-audit-patterns/SKILL.md` & `test_governance_smells.py`)**:
-  - Inversão de sentido do Smell 2.15 de "range desatualizado" para "Acoplamento Rígido de Range Normativo (Hardcoded Range Coupling)".
-  - Nova validação automatizada em `test_smell_2_15_no_hardcoded_normative_rule_range`: exige que todo agent herde `CLAUDE.md` e proíbe a reintrodução de ranges numéricos hardcoded em agents.
-
----
+- **Desacoplamento de Cardinalidade Normativa (Herança Aberta de Governança)**: Substituição da referência rígida ao contador fechado (`R-001..R-051`) pela herança aberta desacoplada em 45.
+- **Redefinição do Smell 2.15**: Inversão de sentido do Smell 2.15 de "range desatualizado" para "Acoplamento Rígido de Range Normativo (Hardcoded Range Coupling)".
 
 ## [2.6.0] — 2026-09-10
 
 ### Adicionado
-- **Suíte de Testes de Conformidade de Templates (Disjunção 1-de-N)**:
-  - `tests/governance_audit/test_template_sections.py`: Implementação estática da regra de conformidade polimórfica (Smells 2.9, 2.10 e 2.11), validando seções de agents, prompts e skills contra os templates canônicos com extração dinâmica e normalização semântica.
-  - `tests/governance_audit/test_router_agents.py`: Validação determinística especializada para os 6 agents com perfil de Router / Supervisor (`agent-router`, `angular-router`, `spring-boot-router`, `spring-reactive-router`, `ejb-router`, `database-router`), exigindo as 6 seções obrigatórias e menor privilégio de ferramentas.
-  - Template canônico oficial para roteadores em `.github/agents/templates/router-agent.md`.
-- **Suíte de Testes de Trajetórias de Workflows Canônicos (R-050) & Simulador MAS**:
-  - `tests/operational_flow/casos-workflows.yaml`: Catálogo declarativo com 8 cenários de ponta a ponta (E2E) cobrindo os 5 workflows canônicos, detecção de deriva de intenção (R-042), circuit breaker (R-050.2) e fast-chaining (R-050.1).
-  - `tests/operational_flow/test_workflow_trajectories.py`: Validação determinística das transições de estados, isolamento de ferramentas por etapa e thresholds de cobertura (100% workflows, ≥85% etapas, ≥15 agentes).
-  - `tests/operational_flow/workflow_eval_simulator.py`: Motor CLI para auditoria estática de trajetórias em lote e cálculo em tempo real das 5 dimensões de cobertura de MAS (`--coverage`).
-  - `.github/prompts/eval-workflows.prompt.md`: Prompt operacional parametrizado para avaliação de trajetórias via modelo `Gemini 3.8 Flash`.
-- **Documentação Arquitetural de Testes MAS (`tests/README.md`)**:
-  - Documentação completa da Pirâmide de Testes de Sistemas Multi-Agentes (MAS), detalhamento arquivo por arquivo, objetivos de qualidade, métricas de cobertura e guia de execução.
-
+- **Suíte de Testes de Conformidade de Templates (Disjunção 1-de-N)**: `tests/governance_audit/test_template_sections.py`: Implementação estática da regra de conformidade polimórfica (Smells 2.9.
+- **Suíte de Testes de Trajetórias de Workflows Canônicos (R-050) & Simulador MAS**: `tests/operational_flow/casos-workflows.yaml`: Catálogo declarativo com 8 cenários de ponta a ponta (E2E).
+- **Documentação Arquitetural de Testes MAS (`tests/README.md`)**: Documentação completa da Pirâmide de Testes de Sistemas Multi-Agentes (MAS), detalhamento arquivo por arquivo.
 ### Alterado
-- **Configuração do Pytest (`pytest.ini`)**:
-  - Inclusão da diretiva `pythonpath = .` garantindo resolução determinística da raiz do projeto independente da forma de invocação do runner.
-
----
+- **Configuração do Pytest (`pytest.ini`)**: Inclusão da diretiva `pythonpath = .` garantindo resolução determinística da raiz do projeto independente da forma de invocação do runner.
 
 ## [2.5.0] — 2026-09-10
 
 ### Adicionado
-- **Mapa do Repositório Canônico (`docs/ai-context/repo-map.md`)**:
-  - Fonte de verdade de navegação determinística de arquivos (princípio Zero Blind Searches), contendo guia de localização direta, tabela rápida de arquivos de governança (Quick File Finder) e árvore física estrutural do projeto.
-- **Whitelist de Busca e Indexação para ripgrep (`.ignore` e `.rgignore`)**:
-  - Arquivos de configuração na raiz liberando a varredura de `!.github/` e `!.github/**` pelas ferramentas de busca (`file_search` e `grep_search`), sanando falhas de localização com 0 matches de agents e skills em workspaces multi-root.
-
+- **Mapa do Repositório Canônico (`docs/ai-context/repo-map.md`)**: Fonte de verdade de navegação determinística de arquivos (princípio Zero Blind Searches), contendo guia de localização direta.
+- **Whitelist de Busca e Indexação para ripgrep (`.ignore` e `.rgignore`)**: Arquivos de configuração na raiz liberando a varredura de `!.github/` e `!.github/**` pelas ferramentas de busca.
 ### Alterado
-- **Desambiguação Canônica dos Catálogos (`catalog.yaml`)**:
-  - Formalizada a distinção unívoca entre o Catálogo de Agents (`.github/agents/catalog.yaml` — metadados, modelos Gemini/Claude, prioridades) e o Catálogo de Binding (`docs/ai-context/catalog.yaml` — manifest de stacks e adapters).
-  - Atualizadas as instruções em `CLAUDE.md`, `.github/copilot-instructions.md` e `.github/agents/agent-router.agent.md` proibindo explicitamente que o router busque modelos em `docs/ai-context/catalog.yaml`.
-  - Inclusão do `repo-map.md` como leitura de infraestrutura mandatória no `@agent-router`.
-
----
+- **Desambiguação Canônica dos Catálogos (`catalog.yaml`)**: Formalizada a distinção unívoca entre o Catálogo de Agents e o Catálogo de Binding.
 
 ## [2.4.0] — 2026-09-10
 
 ### Adicionado
-- **Novos Smells de Governança (20 Smells Canônicos)** — originados de auditoria real do primeiro ciclo completo de `WORKFLOW-FEATURE-DEVELOPMENT` (feature de Gestão de Usuários/Auditoria Global no projeto de referência):
-  - **Smell 2.18 (Gap de Definição de Pronto — Feature Não-Alcançável / Rota Órfã de Navegação)**: nenhum artefato do pipeline (blueprint, implementer, test-strategy, code-review) tratava "alcançabilidade via navegação" como critério de conclusão — feature entregue com testes verdes e build íntegro, porém sem entrada correspondente no menu/sidenav do projeto.
-  - **Smell 2.19 (Ausência de Verificação de Reuso de Design System / Componentes Compartilhados)**: agent implementer de UI criou HTML/CSS customizado (`<select>` nativo, cards/badges ad-hoc) ignorando catálogo interno de componentes compartilhados já documentado no projeto (`docs/componentes-shared.md`, `docs/padrao-angular-material.md`).
-  - **Smell 2.20 (Duplicação por Aninhamento de Router — Nested Subagent Sprawl)**: identificada e eliminada a duplicação na cadeia de orquestração onde o `@agent-router` invocava executores downstream via `run_subagent` por dentro de si mesmo e, ao retornar ao Orquestrador Raiz com o bloco de decisão, o orquestrador re-disparava o mesmo downstream. Formalizada a regra de Delegação Plana (Flat Delegation) em R-047, R-037, `agent-router.agent.md` e `handoff-governance/SKILL.md` (§ 2.3), acompanhada de teste estático determinístico no Tier 1 (`test_smell_2_20_router_flat_delegation_rule`).
-- **Reforço de Definition of Done em Frontend**: `angular-implementation-patterns/SKILL.md` ganha passo 0 (Reuse-First) e passo 7 (Navegabilidade) no Workflow — Feature Nova, com checklist de PR e anti-padrões correspondentes.
-- **Princípio Reuse-First**: `frontend-componentization-patterns/SKILL.md` ganha nova seção "Reuso-First: Antes de Criar Componente Novo" com processo objetivo de busca em `shared/`/documentação interna antes de qualquer HTML/CSS customizado.
-- **8ª Dimensão de Code Review**: `code-review-patterns/SKILL.md` § 2 ganha dimensão "UX/Design System & Navegabilidade", cobrindo os Smells 2.18/2.19 na revisão de diffs de frontend.
-- **Template Canônico Completado em 2 Agents**: `angular-feature-developer.agent.md` e `angular-ui-stylist.agent.md` — únicos 2 agents do catálogo Angular sem `Decision Tree`/`Checklist Antes de Entregar`/`Quando Delegar` — receberam as 3 seções ausentes (Smell 2.9 aplicado retroativamente).
-- **Reforço em `tech-solution-architect.agent.md`**: Context Firewall `[FRONTEND_TASKS]` e Checklist Antes de Entregar agora exigem explicitamente tarefa de integração ao shell de navegação e consulta prévia a design system compartilhado quando a feature introduzir rota(s)/UI nova(s).
-- **Reforço em `code-review.agent.md`**: novo branch no Decision Tree e item 6 nos Padrões Obrigatórios para validar navegabilidade e reuso de design system antes do veredito em diffs de frontend.
-- **Reforço em `test-strategy.agent.md`**: item 5 dos Padrões Obrigatórios exige cenário de Navegabilidade na Matriz de Cenários Frontend quando houver rota nova.
-- **Adapter Local Corrigido (`[PROJETO-ALVO].instructions.md`)**: novas seções § 1.1 (Design System Interno — Consulta Obrigatória) e § 1.2 (Navegação — SidenavComponent/Shell como Única Fonte de Verdade), referenciando explicitamente a documentação interna de componentes/design system e o componente de shell de navegação do projeto — o adapter não continha nenhuma dessas referências antes desta correção, apesar de os documentos já existirem no projeto.
-
+- **Novos Smells de Governança (20 Smells Canônicos)**.
+- **Reforço de Definition of Done em Frontend**: `angular-implementation-patterns/SKILL.md` ganha passo 0 (Reuse-First) e passo 7 (Navegabilidade) no Workflow.
 ### Autocrítica de Processo (Achado de Execução)
-- Identificado e documentado que a fidelidade de handoff da Etapa 5 (`tdd_domain_implementation`) de `WORKFLOW-FEATURE-DEVELOPMENT` depende de invocação **real** de `run_subagent` para o specialist correspondente — rotular a resposta com `Agente Ativo: <specialist>` sem a invocação real não carrega o contrato/checklist do agent, tornando as correções de conteúdo insuficientes por si só sem a disciplina de delegação genuína já normatizada em R-042.
-
----
+- Identificado e documentado que a fidelidade de handoff da Etapa 5 (`tdd_domain_implementation`) de `WORKFLOW-FEATURE-DEVELOPMENT` depende de invocação **real** de `run_subagent` para o specialist.
 
 ## [2.3.0] — 2026-09-10
 
 ### Adicionado
-- **Regra Normativa R-051 (Proteção Anti-Corrupção em Edição de Arquivo Único Grande/Estruturado)**: Formalizada em `CLAUDE.md` e `efficient-batch-code-modification/SKILL.md` (§ 5). Veda o uso de `insert_edit_into_file` em arquivos com mais de 200 linhas, formato YAML/JSON ou consumidos por CI/testes, exigindo o Padrão de Edição Segura Verificada (leitura integral, contagem unívoca de ocorrência da âncora, all-or-nothing write e releitura de confirmação).
-- **Snippet Canônico de Edição Segura (`safe-single-file-edit-pattern.js`)**: Materializado em `.github/skills/efficient-batch-code-modification/snippets/safe-single-file-edit-pattern.js` como template reutilizável para context-mode (`ctx_execute`), em estrita conformidade com R-026 (código real fora do corpo da skill).
-- **Novos Smells de Governança (17 Smells Canônicos)**:
-  - **Smell 2.15 (Citação de Range Normativo Desatualizado — Drift de R-0XX)**: Formalizada em `governance-audit-patterns/SKILL.md` e amparada por teste determinístico no Tier 1 (`test_smell_2_15_no_stale_normative_rule_range`), que lê dinamicamente o maior R-0XX de `CLAUDE.md` e bloqueia desatualizações nos agents.
-  - **Smell 2.16 (Agent Mutativo Sem Skill de Edição Segura Referenciada)**: Formalizada em `governance-audit-patterns/SKILL.md` e amparada por teste determinístico no Tier 1 (`test_smell_2_16_mutating_agents_reference_safe_editing_skill`), exigindo que todo agent com tools mutativas referencie `efficient-batch-code-modification`.
-- **Transparência de Base de Conhecimento — Terceira Linha do Banner Universal (`Skills Carregadas`)**: Estendido o Banner Universal de Identidade em `CLAUDE.md` (R-042), `agent-contracts/SKILL.md` (§ 0 e § 8), `.github/copilot-instructions.md` e `handoff-governance/SKILL.md` (§ 5.2) para exibir compulsoriamente a linha `Skills Carregadas: <skill-1>, ...` em cada resposta, garantindo visibilidade no chat sobre quais skills foram pre-fetched e consultadas a cada turno.
-
+- **Regra Normativa R-051**: Formalizada em `CLAUDE.md` e `efficient-batch-code-modification/SKILL.md` (§ 5).
+- **Snippet Canônico de Edição Segura**: Materializado em `.github/skills/efficient-batch-code-modification/snippets/safe-single-file-edit-pattern.js` como template reutilizável para context-mode.
 ### Evoluído
-- **Auditoria e Refinamento Profundo dos 5 Workflows Canônicos (`workflows.md` e `routing-graph.yaml`)**:
-  - **Resolução de Papéis Genéricos (`specialist-<papel>`)**: Formalizada convenção em `workflows.md` § 1.3 mapeando papéis agnósticos de stack (fixer, tester, stylist, implementer, advisory) para os agentes concretos dos sub-catálogos locais (`angular-catalog.yaml`, `spring-boot-catalog.yaml`, `spring-reactive-catalog.yaml`, `ejb-catalog.yaml`).
-  - **Princípio Arquitetural de Separação Declarador/Executor em Circuit Breakers**: Formalizado em `workflows.md` § 5 (Invariante #6) e § 8.1. Agentes estritamente read-only (`runtime-verifier`, `refactor-planner`) apenas detectam e declaram vereditos de bloqueio; a execução física de reversão atômica (`git checkout`/`git restore`) é sempre executada pelo especialista de implementação correspondente via `run_subagent`.
-  - **WF1 (`WORKFLOW-BUG-FIX`)**: Repro Gate com teto de 2 tentativas e estado terminal Não-Reproduzível; distinção entre testes unitários puros vs testes exigindo contexto de framework/DOM; checkpoint de segurança condicional (R-048.1) para correções que toquem autenticação/identidade.
-  - **WF2 (`WORKFLOW-REFACTORING`)**: Safety net com cobertura orientada a risco (`test-coverage-governance/SKILL.md`) em substituição ao threshold plano de 80%; checkpoint de aprovação humana para breaking change, schema ou blast radius grande; limite de escala do DAG Mikado em 15 nós; rollback atômico e incremental decidido pelo planner e executado pelos specialists.
-  - **WF3 (`WORKFLOW-TECHNICAL-ANALYSIS`)**: Inclusão de `devops-engineer` e `code-style-enforcer` no dispatch analítico; suporte a Fan-out/Fan-in multidimensional (`[P]`); teto de profundidade em sub-rotinas (`MAX_DEPTH = 3`); escape hatch formal para análises sem achados (`"nenhuma_proposta_necessaria_conformidade_validada"`).
-  - **WF4 (`WORKFLOW-FEATURE-DEVELOPMENT`)**: Sequenciamento de requisitos (`@requirements-analyst`) e decomposição (`@feature-planner`); sub-rotina de banco (`@database-specialist`); particionamento com tags de stack; shift-left de testes de segurança em TDD; circuit breaker de 2 tentativas no loop de remediação de segurança.
-  - **WF5 (`WORKFLOW-GOVERNANCE-MAINTENANCE`)**: Sincronização atômica estruturada por tipo de artefato, corrigindo a omissão de `evals/casos-roteamento.yaml` para novos agents (R-040); circuit breaker de 3 tentativas no loop de autofix.
+- **Auditoria e Refinamento Profundo dos 5 Workflows Canônicos**: **Resolução de Papéis Genéricos (`specialist-<papel>`)**: Formalizada convenção em `workflows.md` § 1.3 mapeando papéis agnósticos.
 - **Sincronização de Ranges Normativos**: Atualizados 100% dos 44 agents com seção de regras herdadas e todos os prompts e catálogos para a numeração consolidada `R-001..R-051`.
-- **Expansão de Isolamento Read-Only**: `READONLY_ADVISORY_AGENTS` expandido de 8 para 17 agents em `test_operational_workflows.py`, blindando especialistas consultivos contra tools mutativas.
-
----
 
 ## [2.2.0] — 2026-09-10
 
 ### Adicionado
-- **Regra Normativa R-050 (Workflows Operacionais Determinísticos — Pipelines de Estado Finito)**: Formalizada em `CLAUDE.md` a obrigatoriedade de vincular e executar toda solicitação técnica através de um dos 5 Workflows Canônicos:
-  1. `WORKFLOW-BUG-FIX` (Bugs, Erros 500/NPE, Falhas de Layout e Regressões em 5 etapas).
-  2. `WORKFLOW-REFACTORING` (Refatoração Estrutural, Modernização e Desacoplamento em 5 etapas).
-  3. `WORKFLOW-TECHNICAL-ANALYSIS` (Análise Técnica, Diagnóstico e Auditoria Especializada em 3 etapas).
-  4. `WORKFLOW-FEATURE-DEVELOPMENT` (Nova Feature e Evolução Funcional E2E em 6 etapas).
-  5. `WORKFLOW-GOVERNANCE-MAINTENANCE` (Auditoria, Padronização e Manutenção de Governança em 3 etapas).
-- **Especificação Canônica dos 5 Workflows (`.github/agents/workflows.md`)**: Novo artefato canônico com diagramas Mermaid em `flowchart TD`, matrizes de entrada/saída, regras de não-desvio e invariantes de execução.
-- **Roadmap Visual de Execução no Chat (Anti-Cegueira de Fluxo)**: Padronizada no `@agent-router`, `agent-contracts` (§ 0.1) e `workflows.md` (§ 6) a exibição compulsória do bloco visual `### 🗺️ Pipeline de Execução do Workflow (<total> etapas)` com marcadores `[✅]` (Concluído), `[▶]` (Em Andamento) e `[⏳]` (Pendente) para eliminar a cegueira do usuário durante o fluxo.
-- **Extensão de Handoff v1.2 (`workflow_tracking`)**: Adicionado ao schema formal de `handoff-governance` o bloco `workflow_tracking` (`workflow_id`, `etapa_atual`, `total_etapas`, `nome_etapa`, `proximos_agentes_permitidos`, `politica_desvio: "strict"`).
-- **Protocolo de Encadeamento de Workflows (Fast-Chaining — R-050.1)**: Reconhecimento de aprovações/ordens de execução de diagnósticos prévios no `@agent-router`, transferindo `carry_over_state` diretamente para a Etapa 1 do workflow de implementação sem desvio para `@prompt-structuring`.
-- **Estados de Contingência & Circuit Breaker (R-050.2)**: Inclusão de caminhos formais de rollback (4b em bugfix e 5b em refatoração) nos diagramas e contratos para reversão atômica de diffs sujos e escalação humana via `ask_questions` após esgotar o teto de 3 tentativas de teste ou violar regras de negócio.
-- **Rastreamento Multi-Projeto no Handoff (v1.3 — R-050.3)**: Extensão do `workflow_tracking` com `projeto_alvo` (`id`, `root_path`, `adapter_ref`) e `chaining` para garantir isolamento em workspaces multi-repositório.
-- **Nova Suíte de Testes de Isolamento de Projetos Locais (`test_local_project_isolation.py`)**: 5 novos testes automatizados determinísticos cobrindo 100% das regras R-038, R-043 e R-044 (varredura de git-tracked files, gitignore guardrails, caminhos de máquina reais e genericidade de placeholders).
-- **Verificação #5 no Pre-commit Hook (`.githooks/pre-commit`)**: Bloqueio ativo no commit contra menções a projetos registrados em `catalog.local.yaml`.
-- **Testes de Conformidade de Workflows**: 8 testes determinísticos em `tests/operational_flow/test_operational_workflows.py` validando workflows, integridade de `workflows.md`, declaração no grafo, fast-chaining, circuit breaker e rastreamento de projeto-alvo.
-- **Novos Casos na Suíte de Evals**: `canon-043` (layout e erro runtime), `canon-044` (refactor com alvo) e `regr-026` (bloqueio de desvio de bugs para `prompt-structuring`) em `.github/agents/evals/casos-roteamento.yaml`.
-
+- **Regra Normativa R-050**: Formalizada em `CLAUDE.md` a obrigatoriedade de vincular e executar toda solicitação técnica através de um dos 5 Workflows Canônicos:.
+- **Especificação Canônica dos 5 Workflows (`.github/agents/workflows.md`)**: Novo artefato canônico com diagramas Mermaid em `flowchart TD`, matrizes de entrada/saída.
 ### Evoluído
-- **Regra Normativa R-041 (Fast-Path Determinístico)**: Ajustada em `CLAUDE.md`, `copilot-instructions.md`, `routing-graph.yaml` e `agent-router.agent.md` para permitir que solicitações com intenções operacionais evidentes (bugs, refatoração com alvo, diagnósticos diretos) bypassam o `@prompt-structuring` diretamente para a etapa 1 do workflow, eliminando latência e perguntas redundantes.
+- **Regra Normativa R-041 (Fast-Path Determinístico)**: Ajustada em `CLAUDE.md`, `copilot-instructions.md`, `routing-graph.yaml` e `agent-router.agent.md` para permitir que solicitações com.
 - **Agent Router (`@agent-router` v2.0.0)**: Inserido Passo 0.4 (Classificação de Fast-Path) antes do Passo 0.5 e inclusão de `Workflow:` e `Etapa do Workflow:` no Formato de Saída.
-- **Grafo Estrutural (`routing-graph.yaml`)**: Adicionado bloco de primeira classe `workflows:` declarando estados finitos e inclusão de `fast_path_bypass` na aresta de `prompt-structuring`.
-
----
 
 ## [2.1.0] — 2026-09-06
 
 ### Adicionado
-- **Regra Normativa R-046 (Injeção Compulsória de Modificação de Código em Lote)**: Formalizada em `CLAUDE.md` a obrigatoriedade da skill operacional `efficient-batch-code-modification` em toda tarefa que envolva escrita, refatoração ou alteração em massa de código, erradicando loops sequenciais de roundtrip e reenvio recursivo de contexto.
-- **Injeção Compulsória em `prompt-structuring` (R-046)**: Adicionado mecanismo no refinamento de prompt para injetar nativamente a constraint de dry-run prévio em memória, single-turn batching e diffs cirúrgicos em `<constraints>` para qualquer tarefa de código sem exigir intervenção manual do usuário.
-- **Novo Agente `@governance-maintainer` (v1.0.0)**: Especialista executor em manutenção atômica, refatoração estrutural e sincronização em lote de artefatos de governança (`.github/agents`, `.github/skills`, `.github/prompts`, catálogos e grafo de roteamento). Opera sob o protocolo de single-turn batching e priorização de context-mode sobre terminal.
-- **Nova Skill `efficient-batch-code-modification` (Tier 1, Process)**: Protocolo operacional para economia de tokens e créditos Copilot — análise prévia em memória (dry-run), tool calls de escrita emitidas em lote na mesma rodada e diffs cirúrgicos mínimos.
-
+- **Regra Normativa R-046**: Formalizada em `CLAUDE.md` a obrigatoriedade da skill operacional `efficient-batch-code-modification` em toda tarefa que envolva escrita.
+- **Injeção Compulsória em `prompt-structuring` (R-046)**: Adicionado mecanismo no refinamento de prompt para injetar nativamente a constraint de dry-run prévio em memória.
 ### Evoluído
-- **Agents Executores de Código Alinhados a R-046**: Inclusão explícita de `efficient-batch-code-modification` em `source_docs`, `skills:` e diretrizes operacionais de 26 agents (database-specialist e 25 especialistas de domínio em frontend/angular, backend/spring-boot, backend/spring-reactive e backend/ejb).
-- **Evolução de `analysis-architect` para `tech-solution-architect` (v2.1.0)**:
-  - Adotado o padrão consolidado de mercado *Spec-First / Technical Blueprint* e *Context Firewall* (particionamento isolado `[BACKEND_TASKS]` e `[FRONTEND_TASKS]` para eliminar alucinações e perda de contexto downstream).
-  - Escopo: Viabilidade técnica, elaboração de Blueprint, contratos OpenAPI/AsyncAPI, modelo de dados (Flyway) e divisão de tarefas por stack antes do despacho aos Domain Routers.
-  - Sincronização atômica de governança (R-015/R-040): atualizados `catalog.yaml`, `routing-graph.yaml`, `agent-router.agent.md`, `casos-roteamento.yaml` (novo `canon-036`), `requirements-analyst.agent.md`, `feature-planner.agent.md`, `refactor-planner.agent.md`, `code-review.agent.md`, `test-strategy.agent.md`, `bug-triage.agent.md`, `code-knowledge-graph.agent.md`, `copilot-instructions.md`, `CLAUDE.md`, `README.md` e `.index.json`.
-  - Substituição do arquivo `analysis-architect.agent.md` por `tech-solution-architect.agent.md`.
-
+- **Agents Executores de Código Alinhados a R-046**: Inclusão explícita de `efficient-batch-code-modification` em `source_docs`, `skills:` e diretrizes operacionais de 26 agents.
 ### Consolidado
-- **Consolidação Biparadigma de Modelos nos Agents e Prompts**:
-  - **Paradigma do Prompt Procedural (SLMs / Alta Velocidade — Padrão Base)**: Definido `"Gemini 3.8 Flash"` como escolha padrão em toda a base (54 agents e 16 prompts procedurais/determinísticos: implementadores TDD, fixers, test-writers, geradores de adapters, linters/enforcers, scanners e roteadores de domínio).
-  - **Paradigma do Prompt Decompositivo / Raciocínio Guiado (Pensamento Profundo)**: Reservado `"Claude Sonnet 5.5"` exclusivamente para perfis deliberativos de alta complexidade:
-    - **Orquestração e Triagem Central**: `@agent-router` (agent e prompt `/agent-router`).
-    - **Arquitetura Técnica & Blueprint**: `@tech-solution-architect`.
-    - **Planejamento Decompositivo & Rollback**: `@refactor-planner` e prompt `/plan`.
-    - **Elicitação & Decomposição Crítica de Requisitos**: `@requirements-analyst`.
-    - **Pesquisa Multi-hop & Síntese Deliberativa**: `@deep-search` (agent e prompt `/deep-search`).
-    - **Especialistas de Arquitetura Consultiva (Advisors)**: `@angular-arch-advisor`, `@spring-boot-arch-advisor`, `@spring-reactive-arch-advisor`, `@ejb-arch-advisor`.
-  - Sincronização atômica (R-015) em todos os catálogos (`catalog.yaml`, `angular-catalog.yaml`, `spring-boot-catalog.yaml`, `spring-reactive-catalog.yaml`, `ejb-catalog.yaml`) e na skill `governance-factory-patterns/SKILL.md` (§ 9.1).
-  - Validação via `get_errors` com 0 erros em todos os arquivos modificados.
+- **Consolidação Biparadigma de Modelos nos Agents e Prompts**: **Paradigma do Prompt Procedural**: Definido `"Gemini 3.8 Flash"` como escolha padrão em toda a base.
 
 ## [2.0.0] — 2026-09-06
 
 ### Adicionado
-- **Arquitetura Hierárquica de Routers de Domínio**: Decomposição de agentes monolíticos em ecossistemas de domínio com sub-catálogos locais e isolamento em pastas:
-  - **Frontend Angular (`.github/agents/frontend/angular/`)**: Supervisor `angular-router` + sub-catálogo `angular-catalog.yaml` + 8 especialistas (`angular-arch-advisor`, `angular-feature-developer`, `angular-bug-fixer`, `angular-ui-stylist`, `angular-unit-test-writer`, `angular-component-test-writer`, `angular-test-fixer`, `angular-e2e-writer`).
-  - **Backend Spring Boot (`.github/agents/backend/spring-boot/`)**: Supervisor `spring-boot-router` + sub-catálogo `spring-boot-catalog.yaml` + 7 especialistas (`spring-boot-arch-advisor`, `spring-boot-feature-developer`, `spring-boot-bug-fixer`, `spring-boot-perf-tuner`, `spring-boot-unit-test-writer`, `spring-boot-integration-test-writer`, `spring-boot-test-fixer`).
-  - **Backend Spring Reactive (`.github/agents/backend/spring-reactive/`)**: Supervisor `spring-reactive-router` + sub-catálogo `spring-reactive-catalog.yaml` + 7 especialistas (`spring-reactive-arch-advisor`, `spring-reactive-feature-developer`, `spring-reactive-bug-fixer`, `spring-reactive-resilience-tuner`, `spring-reactive-unit-test-writer`, `spring-reactive-integration-test-writer`, `spring-reactive-test-fixer`).
-  - **Backend Java Legado EJB (`.github/agents/backend/ejb/`)**: Supervisor `ejb-router` + sub-catálogo `ejb-catalog.yaml` + 7 especialistas (`ejb-arch-advisor`, `ejb-feature-developer`, `ejb-bug-fixer`, `ejb-perf-tuner`, `ejb-unit-test-writer`, `ejb-integration-test-writer`, `ejb-test-fixer`).
-- **Suporte a `type: stack` no `@governance-factory`**: Nova capacidade de geração de ecossistemas tecnológicos completos estruturados em pastas de domínio com sub-catálogo, router e especialistas canônicos, com pesquisa prévia compulsória via `@deep-search` e sincronização atômica global (R-015).
-- **Smell 2.7 (Desalinhamento Contratual: Perfil ↔ Tools ↔ Skills ↔ Catálogo) em `governance-audit-patterns`**: Nova regra de conformidade com Matriz Canônica § 2.7.1 auditando papéis, permissões de escrita, tooling de terminal (`terminal-governance`), MCP `context-mode` e sincronismo atômico com o catálogo. Remediação executada com 100% de conformidade nos 33 agentes de frontend e backend.
-- **Dois Fluxos Canônicos de TDD com `@test-strategy`**:
-  - *Fluxo 1 (Cross-cutting Gateway)*: `@agent-router` aciona `@test-strategy` para matriz unificada antes de despachar aos routers de frontend/backend.
-  - *Fluxo 2 (Consulta Interna de Domínio)*: Routers de domínio consultam `@test-strategy` internamente via `run_subagent` antes de acionar seus test-writers.
-
+- **Arquitetura Hierárquica de Routers de Domínio**: Decomposição de agentes monolíticos em ecossistemas de domínio com sub-catálogos locais e isolamento em pastas: **Frontend Angular**: Supervisor.
+- **Suporte a `type: stack` no `@governance-factory`**: Nova capacidade de geração de ecossistemas tecnológicos completos estruturados em pastas de domínio com sub-catálogo.
 ### Removido
-- Descomissionamento dos agentes monolíticos substituídos pela nova topologia hierárquica: `angular-engineer.agent.md`, `spring-boot-engineer.agent.md`, `spring-reactive-engineer.agent.md` e `test-engineer.agent.md`.
-
----
+- Descomissionamento dos agentes monolíticos substituídos pela nova topologia hierárquica: `angular-engineer.agent.md`, `spring-boot-engineer.agent.md`, `spring-reactive-engineer.agent.md` e.
 
 ## [1.9.0] — 2026-09-04
 
 ### Adicionado
-- **`tools/context-insight-visualizer/`**: Suíte analítica completa e dashboard standalone (HTML/CSS/JS puro com design tokens do Angular Material 3 Dark Theme e gerador em Python) para métricas locais do Context Mode MCP (`sessions/*.db`, `stats-pid-*.json`, `content/*.db`). Replicando a arquitetura validada de `tools/codegraph-visualizer/` (zero dependências npm em runtime, zero lock-in SaaS, execução offline via `file://`).
-  - **Sidebar M3 com 5 Visões Profissionais**:
-    - `Dashboard`: Top KPIs (Sessões, R:W Ratio, Compact Rate, Error Rate, PPS), Heatmap 24h ("When You Code"), Volume temporal e cards de Insights determinísticos (`Nice`, `Heads up`, `Fix this`, `FYI`).
-    - `Knowledge Base`: Catálogo de 250+ fontes indexadas agrupadas por recência (*Hoje, Ontem, Esta Semana, Anteriores*), proporção de código e modal de inspeção de chunks.
-    - `Sessions & Decisions`: Auditoria cronológica de sessões, timeline de eventos com prioridade e **Diário de Decisões Técnicas** com exportação direta para Markdown (`.md`).
-    - `Search`: Mecanismo de busca unificado na memória local com destaque em tempo real sobre fontes, decisões técnicas e sessões.
-    - `Enterprise`: Painel executivo com matriz de personas de liderança (CTO, EM, DevEx, CISO, QA, Developer) calculando ROI, economia financeira e conformidade.
-  - `schemas/insight-data.schema.json`: contrato formal de dados unificado (JSON Schema draft 2020-12) validando todas as estruturas.
-  - `generator/`: motor de extração multi-DB com fallback de diretórios, cálculo de KPIs executivos, diário de decisões e empacotador de HTML.
-
----
+- **`tools/context-insight-visualizer/`**: Suíte analítica completa e dashboard standalone para métricas locais do Context Mode MCP.
 
 ## [1.8.0] — 2026-08-30
 
 ### Adicionado
-- **`agent-contracts/SKILL.md` § 0 — Banner Universal de Identidade (Visibilidade de Fluxo)**: nova regra de ouro — toda resposta de TODO agent (não apenas `agent-router`) abre com `Agente Ativo: <name>`; se resultado de handoff/re-triagem, uma segunda linha declara `Handoff: <origem> → <destino> (motivo: ...)`. Baseado em pesquisa de mercado 2026 (Tavily): LangGraph "Stream the Active Agent" (campo `active_agent` no state, streamado ao usuário) e OpenAI Agents SDK (`HandoffOutputItem` imprimindo "Handed off from X to Y").
+- **`agent-contracts/SKILL.md` § 0 — Banner Universal de Identidade**: nova regra de ouro; toda resposta de TODO agent (não apenas `agent-router`) abre com `Agente Ativo: <name>`.
 - **`agent-router.agent.md`**: novo campo `Transição` no Formato de Saída, explicitando "Nova triagem (1º turno)" | "`<origem>` → `<atual>` (motivo: deriva_de_intencao)" | "Sem mudança".
-
 ### Corrigido
-- **Gap de visibilidade em R-042**: antes desta correção, apenas o `agent-router` declarava "Agente Ativo" — um agent downstream em `task_mode` por vários turnos consecutivos não reafirmava quem estava respondendo, deixando o usuário sem visibilidade do fluxo. Corrigido nos 23 agents downstream (parágrafo "Banner obrigatório" inserido na seção já existente "Retorno ao Router", via script Node.js determinístico) e nos 2 templates (`research-agent.md`, `operational-agent.md`) usados pelo `agent-factory` para gerar novos agents.
-
+- **Gap de visibilidade em R-042**: antes desta correção, apenas o `agent-router` declarava "Agente Ativo".
 ### Alterado
 - **`agent-factory.agent.md`**: Padrões Obrigatórios (item 10), Checklist e Formato de Saída passam a validar a presença do banner em todo agent criado/revisado.
-- **`CLAUDE.md` (R-042)**, **`copilot-instructions.md`** (fluxo garantido) e **`agents/README.md`** § 8 — formalizam a exigência de visibilidade turno a turno.
-- **`handoff-governance/SKILL.md`** § 5.2 — referência cruzada ao banner de identidade.
-
----
 
 ## [1.7.0] — 2026-08-30
 
 ### Corrigido
-- **Gap estrutural de tooling para R-042**: `run_subagent` era ausente no frontmatter `tools:` de 3 agents (`agent-factory`, `adapter-generator`, `binding-initializer`) — sem essa tool, o handoff de retorno a `@agent-router` descrito em prosa na seção "Retorno ao Router" nunca era executável de fato. Corrigido nos 3 agents.
-- **Causa raiz nos templates**: `templates/research-agent.md` (tools com nomenclatura não-canônica `[Read, Grep, Glob]`, sem `run_subagent`, sem seção "Retorno ao Router") e `templates/operational-agent.md` (sem `run_subagent`, seção "Retorno ao Router" totalmente ausente) — todo agent novo criado por `agent-factory` herdava o gap. Ambos corrigidos.
-
+- **Gap estrutural de tooling para R-042**: `run_subagent` era ausente no frontmatter `tools:` de 3 agents.
+- **Causa raiz nos templates**: `templates/research-agent.md` e `templates/operational-agent.md` — todo agent novo criado por `agent-factory` herdava o gap. Ambos corrigidos.
 ### Adicionado
-- **`agent-contracts/SKILL.md` § 9 — Ferramentas Mínimas por Agent (Tooling Baseline)**: tabela de tools mínimas obrigatórias por perfil (Router, Analista, Especialista, Operacional); regra de ouro — `run_subagent` é obrigatório e bloqueante em TODO agent, sem exceção.
-- **`agent-factory.agent.md`**: valida a nova regra em Padrões Obrigatórios (itens 8-9), Checklist Antes de Codar e Formato de Saída — nenhum agent é finalizado sem `run_subagent` no frontmatter e sem a seção "Retorno ao Router".
-
+- **`agent-contracts/SKILL.md` § 9 — Ferramentas Mínimas por Agent (Tooling Baseline)**: tabela de tools mínimas obrigatórias por perfil; regra de ouro.
 ### Alterado
-- **`CLAUDE.md` (R-042)**, **`copilot-instructions.md`** e **`agents/README.md`** § 8 — adicionado o pré-requisito estrutural: o handoff de retorno só é efetivo via chamada real de `run_subagent`, não apenas descrito em texto.
-
----
+- **`CLAUDE.md` (R-042)**, **`copilot-instructions.md`** e **`agents/README.md`** § 8.
 
 ## [1.6.0] — 2026-08-30
 
 ### Alterado
-- **Especialistas `angular`, `spring-boot`, `spring-reactive` migrados de perfil "advisory puro" para perfil HÍBRIDO (v2.0.0)**: além de análise/recomendação, agora também implementam feature nova e correção de bug dentro do próprio domínio de stack, seguindo padrões de mercado consolidados via pesquisa Tavily 2026.
-- **Testing-first obrigatório** em modo Implementação: nenhum dos 3 agents pode reportar sucesso sem teste escrito/atualizado e suíte executada localmente.
-- **`agent-router` / `routing-graph.yaml` / `CLAUDE.md` (R-042)**: condição `intent_drift_detected` ajustada — implementação **dentro** do domínio de stack do specialist não é mais deriva de intenção; deriva só ocorre em pivô **cross-stack** (ex.: `@angular` recebe pedido de código Spring Boot) ou pedido fora do domínio técnico.
-
+- **Especialistas `angular`, `spring-boot`, `spring-reactive` migrados de perfil "**: além de análise/recomendação, agora também implementam feature nova e correção de bug dentro do próprio domínio.
 ### Adicionado
-- **3 novas skills de implementação** (Tier 2, pesquisa de mercado 2026 via Tavily):
-  - `angular-implementation-patterns` — fronteira Signals/RxJS, testing-first, checklist de PR.
-  - `spring-boot-implementation-patterns` — matriz de decisão virtual threads vs reativo, N+1/OSIV, DTOs de borda.
-  - `spring-reactive-implementation-patterns` — composição não-bloqueante, operadores de erro (`onErrorResume`/`onErrorMap`/`retryWhen`), `StepVerifier`/`WebTestClient`.
-- **`tools:`** dos 3 agents expandidas com `create_file`, `insert_edit_into_file`, `get_errors`, `run_in_terminal`.
-- **`docs/ai-context/evals/casos-roteamento.yaml`**: `canon-018` (implementação direta de bugfix), `regr-014` corrigido (implementação no próprio domínio não é deriva), `regr-016` novo (deriva real cross-stack) — suíte passa de 35 para 40 casos.
-
+- **3 novas skills de implementação** (Tier 2, pesquisa de mercado 2026 via Tavily): `angular-implementation-patterns` — fronteira Signals/RxJS, testing-first, checklist de PR.
 ### Corrigido
-- **SYNC (R-015)**: `.github/skills/.index.json` — corrigido gap pré-existente onde as 3 skills de análise (`angular-frontend-patterns`, `spring-boot-backend-patterns`, `spring-reactive-webflux-patterns`) nunca haviam sido registradas; total_skills 39 → 45 (3 análise + 3 implementação novas).
-- **SYNC**: `catalog.yaml` (agents), `agents/README.md`, `copilot-instructions.md`, `handoff-governance/SKILL.md` § 5 — todas as referências a "sem implementação"/"advisory puro" para os 3 specialists atualizadas para refletir o perfil híbrido.
-
----
-
-
-
+- **SYNC (R-015)**: `.github/skills/.index.json` — corrigido gap pré-existente onde as 3 skills de análise nunca haviam sido registradas; total_skills 39 → 45 (3 análise + 3 implementação novas).
 ### Adicionado
-- **R-042 (Re-triagem Obrigatória por Turno — Anti Sticky-Session)**: R-037 passa a se aplicar explicitamente a **cada novo turno**, não só ao primeiro. Fecha o gap relatado onde um agent downstream (ex.: `requirements-analyst`) continuava respondendo sozinho mesmo quando o pedido do usuário mudava de fase (requisito→implementação, análise→código, revisão→correção).
-- **Seção "Retorno ao Router"** adicionada nos 23 agents downstream/specialist (atualização atômica, R-015): cada agent declara gatilho objetivo de deriva de intenção e retorna a `@agent-router` via handoff (`handoff-governance` § 2.1, `motivo: "deriva_de_intencao"`) em vez de prosseguir fora do próprio escopo.
-- **`agent-router.agent.md` v1.5.0**: novo PASSO 0.3 na Decision Tree (checagem de deriva quando há agent ativo de turno anterior); output com campo `Agente Ativo` para auditoria; roteamento direto para `angular`/`spring-boot`/`spring-reactive` (antes órfãos — só alcançáveis por `@menção` manual, nunca roteados pelo próprio router).
-- **`docs/ai-context/routing-graph.yaml`**: 3 novos nós `specialist_advisory` (`angular`, `spring-boot`, `spring-reactive`) + arestas de entrada a partir do router; nova aresta reversa universal `de: *downstream → para: agent-router` (condição `intent_drift_detected`, prioridade 0) aplicável a todo nó `downstream`/`specialist_advisory`.
-- **`handoff-governance/SKILL.md`**: § 5 nova linha de escalonamento para mudança de fase na mesma conversa; nova § 5.2 "Anti Sticky-Session (R-042)".
-- **`docs/ai-context/evals/casos-roteamento.yaml`**: `canon-015/016/017` (specialists agora roteáveis) + `regr-014/015` (regressão de sticky-session, 2 turnos) — suíte passa de 35 para 40 casos.
-
+- **R-042**: R-037 passa a se aplicar explicitamente a **cada novo turno**, não só ao primeiro.
 ### Corrigido
-- Gap de catálogo: `angular`, `spring-boot` e `spring-reactive` já existiam em `catalog.yaml`/`README.md` mas nunca haviam sido registrados como nós roteáveis em `routing-graph.yaml` nem na Decision Tree do `agent-router` — corrigido.
-- **SYNC (R-015)**: `agents/catalog.yaml` (`related_agents: agent-router` adicionado aos 3 specialists), `agents/README.md` (nota R-042 em Diretrizes Transversais), `CLAUDE.md`, `.github/copilot-instructions.md`.
-
+- Gap de catálogo: `angular`, `spring-boot` e `spring-reactive` já existiam em `catalog.yaml`/`README.md` mas nunca haviam sido registrados como nós roteáveis em `routing-graph.yaml` nem na Decision.
 ### Pesquisa de mercado (base da decisão)
 - OpenAI Agents SDK — padrão `handoff()` + `transfer_back_to_*` (retorno explícito de controle).
-- LangGraph `langgraph-supervisor` — `create_handoff_tool` + `add_handoff_back_messages`.
-- Padrão de state machine de 2 modos (`orchestrator_mode`/`task_mode`) com detecção conservadora de deriva de tópico (Orchestrator Pattern, 2026).
-
----
 
 ## [1.3.0] — 2026-08-29
 
 ### Adicionado
-- **Agent `requirements-analyst`**: perfil de elicitação prospectiva para transformar pedido de negócio ambíguo em requisitos funcionais/não-funcionais estruturados e testáveis, com rastreabilidade da fonte; aplica mediação contra *solution-jumping* (Five Whys) antes de qualquer decisão técnica
-- **Skill `requirements-engineering-patterns`** (Tier 2): base de conhecimento consolidada via pesquisa de mercado (ISO/IEC/IEEE 29148, EARS, INVEST, Gherkin/BDD, FURPS+, regra de singularidade INCOSE)
-- **`docs/ai-context/routing-graph.yaml`**: novo nó + aresta `agent-router → requirements-analyst` (R-040), com `nao_confundir_com` cruzado para evitar colisão com `business-rules-extractor` e `impact-architect`
-- **`docs/ai-context/evals/casos-roteamento.yaml`**: `canon-014` (roteamento correto para `requirements-analyst`), `regr-012` e `regr-013` (não-confusão `requirements-analyst` × `business-rules-extractor`) — suíte passa de 32 para 35 casos
-- **`agent-router.agent.md`**: nova ramificação na Decision Tree para elicitação de requisito novo; bump `version: 1.3.0 → 1.4.0`
-
+- **Agent `requirements-analyst`**: perfil de elicitação prospectiva para transformar pedido de negócio ambíguo em requisitos funcionais/não-funcionais estruturados e testáveis.
+- **Skill `requirements-engineering-patterns`** (Tier 2): base de conhecimento consolidada via pesquisa de mercado.
 ### Corrigido
-- **SYNC de catálogos (R-015/R-040)**: atualização atômica de `agents/catalog.yaml` (23 → 24 agents), `skills/.index.json` (38 → 39 skills), `agents/README.md` e `skills/README.md` para refletir o novo perfil de requisitos
-- **`README.md`** consolidado para refletir o estado real: 24 agents, 39 skills, 35 casos de roteamento e distinção explícita de escopo entre `requirements-analyst` (pedido → requisito) e `business-rules-extractor` (código → regra)
-
+- **SYNC de catálogos (R-015/R-040)**: atualização atômica de `agents/catalog.yaml` (23 → 24 agents), `skills/.index.json` (38 → 39 skills).
 ### Conformidade
-- Mantida separação de responsabilidades sem duplicação (R-003): `requirements-analyst` opera em requisito **novo/prospectivo**; `business-rules-extractor` permanece no fluxo **reverso** (código existente)
-
----
+- Mantida separação de responsabilidades sem duplicação (R-003): `requirements-analyst` opera em requisito **novo/prospectivo**.
 
 ## [1.2.0] — 2026-06-12
 
 ### Adicionado
-- **Prompt `/commit`**: Gera mensagem Conventional Commits (PT-BR) sem executar git autonomamente
-- **Prompt `/review`**: Revisão de código por qualidade, convenções e impacto com relatório por severidade
-- **Prompt `/health`**: Health check completo da governança (binding, agents, skills, R-038)
-- **Agent `skill-factory`**: Criar/revisar skills com padrão SKILL.md e atualização atômica do `.index.json`
-- **Skill `git-governance`**: Convenções de branch naming, commit standards e PR guidelines
-- **`docs/ai-context/catalog.yaml`**: Binding instanciado para o ecossistema
-- **`docs/ai-context/binding.md`**: Documentação do binding ativo
-- Diagrama Mermaid no README.md mostrando fluxo completo de agents
-
+- **Prompt `/commit`**: Gera mensagem Conventional Commits (PT-BR) sem executar git autonomamente.
+- **Prompt `/review`**: Revisão de código por qualidade, convenções e impacto com relatório por severidade.
 ### Corrigido
 - **SYNC**: `.index.json` com `total_agents: 10` (corrigido para 15) e 2 skills sem entrada (`project-scanner`, `project-context-builder`)
-- **SYNC**: `copilot-instructions.md` § 4.1 ainda mencionava "5 perguntas" após simplificação para 1
-
 ### Conformidade R-038
 - Todos os arquivos de governança agora seguem o padrão de genericidade obrigatória (R-038)
----
 
 ## [1.1.0] — 2026-06-11
 
 ### Adicionado
-- **Prompt `/init-context` v1.1**: PASSO 2 informativo (não bloqueante), PASSO 3 condicional por sessão, PASSO 4 lista projetos por nome
+- **Prompt `/init-context` v1.1**: PASSO 2 informativo (não bloqueante), PASSO 3 condicional por sessão, PASSO 4 lista projetos por nome.
 - **Simplificação `binding-initializer`**: 5 perguntas → 1 pergunta (só nome do ecossistema)
-- **Desacoplamento `adapter-generator`**: Removido auto-disparo pelo `binding-initializer` — apenas chamado por `/add-project-context`
-- **Guardrail de confinamento**: Todos os arquivos gerados ficam exclusivamente no repositório de governança
-- **Naming de adapters**: Padrão `<nome-projeto>.instructions.md` (sem sufixo de stack)
-- Source_docs do `/init-context` agora inclui `docs/ai-context/catalog.yaml`
-- PASSO 3 do `/init-context` condicional: sessão recorrente mostra top-5; primeira execução mostra todas
-
 ### Corrigido
 - `add-project-context`: reduzido de 4 para 3 perguntas (Q2 tipo removida — inferida pelo scanner)
-- `QUICK-START.md`: exemplos atualizados com caminhos corretos de projeto
-
----
+- `QUICK-START.md`: exemplos atualizados com caminhos corretos de projeto.
 
 ## [1.0.0] — 2026-06-10
 
 ### Adicionado
 - Estrutura inicial de governança (`CLAUDE.md`, `copilot-instructions.md`)
-- 14 agents: `agent-router`, `bug-triage`, `test-strategy`, `test-implementation`, `refactor-planner`, `impact-architect`, `docs-curator`, `research-router`, `analysis-architect`, `agent-factory`, `context-builder`, `binding-initializer`, `adapter-generator`
-- 17 skills: `context-mode`, `context-builder`, `context-compact`, `sonarqube-governance`, `tavily`, `mermaid-diagrams`, `agent-contracts`, `handoff-governance`, `confidence-fallback-policy`, `agent-safety-guardrails`, `agent-observability-otel`, `agent-evals-lab`, `yaml-governance`, `test-implementation-angular`, `test-implementation-backend`, `test-coverage-governance`
+- 14 agents: `agent-router`, `bug-triage`, `test-strategy`, `test-implementation`, `refactor-planner`, `impact-architect`, `docs-curator`, `research-router`, `analysis-architect`, `agent-factory`.
+- 17 skills: `context-mode`, `context-builder`, `context-compact`, `sonarqube-governance`, `tavily`, `mermaid-diagrams`, `agent-contracts`, `handoff-governance`, `confidence-fallback-policy`.
 - Prompts de workflow: `/research`, `/plan`, `/implement`, `/validate` (renomeados de PT→EN em 2026-08-29)
-- Prompts de Context Mode: `/ctx-checkpoint`, `/ctx-resume`, `/ctx-doctor`, `/ctx-insight`, `/ctx-status`
-- Prompts de binding: `/init-context`, `/add-project-context`, `/del-project-context`
-- Templates base: `catalog-base.yaml`, `binding-base.md`
-- Adapters: `spring-boot-backend.instructions.md` (Java/Spring), `angular-v21-frontend.instructions.md` (Angular 21)
-- Regras normativas R-001..R-039 em CLAUDE.md

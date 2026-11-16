@@ -40,7 +40,7 @@ Conventional Commits, imperativo PT-BR, ≤ 72 colunas. Ex.: `feat(auth): adicio
 - [ ] Guardrail de segredos limpo
 - [ ] Testes adicionados/atualizados e passando
 - [ ] Documentação viva atualizada
-- [ ] CHANGELOG.md atualizado
+- [ ] CHANGELOG.md atualizado conforme `references/changelog.md` §4 (`<= 200 chars/bullet`, sem listas exaustivas)
 - [ ] Plano de Rollback preenchido
 ````
 

@@ -88,7 +88,7 @@ Apresentar a saída estruturada nas seguintes seções claras:
 2. **Bloco 2 (Comando para Execução Manual)**: bloco ```bash isolado utilizando `git commit -F - << 'EOF' ... EOF` (precedido de `git add` se sugerido) para preservar formatação e evitar cercas aninhadas.
 3. **Bloco 3 (Título do PR)**: bloco ```text isolado no formato Conventional Commits (≤72 cols, imperativo, PT-BR).
 4. **Bloco 4 (Descrição do PR)**: bloco ````markdown isolado (delimitado por 4 backticks) com seções "O que mudou", "Matriz de Risco", "Plano de Rollback", "Como validar" e "Checklist" (alinhado a `references/pr-template.md`). Em "Como validar", usar inline code para evitar conflito de cercas.
-5. **Bloco 5 (CHANGELOG.md - Entrada Sugerida)**: bloco ```diff isolado sugerido no formato Keep a Changelog / SemVer (alinhado a `references/changelog.md`).
+5. **Bloco 5 (CHANGELOG.md - Entrada Sugerida)**: bloco ```diff isolado sugerido no formato Keep a Changelog / SemVer (alinhado a `references/changelog.md` §4: `<= 200 chars` por bullet, `<= 8 bullets` por versão e zero listagem exaustiva de arquivos/RCA).
 
 A matriz de risco segue `references/risk-matrix.md`. Em "Como validar", usar inline code.
 
@@ -98,7 +98,7 @@ A matriz de risco segue `references/risk-matrix.md`. Em "Como validar", usar inl
 - [ ] Mensagem reflete o stage; atomicidade respeitada
 - [ ] Título imperativo, PT-BR, sem ponto final, ≤ 72 cols; corpo ≤ 72 cols
 - [ ] Removidos com motivo e substituto; "Como validar" presente
-- [ ] PR com Matriz de Risco e Plano de Rollback; CHANGELOG compatível com SemVer
+- [ ] PR com Matriz de Risco e Plano de Rollback; CHANGELOG compatível com SemVer e `references/changelog.md` §4 (`<= 200 chars/bullet`, `<= 8 bullets/versão`, sem listas exaustivas/RCA)
 - [ ] Blocos isolados (sem cerca global ou aninhada)
 - [ ] Nenhum comando git de escrita executado
 

@@ -35,7 +35,7 @@ Padroniza versionamento Git: histórico semântico, commits atômicos, PRs audit
 
 ## 1) Quando Usar
 
-- ✅ Nomear branches, redigir commits, PR (título/descrição/risco/rollback) e entradas de CHANGELOG.
+- ✅ Nomear branches, redigir commits, PR (título/descrição/risco/rollback) e entradas de CHANGELOG com concisão obrigatória (`references/changelog.md` §4 e §5: bullets `<= 200 chars`, `<= 12 bullets/release`, teto `<= 1.000 linhas`).
 - ❌ Executar `git add/commit/push` de forma autônoma (R-031), resolver conflitos às cegas, substituir `@code-review`.
 
 ## 2) Mapa de Referências (Nível 3)
@@ -46,7 +46,7 @@ Padroniza versionamento Git: histórico semântico, commits atômicos, PRs audit
 | Template de PR + Plano de Rollback | [`references/pr-template.md`](references/pr-template.md) |
 | Critérios de risco e blast radius | [`references/risk-matrix.md`](references/risk-matrix.md) |
 | Defesa em camadas de segredos, regex | [`references/secrets-guardrail.md`](references/secrets-guardrail.md) |
-| Keep a Changelog + mapeamento semântico | [`references/changelog.md`](references/changelog.md) |
+| Keep a Changelog + mapeamento semântico + concisão (§4/§5: `<= 200 chars/bullet`, `<= 12 bullets/release`, `<= 1.000 linhas`) | [`references/changelog.md`](references/changelog.md) |
 
 ## 3) Branch Naming
 
@@ -93,7 +93,7 @@ Nunca `--abort` como fuga (só base errada ou pedido humano); diagnosticar hunk 
 - [ ] Testes passando; sem debug (`console.log`, `System.out.println`)
 - [ ] Guardrail de segredos limpo (R-010)
 - [ ] Matriz de Risco + Plano de Rollback preenchidos
-- [ ] CHANGELOG atualizado (`references/changelog.md`)
+- [ ] CHANGELOG atualizado conforme orçamento de concisão (`references/changelog.md` §4 e §5: bullets `<= 200 chars`, `<= 12 bullets/release`, teto `<= 1.000 linhas`)
 - [ ] Nenhuma execução autônoma de `git commit`/`git push` (R-031)
 
 ## 10) Referências

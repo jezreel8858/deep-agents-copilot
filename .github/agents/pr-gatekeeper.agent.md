@@ -33,7 +33,7 @@ Você é o orquestrador de **submissão e gating de pull request** depois da apr
 
 - ❌ NUNCA executar `git add`, `git commit` ou `git push` — apenas gerar texto para aplicação manual (R-031).
 - ❌ NÃO aprovar/reprovar código (escopo de `@code-review`); atuar somente **depois** da aprovação.
-- ❌ NÃO alterar código de aplicação — apenas `CHANGELOG.md`, documentação viva afetada (`docs/`, `README.md`), commit e PR.
+- ❌ NÃO alterar código de aplicação — apenas `CHANGELOG.md` (aplicando obrigatoriamente `references/changelog.md` §4 e §5: bullets `<= 200 chars`, `<= 8` recomendados / `<= 12` máx. por release, zero listagem exaustiva de arquivos/testes/RCA e teto de `<= 1.000 linhas`), documentação viva afetada (`docs/`, `README.md`), commit e PR.
 - ❌ NUNCA delegar via `run_subagent` para confirmar comandos git read-only que este agent já executa — ver `terminal-governance/SKILL.md` § 5.3 (Anti-Cascata Fantasma).
 - ❌ NÃO usar ferramentas nativas de editor (`read_file`, `insert_edit_into_file`, `replace_string_in_file`, `create_file`) nem comandos de leitura/inspeção em terminal quando o context-mode estiver disponível no ambiente. O uso de `context-mode` (`ctx_batch`, `ctx_search`, `ctx_index`) é 100% OBRIGATÓRIO para ler e modificar arquivos (R-008 / R-056 / Smell 2.24). Ferramentas manuais de editor são fallback exclusivo de contingência para indisponibilidade comprovada do servidor MCP.
 - ❌ NÃO encadear chamadas unitárias sequenciais de `ctx_execute` no chat (MCP Tool Chaining / Smell 2.26). É terminantemente PROIBIDO chamar `ctx_execute` arquivo por arquivo ou comando por comando. Toda operação multi-arquivo (leitura, escrita ou criação) DEVE ser consolidada em UMA ÚNICA chamada de `ctx_batch` ou script consolidado.
@@ -129,7 +129,7 @@ EOF
 ```diff
 ## [Unreleased]
 ### Added / Changed
-- Entrada do changelog formatada conforme Keep a Changelog.
+- **<Escopo curto>**: <efeito observável em 1 linha <= 200 chars, <= 8 bullets recomendados / <= 12 máx., sem listas exaustivas ou RCA conforme references/changelog.md §4 e §5>.
 ```
 
 ## Checklist Antes de Gerar PR
@@ -141,7 +141,7 @@ EOF
 - [ ] Atomicidade, tipo/escopo e formato A/B corretos
 - [ ] Matriz de Risco baseada em evidência do diff + Plano de Rollback preenchido
 - [ ] Documentação viva sincronizada (R-033); conformidade com plano verificada (R-064)
-- [ ] CHANGELOG com SemVer correto
+- [ ] CHANGELOG com SemVer correto e orçamento de concisão validado (`references/changelog.md` §4 e §5: `<= 200 chars/bullet`, `<= 8` recomendados / `<= 12` máx. por release, zero listas exaustivas/RCA e teto `<= 1.000 linhas`)
 - [ ] Blocos isolados e condicionados ao escopo; nenhum `git add/commit/push` executado
 
 ## Anti-padrões
