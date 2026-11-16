@@ -22,6 +22,9 @@ review_tier1: "PASS"
 rollback_plan:
   strategy: "Restaurar .vscode/mcp.json a partir do backup pré-execução salvo em tmp/mcp.json.bak (visto que .vscode/ é ignorado pelo Git na linha 3 do .gitignore e git checkout não se aplica a arquivos ignorados) e remover .config/vscode_mcp.json do disco."
   verification: "Validar parsing JSON de .vscode/mcp.json restaurado, confirmar ausência de .config/vscode_mcp.json e executar pytest tests/governance_audit/ -q confirmando exit code 0."
+lessons_extracted: true
+lessons_applied_to: ["plan-conformance-patterns"]
+lessons_at: "2026-11-16"
 ---
 
 # Plano de Governança — Sincronização de MCP Servers no VS Code e Template Genérico `vscode_mcp.json`

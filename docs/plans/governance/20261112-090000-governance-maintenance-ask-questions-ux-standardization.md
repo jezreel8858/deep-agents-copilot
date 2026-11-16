@@ -16,6 +16,9 @@ allowed_files:
   - ".github/prompts/**"
   - "tools/agent_protocol_sync/**"
   - "tests/governance_audit/**"
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-16"
 ---
 
 # Plano de Manutenção de Governança — Padronização Universal de UX na Tool `ask_questions` (R-027)

@@ -38,6 +38,9 @@ allowed_files:
   - CLAUDE.md # alteração de referência curta aprovada na B3′
   - README.md
 progress: 97
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-16"
 ---
 Agente Ativo: tech-solution-architect
 [CURRENT_STATE_LOCK: WF4_BLUEPRINT_SPEC]

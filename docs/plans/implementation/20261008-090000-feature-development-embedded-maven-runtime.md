@@ -51,6 +51,9 @@ allowed_files:
   - .a2a/agentcards/runtime-verifier.agentcard.json
   - .a2a/agentcards/pr-gatekeeper.agentcard.json
   - tests/governance_audit/test_embedded_maven_runtime_governance.py
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-16"
 ---
 Progresso: 0/14 tarefas concluídas
 

@@ -39,6 +39,9 @@ allowed_files:
   - tests/governance_audit/test_embedded_python_runtime_governance.py
 approved_by: humano (ask_questions)
 approved_date: 2026-10-08
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-16"
 ---
 Progresso: 0/14 tarefas concluídas
 

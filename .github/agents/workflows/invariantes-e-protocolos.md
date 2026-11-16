@@ -259,11 +259,21 @@ Sem um protocolo explícito de encadeamento:
    - Injeta o `carry_over_state` no `workflow_tracking.chaining` do handoff, transferindo os artefatos, classes e regras já mapeadas diretamente para a Etapa 1 do novo workflow.
 
 ```mermaid
+
 flowchart LR
     W3["WORKFLOW-TECHNICAL-ANALYSIS<br/>(Estado 3: Recomendações [PROPOSTA-1..N])"] --> UserApprove{"Usuário:<br/>'Aprovado, implemente a 1'"}
     UserApprove --> RouterChain["@agent-router<br/>(Fast-Chaining Check)"]
     RouterChain -- "Bypass @prompt-structuring<br/>com carry_over_state" --> W2["⚡ WORKFLOW-REFACTORING<br/>(Etapa 1 direta com arquivos mapeados)"]
     RouterChain -- "Se for nova feature" --> W4["⚡ WORKFLOW-FEATURE-DEVELOPMENT<br/>(Etapa 2 direta com requisitos da análise)"]
+    %% --- R-064 PARITY START ---
+    RouterHub["<b>Hub Central: @agent-router (R-037)</b>"] --> DocsDraft["<b>Materialização DRAFT (@docs-engineer)</b><br/>plano_materializacao_pendente"]
+    DocsDraft --> CriticGate{"<b>Revisão Cética (@plan-critic)</b><br/>NEEDS_REVISION (<= 2x) / ESCALATED_HITL"}
+    CriticGate -- "NEEDS_REVISION" --> DocsDraft
+    CriticGate -- "PASS / ESCALATED_HITL" --> GateHITL{"<b>Gate HITL (ask_questions)</b><br/>Fail-Closed R-064"}
+    GateHITL -- "REJECTED" --> PlanRej["<b>status: REJECTED</b><br/>Retorno via @agent-router"] --> RouterHub
+    GateHITL -- "APPROVED" --> Step5a["<b>Subetapa 5a: Quality Gate & Testes</b>"]
+    Step5a -- "Falha (5a-CB)" --> Step5aCB["<b>Subetapa 5a-CB: Circuit Breaker de Autofix</b><br/>Via @agent-router"] --> Step5a
+    Step5a -- "Sucesso (REVIEW_PENDING)" --> Step5b["<b>Subetapa 5b: Revisão Pós-Execução</b><br/>revisao_conformidade_pos_execucao via @agent-router"]
 ```
 
 ---
@@ -287,6 +297,13 @@ Nenhum workflow mutativo pode deixar o repositório em estado quebrado, sujo ou 
    - Se o `@business-rules-extractor` detectar no Estado 5 que qualquer regra de negócio do ground truth (Estado 1) foi alterada ou violada, se o gate de contratos falhar, OU se um Gate Out de qualquer nó do DAG (Estado 4) falhar de forma persistente, o `@refactor-planner` aciona o plano de rollback desenhado no Estado 3 **antes** de qualquer aprovação humana adicional — mas a reversão física é sempre executada pelo(s) specialist(s) de stack que tocaram os nós afetados (nunca pelo `@refactor-planner` diretamente, ver item 2b).
    - Rollback é preferencialmente **incremental** (reverte apenas os nós do DAG posteriores ao ponto de violação identificado), não obrigatoriamente o plano inteiro — o Gate Out por nó (compilação limpa + testes verdes) já valida cada micro-lote durante o Estado 4, reduzindo o blast radius de uma violação tardia. O relatório final de rollback registra expressamente o `blast_radius_revertido` (nós revertidos, callers e arquivos restaurados) no `workflow_state`.
 4. **Circuit Breaker Complementar de Delegação (`handoff-governance/SKILL.md` § 2.4)**: o teto de 3 tentativas acima trata de *retry de teste*; um mecanismo **distinto e complementar** protege contra loop infinito de *handoff entre agentes* (`call_stack_depth >= 3` ou ciclo A→B→A) — ambos podem estar ativos simultaneamente sem conflito, pois medem falhas de naturezas diferentes.
+
+---
+
+
+### 8.5 Invariante de Paridade Atômica Prosa ↔ Mermaid (Anti-Recorrência W-01..W-08)
+
+É **terminantemente proibido** adicionar, remover ou renomear etapas, gates (`@docs-engineer`, `@plan-critic`, `HITL`, `REJECTED`, `5a`, `5a-CB`, `5b`) ou rotas de agentes na prosa de `.github/agents/workflows/workflow-*.md` ou `invariantes-e-protocolos.md` sem atualizar atomicamente o respectivo bloco ```` ```mermaid ```` no **mesmo diff**.
 
 ---
 

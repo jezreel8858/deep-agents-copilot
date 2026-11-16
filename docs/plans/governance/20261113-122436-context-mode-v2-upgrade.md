@@ -31,6 +31,9 @@ allowed_files:
   - "apps/web/copilot/toolLabels.ts"
   - "deploy/local-chat-gateway/src/local_chat_gateway/{permission_policy,sdk_session}.py"
   - "deploy/local-chat-gateway/tests/unit/test_{permission_policy,sdk_session}.py"
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-16"
 ---
 
 # Plano de Governança — Upgrade context-mode v1 → v2.1.10

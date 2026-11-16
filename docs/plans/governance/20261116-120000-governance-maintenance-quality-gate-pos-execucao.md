@@ -34,6 +34,9 @@ reviewer: "@plan-critic"
 post_exec_review_verdict: "PASS_WITH_WARNINGS"
 post_exec_reviewer: "@agent-auditor"
 post_exec_reviewed_at: "2026-11-16"
+lessons_extracted: true
+lessons_applied_to: ["plan-conformance-patterns"]
+lessons_at: "2026-11-16"
 ---
 
 # Plano de Manutenção de Governança — Quality Gate Pós-Execução de Conformidade com o Plano (R-064)

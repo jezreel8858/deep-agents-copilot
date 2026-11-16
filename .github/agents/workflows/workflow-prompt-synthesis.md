@@ -10,6 +10,7 @@
 > **Fast-Path**: Sim (dispensa Fast-Chaining prévio; ingressa diretamente no Estado 1).
 
 ```mermaid
+
 flowchart TD
     Start(["Entrada do Usuário:<br/>Objetivo / Ideia Inicial"]) --> CheckType{"Tipo de Demanda"}
 
@@ -29,6 +30,12 @@ flowchart TD
     S4 --> S5{"<b>5. Quality Gate & Emissão do Bloco .md</b><br/>Agente: @prompt-structuring<br/>Ação: Red-teaming de Solution Space, ambiguidade e emissão do bloco Markdown final"}
 
     S5 --> End(["📋 Prompt Perfeito Pronto para Novo Chat"])
+    %% --- R-064 PARITY START ---
+    RouterHub["<b>Hub Central: @agent-router</b><br/>Flat Delegation (R-037) & Classificação R-041"] --> TierCheck{"<b>Triagem de Complexidade (R-041)</b>"}
+    TierCheck -- "Tier 1 (Silencioso / Direto)" --> S1_Tech
+    TierCheck -- "Tier 2 (Gate 1-Clique ask_questions)" --> Tier2Gate["<b>Tier 2: Gate 1-Clique (HITL)</b><br/>Ferramenta: ask_questions (Validação rápida)"] --> S2
+    TierCheck -- "Tier 3 (Loop Socrático máx. 5x)" --> S1_Req
+    S5 -- "Retorno Obrigatório (R-037)" --> RouterReturn(["<b>Retorno ao @agent-router</b><br/>Entrega do Prompt .md Estruturado"])
 ```
 
 #### Cadeia Sequencial e Papéis:

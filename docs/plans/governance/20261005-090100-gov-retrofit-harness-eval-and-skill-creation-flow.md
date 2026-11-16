@@ -12,6 +12,9 @@ allowed_files:
   - "docs/**"
   - "tools/**"
   - "tests/**"
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-16"
 ---
 
 # Plano de Planejamento: Retrofit de `harness-eval` em Agents/Prompts e Evolução do Fluxo de Criação de Skills

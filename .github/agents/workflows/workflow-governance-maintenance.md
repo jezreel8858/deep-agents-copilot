@@ -11,33 +11,30 @@
 
 ```mermaid
 flowchart TD
-    ReqGov(["⚡ Demanda de Governança (Fast-Path)"]) --> RouterGov["<b>1. Triagem & Despacho de Governança</b><br/>Agente: @agent-router<br/>Ação: Classifica tipo de manutenção ou autoria"]
-
-    RouterGov --> GovCheck{"Tipo de Operação"}
-
-    GovCheck -- "Diagnóstico de Smells / Gaps" --> Auditor["<b>1a. Auditoria de Smells (Tier 2)</b><br/>Agente: @agent-auditor (Read-Only)<br/>Ação: Análise de conformidade e R-046"]
-    GovCheck -- "Higiene / CI-CD / Licença / Docs" --> Hygiene["<b>1b. Auditoria de Higiene & Docs</b><br/>Agente: @repo-hygiene-auditor / @docs-engineer (Read-Only)<br/>Ação: README, CONTRIBUTING, .gitignore e documentação"]
-    GovCheck -- "Criação de Novo Artefato / Stack" --> PreSearch["<b>1c. Pesquisa Prévia de Mercado</b><br/>Agente: @deep-search (sub-rotina)<br/>Ação: Sintetiza padrões consolidados de mercado"]
-
-    PreSearch --> Factory["<b>2a. Modelagem de Artefato / Stack</b><br/>Agente: @governance-factory<br/>Ação: Geração com templates canônicos (R-015)"]
-
-    Auditor & Hygiene --> PlanReport["<b>2. Relatório de Gaps & Plano em Lote</b><br/>Revisão Pré-HITL via @plan-critic (R-064)"]
-
-    PlanReport --> HumanGate{"<b>2b. Checkpoint de Aprovação</b><br/>Humana via ask_questions"}
-
-    HumanGate -- "Aprovado" --> Maintainer["<b>3. Execução em Lote no Sandbox</b><br/>Agente: @governance-maintainer / @docs-engineer<br/>Ação: Batching atômico via context-mode (R-046)"]
-    HumanGate -- "Rejeitado" --> EndCancel(["🛑 Ajuste de Escopo / Cancelado"])
-
-    Factory --> MaintainerSync["<b>4b. Sincronização Quádrupla SSOT</b><br/>Atualização atômica de catálogos e grafos (R-015)"]
-    MaintainerSync --> GateGov["<b>5. Quality Gate de Governança (Tier 1)</b><br/>Validação via pytest: smells 2.1..2.35, routing e isolamento"]
-    Maintainer --> GateGov
-
-    GateGov --> CheckGov{"Suíte de Governança<br/>100% verde?"}
-    CheckGov -- "Sim" --> EndDone(["✅ Governança Atualizada & Consistente"])
-    CheckGov -- "Falha (tentativa N/3)" --> CheckAutoFixCap{"Tentativas<br/>autofix < 3?"}
-    CheckAutoFixCap -- "Sim" --> AutoFix["Autocorreção cirúrgica pelo @governance-maintainer"]
-    AutoFix --> GateGov
-    CheckAutoFixCap -- "Não (teto esgotado)" --> GovEscalate["<b>5b. Escalonamento</b><br/>ask_questions: revisão manual do diff"]
+    Start(["Solicitação de Governança / Manutenção"]) --> Router["<b>Hub Central: @agent-router</b><br/>Flat Delegation (R-037) & Classificação de Rota"]
+    Router -- "Rota Audit (Inspeção)" --> Audit["<b>1a. Auditoria Read-Only</b><br/>Agente: @agent-auditor<br/>Ação: Diagnóstico N1-N3 + Portão R-055 (Q1/Q2/Q3)<br/>Handoff: plano_materializacao_pendente"]
+    Router -- "Rota Factory (Pesquisa/Design)" --> FactoryDesign["<b>1b. Especificação & Pesquisa Pré-Plano</b><br/>Ação: Desenho canônico de artefatos e invariantes W-01..W-08<br/>Handoff: plano_materializacao_pendente"]
+    Audit --> RouterMat["<b>@agent-router</b><br/>Roteamento de Materialização R-064"]
+    FactoryDesign --> RouterMat
+    RouterMat --> DocsEng["<b>2. Materialização Única do Plano (DRAFT)</b><br/>Agente: @docs-engineer<br/>Ação: Persiste docs/plans/governance/*.md (status: DRAFT)<br/>(+ Plano-Filho Q3 via @python-arch-advisor se houver *.py)"]
+    DocsEng --> RouterCrit["<b>@agent-router</b><br/>Despacho para Revisão Cética"]
+    RouterCrit --> PlanCritic{"<b>3. Revisão Cética Pré-HITL</b><br/>Agente: @plan-critic<br/>Avalia rubrica R-064 e paridade Prosa↔Mermaid"}
+    PlanCritic -- "NEEDS_REVISION (<= 2x)" --> RouterRev["<b>@agent-router</b><br/>Retorno para Correção do DRAFT"] --> DocsEng
+    PlanCritic -- "PASS / PASS_WITH_NITS / ESCALATED_HITL" --> HITL{"<b>4. Gate Humano Obrigatório (HITL)</b><br/>Ferramenta: ask_questions (Fail-Closed Total)<br/>Decisão sobre o Plano de Governança / Factory"}
+    HITL -- "REJECTED / Replanejar" --> Rejected["<b>Plano REJECTED / Replanejamento</b><br/>status: REJECTED ou retorno ao planejador via @agent-router"] --> Router
+    HITL -- "APPROVED (status: APPROVED)" --> RouterExec["<b>5. Despacho de Execução (@agent-router)</b><br/>Bifurcação Territorial R-055 / Q3"]
+    RouterExec -- "Escopo Declarativo ([GOVERNANCE_TASKS])" --> GovMaint["<b>5.1 Executor de Manutenção</b><br/>Agente: @governance-maintainer<br/>Ação: Mutação atômica em lote (ctx_execute JS)"]
+    RouterExec -- "Escopo Criação/Evolução (Factory)" --> GovFactory["<b>5.2 Executor de Fábrica</b><br/>Agente: @governance-factory<br/>Ação: Materialização de agente/skill + sincronização R-015/R-040"]
+    RouterExec -- "Escopo Python / Sensor Q3 (*.py)" --> PyRouter["<b>5.3 Tríade Python (@python-router)</b><br/>@python-arch-advisor -> @python-developer / @python-test-engineer<br/>Ação: Implementação e testes em tools/** e tests/**"]
+    GovMaint --> Step5a["<b>Subetapa 5a: Validação Determinística</b><br/>pytest + python -m tools.governance_sync --check + get_errors"]
+    GovFactory --> Step5a
+    PyRouter --> Step5a
+    Step5a --> Check5a{"<b>Gate 5a Passou?</b>"}
+    Check5a -- "Falha (Circuit Breaker 5a-CB <= 1x)" --> Autofix5aCB["<b>Subetapa 5a-CB: Autofix Controlado</b><br/>Retorno mediado via @agent-router ao executor da falha"] --> RouterExec
+    Check5a -- "Sucesso (status: REVIEW_PENDING)" --> Router5b["<b>@agent-router</b><br/>Handoff: revisao_conformidade_pos_execucao"]
+    Router5b --> Step5b{"<b>Subetapa 5b: Revisão de Conformidade Pós-Execução</b><br/>Agente: @agent-auditor (Read-Only)<br/>Auditoria N1/N2/N3 contra allowed_files"}
+    Step5b -- "FAIL" --> Autofix5aCB
+    Step5b -- "PASS / PASS_WITH_WARNINGS" --> EndDone(["<b>Concluído (status: COMPLETED)</b><br/>Retorno final via @agent-router"])
 ```
 
 #### Cadeia Sequencial e Papéis:
@@ -102,5 +99,5 @@ workflow_state:
 > **Diretórios Canônicos de Persistência R-064 (`docs/plans/<tipo>/`)**: Gate 1 (`plan_type: governance`) em `docs/plans/governance/` (e `docs/plans/requirements/` para requisitos, `docs/plans/architecture/` para arquitetura, `docs/plans/test-strategy/` para estratégia de testes); Gate 2 (`plan_type: implementation`) em `docs/plans/governance/`. Agentes planejadores/advisors permanecem 100% Read-Only (com `author` preservando o autor intelectual real do plano e proibição de `@tech-solution-architect` materializar docs no `WORKFLOW-BUG-FIX`), delegando a escrita física do `.md` a `@docs-engineer` / `@governance-maintainer` antes da aprovação humana (`status: APPROVED`, `approved: true`, `allowed_files`).
 
   - **Subdivisão Obrigatória do Estado 5 / Quality Gate Pós-Execução (`invariantes-e-protocolos.md § 10.9` / R-064)**:
-    - **Subetapa 5a — Tier 1 Determinístico (`pytest` + `governance_sync`)**: Execução da suíte `tests/governance_audit/` (incluindo sensores Q3 recém-criados pela Onda 4B via `@python-router` → `@python-arch-advisor` → `@python-test-engineer`) e `python -m tools.governance_sync --check`.
+    - **Subetapa 5a — Tier 1 Determinístico (`pytest` + `governance_sync`)**: Execução da suíte `tests/governance_audit/` (incluindo sensores Q3 recém-criados pela Onda 4B via `@python-router` → `@python-arch-advisor` → `@python-test-engineer`) e `python -m tools.governance_sync --check`. (com Circuit Breaker de Autofix `5a-CB` mediado por `@agent-router`)
     - **Subetapa 5b — Tier 2 Conformance Review Semântico Pós-Execução (`@agent-auditor`, Read-Only, Agency Score 0)**: Acionado via handoff `motivo: "revisao_conformidade_pos_execucao"` após o executor promover o plano para `status: "REVIEW_PENDING"`. O `@agent-auditor` audita o diff real contra o `active_plan_ref` sob `plan-conformance-patterns` em **N1** (aderência a `allowed_files` e frontmatter R-064), **N2** (completude 1:1 das tasks `[GOVERNANCE_TASKS]` e sensor Q3) e **N3** (aderência semântica e invariantes `W-01`..`W-09`), registrando `post_exec_review_verdict` (`PASS` / `PASS_WITH_WARNINGS` / `FAIL`), `post_exec_reviewer: "@agent-auditor"`, `post_exec_reviewed_at` e a seção `## Parecer de Conformidade Pós-Execução (R-064)` antes de autorizar `status: "COMPLETED"` (em caso de `FAIL`, retorna ao executor via `motivo: "conformidade_reprovada_retorno_execucao"`, máx. 2 rodadas antes de escalonamento HITL).

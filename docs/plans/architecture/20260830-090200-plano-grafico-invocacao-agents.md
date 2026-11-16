@@ -14,6 +14,9 @@ status: planejado
 data_criacao: 2026-08-30
 autor: docs-engineer
 tipo: plano-de-implementacao
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-16"
 ---
 # Plano de Implementação — Gráfico de Invocação de Agentes (Estilo When You Code) no Context Insight Visualizer
 

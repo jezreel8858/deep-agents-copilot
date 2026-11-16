@@ -14,6 +14,9 @@ autor: governance-factory
 workflow: WORKFLOW-GOVERNANCE-MAINTENANCE
 related-planning-doc: "docs/plans/governance/20261003-090100-governance-maintenance-progressive-disclosure-source-docs.md"
 progress: 100
+lessons_extracted: true
+lessons_applied_to: ["plan-conformance-patterns"]
+lessons_at: "2026-11-16"
 ---
 # Plano de Implementação — Progressive Disclosure de `source_docs:` (R-066)
 

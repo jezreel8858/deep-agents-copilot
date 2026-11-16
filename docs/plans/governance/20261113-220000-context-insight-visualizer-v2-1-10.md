@@ -16,6 +16,9 @@ allowed_files:
   - "tools/context-insight-visualizer/README.md"
   - "tools/context-insight-visualizer/PLAN.md"
   - "tests/context_insight_visualizer/**"
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-16"
 ---
 
 # Plano — Compatibilidade do context-insight-visualizer com context-mode v2.1.10

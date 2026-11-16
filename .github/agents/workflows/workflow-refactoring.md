@@ -13,6 +13,7 @@
 - **⚠️ Invariante de Rollback com Blast Radius Revertido (não-negociável)**: Em caso de falha de validação ou violação de ground truth no Estado 5b, a governança de rollback obriga o registro quantitativo do `blast_radius_revertido` no `workflow_state` (inventário exato dos nós Mikado revertidos, callers e arquivos restaurados), mantendo rastreabilidade total da reversão atômica.
 
 ```mermaid
+
 flowchart TD
     StartRefactor(["⚡ Solicitação de Refactor (Fast-Path)"]) --> GroundTruth["<b>1. Mapeamento de Regras Vigentes</b><br/>Agente: @business-rules-extractor<br/>Ação: Extrai regras vigentes em markdown (Ground Truth)"]
 
@@ -42,6 +43,17 @@ flowchart TD
     CheckRefactor -- "Sim" --> EndRefactor(["✅ Concluído com Sucesso"])
     CheckRefactor -- "Não (Violação de Regra)" --> RefactorRollback["<b>5b. Rollback Decidido pelo Planner & Blast Radius Revertido</b><br/>Agente: @refactor-planner (decide escopo) → domain router/specialist (executa)<br/>Ação: Reversão dos nós DAG afetados + registro de blast_radius_revertido"]
     RefactorRollback --> EndRefactorFail(["🛑 Refatoração Revertida com Segurança"])
+    %% --- R-064 PARITY START ---
+    RouterHub["<b>Hub Central: @agent-router</b><br/>Flat Delegation (R-037) & Orquestração de Gates"] --> Gate1Mat["<b>Gate 1 & Gate 2: Materialização DRAFT</b><br/>Agente: @docs-engineer (plano_materializacao_pendente)<br/>Plano de Domínio + Plano de Implementação (docs/plans/implementation/)"]
+    Gate1Mat --> GateCritic{"<b>Revisão Cética Pré-HITL (@plan-critic)</b><br/>Valida rubrica R-064 nos Gates 1 e 2"}
+    GateCritic -- "NEEDS_REVISION (<= 2x/3x)" --> Gate1Mat
+    GateCritic -- "PASS / PASS_WITH_NITS / ESCALATED_HITL" --> GateHITL{"<b>Gate Humano Obrigatório (HITL)</b><br/>ask_questions (Duplo Gate R-064)"}
+    GateHITL -- "REJECTED / Replanejar" --> GateRejected["<b>Plano REJECTED</b><br/>status: REJECTED / Retorno ao planejador via @agent-router"] --> RouterHub
+    GateHITL -- "APPROVED (status: APPROVED)" --> ExecStack["<b>Execução pelos Especialistas da Stack</b><br/>Despacho mediado por @agent-router"]
+    ExecStack --> Sub5a["<b>Subetapa 5a: Testes & Quality Gate</b><br/>Validação determinística da suíte e contratos"]
+    Sub5a -- "Falha (Autofix 5a-CB cap rígido R-053)" --> Sub5aCB["<b>Subetapa 5a-CB: Loop de Autofix</b><br/>Retorno via @agent-router ao especialista"] --> ExecStack
+    Sub5a -- "Sucesso (status: REVIEW_PENDING)" --> Sub5b["<b>Subetapa 5b: Revisão de Conformidade Pós-Execução</b><br/>Handoff: revisao_conformidade_pos_execucao via @agent-router<br/>Agentes: @code-review + @security-reviewer (R-065)"]
+    Sub5b -- "PASS / PASS_WITH_WARNINGS" --> PlanCompleted(["<b>Plano COMPLETED</b><br/>Encerramento via @agent-router"])
 ```
 
 #### Cadeia Sequencial e Papéis:

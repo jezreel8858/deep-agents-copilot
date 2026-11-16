@@ -17,6 +17,9 @@ data_atualizacao: 2026-08-31
 autor: analise-tecnica-catalogo
 escopo: ".github/agents/*.agent.md (24 agents)"
 fontes_pesquisa: "Tavily — taxonomias consolidadas 2025-2026"
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-16"
 ---
 # Categorização e Agrupamento de Agents
 

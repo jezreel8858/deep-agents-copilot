@@ -12,6 +12,9 @@ allowed_files:
   - tools/headless-governance-runner/src/governance_runner/synth/storage.py
   - tools/headless-governance-runner/tests/synth_unit/test_storage.py
   - tests/governance_audit/test_synth_waves_prompt.py
+lessons_extracted: true
+lessons_applied_to: ["plan-conformance-patterns"]
+lessons_at: "2026-11-16"
 ---
 
 # Plano de Triagem e Correção de Bug: Timeout no `/synth-waves` via `ctx_execute`

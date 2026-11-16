@@ -16,6 +16,9 @@ allowed_files:
   - tests/governance_audit/test_synth_waves_prompt.py
   - .github/prompts/synth-waves.prompt.md
 progress: 100
+lessons_extracted: true
+lessons_applied_to: ["plan-conformance-patterns"]
+lessons_at: "2026-11-16"
 ---
 
 # Plano de Implementação Técnica — Correção de Timeout, Concorrência SQLite e Reconciliação de Runs Órfãos em `/synth-waves`

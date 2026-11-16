@@ -23,6 +23,9 @@ allowed_files:
 amendments:
   - "2026-10-08: Emenda A (token em sessionStorage) aprovada por humano via chat (opcao A); status permanece approved; ver secao 11"
 progress: 0
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-16"
 ---
 > **Status: APPROVED** — aprovado por humano em 2026-10-08 via `ask_questions`. Plano consultivo e GENERICO (anonimizado, R-038/R-043): sem codigo de producao nem specs; o projeto real e referido apenas como [PROJETO-ALVO].
 

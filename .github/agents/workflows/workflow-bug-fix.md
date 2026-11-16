@@ -14,6 +14,7 @@
 - **⚠️ Invariante de Mini Mutation-Check e Observação Pós-Fix (não-negociável)**: No Estado 4, todo teste de regressão para bug de severidade média/alta deve passar por mini mutation-check pontual proporcional ao risco (1 a 3 mutantes sintéticos injetados) para comprovar a eliminação de falsos-verdes. No Estado 5, bugs de criticidade alta/crítica (P0/P1, segurança, integridade de dados, indisponibilidade ou memory leak) exigem plano formal de observação pós-fix/canary com telemetria definida.
 
 ```mermaid
+
 flowchart TD
     Start(["⚡ Solicitação de Bug (Fast-Path)"]) --> Triage["<b>1. Triagem & RCA Estruturado</b><br/>Agente: @bug-triage<br/>Ação: RCA 5 Whys/Fishbone + 2 fontes independentes"]
 
@@ -60,6 +61,17 @@ flowchart TD
 
     QualityGate --> EndBug(["✅ Concluído com Sucesso"])
     CircuitBreaker --> EndFail(["🛑 Interrompido com Reversão Segura"])
+    %% --- R-064 PARITY START ---
+    RouterHub["<b>Hub Central: @agent-router</b><br/>Flat Delegation (R-037) & Orquestração de Gates"] --> Gate1Mat["<b>Gate 1 & Gate 2: Materialização DRAFT</b><br/>Agente: @docs-engineer (plano_materializacao_pendente)<br/>Plano de Domínio + Plano de Implementação (docs/plans/implementation/)"]
+    Gate1Mat --> GateCritic{"<b>Revisão Cética Pré-HITL (@plan-critic)</b><br/>Valida rubrica R-064 nos Gates 1 e 2"}
+    GateCritic -- "NEEDS_REVISION (<= 2x/3x)" --> Gate1Mat
+    GateCritic -- "PASS / PASS_WITH_NITS / ESCALATED_HITL" --> GateHITL{"<b>Gate Humano Obrigatório (HITL)</b><br/>ask_questions (Duplo Gate R-064)"}
+    GateHITL -- "REJECTED / Replanejar" --> GateRejected["<b>Plano REJECTED</b><br/>status: REJECTED / Retorno ao planejador via @agent-router"] --> RouterHub
+    GateHITL -- "APPROVED (status: APPROVED)" --> ExecStack["<b>Execução pelos Especialistas da Stack</b><br/>Despacho mediado por @agent-router"]
+    ExecStack --> Sub5a["<b>Subetapa 5a: Testes & Quality Gate</b><br/>Validação determinística da suíte e contratos"]
+    Sub5a -- "Falha (Autofix 5a-CB cap rígido R-053)" --> Sub5aCB["<b>Subetapa 5a-CB: Loop de Autofix</b><br/>Retorno via @agent-router ao especialista"] --> ExecStack
+    Sub5a -- "Sucesso (status: REVIEW_PENDING)" --> Sub5b["<b>Subetapa 5b: Revisão de Conformidade Pós-Execução</b><br/>Handoff: revisao_conformidade_pos_execucao via @agent-router<br/>Agentes: @code-review + @security-reviewer (R-065)"]
+    Sub5b -- "PASS / PASS_WITH_WARNINGS" --> PlanCompleted(["<b>Plano COMPLETED</b><br/>Encerramento via @agent-router"])
 ```
 
 #### Cadeia Sequencial e Papéis:

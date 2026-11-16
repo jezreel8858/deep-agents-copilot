@@ -14,6 +14,9 @@ date: 2026-10-03
 autor: "@agent-auditor (diagnóstico) + governance-maintainer (execução)"
 workflow: WORKFLOW-GOVERNANCE-MAINTENANCE
 related-plan: docs/plans/governance/20261003-090100-governance-maintenance-progressive-disclosure-source-docs.md
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-16"
 ---
 # Plano de Planejamento — Classificação de Perfil de Capacidade de Ferramentas de Context-Mode (Gather-only vs Gather+Process)
 

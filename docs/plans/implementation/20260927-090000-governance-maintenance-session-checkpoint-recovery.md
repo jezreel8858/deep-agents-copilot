@@ -15,6 +15,9 @@ allowed_files:
   - "docs/**"
   - "tools/**"
   - "tests/**"
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-16"
 ---
 
 # Plano de Implementação — Persistência de Estado de Sessão e Recuperação de Crash (Terminal Hang)

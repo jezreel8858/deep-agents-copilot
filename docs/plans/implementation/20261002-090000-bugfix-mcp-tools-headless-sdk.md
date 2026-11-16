@@ -15,6 +15,9 @@ allowed_files:
   - "docs/**"
   - "tools/**"
   - "tests/**"
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-16"
 ---
 
 # Plano de Implementacao — Bugfix: Tools MCP/IDE nao expostas na sessao headless do SDK

@@ -19,6 +19,9 @@ allowed_files:
   - "CHANGELOG.md"
   - "docs/plans/**"
   - "tests/governance_audit/*.py"
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-16"
 ---
 
 # Plano de Manutenção de Governança — Padronização de `tools:` Inline Array e Timestamp `AAAAMMDD-HHMMSS` em `docs/plans/`

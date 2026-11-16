@@ -15,6 +15,9 @@ allowed_files:
   - "docs/**"
   - "tools/**"
   - "tests/**"
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-16"
 ---
 
 # Plano de Implementação — Integração `governance_runner` ↔ `local-chat-gateway` (Copilot SDK)

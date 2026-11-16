@@ -295,7 +295,7 @@ Ao criar ou revisar qualquer agent com papel de **planejamento, consultoria arqu
 3. **Subpasta Canônica Alvo em `docs/plans/<tipo>/`**: Especificar a subpasta exata dentre as 8 categorias canônicas (`feature/`, `refactor/`, `architecture/`, `implementation/`, `test-strategy/`, `bug-triage/`, `requirements/`, `governance/`) e incluir `docs/plans/README.md` (ou `docs/plans/implementation/README.md`) em `source_docs` / `source_docs_lazy` respeitando R-066.
 4. **Contrato de Handoff de Materialização Física**: Determinar explicitamente que o agent emite o plano estruturado segundo o template e aciona handoff para `@docs-engineer` (ou `@governance-maintainer` em fluxos de governança) materializar fisicamente o arquivo `.md` em `docs/plans/<tipo>/` antes do Gate de Aprovação Humana R-064.
 
-- **Checklist Pré-Voo (C1–C9)**: Antes do Gate `@plan-critic`, validar `.github/skills/plan-conformance-patterns/references/planner-preflight-checklist.md`.
+- **Checklist Pré-Voo (C1–C10)**: Antes do Gate `@plan-critic`, validar `.github/skills/plan-conformance-patterns/references/planner-preflight-checklist.md`.
 - **RCA Upstream (Q0, planos corretivos)**: investigar `tools/**`, templates SSOT, instruções conflitantes e sensores antes de propor correções; ver `plan-template-governance.md` §1/§5.
 
 

@@ -19,6 +19,9 @@ allowed_files:
   - ".github/agents/templates/**"
   - ".github/prompts/craft-prompt.prompt.md"
   - "tests/governance_audit/**"
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-16"
 ---
 
 # Plano de Manutenção de Governança — Fechamento Fail-Closed e Hard-Stop Universal da Regra R-064

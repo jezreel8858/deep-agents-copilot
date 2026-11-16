@@ -256,3 +256,181 @@ def test_origin_workflow_invariants_and_smell_2_35_exist() -> None:
         "Smell 2.35 ausente em .github/skills/governance-audit-patterns/SKILL.md.",
         fix_hint="Documentar o Smell 2.35 (Drift de Paridade e Invariantes de Workflow) em governance-audit-patterns/SKILL.md.",
     )
+
+
+CANONICAL_WORKFLOW_FILES = (
+    "workflow-bug-fix.md",
+    "workflow-dependency-vulnerability-remediation.md",
+    "workflow-feature-development.md",
+    "workflow-framework-migration.md",
+    "workflow-governance-maintenance.md",
+    "workflow-prompt-synthesis.md",
+    "workflow-refactoring.md",
+    "workflow-release-readiness.md",
+    "workflow-technical-analysis.md",
+    "workflow-ui-layout.md",
+)
+
+EXEMPT_FROM_R064_WORKFLOW = "workflow-prompt-synthesis.md"
+
+WORKFLOWS_WITH_AUTOFIX_CB = (
+    "workflow-governance-maintenance.md",
+    "workflow-bug-fix.md",
+    "workflow-dependency-vulnerability-remediation.md",
+    "workflow-feature-development.md",
+    "workflow-framework-migration.md",
+    "workflow-refactoring.md",
+)
+
+
+def _extract_mermaid_blocks(text: str) -> str:
+    """Isola apenas o conteúdo dentro dos blocos ```mermaid ... ``` de um arquivo Markdown."""
+    blocks = re.findall(r"```mermaid\s*\n(.*?)```", text, flags=re.DOTALL)
+    return "\n".join(blocks)
+
+
+def test_workflows_mermaid_blocks_reflect_all_r064_r065_and_post_exec_states() -> None:
+    """Garante paridade entre a prosa e os blocos Mermaid nos 10 workflows (R-064, R-065, 5a/5a-CB/5b)."""
+    for wf_name in CANONICAL_WORKFLOW_FILES:
+        wf_path = WORKFLOWS_DIR / wf_name
+        text = wf_path.read_text(encoding="utf-8")
+        mermaid = _extract_mermaid_blocks(text)
+        assert mermaid.strip(), remediation(
+            f"{wf_name} deve conter ao menos um bloco ```mermaid.",
+            fix_hint=f"Adicionar diagrama Mermaid canônico em {wf_name}.",
+        )
+
+        if wf_name == EXEMPT_FROM_R064_WORKFLOW:
+            for tier in ("Tier 1", "Tier 2", "Tier 3"):
+                assert tier in mermaid, remediation(
+                    f"{wf_name} (Mermaid) deve refletir o gate {tier} da taxonomia R-041.",
+                    fix_hint=f"Incluir {tier} no bloco Mermaid de {wf_name}.",
+                )
+            assert "agent-router" in mermaid, remediation(
+                f"{wf_name} (Mermaid) deve conter retorno explícito ao @agent-router.",
+                fix_hint=f"Incluir @agent-router no bloco Mermaid de {wf_name}.",
+            )
+            continue
+
+        for token in ("docs-engineer", "plan-critic", "NEEDS_REVISION", "ESCALATED_HITL", "agent-router"):
+            assert token in mermaid, remediation(
+                f"{wf_name} (Mermaid) deve conter '{token}' para paridade com a prosa.",
+                fix_hint=f"Sincronizar o bloco Mermaid de {wf_name} incluindo '{token}'.",
+            )
+
+        for pattern, label in (
+            (r"(?<!ESCALATED_)\bHITL\b", "HITL"),
+            (r"\bREJECTED\b", "REJECTED"),
+            (r"\b5a\b", "5a"),
+            (r"\b5b\b", "5b"),
+        ):
+            assert re.search(pattern, mermaid), remediation(
+                f"{wf_name} (Mermaid) deve conter o estado/etapa '{label}' (pattern: {pattern}).",
+                fix_hint=f"Sincronizar o bloco Mermaid de {wf_name} com o estado/etapa '{label}'.",
+            )
+
+        if wf_name in WORKFLOWS_WITH_AUTOFIX_CB:
+            assert re.search(r"\b5a-CB\b", mermaid), remediation(
+                f"{wf_name} (Mermaid) deve conter '5a-CB' para o Circuit Breaker de Autofix sem colisão com 5b.",
+                fix_hint=f"Adicionar nó 5a-CB no bloco Mermaid de {wf_name}.",
+            )
+
+
+def test_workflow_governance_maintenance_mermaid_fail_closed_and_roles() -> None:
+    """Valida que o bloco Mermaid de workflow-governance-maintenance respeita Fail-Closed e papéis reais."""
+    wf_path = WORKFLOWS_DIR / "workflow-governance-maintenance.md"
+    mermaid = _extract_mermaid_blocks(wf_path.read_text(encoding="utf-8"))
+    assert mermaid.strip(), remediation(
+        "workflow-governance-maintenance.md deve possuir bloco Mermaid.",
+        fix_hint="Adicionar bloco Mermaid em workflow-governance-maintenance.md.",
+    )
+
+    assert not re.search(r"docs-engineer[^\n]*Read-Only", mermaid, flags=re.IGNORECASE), remediation(
+        "workflow-governance-maintenance.md (Mermaid) não deve rotular @docs-engineer como Read-Only.",
+        fix_hint="Remover rótulo (Read-Only) de @docs-engineer no bloco Mermaid de workflow-governance-maintenance.md.",
+    )
+
+    assert "python-router" in mermaid, remediation(
+        "workflow-governance-maintenance.md (Mermaid) deve exibir a bifurcação para @python-router.",
+        fix_hint="Incluir bifurcação @python-router no bloco Mermaid de workflow-governance-maintenance.md.",
+    )
+
+    hitl_match = re.search(r"(?<!ESCALATED_)\bHITL\b", mermaid)
+    exec_match = re.search(r"Etapa\s*4|Sincroniza|Cria/Atualiza|Execu", mermaid, flags=re.IGNORECASE)
+    assert hitl_match is not None and exec_match is not None, remediation(
+        "workflow-governance-maintenance.md (Mermaid) deve conter o gate HITL e a etapa de execução.",
+        fix_hint="Garantir presença do Gate HITL e da etapa de execução/sincronização no Mermaid.",
+    )
+    assert hitl_match.start() < exec_match.start(), remediation(
+        "Fail-Closed violado no Mermaid: o gate HITL deve preceder a execução/mutação.",
+        fix_hint="Posicionar o Gate HITL antes de qualquer nó de execução/sincronização no Mermaid.",
+    )
+
+
+def test_invariantes_e_protocolos_mermaid_and_atomic_parity_rule() -> None:
+    """Valida o diagrama Mermaid de invariantes-e-protocolos.md e a regra de blindagem Prosa <-> Mermaid na origem."""
+    inv_path = WORKFLOWS_DIR / "invariantes-e-protocolos.md"
+    inv_text = inv_path.read_text(encoding="utf-8")
+    inv_mermaid = _extract_mermaid_blocks(inv_text)
+    assert inv_mermaid.strip(), remediation(
+        "invariantes-e-protocolos.md deve conter bloco Mermaid.",
+        fix_hint="Adicionar bloco Mermaid em invariantes-e-protocolos.md.",
+    )
+
+    for token in ("docs-engineer", "plan-critic", "ESCALATED_HITL"):
+        assert token in inv_mermaid, remediation(
+            f"invariantes-e-protocolos.md (Mermaid) deve conter '{token}'.",
+            fix_hint=f"Incluir '{token}' no bloco Mermaid de invariantes-e-protocolos.md.",
+        )
+
+    for pattern, label in (
+        (r"(?<!ESCALATED_)\bHITL\b", "HITL"),
+        (r"\bREJECTED\b", "REJECTED"),
+        (r"\b5a\b", "5a"),
+        (r"\b5a-CB\b", "5a-CB"),
+        (r"\b5b\b", "5b"),
+    ):
+        assert re.search(pattern, inv_mermaid), remediation(
+            f"invariantes-e-protocolos.md (Mermaid) deve conter '{label}' (pattern: {pattern}).",
+            fix_hint=f"Incluir '{label}' no bloco Mermaid de invariantes-e-protocolos.md.",
+        )
+
+    assert "Paridade Atômica Prosa ↔ Mermaid" in inv_text, remediation(
+        "invariantes-e-protocolos.md deve documentar a regra 'Paridade Atômica Prosa ↔ Mermaid'.",
+        fix_hint="Documentar 'Paridade Atômica Prosa ↔ Mermaid' em invariantes-e-protocolos.md.",
+    )
+
+    gov_agent_path = AGENTS_DIR / "governance-maintainer.agent.md"
+    gov_agent_text = gov_agent_path.read_text(encoding="utf-8")
+    assert "Paridade Atômica Prosa ↔ Mermaid" in gov_agent_text, remediation(
+        "governance-maintainer.agent.md deve exigir 'Paridade Atômica Prosa ↔ Mermaid'.",
+        fix_hint="Incluir 'Paridade Atômica Prosa ↔ Mermaid' em governance-maintainer.agent.md.",
+    )
+
+    rubric_path = (
+        REPO_ROOT
+        / ".github"
+        / "skills"
+        / "plan-conformance-patterns"
+        / "references"
+        / "pre-hitl-skeptical-review-rubric.md"
+    )
+    rubric_text = rubric_path.read_text(encoding="utf-8")
+    assert "Paridade Atômica Prosa ↔ Mermaid" in rubric_text, remediation(
+        "pre-hitl-skeptical-review-rubric.md deve auditar 'Paridade Atômica Prosa ↔ Mermaid'.",
+        fix_hint="Incluir 'Paridade Atômica Prosa ↔ Mermaid' em pre-hitl-skeptical-review-rubric.md.",
+    )
+
+    checklist_path = (
+        REPO_ROOT
+        / ".github"
+        / "skills"
+        / "plan-conformance-patterns"
+        / "references"
+        / "planner-preflight-checklist.md"
+    )
+    checklist_text = checklist_path.read_text(encoding="utf-8").replace("`", "")
+    assert "paridade Prosa↔Mermaid em workflow-*.md" in checklist_text, remediation(
+        "planner-preflight-checklist.md deve verificar 'paridade Prosa↔Mermaid em workflow-*.md'.",
+        fix_hint="Incluir 'paridade Prosa↔Mermaid em workflow-*.md' em planner-preflight-checklist.md.",
+    )

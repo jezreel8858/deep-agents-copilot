@@ -21,6 +21,9 @@ allowed_files:
   - ".github/prompts/**"
   - "tools/**"
   - "tests/**"
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-16"
 ---
 # Plano de Governança: Padronização e Materialização Universal de Planos em `docs/plans/<tipo>/` (R-064)
 

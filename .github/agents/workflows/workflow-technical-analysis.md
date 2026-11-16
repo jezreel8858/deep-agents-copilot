@@ -10,6 +10,7 @@
 - **Política R-041**: **Bypass Total** de `@prompt-structuring`. Direcionamento imediato ao especialista analítico.
 
 ```mermaid
+
 flowchart TD
     Start(["⚡ Fast-Path Análise Técnica"]) --> RouterSelect["<b>1. Triagem & Despacho Analítico</b><br/>Agente: @agent-router<br/>Ação: Seleciona especialista de domínio ou stack"]
 
@@ -35,6 +36,15 @@ flowchart TD
     Synth --> ChainingDecision{"Usuário decide<br/>implementar?"}
     ChainingDecision -- "Sim ('implemente a 1')" --> FastChaining["⚡ Fast-Chaining R-050.1 → WORKFLOW-REFACTORING ou FEATURE"]
     ChainingDecision -- "Dúvida / Ajuste" --> AskUser["Esclarecimento via ask_questions (R-047)"]
+    %% --- R-064 PARITY START ---
+    RouterHub["<b>Hub Central: @agent-router</b><br/>Flat Delegation (R-037)"] --> DocsDraft["<b>Materialização DRAFT (@docs-engineer)</b><br/>Handoff: plano_materializacao_pendente"]
+    DocsDraft --> CriticGate{"<b>Revisão Cética (@plan-critic)</b><br/>Validação Pré-HITL R-064"}
+    CriticGate -- "NEEDS_REVISION (<= 2x)" --> DocsDraft
+    CriticGate -- "PASS / PASS_WITH_NITS / ESCALATED_HITL" --> GateHITL{"<b>Gate Humano (HITL)</b><br/>ask_questions"}
+    GateHITL -- "REJECTED / Replanejar" --> PlanRej["<b>status: REJECTED</b><br/>Retorno via @agent-router"] --> RouterHub
+    GateHITL -- "APPROVED (status: APPROVED)" --> Step5a["<b>Subetapa 5a: Validação Técnica / Quality Gate</b>"]
+    Step5a -- "Falha (5a-CB)" --> Step5aCB["<b>Subetapa 5a-CB: Autofix / Ajuste</b><br/>Via @agent-router"] --> Step5a
+    Step5a -- "Sucesso (REVIEW_PENDING)" --> Step5b["<b>Subetapa 5b: Revisão Pós-Execução</b><br/>revisao_conformidade_pos_execucao via @agent-router<br/>(@code-review / @pr-gatekeeper)"]
 ```
 
 #### Cadeia Sequencial e Papéis:

@@ -1,7 +1,7 @@
 """
 test_plan_lessons_harvester_governance.py — Sensores determinísticos para o contrato
 de colheita de lições do @plan-critic (/plan-lessons-harvester), checklist pré-voo
-lazy (C1–C9) e selo de idempotência (lessons_extracted, lessons_applied_to, lessons_at).
+lazy (C1–C10) e selo de idempotência (lessons_extracted, lessons_applied_to, lessons_at).
 """
 
 from __future__ import annotations
@@ -42,12 +42,16 @@ PROMPTS_CATALOG_PATH = REPO_ROOT / ".github" / "prompts" / "catalog.yaml"
 PROMPTS_README_PATH = REPO_ROOT / ".github" / "prompts" / "README.md"
 PROMPTS_QUICKSTART_PATH = REPO_ROOT / ".github" / "prompts" / "QUICK-START.md"
 
-PLANNER_AGENTS = [
+FIVE_PLANNER_AGENTS = [
     REPO_ROOT / ".github" / "agents" / "agent-auditor.agent.md",
     REPO_ROOT / ".github" / "agents" / "tech-solution-architect.agent.md",
     REPO_ROOT / ".github" / "agents" / "bug-triage.agent.md",
     REPO_ROOT / ".github" / "agents" / "requirements-analyst.agent.md",
     REPO_ROOT / ".github" / "agents" / "governance-factory.agent.md",
+]
+
+PLANNER_AGENTS = [
+    *FIVE_PLANNER_AGENTS,
     REPO_ROOT / ".github" / "agents" / "backend" / "python" / "python-arch-advisor.agent.md",
 ]
 
@@ -69,7 +73,7 @@ def filter_eligible_plans(plans_root: Path) -> list[Path]:
 
 
 def test_t1_lessons_contract_in_references_and_skill():
-    """T1: Referências R-064, template governance e SKILL.md documentam lessons_* e o checklist pré-voo."""
+    """T1: Referências R-064, template governance e SKILL.md documentam lessons_* e o checklist pré-voo (C1–C10)."""
     r064_text = R064_REF_PATH.read_text(encoding="utf-8")
     gov_text = GOV_TMPL_PATH.read_text(encoding="utf-8")
     skill_text = SKILL_PATH.read_text(encoding="utf-8")
@@ -80,10 +84,18 @@ def test_t1_lessons_contract_in_references_and_skill():
         assert key in skill_text, f"{key} deve estar referenciado em plan-conformance-patterns/SKILL.md"
 
     assert "planner-preflight-checklist.md" in skill_text
+    assert ("C1–C10" in skill_text) or ("`C1`–`C10`" in skill_text), (
+        "SKILL.md deve referenciar o intervalo completo C1–C10"
+    )
+    assert "`C1`–`C9`" not in skill_text and "C1–C9" not in skill_text, (
+        "SKILL.md não deve conter referência defasada C1–C9"
+    )
+    nivel3_lines = [ln for ln in skill_text.splitlines() if "Nível 3" in ln and "references/" in ln]
+    assert nivel3_lines, "Nível 3 de SKILL.md deve mencionar explicitamente references/"
 
 
 def test_t2_planner_preflight_checklist_budget_and_agent_pointers():
-    """T2: Checklist lazy <= 40 linhas e <= 2048 bytes cobrindo C1–C9, e ponteiro <= 200 chars nos 6 planejadores."""
+    """T2: Checklist lazy <= 40 linhas e <= 2048 bytes cobrindo C1–C10, tokens C3/C4/C10 e ponteiro nos planejadores."""
     assert CHECKLIST_PATH.exists(), "planner-preflight-checklist.md deve existir"
     raw_bytes = CHECKLIST_PATH.read_bytes()
     text = raw_bytes.decode("utf-8")
@@ -92,8 +104,24 @@ def test_t2_planner_preflight_checklist_budget_and_agent_pointers():
     assert len(lines) <= 40, f"Checklist excede 40 linhas: {len(lines)}"
     assert len(raw_bytes) <= 2048, f"Checklist excede 2048 bytes: {len(raw_bytes)}"
 
-    for cls_id in ("C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9"):
+    for idx in range(1, 11):
+        cls_id = f"C{idx}"
         assert cls_id in text, f"Classe {cls_id} ausente em planner-preflight-checklist.md"
+
+    for required_token in (
+        "*.py",
+        "source_docs_lazy",
+        "handoff-governance",
+        "agent-contracts",
+        "terminal-governance",
+        "R-043",
+        "R-044",
+        "<path_externo>/docs/**",
+        "Exceção Única Canônica",
+    ):
+        assert required_token in text, (
+            f"Token obrigatório '{required_token}' ausente em planner-preflight-checklist.md"
+        )
 
     for agent_path in PLANNER_AGENTS:
         assert agent_path.exists(), f"Agent planejador ausente: {agent_path}"
@@ -104,9 +132,16 @@ def test_t2_planner_preflight_checklist_budget_and_agent_pointers():
             f"Ponteiro em {agent_path} excede 200 caracteres: {[len(ln) for ln in matching]}"
         )
 
+    for agent_path in FIVE_PLANNER_AGENTS:
+        agent_lines = agent_path.read_text(encoding="utf-8").splitlines()
+        matching = [ln for ln in agent_lines if "planner-preflight-checklist.md" in ln]
+        assert any(("C1–C10" in ln) or ("`C1`–`C10`" in ln) for ln in matching), (
+            f"Ponteiro em {agent_path} deve referenciar C1–C10: {matching}"
+        )
+
 
 def test_t3_plan_lessons_harvester_prompt_two_phases_and_safeguards():
-    """T3: Prompt /plan-lessons-harvester declara frontmatter válido, Fase 1 Read-Only, HITL e Fase 2 pós-pytest."""
+    """T3: Prompt /plan-lessons-harvester declara frontmatter válido, Fase 1 Read-Only, HITL, C1–C10 e Fase 2 pós-pytest."""
     assert HARVESTER_PROMPT_PATH.exists(), "plan-lessons-harvester.prompt.md deve existir"
     text = HARVESTER_PROMPT_PATH.read_text(encoding="utf-8")
     m = re.match(r"^---\s*\n(.*?)\n---", text, re.DOTALL)
@@ -137,6 +172,13 @@ def test_t3_plan_lessons_harvester_prompt_two_phases_and_safeguards():
         "OWASP ASI01 / ASI06",
     ):
         assert marker in text, f"Marcador contratual '{marker}' ausente em plan-lessons-harvester.prompt.md"
+
+    assert ("C1–C10" in text) or ("`C1`–`C10`" in text), (
+        "plan-lessons-harvester.prompt.md deve referenciar C1–C10"
+    )
+    assert "`C1`–`C9`" not in text and "C1–C9" not in text, (
+        "plan-lessons-harvester.prompt.md não deve conter referência defasada C1–C9"
+    )
 
 
 def test_t4_catalog_readme_quickstart_parity_r015():

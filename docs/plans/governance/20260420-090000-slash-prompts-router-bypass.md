@@ -41,6 +41,9 @@ allowed_files:
   - ".github/prompts/ctx-start.prompt.md"
   - "tests/governance_audit/test_utility_slash_prompts_bypass.py"
   - "tests/governance_audit/test_root_orchestrator_silent_execution_governance.py"
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-16"
 ---
 
 ## 1. Contexto e Motivacao (Evolucao v1 -> v2)

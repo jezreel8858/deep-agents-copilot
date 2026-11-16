@@ -14,6 +14,9 @@ date: 2026-10-03
 autor: "@agent-auditor (diagnóstico) + Root Orchestrator (materialização)"
 workflow: governance-maintenance
 related-plan: docs/plans/governance/20260929-090000-governance-maintenance-harness-bloat-audit.md (escopo irmão/mais amplo, ainda aguardando aprovação — este plano é mais estreito e específico de Progressive Disclosure de `source_docs:`)
+lessons_extracted: true
+lessons_applied_to: ["plan-conformance-patterns"]
+lessons_at: "2026-11-16"
 ---
 # Plano de Planejamento — Progressive Disclosure de `source_docs:` (Anti Context Bloat Inicial)
 

@@ -38,6 +38,9 @@ allowed_files:
   - ".github/agents/workflows.md"
   - ".github/agents/workflows/invariantes-e-protocolos.md"
   - "CHANGELOG.md"
+lessons_extracted: true
+lessons_applied_to: ["plan-conformance-patterns"]
+lessons_at: "2026-11-16"
 ---
 
 # Plano de Governança — RCA Upstream (Q0) obrigatória em planos corretivos

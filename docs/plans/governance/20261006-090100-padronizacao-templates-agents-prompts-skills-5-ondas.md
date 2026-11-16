@@ -17,6 +17,9 @@ allowed_files:
   - "README.md"
   - "CLAUDE.md"
   - "AGENTS.md"
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-16"
 ---
 
 # Plano de Padronização Estrutural de Templates, Agents, Prompts e Skills (5 Ondas)

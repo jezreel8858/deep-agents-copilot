@@ -14,6 +14,9 @@ autor: governance-maintainer
 workflow: WORKFLOW-GOVERNANCE-MAINTENANCE
 related-planning-doc: "docs/plans/governance/20261003-090000-governance-maintenance-ctx-execute-profile-classification.md"
 progress: 100
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-16"
 ---
 # Plano de Implementação — Poda de Ferramentas de Context-Mode em Agentes Gather-Only
 

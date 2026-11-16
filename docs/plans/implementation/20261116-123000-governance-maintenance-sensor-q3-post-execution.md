@@ -17,6 +17,9 @@ parent_plan_ref: "docs/plans/governance/20261116-120000-governance-maintenance-q
 allowed_files:
   - "tests/governance_audit/test_post_execution_conformance_gate.py"
 progress: 100
+lessons_extracted: true
+lessons_applied_to: ["plan-conformance-patterns"]
+lessons_at: "2026-11-16"
 ---
 
 # Plano de Implementação (Tier Light) — Sensor Q3 de Quality Gate Pós-Execução (`test_post_execution_conformance_gate.py`)

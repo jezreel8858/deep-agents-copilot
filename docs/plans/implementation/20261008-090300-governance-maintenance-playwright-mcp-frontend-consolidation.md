@@ -54,6 +54,9 @@ amendments:
   - "2026-10-08: Emenda B (token_storage + hardening do teste de isolamento) aprovada por humano via chat; status permanece approved; ver secao 10"
   - "2026-10-08: Emenda C (correcao de vazamentos pre-existentes de ID-LOCAL) aprovada por humano via instrucao no chat; status permanece approved; ver secao 11"
 progress: 0
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-16"
 ---
 Progresso: 0/16 tarefas concluidas
 

@@ -16,6 +16,9 @@ rollback_plan: "Snapshot prévio em tmp/pre-commit-py-snapshot/ e reversão atô
 tier: "light"
 plan_ref: "docs/plans/governance/20261116-123000-pre-commit-r044-tb34-fix.md"
 related-planning-doc: "docs/plans/governance/20261116-123000-pre-commit-r044-tb34-fix.md"
+lessons_extracted: true
+lessons_applied_to: ["plan-conformance-patterns"]
+lessons_at: "2026-11-16"
 ---
 
 # Plano de Implementação (Gate 2 — Camada C Python Tests): Blindagem TDD para R-044 e TB-34 no Pre-Commit

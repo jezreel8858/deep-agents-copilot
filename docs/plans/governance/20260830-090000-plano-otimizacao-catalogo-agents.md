@@ -16,6 +16,9 @@ data: 2026-08-30
 data_implementacao: 2026-08-31
 autor: analise-tecnica-catalogo
 escopo: ".github/agents/*.agent.md (24 agents)"
+lessons_extracted: true
+lessons_applied_to: []
+lessons_at: "2026-11-16"
 ---
 # Plano de Otimização do Catálogo de Agents
 

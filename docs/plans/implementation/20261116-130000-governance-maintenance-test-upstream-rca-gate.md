@@ -32,6 +32,9 @@ critic_findings_summary:
   author_ref: "@python-arch-advisor"
 allowed_files:
   - "tests/governance_audit/test_upstream_rca_gate.py"
+lessons_extracted: true
+lessons_applied_to: ["plan-conformance-patterns"]
+lessons_at: "2026-11-16"
 ---
 
 # Plano de Implementação Técnica (Onda 2 — T9 / Q3): Suíte Automatizada `test_upstream_rca_gate.py` (R-065)

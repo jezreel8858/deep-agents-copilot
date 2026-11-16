@@ -15,7 +15,7 @@ source_docs:
 
 # `/plan-lessons-harvester`
 
-> **Propósito**: Varredura idempotente de planos em `docs/plans/**` para colher lições estruturadas do `@plan-critic`, retroalimentar o checklist pré-voo (`C1`–`C9`) e os agentes planejadores sob aprovação humana (HITL), e selar os planos processados somente após `pytest tests/governance_audit/` 100% verde.
+> **Propósito**: Varredura idempotente de planos em `docs/plans/**` para colher lições estruturadas do `@plan-critic`, retroalimentar o checklist pré-voo (`C1`–`C10`) e os agentes planejadores sob aprovação humana (HITL), e selar os planos processados somente após `pytest tests/governance_audit/` 100% verde.
 > **Arquivo Ativo**: `${file}`
 > **Workspace**: `${workspaceFolder}`
 
@@ -50,9 +50,9 @@ Invocação via comando slash `/plan-lessons-harvester` (argumento: `[tipo-de-pl
    - Filtrar exclusivamente os planos elegíveis onde a chave de frontmatter YAML `lessons_extracted` esteja ausente ou seja `false` (`lessons_extracted != true`). Planos com `lessons_extracted: true` são estritamente ignorados (idempotência).
 2. **Extração e Correlação de Achados do `@plan-critic`**:
    - Extrair achados das seções de revisão cética (tabelas/listas `BLOCKER`, `HIGH`, `MEDIUM`, `LOW`, `NIT`) e metadados do frontmatter R-064 (`review_verdict`, `review_rounds`, `critic_findings_summary`, `critic_rubric_gaps`), complementando com `ctx_search` no histórico da sessão quando necessário.
-   - Agrupar as falhas recorrentes por `author` (agente planejador) e por classe de causa-raiz (`C1` a `C9`).
+   - Agrupar as falhas recorrentes por `author` (agente planejador) e por classe de causa-raiz (`C1` a `C10`).
 3. **Deduplicação contra SSoT Lazy**:
-   - Confrontar os padrões extraídos contra `.github/skills/plan-conformance-patterns/references/planner-preflight-checklist.md` e os ponteiros dos agents planejadores para evitar regras duplicadas ou inflação de tokens (R-066).
+   - Confrontar padrões com `.github/skills/plan-conformance-patterns/references/planner-preflight-checklist.md` e ponteiros de agents para evitar duplicação (R-066).
 4. **Gate HITL Obrigatório (`ask_questions` — R-027)**:
    - Apresentar a matriz consolidada de lições e acionar `ask_questions` (1 a 4 perguntas, `header` <= 25 chars, `allowFreeformInput: true`, 2 a 4 opções com `description` contendo `[Consequência prática + Trade-off/quando escolher]`, 1ª opção `(Recomendado)`) para aprovar:
      - Quais blindagens aplicar em `planner-preflight-checklist.md` e/ou ponteiros de agents/skills;
@@ -91,7 +91,7 @@ Invocação via comando slash `/plan-lessons-harvester` (argumento: `[tipo-de-pl
 Apresente o resultado consolidado da execução de `/plan-lessons-harvester` conforme a estrutura operacional definida neste prompt:
 - **Comando Executado**: `/plan-lessons-harvester`
 - **Escopo Processado**: `${file}` / `${workspaceFolder}` (planos elegíveis vs. planos já selados ignorados)
-- **Status e Evidências**: Matriz de achados por `author` e classe (`C1`–`C9`), blindagens aplicadas pelo `@governance-maintainer`, resultado de `pytest tests/governance_audit/` e planos selados (`lessons_extracted: true`).
+- **Status e Evidências**: Matriz de achados por `author` e classe (`C1`–`C10`), blindagens aplicadas pelo `@governance-maintainer`, resultado de `pytest tests/governance_audit/` e planos selados (`lessons_extracted: true`).
 
 ## ⚙️ Protocolo de Execução Obrigatório
 
