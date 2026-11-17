@@ -3,7 +3,7 @@ name: 'synth-waves'
 description: 'Ciclo Prata de avaliação sintética de roteamento em 3 Ondas (estrutural, semântico/adversarial, cross-dimensão) com intake único e auto-promoção zero-touch'
 agent: 'agent'
 router_bypass: slash_workflow
-model: "Gemini 4 Argon"
+model: "Gemini 4 Carbon"
 tools: ['read_file', 'ask_questions', 'get_errors', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_search', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 argument-hint: '[perfil: bronze | prata | ouro | smoke]'
 source_docs:

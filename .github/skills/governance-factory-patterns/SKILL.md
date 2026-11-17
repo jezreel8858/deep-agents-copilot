@@ -119,8 +119,8 @@ Antes de importar ou adaptar qualquer skill externa (URL, repositório GitHub, m
 ## 6) Seleção de Modelo (`model:` — R-021), `description` e Topologia de Stacks (`type: stack`)
 
 - **Classificação de Perfil (`model:` — R-021)**:
-  - `"Gemini 3.8 Flash"`: Perfil Procedural / Operacional / SLM de alta velocidade (routers, executores leves).
-  - `"Claude Sonnet 5.5"` / `"Gemini 4 Argon"`: Perfil Decompositivo / Deliberativo (arquitetura, `*-developer`, `*-test-engineer`).
+  - `"Gemini Hydrogen 4"`: Perfil Procedural / Operacional / SLM de alta velocidade (routers, executores leves).
+  - `"Claude Sonnet 5.5"` / `"Gemini 4 Carbon"`: Perfil Decompositivo / Deliberativo (arquitetura, `*-developer`, `*-test-engineer`).
   - Proibido fixar tier máximo (`Claude Opus`) permanentemente sem `model_exception_reason:` formalizado (`R-021`). Validar disponibilidade real na IDE (VS Code vs JetBrains).
 - **Tamanho e Conteúdo da `description`**:
   - `agent` e `skill`: `≤ 400` caracteres em 3ª pessoa (`Fornece/Define... Use quando... Não use para...`).

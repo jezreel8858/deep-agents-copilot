@@ -5,7 +5,7 @@ Implementa a arquitetura de avaliação em camadas inspirada nas práticas de 20
 (DeepEval, Maxim AI, LangSmith, IHBench):
 1. Avaliação Estática de Trajetória (FSM / Grafo determinístico, 0 tokens).
 2. Validação de Invariantes de Handoff (Completude, Schema v1.3, Restrição de Ferramentas).
-3. Avaliação de Execução (Synthetic User Simulation / LLM-as-a-Judge com Gemini 3.8 Flash).
+3. Avaliação de Execução (Synthetic User Simulation / LLM-as-a-Judge com Gemini Hydrogen 4).
 """
 from __future__ import annotations
 

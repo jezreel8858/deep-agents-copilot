@@ -7,7 +7,7 @@ description: >-
   .github/skills, .github/prompts, catálogos e grafo de roteamento). Aplica
   rigorosamente efficient-batch-code-modification, priorizando context-mode em
   batch sobre terminal para zero desperdício de créditos.
-model: "Gemini 4 Argon"
+model: "Gemini 4 Carbon"
 tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'ask_questions', 'run_subagent', 'context-mode/ctx_batch', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 source_docs:
   - .github/skills/efficient-batch-code-modification/SKILL.md

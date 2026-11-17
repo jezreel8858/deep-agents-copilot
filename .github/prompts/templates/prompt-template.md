@@ -4,7 +4,7 @@ description: "<Descrição concisa em 3ª pessoa do comando slash, ≤ 200 carac
 agent: "<agent-alvo-ou-agent-router>"
 # Opcional — router_bypass: utility | slash_workflow (todos os Slash Prompts exceto /agent-router declaram router_bypass para execução direta sem passar por @agent-router)
 # router_bypass: utility | slash_workflow (prompts router_bypass: slash_workflow requerem context-mode/ctx_index, ctx_search, ctx_batch e ctx_resume; prompts router_bypass: utility não requerem context-mode/ctx_resume)
-model: "Gemini 3.8 Flash"
+model: "Gemini Hydrogen 4"
 tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'context-mode/ctx_resume', 'context-mode/ctx_search']
 argument-hint: "[caminho-ou-escopo] [--opcoes]"
 # R-066 (Progressive Disclosure): docs <= 300 linhas em source_docs:; docs > 300 linhas em source_docs_lazy:
@@ -148,4 +148,4 @@ Este prompt utiliza as variáveis de contexto nativas do VS Code Copilot:
 </execution_protocol>
 <!-- END:STANDARD -->
 
-- **Guarda Pre-Commit de Frontmatter e Portabilidade (`[T-B3.4]` / `[R-044]`)**: Em `model:`, use sempre o identificador canônico entre aspas idêntico a `model-profiles.yaml` (ex.: `model: "Gemini 4 Argon"`), sendo **proibido** incluir o sufixo `(copilot)` injetado pela UI do VS Code (evita bloqueio `[T-B3.4]` em `.githooks/pre-commit`). No corpo do prompt, é **proibido** usar caminhos absolutos locais que casem com a regex `([A-Za-z]:\\(Users|workspace)|/home/[A-Za-z0-9_.-]+/|/Users/[A-Za-z0-9_.-]+/)` de `[R-044]` — use sempre `${workspaceFolder}` ou placeholders neutros (`<WORKSPACE_ROOT>`, `<HOME_DO_USUARIO>`).
+- **Guarda Pre-Commit de Frontmatter e Portabilidade (`[T-B3.4]` / `[R-044]`)**: Em `model:`, use sempre o identificador canônico entre aspas idêntico a `model-profiles.yaml` (ex.: `model: "Gemini 4 Carbon"`), sendo **proibido** incluir o sufixo `(copilot)` injetado pela UI do VS Code (evita bloqueio `[T-B3.4]` em `.githooks/pre-commit`). No corpo do prompt, é **proibido** usar caminhos absolutos locais que casem com a regex `([A-Za-z]:\\(Users|workspace)|/home/[A-Za-z0-9_.-]+/|/Users/[A-Za-z0-9_.-]+/)` de `[R-044]` — use sempre `${workspaceFolder}` ou placeholders neutros (`<WORKSPACE_ROOT>`, `<HOME_DO_USUARIO>`).

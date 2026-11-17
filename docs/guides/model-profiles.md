@@ -20,9 +20,9 @@ Este guia orienta desenvolvedores sobre como alternar o consumo de modelos LLM e
 
 | Perfil | Objetivo | Principais Modelos Mapeados |
 |---|---|---|
-| `default` | Padrão canônico do repositório | Claude Opus 5.5 (arquitetura/debug complexo), Claude Sonnet 5.5 (routers/desenvolvedores), Gemini 3.8 Flash (operacionais/testes) |
-| `balanceado` | Relação equilibrada custo x raciocínio | Claude Sonnet 5.5 (orquestração), Gemini 3.8 Flash (tarefas analíticas e operacionais) |
-| `economico` | Redução máxima de consumo/créditos | Claude Haiku 5.5 (orquestração e standard), Gemini 3.8 Flash (tarefas leves) |
+| `default` | Padrão canônico do repositório | Claude Opus 5.5 (arquitetura/debug complexo), Claude Sonnet 5.5 (routers/desenvolvedores), Gemini Hydrogen 4 (operacionais/testes) |
+| `balanceado` | Relação equilibrada custo x raciocínio | Claude Sonnet 5.5 (orquestração), Gemini Hydrogen 4 (tarefas analíticas e operacionais) |
+| `economico` | Redução máxima de consumo/créditos | Claude Haiku 5.5 (orquestração e standard), Gemini Hydrogen 4 (tarefas leves) |
 
 > ⚠️ **Aviso de Perda de Qualidade (D5):** Perfis rebaixados (`balanceado`, `economico`) reduzem significativamente a capacidade de raciocínio lógico em decomposições arquiteturais complexas, refatorações multi-arquivo e diagnósticos de erros sutis. Ao aplicar um perfil econômico, esteja ciente de que agents de arquitetura e planejamento operarão com capacidade analítica reduzida.
 

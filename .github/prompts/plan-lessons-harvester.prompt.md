@@ -3,7 +3,7 @@ name: plan-lessons-harvester
 description: Extrai achados do revisor cético (@plan-critic) em planos docs/plans/** não selados, propõe blindagem cirúrgica via HITL e delega mutação e selo de idempotência ao @governance-maintainer pós-pytest verde.
 agent: 'agent'
 router_bypass: slash_workflow
-model: "Gemini 4 Argon"
+model: "Gemini 4 Carbon"
 tools: ['ask_questions', 'get_errors', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_search', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 argument-hint: '[tipo-de-plano | all]'
 source_docs:

@@ -4,7 +4,7 @@ prompts:
   - name: "add-project-context"
     path: ".github/prompts/add-project-context.prompt.md"
     description: "DESCOBERTA DE PROJETO — Execute DEPOIS de `/init-context`. Orquestra descoberta estruturada de projeto com Intent Classification + Multi-Query RRF. Análise estática offline → geração automática de YAML/Markdown → validação e binding atômico. Execute UMA VEZ POR PROJETO (reutilizável). PRÉ-REQUISITO `/init-context` já executado."
-    model: "Gemini 3.8 Flash"
+    model: "Gemini Hydrogen 4"
     router_bypass: slash_workflow
   - name: "agent-router"
     path: ".github/prompts/agent-router.prompt.md"
@@ -14,7 +14,7 @@ prompts:
   - name: "commit"
     path: ".github/prompts/commit.prompt.md"
     description: "Gera mensagem de commit convencional (PT-BR), título/descrição de PR com matriz de risco e plano de rollback, e entrada de CHANGELOG, consumindo a skill git-governance. Aplica guardrail de segredos e atomicidade. NÃO executa git add/commit/push."
-    model: "Gemini 3.8 Flash"
+    model: "Gemini Hydrogen 4"
     router_bypass: utility
   - name: "connect-integration-graphs"
     path: ".github/prompts/connect-integration-graphs.prompt.md"
@@ -24,37 +24,37 @@ prompts:
   - name: "craft-prompt"
     path: ".github/prompts/craft-prompt.prompt.md"
     description: "Aciona o WORKFLOW-PROMPT-SYNTHESIS para refinar, enriquecer com contexto determinístico e gerar o prompt perfeito em template Markdown para um novo chat"
-    model: "Gemini 4 Argon"
+    model: "Gemini 4 Carbon"
     router_bypass: slash_workflow
   - name: "ctx-checkpoint"
     path: ".github/prompts/ctx-checkpoint.prompt.md"
     description: "Grava snapshot de sessão no Context Mode via `ctx_index` (persistência cross-session) para retomada com `/ctx-resume`."
-    model: "Gemini 3.8 Flash"
+    model: "Gemini Hydrogen 4"
     router_bypass: utility
   - name: "ctx-doctor"
     path: ".github/prompts/ctx-doctor.prompt.md"
     description: "Diagnostica o Context Mode usando `ctx_doctor` para validar instalação, hooks e conectividade."
-    model: "Gemini 3.8 Flash"
+    model: "Gemini Hydrogen 4"
     router_bypass: utility
   - name: "ctx-insight"
     path: ".github/prompts/ctx-insight.prompt.md"
     description: "Abre o dashboard de analytics do Context Mode com `ctx_insight` para observar uso de ferramentas e sessões."
-    model: "Gemini 3.8 Flash"
+    model: "Gemini Hydrogen 4"
     router_bypass: utility
   - name: "ctx-resume"
     path: ".github/prompts/ctx-resume.prompt.md"
     description: "Retoma contexto específico via `ctx_search(source:\"checkpoint::<slug>\")`. Cobre cenário de múltiplos chats abertos com checkpoints distintos — lista e seleciona o correto."
-    model: "Gemini 3.8 Flash"
+    model: "Gemini Hydrogen 4"
     router_bypass: utility
   - name: "ctx-start"
     path: ".github/prompts/ctx-start.prompt.md"
     description: "Inicializa e valida a sessão do Context Mode para garantir rastreabilidade e ingestão no dashboard."
-    model: "Gemini 3.8 Flash"
+    model: "Gemini Hydrogen 4"
     router_bypass: utility
   - name: "ctx-status"
     path: ".github/prompts/ctx-status.prompt.md"
     description: "Exibe estatísticas de consumo do Context Mode usando `ctx_stats` para diagnosticar uso de contexto e economia."
-    model: "Gemini 3.8 Flash"
+    model: "Gemini Hydrogen 4"
     router_bypass: utility
   - name: "deep-search"
     path: ".github/prompts/deep-search.prompt.md"
@@ -64,17 +64,17 @@ prompts:
   - name: "del-project-context"
     path: ".github/prompts/del-project-context.prompt.md"
     description: "Remove contexto estruturado de um projeto do overlay local (projects.local.yaml, gitignored — R-043) e do cache Context Mode. Operação destrutiva com validação prévia, confirmação e rollback via Git. NUNCA toca .github/agents/catalog.yaml (compartilhado/commitado)."
-    model: "Gemini 3.8 Flash"
+    model: "Gemini Hydrogen 4"
     router_bypass: slash_workflow
   - name: "eval-workflows"
     path: ".github/prompts/eval-workflows.prompt.md"
-    description: "Avalia a conformidade de trajetórias dos workflows canônicos (R-050) com Gemini 3.8 Flash"
-    model: "Gemini 4 Argon"
+    description: "Avalia a conformidade de trajetórias dos workflows canônicos (R-050) com Gemini Hydrogen 4"
+    model: "Gemini 4 Carbon"
     router_bypass: slash_workflow
   - name: "health"
     path: ".github/prompts/health.prompt.md"
     description: "Verifica saúde completa da infraestrutura de governança. Valida catalog.yaml, .index.json, binding context, agents acessíveis e sincronização entre arquivos. Vai além do /ctx-doctor (que cobre apenas Context Mode MCP)."
-    model: "Gemini 3.8 Flash"
+    model: "Gemini Hydrogen 4"
     router_bypass: utility
   - name: "implement"
     path: ".github/prompts/implement.prompt.md"
@@ -84,7 +84,7 @@ prompts:
   - name: "init-context"
     path: ".github/prompts/init-context.prompt.md"
     description: "⚠️ PRÉ-REQUISITO OBRIGATÓRIO — Inicializa contexto de governança global para TODA sessão. Carrega CLAUDE.md + copilot-instructions.md, valida conformidade com as regras normativas globais. Execute UMA ÚNICA VEZ no início da sessão ANTES de /add-project-context ou qualquer agent. NÃO REPITA na mesma sessão — faz 1x apenas."
-    model: "Gemini 3.8 Flash"
+    model: "Gemini Hydrogen 4"
     router_bypass: slash_workflow
   - name: "plan"
     path: ".github/prompts/plan.prompt.md"
@@ -94,7 +94,7 @@ prompts:
   - name: "review"
     path: ".github/prompts/review.prompt.md"
     description: "Aciona o agent @code-review para revisar diff/PR/arquivo por qualidade, segurança, convenções, impacto e testes. Gera relatório por severidade. NÃO executa alterações."
-    model: "Gemini 4 Argon"
+    model: "Gemini 4 Carbon"
     router_bypass: slash_workflow
   - name: "strategic-review"
     path: ".github/prompts/strategic-review.prompt.md"
@@ -104,20 +104,20 @@ prompts:
   - name: "synth-waves"
     path: ".github/prompts/synth-waves.prompt.md"
     description: "Ciclo Prata de avaliação sintética de roteamento em 3 Ondas (estrutural, semântico/adversarial, cross-dimensão) com intake único e auto-promoção zero-touch"
-    model: "Gemini 4 Argon"
+    model: "Gemini 4 Carbon"
     router_bypass: slash_workflow
   - name: "validate"
     path: ".github/prompts/validate.prompt.md"
     description: "Valida implementação contra plano aprovado, verifica critérios de sucesso e identifica desvios."
-    model: "Gemini 4 Argon"
+    model: "Gemini 4 Carbon"
     router_bypass: slash_workflow
   - name: "visualize-graph"
     path: ".github/prompts/visualize-graph.prompt.md"
     description: "Gera e abre a visualização interativa do grafo de conhecimento multi-repo em Angular Material 3 (2D/3D), integrando AST de código, classificação de acoplamento, filtros arquiteturais (isolados/órfãos, papéis, camadas, multi-select de repositórios) e pontes de integração REST."
-    model: "Gemini 3.8 Flash"
+    model: "Gemini Hydrogen 4"
     router_bypass: slash_workflow
   - name: plan-lessons-harvester
     path: .github/prompts/plan-lessons-harvester.prompt.md
     description: "Extrai achados do @plan-critic em planos docs/plans/** não selados, propõe blindagem via HITL e delega mutação e selo de idempotência ao @governance-maintainer pós-pytest verde."
-    model: "Gemini 4 Argon"
+    model: "Gemini 4 Carbon"
     router_bypass: slash_workflow

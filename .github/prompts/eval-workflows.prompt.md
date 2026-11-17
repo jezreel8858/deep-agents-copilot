@@ -3,7 +3,7 @@ name: 'eval-workflows'
 description: 'Avalia de forma read-only a conformidade de trajetórias e invariantes dos workflows canônicos (R-050) por micro-cenário isolado'
 agent: 'agent'
 router_bypass: slash_workflow
-model: "Gemini 4 Argon"
+model: "Gemini 4 Carbon"
 tools: ['read_file', 'ask_questions', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_search', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 argument-hint: "[cenario-id | todos]"
 source_docs:

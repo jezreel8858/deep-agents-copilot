@@ -19,4 +19,4 @@ profiles:
     agents:
       tech-solution-architect: Claude Opus 5.5
     prompts:
-      prompt:commit: Gemini 3.8 Flash
+      prompt:commit: Gemini Hydrogen 4

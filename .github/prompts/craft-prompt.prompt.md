@@ -4,7 +4,7 @@ description: >-
   Aciona o WORKFLOW-PROMPT-SYNTHESIS para refinar, enriquecer com contexto determinístico e gerar o prompt perfeito em template Markdown para um novo chat
 agent: 'agent'
 router_bypass: slash_workflow
-model: "Gemini 4 Argon"
+model: "Gemini 4 Carbon"
 tools: ['read_file', 'get_errors', 'ask_questions', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_search', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 argument-hint: '[ideia-ou-requisito-inicial]'
 source_docs:

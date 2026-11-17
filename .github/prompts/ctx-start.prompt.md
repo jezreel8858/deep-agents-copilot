@@ -3,7 +3,7 @@ name: ctx-start
 description: Inicializa e valida a sessão do Context Mode para garantir rastreabilidade e ingestão no dashboard.
 agent: 'agent'
 router_bypass: utility
-model: "Gemini 3.8 Flash"
+model: "Gemini Hydrogen 4"
 tools: ['context-mode/ctx_stats', 'context-mode/ctx_doctor', 'context-mode/ctx_execute']
 argument-hint: ''
 source_docs:

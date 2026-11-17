@@ -3,7 +3,7 @@ name: ctx-doctor
 description: Diagnostica o Context Mode usando `ctx_doctor` para validar instalação, hooks e conectividade.
 agent: 'agent'
 router_bypass: utility
-model: "Gemini 3.8 Flash"
+model: "Gemini Hydrogen 4"
 tools: ['context-mode/ctx_doctor']
 argument-hint: ''
 source_docs:

@@ -89,33 +89,33 @@ profiles:
       premium: Claude Opus 5.5
       orchestration: Claude Sonnet 5.5
       standard: Claude Sonnet 5.5
-      light: Gemini 4 Argon
-      utility: Gemini 3.8 Flash
+      light: Gemini 4 Carbon
+      utility: Gemini Hydrogen 4
       stack-arch: Claude Sonnet 5.5
-      stack-squad: Gemini 4 Argon
+      stack-squad: Gemini 4 Carbon
 
   balanceado:
     extends: default
-    description: "Substitui Opus por Sonnet no tier premium; otimiza stack-arch e revisores selecionados com Gemini 4 Argon."
+    description: "Substitui Opus por Sonnet no tier premium; otimiza stack-arch e revisores selecionados com Gemini 4 Carbon."
     quality_warning: "Arquitetura e debug profundo perdem raciocínio premium."
     tiers:
       premium: Claude Sonnet 5.5
-      stack-arch: Gemini 4 Argon
+      stack-arch: Gemini 4 Carbon
     agents:
-      security-reviewer: Gemini 4 Argon
-      code-review: Gemini 4 Argon
-      bug-triage: Gemini 4 Argon
+      security-reviewer: Gemini 4 Carbon
+      code-review: Gemini 4 Carbon
+      bug-triage: Gemini 4 Carbon
 
   economico:
     extends: balanceado
-    description: "Rebaixa orquestração para Gemini 3.8 Flash e demais tiers operacionais para Claude Haiku 5.5; preserva D6."
+    description: "Rebaixa orquestração para Gemini Hydrogen 4 e demais tiers operacionais para Claude Haiku 5.5; preserva D6."
     quality_warning: "Roteamento, planos e código podem perder precisão; routers podem errar triagem."
     tiers:
-      orchestration: Gemini 3.8 Flash
+      orchestration: Gemini Hydrogen 4
       standard: Claude Haiku 5.5
       light: Claude Haiku 5.5
       utility: Claude Haiku 5.5
-      stack-arch: Gemini 3.8 Flash
+      stack-arch: Gemini Hydrogen 4
       stack-squad: Claude Haiku 5.5
     agents:
       security-reviewer: Claude Haiku 5.5

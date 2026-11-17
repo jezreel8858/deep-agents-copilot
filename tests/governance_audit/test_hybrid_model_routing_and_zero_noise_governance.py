@@ -3,7 +3,7 @@ test_hybrid_model_routing_and_zero_noise_governance.py — Quality Gate Determin
 
 Valida as seguintes garantias de governança:
 (a) Todos os 14 agents developers e test-engineers das stacks DEVEM utilizar o modelo "Grok 4.7";
-(b) Qualquer agent com papel test-writer (unit/integration/component) DEVE utilizar o modelo "Gemini 3.8 Flash";
+(b) Qualquer agent com papel test-writer (unit/integration/component) DEVE utilizar o modelo "Gemini Hydrogen 4";
 (c) Todos os 30 agents executores DEVEM declarar '.github/skills/terminal-governance/SKILL.md' em source_docs;
 (d) Todos os 30 agents executores DEVEM citar expressamente 'Zero-Noise Test Policy (terminal-governance/SKILL.md §3.1)';
 (e) .github/copilot-instructions.md DEVE formalizar a regra R-021.2 (Retry-Rate Model Escalation).
@@ -70,14 +70,14 @@ def test_promoted_executor_agents_use_claude_sonnet_5():
             content = agent_file.read_text(encoding="utf-8")
             fm = parse_frontmatter(content)
             model = fm.get("model")
-            assert model == "Gemini 4 Argon", remediation(
-                f"Agent '{stem}' possui model '{model}' no frontmatter, esperado 'Gemini 4 Argon'",
-                fix_hint=f"Edite {agent_file.relative_to(REPO_ROOT)} definindo model: \"Gemini 4 Argon\""
+            assert model == "Gemini 4 Carbon", remediation(
+                f"Agent '{stem}' possui model '{model}' no frontmatter, esperado 'Gemini 4 Carbon'",
+                fix_hint=f"Edite {agent_file.relative_to(REPO_ROOT)} definindo model: \"Gemini 4 Carbon\""
             )
 
 
 def test_test_writers_use_gemini_38_flash():
-    """Valida (b): test-writers (unit/integration/component) devem usar Gemini 3.8 Flash."""
+    """Valida (b): test-writers (unit/integration/component) devem usar Gemini Hydrogen 4."""
     agent_files = get_executor_agent_files()
     for agent_file in agent_files:
         stem = agent_file.name.replace(".agent.md", "")
@@ -85,9 +85,9 @@ def test_test_writers_use_gemini_38_flash():
             content = agent_file.read_text(encoding="utf-8")
             fm = parse_frontmatter(content)
             model = fm.get("model")
-            assert model == "Gemini 3.8 Flash", remediation(
-                f"Agent '{stem}' possui model '{model}' no frontmatter, esperado 'Gemini 3.8 Flash'",
-                fix_hint=f"Edite {agent_file.relative_to(REPO_ROOT)} definindo model: \"Gemini 3.8 Flash\""
+            assert model == "Gemini Hydrogen 4", remediation(
+                f"Agent '{stem}' possui model '{model}' no frontmatter, esperado 'Gemini Hydrogen 4'",
+                fix_hint=f"Edite {agent_file.relative_to(REPO_ROOT)} definindo model: \"Gemini Hydrogen 4\""
             )
 
 

@@ -24,7 +24,7 @@ LOCK_REL = ".model-profiles/lock"
 OPUS = "Claude Opus 5.5"
 SONNET = "Claude Sonnet 5.5"
 HAIKU = "Claude Haiku 5.5"
-FLASH = "Gemini 3.8 Flash"
+FLASH = "Gemini Hydrogen 4"
 
 ECON_WARNING = "Roteamento e codigo podem perder precisao."
 

@@ -6,7 +6,7 @@ description:
   NÃO executa alterações.
 agent: 'agent'
 router_bypass: slash_workflow
-model: "Gemini 4 Argon"
+model: "Gemini 4 Carbon"
 tools: ['read_file', 'grep_search', 'file_search', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_search', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 argument-hint: '[caminho-do-arquivo | diff]'
 source_docs:

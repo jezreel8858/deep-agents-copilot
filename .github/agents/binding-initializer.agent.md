@@ -6,7 +6,7 @@ description:
   `.github/projects.local.yaml (e `.github/instructions/README.md` como catálogo documental)` e `.github/projects.local.yaml.example` via Health Check (R-034), coleta o nome do
   ecossistema via `ask_questions` (1 pergunta) e gera o esqueleto dos artefatos.
   Projetos são adicionados depois via `/add-project-context`.
-model: "Gemini 4 Argon"
+model: "Gemini 4 Carbon"
 tools: ['ask_questions', 'context-mode/ctx_execute', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 source_docs:
   - '.github/skills/project-context-builder/SKILL.md'

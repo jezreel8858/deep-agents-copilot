@@ -464,14 +464,14 @@ No adaptador `src/governance_runner/runner/sdk_adapter.py`, a flag `--model` é 
 | :---: | :--- | :--- | :--- | :--- | :--- |
 | — | `Auto` (`pinnable: false`) | `github` | Variável | *(omitir a flag `--model`)* | Usa o seletor automático do runtime Copilot |
 | **1** | `Claude Haiku 5.5` | `anthropic` | **Low** (`10` / `50`) | `claude-haiku-5.5` | **Recomendado para `synth-generate --generator-mode sdk`** (geração rápida e de baixo custo) |
-| **2** | `Gemini 3.8 Flash` | `google` | **Low** (`75` / `375`) | `gemini-3.8-flash` | Alternativa rápida de baixo custo para geração sintética |
+| **2** | `Gemini Hydrogen 4` | `google` | **Low** (`75` / `375`) | `gemini-hydrogen-4` | Alternativa rápida de baixo custo para geração sintética |
 | **3** | `Grok 4.7` | `xai` | **Medium** (`200` / `600`) | `grok-4.7` | Avaliação intermediária ou geração diversificada |
-| **4** | `Gemini 4 Argon` | `google` | **Medium** (`200` / `1000`) | `gemini-4-argon` | Avaliação de roteamento em lote (`synth-eval`) |
+| **4** | `Gemini 4 Carbon` | `google` | **Medium** (`200` / `1000`) | `gemini-4-carbon` | Avaliação de roteamento em lote (`synth-eval`) |
 | **5** | `Claude Sonnet 5.5` | `anthropic` | **Medium** (`300` / `1500`) | `claude-sonnet-5.5` | **Recomendado para `synth-eval`** (paridade com o modelo padrão do `agent-router`) |
 | **6** | `GPT-6.1 Sol` | `openai` | **Medium** (`300` / `1500`) | `gpt-6.1-sol` | Alternativa de paridade média para `synth-eval` ou geração cross-family (anti self-bias) |
 | **7** | `Claude Opus 5.5` | `anthropic` | **High** (`500` / `2500`) | `claude-opus-5.5` | Uso restrito a auditoria profunda de casos ambíguos (alto consumo de orçamento) |
 
-> **Governança de Modelos (R-038 / R-053)**: Nunca utilize modelos fora desta tabela (como `gpt-4o`, `claude-3.5-sonnet` ou `o1`). Para evitar *self-preference bias* (RK-10), recomenda-se gerar prompts com um modelo de custo baixo/família distinta (ex.: `--model "claude-haiku-5.5"` ou `--model "gemini-3.8-flash"`) e avaliar o `@agent-router` com `--model "claude-sonnet-5.5"` ou `--model "gpt-6.1-sol"`.
+> **Governança de Modelos (R-038 / R-053)**: Nunca utilize modelos fora desta tabela (como `gpt-4o`, `claude-3.5-sonnet` ou `o1`). Para evitar *self-preference bias* (RK-10), recomenda-se gerar prompts com um modelo de custo baixo/família distinta (ex.: `--model "claude-haiku-5.5"` ou `--model "gemini-hydrogen-4"`) e avaliar o `@agent-router` com `--model "claude-sonnet-5.5"` ou `--model "gpt-6.1-sol"`.
 ---
 
 

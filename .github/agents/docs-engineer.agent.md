@@ -7,7 +7,7 @@ description: >-
   runbook, postmortem). Fusão de docs-writer + docs-curator: mesma saída
   restrita a `.md`, mesma skill base, diferença apenas entre autoria nova
   e curadoria/consolidação de conteúdo já existente.
-model: "Gemini 4 Argon"
+model: "Gemini 4 Carbon"
 tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'get_errors', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 source_docs:
   - .github/skills/documentation-writing-patterns/SKILL.md

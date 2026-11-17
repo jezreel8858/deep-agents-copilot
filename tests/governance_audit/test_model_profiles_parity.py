@@ -111,13 +111,13 @@ def test_default_profile_parity_with_frontmatters():
 
 
 def test_economico_profile_downgrades_orchestration_and_standard_to_haiku():
-    """Valida que o perfil 'economico' rebaixa orchestration para Gemini 3.8 Flash e tiers operacionais para Claude Haiku 5.5."""
+    """Valida que o perfil 'economico' rebaixa orchestration para Gemini Hydrogen 4 e tiers operacionais para Claude Haiku 5.5."""
     data = load_profiles(REPO_ROOT)
     profiles = data["profiles"]
     resolved_economico = resolve_profile("economico", profiles)
 
-    assert resolved_economico["tiers"]["orchestration"] == "Gemini 3.8 Flash", (
-        f"orchestration em economico deve ser 'Gemini 3.8 Flash', obteve: {resolved_economico['tiers']['orchestration']}"
+    assert resolved_economico["tiers"]["orchestration"] == "Gemini Hydrogen 4", (
+        f"orchestration em economico deve ser 'Gemini Hydrogen 4', obteve: {resolved_economico['tiers']['orchestration']}"
     )
     assert resolved_economico["tiers"]["standard"] == "Claude Haiku 5.5", (
         f"standard em economico deve ser 'Claude Haiku 5.5', obteve: {resolved_economico['tiers']['standard']}"
@@ -128,7 +128,7 @@ def test_economico_profile_downgrades_orchestration_and_standard_to_haiku():
     assert resolved_economico["tiers"]["utility"] == "Claude Haiku 5.5", (
         f"utility em economico deve ser 'Claude Haiku 5.5', obteve: {resolved_economico['tiers']['utility']}"
     )
-    assert resolved_economico["tiers"]["stack-arch"] == "Gemini 3.8 Flash"
+    assert resolved_economico["tiers"]["stack-arch"] == "Gemini Hydrogen 4"
     assert resolved_economico["tiers"]["stack-squad"] == "Claude Haiku 5.5"
     assert resolved_economico["tiers"]["premium"] == "Claude Sonnet 5.5" 
 
@@ -195,7 +195,7 @@ def test_canonical_prompt_key_and_error_on_non_canonical():
     # 2. validate_profile_keys rejeita chaves em prompts: sem o prefixo prompt:
     invalid_profile = {
         "prompts": {
-            "commit": "Gemini 3.8 Flash"  # forma não-canônica (sem 'prompt:')
+            "commit": "Gemini Hydrogen 4"  # forma não-canônica (sem 'prompt:')
         }
     }
     with pytest.raises(ValueError, match="deve usar a forma canônica 'prompt:<nome>'"):
@@ -238,7 +238,7 @@ def test_precedence_d2_table_cases():
                 "premium": "Claude Opus 5.5",
                 "orchestration": "Claude Sonnet 5.5",
                 "standard": "Claude Sonnet 5.5",
-                "light": "Gemini 3.8 Flash",
+                "light": "Gemini Hydrogen 4",
             }
         },
         "base_custom": {
@@ -257,7 +257,7 @@ def test_precedence_d2_table_cases():
     # 1. Herança do default (não modificado em base nem child)
     assert resolve_target_model("tech-solution-architect", "premium", resolved) == "Claude Opus 5.5"
     assert resolve_target_model("agent-router", "orchestration", resolved) == "Claude Sonnet 5.5"
-    assert resolve_target_model("prompt:review", "light", resolved) == "Gemini 3.8 Flash"
+    assert resolve_target_model("prompt:review", "light", resolved) == "Gemini Hydrogen 4"
 
     # 2. Sobrescrita de tier via base_custom (extends)
     assert resolve_target_model("python-developer", "standard", resolved) == "Grok 4.7"
@@ -304,7 +304,7 @@ def test_resolve_profile_edge_cases():
         "base": {
             "description": "Base desc",
             "quality_warning": "Warning base",
-            "tiers": {"light": "Gemini 3.8 Flash"},
+            "tiers": {"light": "Gemini Hydrogen 4"},
         },
         "child": {
             "extends": "base",
@@ -321,7 +321,7 @@ def test_resolve_profile_edge_cases():
     }
 
     res_child = resolve_profile("child", profiles)
-    assert res_child["tiers"]["light"] == "Gemini 3.8 Flash"
+    assert res_child["tiers"]["light"] == "Gemini Hydrogen 4"
     assert res_child["description"] == "Base desc"
     assert res_child["quality_warning"] == "Warning base"
 
@@ -425,3 +425,38 @@ def test_no_provider_suffix_and_canonical_double_quotes_in_model_frontmatter():
             )
 
     assert not violations, "Violacoes TB-34 de formatacao/paridade em model::\n" + "\n".join(violations)
+
+
+def test_all_agent_and_prompt_models_are_in_allowlist():
+    """Sensor de paridade (R-055): todo 'model:' em agents/prompts/catalogos deve existir e ser pinável na model-allowlist.yaml."""
+    allowlist = load_allowlist(REPO_ROOT)
+    pinnable_models = {
+        m["name"]
+        for m in allowlist.get("models", [])
+        if m.get("pinnable") is True
+    }
+    violations = []
+
+    for entity_key, entry in collect_repo_frontmatter_files(REPO_ROOT).items():
+        f = entry[0]
+        text = f.read_text(encoding="utf-8")
+        m_fm = re.match(r"^---\s*\n(.*?)\n---", text, flags=re.DOTALL)
+        if not m_fm:
+            continue
+        fm = safe_load_yaml_unique(m_fm.group(1)) or {}
+        model = fm.get("model")
+        if model and model not in pinnable_models:
+            violations.append(f"{entity_key} ({f.relative_to(REPO_ROOT).as_posix()}): model '{model}' ausente ou nao pinavel em model-allowlist.yaml")
+
+    for cat_path_str in (".github/agents/catalog.yaml", ".github/prompts/catalog.yaml"):
+        cat_path = Path(cat_path_str)
+        if not cat_path.exists():
+            continue
+        cat_data = safe_load_yaml_unique(cat_path.read_text(encoding="utf-8")) or {}
+        for key in ("agents", "prompts"):
+            for item in cat_data.get(key, []) or []:
+                if isinstance(item, dict) and item.get("model"):
+                    if item["model"] not in pinnable_models:
+                        violations.append(f"{cat_path_str} ({item.get('name', '?')}): model '{item['model']}' ausente em model-allowlist.yaml")
+
+    assert not violations, "Modelos fora da allowlist detectados:\n" + "\n".join(violations)

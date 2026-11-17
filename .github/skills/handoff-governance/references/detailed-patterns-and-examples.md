@@ -12,7 +12,7 @@ handoff_payload:
   emissor:                                # identidade do agent delegante (P10)
     nome: "<nome-do-agent-atual>"
     versao: "<versao-semantica>"          # ex.: "1.1.0"
-    modelo_llm: "<modelo-usado>"          # ex.: "Gemini 3.8 Flash"
+    modelo_llm: "<modelo-usado>"          # ex.: "Gemini Hydrogen 4"
     timestamp: "<ISO-8601>"              # ex.: "2026-08-28T14:23:00Z"
   roteamento_grafo:                       # extensão aditiva (v1.1) — topologia e transição de estado, opcional
     current_node: "<nome-do-agent-atual>" # string — alias explícito do nó emissor

@@ -17,7 +17,7 @@ Consolida, a partir de pesquisa de mercado (2025/2026), Anthropic Open Spec (dez
 | VS Code Copilot Agent/Prompt Engine | Variáveis de contexto nativas (`${file}`, `${selection}`, `${workspaceFolder}`, `${input:param}`), convenção `argument-hint` e parsing estrito de display names em `model:` |
 | TrustAgent taxonomy (KDD 2025) | Classifica origem do gap: **intrínseco** (brain/memory/tool do próprio agent) vs. **extrínseco** (user/other agents/environment) |
 | Protocolo R-046 & `efficient-batch-code-modification` | Hierarquia estrita de batching: editor tools para 1-4 arquivos em *Single-Turn Batching*; sandbox `ctx_execute` (com `file`)/`ctx_batch` para 5+ arquivos ou operações repetitivas |
-| Matriz Biparadigma (§9 de `governance-factory-patterns`) | Alocação pragmática de SLM vs LLM: **Procedural/Operacional** (`Gemini 3.8 Flash`) vs **Decompositivo/Raciocínio Guiado** (`Claude Sonnet 5.5`) |
+| Matriz Biparadigma (§9 de `governance-factory-patterns`) | Alocação pragmática de SLM vs LLM: **Procedural/Operacional** (`Gemini Hydrogen 4`) vs **Decompositivo/Raciocínio Guiado** (`Claude Sonnet 5.5`) |
 | `code-review-patterns` (já existente) | Taxonomia de severidade tripla (**Bloqueador \| Alto \| Sugestão**) — reaproveitada nesta skill |
 | `agent-contracts/SKILL.md` §8-9 | Baseline de formato de saída por perfil e tooling mínimo por perfil |
 
@@ -138,7 +138,7 @@ Para maximizar a precisão, eliminar alucinações e economizar tokens, a govern
 
 | Campo | Conteúdo |
 |---|---|
-| Sintoma | Arquivo `.agent.md` que diverge dos templates canônicos (`.github/agents/templates/agent-template.md`, `operational-agent.md`, `research-agent.md`): *(a)* ausência dos blocos contrastantes obrigatórios `## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO` com sub-seções `### ✅ O que este agente FAZ` e `### ❌ O que este agente NUNCA faz`; *(b)* ausência de workflow sequencial numerado; *(c)* ausência de Contrato Operacional com entradas mínimas e formato de saída estruturado; *(d)* modelo configurado em desacordo com a Matriz Biparadigma (`"Gemini 3.8 Flash"` para procedural/operacional vs `"Claude Sonnet 5.5"` para deliberativo/decompositivo); *(e)* `model:` declarado como array ou kebab-case sem validação via `get_errors`; ou *(f)* `description` > 500 caracteres ou com changelog embutido (§10). |
+| Sintoma | Arquivo `.agent.md` que diverge dos templates canônicos (`.github/agents/templates/agent-template.md`, `operational-agent.md`, `research-agent.md`): *(a)* ausência dos blocos contrastantes obrigatórios `## 🛑 CRÍTICO: ESCOPO E NÃO-ESCOPO` com sub-seções `### ✅ O que este agente FAZ` e `### ❌ O que este agente NUNCA faz`; *(b)* ausência de workflow sequencial numerado; *(c)* ausência de Contrato Operacional com entradas mínimas e formato de saída estruturado; *(d)* modelo configurado em desacordo com a Matriz Biparadigma (`"Gemini Hydrogen 4"` para procedural/operacional vs `"Claude Sonnet 5.5"` para deliberativo/decompositivo); *(e)* `model:` declarado como array ou kebab-case sem validação via `get_errors`; ou *(f)* `description` > 500 caracteres ou com changelog embutido (§10). |
 | Como detectar | Comparação estrutural contra os templates de referência em `.github/agents/templates/` e validação de `model:` via `get_errors` |
 | Origem (TrustAgent) | Intrínseco — inconsistência estrutural e instrucional do agente |
 | Severidade | **Bloqueador** se `model:` inválido (`Unknown model`) ou ausência de escopo delimitado; **Alta** para ausência de blocos ✅/❌ ou workflow numerado; **Sugestão** para pequenos desvios de formatação |

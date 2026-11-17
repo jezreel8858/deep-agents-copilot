@@ -6,7 +6,7 @@ description: >-
   novas features (Session Beans SLSB/SFSB, MDB, JPA legada/EntityManager, transações JTA/CMT),
   executa diagnósticos e correções cirúrgicas de bugs (RCA, diff mínimo) e aplica
   otimizações de performance (tuning de pool de EJBs, DataSources JNDI e eliminação de transações longas).
-model: "Gemini 4 Argon"
+model: "Gemini 4 Carbon"
 tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 source_docs:
   - '.github/skills/java-jdk-backend-governance/SKILL.md'

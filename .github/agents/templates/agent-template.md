@@ -3,13 +3,13 @@ name: <slug-kebab-case>
 description: >-
   <Descrição concisa em 3ª pessoa, ≤ 400 caracteres. Explica O QUÊ o agente faz, QUANDO deve ser invocado (frase-gatilho) e principal limite negativo.>
 # Seleção de Modelo (governance-factory-patterns/SKILL.md §9 e R-021):
-# - "Gemini 3.8 Flash" -> Perfil Procedural / Operacional / SLM de alta velocidade (padrão para executores leves e test-writers)
+# - "Gemini Hydrogen 4" -> Perfil Procedural / Operacional / SLM de alta velocidade (padrão para executores leves e test-writers)
 # - "Claude Sonnet 5.5"  -> Perfil Decompositivo / Deliberativo / Raciocínio Guiado (arquitetura, planejamento, desenvolvedores [*-developer], engenheiros de teste [*-test-engineer])
 # NOTA DE GOVERNANÇA (R-021 — Model Routing Signal):
 # É PROIBIDO fixar 'model:' permanentemente em tier premium ("Claude Opus" ou equivalente de tier máximo) para papéis de
 # execução contínua/genérica. O escalonamento é sempre PONTUAL (por chamada/tarefa via sinal 🧠 em run_subagent), nunca permanente.
 # Exceções estritas de catálogo requerem 'model_exception_reason:' formalizado (ex.: debugger, tech-solution-architect).
-model: "Gemini 4 Argon"
+model: "Gemini 4 Carbon"
 # Tools: Princípio de menor privilégio. run_subagent é OBRIGATÓRIO por R-042.
 # Se run_in_terminal for declarado em tools, é OBRIGATÓRIO incluir .github/skills/terminal-governance/SKILL.md em source_docs (R-049).
 # Operacional: ['read_file', 'insert_edit_into_file', 'create_file', 'grep_search', 'file_search', 'list_dir', 'get_errors', 'run_subagent']

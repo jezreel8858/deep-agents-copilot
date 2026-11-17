@@ -150,7 +150,7 @@ def test_t3_plan_lessons_harvester_prompt_two_phases_and_safeguards():
 
     assert fm.get("name") == "plan-lessons-harvester"
     assert fm.get("router_bypass") == "slash_workflow"
-    assert fm.get("model") == "Gemini 4 Argon"
+    assert fm.get("model") == "Gemini 4 Carbon"
     tools = set(fm.get("tools") or [])
     for required_tool in (
         "ask_questions",

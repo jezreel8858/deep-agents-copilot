@@ -68,13 +68,13 @@ O mapeamento de agentes e prompts para tiers de custo (`tier_map` em `model-prof
 | `premium` | Raciocínio profundo, arquitetura e debug complexo (`tech-solution-architect`, `debugger`) | `Claude Opus 5.5` |
 | `orchestration` | Roteamento transversal, orquestração e implementação (`*-router`, `prompt:implement`) | `Claude Sonnet 5.5` |
 | `standard` | Especialistas de domínio, revisores, planejadores e pesquisa profunda | `Claude Sonnet 5.5` |
-| `light` | Executores operacionais, templates de agent e prompts analíticos/validação | `Gemini 4 Argon` |
-| `utility` | Automações mecânicas, gestão de contexto de sessão e templates de prompt | `Gemini 3.8 Flash` |
+| `light` | Executores operacionais, templates de agent e prompts analíticos/validação | `Gemini 4 Carbon` |
+| `utility` | Automações mecânicas, gestão de contexto de sessão e templates de prompt | `Gemini Hydrogen 4` |
 | `stack-arch` | Consultores de arquitetura especializados por stack (`*-arch-advisor`) | `Claude Sonnet 5.5` |
-| `stack-squad` | Desenvolvedores e engenheiros de teste por stack (`*-developer`, `*-test-engineer`) | `Gemini 4 Argon` |
+| `stack-squad` | Desenvolvedores e engenheiros de teste por stack (`*-developer`, `*-test-engineer`) | `Gemini 4 Carbon` |
 
 ### Perfis Canônicos Homologados
 - **`default`:** Perfil canônico de máxima fidelidade técnica, espelhado diretamente nos frontmatters de todos os agents e prompts.
-- **`balanceado`:** Otimização intermediária (`extends: default`), substituindo `Claude Opus 5.5` por `Claude Sonnet 5.5` no tier `premium`, adotando `Gemini 4 Argon` em `stack-arch` e aplicando overrides específicos para `Gemini 4 Argon` em `security-reviewer`, `code-review` e `bug-triage`.
-- **`economico`:** Modo de baixo consumo (`extends: balanceado`), rebaixando `orchestration` e `stack-arch` para `Gemini 3.8 Flash`, e padronizando `standard`, `light`, `utility` e `stack-squad` em `Claude Haiku 5.5`. Mantém conformidade estrita com a Regra D6 (custo do pai >= custo do filho no grafo de roteamento).
+- **`balanceado`:** Otimização intermediária (`extends: default`), substituindo `Claude Opus 5.5` por `Claude Sonnet 5.5` no tier `premium`, adotando `Gemini 4 Carbon` em `stack-arch` e aplicando overrides específicos para `Gemini 4 Carbon` em `security-reviewer`, `code-review` e `bug-triage`.
+- **`economico`:** Modo de baixo consumo (`extends: balanceado`), rebaixando `orchestration` e `stack-arch` para `Gemini Hydrogen 4`, e padronizando `standard`, `light`, `utility` e `stack-squad` em `Claude Haiku 5.5`. Mantém conformidade estrita com a Regra D6 (custo do pai >= custo do filho no grafo de roteamento).
 

@@ -79,7 +79,7 @@ def test_resume_com_perfil_alterado_recusa_sem_force_e_aceita_com_force(applied,
     run_cli(capsys, applied, "suspend", "--yes")
     path = applied / "model-profiles.yaml"
     path.write_bytes(path.read_bytes().replace(b"orchestration: " + HAIKU.encode(),
-                                               b"orchestration: Gemini 3.8 Flash"))
+                                               b"orchestration: Gemini Hydrogen 4"))
     git(applied, "commit", "-qam", "perfil mudou")
     code, out = run_cli(capsys, applied, "resume", "--yes")
     assert code == 1 and "[PROFILE_CHANGED]" in out and "--force" in out

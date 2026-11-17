@@ -7,7 +7,7 @@ description: >-
   estruturado (## Tarefa, ## Contexto, ## Restrições e Não-Escopo, ## Formato de Saída Esperado)
   com Gate Pattern de 1-clique (Tier 2) ou loop interativo (Tier 3 — máx. 5 iterações), operando
   estritamente no Problem Space sem invadir o Solution Space dos especialistas.
-model: "Gemini 4 Argon"
+model: "Gemini 4 Carbon"
 tools: ['ask_questions', 'run_subagent', 'context-mode/ctx_search']
 source_docs:
   - '.github/skills/prompt-engineering-patterns/SKILL.md'

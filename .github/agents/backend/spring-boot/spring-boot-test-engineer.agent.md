@@ -6,7 +6,7 @@ description: >-
   projeta e implementa testes unitários (JUnit 5, Mockito BDD), testes de integração
   com Testcontainers (@SpringBootTest, @DataJpaTest, MockMvc) e realiza diagnóstico
   e autocorreção de suítes de testes quebradas com retry cap estrito (R-053).
-model: "Gemini 4 Argon"
+model: "Gemini 4 Carbon"
 tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 source_docs:
   - '.github/skills/test-implementation-spring-boot/SKILL.md'
