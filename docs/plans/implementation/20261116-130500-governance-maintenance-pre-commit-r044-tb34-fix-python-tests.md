@@ -15,10 +15,23 @@ allowed_files:
 rollback_plan: "Snapshot prévio em tmp/pre-commit-py-snapshot/ e reversão atômica não-destrutiva via git diff -- tests/governance_audit/test_local_project_isolation.py tests/governance_audit/test_synth_waves_prompt.py tests/governance_audit/test_model_profiles_parity.py > tmp/pre-commit-py-delta.patch seguido de git apply -R tmp/pre-commit-py-delta.patch (sem uso de git checkout -- ou git reset --hard)."
 tier: "light"
 plan_ref: "docs/plans/governance/20261116-123000-pre-commit-r044-tb34-fix.md"
-related-planning-doc: "docs/plans/governance/20261116-123000-pre-commit-r044-tb34-fix.md"
 lessons_extracted: true
 lessons_applied_to: ["plan-conformance-patterns"]
 lessons_at: "2026-11-16"
+related-planning-doc: "docs/plans/governance/20261116-123000-pre-commit-r044-tb34-fix.md"
+session_id: "sess-20261116-eval-workflows-gov"
+workflow_id: "WORKFLOW-GOVERNANCE-MAINTENANCE"
+workflow_trace_id: "wt-20261116-eval-workflows-gov-01"
+parent_plan_ref: "docs/plans/governance/20261116-123000-pre-commit-r044-tb34-fix.md"
+critic_rubric_gaps: []
+critic_findings_summary:
+  rounds: 2
+  blockers: 0
+  majors: 0
+  minors: 0
+  nits: 0
+  last_verdict: "PASS_WITH_NITS"
+  author_ref: "@python-arch-advisor"
 ---
 
 # Plano de Implementação (Gate 2 — Camada C Python Tests): Blindagem TDD para R-044 e TB-34 no Pre-Commit
@@ -34,7 +47,7 @@ Este plano de implementação detalha exclusivamente a **Camada C (Testes de Aud
    - Essa expressão não detecta caminhos no padrão `[LETRA_DRIVE]:\workspace` nem diretórios home Unix (`/home/...`, `/Users/...`), razão pela qual a suíte Python passava em falso-negativo enquanto `.githooks/pre-commit` (linha 58) barrava commits aplicando a regex `([A-Za-z]:\\(Users|workspace)|/home/[A-Za-z0-9_.-]+/|/Users/[A-Za-z0-9_.-]+/)` sobre `.github/**`.
 2. **Acoplamento a Caminho Local em `tests/governance_audit/test_synth_waves_prompt.py` (58 linhas)**:
    - A função `test_deve_exigir_cwd_explicito_e_resolucao_token_sdk()` (linhas 39–49, correspondente à Regra 3 do prompt `synth-waves.prompt.md`) aceita caminho absoluto literal de máquina Windows nas linhas 43–44 como alternativa a `${workspaceFolder}`, além de não auditar a ausência de matches da regex R-044 no arquivo `.github/prompts/synth-waves.prompt.md`.
-   - *Nota de auditoria complementar sobre planos correlatos*: a inspeção de `docs/plans/implementation/20261116-120500-bugfix-synth-waves-timeout.md` (linhas 33, 110 e 121) e `docs/plans/bug-triage/20261116-120000-bugfix-synth-waves-timeout.md` (linha 39) confirmou que esses documentos contêm ocorrências literais do caminho de diretório de trabalho local da máquina (fora de `.github/**`, onde o hook `.githooks/pre-commit` L58 filtra apenas `^\.github/`, mas relevantes para higienização documental na Camada B).
+   - *Nota de auditoria complementar sobre planos correlatos*: a inspeção de `docs/plans/implementation/20261116-120500-bug-fix-synth-waves-timeout.md` (linhas 33, 110 e 121) e `docs/plans/bug-triage/20261116-120000-bug-fix-synth-waves-timeout.md` (linha 39) confirmou que esses documentos contêm ocorrências literais do caminho de diretório de trabalho local da máquina (fora de `.github/**`, onde o hook `.githooks/pre-commit` L58 filtra apenas `^\.github/`, mas relevantes para higienização documental na Camada B).
 3. **Lacuna de Paridade TB-34 em `tests/governance_audit/test_model_profiles_parity.py` (351 linhas)**:
    - O arquivo define `REPO_ROOT = Path(__file__).resolve().parents[2]` (linha 39), `PROFILES_PATH = REPO_ROOT / "model-profiles.yaml"` (linha 40), `AGENTS_DIR = REPO_ROOT / ".github" / "agents"` (linha 42) e `PROMPTS_DIR = REPO_ROOT / ".github" / "prompts"` (linha 43).
    - Embora `test_default_profile_parity_with_frontmatters()` (linhas 86–109) compare o modelo extraído via `collect_repo_frontmatter_files(REPO_ROOT)` contra o perfil `default` resolvido (`resolve_profile("default", profiles)` e `resolve_target_model(key, tier, resolved_default)`), não há asserção explícita sobre a linha bruta `model:` do frontmatter garantindo que: (a) nenhum arquivo `.github/agents/*.agent.md` ou `.github/prompts/*.prompt.md` contenha o sufixo de provedor `(copilot)` na chave `model:`; e (b) toda linha `model:` nos agents e prompts mapeados em `model-profiles.yaml` (`PROFILES_PATH`) esteja delimitada por aspas duplas (`model: "..."`) e coincida exatamente com o modelo resolvido do perfil `default`.

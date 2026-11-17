@@ -11,7 +11,6 @@ review_verdict: "PASS_WITH_NITS"
 review_tier1: "PASS"
 review_rounds: 1
 created_at: "2026-11-15T12:00:00Z"
-related-planning-doc: "N/A"
 rollback_plan: "git checkout -- .github/agents/agent-router.agent.md .github/agents/backend/database/database-router.agent.md .github/agents/backend/ejb/ejb-router.agent.md .github/agents/backend/python/python-router.agent.md .github/agents/backend/spring-boot/spring-boot-router.agent.md .github/agents/backend/spring-reactive/spring-reactive-router.agent.md .github/agents/backend/struts/struts-router.agent.md .github/agents/frontend/angular/angular-router.agent.md .github/agents/frontend/react/react-router.agent.md .github/agents/backend/database/database-arch-advisor.agent.md .github/agents/backend/ejb/ejb-arch-advisor.agent.md .github/agents/backend/python/python-arch-advisor.agent.md .github/agents/backend/spring-boot/spring-boot-arch-advisor.agent.md .github/agents/backend/spring-reactive/spring-reactive-arch-advisor.agent.md .github/agents/backend/struts/struts-arch-advisor.agent.md .github/agents/frontend/angular/angular-arch-advisor.agent.md .github/agents/frontend/react/react-arch-advisor.agent.md .github/agents/tech-solution-architect.agent.md .github/agents/agent-auditor.agent.md .github/agents/docs-engineer.agent.md .github/agents/governance-maintainer.agent.md .github/copilot-instructions.md .github/instructions/README.md .github/instructions/angular-v21-frontend.instructions.md .github/instructions/database.instructions.md .github/instructions/devops.instructions.md .github/instructions/python-backend.instructions.md .github/instructions/react-frontend.instructions.md .github/instructions/spring-boot-backend.instructions.md .github/skills/agent-contracts/SKILL.md .github/skills/agent-contracts/references/detailed-patterns-and-examples.md .github/skills/handoff-governance/SKILL.md .github/skills/handoff-governance/references/detailed-patterns-and-examples.md .github/skills/plan-conformance-patterns/SKILL.md .github/skills/plan-conformance-patterns/references/plan-frontmatter-r064.md .github/skills/plan-conformance-patterns/references/planner-preflight-checklist.md .github/skills/plan-conformance-patterns/references/pre-hitl-skeptical-review-rubric.md AGENTS.md README.md docs/README.md docs/adr/0011-mcp-server-java-framework-agnostico-langchain4j-agentic.md tests/context_insight_visualizer/test_agent_invocations.py tests/governance_audit/_embedded_runtime_common.py .github/agents/governance-factory.agent.md .github/skills/governance-factory-patterns/SKILL.md .github/skills/governance-factory-patterns/references/artifact-specs-and-stack-topology.md .github/agents/templates/agent-template.md .github/agents/templates/research-agent.md .github/agents/templates/router-agent.md .github/agents/feature-planner.agent.md .github/agents/refactor-planner.agent.md .github/agents/test-strategy.agent.md .github/agents/bug-triage.agent.md .github/agents/requirements-analyst.agent.md tests/governance_audit/test_agent_guardrails_regression.py tests/governance_audit/_helpers.py .github/agents/plan-critic.agent.md .github/agents/pr-gatekeeper.agent.md docs/plans/bug-triage/20261114-180000-correcao-falhas-github-actions-ci.md tests/governance_audit/test_local_project_isolation.py"
 allowed_files:
   - ".github/agents/agent-router.agent.md"
@@ -77,6 +76,20 @@ allowed_files:
 lessons_extracted: true
 lessons_applied_to: ["@agent-auditor", "plan-conformance-patterns"]
 lessons_at: "2026-11-16"
+related-planning-doc: "N/A"
+session_id: "sess-20261115-120000-workflow-governance-maintenance-arch-advisor"
+workflow_id: "WORKFLOW-GOVERNANCE-MAINTENANCE"
+workflow_trace_id: "wf-trace-20261115-120000-workflow-governance-maintenance-arch-advisor"
+parent_plan_ref: "N/A — plano raiz"
+critic_rubric_gaps: []
+critic_findings_summary:
+  rounds: 1
+  blockers: 0
+  majors: 0
+  minors: 0
+  nits: 0
+  last_verdict: "PASS_WITH_NITS"
+  author_ref: "@agent-auditor"
 ---
 
 # Plano de Manutencao de Governanca: Unificacao da Cadeia Pos-Plano dos Consultores Arquiteturais (R-064 + R-065)

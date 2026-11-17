@@ -7,11 +7,6 @@ author: "@agent-auditor"
 tier: "governance"
 created_at: "2026-11-16T14:10:00Z"
 updated_at: "2026-11-16T14:20:00Z"
-related-planning-doc: "docs/plans/governance/20261116-123000-governance-maintenance-plan-lessons-harvester.md"
-parent_plan_ref: "N/A — plano raiz"
-session_id: "sess-20261116-plan-lessons-harvester"
-workflow_id: "WORKFLOW-GOVERNANCE-MAINTENANCE"
-workflow_trace_id: "wt-20261116-plan-lessons-harvester-01"
 allowed_files:
   - ".github/skills/plan-conformance-patterns/references/planner-preflight-checklist.md"
   - ".github/skills/plan-conformance-patterns/SKILL.md"
@@ -25,6 +20,20 @@ rollback_plan: "git restore .github/skills/plan-conformance-patterns/references/
 lessons_extracted: true
 lessons_applied_to: []
 lessons_at: "2026-11-16"
+related-planning-doc: "N/A — plano raiz"
+session_id: "sess-20261116-plan-lessons-harvester"
+workflow_id: "WORKFLOW-GOVERNANCE-MAINTENANCE"
+workflow_trace_id: "wt-20261116-plan-lessons-harvester-01"
+parent_plan_ref: "N/A — plano raiz"
+critic_rubric_gaps: []
+critic_findings_summary:
+  rounds: 1
+  blockers: 0
+  majors: 0
+  minors: 0
+  nits: 0
+  last_verdict: "PASS"
+  author_ref: "@agent-auditor"
 ---
 
 # Plano de Manutenção de Governança — Sincronização do Invariante `C10` e Compactação de Tokens em `planner-preflight-checklist.md` (Rodada 2)

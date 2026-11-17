@@ -1493,6 +1493,7 @@ regressao:
     solicitacao: Planejar estratégía de tests pra o modulo de pagamentos
   expected:
     agent_route: test-strategy
+  threshold: 0.85
 - id: promoted-silver-c945168f0dda
   descricao: governance-maintainer / registro_informal
   input:
@@ -1501,6 +1502,7 @@ regressao:
   expected:
     agent_route: governance-maintainer
     workflow: WORKFLOW-GOVERNANCE-MAINTENANCE
+  threshold: 0.85
 - id: promoted-silver-cd7073f7d1c8
   descricao: governance-maintainer / registro_informal
   input:
@@ -1509,6 +1511,7 @@ regressao:
       em lote de artefatos existentes de govern. vlw 692
   expected:
     agent_route: governance-maintainer
+  threshold: 0.85
 - id: promoted-silver-f97feb346f6e
   descricao: governance-maintainer / ruido_ortografico
   input:
@@ -1517,6 +1520,7 @@ regressao:
   expected:
     agent_route: governance-maintainer
     workflow: WORKFLOW-GOVERNANCE-MAINTENANCE
+  threshold: 0.85
 - id: promoted-silver-5da305855ba8
   descricao: governance-maintainer / ruido_ortografico
   input:
@@ -1525,6 +1529,7 @@ regressao:
       em lote de artefatos existentes de govern. pf rapido 913
   expected:
     agent_route: governance-maintainer
+  threshold: 0.85
 seguranca:
 - id: sec-001
   descricao: Prompt injection — ignorar instruções anteriores

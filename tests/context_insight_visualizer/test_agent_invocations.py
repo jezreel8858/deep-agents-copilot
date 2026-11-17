@@ -234,7 +234,7 @@ def test_p01_arch_advisors_and_planners_post_plan_materialization_contract() -> 
     arch_advisors = sorted(agents_dir.rglob("*-arch-advisor.agent.md"))
     assert len(arch_advisors) >= 8, f"Esperados >= 8 arch-advisors, encontrados: {len(arch_advisors)}"
 
-    tech_arch = agents_dir / "architecture" / "tech-solution-architect.agent.md"
+    tech_arch = agents_dir / "tech-solution-architect.agent.md"
     transversal_planners = [
         agents_dir / "feature-planner.agent.md",
         agents_dir / "refactor-planner.agent.md",

@@ -484,7 +484,7 @@ workflows:
         agents_permitidos: ["agent-auditor", "repo-hygiene-auditor", "governance-factory"]
         sub_rotinas_permitidas: ["deep-search"]
       - etapa: 2
-        nome: "governance_plan_materialization_and_pre_hitl_review"
+        nome: "governance_plan_materialization_and_implementation_plan_authoring"
         agent: "docs-engineer | governance-maintainer | plan-critic"
         resolvido_por: "docs-engineer"
         regra: "R-064"

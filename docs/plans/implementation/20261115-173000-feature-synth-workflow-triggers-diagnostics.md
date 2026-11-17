@@ -6,8 +6,6 @@ plan_type: "implementation"
 created_at: "2026-11-15"
 revision: 1
 workflow: WORKFLOW-FEATURE-DEVELOPMENT
-related-planning-doc: "docs/plans/architecture/20261115-170000-synth-workflow-triggers-diagnostics.md"
-parent_plan_ref: "docs/plans/architecture/20261115-170000-synth-workflow-triggers-diagnostics.md"
 hitl_decision: "N1 → opção (a) estender WorkflowSpec (2026-11-15)"
 allowed_files:
   - "tools/headless-governance-runner/src/governance_runner/cli.py"
@@ -34,6 +32,20 @@ read_only_dependencies:
 lessons_extracted: true
 lessons_applied_to: ["@python-arch-advisor", "plan-conformance-patterns"]
 lessons_at: "2026-11-15"
+related-planning-doc: "docs/plans/architecture/20261115-170000-synth-workflow-triggers-diagnostics.md"
+session_id: "sess-20261115-170000-synth-workflow-triggers-diagnostics"
+workflow_id: "WORKFLOW-FEATURE-DEVELOPMENT"
+workflow_trace_id: "wf-trace-20261115-170000-synth-workflow-triggers-diagnostics"
+parent_plan_ref: "docs/plans/architecture/20261115-170000-synth-workflow-triggers-diagnostics.md"
+critic_rubric_gaps: []
+critic_findings_summary:
+  rounds: 1
+  blockers: 0
+  majors: 0
+  minors: 0
+  nits: 0
+  last_verdict: "PASS"
+  author_ref: "@python-arch-advisor"
 ---
 
 # Blueprint — Diagnóstico de Gatilhos de Workflows no CLI `synth` (rev. 2)

@@ -9,7 +9,6 @@ materialized_by: "@docs-engineer"
 created_at: "2026-11-15T12:00:00Z"
 updated_at: "2026-11-16T00:00:00Z"
 tier: "governance"
-related-planning-doc: "N/A — plano primário de governança"
 approved_by: "user_hitl"
 approved_at: "2026-11-16T00:00:00Z"
 review_verdict: "PASS_WITH_NITS"
@@ -36,6 +35,20 @@ allowed_files:
 lessons_extracted: true
 lessons_applied_to: ["@agent-auditor", "plan-conformance-patterns"]
 lessons_at: "2026-11-16"
+related-planning-doc: "N/A — plano primário de governança"
+session_id: "sess-20261115-120000-workflows-parity-remediation"
+workflow_id: "WORKFLOW-GOVERNANCE-MAINTENANCE"
+workflow_trace_id: "wf-trace-20261115-120000-workflows-parity-remediation"
+parent_plan_ref: "N/A — plano raiz"
+critic_rubric_gaps: []
+critic_findings_summary:
+  rounds: 3
+  blockers: 0
+  majors: 0
+  minors: 0
+  nits: 0
+  last_verdict: "PASS_WITH_NITS"
+  author_ref: "@agent-auditor"
 ---
 
 # Plano de Governança: Remediação de Paridade de Workflows, Gates R-064/R-065 e Sincronia com Routing Graph

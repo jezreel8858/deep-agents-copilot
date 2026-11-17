@@ -8,9 +8,6 @@ review_rounds: 2
 reviewer: "@plan-critic"
 review_tier1: PASS
 review_verdict: PASS_WITH_NITS
-related-planning-doc: "docs/plans/architecture/20261115-100000-synth-routing-eval-sqlite.md"
-workflow_id: "WORKFLOW-FEATURE-DEVELOPMENT"
-parent_plan_ref: "docs/plans/architecture/20261115-100000-synth-routing-eval-sqlite.md"
 allowed_files:
   - "tools/headless-governance-runner/src/governance_runner/synth/**"
   - "tools/headless-governance-runner/src/governance_runner/cli.py"
@@ -27,6 +24,20 @@ read_only_files:
 lessons_extracted: true
 lessons_applied_to: ["@tech-solution-architect", "plan-conformance-patterns"]
 lessons_at: "2026-11-15"
+related-planning-doc: "docs/plans/architecture/20261115-100000-synth-routing-eval-sqlite.md"
+session_id: "sess-20261115-100000-synth-routing-eval-sqlite"
+workflow_id: "WORKFLOW-FEATURE-DEVELOPMENT"
+workflow_trace_id: "trace-20261115-100000-synth-routing-eval-sqlite"
+parent_plan_ref: "docs/plans/architecture/20261115-100000-synth-routing-eval-sqlite.md"
+critic_rubric_gaps: []
+critic_findings_summary:
+  rounds: 2
+  blockers: 0
+  majors: 0
+  minors: 0
+  nits: 0
+  last_verdict: "PASS_WITH_NITS"
+  author_ref: "@tech-solution-architect"
 ---
 
 # Blueprint Técnico (Delta) — Integração do `routing-graph.yaml` ao Pipeline `synth` (Geração + Diagnóstico de Assertividade)

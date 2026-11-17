@@ -7,8 +7,7 @@ plan_type: "implementation"
 created_at: "2026-11-16T12:05:00Z"
 workflow: WORKFLOW-BUG-FIX
 tier: light
-related-planning-doc: docs/plans/bug-triage/20261116-120000-bugfix-synth-waves-timeout.md
-plan_ref: docs/plans/implementation/20261116-120500-bugfix-synth-waves-timeout.md
+plan_ref: docs/plans/implementation/20261116-120500-bug-fix-synth-waves-timeout.md
 rollback_plan: "git checkout -- tools/headless-governance-runner/src/governance_runner/synth/storage.py tools/headless-governance-runner/tests/synth_unit/test_storage.py .github/prompts/synth-waves.prompt.md && git clean -f tests/governance_audit/test_synth_waves_prompt.py"
 allowed_files:
   - tools/headless-governance-runner/src/governance_runner/synth/storage.py
@@ -19,6 +18,20 @@ progress: 100
 lessons_extracted: true
 lessons_applied_to: ["plan-conformance-patterns"]
 lessons_at: "2026-11-16"
+related-planning-doc: "docs/plans/bug-triage/20261116-120000-bug-fix-synth-waves-timeout.md"
+session_id: "sess-20261116-120000-bug-fix-synth-waves-timeout"
+workflow_id: "WORKFLOW-BUG-FIX"
+workflow_trace_id: "wf-trace-20261116-120000-bug-fix-synth-waves-timeout"
+parent_plan_ref: "docs/plans/bug-triage/20261116-120000-bug-fix-synth-waves-timeout.md"
+critic_rubric_gaps: []
+critic_findings_summary:
+  rounds: 1
+  blockers: 0
+  majors: 0
+  minors: 0
+  nits: 0
+  last_verdict: "PASS"
+  author_ref: "@python-arch-advisor"
 ---
 
 # Plano de Implementação Técnica — Correção de Timeout, Concorrência SQLite e Reconciliação de Runs Órfãos em `/synth-waves`
@@ -27,7 +40,7 @@ Progresso: 6/6 tarefas concluídas
 
 ## 1. Contexto e Objetivo
 
-Este plano de implementação técnica materializa a correção da causa raiz diagnosticada em `docs/plans/bug-triage/20261116-120000-bugfix-synth-waves-timeout.md` para o comando `/synth-waves`:
+Este plano de implementação técnica materializa a correção da causa raiz diagnosticada em `docs/plans/bug-triage/20261116-120000-bug-fix-synth-waves-timeout.md` para o comando `/synth-waves`:
 
 1. **Concorrência SQLite e Resiliência em `SynthRepository` (`storage.py`)**: Observa-se que `storage.py:154-155` (`migrar_conexao`) já define `PRAGMA foreign_keys = ON;` e `PRAGMA journal_mode = WAL;`. O que é **novo** em `storage.py` é:
    - (a) `timeout=30.0` em `sqlite3.connect(str(resolved), timeout=30.0)` em `SynthRepository.__init__` (`storage.py:331`); e
@@ -106,7 +119,7 @@ Comportamento determinístico sobre registros de `synth_runs` com `status = 'run
 
 ### 3.3. Protocolo Resiliente em `.github/prompts/synth-waves.prompt.md` e Contrato de `tests/governance_audit/test_synth_waves_prompt.py`
 
-O arquivo `.github/prompts/synth-waves.prompt.md` será atualizado e validado pelo novo teste `tests/governance_audit/test_synth_waves_prompt.py` quanto às **5 regras determinísticas** alinhadas ao plano pai (`docs/plans/bug-triage/20261116-120000-bugfix-synth-waves-timeout.md`):
+O arquivo `.github/prompts/synth-waves.prompt.md` será atualizado e validado pelo novo teste `tests/governance_audit/test_synth_waves_prompt.py` quanto às **5 regras determinísticas** alinhadas ao plano pai (`docs/plans/bug-triage/20261116-120000-bug-fix-synth-waves-timeout.md`):
 
 1. **Regra 1**: Frontmatter `tools:` não contém `run_in_terminal`;
 2. **Regra 2**: Corpo documenta particionamento incremental com `--pending` e `--limit 3` (e menção a `background: true`);

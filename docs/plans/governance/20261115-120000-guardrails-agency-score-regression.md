@@ -6,7 +6,6 @@ author: "@agent-auditor"
 plan_type: governance
 workflow: WORKFLOW-GOVERNANCE-MAINTENANCE
 created_at: "2026-11-15T12:00:00Z"
-related-planning-doc: "N/A"
 review_verdict: PASS
 review_rounds: 2
 reviewer: "@plan-critic"
@@ -29,6 +28,20 @@ rollback_plan:
 lessons_extracted: true
 lessons_applied_to: ["@agent-auditor", "plan-conformance-patterns"]
 lessons_at: "2026-11-16"
+related-planning-doc: "N/A"
+session_id: "sess-20261115-120000-guardrails-agency-score-regression"
+workflow_id: "WORKFLOW-GOVERNANCE-MAINTENANCE"
+workflow_trace_id: "wf-trace-20261115-120000-guardrails-agency-score-regression"
+parent_plan_ref: "N/A — plano raiz"
+critic_rubric_gaps: []
+critic_findings_summary:
+  rounds: 2
+  blockers: 0
+  majors: 0
+  minors: 0
+  nits: 0
+  last_verdict: "PASS"
+  author_ref: "@agent-auditor"
 ---
 
 # Plano de Governança: Consolidação de Guardrails Proporcionais por Agency Score (0-3) e Suíte Regressiva Two-Tier (OWASP ASI 2026)

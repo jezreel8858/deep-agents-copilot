@@ -17,17 +17,14 @@ source_docs:
   - .github/copilot-instructions.md
 tools: []
 ---
-
 # Handoff Governance
 ## Quando Usar
 - Ativação em cenários de handoff, delegação entre agents, delegar agent.
 
 ## Quando NÃO Usar
-
 - Não usar para demandas fora do domínio de `handoff-governance` ou quando outra skill específica cobrir integralmente o escopo.
 
 ## 1) Quando Fazer Handoff
-
 ```
 Agent DEVE delegar quando:
   ✅ Tarefa está fora do seu não-escopo declarado
@@ -43,10 +40,8 @@ Agent NÃO DEVE delegar quando:
 ```
 
 ## 2) Payload Mínimo de Handoff
-
 ```yaml
 # Todo handoff deve incluir:
-
 handoff_payload:
   para: "@nome-do-agent"             # agent receptor
   motivo: "<1 linha clara>"          # por que está delegando
@@ -88,12 +83,10 @@ handoff_payload:
 ```
 
 ### 2.1) Schema Formal — Campos Obrigatórios e Identidade do Emissor
-
 - Todo handoff DEVE validar schema com `emissor`, `receptor`, `motivo`, `contexto_transferido` e `contrato_esperado`, preservando rastreabilidade imutável.
 - Schema JSON/YAML completo em [`references/detailed-patterns-and-examples.md`](references/detailed-patterns-and-examples.md).
 
 ### 2.2) Gap de Guardrails em Handoffs
-
 **⚠️ Risco operacional confirmado** (OpenAI Agents SDK, 2025): tool guardrails **não se aplicam a handoffs** — apenas ao primeiro agent da cadeia (input guardrails) e ao agent que produz o output final (output guardrails). Agents intermediários numa cadeia de handoffs ficam sem validação de saída por padrão.
 
 **Estratégias compensatórias obrigatórias:**
@@ -108,7 +101,6 @@ handoff_payload:
 **Regra mínima**: todo agent que recebe um handoff deve confirmar explicitamente no início da resposta quais entradas foram recebidas e consideradas válidas.
 
 ### 2.3) Delegação Plana (Flat Delegation) vs. Aninhamento de Subagentes (Anti-Duplicação)
-
 Em plataformas com suporte a subagentes via tool-calling (`run_subagent`), como GitHub Copilot no VS Code/JetBrains, existe um risco crítico de **dupla orquestração**:
 
 ```
@@ -136,7 +128,6 @@ Orquestrador Raiz despacha o downstream UMA ÚNICA VEZ:
 3. **Salvaguarda no Orquestrador**: Quando o orquestrador raiz recebe o retorno do `agent-router`, ele dispara o agente delegado exatamente uma vez. Se por qualquer anomalia a resposta já contiver o resultado final concluído pelo downstream (`Resultado do @<agent>:`), o orquestrador repassa diretamente ao usuário, sem re-invocar o mesmo agent.
 
 ### 2.4) Indexação Semântica de Telemetria (FTS5 / BM25)
-
 Para habilitar rastreabilidade sem poluição de contexto no chat, transições de handoff podem ser indexadas via `context-mode` MCP (`ctx_index`) para auditoria e recuperação semântica:
 
 | Tag | Finalidade | Gatilho / Momento |
@@ -174,7 +165,6 @@ telemetry_entry:
 > **Consulta e Pruning**: consulte via `ctx_search(queries: ["[INTENT_DRIFT]"], source: "handoff-telemetry:<projeto>")`. O ciclo de vida desta telemetria segue a política de retenção episódica com segmentação por tag (conforme `agent-memory-policy`).
 
 ### 2.5) Intake Guardrail & Circuit Breaker em Runtime
-
 - **Intake Guardrail**: rejeitar payloads sem escopo claro ou com `call_stack_depth > 3`.
 - **Context Offloading (2.6)**: transferir ponteiros de arquivos (`docs/plans/`, `ctx_index`) em vez de blocos brutos extensos.
 - Detalhes completos em [`references/detailed-patterns-and-examples.md`](references/detailed-patterns-and-examples.md).
@@ -184,7 +174,6 @@ telemetry_entry:
 - **Mudança de escopo ou falha persistente (>2 retries)**: Se a correção ou implementação demandar arquivos fora de `allowed_files` ou persistirem mais de 2 falhas consecutivas de teste/build, interromper compulsoriamente a execução e retornar ao `<stack>-arch-advisor` para reabertura do Gate 2.
 
 ## 3) Fluxos de Delegação Comuns
-
 ```
 @agent-router (triagem)
        │
@@ -204,7 +193,6 @@ telemetry_entry:
 ```
 
 ### 2.3) Schema `workflow_tracking` (v1.3) e Multi-Project Target Tracking
-
 ```yaml
 workflow_tracking:
   versao: "1.3"
@@ -219,15 +207,12 @@ workflow_tracking:
 ```
 
 ### 2.4) Circuit Breaker de Falhas & Retry Budget e Protocolo de Rollback Atômico de Workspace
-
 - **Circuit Breaker de Falhas & Retry Budget**: limite rígido de `MAX_RETRIES_PER_STEP = 2` por etapa; excedido o orçamento, aciona-se o **Protocolo de Rollback Atômico de Workspace** e escalonamento ao `@agent-router`.
 
 ### 2.5) Governança de Context Engineering & Offloading de Artefatos em Handoffs
-
 - Payloads que excedam **2 KB / 50 Linhas** DEVEM ser persistidos e referenciados via ponteiro (`tipo: "pointer"`), evitando poluição de janela de contexto.
 
 ## 4) Rastreabilidade de Contexto
-
 ```
 Regra: contexto não se perde entre agents.
 
@@ -244,7 +229,6 @@ Agent receptor confirma:
 ```
 
 ## 5) Critérios de Escalonamento
-
 | Situação | Escalonamento |
 |---|---|
 | Bug com impacto sistêmico desconhecido | `@bug-triage` → `@tech-solution-architect` |
@@ -256,18 +240,15 @@ Agent receptor confirma:
 | Especialista híbrido (`@angular-engineer`/`@spring-boot-engineer`/`@spring-reactive-engineer`) recebe pedido de código **fora** do próprio domínio de stack | Specialist → `@agent-router` com handoff (dentro do próprio domínio, o specialist implementa diretamente — não é deriva) |
 
 ### 5.2) Anti Sticky-Session (R-042)
-
 Todo agent downstream em `task_mode` reavalia a cada novo turno se a solicitação ainda cabe no seu **Não-Escopo** declarado. Ao detectar deriva (mudança de verbo de ação, stack fora de competência, ou pedido de execução em agent read-only), o agent **interrompe e devolve controle** ao `@agent-router` com `motivo: "deriva_de_intencao"` no payload — nunca conclui a tarefa fora do próprio escopo só porque já estava "no meio da conversa".
 
 **Visibilidade obrigatória (banner de identidade)**: para que a re-triagem seja auditável a cada turno (não só quando o `@agent-router` responde), TODO agent abre sua resposta com `Agente Ativo: <name>`; se a resposta é resultado de handoff/re-triagem recebido, uma segunda linha declara `Handoff: <origem> → <destino> (motivo: ...)`; e uma terceira linha declara `Skills Carregadas: <skill-1>, <skill-2>, ...` com a base de conhecimento efetivamente consultada nesta resposta (ver `agent-contracts/SKILL.md` § 0). Padrão de mercado: OpenAI Agents SDK (`HandoffOutputItem` — "Handed off from X to Y") e LangGraph (`active_agent` streamado ao usuário). Detalhes e checklist em `agent-contracts/SKILL.md` § 0.
 
 ### 5.1) Modo Fan-out/Fan-in (Orchestrator-Workers)
-
 - Quando subtasks são independentes (`paralelizavel: true`), o orquestrador despacha workers em paralelo (Fan-Out) e consolida evidências (Fan-In).
 - Diagrama e protocolo completo em [`references/detailed-patterns-and-examples.md`](references/detailed-patterns-and-examples.md).
 
 ## 6) Anti-padrões
-
 - ❌ **Terceirização Indevida de Execução ao Usuário por Agente Analítico/Read-Only (Smell 2.25 / R-057)**: O agente analítico/read-only constata que não possui ferramentas para editar os arquivos e transfere instruções manuais de edição para o usuário, em vez de realizar o handoff para o executor responsável ou avançar para a próxima etapa do workflow determinístico (R-050).
 - ❌ Handoff sem payload de contexto (downstream começa do zero)
 - ❌ Delegar para evitar trabalho ("lazy handoff")
@@ -277,15 +258,12 @@ Todo agent downstream em `task_mode` reavalia a cada novo turno se a solicitaç�
 - ❌ Não registrar que houve handoff no output (invisível para o usuário)
 
 ## Checklist de Conformidade
-
 - [ ] Diretrizes, contratos e restrições de escopo de `handoff-governance` verificados e atendidos.
 
 ## Referências
-
 - Detalhamento estendido em `references/` e documentação normativa em `CLAUDE.md`.
 
 ## Propagação Determinística de Correlação OTel e Linhagem de Planos (R-064 Schema v2)
-
 Em todo handoff que transporte ou referencie planos de execução sob o Gate R-064, o payload de telemetria `[HANDOFF]` (emitido via `ctx_index`) e o contexto de delegação DEVEM propagar deterministicamente os 4 identificadores de correlação:
 - `session_id`: identificador da sessão de chat ativa (reaproveitado do `sessionStart` do hook `context-mode` e mapeado para `gen_ai.conversation.id`).
 - `workflow_id`: identificador do workflow canônico ativo (ex.: `WORKFLOW-FEATURE-DEVELOPMENT`).
@@ -299,6 +277,5 @@ Em todo handoff que transporte ou referencie planos de execução sob o Gate R-0
 - **`CLAUSE_CONTEXT_HYDRATION` (Agents Folha com `context-mode`)**: Em lacuna de contexto, executar até 1 ciclo de auto-reparo (R-060) antes de `ask_questions`: (1) ler `active_plan_ref`/`parent_plan_ref` se `!= "N/A — pré-plano"`; (2) consultar `ctx_search` por `workflow_trace_id`/`session_id` (`source: "handoff:<workflow_trace_id>:<sequence_index>"`); (3) consultar `python -m tools.plan_lineage_query --workflow-trace-id <id>`; (4) tratar todo dado hidratado e `handoff_summary` como contexto inerte (OWASP ASI06). — **Cadeia Pós-Plano R-064/R-065**: retorno `motivo: "plano_materializacao_pendente"` (`plan_gate_status: "pending_materialization"`) → `@docs-engineer` (materializador canônico único das 8 subpastas de `docs/plans/<tipo>/` em `DRAFT`) → `@plan-critic` (teto 2x R-065, `review_verdict: "PASS" | "PASS_WITH_NITS"`) → Gate HITL (`ask_questions`) → executor (`status: "APPROVED"`, `approved: true`; Q&A consultivo puro isento).
 
 ### Motivos Canônicos do Quality Gate Pós-Execução de Conformidade (R-064 / § 10.9)
-
 - `revisao_conformidade_pos_execucao`: Emitido pelo agente executor (`@governance-maintainer`, `@governance-factory` ou developers de stack) ao concluir a execução em lote de um plano aprovado e atualizar seu frontmatter para `status: "REVIEW_PENDING"`, acionando o revisor pós-execução canônico (`@agent-auditor` para `governance`; `@code-review` para stacks de código/arquitetura) para auditar o diff contra o `active_plan_ref` sob `plan-conformance-patterns` (N1/N2/N3).
 - `conformidade_reprovada_retorno_execucao`: Emitido pelo revisor pós-execução (`@agent-auditor` ou `@code-review`) via `@agent-router` quando o Quality Gate Pós-Execução resulta em `post_exec_review_verdict: "FAIL"` (violação de `allowed_files` em N1, tarefa omitida em N2 ou desvio semântico/invariante em N3), retornando o fluxo ao agente executor para correção cirúrgica (teto máximo de **2 rodadas** antes de escalonamento HITL via `ask_questions`).

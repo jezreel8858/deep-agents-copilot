@@ -10,11 +10,6 @@ gate2_status: approved
 author: "@governance-factory"
 plan_type: "governance"
 created_at: "2026-11-15"
-related-planning-doc: "docs/guides/synth-routing-eval-copilot-sdk-guide.md"
-session_id: "sess-20261115-183000-synth-waves-prompt"
-workflow_id: "WORKFLOW-GOVERNANCE-MAINTENANCE"
-workflow_trace_id: "wf-20261115-183000-synth-waves-prompt"
-parent_plan_ref: "N/A — plano raiz"
 allowed_files:
   - "tests/governance_audit/test_template_sections.py"
   - "docs/plans/governance/20261115-183000-synth-waves-prompt.md"
@@ -26,6 +21,20 @@ allowed_files:
 lessons_extracted: true
 lessons_applied_to: ["@governance-factory", "plan-conformance-patterns"]
 lessons_at: "2026-11-15"
+related-planning-doc: "docs/guides/synth-routing-eval-copilot-sdk-guide.md"
+session_id: "sess-20261115-183000-synth-waves-prompt"
+workflow_id: "WORKFLOW-GOVERNANCE-MAINTENANCE"
+workflow_trace_id: "wf-20261115-183000-synth-waves-prompt"
+parent_plan_ref: "N/A — plano raiz"
+critic_rubric_gaps: []
+critic_findings_summary:
+  rounds: 2
+  blockers: 0
+  majors: 0
+  minors: 0
+  nits: 0
+  last_verdict: "PASS_WITH_NITS"
+  author_ref: "@governance-factory"
 ---
 
 # Plano de Governança — Slash Prompt /synth-waves (Ciclo Prata em 3 Ondas, Zero-Touch)

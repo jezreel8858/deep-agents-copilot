@@ -5,8 +5,6 @@ author: "@agent-auditor"
 plan_type: "governance"
 created_at: "2026-11-16"
 intencao_plano: "hibrido"
-workflow_trace_id: "trace-20261116-gov-qg-gap"
-related-planning-doc: "N/A — plano raiz"
 allowed_files:
   - ".github/agents/workflows.md"
   - ".github/agents/workflows/workflow-governance-maintenance.md"
@@ -25,9 +23,6 @@ allowed_files:
   - ".github/agents/code-review.agent.md"
   - ".github/agents/governance-maintainer.agent.md"
   - ".github/agents/agent-router.agent.md"
-session_id: "sess-20261116-gov-qg-gap"
-workflow_id: "WORKFLOW-GOVERNANCE-MAINTENANCE"
-parent_plan_ref: "N/A — plano raiz"
 review_verdict: "ESCALATED_HITL"
 review_rounds: 2
 reviewer: "@plan-critic"
@@ -37,6 +32,20 @@ post_exec_reviewed_at: "2026-11-16"
 lessons_extracted: true
 lessons_applied_to: ["plan-conformance-patterns"]
 lessons_at: "2026-11-16"
+related-planning-doc: "N/A — plano raiz"
+session_id: "sess-20261116-gov-qg-gap"
+workflow_id: "WORKFLOW-GOVERNANCE-MAINTENANCE"
+workflow_trace_id: "trace-20261116-gov-qg-gap"
+parent_plan_ref: "N/A — plano raiz"
+critic_rubric_gaps: []
+critic_findings_summary:
+  rounds: 2
+  blockers: 0
+  majors: 0
+  minors: 0
+  nits: 0
+  last_verdict: "ESCALATED_HITL"
+  author_ref: "@agent-auditor"
 ---
 
 # Plano de Manutenção de Governança — Quality Gate Pós-Execução de Conformidade com o Plano (R-064)
@@ -103,7 +112,7 @@ Por respeito estrito à fronteira de escrita do `@governance-maintainer` (restri
 
 ## 3. Plano de Correção em Lote (Plan-Then-Batch)
 
-[GOVERNANCE_TASKS]
+`[GOVERNANCE_TASKS]`
 
 - [x] **T-01 (E4 — Desambiguação de Numeração L426/L460 e Gate Pós-Execução em `invariantes-e-protocolos.md`)**: Editar `.github/agents/workflows/invariantes-e-protocolos.md` (L426–510) com precisão cirúrgica validada contra `tests/governance_audit/test_workflows_parity_and_gates.py` (L5, L54, L65–L67) e `.github/skills/governance-factory-patterns/references/workflow-invariants.md` (W-03):
   1. **Manter `### 10.7` para o Gate do `@plan-critic`**: Preservar o título e a numeração de `### 10.7 Quality Gate Universal de Revisão Cética Pré-HITL (@plan-critic / ADR-0014)` (atualmente na L460), garantindo 100% de compatibilidade retroativa com as referências cruzadas a `§ 10.7` nos 6 sub-arquivos `workflow-*.md`, em `workflow-invariants.md` (W-03) e no assert de `test_workflows_parity_and_gates.py:65`.
@@ -163,7 +172,7 @@ Por respeito estrito à fronteira de escrita do `@governance-maintainer` (restri
 - **Análise de Escape (Por que os sensores atuais não detectaram)**: Os sensores existentes em `tests/governance_audit/test_workflow_invariants.py` (invariantes W-01 a W-08), `tests/governance_audit/test_workflows_parity_and_gates.py` e `tests/governance_audit/test_r064_plan_gate.py` validavam exclusivamente a cadeia pré-HITL (`@docs-engineer` -> `@plan-critic` -> HITL) e a estrutura estática de cabeçalhos de workflows. Nenhum teste automatizado em `tests/governance_audit/` verificava a existência do contrato de revisão de conformidade pós-execução (*diff vs. plano* N1/N2/N3) nos sub-arquivos `workflow-*.md` ou a unicidade de numeração das subseções `### 10.x` dentro de `.github/agents/workflows/invariantes-e-protocolos.md`.
 - **Contenção Imediata vs. Neutralização na Fonte**:
   - **Contenção Imediata (Sintoma Local)**: Atualização direta da Etapa 5 em `.github/agents/workflows/workflow-governance-maintenance.md` (T-02) e da restrição de retorno em `.github/agents/governance-maintainer.agent.md` (T-05), impedindo o encerramento sem auditoria pós-execução do `@agent-auditor`.
-  - **Neutralização na Fonte (Prevenção Sistêmica)**: (1) Formalização da invariante global `### 10.9 Quality Gate Universal Pós-Execução de Conformidade com o Plano (R-064)` e saneamento de `### 10.7` (L460) / `### 10.8` (L426) em `invariantes-e-protocolos.md` [T-01]; (2) Atualização do catálogo de invariantes de fábrica `.github/skills/governance-factory-patterns/references/workflow-invariants.md` com a invariante pós-execução para impedir que novos workflows nasçam com o mesmo gap [T-06 / Q2]; (3) Atualização dos templates canônicos `plan-frontmatter-r064.md` e `plan-template-governance.md` [T-03 / Q2]; e (4) Criação do sensor determinístico `tests/governance_audit/test_post_execution_conformance_gate.py` [Q3] para bloquear regressões futuras.
+  - **Neutralização na Fonte (Prevenção Sistêmica)**: (1) Formalização da invariante global `### 10.9 Quality Gate Universal Pós-Execução de Conformidade com o Plano (R-064)` e saneamento de `### 10.7` (L460) / `### 10.8` (L426) em `invariantes-e-protocolos.md` `[T-01]`; (2) Atualização do catálogo de invariantes de fábrica `.github/skills/governance-factory-patterns/references/workflow-invariants.md` com a invariante pós-execução para impedir que novos workflows nasçam com o mesmo gap `[T-06 / Q2]`; (3) Atualização dos templates canônicos `plan-frontmatter-r064.md` e `plan-template-governance.md` `[T-03 / Q2]`; e (4) Criação do sensor determinístico `tests/governance_audit/test_post_execution_conformance_gate.py` `[Q3]` para bloquear regressões futuras.
 
 ### 5.2. Q1 — Varredura de Artefatos Irmãos (Peers)
 

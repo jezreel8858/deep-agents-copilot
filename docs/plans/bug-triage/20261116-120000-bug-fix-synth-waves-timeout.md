@@ -6,7 +6,6 @@ materialized_by: "@docs-engineer"
 plan_type: "bug-triage"
 workflow: "WORKFLOW-BUG-FIX"
 created_at: "2026-11-16T12:00:00Z"
-related-planning-doc: "N/A — plano raiz"
 allowed_files:
   - .github/prompts/synth-waves.prompt.md
   - tools/headless-governance-runner/src/governance_runner/synth/storage.py
@@ -15,6 +14,20 @@ allowed_files:
 lessons_extracted: true
 lessons_applied_to: ["plan-conformance-patterns"]
 lessons_at: "2026-11-16"
+related-planning-doc: "N/A — plano raiz"
+session_id: "sess-20261116-120000-bug-fix-synth-waves-timeout"
+workflow_id: "WORKFLOW-BUG-FIX"
+workflow_trace_id: "wf-trace-20261116-120000-bug-fix-synth-waves-timeout"
+parent_plan_ref: "N/A — plano raiz"
+critic_rubric_gaps: []
+critic_findings_summary:
+  rounds: 1
+  blockers: 0
+  majors: 0
+  minors: 0
+  nits: 0
+  last_verdict: "PASS"
+  author_ref: "@bug-triage"
 ---
 
 # Plano de Triagem e Correção de Bug: Timeout no `/synth-waves` via `ctx_execute`
@@ -143,7 +156,7 @@ git checkout -- .github/prompts/synth-waves.prompt.md tools/headless-governance-
 
 ## 7. Critérios de Aceitação Verificáveis
 
-- [ ] **CA-01 (Frontmatter & R-064)**: Plano materializado em `docs/plans/bug-triage/20261116-120000-bugfix-synth-waves-timeout.md` com `status: DRAFT`, `approved: false`, `author: "@bug-triage"`, `materialized_by: "@docs-engineer"` e `allowed_files` restrito aos 4 arquivos mapeados.
+- [ ] **CA-01 (Frontmatter & R-064)**: Plano materializado em `docs/plans/bug-triage/20261116-120000-bug-fix-synth-waves-timeout.md` com `status: DRAFT`, `approved: false`, `author: "@bug-triage"`, `materialized_by: "@docs-engineer"` e `allowed_files` restrito aos 4 arquivos mapeados.
 - [ ] **CA-02 (Governança de Terminal R-008/R-049/R-056)**: `.github/prompts/synth-waves.prompt.md` permanece sem `run_in_terminal` e passa 100% em `tests/governance_audit/test_governance_smells.py` e `tests/governance_audit/test_synth_waves_prompt.py`.
 - [ ] **CA-03 (Mitigação do Timeout de 60s do Cliente MCP)**: Onda 2 (`synth-eval`) documentada e configurada para operar com `--pending --limit 3` e/ou `background: true` em `ctx_execute`, com `cwd` explícito e `COPILOT_SDK_TOKEN` resolvido, mantendo cada chamada síncrona abaixo de 60s.
 - [ ] **CA-04 (Resiliência SQLite)**: `storage.py` aplica `timeout=30.0`, `PRAGMA journal_mode=WAL` e `PRAGMA busy_timeout=30000` em todas as conexões e reconcilia runs órfãos com `status='running'`, validado por `tools/headless-governance-runner/tests/synth_unit/test_storage.py`.

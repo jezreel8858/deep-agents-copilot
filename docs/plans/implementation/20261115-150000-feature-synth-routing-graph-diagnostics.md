@@ -4,9 +4,7 @@ approved: true
 author: "@python-arch-advisor"
 plan_type: "implementation"
 created_at: "2026-11-15T15:00:00Z"
-workflow_id: "WORKFLOW-FEATURE-DEVELOPMENT"
 tier: full
-related-planning-doc: "docs/plans/architecture/20261115-140000-synth-routing-graph-diagnostics.md"
 plan_ref: docs/plans/implementation/20261115-150000-feature-synth-routing-graph-diagnostics.md
 allowed_files:
   - "tools/headless-governance-runner/src/governance_runner/synth/**"
@@ -29,6 +27,20 @@ review_verdict: PASS_WITH_NITS
 lessons_extracted: true
 lessons_applied_to: ["@python-arch-advisor", "plan-conformance-patterns"]
 lessons_at: "2026-11-15"
+related-planning-doc: "docs/plans/architecture/20261115-140000-synth-routing-graph-diagnostics.md"
+session_id: "sess-20261115-100000-synth-routing-eval-sqlite"
+workflow_id: "WORKFLOW-FEATURE-DEVELOPMENT"
+workflow_trace_id: "trace-20261115-100000-synth-routing-eval-sqlite"
+parent_plan_ref: "docs/plans/architecture/20261115-140000-synth-routing-graph-diagnostics.md"
+critic_rubric_gaps: []
+critic_findings_summary:
+  rounds: 2
+  blockers: 0
+  majors: 0
+  minors: 0
+  nits: 0
+  last_verdict: "PASS_WITH_NITS"
+  author_ref: "@python-arch-advisor"
 ---
 
 Progresso: 8/11 tarefas concluídas

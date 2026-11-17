@@ -9,8 +9,6 @@ plan_type: "implementation"
 created_at: "2026-11-16"
 date: "2026-11-16"
 workflow: "WORKFLOW-GOVERNANCE-MAINTENANCE"
-related-planning-doc: "docs/plans/governance/20261116-120000-governance-maintenance-rca-upstream-origin-escape.md"
-parent_plan_ref: "docs/plans/governance/20261116-120000-governance-maintenance-rca-upstream-origin-escape.md"
 plan_ref: "docs/plans/implementation/20261116-130000-governance-maintenance-test-upstream-rca-gate.md"
 reversibility: "T1"
 rollback_plan: "git --no-pager revert HEAD && pytest tests/governance_audit/ -q"
@@ -21,6 +19,16 @@ reviewer: "@plan-critic"
 reviewed_at: "2026-11-16"
 critic_round: 2
 critic_Agent: "@plan-critic"
+allowed_files:
+  - "tests/governance_audit/test_upstream_rca_gate.py"
+lessons_extracted: true
+lessons_applied_to: ["plan-conformance-patterns"]
+lessons_at: "2026-11-16"
+related-planning-doc: "docs/plans/governance/20261116-120000-governance-maintenance-rca-upstream-origin-escape.md"
+session_id: "sess-20261116-rca-upstream"
+workflow_id: "WORKFLOW-GOVERNANCE-MAINTENANCE"
+workflow_trace_id: "wf-trace-20261116-000001"
+parent_plan_ref: "docs/plans/governance/20261116-120000-governance-maintenance-rca-upstream-origin-escape.md"
 critic_rubric_gaps: []
 critic_findings_summary:
   rounds: 2
@@ -30,11 +38,6 @@ critic_findings_summary:
   nits: 2
   last_verdict: "PASS_WITH_NITS"
   author_ref: "@python-arch-advisor"
-allowed_files:
-  - "tests/governance_audit/test_upstream_rca_gate.py"
-lessons_extracted: true
-lessons_applied_to: ["plan-conformance-patterns"]
-lessons_at: "2026-11-16"
 ---
 
 # Plano de Implementação Técnica (Onda 2 — T9 / Q3): Suíte Automatizada `test_upstream_rca_gate.py` (R-065)

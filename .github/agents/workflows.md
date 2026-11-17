@@ -59,7 +59,7 @@ Para evitar sobreposição e ambiguidade operacional, o ecossistema distingue ri
 
 ```mermaid
 flowchart TD
-    Gen["<b>1. Gerador Original</b><br/>(specialist-dev, planner, maintainer, etc.)<br/>Submete artefato gerado/alterado"] --> Eval["<b>2. Avaliador Cético Independente (§ 1.4)</b><br/>(@code-review, @security-reviewer, etc.)<br/>Avaliação objetiva via rubrica com threshold"]
+    Gen["<b>1. Gerador Original</b><br/>(specialist-dev, planner, maintainer, etc.)<br/>Submete artefato gerado/alterado"] --> Eval["<b>2. Avaliador Cético Independente (§ 1.4)</b><br/>(@plan-critic, @code-review, @security-reviewer, etc.)<br/>Avaliação objetiva via rubrica com threshold"]
 
     Eval --> CheckVerdict{"Veredito da<br/>Rubrica"}
 

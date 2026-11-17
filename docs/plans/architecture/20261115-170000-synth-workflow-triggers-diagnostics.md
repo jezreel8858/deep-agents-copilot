@@ -6,7 +6,6 @@ plan_type: "architecture"
 created_at: "2026-11-15"
 revision: 3
 workflow: WORKFLOW-TECHNICAL-ANALYSIS
-related-planning-doc: "N/A — plano raiz"
 review_verdict: ESCALATED_HITL
 review_rounds: 2
 hitl_decision: "N1 → opção (a) estender WorkflowSpec (2026-11-15)"
@@ -37,6 +36,20 @@ read_only_dependencies:
 lessons_extracted: true
 lessons_applied_to: ["@tech-solution-architect", "plan-conformance-patterns"]
 lessons_at: "2026-11-15"
+related-planning-doc: "N/A — plano raiz"
+session_id: "sess-20261115-170000-synth-workflow-triggers-diagnostics"
+workflow_id: "WORKFLOW-TECHNICAL-ANALYSIS"
+workflow_trace_id: "wf-trace-20261115-170000-synth-workflow-triggers-diagnostics"
+parent_plan_ref: "N/A — plano raiz"
+critic_rubric_gaps: []
+critic_findings_summary:
+  rounds: 2
+  blockers: 0
+  majors: 0
+  minors: 0
+  nits: 0
+  last_verdict: "ESCALATED_HITL"
+  author_ref: "@tech-solution-architect"
 ---
 
 # Blueprint — Diagnóstico de Gatilhos de Workflows no CLI `synth` (rev. 2)

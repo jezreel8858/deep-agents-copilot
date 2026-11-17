@@ -4,24 +4,10 @@ approved: true
 author: "@agent-auditor"
 plan_type: "governance"
 created_at: "2026-04-19"
-related-planning-doc: "docs/plans/governance/20260420-183000-router-header-line-breaks.md"
 review_verdict: PASS_WITH_NITS
 review_rounds: 2
 reviewer: "@plan-critic"
 review_tier1: PASS
-session_id: "sess-20260419-211000-agents-prompts-formato-saida"
-workflow_id: "WORKFLOW-GOVERNANCE-MAINTENANCE"
-workflow_trace_id: "wf-trace-20260419-211000-formato-saida"
-parent_plan_ref: "docs/plans/governance/20260420-183000-router-header-line-breaks.md"
-critic_rubric_gaps: []
-critic_findings_summary:
-  rounds: 2
-  blockers: 0
-  majors: 0
-  minors: 0
-  nits: 3
-  last_verdict: "PASS_WITH_NITS"
-  author_ref: "@agent-auditor"
 allowed_files:
   - "docs/plans/governance/20260419-211000-agents-prompts-formato-saida.md"
   - ".github/agents/adapter-generator.agent.md"
@@ -64,6 +50,20 @@ allowed_files:
 lessons_extracted: true
 lessons_applied_to: ["@agent-auditor", "plan-conformance-patterns"]
 lessons_at: "2026-11-15"
+related-planning-doc: "docs/plans/governance/20260420-183000-router-header-line-breaks.md"
+session_id: "sess-20260420-router-header-line-breaks"
+workflow_id: "WORKFLOW-GOVERNANCE-MAINTENANCE"
+workflow_trace_id: "wf-trace-20260420-router-header-line-breaks"
+parent_plan_ref: "docs/plans/governance/20260420-183000-router-header-line-breaks.md"
+critic_rubric_gaps: []
+critic_findings_summary:
+  rounds: 2
+  blockers: 0
+  majors: 0
+  minors: 0
+  nits: 3
+  last_verdict: "PASS_WITH_NITS"
+  author_ref: "@agent-auditor"
 ---
 
 # Plano de Manutenção de Governança — Padronização Anti-Colapso CommonMark do Bloco `Formato de Saída` em Todos os Agents, Templates e Contratos

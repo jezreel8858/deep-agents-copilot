@@ -114,13 +114,17 @@ def extract_frontmatter_model(file_path: Path) -> str:
 def is_governance_target_file(file_path: Path, agents_dir: Path, prompts_dir: Path) -> bool:
     """Determina se o arquivo markdown é um agent ou prompt governado que DEVE conter model:.
 
-    Exclui documentações e workflows (README.md, QUICK-START.md, workflows.md, workflows/**).
+    Exclui documentações, workflows e evals (README.md, QUICK-START.md, workflows.md, workflows/**, evals/**).
     """
     try:
         rel = file_path.relative_to(agents_dir).as_posix()
-        if rel in ("README.md", "workflows.md") or rel.startswith("workflows/"):
+        if (
+            rel in ("README.md", "workflows.md")
+            or rel.startswith("workflows/")
+            or rel.startswith("evals/")
+        ):
             return False
-        return True
+        return file_path.name.endswith(".agent.md") or rel.startswith("templates/")
     except ValueError:
         pass
 

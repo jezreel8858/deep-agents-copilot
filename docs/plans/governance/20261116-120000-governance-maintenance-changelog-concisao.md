@@ -5,10 +5,6 @@ author: "@agent-auditor"
 plan_type: "governance"
 created_at: "2026-11-16T12:00:00Z"
 updated_at: "2026-11-16T12:45:00Z"
-workflow_id: "WORKFLOW-GOVERNANCE-MAINTENANCE"
-workflow_trace_id: "trace-changelog-gov-001"
-session_id: "sess-20261116-changelog-gov"
-related-planning-doc: "N/A — plano primário da manutenção de governança"
 allowed_files:
   - ".github/skills/git-governance/references/changelog.md"
   - ".github/skills/git-governance/SKILL.md"
@@ -23,11 +19,23 @@ allowed_files:
 rollback_plan: "git checkout HEAD -- CHANGELOG.md .github/skills/git-governance/references/changelog.md .github/skills/git-governance/SKILL.md .github/skills/git-governance/references/pr-template.md .github/skills/governance-factory-patterns/SKILL.md .github/agents/pr-gatekeeper.agent.md .github/agents/governance-maintainer.agent.md .github/agents/docs-engineer.agent.md .github/prompts/commit.prompt.md tests/governance_audit/test_changelog_integrity.py"
 review_tier1: PASS
 review_rounds: 2
-critic_rubric_gaps: []
-critic_findings_summary: "Rodada 1 (NEEDS_REVISION): 5 achados estruturais saneados. Rodada 2 (PASS pós-correção factual): saneadas referências de índice negativo oriundas de findIndex em changelog.md (H2 reais nas linhas 3, 19 e 32; arquivo nas linhas 1-41), nome real test_changelog_minimum_volume_and_release_count (linha 48, literal 400 na linha 55, novas constantes na Onda 4B) e contagens exatas wc -l / UTF-16 code units sem CR (1.700 linhas em CHANGELOG.md, 491 linhas em test_changelog_integrity.py, 1498, 122 e 560 chars nas linhas 320, 721 e 797)."
 lessons_extracted: true
 lessons_applied_to: []
 lessons_at: "2026-11-16"
+related-planning-doc: "N/A — plano primário da manutenção de governança"
+session_id: "sess-20261116-changelog-gov"
+workflow_id: "WORKFLOW-GOVERNANCE-MAINTENANCE"
+workflow_trace_id: "trace-changelog-gov-001"
+parent_plan_ref: "N/A — plano raiz"
+critic_rubric_gaps: []
+critic_findings_summary:
+  rounds: 2
+  blockers: 0
+  majors: 0
+  minors: 0
+  nits: 0
+  last_verdict: "PASS"
+  author_ref: "@agent-auditor"
 ---
 
 # Plano de Manutenção de Governança — Concisão, Teto Anti-Bloat e Simetria de Enforcement do `CHANGELOG.md`

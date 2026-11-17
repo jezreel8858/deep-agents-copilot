@@ -4,11 +4,6 @@ approved: true
 author: "@agent-auditor"
 plan_type: "governance"
 created_at: "2026-11-16"
-related-planning-doc: "N/A — plano primário da manutenção de governança"
-workflow_id: "WORKFLOW-GOVERNANCE-MAINTENANCE"
-workflow_trace_id: "wt-20261116-eval-workflows-gov-01"
-session_id: "sess-20261116-eval-workflows-gov"
-parent_plan_ref: "N/A — plano raiz"
 allowed_files:
   - ".github/prompts/eval-workflows.prompt.md"
   - ".github/prompts/catalog.yaml"
@@ -21,6 +16,20 @@ review_tier1: "PASS"
 lessons_extracted: true
 lessons_applied_to: ["plan-conformance-patterns"]
 lessons_at: "2026-11-16"
+related-planning-doc: "N/A — plano primário da manutenção de governança"
+session_id: "sess-20261116-eval-workflows-gov"
+workflow_id: "WORKFLOW-GOVERNANCE-MAINTENANCE"
+workflow_trace_id: "wt-20261116-eval-workflows-gov-01"
+parent_plan_ref: "N/A — plano raiz"
+critic_rubric_gaps: []
+critic_findings_summary:
+  rounds: 2
+  blockers: 0
+  majors: 0
+  minors: 0
+  nits: 0
+  last_verdict: "PASS_WITH_NITS"
+  author_ref: "@agent-auditor"
 ---
 
 # Plano de Evolução de Governança — Melhorias Estruturais e Operacionais em `eval-workflows.prompt.md`

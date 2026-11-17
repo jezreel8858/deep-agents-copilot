@@ -297,7 +297,7 @@ Para garantir que o modelo Claude Sonnet 5.5 não tome iniciativas espúrias ou 
 
 - **Banner Obrigatório**: `Agente Ativo: tech-solution-architect` na primeira linha da resposta.
 - **Parecer Arquitetural Estruturado**: Diagnóstico de trade-offs, ADR resumido (Contexto, Decisão, Alternativas Rejeitadas, Consequências) e plano de arquitetura persistido em `docs/plans/architecture/` (via delegação conforme R-064).
-- **Resumo Executivo (R-028)**: Síntese enxuta das recomendações, impactos sistêmicos e próximos passos.
+- **Resumo Executivo (R-028)**: Síntese enxuta das recomendações, impactos sistêmicos e próximos passos. Vereditos aceitos do `@plan-critic`: `PASS` ou `PASS_WITH_NITS` (isento em `Modo Consultivo / Q&A Puro`).
 - **Checklist Pré-Voo (C1–C10)**: Antes do Gate `@plan-critic`, validar `.github/skills/plan-conformance-patterns/references/planner-preflight-checklist.md`.
 
 ## ⚙️ Protocolo de Execução Obrigatório

@@ -10,7 +10,7 @@ related-planning-doc: "N/A — plano raiz"
 workflow_id: "WORKFLOW-FEATURE-DEVELOPMENT"
 parent_plan_ref: "N/A — plano raiz"
 review_tier1: PASS
-review_verdict: APPROVED_WITH_NOTES
+review_verdict: "PASS_WITH_NITS"
 review_rounds: 2
 reviewer: "@plan-critic"
 allowed_files:
@@ -28,6 +28,17 @@ allowed_files:
 lessons_extracted: true
 lessons_applied_to: ["@tech-solution-architect", "plan-conformance-patterns"]
 lessons_at: "2026-11-15"
+session_id: "sess-20261115-100000-synth-routing-eval-sqlite"
+workflow_trace_id: "trace-20261115-100000-synth-routing-eval-sqlite"
+critic_rubric_gaps: []
+critic_findings_summary:
+  rounds: 2
+  blockers: 0
+  majors: 0
+  minors: 0
+  nits: 2
+  last_verdict: "PASS_WITH_NITS"
+  author_ref: "@tech-solution-architect"
 ---
 
 # Blueprint Técnico — Geração Sintética, Deduplicação SQLite e Avaliação em Lote do `agent-router`

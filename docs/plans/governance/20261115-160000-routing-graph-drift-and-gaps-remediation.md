@@ -4,15 +4,10 @@ approved: true
 author: "@agent-auditor"
 plan_type: "governance"
 created_at: "2026-11-15"
-related-planning-doc: "docs/architecture/BLUEPRINT_COPILOT_SDK_HEADLESS_RUNNER.md"
 review_verdict: PASS
 review_rounds: 1
 reviewer: "@plan-critic"
 review_tier1: PASS
-session_id: "sess-20261115-160000-routing-drift-remediation"
-workflow_id: "WORKFLOW-GOVERNANCE-MAINTENANCE"
-workflow_trace_id: "wf-20261115-160000-routing-graph-drift-and-gaps"
-parent_plan_ref: "N/A — plano raiz"
 allowed_files:
   - "docs/plans/governance/20261115-160000-routing-graph-drift-and-gaps-remediation.md"
   - ".github/agents/agent-router.agent.md"
@@ -27,6 +22,20 @@ allowed_files:
 lessons_extracted: true
 lessons_applied_to: []
 lessons_at: "2026-11-15"
+related-planning-doc: "docs/architecture/BLUEPRINT_COPILOT_SDK_HEADLESS_RUNNER.md"
+session_id: "sess-20261115-160000-routing-drift-remediation"
+workflow_id: "WORKFLOW-GOVERNANCE-MAINTENANCE"
+workflow_trace_id: "wf-20261115-160000-routing-graph-drift-and-gaps"
+parent_plan_ref: "N/A — plano raiz"
+critic_rubric_gaps: []
+critic_findings_summary:
+  rounds: 1
+  blockers: 0
+  majors: 0
+  minors: 0
+  nits: 0
+  last_verdict: "PASS"
+  author_ref: "@agent-auditor"
 ---
 
 # Plano de Manutenção de Governança — Remediação de Drift e Cobertura de Arestas (`diag-fca52925eb24`)

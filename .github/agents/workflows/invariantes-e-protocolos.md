@@ -172,7 +172,7 @@ Para que o usuário nunca fique no escuro quanto ao fluxo em andamento, o `@agen
 
 #### WORKFLOW 7: `WORKFLOW-FRAMEWORK-MIGRATION` (6 estados / 7 etapas no grafo com Gate R-064 — Cross-Stack exige Router Origem + Destino + Grafo)
 ```markdown
-### 🗺️ Pipeline de Execução: WORKFLOW-FRAMEWORK-MIGRATION (6 estados / 7 etapas no grafo com Gate R-064)
+### 🗺️ Pipeline de Execução: WORKFLOW-FRAMEWORK-MIGRATION (6 etapas)
 - [▶] **Etapa 1 (Estado 0/1/1b): Pre-Flight Assessment, 5D & Symbol Exhaustion** → `@tech-solution-architect` + `@codegraph-engine` (obrigatório) + `@domain-router-ORIGEM` (ex.: `@ejb-router`) + `@business-rules-extractor` *(Em Andamento: inventário 100% de símbolos/AST + blast radius/ciclos do legado + extração 5D)*
 - [⏳] **Etapa 2 (Estado 2/2b): Migration Phasing & Blueprint com Matriz De-Para** → `@tech-solution-architect` + `@domain-router-ORIGEM` + `@domain-router-DESTINO` + `@docs-engineer` + `@plan-critic` (§ 10.7) *(Pendente: mapeamento de 100% dos símbolos na matriz + fases B1..BN + revisão pré-HITL + checkpoint humano)*
 - [⏳] **Etapa 2b / Etapa 3 (Gate 2 R-064): Plano de Implementação Técnica** → `<stack>-arch-advisor` + `@docs-engineer` + `@plan-critic` (§ 10.7) + `ask_questions` *(Pendente: plano R-064 em `docs/plans/implementation/` aprovado antes do codemod)*

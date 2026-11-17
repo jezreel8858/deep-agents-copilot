@@ -5,11 +5,6 @@ approved: true
 author: "@agent-auditor"
 plan_type: "governance"
 created_at: "2026-11-16T12:00:00Z"
-workflow_id: "WORKFLOW-GOVERNANCE-MAINTENANCE"
-workflow_trace_id: "wt-20261116-vscode-mcp-01"
-session_id: "e0fbf32b-34fc-47af-b026-b703d0eb6dd2"
-parent_plan_ref: "N/A — plano raiz"
-related-planning-doc: "N/A"
 allowed_files:
   - ".vscode/mcp.json"
   - ".config/vscode_mcp.json"
@@ -25,6 +20,20 @@ rollback_plan:
 lessons_extracted: true
 lessons_applied_to: ["plan-conformance-patterns"]
 lessons_at: "2026-11-16"
+related-planning-doc: "N/A"
+session_id: "e0fbf32b-34fc-47af-b026-b703d0eb6dd2"
+workflow_id: "WORKFLOW-GOVERNANCE-MAINTENANCE"
+workflow_trace_id: "wt-20261116-vscode-mcp-01"
+parent_plan_ref: "N/A — plano raiz"
+critic_rubric_gaps: []
+critic_findings_summary:
+  rounds: 2
+  blockers: 0
+  majors: 0
+  minors: 0
+  nits: 0
+  last_verdict: "PASS_WITH_NITS"
+  author_ref: "@agent-auditor"
 ---
 
 # Plano de Governança — Sincronização de MCP Servers no VS Code e Template Genérico `vscode_mcp.json`

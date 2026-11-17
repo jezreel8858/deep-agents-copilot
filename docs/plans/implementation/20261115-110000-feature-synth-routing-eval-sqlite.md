@@ -6,9 +6,6 @@ approved_at: "2026-11-15"
 author: "@python-arch-advisor"
 plan_type: "implementation"
 created_at: "2026-11-15"
-related-planning-doc: "docs/plans/architecture/20261115-100000-synth-routing-eval-sqlite.md"
-parent_plan_ref: "docs/plans/architecture/20261115-100000-synth-routing-eval-sqlite.md"
-workflow_id: "WORKFLOW-FEATURE-DEVELOPMENT"
 tier: full
 plan_ref: "docs/plans/implementation/20261115-110000-feature-synth-routing-eval-sqlite.md"
 rollback_plan: "Seção '## Rollback' deste plano: git revert por bloco (B3→B2→B1), 1 commit por bloco; DB .cache descartável; Golden nunca alterado"
@@ -37,6 +34,20 @@ progress: 100
 lessons_extracted: true
 lessons_applied_to: ["@python-arch-advisor", "plan-conformance-patterns"]
 lessons_at: "2026-11-15"
+related-planning-doc: "docs/plans/architecture/20261115-100000-synth-routing-eval-sqlite.md"
+session_id: "sess-20261115-100000-synth-routing-eval-sqlite"
+workflow_id: "WORKFLOW-FEATURE-DEVELOPMENT"
+workflow_trace_id: "trace-20261115-100000-synth-routing-eval-sqlite"
+parent_plan_ref: "docs/plans/architecture/20261115-100000-synth-routing-eval-sqlite.md"
+critic_rubric_gaps: []
+critic_findings_summary:
+  rounds: 3
+  blockers: 0
+  majors: 0
+  minors: 0
+  nits: 0
+  last_verdict: "PASS_WITH_NITS"
+  author_ref: "@python-arch-advisor"
 ---
 
 Progresso: 6/26 tarefas concluídas

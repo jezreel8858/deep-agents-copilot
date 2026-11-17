@@ -5,7 +5,7 @@
 
 ### 3.5 WORKFLOW 5: `WORKFLOW-GOVERNANCE-MAINTENANCE` (Governança e Manutenção do Ecossistema)
 
-- **Objetivo**: Auditar, padronizar, expandir e manter o catálogo de agents, skills, prompts e convenções do repositório de governança com pesquisa prévia compulsória, checkpoints humanos para mutações estruturais, execução atômica em lote (R-046) e validação final via suíte determinística de testes.
+- **Objetivo**: Auditar, padronizar, expandir e manter o catálogo de agents, skills, prompts e convenções do repositório de governança com Pesquisa Prévia de Mercado compulsória (via `@deep-search`), checkpoints humanos para mutações estruturais, execução atômica em lote (R-046) com Sincronização Quádrupla SSOT (R-015) e validação final via Quality Gate de Governança (Tier 1) e suíte determinística de testes (`implementation_plan_authoring` quando houver escopo Python/Q3).
 - **Gatilhos de Fast-Path**: `"auditar governança"`, `"novo agent"`, `"nova skill"`, `"novo prompt"`, `"nova stack"`, `"manutenção de catálogo"`, `"corrigir smell de agent"`, `"higiene de repositório"`.
 - **Política R-041**: **Bypass Total** de `@prompt-structuring`. Direcionamento imediato para auditoria ou factory.
 
