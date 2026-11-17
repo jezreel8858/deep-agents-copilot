@@ -5,7 +5,7 @@ description: >-
   Especialista analítico em performance de consultas, planos de execução e arquitetura de dados (Oracle e Informix) —
   diagnóstico de EXPLAIN PLAN, DBMS_XPLAN, SET EXPLAIN (sqexplain.out), índices, particionamento e design relacional (Read-Only).
 model: "Claude Sonnet 5.5"
-tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index']
+tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 source_docs:
   - '.github/skills/performance-engineering-patterns/SKILL.md'
   - '.github/skills/context-mode/SKILL.md'

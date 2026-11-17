@@ -5,7 +5,7 @@ description: >-
 agent: 'agent'
 router_bypass: slash_workflow
 model: "Gemini 4 Argon"
-tools: ['read_file', 'get_errors', 'ask_questions', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_search']
+tools: ['read_file', 'get_errors', 'ask_questions', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_search', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 argument-hint: '[ideia-ou-requisito-inicial]'
 source_docs:
   - '.github/skills/prompt-engineering-patterns/SKILL.md'

@@ -6,7 +6,7 @@ description: >-
   desacoplamento e migrações estruturais. Produz planos em fases isoladas com
   estratégia de rollback, sem implementar código.
 model: "Claude Sonnet 5.5"
-tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_stats', 'context-mode/ctx_doctor', 'context-mode/ctx_upgrade', 'context-mode/ctx_purge', 'context-mode/ctx_execute', 'mcp-atlassian/jira_get_issue', 'mcp-atlassian/jira_search']
+tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_stats', 'context-mode/ctx_doctor', 'context-mode/ctx_upgrade', 'context-mode/ctx_purge', 'context-mode/ctx_execute', 'context-mode/ctx_resume', 'mcp-atlassian/jira_get_issue', 'mcp-atlassian/jira_search']
 source_docs:
   - '.github/skills/documentation-writing-patterns/SKILL.md'
   - '.github/skills/security-review-patterns/SKILL.md'

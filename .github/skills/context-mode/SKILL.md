@@ -40,7 +40,7 @@ Skill para operar `ctx_*` com mínimo consumo de contexto: coletar em lote, proc
 | `ctx_upgrade` | `{}` | Atualiza a instalação do `context-mode` e sincroniza hooks do host. |
 | `ctx_purge` | `{}` | Limpa sessões e conteúdos indexados do diretório de dados (`CONTEXT_MODE_DATA_DIR`, padrão `~/.context-mode`). |
 
-> **Configuração de Host e Ambiente v2.1.10**: O servidor e os hooks requerem a flag explícita `--agent copilot-cli` (ex.: `server.mjs --agent copilot-cli` / `context-mode setup --agents copilot-cli`) e utilizam a variável unificada `CONTEXT_MODE_DATA_DIR` (padrão `~/.context-mode`).
+> **Configuração de Host v2.1.10 e Matriz de Distribuição por Perfil (R-054 / Least Privilege)**: O servidor/hooks requerem `--agent copilot-cli` e `CONTEXT_MODE_DATA_DIR` (`~/.context-mode`). Distribuição canônica no frontmatter `tools:`: **(a) 53 Agents Operacionais (24 analíticos/planejadores/revisores + 29 executores/devs)** declaram obrigatoriamente `ctx_search`, `ctx_index`, `ctx_batch` e `ctx_resume` (recuperação de estado pós-compactação); **(b) 9 Routers (`*-router.agent.md`) + `prompt-structuring.agent.md`** declaram apenas `ctx_search`, sendo **proibidos** `ctx_resume`, `ctx_index`, `ctx_batch` e `ctx_execute` (R-054); **(c) 15 Prompts `router_bypass: slash_workflow`** declaram `ctx_search`, `ctx_index`, `ctx_batch` e `ctx_resume`, enquanto os **9 Prompts isentos** (8 `router_bypass: utility` + `agent-router.prompt.md`) não declaram `ctx_resume`.
 
 ## Quando Usar
 

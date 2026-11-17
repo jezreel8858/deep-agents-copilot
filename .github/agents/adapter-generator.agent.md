@@ -6,7 +6,7 @@ description: >-
   (gitignored, R-043) via scanner read-only de stack e arquitetura. Opera em
   modos scan, generate-one e batch, integrando-se a `/add-project-context`.
 model: "Gemini 4 Argon"
-tools: ['file_search', 'list_dir', 'get_errors', 'grep_search', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch']
+tools: ['file_search', 'list_dir', 'get_errors', 'grep_search', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_resume']
 source_docs:
   - .github/skills/context-mode/SKILL.md
   - .github/skills/efficient-batch-code-modification/SKILL.md

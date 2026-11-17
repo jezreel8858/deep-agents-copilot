@@ -7,7 +7,7 @@ description:
 agent: 'agent'
 router_bypass: slash_workflow
 model: "Gemini 3.8 Flash"
-tools: ['read_file', 'file_search', 'list_dir', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_search']
+tools: ['read_file', 'file_search', 'list_dir', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_search', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 argument-hint: '[--diff <ref> | --bridges <file>]'
 source_docs:
   - '.github/instructions/README.md'

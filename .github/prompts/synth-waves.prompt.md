@@ -4,7 +4,7 @@ description: 'Ciclo Prata de avaliação sintética de roteamento em 3 Ondas (es
 agent: 'agent'
 router_bypass: slash_workflow
 model: "Gemini 4 Argon"
-tools: ['read_file', 'ask_questions', 'get_errors', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_search']
+tools: ['read_file', 'ask_questions', 'get_errors', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_search', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 argument-hint: '[perfil: bronze | prata | ouro | smoke]'
 source_docs:
   - 'docs/guides/synth-routing-eval-copilot-sdk-guide.md'

@@ -70,6 +70,7 @@ Divergência entre o perfil do agent (`Router`, `Analítico/Read-Only/Advisor`, 
 - `Analítico/Read-Only/Advisor`: sem tools de edição (`insert_edit_into_file`, `create_file`, `replace_string_in_file`); requer `run_subagent` e `context-mode/ctx_search`.
 - `Executor/Developer/Test-Engineer`: possui tools de mutação/execução (`ctx_execute`, `ctx_batch`, `get_errors`) e skills `safe-file-editing` / `efficient-batch-code-modification`.
 - **Invariante Sintática de `tools:`**: Em `.agent.md`, `.prompt.md` e `SKILL.md`, o campo `tools:` no frontmatter deve ser declarado estritamente em sintaxe inline `tools: ['...']` (ou `tools: []`), sendo proibido o formato de lista YAML multilinha (`tools:\n  - ...`).
+- **Invariante de Distribuição `context-mode` (`ctx_resume` / `ctx_index` / `ctx_search` — R-054)**: Os **53 agents operacionais** (não-routers e exceto `prompt-structuring`) e os **15 prompts `router_bypass: slash_workflow`** devem declarar `context-mode/ctx_search`, `context-mode/ctx_index`, `context-mode/ctx_batch` e `context-mode/ctx_resume`; os **9 routers (`*-router.agent.md`)**, `prompt-structuring.agent.md` e `.github/agents/templates/router-agent.md` declaram apenas `context-mode/ctx_search` (proibido `ctx_resume` e `ctx_index` por R-054); os **9 prompts isentos** (8 `utility` + `agent-router.prompt.md`) não declaram `context-mode/ctx_resume`.
 
 ### 2.8 — Violação de Batching e Limiar de Modificação (R-046)
 Edições sequenciais arquivo a arquivo no chat em vez de consolidação em lote via `ctx_batch` / `ctx_execute` (`R-046` / `R-059`).

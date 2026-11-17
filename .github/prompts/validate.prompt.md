@@ -4,7 +4,7 @@ description: Valida implementação contra plano aprovado, verifica critérios d
 agent: 'agent'
 router_bypass: slash_workflow
 model: "Gemini 4 Argon"
-tools: ['read_file', 'grep_search', 'file_search', 'run_in_terminal', 'get_errors', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch']
+tools: ['read_file', 'grep_search', 'file_search', 'run_in_terminal', 'get_errors', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 argument-hint: '[caminho-do-plano | escopo-de-validação]'
 source_docs:
   - '.github/skills/terminal-governance/SKILL.md'

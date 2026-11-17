@@ -7,7 +7,7 @@ description: >-
   analisa e reporta; complementa code-review (dimensão genérica) com
   profundidade de security specialist. Read-only.
 model: "Claude Sonnet 5.5"
-tools: ['list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'context-mode/ctx_batch', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_index']
+tools: ['list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'context-mode/ctx_batch', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 source_docs:
   - '.github/skills/security-review-patterns/SKILL.md'
   - '.github/skills/compliance-governance-patterns/SKILL.md'

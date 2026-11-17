@@ -8,7 +8,7 @@ description: >-
   por stack); complementa bug-triage com investigação mais profunda.
 model: "Claude Opus 5.5"
 model_exception_reason: "R-021: Papel de raciocínio crítico avançado e debug profundo (§9 governance-factory-patterns)"
-tools: ['list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'context-mode/ctx_batch', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_index']
+tools: ['list_dir', 'grep_search', 'file_search', 'run_in_terminal', 'context-mode/ctx_batch', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 source_docs:
   - '.github/skills/context-mode/SKILL.md'
   - '.github/skills/efficient-batch-code-modification/SKILL.md'

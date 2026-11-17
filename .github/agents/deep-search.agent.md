@@ -6,7 +6,7 @@ description: >-
   context-mode) e externa (Tavily). Sintetiza respostas factuais com citação de
   fontes sem implementar código ou opinar sobre arquitetura.
 model: "Claude Sonnet 5.5"
-tools: ['grep_search', 'file_search', 'list_dir', 'run_subagent', 'run_in_terminal', 'tavily/tavily_search', 'tavily/tavily_extract', 'tavily/tavily_crawl', 'tavily/tavily_map', 'tavily/tavily_research', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch']
+tools: ['grep_search', 'file_search', 'list_dir', 'run_subagent', 'run_in_terminal', 'tavily/tavily_search', 'tavily/tavily_extract', 'tavily/tavily_crawl', 'tavily/tavily_map', 'tavily/tavily_research', 'context-mode/ctx_index', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_resume']
 source_docs:
   - '.github/skills/tavily/SKILL.md'
   - '.github/skills/context-mode/SKILL.md'

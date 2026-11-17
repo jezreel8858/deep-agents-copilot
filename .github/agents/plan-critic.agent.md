@@ -8,7 +8,7 @@ description: >-
   domínio / Gate 2 de código), Fast-Pass e teto de iterações. Estritamente
   read-only — nunca edita planos nem implementa código.
 model: "Claude Sonnet 5.5"
-tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index']
+tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 source_docs:
   - 'CLAUDE.md'
   - '.github/copilot-instructions.md'

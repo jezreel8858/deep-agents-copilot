@@ -7,7 +7,7 @@ description: >-
   executa diagnósticos e correções cirúrgicas de bugs (RCA, diff mínimo) e aplica
   otimizações de performance (tuning de pool de EJBs, DataSources JNDI e eliminação de transações longas).
 model: "Gemini 4 Argon"
-tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index']
+tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 source_docs:
   - '.github/skills/java-jdk-backend-governance/SKILL.md'
   - '.github/skills/performance-engineering-patterns/SKILL.md'

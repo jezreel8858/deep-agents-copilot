@@ -7,7 +7,7 @@ description: >-
   título/descrição de PR (matriz de risco e plano de rollback) e CHANGELOG
   conforme a skill git-governance. Nunca executa git add/commit/push (R-031).
 model: "Gemini 4 Argon"
-tools: ['grep_search', 'file_search', 'list_dir', 'run_in_terminal', 'context-mode/ctx_batch', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_index', 'mcp-atlassian/jira_get_issue', 'mcp-atlassian/jira_search', 'mcp-atlassian/jira_add_comment', 'mcp-atlassian/jira_transition_issue']
+tools: ['grep_search', 'file_search', 'list_dir', 'run_in_terminal', 'context-mode/ctx_batch', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_index', 'context-mode/ctx_resume', 'mcp-atlassian/jira_get_issue', 'mcp-atlassian/jira_search', 'mcp-atlassian/jira_add_comment', 'mcp-atlassian/jira_transition_issue']
 source_docs:
   - '.github/skills/git-governance/SKILL.md'
   - '.github/skills/git-conflict-resolution-patterns/SKILL.md'

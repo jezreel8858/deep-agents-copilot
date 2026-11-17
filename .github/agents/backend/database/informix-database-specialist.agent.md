@@ -6,7 +6,7 @@ description: >-
   com Flyway, dbspaces, fragmentação por expressão, lock mode row e programação procedural em Informix SPL
   (Procedures, Functions, Triggers, cursores FOREACH e tratamento ON EXCEPTION) sob R-046.
 model: "Claude Sonnet 5.5"
-tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index']
+tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'get_errors', 'run_in_terminal', 'context-mode/ctx_execute', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 source_docs:
   - '.github/skills/context-mode/SKILL.md'
   - '.github/skills/efficient-batch-code-modification/SKILL.md'

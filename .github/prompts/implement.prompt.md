@@ -4,7 +4,7 @@ description: Executa plano aprovado fase a fase, marcando `- [x]` ao concluir e 
 agent: 'agent'
 router_bypass: slash_workflow
 model: "Claude Sonnet 5.5"
-tools: ['read_file', 'insert_edit_into_file', 'create_file', 'grep_search', 'file_search', 'get_errors', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_execute']
+tools: ['read_file', 'insert_edit_into_file', 'create_file', 'grep_search', 'file_search', 'get_errors', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_execute', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 argument-hint: '[caminho-do-plano | descrição-da-fase]'
 source_docs:
   - '.github/skills/efficient-batch-code-modification/SKILL.md'

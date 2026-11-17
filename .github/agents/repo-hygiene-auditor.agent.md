@@ -7,7 +7,7 @@ description: >-
   identificando ausência de README/CONTRIBUTING/LICENSE, vazamentos de .env, gaps
   de CI/CD e linters. Estritamente read-only — nunca implementa ou altera arquivos.
 model: "Claude Sonnet 5.5"
-tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_batch', 'context-mode/ctx_search', 'context-mode/ctx_index']
+tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_batch', 'context-mode/ctx_search', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 source_docs:
   - '.github/skills/context-mode/SKILL.md'
   - '.github/skills/repository-hygiene-patterns/SKILL.md'

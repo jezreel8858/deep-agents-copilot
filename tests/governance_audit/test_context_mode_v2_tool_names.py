@@ -132,3 +132,36 @@ def test_mcp_config_files_have_v2_agent_flag_and_no_legacy_env() -> None:
                 f"{mcp_path.name} não deve conter variável legada v1: {legacy_key}"
             )
         assert not LEGACY_PATTERN.search(raw), f"{mcp_path.name} não deve conter tokens v1 legados"
+
+
+def test_agent_and_prompt_templates_declare_ctx_resume() -> None:
+    """Valida que os 4 templates elegiveis declaram context-mode/ctx_resume e que
+    router-agent.md declara context-mode/ctx_search sem context-mode/ctx_resume nem context-mode/ctx_index.
+    """
+    eligible_templates = [
+        REPO_ROOT / ".github" / "agents" / "templates" / "agent-template.md",
+        REPO_ROOT / ".github" / "agents" / "templates" / "operational-agent.md",
+        REPO_ROOT / ".github" / "agents" / "templates" / "research-agent.md",
+        REPO_ROOT / ".github" / "prompts" / "templates" / "prompt-template.md",
+    ]
+    for tpl_path in eligible_templates:
+        assert tpl_path.exists(), f"Template ausente: {tpl_path.relative_to(REPO_ROOT)}"
+        fm = _extract_frontmatter(tpl_path)
+        tools = set(fm.get("tools") or [])
+        assert "context-mode/ctx_resume" in tools, (
+            f"{tpl_path.relative_to(REPO_ROOT)} deve declarar context-mode/ctx_resume em tools:"
+        )
+
+    router_tpl = REPO_ROOT / ".github" / "agents" / "templates" / "router-agent.md"
+    assert router_tpl.exists(), f"Template ausente: {router_tpl.relative_to(REPO_ROOT)}"
+    router_fm = _extract_frontmatter(router_tpl)
+    router_tools = set(router_fm.get("tools") or [])
+    assert "context-mode/ctx_search" in router_tools, (
+        "router-agent.md deve declarar context-mode/ctx_search em tools:"
+    )
+    assert "context-mode/ctx_resume" not in router_tools, (
+        "router-agent.md NAO deve declarar context-mode/ctx_resume em tools: (R-054)"
+    )
+    assert "context-mode/ctx_index" not in router_tools, (
+        "router-agent.md NAO deve declarar context-mode/ctx_index em tools: (R-054)"
+    )

@@ -6,7 +6,7 @@ description: >-
   Module Federation/Microfrontends, SSR/hydration, governança de estado (NgRx/Signals),
   Clean Frontend Architecture e migrações estruturais de versão (Read-Only).
 model: "Claude Sonnet 5.5"
-tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'figma/get_file_nodes', 'figma/export_image', 'figma/get_styles', 'figma/get_component_sets', 'figma/get_comments']
+tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'context-mode/ctx_resume', 'figma/get_file_nodes', 'figma/export_image', 'figma/get_styles', 'figma/get_component_sets', 'figma/get_comments']
 source_docs:
   - '.github/skills/context-mode/SKILL.md'
   - '.github/skills/documentation-writing-patterns/SKILL.md'

@@ -8,7 +8,7 @@ description: >-
 agent: 'agent'
 router_bypass: slash_workflow
 model: "Gemini 3.8 Flash"
-tools: ['read_file', 'insert_edit_into_file', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_search']
+tools: ['read_file', 'insert_edit_into_file', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_search', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 argument-hint: '<nome-do-projeto>'
 source_docs:
   - '.github/projects.local.yaml.example'

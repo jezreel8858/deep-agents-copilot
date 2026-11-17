@@ -21,7 +21,7 @@ model: "Gemini 4 Argon"
 # e referenciar compulsoriamente '.github/skills/playwright-mcp/SKILL.md' em source_docs:. Esta herança é
 # formalizada deterministicamente em tools/agent_source_docs_sync/required_source_docs_rules.json
 # (regra 'playwright_mcp_requires_skill_doc') e detalhada em docs/plans/architecture/20260830-090000-agent-profiles-taxonomy.md (Addendum).
-tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'context-mode/ctx_search']
+tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'context-mode/ctx_resume', 'context-mode/ctx_search']
 # SSOT de Governança e Dependências (Context Engineering Benchmark 2026):
 # 100% das dependências documentais e skills DEVEM residir exclusivamente em source_docs:/source_docs_lazy: no frontmatter.
 # É TERMINANTEMENTE PROIBIDO criar seções redundantes de herança, catálogo, skills ou pré-carregamento no corpo markdown.

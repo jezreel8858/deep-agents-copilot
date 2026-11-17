@@ -9,7 +9,7 @@ description: >-
 agent: 'agent'
 router_bypass: slash_workflow
 model: "Claude Sonnet 5.5"
-tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'ask_questions', 'context-mode/ctx_search', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_index']
+tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'run_subagent', 'ask_questions', 'context-mode/ctx_search', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 argument-hint: '[repositório-alvo]'
 source_docs:
   - '.github/instructions/README.md'

@@ -4,7 +4,7 @@ description: 'Avalia de forma read-only a conformidade de trajetórias e invaria
 agent: 'agent'
 router_bypass: slash_workflow
 model: "Gemini 4 Argon"
-tools: ['read_file', 'ask_questions', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_search']
+tools: ['read_file', 'ask_questions', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_search', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 argument-hint: "[cenario-id | todos]"
 source_docs:
   - .github/copilot-instructions.md

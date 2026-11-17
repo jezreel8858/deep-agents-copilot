@@ -4,7 +4,7 @@ description: Extrai achados do revisor cético (@plan-critic) em planos docs/pla
 agent: 'agent'
 router_bypass: slash_workflow
 model: "Gemini 4 Argon"
-tools: ['ask_questions', 'get_errors', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_search']
+tools: ['ask_questions', 'get_errors', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_search', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 argument-hint: '[tipo-de-plano | all]'
 source_docs:
   - '.github/skills/plan-conformance-patterns/SKILL.md'

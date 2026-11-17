@@ -7,7 +7,7 @@ description: >-
   identificando violações, decisões obsoletas e ausência de ADR para mudanças
   estruturais relevantes. Estritamente read-only — nunca implementa código.
 model: "Claude Sonnet 5.5"
-tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index']
+tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 source_docs:
   - '.github/skills/documentation-writing-patterns/SKILL.md'
   - '.github/skills/context-mode/SKILL.md'

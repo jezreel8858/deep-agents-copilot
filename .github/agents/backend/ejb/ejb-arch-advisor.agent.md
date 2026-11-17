@@ -6,7 +6,7 @@ description: >-
   governança transacional JTA/CMT, topologias EAR/WAR/JAR, design de interfaces Remote/Local,
   modernização e estratégias seguras de migração/desacoplamento (Read-Only).
 model: "Claude Sonnet 5.5"
-tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index']
+tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 source_docs:
   - '.github/skills/context-mode/SKILL.md'
   - '.github/skills/documentation-writing-patterns/SKILL.md'

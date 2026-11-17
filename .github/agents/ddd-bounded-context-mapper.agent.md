@@ -8,7 +8,7 @@ description: >-
   Complementa o mapeamento estrutural determinístico do codegraph-engine
   com análise semântica de domínio. Estritamente read-only.
 model: "Claude Sonnet 5.5"
-tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_index', 'context-mode/ctx_execute', 'context-mode/ctx_batch']
+tools: ['grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_index', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_resume']
 source_docs:
   - '.github/skills/refactoring-planning-patterns/SKILL.md'
   - '.github/skills/context-mode/SKILL.md'

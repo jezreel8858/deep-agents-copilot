@@ -6,7 +6,7 @@ description: >-
   governança de ActionServlet, struts-config.xml, struts.xml, Tiles, segurança OGNL,
   desacoplamento de regras de negócio e manutenibilidade arquitetural (Read-Only).
 model: "Claude Sonnet 5.5"
-tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index']
+tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 source_docs:
   - '.github/skills/context-mode/SKILL.md'
   - '.github/skills/documentation-writing-patterns/SKILL.md'

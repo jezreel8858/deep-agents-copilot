@@ -902,3 +902,138 @@ def test_javascript_preferential_runtime_and_timeout_circuit_breaker_in_governan
         assert "python -c" in text, f"Falta proibicao de python -c para I/O em {doc_path}"
         assert "Circuit Breaker Fail-Fast" in text, f"Falta Circuit Breaker Fail-Fast em {doc_path}"
         assert "1 retry" in text, f"Falta limite de 1 retry com troca de estrategia em {doc_path}"
+
+
+def _parse_frontmatter_dict(md_path: Path) -> dict:
+    import yaml
+
+    text = md_path.read_text(encoding="utf-8")
+    if not text.startswith("---"):
+        return {}
+    parts = text.split("---", 2)
+    if len(parts) < 3:
+        return {}
+    return yaml.safe_load(parts[1]) or {}
+
+
+def test_eligible_53_agents_declare_ctx_resume_index_search() -> None:
+    """Os 53 agents operacionais elegiveis (todos os .agent.md em .github/agents recursivamente,
+    excluindo pastas templates/workflows, os 9 *-router.agent.md e prompt-structuring.agent.md)
+    declaram context-mode/ctx_resume, context-mode/ctx_index e context-mode/ctx_search em tools:.
+    """
+    eligible_agents: list[Path] = []
+    for agent_path in sorted(AGENTS_DIR.rglob("*.agent.md")):
+        rel_parts = agent_path.relative_to(AGENTS_DIR).parts
+        if any(part in {"templates", "workflows"} for part in rel_parts):
+            continue
+        if agent_path.name.endswith("-router.agent.md") or agent_path.name == "prompt-structuring.agent.md":
+            continue
+        eligible_agents.append(agent_path)
+
+    assert len(eligible_agents) == 53, (
+        f"Esperados 53 agents operacionais elegiveis, encontrados {len(eligible_agents)}: "
+        f"{[p.name for p in eligible_agents]}"
+    )
+
+    required_tools = {
+        "context-mode/ctx_resume",
+        "context-mode/ctx_index",
+        "context-mode/ctx_search",
+    }
+    offenders: list[str] = []
+    for agent_path in eligible_agents:
+        fm = _parse_frontmatter_dict(agent_path)
+        tools = set(fm.get("tools") or [])
+        missing = sorted(required_tools - tools)
+        if missing:
+            offenders.append(f"{agent_path.name}: faltando {missing}")
+
+    assert not offenders, (
+        "Agents operacionais elegiveis sem ctx_resume/ctx_index/ctx_search em tools:\n"
+        + "\n".join(offenders)
+    )
+
+
+def test_routers_and_prompt_structuring_forbid_ctx_resume_and_ctx_index_r054() -> None:
+    """Os 9 routers (*-router.agent.md) e prompt-structuring.agent.md NAO declaram
+    context-mode/ctx_resume nem context-mode/ctx_index em tools: (R-054; routers possuem
+    context-mode/ctx_search, o que e permitido).
+    """
+    router_files = sorted(
+        p
+        for p in AGENTS_DIR.rglob("*-router.agent.md")
+        if not any(part in {"templates", "workflows"} for part in p.relative_to(AGENTS_DIR).parts)
+    )
+    assert len(router_files) == 9, (
+        f"Esperados 9 routers (*-router.agent.md), encontrados {len(router_files)}: "
+        f"{[p.name for p in router_files]}"
+    )
+
+    prompt_structuring = AGENTS_DIR / "prompt-structuring.agent.md"
+    assert prompt_structuring.exists(), "prompt-structuring.agent.md deve existir em .github/agents"
+
+    forbidden_tools = {"context-mode/ctx_resume", "context-mode/ctx_index"}
+    targets = [*router_files, prompt_structuring]
+    offenders: list[str] = []
+    for path in targets:
+        fm = _parse_frontmatter_dict(path)
+        tools = set(fm.get("tools") or [])
+        present_forbidden = sorted(forbidden_tools & tools)
+        if present_forbidden:
+            offenders.append(f"{path.name}: declara indevidamente {present_forbidden}")
+
+    assert not offenders, (
+        "Violacao R-054: routers ou prompt-structuring declaram ctx_resume/ctx_index:\n"
+        + "\n".join(offenders)
+    )
+
+
+def test_slash_workflow_prompts_declare_ctx_resume_and_exempt_prompts_do_not() -> None:
+    """Os 15 prompts router_bypass: slash_workflow em .github/prompts/*.prompt.md declaram
+    context-mode/ctx_resume, context-mode/ctx_index e context-mode/ctx_search em tools:,
+    enquanto os 9 prompts isentos (8 utility + agent-router.prompt.md) NAO declaram
+    context-mode/ctx_resume.
+    """
+    prompts_dir = REPO_ROOT / ".github" / "prompts"
+    prompt_files = sorted(prompts_dir.glob("*.prompt.md"))
+    assert len(prompt_files) == 24, (
+        f"Esperados 24 prompts em .github/prompts/*.prompt.md, encontrados {len(prompt_files)}"
+    )
+
+    slash_workflow_prompts: list[Path] = []
+    exempt_prompts: list[Path] = []
+    required_for_slash = {
+        "context-mode/ctx_resume",
+        "context-mode/ctx_index",
+        "context-mode/ctx_search",
+    }
+    offenders: list[str] = []
+
+    for prompt_path in prompt_files:
+        fm = _parse_frontmatter_dict(prompt_path)
+        tools = set(fm.get("tools") or [])
+        bypass_mode = fm.get("router_bypass")
+
+        if bypass_mode == "slash_workflow":
+            slash_workflow_prompts.append(prompt_path)
+            missing = sorted(required_for_slash - tools)
+            if missing:
+                offenders.append(f"{prompt_path.name} (slash_workflow): faltando {missing}")
+        else:
+            exempt_prompts.append(prompt_path)
+            if "context-mode/ctx_resume" in tools:
+                offenders.append(
+                    f"{prompt_path.name} (router_bypass={bypass_mode!r}): NAO deve declarar context-mode/ctx_resume"
+                )
+
+    assert len(slash_workflow_prompts) == 15, (
+        f"Esperados 15 prompts slash_workflow, encontrados {len(slash_workflow_prompts)}: "
+        f"{[p.name for p in slash_workflow_prompts]}"
+    )
+    assert len(exempt_prompts) == 9, (
+        f"Esperados 9 prompts isentos (8 utility + agent-router.prompt.md), encontrados {len(exempt_prompts)}: "
+        f"{[p.name for p in exempt_prompts]}"
+    )
+    assert not offenders, (
+        "Inconsistencia de context-mode/ctx_resume nos prompts:\n" + "\n".join(offenders)
+    )

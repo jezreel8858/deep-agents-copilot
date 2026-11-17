@@ -8,7 +8,7 @@ description: >-
   delega compulsoriamente pesquisa prévia de diretrizes e skills ao deep-search,
   com atualização atômica de catálogos (R-015).
 model: "Claude Sonnet 5.5"
-tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_execute', 'context-mode/ctx_index']
+tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_execute', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 source_docs:
   - .github/skills/efficient-batch-code-modification/SKILL.md
   - .github/skills/context-mode/SKILL.md

@@ -4,7 +4,7 @@ description: Cria plano de implementação detalhado com análise de dependênci
 agent: 'agent'
 router_bypass: slash_workflow
 model: "Claude Sonnet 5.5"
-tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_execute']
+tools: ['read_file', 'grep_search', 'file_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_execute', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 argument-hint: '[descrição-da-feature | caminho-do-arquivo]'
 source_docs:
   - 'docs/plans/README.md'

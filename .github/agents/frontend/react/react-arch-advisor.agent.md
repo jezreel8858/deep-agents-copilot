@@ -6,7 +6,7 @@ description: >-
   Components, hooks patterns, React Compiler, state management (TanStack Query/Zustand),
   performance (Core Web Vitals) e planos de migração/upgrade de versão (Read-Only).
 model: "Claude Sonnet 5.5"
-tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'figma/get_file_nodes', 'figma/export_image', 'figma/get_styles', 'figma/get_component_sets', 'figma/get_comments']
+tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'context-mode/ctx_resume', 'figma/get_file_nodes', 'figma/export_image', 'figma/get_styles', 'figma/get_component_sets', 'figma/get_comments']
 source_docs:
   - '.github/skills/context-mode/SKILL.md'
   - '.github/skills/documentation-writing-patterns/SKILL.md'

@@ -7,7 +7,7 @@ description: >-
   pessoais. Distinto de agent-safety-guardrails (segurança do próprio agent
   de IA). Nunca corrige, apenas analisa e reporta. Read-only.
 model: "Claude Sonnet 5.5"
-tools: ['list_dir', 'grep_search', 'file_search', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index']
+tools: ['list_dir', 'grep_search', 'file_search', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 source_docs:
   - '.github/skills/compliance-governance-patterns/SKILL.md'
   - '.github/skills/security-review-patterns/SKILL.md'

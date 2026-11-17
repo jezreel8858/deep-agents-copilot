@@ -7,7 +7,7 @@ description: >-
   para scripts/tooling (tools/**/*.py, scripts/**/*.py) e suítes determinísticas de governança/auditoria (tests/**/*.py, tests/governance_audit/**/*.py),
   auditoria de dependências, análise de performance e event-loop tuning, queries N+1 e estratégias de modernização e desacoplamento (Read-Only).
 model: "Claude Sonnet 5.5"
-tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index']
+tools: ['file_search', 'grep_search', 'list_dir', 'ask_questions', 'run_subagent', 'context-mode/ctx_search', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 source_docs:
   - '.github/instructions/python-backend.instructions.md'
   - '.github/skills/performance-engineering-patterns/SKILL.md'
