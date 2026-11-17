@@ -25,7 +25,6 @@ source_docs:
 
 Skill para operar `ctx_*` com mínimo consumo de contexto: coletar em lote, processar em sandbox e responder apenas com sinal útil.
 
-
 ## Catálogo Oficial de 9 Ferramentas MCP (context-mode v2.1.10)
 
 | Tool MCP (`context-mode/*`) | Assinatura / Parâmetros Principais | Papel Canônico na v2.1.10 |
@@ -95,24 +94,14 @@ Para evitar que agents leiam arquivos repetidamente ou recorram ao terminal (`fi
 - **Caminho (`path`)**: subpasta de código real (ex.: `<raiz>/src`), **nunca a raiz cega do projeto** (para evitar `.git`, `node_modules`, `dist`, `.angular`).
 - **Exclusões obrigatórias (`exclude`)**: `["**/*.spec.ts", "**/*Test.java", "**/assets/**", "**/environments/**", "**/dist/**", "**/node_modules/**"]`.
 - **Hard cap de arquivos (`maxFiles`)**: padrão seguro `200` para proteger contra blow-up do FTS5.
-- **Consumo posterior**: qualquer busca de código semântica ou estrutural usa:
-  ```javascript
-  ctx_search({
-    source: "code:<project-id>",
-    queries: ["nomeDaClasse", "padrao arquitetural", "metodo"]
-  })
-  ```
-- **Detecção de alteração (Staleness / Frescor de cache)**:
-  - O `context-mode` armazena o hash SHA-256 de cada arquivo indexado. Se você alterar o arquivo no disco, o `ctx_search` sinaliza o trecho com a flag `[STALE / OUTDATED]`.
-  - **Regra de Ouro (Search para Descobrir, Read para Editar)**: O `ctx_search` serve como mapa de localização. Antes de editar qualquer arquivo, o agent deve obrigatoriamente reler o arquivo real com `read_file` para garantir que está aplicando a mudança sobre a versão mais recente em disco.
-  - Para reindexar após grandes alterações: basta chamar `ctx_index` novamente sobre a mesma subpasta e `source` (recalculo incremental rápido).
+- **Consumo posterior**: qualquer busca de código semântica ou estrutural usa: `ctx_search({ source: "code:<project-id>", queries: ["nomeDaClasse", "padrao arquitetural", "metodo"] })`.
+- **Detecção de alteração (Staleness / Frescor de cache)**: O `context-mode` armazena o hash SHA-256 de cada arquivo indexado; se alterado no disco, `ctx_search` sinaliza `[STALE / OUTDATED]`. **Regra de Ouro (Search para Descobrir, Read para Editar)**: `ctx_search` serve como mapa de localização; antes de editar, releia o arquivo real (`read_file`) para aplicar a mudança sobre a versão mais recente em disco. Para reindexar após grandes alterações, chame `ctx_index` novamente sobre a mesma subpasta e `source` (recálculo incremental rápido).
 
 ## 3.2) Leitura Cirúrgica vs. Agregação em Sandbox (R-048)
 
 A regra **R-048** estabelece critérios objetivos para evitar o tráfego desnecessário de conteúdo bruto na memória conversacional:
 - **`read_file(offset, limit)` (Leitura Pontual/Pequena)**: Utilize quando o objetivo for inspecionar ou preparar uma edição localizada após encontrar a linha via `grep_search`. A janela útil recomendada é de 60 a 80 linhas. Nunca leia o arquivo integralmente (>100 linhas) apenas para editar uma função ou método isolado.
 - **`ctx_execute` (Agregação/Processamento de Arquivo Grande)**: Utilize quando o arquivo for extenso (>300 linhas ou logs) e o objetivo for sumarizar, extrair métricas, filtrar padrões ou responder perguntas analíticas sem necessidade de edição direta no editor. O arquivo é processado dentro do sandbox e apenas o resultado sintetizado retorna ao chat.
-
 
 ## 3.3) Padrão `CONTEXT.md` (Glossário de Domínio Compartilhado para Compressão Semântica)
 
@@ -277,17 +266,9 @@ A transição de chamadas diretas de ferramentas (tool-calling declarativo) para
 
 ### Política Anti-Timeout, Runtime Preferencial JavaScript (`fs` nativo) e Circuit Breaker Fail-Fast (`ctx_execute` / `ctx_batch`)
 
-1. **Runtime Obrigatório `language: "javascript"` no `ctx_execute` (Anti-Defender/AMSI Hang)**:
-   - No Windows, a invocação de `python.exe` (`language: "python"` ou `python -c`) ou cadeias pesadas de subshells a partir do processo Node.js do servidor MCP `context-mode` sofre interceptação síncrona pelo Windows Defender (`MsMpEng.exe` / Behavior Monitoring / AMSI), causando bloqueios severos de I/O e timeouts (`ETIMEDOUT` / `taskkill /F /T`).
-   - Portanto, `language: "javascript"` (com módulos nativos `fs` e `path` do Node.js) é o **runtime obrigatório** no `ctx_execute` para leitura, inspeção, busca, parsing JSON/texto e modificação em lote de arquivos.
-   - É **terminantemente proibido** invocar `language: "python"`, `python -c` ou subshells aninhados para I/O de arquivos. (A execução de binários Python via `child_process` é restrita exclusivamente a ferramentas CLI do ecossistema, como `pytest` ou scripts de sincronização canônicos, nunca para ler/editar arquivos).
-2. **Higiene de Comandos em `ctx_batch`**:
-   - Os comandos shell em `ctx_batch` devem ser leves, atômicos e com escopo de diretório estritamente restrito.
-   - É **proibido** disparar `python -c` inline em lote ou varreduras recursivas irrestritas na raiz do workspace sem filtro de pasta/extensão (evitando estourar o orçamento de tempo do batch).
-3. **Política Fail-Fast & Circuit Breaker de Timeout (Máx. 1 Retry com Troca de Estratégia)**:
-   - Em caso de erro de timeout (`ETIMEDOUT`, `timed out`, `taskkill`) em `ctx_execute` ou `ctx_batch`, o agente tem **tolerância zero para repetir a mesma chamada/runtime**.
-   - É permitido no **máximo 1 retry**, contanto que haja **troca obrigatória de estratégia** (migrar de `python`/`shell` para `language: "javascript"` puro com `fs` nativo, ou dividir o lote em comandos menores/escopo restrito).
-   - Se ocorrer um **2º timeout**, o **Circuit Breaker Fail-Fast** abre imediatamente: o agente deve abortar novas tentativas de spawn, registrar a evidência e acionar o fallback canônico ou reportar o bloqueio em formato Compact Error Reporting (R-020).
+1. **Runtime Obrigatório `language: "javascript"` no `ctx_execute` (Anti-Defender/AMSI Hang)**: No Windows, a invocação de `python.exe` (`language: "python"` ou `python -c`) ou cadeias pesadas de subshells a partir do processo Node.js do servidor MCP `context-mode` sofre interceptação síncrona pelo Windows Defender (`MsMpEng.exe` / Behavior Monitoring / AMSI), causando bloqueios severos de I/O e timeouts (`ETIMEDOUT` / `taskkill /F /T`). Portanto, `language: "javascript"` (com módulos nativos `fs` e `path` do Node.js) é o **runtime obrigatório** no `ctx_execute` para leitura, inspeção, busca, parsing JSON/texto e modificação em lote de arquivos. É **terminantemente proibido** invocar `language: "python"`, `python -c` ou subshells aninhados para I/O de arquivos (a execução de binários Python via `child_process` é restrita exclusivamente a ferramentas CLI do ecossistema, como `pytest` ou scripts de sincronização canônicos, nunca para ler/editar arquivos).
+2. **Higiene de Comandos em `ctx_batch`**: Os comandos shell em `ctx_batch` devem ser leves, atômicos e com escopo de diretório estritamente restrito. É **proibido** disparar `python -c` inline em lote ou varreduras recursivas irrestritas na raiz do workspace sem filtro de pasta/extensão (evitando estourar o orçamento de tempo do batch).
+3. **Política Fail-Fast & Circuit Breaker de Timeout (Máx. 1 Retry com Troca de Estratégia)**: Em caso de erro de timeout (`ETIMEDOUT`, `timed out`, `taskkill`) em `ctx_execute` ou `ctx_batch`, o agente tem **tolerância zero para repetir a mesma chamada/runtime**. É permitido no **máximo 1 retry**, contanto que haja **troca obrigatória de estratégia** (migrar de `python`/`shell` para `language: "javascript"` puro com `fs` nativo, ou dividir o lote em comandos menores/escopo restrito). Se ocorrer um **2º timeout**, o **Circuit Breaker Fail-Fast** abre imediatamente: o agente deve abortar novas tentativas de spawn, registrar a evidência e acionar o fallback canônico ou reportar o bloqueio em formato Compact Error Reporting (R-020).
 
 ## Checklist de Conformidade
 
@@ -296,3 +277,12 @@ A transição de chamadas diretas de ferramentas (tool-calling declarativo) para
 ## Referências
 
 - Detalhamento estendido em `references/` e documentação normativa em `CLAUDE.md`.
+
+### Matriz Canônica dos 4 Perfis de Distribuição (`context-mode`)
+
+| Perfil Canônico | Escopo / Artefatos | Tools `context-mode` Autorizadas | Cláusula `<execution_protocol>` e Guardrails |
+| :--- | :--- | :--- | :--- |
+| **`COMPUTE_MUTATE`** | Agents executores e especialistas híbridos (incluindo `database-specialist`, `oracle-database-specialist`, `informix-database-specialist`) | `ctx_execute`, `ctx_batch`, `ctx_search`, `ctx_index`, `ctx_resume` | `CLAUSE_BATCH_OR_EXEC` / `CLAUSE_EXEC_ONLY` — mutação e I/O em lote via Node.js (`language: "javascript"`) |
+| **`COMPUTE_READONLY`** | 7 agents Read-Only Score 0 (`agent-auditor`, `tech-solution-architect`, `performance-agent`, `refactor-planner`, `business-rules-extractor`, `codegraph-engine`, `ddd-bounded-context-mapper`) + prompts analíticos (`validate.prompt.md`, `strategic-review.prompt.md`) | `ctx_execute`, `ctx_batch`, `ctx_search`, `ctx_index`, `ctx_resume` | `CLAUSE_BATCH_OR_EXEC_READONLY` — `ctx_execute` JS estritamente Read-Only para agregação/parsing em memória; proibido `fs.writeFileSync`, `fs.appendFileSync`, `fs.unlinkSync`, `fs.rmSync` |
+| **`GATHER_ONLY`** | 24 agents consultivos, revisores, planejadores e auditores sem computação pesada | `ctx_batch`, `ctx_search`, `ctx_index`, `ctx_resume` (sem `ctx_execute`) | `CLAUSE_BATCH_ONLY` — coleta e busca em lote via `ctx_batch` e `ctx_search`; proibido instruir `ctx_execute` no corpo |
+| **`ROUTER_EXEMPT`** | 6 roteadores puros (`agent-router` e domain routers, R-054) | Nenhuma (isentos de `context-mode`) | Sem `<execution_protocol>` de `context-mode` (passthrough OTEL puro) |

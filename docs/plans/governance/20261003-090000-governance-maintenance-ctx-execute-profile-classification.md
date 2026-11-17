@@ -104,3 +104,11 @@ Todos os demais agentes do catálogo de governança retêm suas capacidades comp
   - `governance-audit-patterns/SKILL.md`: registro formal do **Smell 2.32** (*Capability Overreach de ctx_execute / ctx_execute_file em Agent Gather-only*).
 - **Q3 (Teste determinístico no pytest)**:
   - Criação de `tests/governance_audit/test_ctx_execute_capability_profile.py` com validação estática de não-regressão.
+
+---
+
+## Nota de Reconciliação Histórica (Pós-Revisão Arquitetural R-064)
+
+> **Referência Cruzada Canônica**: Este plano histórico foi reconciliado e refinado por `docs/plans/governance/20261117-120000-governance-maintenance-ctx-execute-profile-revisao.md`:
+> 1. **Evolução da Contagem `GATHER_ONLY` (`26 -> 25 -> 24`)**: Da listagem preliminar de 26 agents, `tech-writer` já fora preservado como executor documentador (25), e `database-specialist` foi restaurado ao perfil híbrido `COMPUTE_MUTATE` (retornando `context-mode/ctx_execute` ao seu frontmatter em paridade com `oracle-database-specialist` e `informix-database-specialist`), consolidando **24 agents `GATHER_ONLY`**.
+> 2. **Taxonomia Canônica de 4 Perfis**: Formalização dos perfis `COMPUTE_MUTATE`, `COMPUTE_READONLY` (7 agents Read-Only Score 0 + prompts `validate.prompt.md` e `strategic-review.prompt.md` com guardrail anti-mutação `CLAUSE_BATCH_OR_EXEC_READONLY`), `GATHER_ONLY` (24 agents com `CLAUSE_BATCH_ONLY` e erradicação de instruções órfãs de `ctx_execute` no corpo) e `ROUTER_EXEMPT` (6 roteadores puros).

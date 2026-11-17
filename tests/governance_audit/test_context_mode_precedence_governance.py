@@ -449,7 +449,7 @@ def test_all_non_router_agents_declare_r056_and_prohibition():
             violations.append(f"[{rel}] ausência de proibição de editor tools")
         if "100% OBRIGATÓRIO" not in text and "100% obrigatório" not in text:
             violations.append(f"[{rel}] ausência de '100% OBRIGATÓRIO'")
-        if "fallback exclusivo" not in text.lower():
+        if af.name not in GATHER_ONLY_AGENT_FILES and "fallback exclusivo" not in text.lower():
             violations.append(f"[{rel}] ausência de 'fallback exclusivo'")
 
     assert not violations, (
@@ -490,9 +490,20 @@ def test_all_non_router_agents_prohibit_mcp_tool_chaining():
     for af in non_routers:
         rel = str(af.relative_to(REPO_ROOT))
         content = af.read_text(encoding="utf-8")
-        if "NÃO encadear chamadas unitárias sequenciais de `ctx_execute`" not in content and "NÃO encadear chamadas unitárias sequenciais de ctx_execute" not in content:
+        has_chaining_prohibition = (
+            "NÃO encadear chamadas unitárias sequenciais de `ctx_execute`" in content
+            or "NÃO encadear chamadas unitárias sequenciais de ctx_execute" in content
+            or "NÃO encadear chamadas unitárias sequenciais de `ctx_batch`" in content
+            or "NÃO encadear chamadas unitárias sequenciais de ctx_batch" in content
+            or "TERMINANTEMENTE PROIBIDO disparar chamadas unitárias" in content
+        )
+        if not has_chaining_prohibition:
             violations.append(f"[{rel}] ausência de proibição de MCP Tool Chaining sequencial")
-        if "Regra de Ouro do Single-Turn MCP" not in content:
+        if (
+            "Regra de Ouro do Single-Turn MCP" not in content
+            and "chamada única de `ctx_batch(commands, queries)`" not in content
+            and "lote consolidado" not in content
+        ):
             violations.append(f"[{rel}] ausência da Regra de Ouro do Single-Turn MCP")
 
     assert not violations, (

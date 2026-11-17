@@ -147,6 +147,7 @@ Manter documento `> 300 linhas` em `source_docs:` (full-load) em vez de `source_
 ### 2.32 — Capability Overreach de `ctx_execute` (com `file`) em Agent Gather-only (R-008 / R-046 / R-056 / R-059)
 Agente estritamente read-only/gather-only que utiliza `ctx_execute` para mutar estado ou executar ações fora do perfil analítico.
 
+  - **Matriz Canônica de 4 Perfis (`context-mode`)**: (1) `COMPUTE_MUTATE` (executors/híbridos com `ctx_execute` JS para leitura e mutação em lote, incluindo `database-specialist`, `oracle-database-specialist` e `informix-database-specialist`); (2) `COMPUTE_READONLY` (7 agents Read-Only Score 0 + prompts analíticos `validate.prompt.md` e `strategic-review.prompt.md` que retêm `ctx_execute` JS estritamente Read-Only para parsing/agregação em memória, vedado `fs.writeFileSync`/`fs.appendFileSync`/`fs.unlinkSync`/`fs.rmSync`); (3) `GATHER_ONLY` (24 agents consultivos/revisores restritos a `ctx_batch`, `ctx_search`, `ctx_index`, `ctx_resume`, sem `ctx_execute`); (4) `ROUTER_EXEMPT` (roteadores puros isentos de `context-mode`, R-054).
 ### 2.33 — Importação de Skill Externa sem Avaliação de Pertinência (Skill Import Viability Gate / R-067)
 Materializar ou copiar skill externa sem executar os 4 critérios do gate `R-067` (Pertinência, Duplicidade, Aderência Estrutural e Guardrails) ou omitir proveniência (`adapted_from`, `source_url`, `source_license`, `adaptation_notes`).
 

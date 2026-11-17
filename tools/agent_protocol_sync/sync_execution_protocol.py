@@ -20,9 +20,26 @@ PROMPTS_DIR = REPO_ROOT / ".github" / "prompts"
 
 CLAUSE_BATCH_OR_EXEC = "Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de `ctx_execute` por alvo no chat. Use compulsoriamente `ctx_batch(commands, queries)` OU script iterativo consolidado em `ctx_execute`. No `ctx_execute`, use obrigatoriamente `language: \"javascript\"` (`fs`/`path` nativos do Node.js) para I/O, inspeção e mutação de arquivos (proibido `language: \"python\"` ou `python -c` para I/O, evitando bloqueio do `python.exe` pelo Windows Defender/AMSI); em `ctx_batch`, use apenas comandos shell leves com escopo restrito (proibido `python -c` inline ou varreduras recursivas irrestritas). Em caso de timeout (`ETIMEDOUT`/`timed out`/`taskkill`), aplica-se **Circuit Breaker Fail-Fast**: tolerância zero para repetir a mesma chamada/runtime — máximo de **1 retry** exigindo troca obrigatória de estratégia (migrar para `language: \"javascript\"` puro com `fs` ou reduzir o lote); no 2º timeout, aborte novos spawns e reporte em formato Compact Error Reporting (R-020)."
 
+CLAUSE_BATCH_OR_EXEC_READONLY = "Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de `ctx_execute` por alvo no chat. Use compulsoriamente `ctx_batch(commands, queries)` OU script iterativo consolidado em `ctx_execute`. No `ctx_execute`, use obrigatoriamente `language: \"javascript\"` (`fs`/`path` nativos do Node.js) **exclusivamente em modo Read-Only** para leitura, parsing, contagem e agregação em memória (é TERMINANTEMENTE PROIBIDO invocar `fs.writeFileSync`, `fs.appendFileSync`, `fs.unlinkSync`, `fs.rmSync` ou mutar arquivos em disco, e proibido `language: \"python\"` ou `python -c` para I/O, evitando bloqueio do `python.exe` pelo Windows Defender/AMSI); em `ctx_batch`, use apenas comandos shell leves com escopo restrito (proibido `python -c` inline ou varreduras recursivas irrestritas). Em caso de timeout (`ETIMEDOUT`/`timed out`/`taskkill`), aplica-se **Circuit Breaker Fail-Fast**: tolerância zero para repetir a mesma chamada/runtime — máximo de **1 retry** exigindo troca obrigatória de estratégia (migrar para `language: \"javascript\"` puro com `fs` Read-Only ou reduzir o lote); no 2º timeout, aborte novos spawns e reporte em formato Compact Error Reporting (R-020)."
+
 CLAUSE_EXEC_ONLY = "Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de `ctx_execute` por alvo no chat. Use compulsoriamente script iterativo consolidado em `ctx_execute`. No `ctx_execute`, use obrigatoriamente `language: \"javascript\"` (`fs`/`path` nativos do Node.js) para I/O, inspeção e mutação de arquivos (proibido `language: \"python\"` ou `python -c` para I/O, evitando bloqueio do `python.exe` pelo Windows Defender/AMSI). Em caso de timeout (`ETIMEDOUT`/`timed out`/`taskkill`), aplica-se **Circuit Breaker Fail-Fast**: tolerância zero para repetir a mesma chamada/runtime — máximo de **1 retry** exigindo troca obrigatória de estratégia (migrar para `language: \"javascript\"` puro com `fs` ou reduzir o escopo); no 2º timeout, aborte novos spawns e reporte em formato Compact Error Reporting (R-020)."
 
-CLAUSE_GATHER_ONLY = "Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de inspeção por alvo no chat. Use compulsoriamente `ctx_batch(commands, queries)` agrupando comandos e queries em lote único. Em `ctx_batch`, use apenas comandos shell leves, atômicos e com escopo de diretório restrito (proibido `python -c` inline em lote ou varreduras recursivas irrestritas na raiz sem filtro de pasta/extensão, evitando bloqueio pelo Windows Defender/AMSI). Em caso de timeout (`ETIMEDOUT`/`timed out`/`taskkill`) em `ctx_batch`, aplica-se **Circuit Breaker Fail-Fast**: tolerância zero para repetir o mesmo comando — máximo de **1 retry** exigindo troca obrigatória de estratégia (dividir o lote em comandos menores ou restringir o diretório); no 2º timeout, aborte novos spawns e reporte em formato Compact Error Reporting (R-020)."
+CLAUSE_BATCH_ONLY = "Se a tarefa envolver 2 (dois) ou mais arquivos ou comandos, é TERMINANTEMENTE PROIBIDO disparar chamadas unitárias de busca ou inspeção por alvo no chat. Use compulsoriamente `ctx_batch(commands, queries)` e `ctx_search(queries)` em lote consolidado. Em `ctx_batch`, use apenas comandos shell leves com escopo restrito (proibido `python -c` inline ou varreduras recursivas irrestritas). Em caso de timeout (`ETIMEDOUT`/`timed out`/`taskkill`), aplica-se **Circuit Breaker Fail-Fast**: tolerância zero para repetir a mesma chamada/runtime — máximo de **1 retry** exigindo troca obrigatória de estratégia (reduzir o lote ou usar `ctx_search`); no 2º timeout, aborte novos spawns e reporte em formato Compact Error Reporting (R-020)."
+
+CLAUSE_GATHER_ONLY = CLAUSE_BATCH_ONLY
+CLAUSE_SEARCH_ONLY = CLAUSE_BATCH_OR_EXEC
+
+COMPUTE_READONLY_AGENTS: set[str] = {
+    "agent-auditor",
+    "tech-solution-architect",
+    "performance-agent",
+    "refactor-planner",
+    "business-rules-extractor",
+    "codegraph-engine",
+    "ddd-bounded-context-mapper",
+    "validate",
+    "strategic-review",
+}
 
 BLOCK_RE = re.compile(
     r"(?:^## ⚙️ Protocolo de Execução Obrigatório\s*\n+)?<execution_protocol>([\s\S]*?)</execution_protocol>",
@@ -147,18 +164,39 @@ def get_prompt_files() -> list[Path]:
     return [p for p in all_files if "templates" not in p.parts]
 
 
-def build_execution_protocol_block(path: Path, fragments: dict[str, str]) -> str:
+def resolve_consolidate_clause(path: Path, tools: list[str], text: str | None = None) -> str:
+    artifact_id = path.name.replace(".agent.md", "").replace(".prompt.md", "")
+    content = text if text is not None else path.read_text(encoding="utf-8")
+    if "context-mode/ctx_execute" in tools:
+        is_readonly = (
+            artifact_id in COMPUTE_READONLY_AGENTS
+            or "Score 0 (Read-Only)" in content
+            or "COMPUTE_READONLY" in content
+        )
+        if is_readonly:
+            return CLAUSE_BATCH_OR_EXEC_READONLY
+        return CLAUSE_BATCH_OR_EXEC
+    if "context-mode/ctx_batch" in tools:
+        return CLAUSE_BATCH_ONLY
+    return CLAUSE_SEARCH_ONLY
+
+
+def build_execution_protocol_block(path: Path, fragments: dict[str, str], text: str | None = None) -> str:
     tools = extract_tools(path)
     fm_data = extract_frontmatter_dict(path)
+    content = text if text is not None else path.read_text(encoding="utf-8")
 
     has_mutation = (
         any(t in tools for t in ["replace_string_in_file", "create_file", "insert_edit_into_file", "get_errors"])
-        or any(t in tools for t in ["context-mode/ctx_execute", "context-mode/ctx_execute"])
+        or "context-mode/ctx_execute" in tools
     )
     has_subagent = "run_subagent" in tools
     has_lazy = bool(fm_data.get("source_docs_lazy"))
 
-    items = [fragments["CORE"]]
+    clause = resolve_consolidate_clause(path, tools, content)
+    core_text = fragments["CORE"].replace(CLAUSE_BATCH_OR_EXEC, clause)
+
+    items = [core_text]
     next_idx = 6
 
     if has_mutation:
@@ -175,6 +213,11 @@ def build_execution_protocol_block(path: Path, fragments: dict[str, str]) -> str
 
     body = "\n".join(items).strip()
     return f"## ⚙️ Protocolo de Execução Obrigatório\n\n<execution_protocol>\n\n{body}\n\n</execution_protocol>"
+
+
+def expected_protocol_block(file_path: Path, text: str | None = None) -> str:
+    fragments = load_canonical_fragments()
+    return build_execution_protocol_block(file_path, fragments, text=text)
 
 
 def sync_prompts(fragments: dict[str, str], apply: bool) -> tuple[list[str], list[str]]:
@@ -196,7 +239,7 @@ def sync_prompts(fragments: dict[str, str], apply: bool) -> tuple[list[str], lis
                     updated.append(pf.name)
             continue
 
-        expected_block = build_execution_protocol_block(pf, fragments)
+        expected_block = build_execution_protocol_block(pf, fragments, text=text)
 
         if m is None:
             drifted.append(pf.name)
@@ -283,7 +326,7 @@ def main() -> int:
                     updated.append(agent_id)
             continue
 
-        expected_block = build_execution_protocol_block(af, fragments)
+        expected_block = build_execution_protocol_block(af, fragments, text=text)
         if current_full_block == expected_block.strip():
             continue
 
