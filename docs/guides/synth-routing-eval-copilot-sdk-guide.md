@@ -464,7 +464,7 @@ No adaptador `src/governance_runner/runner/sdk_adapter.py`, a flag `--model` é 
 | :---: | :--- | :--- | :--- | :--- | :--- |
 | — | `Auto` (`pinnable: false`) | `github` | Variável | *(omitir a flag `--model`)* | Usa o seletor automático do runtime Copilot |
 | **1** | `Claude Haiku 5.5` | `anthropic` | **Low** (`10` / `50`) | `claude-haiku-5.5` | **Recomendado para `synth-generate --generator-mode sdk`** (geração rápida e de baixo custo) |
-| **2** | `Gemini Hydrogen 4` | `google` | **Low** (`75` / `375`) | `gemini-hydrogen-4` | Alternativa rápida de baixo custo para geração sintética |
+| **2** | `Gemini 4 Hydrogen` | `google` | **Low** (`75` / `375`) | `gemini-hydrogen-4` | Alternativa rápida de baixo custo para geração sintética |
 | **3** | `Grok 4.7` | `xai` | **Medium** (`200` / `600`) | `grok-4.7` | Avaliação intermediária ou geração diversificada |
 | **4** | `Gemini 4 Carbon` | `google` | **Medium** (`200` / `1000`) | `gemini-4-carbon` | Avaliação de roteamento em lote (`synth-eval`) |
 | **5** | `Claude Sonnet 5.5` | `anthropic` | **Medium** (`300` / `1500`) | `claude-sonnet-5.5` | **Recomendado para `synth-eval`** (paridade com o modelo padrão do `agent-router`) |

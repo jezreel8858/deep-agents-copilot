@@ -12,7 +12,7 @@ handoff_payload:
   emissor:                                # identidade do agent delegante (P10)
     nome: "<nome-do-agent-atual>"
     versao: "<versao-semantica>"          # ex.: "1.1.0"
-    modelo_llm: "<modelo-usado>"          # ex.: "Gemini Hydrogen 4"
+    modelo_llm: "<modelo-usado>"          # ex.: "Gemini 4 Hydrogen"
     timestamp: "<ISO-8601>"              # ex.: "2026-08-28T14:23:00Z"
   roteamento_grafo:                       # extensão aditiva (v1.1) — topologia e transição de estado, opcional
     current_node: "<nome-do-agent-atual>" # string — alias explícito do nó emissor
@@ -167,4 +167,5 @@ fan_out:
 
 **Anti-padrão**: fan-out sem ponto explícito de fan-in resulta em resultados fragmentados sem síntese. Prefira sempre delegação única quando o ganho de paralelismo não for evidente.
 
---- — **Cadeia Pós-Plano R-064/R-065**: retorno `motivo: "plano_materializacao_pendente"` (`plan_gate_status: "pending_materialization"`) → `@docs-engineer` (materializador canônico único das 8 subpastas de `docs/plans/<tipo>/` em `DRAFT`) → `@plan-critic` (teto 2x R-065, `review_verdict: "PASS" | "PASS_WITH_NITS"`) → Gate HITL (`ask_questions`) → executor (`status: "APPROVED"`, `approved: true`; Q&A consultivo puro isento).
+---
+ — **Cadeia Pós-Plano R-064/R-065**: retorno `motivo: "plano_materializacao_pendente"` (`plan_gate_status: "pending_materialization"`) → `@docs-engineer` (materializador canônico único das 8 subpastas de `docs/plans/<tipo>/` em `DRAFT`) → `@plan-critic` (teto 2x R-065, `review_verdict: "PASS" | "PASS_WITH_NITS"`) → Gate HITL (`ask_questions`) → executor (`status: "APPROVED"`, `approved: true`; Q&A consultivo puro isento).

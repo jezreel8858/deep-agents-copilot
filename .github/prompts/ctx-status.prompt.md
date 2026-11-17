@@ -3,7 +3,7 @@ name: ctx-status
 description: Exibe estatísticas de consumo do Context Mode usando `ctx_stats` para diagnosticar uso de contexto e economia.
 agent: 'agent'
 router_bypass: utility
-model: "Gemini Hydrogen 4"
+model: "Gemini 4 Hydrogen"
 tools: ['context-mode/ctx_stats']
 argument-hint: ''
 source_docs:

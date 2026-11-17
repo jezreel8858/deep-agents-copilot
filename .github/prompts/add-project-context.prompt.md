@@ -7,7 +7,7 @@ description: >-
   Execute UMA VEZ POR PROJETO (reutilizável). PRÉ-REQUISITO `/init-context` já executado.
 agent: 'agent'
 router_bypass: slash_workflow
-model: "Gemini Hydrogen 4"
+model: "Gemini 4 Hydrogen"
 tools: ['file_search', 'grep_search', 'read_file', 'run_in_terminal', 'run_subagent', 'ask_questions', 'context-mode/ctx_search', 'context-mode/ctx_index', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_resume']
 argument-hint: '<caminho-absoluto-do-projeto>'
 source_docs:

@@ -4,7 +4,7 @@ description: "<Descrição concisa em 3ª pessoa do comando slash, ≤ 200 carac
 agent: "<agent-alvo-ou-agent-router>"
 # Opcional — router_bypass: utility | slash_workflow (todos os Slash Prompts exceto /agent-router declaram router_bypass para execução direta sem passar por @agent-router)
 # router_bypass: utility | slash_workflow (prompts router_bypass: slash_workflow requerem context-mode/ctx_index, ctx_search, ctx_batch e ctx_resume; prompts router_bypass: utility não requerem context-mode/ctx_resume)
-model: "Gemini Hydrogen 4"
+model: "Gemini 4 Hydrogen"
 tools: ['grep_search', 'file_search', 'list_dir', 'get_errors', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_index', 'context-mode/ctx_resume', 'context-mode/ctx_search']
 argument-hint: "[caminho-ou-escopo] [--opcoes]"
 # R-066 (Progressive Disclosure): docs <= 300 linhas em source_docs:; docs > 300 linhas em source_docs_lazy:

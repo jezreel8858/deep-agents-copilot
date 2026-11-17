@@ -7,7 +7,7 @@ description:
   NÃO REPITA na mesma sessão — faz 1x apenas.
 agent: 'agent'
 router_bypass: slash_workflow
-model: "Gemini Hydrogen 4"
+model: "Gemini 4 Hydrogen"
 tools: ['read_file', 'list_dir', 'run_subagent', 'run_in_terminal', 'ask_questions', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_search', 'context-mode/ctx_stats', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 argument-hint: ''
 source_docs:

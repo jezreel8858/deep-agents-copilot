@@ -3,7 +3,7 @@ name: ctx-insight
 description: Abre o dashboard de analytics do Context Mode com `ctx_insight` para observar uso de ferramentas e sessões.
 agent: 'agent'
 router_bypass: utility
-model: "Gemini Hydrogen 4"
+model: "Gemini 4 Hydrogen"
 tools: ['context-mode/ctx_stats']
 argument-hint: '[port]'
 source_docs:

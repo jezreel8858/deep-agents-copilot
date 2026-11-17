@@ -3,7 +3,7 @@ name: ctx-checkpoint
 description: Grava snapshot de sessão no Context Mode via `ctx_index` (persistência cross-session) para retomada com `/ctx-resume`.
 agent: 'agent'
 router_bypass: utility
-model: "Gemini Hydrogen 4"
+model: "Gemini 4 Hydrogen"
 tools: ['context-mode/ctx_index']
 argument-hint: ''
 source_docs:

@@ -6,7 +6,7 @@ description: >-
   Vai além do /ctx-doctor (que cobre apenas Context Mode MCP).
 agent: 'agent'
 router_bypass: utility
-model: "Gemini Hydrogen 4"
+model: "Gemini 4 Hydrogen"
 tools: ['read_file', 'list_dir', 'file_search', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_search']
 argument-hint: '[--quick | categoria]'
 source_docs:

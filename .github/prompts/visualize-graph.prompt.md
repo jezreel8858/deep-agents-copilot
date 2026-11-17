@@ -6,7 +6,7 @@ description:
   (isolados/órfãos, papéis, camadas, multi-select de repositórios) e pontes de integração REST.
 agent: 'agent'
 router_bypass: slash_workflow
-model: "Gemini Hydrogen 4"
+model: "Gemini 4 Hydrogen"
 tools: ['read_file', 'file_search', 'list_dir', 'run_in_terminal', 'run_subagent', 'context-mode/ctx_execute', 'context-mode/ctx_batch', 'context-mode/ctx_search', 'context-mode/ctx_index', 'context-mode/ctx_resume']
 argument-hint: '[--diff <ref> | --bridges <file>]'
 source_docs:

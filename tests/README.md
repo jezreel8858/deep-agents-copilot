@@ -14,7 +14,7 @@ Diferente de aplicações monolíticas tradicionais, um sistema multi-agente ope
 ```text
                         ▲
                        / \     Camada 3: Avaliação de Trajetória / User Simulation
-                      / L3\    Prompt /eval-workflows com Gemini Hydrogen 4 (caso a caso)
+                      / L3\    Prompt /eval-workflows com Gemini 4 Hydrogen (caso a caso)
                      /-----\
                     /  L2   \  Camada 2: Trajetórias E2E & Invariantes de Handoff
                    /         \ Transições de workflows, schema v1.3 e isolamento de tools
@@ -26,7 +26,7 @@ Diferente de aplicações monolíticas tradicionais, um sistema multi-agente ope
 
 - **Camada 1 (Tier 1 — Estático / 0 Tokens)**: Valida topologia de grafos, esquemas YAML, conformidade de seções contra templates canônicos (1-de-N), isolamento de dados de projetos locais e ausência de *dead-ends*.
 - **Camada 2 (Tier 1.5 — Trajetórias & Contratos de Transição)**: Valida sequências completas de estados dos 5 Workflows Canônicos (R-050), detecção de deriva de intenção (R-042), ativação de Circuit Breakers (R-050.2) e propagação do `state_bag`.
-- **Camada 3 (Tier 2 — Simulação Orientada a Cenários)**: Avaliação de interações reais via modelo SLM (`Gemini Hydrogen 4`) disparada sob demanda por cenário unitário (anti-decaimento de contexto).
+- **Camada 3 (Tier 2 — Simulação Orientada a Cenários)**: Avaliação de interações reais via modelo SLM (`Gemini 4 Hydrogen`) disparada sob demanda por cenário unitário (anti-decaimento de contexto).
 
 ---
 
@@ -127,7 +127,7 @@ Abaixo detalha-se o escopo de cobertura e a importância crítica de cada arquiv
 - **O que cobre**: Motor executivo em Python (CLI) que implementa:
   - Validação estática de trajetórias em lote com emissão de relatórios formatados em console ou JSON.
   - Cálculo analítico das 5 dimensões de cobertura de workflows contra o grafo.
-  - Ponto de integração para execução de simulações com o modelo `Gemini Hydrogen 4`.
+  - Ponto de integração para execução de simulações com o modelo `Gemini 4 Hydrogen`.
 - **Importância para a qualidade**: **Observabilidade e Diagnóstico Rápido**. Permite aos engenheiros e ao CI/CD inspecionar a saúde dos fluxos em milissegundos sem depender de sessões manuais de chat.
 
 ---

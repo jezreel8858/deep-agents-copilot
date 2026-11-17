@@ -3,7 +3,7 @@ name: ctx-resume
 description: Retoma contexto específico via `ctx_search(source:"checkpoint::<slug>")`. Cobre cenário de múltiplos chats abertos com checkpoints distintos — lista e seleciona o correto.
 agent: 'agent'
 router_bypass: utility
-model: "Gemini Hydrogen 4"
+model: "Gemini 4 Hydrogen"
 tools: ['context-mode/ctx_search', 'ask_questions']
 argument-hint: '[<task-slug>]'
 source_docs:

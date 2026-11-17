@@ -7,7 +7,7 @@ description: >-
   git add/commit/push.
 agent: 'agent'
 router_bypass: utility
-model: "Gemini Hydrogen 4"
+model: "Gemini 4 Hydrogen"
 tools: ['context-mode/ctx_batch', 'context-mode/ctx_execute', 'context-mode/ctx_search']
 argument-hint: '[contexto-opcional-da-mudança]'
 source_docs:

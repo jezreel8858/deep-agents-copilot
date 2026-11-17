@@ -3,7 +3,7 @@ name: <slug-kebab-case>
 description: >-
   <Descrição concisa em 3ª pessoa, ≤ 400 caracteres. Explica O QUÊ o agente faz, QUANDO deve ser invocado (frase-gatilho) e principal limite negativo.>
 # Seleção de Modelo (governance-factory-patterns/SKILL.md §9 e R-021):
-# - "Gemini Hydrogen 4" -> Perfil Procedural / Operacional / SLM de alta velocidade (padrão para executores leves e test-writers)
+# - "Gemini 4 Hydrogen" -> Perfil Procedural / Operacional / SLM de alta velocidade (padrão para executores leves e test-writers)
 # - "Claude Sonnet 5.5"  -> Perfil Decompositivo / Deliberativo / Raciocínio Guiado (arquitetura, planejamento, desenvolvedores [*-developer], engenheiros de teste [*-test-engineer])
 # NOTA DE GOVERNANÇA (R-021 — Model Routing Signal):
 # É PROIBIDO fixar 'model:' permanentemente em tier premium ("Claude Opus" ou equivalente de tier máximo) para papéis de

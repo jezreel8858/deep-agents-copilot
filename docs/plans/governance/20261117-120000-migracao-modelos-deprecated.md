@@ -119,7 +119,7 @@ Este plano de manutenção de governança formaliza a substituição determinís
 | Modelo Deprecated (Origem) | Modelo Canônico Substituto (Destino) | Escopo de Aplicação |
 | :--- | :--- | :--- |
 | `Gemini 4 Argon` | `Gemini 4 Carbon` | Agentes (`.github/agents/**`), Prompts (`.github/prompts/**`), Skills (`.github/skills/**`), AgentCards (`.a2a/agentcards/**`), Perfis de Modelo, Documentação Viva e Testes |
-| `Gemini 3.8 Flash` | `Gemini Hydrogen 4` | Agentes (`.github/agents/**`), Prompts (`.github/prompts/**`), Skills (`.github/skills/**`), AgentCards (`.a2a/agentcards/**`), Perfis de Modelo, Documentação Viva e Testes |
+| `Gemini 3.8 Flash` | `Gemini 4 Hydrogen` | Agentes (`.github/agents/**`), Prompts (`.github/prompts/**`), Skills (`.github/skills/**`), AgentCards (`.a2a/agentcards/**`), Perfis de Modelo, Documentação Viva e Testes |
 
 ### 1.2. Síntese Quantitativa da Auditoria (`@agent-auditor`)
 
@@ -134,12 +134,12 @@ Este plano de manutenção de governança formaliza a substituição determinís
 
 ## 2. Portão de Reúso e Generalização Sistêmica (R-055 — Q0, Q1, Q2, Q3)
 
-- **Q0 (Origem Upstream / RCA)**: A atualização da allowlist oficial (`model-allowlist.yaml`) substituiu os identificadores `Gemini 4 Argon` por `Gemini 4 Carbon` e `Gemini 3.8 Flash` por `Gemini Hydrogen 4`. Artefatos declarativos, catálogos, templates, snapshots A2A e testes de paridade que referenciavam os nomes antigos precisam convergir atomicamente para evitar deriva de catálogo (R-015) e falhas de paridade.
+- **Q0 (Origem Upstream / RCA)**: A atualização da allowlist oficial (`model-allowlist.yaml`) substituiu os identificadores `Gemini 4 Argon` por `Gemini 4 Carbon` e `Gemini 3.8 Flash` por `Gemini 4 Hydrogen`. Artefatos declarativos, catálogos, templates, snapshots A2A e testes de paridade que referenciavam os nomes antigos precisam convergir atomicamente para evitar deriva de catálogo (R-015) e falhas de paridade.
 - **Q1 (Peers / Artefatos Análogos)**: A varredura cobriu 100% dos peers em `.github/agents/**` (root 9, backend 10, frontend 4), `.github/prompts/**` (18 prompts + catálogo/README), `.github/skills/**` (5 arquivos), `model-profiles.yaml`, `model-profiles.local.yaml.example` (registrado em §3.10 fora de `allowed_files` para não acionar o filtro `*.local.*` do Tier 1 C10), `.a2a/agentcards/**` (9 snapshots) e documentações vivas em `docs/**` e `tests/README.md` (4 arquivos).
 - **Q2 (Templates Canônicos)**: Incluídos explicitamente no escopo ativo os templates canônicos `.github/agents/templates/agent-template.md`, `.github/agents/templates/operational-agent.md` e `.github/prompts/templates/prompt-template.md` para impedir a reintrodução dos modelos antigos na criação de novos agentes/prompts.
 - **Q3 (Sensores Automatizados no `pytest` e Fronteira Python)**:
   - Toda mutação em arquivos `tests/**/*.py` (11 arquivos) e avaliação de fixtures `tests/model_allowlist/fixtures/*.html` (2 arquivos) **NÃO** será executada diretamente pelo `@governance-maintainer`, mas via handoff obrigatório ao subgrafo Python (`@python-router` → 1º `@python-arch-advisor` [plano de implementação em `docs/plans/implementation/` com `related-planning-doc` apontando para este plano] → 2º `@python-test-engineer`).
-  - Inclui a correção da contradição pré-existente em `tests/governance_audit/test_model_profiles_parity.py#L119` (`economico.orchestration` esperava `Gemini 3.8 Flash` enquanto `model-profiles.yaml` já define `Gemini Hydrogen 4`) e a adição do sensor automatizado de paridade `model:` vs. `model-allowlist.yaml` especificamente dentro do arquivo existente `tests/governance_audit/test_model_profiles_parity.py` (já listado entre os 4 arquivos de `tests/governance_audit/` em `allowed_files`), evitando criação ou edição de arquivo não listado.
+  - Inclui a correção da contradição pré-existente em `tests/governance_audit/test_model_profiles_parity.py#L119` (`economico.orchestration` esperava `Gemini 3.8 Flash` enquanto `model-profiles.yaml` já define `Gemini 4 Hydrogen`) e a adição do sensor automatizado de paridade `model:` vs. `model-allowlist.yaml` especificamente dentro do arquivo existente `tests/governance_audit/test_model_profiles_parity.py` (já listado entre os 4 arquivos de `tests/governance_audit/` em `allowed_files`), evitando criação ou edição de arquivo não listado.
 
 ### 2.1. Análise de Escape (T2-RCA — Por que a Deriva Não Foi Bloqueada Automaticamente Antes)
 
@@ -290,7 +290,7 @@ Este plano de manutenção de governança formaliza a substituição determinís
 
 | # | Arquivo | Argon | Flash | Executor | Ação |
 | :---: | :--- | :---: | :---: | :--- | :--- |
-| 1 | `model-profiles.local.yaml.example` | 0 | 1 | `@governance-maintainer` | Atualizar exemplo de perfil local (L22: `Gemini 3.8 Flash` → `Gemini Hydrogen 4`) em conjunto ou mediante confirmação no Gate HITL |
+| 1 | `model-profiles.local.yaml.example` | 0 | 1 | `@governance-maintainer` | Atualizar exemplo de perfil local (L22: `Gemini 3.8 Flash` → `Gemini 4 Hydrogen`) em conjunto ou mediante confirmação no Gate HITL |
 
 ---
 
@@ -334,13 +334,13 @@ Estes **6 arquivos** (`CHANGELOG.md` + **5 planos históricos** já aprovados/ex
 **Decisões Registradas pelo Usuário no Gate HITL (2026-11-17)**:
 1. **Aprovação do Plano**: Plano aprovado (`status: APPROVED`, `approved: true`).
 2. **`tests/model_allowlist/fixtures/*.html`**: **Preservar intactas** como amostras sintéticas históricas do parser do scraper (`reordered_columns.html` e `valid_supported_models.html` não devem ser alteradas).
-3. **`model-profiles.local.yaml.example`**: **Autorizado atualizar** para o modelo vigente (`Gemini 3.8 Flash` → `Gemini Hydrogen 4`).
+3. **`model-profiles.local.yaml.example`**: **Autorizado atualizar** para o modelo vigente (`Gemini 3.8 Flash` → `Gemini 4 Hydrogen`).
 
 **Contexto da Deliberação Submetida**:
 
 No Gate de Aprovação Humana (Etapa 4 do `WORKFLOW-GOVERNANCE-MAINTENANCE`), além da aprovação global do plano e da atualização do template `model-profiles.local.yaml.example` (§3.10), submeter a decisão sobre as 2 fixtures HTML (`tests/model_allowlist/fixtures/reordered_columns.html` e `tests/model_allowlist/fixtures/valid_supported_models.html`):
 1. **1ª Opção `(Recomendado)` — Preservar as 2 fixtures HTML intactas se forem amostras sintéticas históricas do scraper**: Evita falso-positivo e preserva a fidelidade do teste de regressão caso `test_parse.py` valide o parsing de snapshots HTML históricos da documentação upstream, atualizando apenas se algum teste cruzar os nomes da fixture com `model-allowlist.yaml` vigente.
-2. **2ª Opção — Atualizar as 2 fixtures HTML com os novos nomes canônicos (`Gemini 4 Carbon` / `Gemini Hydrogen 4`)**: Alinha os literais HTML aos mocks atualizados em `tests/model_allowlist/conftest.py` e `test_parse.py`, indicado apenas se os testes exigirem igualdade estrita entre a fixture HTML e a allowlist ativa.
+2. **2ª Opção — Atualizar as 2 fixtures HTML com os novos nomes canônicos (`Gemini 4 Carbon` / `Gemini 4 Hydrogen`)**: Alinha os literais HTML aos mocks atualizados em `tests/model_allowlist/conftest.py` e `test_parse.py`, indicado apenas se os testes exigirem igualdade estrita entre a fixture HTML e a allowlist ativa.
 
 ---
 
@@ -350,7 +350,7 @@ No Gate de Aprovação Humana (Etapa 4 do `WORKFLOW-GOVERNANCE-MAINTENANCE`), al
    - Registrar `git status --porcelain` e salvar snapshot em memória/temporário do diff pré-existente de `model-allowlist.yaml` e `model-profiles.yaml`;
    - Executar `pytest tests/governance_audit` via `ctx_batch` para registrar o estado inicial (incluindo a divergência pré-existente em `test_model_profiles_parity.py#L119`).
 2. **Etapa 2 — Mutação Declarativa em Lote (`@governance-maintainer`, R-046 / R-051 / R-059)**:
-   - Executar script único em `ctx_execute` (`language: "javascript"`, `fs` nativo) aplicando o mapeamento (`Gemini 4 Argon` → `Gemini 4 Carbon` e `Gemini 3.8 Flash` → `Gemini Hydrogen 4`) nos 53 arquivos declarativos/configuração em `allowed_files` (mais `model-profiles.local.yaml.example` conforme §3.10 / Gate HITL):
+   - Executar script único em `ctx_execute` (`language: "javascript"`, `fs` nativo) aplicando o mapeamento (`Gemini 4 Argon` → `Gemini 4 Carbon` e `Gemini 3.8 Flash` → `Gemini 4 Hydrogen`) nos 53 arquivos declarativos/configuração em `allowed_files` (mais `model-profiles.local.yaml.example` conforme §3.10 / Gate HITL):
      - 23 arquivos `.github/agents/**/*.agent.md`;
      - 1 arquivo `.github/agents/catalog.yaml`;
      - 2 templates `.github/agents/templates/*.md`;

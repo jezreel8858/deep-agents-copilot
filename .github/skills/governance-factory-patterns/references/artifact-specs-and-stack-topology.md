@@ -267,7 +267,7 @@ A governança do repositório adota dois paradigmas fundamentais para a atribui�
 
 | Paradigma | Perfil / Casos de Uso | Modelo |
 |---|---|---|
-| **Prompt Procedural** (SLM / Alta Velocidade) | Execuções determinísticas, diretas e algorítmicas, sem planejamento abstrato ou análise deliberativa aberta (scanners, templates, geradores, roteadores de stack, implementadores TDD, fixers, test-writers, enforcers). **Escolha padrão em toda a base.** | **`"Gemini Hydrogen 4"`** |
+| **Prompt Procedural** (SLM / Alta Velocidade) | Execuções determinísticas, diretas e algorítmicas, sem planejamento abstrato ou análise deliberativa aberta (scanners, templates, geradores, roteadores de stack, implementadores TDD, fixers, test-writers, enforcers). **Escolha padrão em toda a base.** | **`"Gemini 4 Hydrogen"`** |
 | **Prompt Decompositivo / Raciocínio Guiado** (Pensamento Profundo) | Análises deliberativas, orquestração central, exploração de múltiplos caminhos de decisão, trade-offs e avaliação crítica de riscos antes da resposta final (`agent-router`, `refactor-planner`, `requirements-analyst`, `deep-search`, especialistas advisor de arquitetura). | **`"Claude Sonnet 5.5"`** |
 | **Raciocínio Crítico Avançado / Diagnóstico Profundo** (High-Complexity Thinking) | Arquitetura técnica complexa, Technical Blueprint formal, análise de causa raiz profunda e investigação minuciosa de bugs críticos (`tech-solution-architect`, `debugger`). | **`"Claude Opus 5.5"`** |
 
@@ -278,9 +278,9 @@ A governança do repositório adota dois paradigmas fundamentais para a atribui�
 O valor de `model:` deve ser a **string exata do display name oficial** (Title Case) da [tabela oficial](https://docs.github.com/copilot/reference/ai-models/supported-models) — nunca kebab-case, nunca slug de API.
 
 **Protocolo (nesta ordem, sem pular etapa):**
-1. Escrever o candidato (Title Case oficial, ex.: `"Gemini Hydrogen 4"`) no frontmatter do arquivo já criado/editado.
+1. Escrever o candidato (Title Case oficial, ex.: `"Gemini 4 Hydrogen"`) no frontmatter do arquivo já criado/editado.
 2. Chamar `get_errors` no arquivo.
-3. Se aparecer `Unknown model: '<valor>'` → modelo não reconhecido **neste ambiente real** (VS Code ou JetBrains) — não prosseguir com esse valor; tentar o próximo candidato do mesmo tier (ex.: se `"Gemini Hydrogen 4"` falhar, considerar `"Claude Sonnet 4.6"` como fallback temporário) e repetir o passo 2.
+3. Se aparecer `Unknown model: '<valor>'` → modelo não reconhecido **neste ambiente real** (VS Code ou JetBrains) — não prosseguir com esse valor; tentar o próximo candidato do mesmo tier (ex.: se `"Gemini 4 Hydrogen"` falhar, considerar `"Claude Sonnet 4.6"` como fallback temporário) e repetir o passo 2.
 4. Se `get_errors` não reportar erro de modelo → validado, prosseguir para o restante do checklist (§3).
 5. Se 2 candidatos do mesmo tier falharem e não houver certeza de qual string funciona, perguntar ao usuário via `ask_questions`: *"Qual modelo aparece disponível no seletor do Copilot Chat (VS Code) ou do plugin Copilot/AI Assistant (JetBrains) para o tier <Haiku|Sonnet|Opus>?"* com opções pré-preenchidas da tabela oficial + campo aberto — nunca adivinhar variações às cegas indefinidamente.
 

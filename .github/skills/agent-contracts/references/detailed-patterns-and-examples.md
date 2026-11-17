@@ -91,22 +91,22 @@ O `model:` declarado no frontmatter de um `.agent.md` **é respeitado** pela pla
 
 | Prioridade | Fonte | Observação |
 |---|---|---|
-| 1 (mais alta) | Parâmetro explícito de modelo passado na própria invocação do `run_subagent` (linguagem natural: *"invoque X com o modelo Gemini Hydrogen 4"*) | Único mecanismo de **reforço ativo** disponível para o agent chamador |
-| 2 | `model:` no frontmatter do `.agent.md` do subagent — aceita nome único **ou lista priorizada** (`["Gemini Hydrogen 4", "GPT-5.1"]`) para fallback em caso de indisponibilidade | O que este projeto já declara em todo agent |
+| 1 (mais alta) | Parâmetro explícito de modelo passado na própria invocação do `run_subagent` (linguagem natural: *"invoque X com o modelo Gemini 4 Hydrogen"*) | Único mecanismo de **reforço ativo** disponível para o agent chamador |
+| 2 | `model:` no frontmatter do `.agent.md` do subagent — aceita nome único **ou lista priorizada** (`["Gemini 4 Hydrogen", "GPT-5.1"]`) para fallback em caso de indisponibilidade | O que este projeto já declara em todo agent |
 | 3 (fallback) | Modelo da conversa pai (sessão) | Aplicado quando 1 e 2 falham/excedem o teto |
 
 **Nenhuma das 3 prioridades acima escapa do cost-tier ceiling.** Mesmo a prioridade 1 (explícita) é descartada se exceder o multiplicador do turno pai.
 
 ### Por que "Auto" é o principal risco (não apenas um detalhe)
 
-O modo `Auto` do model picker resolve, **a cada turno**, para um modelo real (faixa 0×–1×: GPT-5 mini, GPT-4.1, Sonnet 4, Sonnet 3.5, etc.) com base em disponibilidade/saúde do sistema — **não** na complexidade da tarefa. Se a cota de requests premium do usuário se esgota, `Auto` **sempre** cai para um modelo 0×. Isso significa que o teto de custo da cadeia inteira de subagents fica **não determinístico por turno** — o mesmo fluxo `@agent-router → security-reviewer` pode funcionar corretamente em um turno (Auto resolveu para Sonnet 4, 1×) e silenciosamente rebaixar `security-reviewer` (declarado `Gemini Hydrogen 4`, 1×) em outro turno (Auto resolveu para GPT-5 mini, 0×).
+O modo `Auto` do model picker resolve, **a cada turno**, para um modelo real (faixa 0×–1×: GPT-5 mini, GPT-4.1, Sonnet 4, Sonnet 3.5, etc.) com base em disponibilidade/saúde do sistema — **não** na complexidade da tarefa. Se a cota de requests premium do usuário se esgota, `Auto` **sempre** cai para um modelo 0×. Isso significa que o teto de custo da cadeia inteira de subagents fica **não determinístico por turno** — o mesmo fluxo `@agent-router → security-reviewer` pode funcionar corretamente em um turno (Auto resolveu para Sonnet 4, 1×) e silenciosamente rebaixar `security-reviewer` (declarado `Gemini 4 Hydrogen`, 1×) em outro turno (Auto resolveu para GPT-5 mini, 0×).
 
 ### Mitigação Obrigatória (checklist — nenhuma resolve tecnicamente o teto, apenas evitam cair nele)
 
-- [ ] **Nunca iniciar o fluxo `@agent-router` com `Auto` selecionado.** Selecionar manualmente, antes do primeiro turno, um modelo cujo tier ≥ o maior tier usado por qualquer agent do catálogo que possa ser alcançado na cadeia de roteamento (neste projeto: `Gemini Hydrogen 4`, 1×).
+- [ ] **Nunca iniciar o fluxo `@agent-router` com `Auto` selecionado.** Selecionar manualmente, antes do primeiro turno, um modelo cujo tier ≥ o maior tier usado por qualquer agent do catálogo que possa ser alcançado na cadeia de roteamento (neste projeto: `Gemini 4 Hydrogen`, 1×).
 - [ ] Verificar que `chat.customAgentInSubagent.enabled` está habilitado nas configurações do VS Code — sem essa flag, agents customizados podem nem ser honrados como subagents (comportamento gated desde a v1.109).
 - [ ] Ao criar/revisar um agent que delegará para outro de tier mais alto via `run_subagent`, instruir explicitamente no corpo do agent chamador para **solicitar o modelo por nome na própria invocação** (prioridade 1 da tabela acima) — reforço, não substituto do `model:` do subagent.
-- [ ] Preferir `model:` como **lista priorizada** (ex.: `["Gemini Hydrogen 4", "Claude Sonnet 4.5"]`) em vez de string única, quando o agent tiver alternativas aceitáveis — evita fallback direto ao modelo do turno pai por indisponibilidade pontual do modelo primário.
+- [ ] Preferir `model:` como **lista priorizada** (ex.: `["Gemini 4 Hydrogen", "Claude Sonnet 4.5"]`) em vez de string única, quando o agent tiver alternativas aceitáveis — evita fallback direto ao modelo do turno pai por indisponibilidade pontual do modelo primário.
 
 ### Model Gate via `ask_questions` — Tentado e Confirmado Inviável (2026-09-01)
 
@@ -118,7 +118,7 @@ Este projeto tentou responder "dá para automatizar isso com uma trava ativa, em
 2. **VS Code Copilot Chat não injeta essa informação para custom agents.** Não existe tool/API pública que exponha "modelo real de execução desta invocação" a um `.agent.md`. A única forma documentada de descobrir é via debug log/trace de rede da extensão — inacessível ao próprio modelo.
 3. **`ask_questions` não altera o picker de modelo da UI.** É um canal de texto para coletar preferência do usuário; a troca real do modelo exige clique manual no dropdown — fora do loop de tool-calling do agent.
 4. **Mesmo o canal de maior prioridade (parâmetro explícito no `run_subagent`) não é uma API garantida.** `microsoft/vscode#298380` ("Allow runSubagent tool to specify a language model") confirma que suporte formal e estruturado a esse parâmetro no schema da tool é **feature request ainda aberta** em 2026 — hoje funciona apenas como interpretação de linguagem natural pelo modelo (melhor esforço, não determinístico).
-5. **Evidência empírica reforça (mas não é a causa principal)**: em Haiku 4.5, o Gate nunca disparou (router ignorou a lógica condicional). Após upgrade para Gemini Hydrogen 4, o Gate **ainda** não disparou — confirmando que o problema não era tier/instruction-following, era ausência estrutural do dado necessário para a comparação.
+5. **Evidência empírica reforça (mas não é a causa principal)**: em Haiku 4.5, o Gate nunca disparou (router ignorou a lógica condicional). Após upgrade para Gemini 4 Hydrogen, o Gate **ainda** não disparou — confirmando que o problema não era tier/instruction-following, era ausência estrutural do dado necessário para a comparação.
 
 **O que substitui o Gate (v1.8.0 — "Model Awareness", best-effort, honesto sobre suas limitações):**
 
@@ -168,4 +168,5 @@ limites_execucao:
 **Anti-padrões:**
 - ❌ Loop de delegação (A → B → A) sem circuit breaker declarado
 - ❌ `allow_redelegation: true` sem `max_delegation_depth` (recursão irrestrita)
-- ❌ Agent que chama ferramentas externas sem `max_execution_time_min` — **Cadeia Pós-Plano R-064/R-065**: retorno `motivo: "plano_materializacao_pendente"` (`plan_gate_status: "pending_materialization"`) → `@docs-engineer` (materializador canônico único das 8 subpastas de `docs/plans/<tipo>/` em `DRAFT`) → `@plan-critic` (teto 2x R-065, `review_verdict: "PASS" | "PASS_WITH_NITS"`) → Gate HITL (`ask_questions`) → executor (`status: "APPROVED"`, `approved: true`; Q&A consultivo puro isento).
+- ❌ Agent que chama ferramentas externas sem `max_execution_time_min`
+ — **Cadeia Pós-Plano R-064/R-065**: retorno `motivo: "plano_materializacao_pendente"` (`plan_gate_status: "pending_materialization"`) → `@docs-engineer` (materializador canônico único das 8 subpastas de `docs/plans/<tipo>/` em `DRAFT`) → `@plan-critic` (teto 2x R-065, `review_verdict: "PASS" | "PASS_WITH_NITS"`) → Gate HITL (`ask_questions`) → executor (`status: "APPROVED"`, `approved: true`; Q&A consultivo puro isento).
