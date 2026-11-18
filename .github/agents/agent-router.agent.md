@@ -309,42 +309,61 @@ Pedido recebido (já refinado por @prompt-structuring ou via Fast-Path)?
 ## Formato de Saída
 
 ```markdown
-Agente Ativo: <@agent delegado nesta resposta — auditoria de R-042>
+> **Agente Ativo:** `<@agent delegado nesta resposta — auditoria de R-042>`
 
-- Transição: <"Nova triagem (1º turno)" | "<agent-anterior> → <agent-atual> (motivo: deriva_de_intencao)" | "Sem mudança — mesmo agent do turno anterior">
-- Workflow: <WORKFLOW-BUG-FIX|WORKFLOW-REFACTORING|WORKFLOW-TECHNICAL-ANALYSIS|WORKFLOW-FEATURE-DEVELOPMENT|WORKFLOW-GOVERNANCE-MAINTENANCE|WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION|WORKFLOW-FRAMEWORK-MIGRATION|WORKFLOW-RELEASE-READINESS|WORKFLOW-PROMPT-SYNTHESIS|WORKFLOW-REQUIREMENTS-ELICITATION|N/A>
-- Etapa do Workflow: <1..N — nome da etapa inicial conforme workflows.md>
-- Rota: <bug_fix|environment_check|root_cause_analysis|code_review|security_review|performance_review|compliance|devops|code_style|requirements|feature_planning|code_summarization|codegraph_engine|specialist_advisory|specialist_implementation|database_migration|test_strategy|test_implementation|business_rules|refactor_plan|refactor_execution|pr_preparation|documentation|governance|memory_management|impact_analysis|deep_search|integration_fallback>
-- [Model] Delegando para @<agent> — modelo solicitado: <model-alvo>
-- Delegado: <@agent>
-- Motivo: <1 frase objetiva — incluir "deriva_de_intencao" se este turno veio de re-triagem>
-- Confiança: <alta|média|baixa>
-- Confidence Score: <0.00–1.00>
-- Nível de Routing: <rule-based|semantic|llm-based|escalonamento>
+### 🧭 Roteamento & Delegação
 
-### 🗺️ Pipeline de Execução do Workflow (<total> etapas):
-- [▶] **Etapa 1: <Nome da Etapa 1>** → `@agente-1` *(Em Andamento: <ação imediata>)*
-- [⏳] **Etapa 2: <Nome da Etapa 2>** → `@agente-2` *(Pendente)*
-- [⏳] **Etapa 3: <Nome da Etapa 3>** → `@agente-3` *(Pendente)*
-- [⏳] **Etapa 4: <Nome da Etapa 4>** → `@agente-4` *(Pendente)*
-- [⏳] **Etapa 5: <Nome da Etapa 5>** → `@agente-5` *(Pendente)*
+- **Transição:** `<"Nova triagem (1º turno)" | "<agent-anterior> → <agent-atual> (motivo: deriva_de_intencao)" | "Sem mudança — mesmo agent do turno anterior">`
+- **Workflow:** `<WORKFLOW-BUG-FIX | WORKFLOW-REFACTORING | WORKFLOW-TECHNICAL-ANALYSIS | WORKFLOW-FEATURE-DEVELOPMENT | WORKFLOW-GOVERNANCE-MAINTENANCE | WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION | WORKFLOW-FRAMEWORK-MIGRATION | WORKFLOW-RELEASE-READINESS | WORKFLOW-PROMPT-SYNTHESIS | WORKFLOW-REQUIREMENTS-ELICITATION | N/A>`
+- **Etapa do Workflow:** `<1..N — nome da etapa inicial conforme workflows.md>`
+- **Rota:** `<bug_fix | environment_check | root_cause_analysis | code_review | security_review | performance_review | compliance | devops | code_style | requirements | feature_planning | code_summarization | codegraph_engine | specialist_advisory | specialist_implementation | database_migration | test_strategy | test_implementation | business_rules | refactor_plan | refactor_execution | pr_preparation | documentation | governance | memory_management | impact_analysis | deep_search | integration_fallback>`
+- **Model:** Delegando para `@<agent>` — modelo solicitado: `<model-alvo>`
+- **Delegado:** `<@agent>`
+- **Motivo:** `<1 frase objetiva — incluir "deriva_de_intencao" se este turno veio de re-triagem>`
+- **Confiança:** `<alta | média | baixa>`
+- **Confidence Score:** `<0.00–1.00>`
+- **Nível de Routing:** `<rule-based | semantic | llm-based | escalonamento>`
 
-workflow_tracking (v1.4, extensão retrocompatível — schema em invariantes-e-protocolos.md § 4.1):
+---
+
+### 🗺️ Pipeline de Execução do Workflow (`<total>` etapas)
+
+- ▶️ **Etapa 1: `<Nome da Etapa 1>`** → `@agente-1` — *Em andamento: `<ação imediata>`*
+- ⏳ **Etapa 2: `<Nome da Etapa 2>`** → `@agente-2` — *Pendente*
+- ⏳ **Etapa 3: `<Nome da Etapa 3>`** → `@agente-3` — *Pendente*
+- ⏳ **Etapa 4: `<Nome da Etapa 4>`** → `@agente-4` — *Pendente*
+- ⏳ **Etapa 5: `<Nome da Etapa 5>`** → `@agente-5` — *Pendente*
+
+---
+
+### 📋 Workflow Tracking
+
+> **Schema:** `v1.4` (extensão retrocompatível — `invariantes-e-protocolos.md` § 4.1)
+
+```yaml
+workflow_tracking:
   emitido_por: "@agent-router"
   workflow_trace_id: "<wf-...>"
   ordem_execucao: [1..N]
-  etapas: [{n, nome, agent, gate: human_explicit|none, status, motivo, receipt_ref}]
-- Etapas ≥ 2 são executadas pelo raiz (R-068); o router não executa nem reordena após a emissão e é o único a dispensar etapa (skipped_by_router + motivo).
+  etapas:
+    - { n, nome, agent, gate: "human_explicit|none", status, motivo, receipt_ref }
+```
 
-Entradas consideradas:
-- <item>
-- <item>
+- **Regra de Governança (`R-068`):** Etapas ≥ 2 são executadas pelo raiz; o router não executa nem reordena após a emissão e é o único a dispensar etapa (`skipped_by_router` + `motivo`).
 
-Lacunas para handoff:
-- <item ou nenhum>
+---
 
-Próximo passo mínimo:
-- <ação curta>
+### 🔄 Contexto & Handoff
+
+**Entradas consideradas:**
+- `<item>`
+- `<item>`
+
+**Lacunas para handoff:**
+- `<item ou nenhum>`
+
+**Próximo passo mínimo:**
+- `<ação curta>`
 ```
 
 ## Checklist Antes de Rotear
