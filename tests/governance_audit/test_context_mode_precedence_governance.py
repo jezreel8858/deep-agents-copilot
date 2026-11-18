@@ -23,6 +23,12 @@ from tests.governance_audit.test_ctx_execute_capability_profile import GATHER_ON
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 AGENTS_DIR = REPO_ROOT / ".github" / "agents"
+
+CONTEXT_MODE_NAME_EXEMPT_FILES: frozenset[str] = frozenset(
+    {"agent-router.agent.md", "prompt-structuring.agent.md", "agent-root.agent.md"}
+)
+"""Agents isentos dos filtros por nome de R-056/chaining: roteadores centrais, prompt-structuring e
+agent-root (raiz declarada sem fan-out de leitura, ADR-0015; perfil protegido por test_agent_root_contract)."""
 SKILLS_DIR = REPO_ROOT / ".github" / "skills"
 
 # Nomes de arquivo (.agent.md) dos 26 agentes Gather-only (R-055/Smell 2.32) — fonte única
@@ -382,7 +388,7 @@ def test_catalog_yaml_declares_ctx_batch_execute_for_all_ctx_execute_agents():
 
 def test_all_non_router_agents_declare_ctx_batch_execute_and_ctx_execute():
     """
-    Valida que 100% dos agentes não-roteadores (exceto prompt-structuring, que não possui tools de arquivo)
+    Valida que 100% dos agentes não-roteadores (exceto prompt-structuring, que não possui tools de arquivo, e agent-root, raiz declarada ADR-0015)
     declaram compulsoriamente 'context-mode/ctx_batch' e 'context-mode/ctx_execute' em tools:.
     """
     import re
@@ -394,7 +400,7 @@ def test_all_non_router_agents_declare_ctx_batch_execute_and_ctx_execute():
     
     non_routers = [
         p for p in all_agents
-        if not p.name.endswith("-router.agent.md") and p.name != "agent-router.agent.md" and p.name != "prompt-structuring.agent.md"
+        if not p.name.endswith("-router.agent.md") and p.name not in CONTEXT_MODE_NAME_EXEMPT_FILES
     ]
     assert len(non_routers) >= 50, f"Esperado ao menos 55 agentes não-roteadores, encontrados {len(non_routers)}"
 
@@ -438,7 +444,7 @@ def test_all_non_router_agents_declare_r056_and_prohibition():
     ]
     non_routers = [
         p for p in all_agents
-        if not p.name.endswith("-router.agent.md") and p.name != "agent-router.agent.md" and p.name != "prompt-structuring.agent.md"
+        if not p.name.endswith("-router.agent.md") and p.name not in CONTEXT_MODE_NAME_EXEMPT_FILES
     ]
 
     violations = []
@@ -483,7 +489,7 @@ def test_all_non_router_agents_prohibit_mcp_tool_chaining():
     ]
     non_routers = [
         p for p in all_agents
-        if not p.name.endswith("-router.agent.md") and p.name != "agent-router.agent.md" and p.name != "prompt-structuring.agent.md"
+        if not p.name.endswith("-router.agent.md") and p.name not in CONTEXT_MODE_NAME_EXEMPT_FILES
     ]
 
     violations = []
@@ -688,7 +694,7 @@ def test_all_non_router_agents_absence_of_native_editor_tools():
 
 def test_all_non_router_agents_declare_all_ctx_tools():
     """
-    Valida que 100% de todos os agentes nao-roteadores (exceto prompt-structuring) declaram
+    Valida que 100% de todos os agentes nao-roteadores (exceto prompt-structuring e agent-root) declaram
     compulsoriamente as 3 ferramentas context-mode universais (ctx_batch, ctx_index,
     ctx_search) em tools:, e que os agentes Gather+Process (fora da lista Gather-only de
     R-055/Smell 2.32) também declaram ctx_execute/ctx_execute.
@@ -707,7 +713,7 @@ def test_all_non_router_agents_declare_all_ctx_tools():
     ]
     non_routers = [
         p for p in all_agents
-        if not p.name.endswith("-router.agent.md") and p.name != "agent-router.agent.md" and p.name != "prompt-structuring.agent.md"
+        if not p.name.endswith("-router.agent.md") and p.name not in CONTEXT_MODE_NAME_EXEMPT_FILES
     ]
     assert len(non_routers) >= 50
 
@@ -734,7 +740,7 @@ def test_all_non_router_agents_declare_all_ctx_tools():
 
 def test_all_non_router_agents_contain_execution_protocol_block():
     """
-    Valida que 100% de todos os agentes nao-roteadores (exceto prompt-structuring) contem o bloco canonico <execution_protocol>
+    Valida que 100% de todos os agentes nao-roteadores (exceto prompt-structuring e agent-root) contem o bloco canonico <execution_protocol>
     referenciando o Protocolo Plan-Then-Batch e a Regra do Limiar >= 2 (Smell 2.26 / Smell 2.13 / R-059).
     """
     all_agents = [
@@ -743,7 +749,7 @@ def test_all_non_router_agents_contain_execution_protocol_block():
     ]
     non_routers = [
         p for p in all_agents
-        if not p.name.endswith("-router.agent.md") and p.name != "agent-router.agent.md" and p.name != "prompt-structuring.agent.md"
+        if not p.name.endswith("-router.agent.md") and p.name not in CONTEXT_MODE_NAME_EXEMPT_FILES
     ]
     assert len(non_routers) >= 50
 
@@ -928,8 +934,8 @@ def _parse_frontmatter_dict(md_path: Path) -> dict:
 
 
 def test_eligible_53_agents_declare_ctx_resume_index_search() -> None:
-    """Os 53 agents operacionais elegiveis (todos os .agent.md em .github/agents recursivamente,
-    excluindo pastas templates/workflows, os 9 *-router.agent.md e prompt-structuring.agent.md)
+    """Os 54 agents operacionais elegiveis (todos os .agent.md em .github/agents recursivamente,
+    excluindo pastas templates/workflows, os 9 *-router.agent.md e prompt-structuring.agent.md; agent-root e elegivel)
     declaram context-mode/ctx_resume, context-mode/ctx_index e context-mode/ctx_search em tools:.
     """
     eligible_agents: list[Path] = []
@@ -941,8 +947,8 @@ def test_eligible_53_agents_declare_ctx_resume_index_search() -> None:
             continue
         eligible_agents.append(agent_path)
 
-    assert len(eligible_agents) == 53, (
-        f"Esperados 53 agents operacionais elegiveis, encontrados {len(eligible_agents)}: "
+    assert len(eligible_agents) == 54, (
+        f"Esperados 54 agents operacionais elegiveis, encontrados {len(eligible_agents)}: "
         f"{[p.name for p in eligible_agents]}"
     )
 

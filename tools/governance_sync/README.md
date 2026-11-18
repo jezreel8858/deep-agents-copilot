@@ -5,9 +5,9 @@ Utilitário determinístico de sincronização e auditoria de governança docume
 ## Responsabilidades
 
 1. **Derivação Dinâmica de Contagens SSOT**:
-   - `total_agent_files` (`.github/agents/**/*.agent.md` = 63: 31 na raiz + 32 em `stacks/`)
-   - `catalog_root_entries` (`.github/agents/catalog.yaml` = 39 entradas)
-   - `routing_graph_nodes` (`.github/agents/routing-graph.yaml` chave `nos:` = 39 nós)
+   - `total_agent_files` (`.github/agents/**/*.agent.md` = 64: 32 na raiz + 32 em `stacks/`)
+   - `catalog_root_entries` (`.github/agents/catalog.yaml` = 40 entradas)
+   - `routing_graph_nodes` (`.github/agents/routing-graph.yaml` chave `nos:` = 40 nós)
    - `total_skills` (`.github/skills/.index.json` e `.github/skills/*/SKILL.md` = 81 skills: 15 Tier 1, 65 Tier 2, 1 Tier 3)
    - `total_canonical_workflows` (`.github/agents/workflows/workflow-*.md` = 10 workflows)
    - `generic_instructions` (`.github/instructions/*.instructions.md` = 6 adapters genéricos)

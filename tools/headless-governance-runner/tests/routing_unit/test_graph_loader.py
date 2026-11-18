@@ -163,3 +163,15 @@ class TestGrafoRealDoRepositorio:
         assert len(grafo.arestas) >= 30
         entry_points = [n for n in grafo.nos_por_id if n.tipo is TipoNo.ENTRY_POINT]
         assert len(entry_points) == 1
+
+    def test_agent_root_e_no_downstream_no_grafo_real(self) -> None:
+        """O agent-root (raiz declarada, ADR-0015) consta no grafo real como nó downstream."""
+        caminho_real = (
+            Path(__file__).parents[4] / ".github" / "agents" / "routing-graph.yaml"
+        )
+
+        grafo = carregar_grafo(caminho_real, SCHEMA_PATH)
+
+        nos_raiz = [n for n in grafo.nos_por_id if n.id == "agent-root"]
+        assert len(nos_raiz) == 1
+        assert nos_raiz[0].tipo is TipoNo.DOWNSTREAM

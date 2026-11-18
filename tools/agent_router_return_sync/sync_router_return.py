@@ -31,6 +31,11 @@ from tools.governance_sync.core import (
 FRAGMENT_PATH = Path(__file__).resolve().parent / "_router-return-fragment.md"
 AGENTS_DIR = REPO_ROOT / ".github" / "agents"
 
+# Agents raiz isentos da seção "Retorno ao Router" (orquestradores, sem retorno a si mesmos).
+ROUTER_RETURN_EXEMPT_AGENTS: frozenset[str] = frozenset(
+    {"agent-router.agent.md", "agent-root.agent.md"}
+)
+
 ROUTER_SECTION_RE = re.compile(
     r"(##\s+[^\n]*(?:Retorno ao Router|R-042)[^\n]*\n)(.*?)(?=\n## |\Z)",
     re.DOTALL,
@@ -118,8 +123,8 @@ def sync_all_agents(mode: str) -> tuple[SyncReport, int]:
 
     agent_files = sorted(AGENTS_DIR.glob("**/*.agent.md"))
     for af in agent_files:
-        # Pular o próprio agent-router (é o orquestrador raiz, não possui retorno a si mesmo)
-        if af.name == "agent-router.agent.md":
+        # Pular agents raiz isentos (orquestradores, não possuem retorno a si mesmos)
+        if af.name in ROUTER_RETURN_EXEMPT_AGENTS:
             continue
 
         report.total_scanned += 1

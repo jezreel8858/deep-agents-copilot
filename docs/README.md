@@ -62,7 +62,7 @@ APRENDIZADO ────────────────────┼─�
   - [Instruções Copilot](../.github/copilot-instructions.md): Diretrizes operacionais e fast-paths do GitHub Copilot.
   - [Mapa do Repositório (Repo Map)](repo-map.md): Fonte de verdade para navegação determinística de arquivos (Zero Blind Searches).
 - **Catálogos Estruturados de Agentes e Skills**:
-  - [Catálogo Central de Agents](../.github/agents/catalog.yaml): Metadados, modelos, ferramentas e restrições dos 39 agents no catálogo raiz (63 totais).
+  - [Catálogo Central de Agents](../.github/agents/catalog.yaml): Metadados, modelos, ferramentas e restrições dos 40 agents no catálogo raiz (64 totais).
   - [Grafo de Roteamento Estrutural](../.github/agents/routing-graph.yaml): Grafo declarativo de nós, arestas e regras de transição (R-040).
   - [Índice Geral de Skills](../.github/skills/.index.json): Mapeamento de 81 skills (15 Tier 1, 65 Tier 2, 1 Tier 3) por tier e categoria.
   - [Catálogo de Prompts Workflow](../.github/prompts/README.md): Prompts padronizados de orquestração.

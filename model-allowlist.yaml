@@ -34,7 +34,7 @@ models:
       cache_write: 12
     cost_rank: 1
 
-  - name: Gemini Hydrogen 4
+  - name: Gemini 4 Hydrogen
     provider: google
     status: ga
     pinnable: true

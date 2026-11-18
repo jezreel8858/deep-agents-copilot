@@ -73,9 +73,9 @@ deep-agents-copilot/
 │   ├── projects.local.yaml                      # Overlay local de projetos (gitignored, R-043)
 │   ├── projects.local.yaml.example              # Template rastreado do overlay local (R-043)
 │   │
-│   ├── agents/                                  # 63 Agents de IA (31 raiz + 32 em 8 stacks; 39 no catalog.yaml raiz)
+│   ├── agents/                                  # 64 Agents de IA (32 raiz + 32 em 8 stacks; 40 no catalog.yaml raiz)
 │   │   ├── catalog.yaml                         # ⭐ Catálogo com modelos e metadados dos agents (ÚNICO)
-│   │   ├── routing-graph.yaml                   # ⭐ Grafo estrutural de transições (39 nós)
+│   │   ├── routing-graph.yaml                   # ⭐ Grafo estrutural de transições (40 nós)
 │   │   ├── workflows.md                         # ⭐ Especificação dos 10 Workflows Canônicos e de Ciclo de Vida
 │   │   ├── agent-router.agent.md                # Entry point obrigatório (R-037/R-042)
 │   │   ├── prompt-structuring.agent.md          # Refinamento de prompt (R-041)
@@ -204,14 +204,14 @@ flowchart TD
     E & WF --> G3["💻 Implementation (Domain Routers & Specialists)\nangular-router · react-router · spring-boot-router · spring-reactive-router\nejb-router · struts-router · python-router · database-router · database-specialist"]
     E & WF --> G4["✅ Quality/Validation\nbug-triage · debugger · test-strategy\ncode-review · code-style-enforcer · security-reviewer\nperformance-agent · devops-engineer · runtime-verifier\nrepo-hygiene-auditor"]
     E & WF --> G5["📚 Documentation/Learning\ndocs-engineer"]
-    E & WF --> G6["🔄 Governance/Orchestration\ngovernance-factory · governance-maintainer\nagent-auditor · binding-initializer\nadapter-generator · compliance-guardrails · pr-gatekeeper"]
+    E & WF --> G6["🔄 Governance/Orchestration\ngovernance-factory · governance-maintainer\nagent-root · agent-auditor · binding-initializer\nadapter-generator · compliance-guardrails · pr-gatekeeper"]
 
     G1 & G2 & G3 & G4 & G5 & G6 --> K["Resultado\n(turno N)"]
     K --> L["/commit\nmensagem gerada"]
     K -.->|"turno N+1: deriva de intenção (R-042)"| E
 ```
 
-> 39 agents no catálogo raiz (63 totais com especialistas de stack), agrupados em 6 perfis de mercado — ver [§ Cobertura de Mercado](#cobertura-de-mercado--perfis-de-agents) para o diagrama detalhado por agent e a análise de aderência às práticas consolidadas.
+> 40 agents no catálogo raiz (64 totais com especialistas de stack), agrupados em 6 perfis de mercado — ver [§ Cobertura de Mercado](#cobertura-de-mercado--perfis-de-agents) para o diagrama detalhado por agent e a análise de aderência às práticas consolidadas.
 
 ### Para Adicionar Novo Adapter
 
@@ -254,7 +254,7 @@ Frameworks de referência (Claude Code/Agent SDK da Anthropic, Microsoft Agent F
 | 📚 Documentation & Learning | Docs Engineer, Context Builder | `docs-engineer` | ✅ 100% |
 | 🔄 Governance & Orchestration | Router, Memory Manager, Guardrails, Factories, Gatekeeper, Maintainer | `agent-router`, `prompt-structuring`, `governance-factory`, `governance-maintainer`, `agent-auditor`, `binding-initializer`, `adapter-generator`, `compliance-guardrails`, `pr-gatekeeper` | ✅ 100% |
 
-**Resultado**: **39 agents no catálogo raiz (63 totais)**, cobrindo **~95% dos 22 perfis consolidados de mercado** — nível de maturidade comparável ao modelo de referência SpecWeave (11 agents core, expandido aqui com granularidade enterprise adicional em segurança/performance/compliance/banco de dados).
+**Resultado**: **40 agents no catálogo raiz (64 totais)**, cobrindo **~95% dos 22 perfis consolidados de mercado** — nível de maturidade comparável ao modelo de referência SpecWeave (11 agents core, expandido aqui com granularidade enterprise adicional em segurança/performance/compliance/banco de dados).
 
 ### Mapa de Agents por Perfil (Mermaid)
 
@@ -297,7 +297,7 @@ flowchart TB
 
         subgraph CAT6["🔄 GOVERNANCE &amp; ORCHESTRATION"]
             direction TB
-            F1["agent-router ⭐"] ~~~ F2[prompt-structuring] ~~~ F3[governance-factory] ~~~ F4[agent-auditor] ~~~ F5[binding-initializer]
+            F1["agent-router ⭐"] ~~~ F1a["agent-root"] ~~~ F2[prompt-structuring] ~~~ F3[governance-factory] ~~~ F4[agent-auditor] ~~~ F5[binding-initializer]
             F6[adapter-generator] ~~~ F8["compliance-guardrails 🛡️"] ~~~ F9["pr-gatekeeper 📦"] ~~~ F10["governance-maintainer 🛠️"]
         end
 
@@ -380,7 +380,7 @@ flowchart TB
 - ✅ `database.instructions.md` — Banco de dados / Migrações
 - ✅ `devops.instructions.md` — Docker, Kubernetes, CI/CD
 
-### Agents (39 catalogados na raiz / 63 totais — ver [§ Cobertura de Mercado](#cobertura-de-mercado--perfis-de-agents) para o mapa completo)
+### Agents (40 catalogados na raiz / 64 totais — ver [§ Cobertura de Mercado](#cobertura-de-mercado--perfis-de-agents) para o mapa completo)
 - ✅ `agent-router` v1.5.0 — PASSO 0.3 de re-triagem por deriva de intenção (R-042), output com campo `Agente Ativo`, roteamento direto para todos os 37 agents downstream
 - ✅ `prompt-structuring` — passo mandatório pós-Health Check (R-041), loop de auto-refinamento (máx. 5 iterações)
 - ✅ 37 agents downstream especializados no catálogo raiz (mais 24 especialistas em 8 stacks), agrupados por função:
@@ -400,11 +400,11 @@ flowchart TB
 - ✅ Fusões canônicas para redução de redundância semântica: `test-strategy` (estratégia e matriz de risco), `docs-engineer` (unifica author/curate) e `governance-factory` (unifica agent/skill/prompt factory).
 - ✅ Novos perfis especializados enterprise integrados: `runtime-verifier` (read-only pre-flight), `pr-gatekeeper` (preparação de PR pós quality gate blindado contra quebra de fences de markdown) e `database-specialist` (migrações de schema e integridade).
 - ✅ Agents de maturidade enterprise e governança adicionados: `security-reviewer`, `performance-agent`, `compliance-guardrails`, `feature-planner`, `plan-critic`, `devops-engineer`, `debugger`, `code-style-enforcer`, `refactor-planner`.
-- ✅ Governança sincronizada atomicamente (R-015/R-040): `catalog.yaml` (39 agents na raiz / 63 totais), `README.md` (raiz e agents), `routing-graph.yaml` (39 nós) e `casos-roteamento.yaml`.
+- ✅ Governança sincronizada atomicamente (R-015/R-040): `catalog.yaml` (40 agents na raiz / 64 totais), `README.md` (raiz e agents), `routing-graph.yaml` (40 nós) e `casos-roteamento.yaml`.
 - ✅ Cobertura de perfis de mercado: **~95% dos 22 perfis consolidados**.
 
 ### Artefatos Estruturais de Orquestração
-- ✅ `.github/agents/routing-graph.yaml` — grafo de roteamento declarado (R-040): 39 nós, arestas condicionais e política de cascata rule-based→semantic→LLM; aresta reversa universal `*downstream → agent-router` (R-042)
+- ✅ `.github/agents/routing-graph.yaml` — grafo de roteamento declarado (R-040): 40 nós, arestas condicionais e política de cascata rule-based→semantic→LLM; aresta reversa universal `*downstream → agent-router` (R-042)
 - ✅ `.github/agents/evals/casos-roteamento.yaml` — suíte de testes de regressão de roteamento (canônicos, ambíguos, regressão, segurança + variantes)
 - ✅ `.github/instructions/README.md` v1.2 — seção `governance_artefacts` com os artefatos estruturais
 - ✅ `docs/plans/architecture/20260830-090000-agent-profiles-taxonomy.md` — análise consolidada de mercado + gaps + recomendações

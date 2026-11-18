@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "1.0.0",
+  "protocol": "A2A/1.0.0",
+  "id": "agent-root",
+  "name": "Agent Root",
+  "version": "1.0.0",
+  "description": "Identidade oficial do turno raiz: invoca o @agent-router (R-063) e executa o pipeline emitido (R-068). Não classifica nem executa o trabalho das etapas.",
+  "domain": "Orquestracao agent-first (raiz)",
+  "role": "specialist",
+  "capabilities": [
+    "raiz",
+    "turno raiz",
+    "agent-root",
+    "router first",
+    "r-063",
+    "r-068"
+  ],
+  "skills": [
+    "agent-contracts",
+    "handoff-governance"
+  ],
+  "tools": [
+    "ask_questions",
+    "run_subagent",
+    "context-mode/ctx_index",
+    "context-mode/ctx_search",
+    "context-mode/ctx_resume"
+  ],
+  "security_profile": {
+    "tool_zones": [
+      "read-only"
+    ],
+    "least_privilege_level": "standard",
+    "data_sensitivity": "internal"
+  },
+  "model_preferences": {
+    "recommended_model": "Claude Sonnet 5.5",
+    "cost_tier": "1x"
+  },
+  "input_contract": {
+    "accepts_payload": "yaml / markdown",
+    "required_fields": [
+      "emissor",
+      "contexto",
+      "motivo"
+    ]
+  },
+  "output_contract": {
+    "expected_format": "markdown estruturado com Agente Ativo e Handoff",
+    "emits_handoff": true,
+    "context_offloading_supported": true
+  },
+  "metadata": {
+    "catalog_source": ".github/agents/catalog.yaml",
+    "priority": 1.1,
+    "estimated_time_minutes": 15
+  }
+}

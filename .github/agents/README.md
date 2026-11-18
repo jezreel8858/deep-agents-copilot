@@ -20,6 +20,7 @@
 | Tipo | Nome | Quando usar |
 |---|---|---|
 | Agent | `agent-router` | Entry point obrigatório para classificar intenção e delegar para downstream |
+| Agent | `agent-root` | Raiz declarada: turno raiz do agent selecionado; invoca `agent-router` (R-063) e executa o pipeline emitido (R-068); não classifica |
 | Agent | `prompt-structuring` | ⚠️ ***(NEW)*** Passo mandatório pós-`agent-router` (R-041) — refina o prompt em loop controlado (máx. 5 iterações) antes de retornar para classificação de intenção |
 | Agent | `bug-triage` | Triagem de bugs/regressões com reprodução e severidade |
 | Agent | `test-strategy` | Estratégia de testes, cobertura por risco e critérios de aceitação |

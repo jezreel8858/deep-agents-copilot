@@ -35,11 +35,11 @@ def test_ssot_counts_match_canonical_repository_topology() -> None:
     counts = collect_ssot_counts(REPO_ROOT)
 
     assert counts.total_agent_files == counts.root_agent_files + counts.stack_agent_files
-    assert counts.total_agent_files == 63
-    assert counts.root_agent_files == 31
+    assert counts.total_agent_files == 64
+    assert counts.root_agent_files == 32
     assert counts.stack_agent_files == 32
-    assert counts.catalog_root_entries == 39
-    assert counts.routing_graph_nodes == 39
+    assert counts.catalog_root_entries == 40
+    assert counts.routing_graph_nodes == 40
     assert counts.total_skills == 81
     assert counts.tier1_skills == 15
     assert counts.tier2_skills == 65

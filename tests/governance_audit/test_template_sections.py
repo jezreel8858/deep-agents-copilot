@@ -240,8 +240,8 @@ def test_smell_2_9_root_agents_conform_to_canonical_agent_templates():
     gaps = []
     for ra in root_agents:
         concepts = set(extract_canonical_concept(h) for h in extract_h2_sections(ra))
-        # O agent-router central é o ponto de entrada, portanto despacha e não retorna a si mesmo
-        if ra.name == "agent-router.agent.md":
+        # agent-router (ponto de entrada) e agent-root (raiz declarada, ADR-0015) invocam o router e não retornam a ele
+        if ra.name in {"agent-router.agent.md", "agent-root.agent.md"}:
             concepts.add("retorno_router")
         missing = core_required - concepts
         if missing:

@@ -36,8 +36,8 @@ def test_router_return_section_golden_master_characterization():
     """
     Varre todos os agents, extrai a seção R-042 e valida os invariantes do snapshot atual:
     - 86 agents no total.
-    - 85 possuem seção explícita de retorno ao router (apenas agent-router.agent.md não possui,
-      pois é o próprio orquestrador raiz).
+    - Todos possuem seção explícita de retorno ao router, exceto agent-router.agent.md e
+      agent-root.agent.md (raízes declaradas, ADR-0015: invocam o router e não retornam a ele).
     - Mapeia variantes textuais e emite relatório estruturado.
     """
     agent_files = sorted(AGENTS_DIR.glob("**/*.agent.md"))
@@ -58,18 +58,23 @@ def test_router_return_section_golden_master_characterization():
             heading_counts[heading] += 1
 
     # Invariantes do estado atual (Golden Master Snapshot)
-    assert missing == [".github/agents/agent-router.agent.md"], (
-        f"Apenas o agent-router não deve ter seção de retorno a si mesmo. Ausentes: {missing}"
+    expected_missing = {
+        ".github/agents/agent-router.agent.md",
+        ".github/agents/agent-root.agent.md",
+    }
+    assert len(missing) == len(expected_missing) and set(missing) == expected_missing, (
+        "Apenas agent-router e agent-root (raiz declarada, ADR-0015) não possuem seção de "
+        f"retorno ao router; atualize expected_missing com justificativa. Ausentes: {missing}"
     )
 
-    # Todos os 85 agents não-roteadores têm seção
-    assert len(agent_files) - len(missing) == len(agent_files) - 1
+    # Todos os agents não-raiz têm seção
+    assert len(agent_files) - len(missing) == len(agent_files) - len(expected_missing)
 
     # Relatório de variantes capturadas
     print(f"\n=== GOLDEN MASTER SNAPSHOT: R-042 RETORNO AO ROUTER ===")
     print(f"Total de agents auditados: {len(agent_files)}")
     print(f"Agents com seção R-042: {len(agent_files) - len(missing)}")
-    print(f"Agents sem seção R-042 (esperado agent-router): {missing}")
+    print(f"Agents sem seção R-042 (esperado agent-router e agent-root): {missing}")
     print(f"Total de variantes textuais distintas: {len(variants)}")
     print(f"Distribuição de cabeçalhos:")
     for h, cnt in heading_counts.items():

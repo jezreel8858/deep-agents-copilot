@@ -51,6 +51,42 @@ agents:
     - .github/agents/routing-graph.yaml
     - .github/agents/evals/casos-roteamento.yaml
     estimated_time_minutes: 15
+  agent-root:
+    id: agent-root
+    model: Claude Sonnet 5.5
+    priority: 1.1
+    version: 1.0.0
+    domain: Orquestracao agent-first (raiz)
+    description: 'Identidade oficial do turno raiz: invoca o @agent-router (R-063) e executa o pipeline emitido (R-068). Não classifica nem executa o trabalho das etapas.'
+    keywords:
+    - raiz
+    - turno raiz
+    - agent-root
+    - router first
+    - r-063
+    - r-068
+    prerequisite_docs:
+    - CLAUDE.md
+    - .github/copilot-instructions.md
+    - .github/agents/README.md
+    - .github/agents/agent-router.agent.md
+    related_agents:
+    - agent-router
+    tools:
+    - ask_questions
+    - run_subagent
+    - context-mode/ctx_index
+    - context-mode/ctx_search
+    - context-mode/ctx_resume
+    related_skills:
+    - agent-contracts
+    - handoff-governance
+    source_docs:
+    - .github/copilot-instructions.md
+    - .github/agents/workflows/invariantes-e-protocolos.md
+    - .github/skills/agent-contracts/SKILL.md
+    - .github/skills/handoff-governance/SKILL.md
+    estimated_time_minutes: 15
   prompt-structuring:
     id: prompt-structuring
     model: Gemini 4 Carbon

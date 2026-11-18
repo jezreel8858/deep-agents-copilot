@@ -526,6 +526,10 @@ Qualquer novo workflow canônico ou customizado adicionado ao ecossistema que en
 
 Quando o usuário invocar explicitamente qualquer Slash Prompt (`.github/prompts/<nome>.prompt.md` com `router_bypass: utility` ou `router_bypass: slash_workflow` no frontmatter — todos os Slash Prompts exceto `/agent-router`), o comando já foi selecionado pelo usuário e possui fluxo determinístico próprio; portanto, o Orquestrador Raiz **NUNCA deve invocar `@agent-router`** na triagem inicial, devendo executar diretamente as instruções/fluxo do `.prompt.md` (ou despachar diretamente para o subagente previsto no próprio `.prompt.md`). Para solicitações em chat livre (ou via `/agent-router`), a passagem inicial por `@agent-router` permanece 100% obrigatória (R-037 / R-063).
 
+### Raiz declarada (@agent-root — R-037 / R-062 / R-063 / ADR-0015)
+
+O agent selecionado no chat como `@agent-root` é o turno raiz e a identidade oficial dele; a autodenominação `agent-root` não viola R-062 e nenhum outro nome de especialista é permitido. O `@agent-router` continua o único classificador (R-037 / R-063); o `agent-root` nunca classifica e sua 1ª ação é invocar o router. A exceção vale só para o nome literal no turno raiz — sem agent selecionado, R-062 / R-063 seguem integrais. Registro: `docs/adr/0015-raiz-declarada-agent-root.md`.
+
 ---
 
 ### 10.9 Quality Gate Universal Pós-Execução de Conformidade com o Plano (R-064)

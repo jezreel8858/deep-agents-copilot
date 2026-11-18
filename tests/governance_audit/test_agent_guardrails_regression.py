@@ -1,7 +1,7 @@
 """
 test_agent_guardrails_regression.py — Suíte Regressiva Determinística de Guardrails por Agency Score (0–3) e OWASP ASI01..ASI10:2026.
 
-Valida que 100% dos agents em .github/agents/**/*.agent.md (63 agents):
+Valida que 100% dos agents em .github/agents/**/*.agent.md (64 agents):
 1. São classificados de forma determinística, exaustiva e sem sobreposição em exatamente 1 Agency Score (0, 1, 2 ou 3);
 2. Cumprem os invariantes de ferramentas (tools:) e seções de guardrails obrigatórios do seu Agency Score;
 3. Mantêm integridade referencial com .github/skills/agent-safety-guardrails/references/agency-score-matrix.md e teto R-066 (<= 300 linhas).
@@ -39,6 +39,7 @@ SCORE_0_AGENTS = [
 
 SCORE_1_AGENTS = [
     "agent-router",
+    "agent-root",
     "database-router",
     "ejb-router",
     "python-router",
@@ -109,7 +110,7 @@ def _extract_tools(content: str) -> list[str]:
 @pytest.fixture(scope="session")
 def all_agents() -> dict[str, Path]:
     files = sorted(AGENTS_DIR.rglob("*.agent.md"))
-    assert len(files) >= 63, f"Esperados pelo menos 63 agents, encontrados {len(files)}"
+    assert len(files) >= 64, f"Esperados pelo menos 64 agents, encontrados {len(files)}"
     return {f.stem.replace(".agent", ""): f for f in files}
 
 
@@ -117,7 +118,7 @@ def test_exhaustive_and_mutually_exclusive_agency_score_classification(all_agent
     """Garante cobertura de 100% do catálogo em exatamente um Agency Score (0, 1, 2 ou 3) sem órfãos."""
     s0, s1, s2, s3 = set(SCORE_0_AGENTS), set(SCORE_1_AGENTS), set(SCORE_2_AGENTS), set(SCORE_3_AGENTS)
     assert len(s0) == 18, f"Score 0 deve conter 18 agents, tem {len(s0)}"
-    assert len(s1) == 9, f"Score 1 deve conter 9 routers, tem {len(s1)}"
+    assert len(s1) == 10, f"Score 1 deve conter 10 routers/raiz, tem {len(s1)}"
     assert len(s2) == 1, f"Score 2 deve conter 1 retriever (deep-search), tem {len(s2)}"
     assert len(s3) == 35, f"Score 3 deve conter 35 executores, tem {len(s3)}"
 

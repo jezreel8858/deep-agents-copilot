@@ -254,9 +254,9 @@ Diretrizes normativas para segurança no uso e exposição do Model Context Prot
 
 ## Matriz de Guardrails Proporcionais por Agency Score (0–3)
 
-Os guardrails de cada agente DEVEM ser calibrados pelo seu **Agency Score (0–3)** para cobrir o **OWASP Agentic Top 10 (`ASI01..ASI10:2026`)** sem causar *Context Bloat* (detalhes, catálogo completo de 63 agents e rubrica Two-Tier em [`references/agency-score-matrix.md`](references/agency-score-matrix.md)):
+Os guardrails de cada agente DEVEM ser calibrados pelo seu **Agency Score (0–3)** para cobrir o **OWASP Agentic Top 10 (`ASI01..ASI10:2026`)** sem causar *Context Bloat* (detalhes, catálogo completo de 64 agents e rubrica Two-Tier em [`references/agency-score-matrix.md`](references/agency-score-matrix.md)):
 
 - **Score 0 (Read-Only / Analítico / Auditor — 18 agents)**: Zero tools de edição/execução; exige `CRÍTICO: ESCOPO E NÃO-ESCOPO`, `❌ NÃO`, imutabilidade de produção e evidência verificável (`ASI01`, `ASI02`, `ASI06`, `ASI09`, `ASI10`).
-- **Score 1 (Roteador / Supervisor — 9 agents)**: Zero tools de edição; exige Flat Delegation (`R-042`), anti-loop, `CLAUSE_OTEL_PASSTHROUGH` e Zero Discovery (`R-054`) (`ASI01`, `ASI03`, `ASI07`, `ASI08`, `ASI10`).
+- **Score 1 (Roteador / Supervisor — 10 agents)**: Zero tools de edição; exige Flat Delegation (`R-042`), anti-loop, `CLAUSE_OTEL_PASSTHROUGH` e Zero Discovery (`R-054`) (`ASI01`, `ASI03`, `ASI07`, `ASI08`, `ASI10`).
 - **Score 2 (Retriever Web / Externo — `deep-search`)**: Gather-only (`ctx_batch` sem `ctx_execute`); trata conteúdo web/Tavily como **dado inerte** (`ASI01`/`ASI06`), proíbe executar scripts/URLs externos (`ASI02`/`ASI05`), terminal `read-only` e citação obrigatória (`ASI04`/`ASI09`).
 - **Score 3 (Executor / Mutação / Shell / DB — 35 agents)**: Exige `<execution_protocol>` com Least-Privilege (`ASI02`/`ASI03`), Plan-Then-Batch (`R-046`/`R-059`), Circuit Breaker (`R-053`/`R-060`/`ASI08`) e Gate HITL (`R-064`/`ASI09`).

@@ -19,7 +19,7 @@ ecosystem: "Multi-Agent AI Coding Governance"
 O `deep-agents-copilot` é uma infraestrutura de governança reutilizável, desacoplada e independente de plataforma, projetada para orquestrar agentes autônomos de IA (GitHub Copilot, Claude Code, Cursor) em tarefas complexas de engenharia de software corporativo.
 
 ### 1.1 Metas de Negócio e Engenharia
-1. **Orquestração Agent-First Determinística**: Substituir prompts genéricos e chatbots monolíticos por uma divisão de trabalho especializada (63 Agents totais / 39 no catálogo raiz), onde cada agente possui papéis, ferramentas e restrições estritamente delimitadas.
+1. **Orquestração Agent-First Determinística**: Substituir prompts genéricos e chatbots monolíticos por uma divisão de trabalho especializada (64 Agents totais / 40 no catálogo raiz), onde cada agente possui papéis, ferramentas e restrições estritamente delimitadas.
 2. **Eficiência e Token Budget**: Eliminar context bloat e desperdício de créditos por meio do paradigma *Think-in-Code* (processamento em sandbox via `context-mode` MCP) e *Artifact Offloading*.
 3. **Resiliência e Contenção de Falhas**: Garantir que agentes nunca entrem em loops infinitos de tentativa e erro ou corrompam o workspace do desenvolvedor (Circuit Breakers com Retry Budget e Rollback Atômico).
 4. **Segurança e Menor Privilégio**: Assegurar conformidade com a taxonomia OWASP Agentic AI 2026 e aplicar zoneamento estrito de permissões MCP (separação física entre agentes de consulta e agentes de mutação de código).
@@ -54,9 +54,9 @@ flowchart TB
 
     subgraph DeepAgents["deep-agents-copilot (Governança Central)"]
         Router["@agent-router\n(Triagem & Health Check R-034)"]
-        Graph["Grafo de Roteamento\n(routing-graph.yaml — 39 nós)"]
+        Graph["Grafo de Roteamento\n(routing-graph.yaml — 40 nós)"]
         Workflows["10 Workflows Canônicos\n(Máquinas de Estados)"]
-        Agents["63 Agents Totais\n(39 no catalog.yaml raiz + 8 Stacks)"]
+        Agents["64 Agents Totais\n(40 no catalog.yaml raiz + 8 Stacks)"]
         Skills["81 Skills Especializadas\n(15 Tier 1, 65 Tier 2, 1 Tier 3)"]
     end
 

@@ -31,7 +31,7 @@ def test_clause_otel_passthrough_and_context_hydration_in_ssot_and_agents() -> N
     assert "CLAUSE_CONTEXT_HYDRATION" in router_text
 
     agent_files = sorted((REPO_ROOT / ".github" / "agents").rglob("*.agent.md"))
-    assert len(agent_files) == 63, f"Esperado 63 agents, obtido {len(agent_files)}"
+    assert len(agent_files) == 64, f"Esperado 64 agents, obtido {len(agent_files)}"
     for full_p in agent_files:
         txt = full_p.read_text(encoding="utf-8")
         assert "CLAUSE_OTEL_PASSTHROUGH" in txt, f"Falta CLAUSE_OTEL_PASSTHROUGH em {full_p}"

@@ -1,6 +1,6 @@
 {
   "protocol": "A2A/1.0.0",
-  "total_agentcards": 63,
+  "total_agentcards": 64,
   "agents": {
     "adapter-generator": {
       "name": "Adapter Generator",
@@ -19,6 +19,12 @@
       "role": "auditor",
       "domain": "Auditoria semantica de governanca do catalogo (meta-nivel, read-only)",
       "version": "1.2.0"
+    },
+    "agent-root": {
+      "name": "Agent Root",
+      "role": "specialist",
+      "domain": "Orquestracao agent-first (raiz)",
+      "version": "1.0.0"
     },
     "agent-router": {
       "name": "Agent Router",

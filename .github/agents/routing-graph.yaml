@@ -13,6 +13,10 @@ nos:
     tipo: entry_point
     descricao: "Entry point obrigatório — nunca é destino, apenas origem"
 
+  - id: agent-root
+    tipo: downstream
+    descricao: "Raiz declarada (ADR-0015): turno raiz do agent selecionado; sem arestas de entrada, nunca destino do router; 1ª ação = invocar agent-router"
+
   - id: prompt-structuring
     tipo: mandatory_pre_step
     descricao: >
