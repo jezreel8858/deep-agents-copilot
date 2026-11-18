@@ -36,6 +36,48 @@ handoff_payload:
     - "Escrever spec isolado simulando payload sem provider"
 ```
 
+### 4.1 Extensão v1.4 do `workflow_tracking` (emitida pelo `@agent-router`)
+
+Extensão retrocompatível: nenhum campo vigente (`workflow_id`, `etapa_atual`, `total_etapas`, `nome_etapa`, `proximos_agentes_permitidos`, `politica_desvio`, `chaining`, `projeto_alvo`) é removido ou renomeado. Campos derivados (`etapa_atual`, `total_etapas`, `nome_etapa`) devem concordar com `ordem_execucao`/`etapas[]`; divergência → parar e acionar `@agent-router`.
+
+```yaml
+workflow_tracking:
+  # campos vigentes inalterados (ver bloco acima)
+  workflow_trace_id: "<wf-...>"
+  emitido_por: "@agent-router"
+  ordem_execucao: [1, 2, 3]      # sequência autoritativa; só o router altera
+  etapas:
+    - n: 1
+      nome: "<nome>"
+      agent: "@agente-1"
+      gate: human_explicit | none
+      status: pending | in_progress | done | failed | blocked | skipped_by_router
+      motivo: "<obrigatório se skipped_by_router/blocked>"
+      receipt_ref: "<receipt_id | null>"
+```
+
+### 4.2 `receipt` (copiado do retorno do agent)
+
+```yaml
+receipt:
+  receipt_id: "<id>"
+  n: 1
+  agent: "@agente-1"
+  banner_ref: "<copiado do banner Agente Ativo>"
+  handoff_seq: 1
+  artefato: "<caminho | N/A>"
+  gate_resolucao: "<resposta explícita via ask_questions | none>"
+  verdict_from_agent: "<copiado, nunca inferido>"
+  status: done | failed | blocked
+```
+
+### 4.3 Invariantes do pipeline emitido
+
+1. `done` somente com recibo completo; `etapa_atual` avança 1 passo por vez, monotônico, seguindo `ordem_execucao`.
+2. Dispensa de etapa somente pelo `@agent-router` (`skipped_by_router` + `motivo`); o raiz nunca dispensa, reordena ou funde etapas (R-068).
+3. `gate: human_explicit | none` em toda etapa; só `ask_questions` com resposta explícita abre gate.
+4. Espelho de estado: `ctx_index source:"wf:<trace>:state"`.
+
 ---
 
 ## 5. Regras de Não-Desvio (Invariantes de Execução)
@@ -103,9 +145,10 @@ handoff_payload:
 Para que o usuário nunca fique no escuro quanto ao fluxo em andamento, o `@agent-router` (ao despachar o workflow) e cada agente participante (ao reportar sua etapa) **DEVEM obrigatoriamente** renderizar o bloco visual `### 🗺️ Pipeline de Execução do Workflow` no início de sua mensagem.
 
 ### 6.1 Marcadores de Status Padronizados
-- `[✅]` **Concluído**: Etapa finalizada com sucesso e evidência registrada.
+- `[✅]` **Concluído**: Etapa finalizada com sucesso, evidência registrada e recibo (§ 4.2).
 - `[▶]` **Em Andamento (Atual)**: Etapa sob execução do agente ativo no turno.
 - `[⏳]` **Pendente**: Etapa futura a ser executada na sequência.
+- `[⏭]` **Dispensada pelo router**: etapa com status `skipped_by_router` e `motivo`; nunca marcada pelo raiz.
 
 ---
 
@@ -337,6 +380,8 @@ workflow_tracking:
       diagnostico_previo: "3 memory leaks detectados em subscriptions manuais sem takeUntil"
 ```
 Com esse bloco, qualquer especialista na cadeia sequencial sabe exatamente onde ler, onde testar e quais convenções de stack aplicar, sem ambiguidades.
+
+Nota (v1.4): `projeto_alvo` coexiste com `etapas[]` no mesmo bloco `workflow_tracking`, sem mudança de schema (§ 4.1).
 
 ---
 

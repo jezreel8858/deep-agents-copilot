@@ -434,3 +434,30 @@ def test_invariantes_e_protocolos_mermaid_and_atomic_parity_rule() -> None:
         "planner-preflight-checklist.md deve verificar 'paridade Prosa↔Mermaid em workflow-*.md'.",
         fix_hint="Incluir 'paridade Prosa↔Mermaid em workflow-*.md' em planner-preflight-checklist.md.",
     )
+
+
+def test_routing_graph_every_workflow_state_declares_gate() -> None:
+    """R-068: toda etapa (workflows[*].estados[*]) do routing-graph.yaml declara a chave 'gate' (presença, não valor)."""
+    data = yaml.safe_load(ROUTING_GRAPH_YAML.read_text(encoding="utf-8"))
+    workflows = data.get("workflows") or []
+    assert workflows, remediation(
+        "routing-graph.yaml deve declarar workflows.",
+        fix_hint="Restaurar a seção 'workflows:' em routing-graph.yaml.",
+    )
+    checked = 0
+    missing: list[str] = []
+    for workflow in workflows:
+        for estado in workflow.get("estados") or []:
+            if not isinstance(estado, dict) or "nome" not in estado:
+                continue
+            checked += 1
+            if "gate" not in estado:
+                missing.append(f"{workflow.get('id')}:{estado['nome']}")
+    assert checked > 0, remediation(
+        "Nenhum estado com 'nome' encontrado em workflows[*].estados[*] do routing-graph.yaml.",
+        fix_hint="Verificar a estrutura workflows[*].estados[*] em routing-graph.yaml.",
+    )
+    assert not missing, remediation(
+        f"Estados sem chave 'gate' em routing-graph.yaml: {', '.join(missing)}.",
+        fix_hint="Declarar 'gate:' (ex.: 'none') em cada estado listado.",
+    )

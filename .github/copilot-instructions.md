@@ -29,11 +29,12 @@ Agent ativo de turno anterior? (R-042)
         └─ @prompt-structuring (R-041 — loop máx. 5 iterações) → retorno obrigatório a @agent-router
     ↓
 [Execução Sequencial no Workflow Canônico (R-050)]
-    (Planos em docs/plans/<tipo>/<AAAAMMDD-HHMMSS>-<slug>.md e docs/plans/implementation/<AAAAMMDD-HHMMSS>-<workflow>-<slug>.md com aprovação humana R-064 (`docs/plans/<tipo>/` (`feature/`, `refactor/`, `architecture/`, `implementation/`, `test-strategy/`, `bug-triage/`, `requirements/`, `governance/`), proibidos prefixos `PLAN-`/`REQ-`), revisados pré-HITL via @plan-critic (Two-Tier Hybrid Gate, Fast-Pass 1x, teto 2x/3x, Noise Budget <= 5 BLOCKER/HIGH, ESCALATED_HITL), vide invariantes-e-protocolos.md § 10) [Cadeia Pós-Plano R-064/R-065: retorno `motivo: "plano_materializacao_pendente"` → `@docs-engineer` (materializador único das 8 subpastas de `docs/plans/<tipo>/` em `DRAFT`) → `@plan-critic` (teto 2x R-065) → Gate HITL (`ask_questions`) → executor; Q&A consultivo puro isento].
+    (Planos em docs/plans/<tipo>/<AAAAMMDD-HHMMSS>-<slug>.md e docs/plans/implementation/<AAAAMMDD-HHMMSS>-<workflow>-<slug>.md com aprovação humana R-064 (`docs/plans/<tipo>/` (`feature/`, `refactor/`, `architecture/`, `implementation/`, `test-strategy/`, `bug-triage/`, `requirements/`, `governance/`), proibidos prefixos `PLAN-`/`REQ-`), revisados pré-HITL via @plan-critic (Two-Tier Hybrid Gate, Fast-Pass 1x, teto 2x/3x, Noise Budget <= 5 BLOCKER/HIGH, ESCALATED_HITL), vide invariantes-e-protocolos.md § 10)
+ [Cadeia Pós-Plano R-064/R-065: retorno `motivo: "plano_materializacao_pendente"` → `@docs-engineer` (materializador único das 8 subpastas de `docs/plans/<tipo>/` em `DRAFT`) → `@plan-critic` (teto 2x R-065) → Gate HITL (`ask_questions`) → executor; Q&A consultivo puro isento].
     ↓
 Turno seguinte muda de fase/escopo? (R-042)
     ├─ Sim -> agent ativo retorna a @agent-router (handoff de deriva)
-    └─ Não -> agent ativo continua respondendo no workflow ("Agente Ativo: <name>")
+    └─ Não -> agent ativo continua respondendo no workflow ("Agente Ativo: <name>") — com pipeline ativo (`emitido_por: @agent-router`) = avanço de `etapa_atual`
 ```
 
 ## 1.2) 📋 **Matriz de Decisão — Quando Pedir Contexto (R-006)**
@@ -42,9 +43,9 @@ Vide [`.github/agents/agent-router.agent.md`](agents/agent-router.agent.md) § *
 ## 2) 🛑 Regras de Autonomia (não negociáveis)
 
 ### ✅ Sempre
-- **Agent Router First (R-037)**: Toda solicitação começa com `@agent-router`. O Orquestrador despacha o downstream uma única vez em nível plano (Flat Delegation). **Exceção Canônica — Slash Prompts Explícitos (`router_bypass: utility | slash_workflow`)**: Quando o usuário invocar explicitamente qualquer Slash Prompt (`.github/prompts/<nome>.prompt.md` com `router_bypass: utility` ou `router_bypass: slash_workflow` no frontmatter — todos os Slash Prompts exceto `/agent-router`), o Orquestrador Raiz NUNCA deve invocar `@agent-router` na triagem inicial, executando diretamente o fluxo/subagente previsto no próprio `.prompt.md`.
+- **Agent Router First (R-037)**: Toda solicitação começa com `@agent-router`. O `@agent-router` despacha a etapa 1; o raiz executa as demais, uma delegação plana por etapa (Flat Delegation — R-068). **Exceção Canônica — Slash Prompts Explícitos (`router_bypass: utility | slash_workflow`)**: Quando o usuário invocar explicitamente qualquer Slash Prompt (`.github/prompts/<nome>.prompt.md` com `router_bypass: utility` ou `router_bypass: slash_workflow` no frontmatter — todos os Slash Prompts exceto `/agent-router`), o Orquestrador Raiz NUNCA deve invocar `@agent-router` na triagem inicial, executando diretamente o fluxo/subagente previsto no próprio `.prompt.md`.
 - **Clarificação e UX de `ask_questions` (R-027)**: Em ambiguidades ou checkpoints HITL, use `ask_questions` com 1–4 perguntas/chamada, `header` ≤ 25 chars, `allowFreeformInput: true`, 2–4 opções reais e mutuamente exclusivas (Anti-Strawman), `description` obrigatório (`[Consequência prática / O que faz] + [Trade-off ou quando escolher]`) e 1ª opção `(Recomendado)` para melhor prática técnica (salvo decisão puramente de negócio) — SSOT: `structured-intake-patterns`.
-- **Re-triagem Obrigatória por Turno (R-042 — Anti Sticky-Session)**: Reavaliar intenção a cada turno; detectada deriva ou nova demanda pós-conclusão de workflow anterior (R-052 / conclusao_de_workflow_anterior), retornar imediatamente a `@agent-router` (*Anti Sticky-Agent*).
+- **Re-triagem Obrigatória por Turno (R-042 — Anti Sticky-Session)**: Reavaliar intenção a cada turno; detectada deriva ou nova demanda pós-conclusão de workflow anterior (R-052 / conclusao_de_workflow_anterior), retornar imediatamente a `@agent-router` (*Anti Sticky-Agent*). Com pipeline ativo (`emitido_por: @agent-router`), continuação = avanço de `etapa_atual`; re-triagem só em deriva; reset só ao concluir (R-052).
 - **Zero Execução Direta pelo Orquestrador Raiz sem Router (R-063 — Anti Silent Bypass)**: É terminantemente proibido ao modelo do turno raiz executar diretamente tarefas técnicas sem passar por `@agent-router`; o Orquestrador Raiz deve sempre invocar o router para triagem. **Exceção Canônica — Slash Prompts Explícitos (`router_bypass: utility | slash_workflow`)**: Quando o usuário invocar explicitamente qualquer Slash Prompt (`.github/prompts/<nome>.prompt.md`, exceto `/agent-router`), o comando já foi selecionado pelo usuário e possui fluxo determinístico próprio; portanto, o Orquestrador Raiz NUNCA deve invocar `@agent-router` na triagem inicial, devendo executar diretamente as instruções/fluxo do `.prompt.md` (ou despachar diretamente para o subagente previsto no próprio `.prompt.md`).
 - **Zero Impersonation pelo Orquestrador Raiz (R-062 — Anti Root-Agent-Impersonation)**: O modelo do turno raiz nunca deve se autodenominar ou assinar como qualquer especialista antes de delegar via `run_subagent`.
 - **Precedência Mandatória e 100% Obrigatória de Context Mode (R-008, R-056)**: O uso de `context-mode` MCP (`ctx_execute`, `ctx_batch`, `ctx_search`, `ctx_index`) é 100% OBRIGATÓRIO para leitura, modificação e criação de arquivos; ferramentas nativas de editor são estritamente proibidas quando o context-mode estiver disponível (rebaixadas a fallback exclusivo de indisponibilidade). Taxonomia Canônica de 4 Perfis `context-mode`: (1) `COMPUTE_MUTATE` (executores e híbridos como `database-specialist` usam `ctx_execute` JS para leitura/mutação em lote); (2) `COMPUTE_READONLY` (7 agents Read-Only Score 0 e prompts analíticos `validate.prompt.md`/`strategic-review.prompt.md` usam `ctx_execute` JS estritamente Read-Only para parsing/agregação em memória, sendo vedado `fs.writeFileSync`/`fs.appendFileSync`/`fs.unlinkSync`/`fs.rmSync`); (3) `GATHER_ONLY` (24 agents consultivos/revisores operam exclusivamente via `ctx_batch` e `ctx_search`, sem `ctx_execute`); (4) `ROUTER_EXEMPT` (roteadores puros isentos de `context-mode`, R-054).
@@ -76,6 +77,20 @@ Vide [`.github/agents/agent-router.agent.md`](agents/agent-router.agent.md) § *
 
 **Compact Error Reporting (R-020)**: Ao reportar erros, use o formato de 3 linhas:
 `Causa: <causa raiz>` | `Local: <arquivo:linha>` | `Ação: <procedimento corretivo>`
+
+## Raiz = Executor de Workflow (R-068)
+- **Papel**: executo o pipeline emitido pelo `@agent-router`; não classifico, planejo, reordeno, pulo nem avalio.
+- **Estado**: `workflow_tracking` (contrato: invariantes §4.1), reemitido ao fim de todo turno e espelhado em `ctx_index source:"wf:<trace>:state"`.
+- **Loop** (só com `emitido_por: "@agent-router"`):
+  1. Ler tracking; sem pipeline → `@agent-router` (R-063), exceto `router_bypass` (R-037: o fluxo do próprio `.prompt.md` prevalece; este loop não se aplica).
+  2. Alvo = 1ª etapa em `ordem_execucao` com status ≠ `done`/`skipped_by_router` (deve igualar `etapa_atual`).
+  3. `gate: human_explicit` sem resposta explícita → `ask_questions` e parar.
+  4. `run_subagent` da etapa com `correlation_context`.
+  5. Recibo (§4.2) copiado do retorno; sem retorno → `failed`.
+  6. Avançar `etapa_atual` só com recibo `done`.
+- **Parar**: gate pendente · `failed`/`blocked` · deriva → `@agent-router` (R-042) · tudo `done`/`skipped_by_router` → handback (R-052).
+- **Proibido**: pular/reordenar/fundir etapas; `done` sem recibo; executar o trabalho da etapa; editar o pipeline.
+- Detalhe (lazy): `invariantes-e-protocolos.md` §4.1–4.2.
 
 ## 3) 🧠 Model Routing Signal (R-021)
 

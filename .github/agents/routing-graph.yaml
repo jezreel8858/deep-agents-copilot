@@ -232,6 +232,7 @@ workflows:
     estados:
       - etapa: 1
         nome: "triage_and_root_cause"
+        gate: none
         agent: "bug-triage"
         sub_rotinas_permitidas: ["debugger", "codegraph-engine"]
         rca_gate: "5_whys | fishbone com 2 fontes independentes de evidencia (logs, traces, network, APM)"
@@ -241,11 +242,13 @@ workflows:
         escalonamento_nao_reproduzivel: "ask_questions (prosseguir_com_hipotese | aguardar_evidencia | encerrar_nao_reproduzivel)"
       - etapa: 2
         nome: "red_test_and_layout_reproduction"
+        gate: none
         agent: "<stack>-test-engineer | specialist-integration-test-writer | <stack>-developer"
         pre_flight: "runtime-verifier (baseline check)"
         nota: "specialist-test-engineer com escopo de integração obrigatório quando o bug só reproduz com contexto de framework (Spring/R2DBC/Testcontainers); specialist-test-engineer para DOM real (Angular)"
       - etapa: 3
         nome: "implementation_plan_authoring"
+        gate: none
         agent: "<stack>-arch-advisor"
         resolvido_por: "domain-router-stack"
         regra: "R-064"
@@ -254,6 +257,7 @@ workflows:
         descricao: "Autoria do Plano de Implementacao pelo <stack>-arch-advisor antes de qualquer correcao de codigo (R-064)"
       - etapa: 4
         nome: "surgical_bug_fix"
+        gate: none
         agent: "<stack>-developer"
         requires_plan: true
         sub_rotinas_permitidas: ["database-specialist"]
@@ -261,12 +265,14 @@ workflows:
         security_checkpoint_condicional: "R-048.1 (tech-solution-architect + security-reviewer) obrigatorio se o diff tocar autenticacao/credenciais/identidade, antes de aplicar o fix"
       - etapa: 5
         nome: "green_test_and_linter_validation"
+        gate: none
         agent: "runtime-verifier | <stack>-test-engineer"
         max_retries: 3
         mini_mutation_check: "mini mutation-check proporcional ao risco para erradicar falsos-verdes no teste de regressao"
         circuit_breaker: "runtime-verifier (declara_veredito_readonly, nunca reverte) -> <stack>-developer|<stack>-test-engineer (executa_revert_via_git conforme rollback_plan) -> ask_questions"
       - etapa: 6
         nome: "quality_gate_and_pr"
+        gate: none
         agent: "code-review | pr-gatekeeper"
         observacao_pos_fix: "criterios de canary e telemetria de observacao pos-fix obrigatorios para bugs criticos (P0/P1)"
 
@@ -299,9 +305,11 @@ workflows:
     estados:
       - etapa: 1
         nome: "ground_truth_rules_extraction"
+        gate: none
         agent: "business-rules-extractor | refactor-planner"
       - etapa: 2
         nome: "blast_radius_and_graph_mapping"
+        gate: none
         agent: "codegraph-engine"
         sub_rotinas_permitidas: ["tech-solution-architect"]
         contract_gate: "contract_testing (Pact-style consumer-driven ou OpenAPI diff) se afetar APIs publicas ou consumidores"
@@ -309,14 +317,16 @@ workflows:
         threshold_cobertura_por_risco: "test-coverage-governance/SKILL.md § 1 (90 critico | 80 integracao | 70 controller)"
       - etapa: 3
         nome: "refactor_plan_and_safety_net"
+        gate: none
         agent: "refactor-planner"
         co_agentes: ["test-strategy"]
         estrategia_decomposicao: "mikado_method"
         sub_rotinas_permitidas: ["database-specialist"]
-        checkpoint_aprovacao_condicional: "ask_questions se breaking_change|schema|blast_radius_grande; contextual/implicita (R-031) se escopo local"
+        checkpoint_aprovacao_condicional: "ask_questions se breaking_change|schema|blast_radius_grande; sem esses fatores, sem gate (gate: human_explicit|none emitido pelo router)"
         limite_escala_dag: 15
       - etapa: 4
         nome: "implementation_plan_authoring"
+        gate: none
         agent: "<stack>-arch-advisor"
         resolvido_por: "domain-router-stack"
         regra: "R-064"
@@ -325,12 +335,14 @@ workflows:
         descricao: "Autoria do Plano de Implementacao pelo <stack>-arch-advisor antes de qualquer refatoracao em lote (R-064)"
       - etapa: 5
         nome: "incremental_batch_execution"
+        gate: none
         agent: "domain-router | <stack>-developer"
         requires_plan: true
         protocolo: "efficient-batch-code-modification"
         gate_out_por_no: "compilacao_limpa + testes_verdes + diff_minimo"
       - etapa: 6
         nome: "ground_truth_validation_and_review"
+        gate: none
         agent: "business-rules-extractor"
         co_agentes: ["code-review"]
         redundancia_proporcional: "auditoria reversa de simbolos (codegraph-engine) + mini mutation gate (test-strategy) + differential replay leve proporcionais ao blast radius"
@@ -359,6 +371,7 @@ workflows:
     estados:
       - etapa: 1
         nome: "specialist_analyst_dispatch"
+        gate: none
         agents_permitidos:
           - "codegraph-engine"
           - "ddd-bounded-context-mapper"
@@ -379,11 +392,13 @@ workflows:
         suporte_fan_out: "handoff-governance/SKILL.md § 5.1 se [P] R-018 e 2+ categorias independentes"
       - etapa: 2
         nome: "deterministic_read_only_collection"
+        gate: none
         modo: "advisory_read_only"
         sub_rotinas_permitidas: ["tech-solution-architect", "codegraph-engine", "deep-search"]
         max_depth_subrotina: 3
       - etapa: 3
         nome: "synthesis_and_next_step"
+        gate: none
         saida_estruturada: "tabela_propostas_acionaveis"
         escape_hatch_sem_achados: "nenhuma_proposta_necessaria_conformidade_validada"
         suporte_fast_chaining: true
@@ -407,13 +422,16 @@ workflows:
     estados:
       - etapa: 1
         nome: "prompt_structuring_refinement"
+        gate: none
         agent: "prompt-structuring"
         condicao: "se_ambiguo_ou_alto_nivel"
       - etapa: 2
         nome: "requirements_elicitation"
+        gate: none
         agent: "requirements-analyst | feature-planner"
       - etapa: 3
         nome: "technical_blueprint_and_contracts"
+        gate: human_explicit
         agent: "tech-solution-architect"
         checkpoint_humano: "ask_questions (aprovacao_blueprint)"
         particionamento_escopo: ["frontend_only", "backend_only", "fullstack", "database_only"]
@@ -423,11 +441,13 @@ workflows:
         proibir_bypass_direto_para_implementador: true
       - etapa: 4
         nome: "test_strategy_and_risk_matrix"
+        gate: none
         agent: "test-strategy"
         threshold_cobertura_por_risco: "test-coverage-governance/SKILL.md § 1 (90 critico | 80 integracao | 70 controller)"
         casos_borda_seguranca_obrigatorios: true
       - etapa: 5
         nome: "implementation_plan_authoring"
+        gate: none
         agent: "<stack>-arch-advisor"
         resolvido_por: "domain-router-stack"
         regra: "R-064"
@@ -436,12 +456,14 @@ workflows:
         descricao: "Autoria do Plano de Implementacao pelo <stack>-arch-advisor antes de qualquer codificacao (R-064)"
       - etapa: 6
         nome: "red_test_authoring"
+        gate: none
         agent: "<stack>-test-engineer"
         padrao: "contract_first_tdd"
         protocolo: "efficient-batch-code-modification"
-        excecao_dominio_frontend: "Quando domain-router = angular-router, esta etapa (red) e a etapa 6 (green) sao COMPULSORIAMENTE invertidas por desenho: Angular adota Implementation-First/Test-Last (ver angular-developer.agent.md / angular-router.agent.md). Nao e bug, e desvio intencional documentado (R-050)."
+        excecao_dominio_frontend: "Quando domain-router = angular-router, esta etapa (red) e a etapa 7 (green) sao COMPULSORIAMENTE invertidas por desenho: Angular adota Implementation-First/Test-Last (ver angular-developer.agent.md / angular-router.agent.md). O router emite ordem_execucao com a etapa 7 antes da 5 (numero = identidade). Nao e bug, e desvio intencional documentado (R-050)."
       - etapa: 7
         nome: "green_implementation"
+        gate: none
         agent: "<stack>-developer"
         requires_plan: true
         padrao: "contract_first_tdd"
@@ -449,12 +471,14 @@ workflows:
         excecao_dominio_frontend: "Quando domain-router = angular-router, esta etapa executa PRIMEIRO (Implementation-First via @angular-developer) e a etapa 5 (red/testes) ocorre a posteriori via handoff para @angular-test-engineer. Ver nota na etapa 5 (R-050)."
       - etapa: 8
         nome: "e2e_journey_validation"
+        gate: none
         agent: "<stack>-test-engineer"
         aplicavel_quando: "domain-router = angular-router | react-router"
         condicional: true
-        nota: "Etapa opcional/condicional — aplicavel somente em stacks com especialista E2E dedicado no catalogo local (ex.: @angular-test-engineer). Stacks sem E2E writer dedicado pulam esta etapa sem bloqueio."
+        nota: "Etapa opcional/condicional — aplicavel somente em stacks com especialista E2E dedicado no catalogo local (ex.: @angular-test-engineer). Stacks sem E2E writer dedicado tem esta etapa dispensada somente pelo router (skipped_by_router com motivo)."
       - etapa: 9
         nome: "quality_gate_and_pr_preparation"
+        gate: none
         agent: "code-review | pr-gatekeeper"
         sub_rotinas_permitidas: ["security-reviewer"]
         owasp_security_gate: true
@@ -481,10 +505,12 @@ workflows:
     estados:
       - etapa: 1
         nome: "read_only_audit_and_diagnosis"
+        gate: none
         agents_permitidos: ["agent-auditor", "repo-hygiene-auditor", "governance-factory"]
         sub_rotinas_permitidas: ["deep-search"]
       - etapa: 2
         nome: "governance_plan_materialization_and_implementation_plan_authoring"
+        gate: none
         agent: "docs-engineer | governance-maintainer | plan-critic"
         resolvido_por: "docs-engineer"
         regra: "R-064"
@@ -493,11 +519,13 @@ workflows:
         descricao: "Materializacao fisica do Plano R-064 (status: DRAFT) em docs/plans/governance/ por @docs-engineer seguida de revisao cetica pre-HITL obrigatoria por @plan-critic (Two-Tier Hybrid Gate, § 10.7)"
       - etapa: 3
         nome: "human_approval_checkpoint"
+        gate: human_explicit
         mecanismo: "ask_questions"
         regra: "R-064"
         descricao: "Checkpoint humano Fail-Closed sobre plan_ref apos veredito PASS/PASS_WITH_WARNINGS do @plan-critic"
       - etapa: 4
         nome: "governed_batch_execution"
+        gate: none
         agents_permitidos: ["governance-maintainer", "governance-factory"]
         requires_plan: true
         protocolo: "efficient-batch-code-modification"
@@ -509,6 +537,7 @@ workflows:
         max_tentativas_autofix: 3
       - etapa: 5
         nome: "tier1_governance_quality_gate"
+        gate: none
         validacao_automatizada: "pytest (smells, routing, isolation)"
         validacao_comportamental: "agent-evals-lab (60 casos casos-roteamento.yaml)"
         escalonamento_apos_teto: "ask_questions (revisao_manual_diff)"
@@ -535,14 +564,17 @@ workflows:
     estados:
       - etapa: 1
         nome: "vulnerability_scan_and_advisory_triage"
+        gate: none
         agent: "security-reviewer"
         sub_rotinas_permitidas: ["deep-search"]
       - etapa: 2
         nome: "dependency_blast_radius_mapping"
+        gate: none
         agent: "codegraph-engine"
         sub_rotinas_permitidas: ["tech-solution-architect"]
       - etapa: 3
         nome: "implementation_plan_authoring"
+        gate: none
         agent: "<stack>-arch-advisor"
         resolvido_por: "domain-router-stack"
         regra: "R-064"
@@ -551,11 +583,13 @@ workflows:
         descricao: "Autoria do Plano de Implementacao pelo <stack>-arch-advisor antes de qualquer bump ou adaptacao de codigo (R-064)"
       - etapa: 4
         nome: "manifest_bump_and_lockfile_sync"
+        gate: none
         agent: "domain-router | <stack>-developer"
         requires_plan: true
         protocolo: "context-mode"
       - etapa: 5
         nome: "breaking_change_adaptation_and_compilation"
+        gate: none
         agent: "domain-router | <stack>-developer"
         requires_plan: true
         sub_rotinas_permitidas: ["<stack>-test-engineer"]
@@ -563,6 +597,7 @@ workflows:
         circuit_breaker: "<stack>-developer (executa_revert_manifesto) -> ask_questions"
       - etapa: 6
         nome: "regression_verification_and_sca_gate"
+        gate: none
         agent: "runtime-verifier | code-review | security-reviewer"
 
   - id: WORKFLOW-FRAMEWORK-MIGRATION
@@ -604,18 +639,21 @@ workflows:
     estados:
       - etapa: 1
         nome: "pre_flight_compatibility_assessment"
+        gate: none
         agent: "tech-solution-architect"
         co_agentes: ["codegraph-engine (obrigatorio, R-045 - inventario de dependencias/blast radius/ciclos do legado)", "domain-router-stack-origem (obrigatorio se cross-stack, ex: ejb-router|struts-router)", "business-rules-extractor"]
         sub_rotinas_permitidas: ["deep-search"]
         nota: "codegraph-engine mapeia dependencias, blast radius e ciclos do codigo legado ANTES do blueprint; domain-router-stack-origem eh convocado via run_subagent para inventariar regras de negocio nas 5 dimensoes criticas (borda, regras, persistencia, downstream, saida); em cenario brownfield_in_flight, executa compulsoriamente o sub-estado 1b de Reconciliacao Delta e auditoria de gaps pre-existentes"
       - etapa: 2
         nome: "migration_blueprint_and_phasing"
+        gate: human_explicit
         agent: "tech-solution-architect"
         co_agentes: ["domain-router-stack-origem", "domain-router-stack-destino"]
         checkpoint_humano: "ask_questions (aprovacao_fases_migracao)"
         nota: "blueprint gera a Matriz De-Para bidirecional canonica (docs/migrations/matriz-de-para-<alvo>.md) vinculando 100% dos elementos legados a componentes destino e fases B1/B2/B3 com dashboard de visibilidade humana; declara papeis de origem (oraculo) e destino (executor)"
       - etapa: 3
         nome: "implementation_plan_authoring"
+        gate: none
         agent: "<stack>-arch-advisor"
         resolvido_por: "domain-router-stack-destino"
         regra: "R-064"
@@ -624,6 +662,7 @@ workflows:
         descricao: "Autoria do Plano de Implementacao pelo <stack>-arch-advisor antes de qualquer codemod (R-064)"
       - etapa: 4
         nome: "codemod_and_batch_rewrite"
+        gate: none
         agent: "domain-router-stack-destino | <stack>-developer"
         requires_plan: true
         co_agentes: ["domain-router-stack-origem (consultivo, obrigatorio se cross-stack)", "codegraph-engine (obrigatorio, R-045 - blast radius por lote antes de cada micro-batch)"]
@@ -636,6 +675,7 @@ workflows:
         gate: "dual_verification_gate (golden_master_100 + matriz_de_para_100_resolvida + regras_de_negocio_100_cobertas + zero_ciclos_dead_code_novos, ver .github/agents/workflows/workflow-framework-migration.md § 3.7.1, fatiado de workflows.md R-066/F3)"
       - etapa: 6
         nome: "baseline_and_quality_gate"
+        gate: none
         agent: "runtime-verifier | code-review"
         co_agentes: ["domain-router-stack-origem (sign-off final de paridade e fechamento de 100% da Matriz De-Para, obrigatorio se cross-stack)", "codegraph-engine (obrigatorio, R-045 - verificacao final de zero ciclos novos e zero dead-code introduzido)"]
 
@@ -658,21 +698,26 @@ workflows:
     estados:
       - etapa: 1
         nome: "contract_and_api_compatibility_audit"
+        gate: none
         agent: "tech-solution-architect"
         sub_rotinas_permitidas: ["codegraph-engine"]
       - etapa: 2
         nome: "database_rollout_pre_flight"
+        gate: none
         agent: "database-specialist"
         verificacoes: ["idempotencia_ddl", "script_rollback_testado", "sem_drop_destrutivo"]
       - etapa: 3
         nome: "security_secrets_and_hygiene_scan"
+        gate: none
         agent: "security-reviewer"
         co_agentes: ["repo-hygiene-auditor"]
       - etapa: 4
         nome: "changelog_semver_and_packaging"
+        gate: none
         agent: "pr-gatekeeper"
       - etapa: 5
         nome: "release_verdict_and_executive_summary"
+        gate: human_explicit
         agent: "code-review"
         checkpoint_final: "ask_questions (aprovacao_go_no_go_deploy)"
 
@@ -694,24 +739,29 @@ workflows:
     estados:
       - etapa: 1
         nome: "elicitation_and_problem_space"
+        gate: none
         agent: "requirements-analyst | prompt-structuring"
         co_agentes: ["requirements-analyst", "prompt-structuring"]
         invariantes: ["ask_questions_obrigatorio_em_ambiguidade", "proibicao_alucinacao_regras", "delimitar_problem_space"]
       - etapa: 2
         nome: "codebase_context_grounding"
+        gate: none
         agent: "codegraph-engine"
         sub_rotinas_permitidas: ["deep-search"]
         mineracoes: ["caminhos_reais_arquivos", "interfaces_dto", "irmaos_canonicos"]
       - etapa: 3
         nome: "constraint_and_boundary_mapping"
+        gate: none
         agent: "prompt-structuring"
         injecoes: ["batching_r046", "nao_escopo", "convencoes_stack"]
       - etapa: 4
         nome: "structured_prompt_synthesis"
+        gate: none
         agent: "prompt-structuring"
         otimizacoes: ["markdown_estruturado", "prompt_caching_alignment"]
       - etapa: 5
         nome: "quality_gate_and_emission"
+        gate: none
         agent: "prompt-structuring"
         formato_entrega: "markdown_code_block"
 

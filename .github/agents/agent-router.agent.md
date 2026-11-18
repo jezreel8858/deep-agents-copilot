@@ -329,6 +329,13 @@ Agente Ativo: <@agent delegado nesta resposta — auditoria de R-042>
 - [⏳] **Etapa 4: <Nome da Etapa 4>** → `@agente-4` *(Pendente)*
 - [⏳] **Etapa 5: <Nome da Etapa 5>** → `@agente-5` *(Pendente)*
 
+workflow_tracking (v1.4, extensão retrocompatível — schema em invariantes-e-protocolos.md § 4.1):
+  emitido_por: "@agent-router"
+  workflow_trace_id: "<wf-...>"
+  ordem_execucao: [1..N]
+  etapas: [{n, nome, agent, gate: human_explicit|none, status, motivo, receipt_ref}]
+- Etapas ≥ 2 são executadas pelo raiz (R-068); o router não executa nem reordena após a emissão e é o único a dispensar etapa (skipped_by_router + motivo).
+
 Entradas consideradas:
 - <item>
 - <item>

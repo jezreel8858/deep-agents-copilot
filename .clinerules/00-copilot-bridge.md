@@ -10,7 +10,7 @@ Sempre utilize o caminho absoluto do interpretador Python:
 
 ## 1. Fonte Única de Verdade (SSOT) & Diretrizes Globais
 - **Governança Canônica Universal:** `CLAUDE.md` (na raiz).
-  - Define as regras normativas inegociáveis (R-001 a R-067).
+  - Define as regras normativas inegociáveis (R-001 a R-068).
   - Estabelece as convenções de código, gestão de estado e políticas de segurança.
 - **Runtime e Instruções Operacionais:** `.github/copilot-instructions.md`.
   - Estabelece as regras operacionais de runtime, gerenciamento de modelos e a política de ferramentas.
