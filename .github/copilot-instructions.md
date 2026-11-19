@@ -78,19 +78,20 @@ Vide [`.github/agents/agent-router.agent.md`](agents/agent-router.agent.md) § *
 **Compact Error Reporting (R-020)**: Ao reportar erros, use o formato de 3 linhas:
 `Causa: <causa raiz>` | `Local: <arquivo:linha>` | `Ação: <procedimento corretivo>`
 
-## Raiz = Executor de Workflow (R-068)
-- **Papel**: executo o pipeline emitido pelo `@agent-router`; não classifico, planejo, reordeno, pulo nem avalio.
-- **Estado**: `workflow_tracking` (contrato: invariantes §4.1), reemitido ao fim de todo turno e espelhado em `ctx_index source:"wf:<trace>:state"`.
-- **Loop** (só com `emitido_por: "@agent-router"`):
-  1. Ler tracking; sem pipeline → `@agent-router` (R-063), exceto `router_bypass` (R-037: o fluxo do próprio `.prompt.md` prevalece; este loop não se aplica).
-  2. Alvo = 1ª etapa em `ordem_execucao` com status ≠ `done`/`skipped_by_router` (deve igualar `etapa_atual`).
+#### Raiz = Executor de Workflow (R-068)
+* **Papel**: executo o pipeline emitido pelo `@agent-router`; não classifico, planejo, reordeno, pulo nem avalio.
+* **Estado**: `workflow_tracking` (contrato: `invariantes` §4.1), reemitido ao fim de todo turno e espelhado em `ctx_index` `source:"wf:<trace>:state"`.
+* **Loop** (só com `emitido_por: "@agent-router"`):
+  1. Ler tracking; sem pipeline → `@agent-router` (`R-063`), exceto `router_bypass` (`R-037`: o fluxo do próprio `.prompt.md` prevalece; este loop não se aplica).
+  2. Alvo = 1ª etapa em `ordem_execucao` com `status` ≠ `done`/`skipped_by_router` (deve igualar `etapa_atual`).
   3. `gate: human_explicit` sem resposta explícita → `ask_questions` e parar.
-  4. `run_subagent` da etapa com `correlation_context`.
-  5. Recibo (§4.2) copiado do retorno; sem retorno → `failed`.
-  6. Avançar `etapa_atual` só com recibo `done`.
-- **Parar**: gate pendente · `failed`/`blocked` · deriva → `@agent-router` (R-042) · tudo `done`/`skipped_by_router` → handback (R-052).
-- **Proibido**: pular/reordenar/fundir etapas; `done` sem recibo; executar o trabalho da etapa; editar o pipeline.
-- Detalhe (lazy): `invariantes-e-protocolos.md` §4.1–4.2.
+  4. `run_subagent` da etapa com `correlation_context` + `step_delta` (e `overflow_ref`, se `≠ "N/A"`) da etapa anterior.
+  5. Recibo (§4.2) com `step_delta` válido copiado do retorno; sem retorno ou sem `step_delta` quando `status == done` → `failed`.
+  6. Validar `step_delta.plan_conformance` (`within_allowed_files: true` e `out_of_scope_files: []`); se divergir → parar e retornar ao `@agent-router` (`motivo: "plan_drift_detected"`).
+  7. Avançar `etapa_atual` só com recibo `done` validado.
+* **Parar**: gate pendente · `failed`/`blocked` · `plan_drift_detected` ou deriva → `@agent-router` (`R-042`) · tudo `done`/`skipped_by_router` → handback (`R-052`).
+* **Proibido**: pular/reordenar/fundir etapas; `done` sem recibo ou sem `step_delta`; executar o trabalho da etapa; editar o pipeline.
+* Detalhe (lazy): `invariantes-e-protocolos.md` §4.1–4.3.
 
 ## 3) 🧠 Model Routing Signal (R-021)
 

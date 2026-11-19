@@ -168,9 +168,9 @@ Bloqueante:
 
 ---
 
-## 4) Contrato de Handoff
+## 4) Contrato de Handoff e Recibo de Conclusão (`step_delta`)
 
-Quando um agent delega para outro, o payload mínimo é:
+Quando um agent delega para outro (ou retorna ao `@agent-router`), o payload mínimo de passagem é:
 
 ```yaml
 handoff:
@@ -183,6 +183,13 @@ handoff:
     - estado parcial de implementação
     - outputs incompletos
 ```
+### 4.1) Contrato de Recibo Estruturado (`receipt` + `step_delta` — R-068)
+
+Ao concluir qualquer etapa despachada pelo `agent-root` em nível plano (`R-068`), o agent delegado DEVE encerrar sua entrega emitindo o bloco `receipt` com `step_delta` conforme o schema canônico em [`references/receipt-step-delta-schema.yaml`](references/receipt-step-delta-schema.yaml) (e `invariantes-e-protocolos.md` § 4.2):
+
+- **Agentes *Read-Only* / *Advisory* (Score 0):** Usam `mode: readonly_analysis` com `files_modified: []` e `files_created: []`, registrando relatórios em `artefato` e contratos ou IDs de regras em `exports_and_signatures`.
+- **Teto de Payload (`overflow_ref`):** Cada lista comporta até **10 itens** inline; entregas maiores persistem o inventário completo via `ctx_index` (`wf:<trace>:delta:step-<n>`).
+- **Conformidade de Plano (`R-064`):** `within_allowed_files: false` ou `out_of_scope_files` não vazio dispara *Plan Drift Detection* imediato no `agent-root`.
 
 ---
 
@@ -214,7 +221,7 @@ Agentes analíticos, consultivos e supervisores desprovidos de ferramentas de es
 ### Modelo de 2 Camadas
 
 **Camada 1 — Contrato Universal (obrigatório em TODO agent, nunca varia):**
-Já normatizado por R-016/R-020 e pelas seções 1-4 desta skill: banner de identidade (`Agente Ativo:`/`Handoff:`/`Skills Carregadas:` — § 0), confiança declarada, evidências rastreáveis (arquivo/símbolo/comando) e próximo passo mínimo. Esta camada é o que garante interoperabilidade — evita o risco de "handoff incompatível" documentado pelo JetBrains.
+Já normatizado por R-016/R-020 e pelas seções 1-4 desta skill: banner de identidade (`Agente Ativo:`/`Handoff:`/`Skills Carregadas:` — § 0), confiança declarada, evidências rastreáveis (arquivo/símbolo/comando), próximo passo mínimo e — quando acionado em pipeline plano pelo `agent-root` (`R-068`) — o bloco `receipt` com `step_delta` validado (§ 4.1). Esta camada é o que garante interoperabilidade — evita o risco de "handoff incompatível" documentado pelo JetBrains.
 
 **Camada 2 — Template Narrativo por Perfil (varia conforme o papel do agent):**
 

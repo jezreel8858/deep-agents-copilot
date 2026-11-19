@@ -228,6 +228,16 @@ Agent receptor confirma:
   - Tem os pré-requisitos necessários
 ```
 
+### 4.1) Passagem de Estado entre Etapas via `receipt` + `step_delta` (R-068)
+
+Nos pipelines coordenados em nível plano pelo `agent-root` (`R-068`), a continuidade entre a etapa `N` e a etapa `N+1` é governada pelo sub-bloco `step_delta` retornado dentro do `receipt` (schema canônico em [`.github/skills/agent-contracts/references/receipt-step-delta-schema.yaml`](../agent-contracts/references/receipt-step-delta-schema.yaml)):
+
+- **Emissão pelo Subagent Concluinte:** Ao finalizar a etapa com `status: done`, o agent preenche `step_delta` (`mode: mutation | readonly_analysis`, `files_modified`, `files_created`, `exports_and_signatures`, `plan_conformance`, `overflow_ref` e `notes_for_next_step`).
+- **Propagação pelo `agent-root`:** O orquestrador raiz injeta o `step_delta` (e resolve `overflow_ref` via `ctx_search` quando `≠ "N/A"`) no contexto de entrada da etapa `N+1`, eliminando redescoberta redundante de arquivos e assinaturas.
+- **Bloqueio por *Plan Drift* (`R-064`):** Se `plan_conformance.within_allowed_files` for `false` ou `out_of_scope_files` contiver itens, o avanço é interrompido imediatamente e o controle retorna ao `@agent-router` (`motivo: "plan_drift_detected"`).
+- **Gatilho de *Plan Drift* no Catálogo de Motivos:**
+  - `plan_drift_detected`: Emitido pelo `agent-root` quando o `step_delta` de uma etapa executada reporta mutação fora de `allowed_files` do plano ativo (`R-064`), acionando reavaliação de escopo pelo `@agent-router`.
+
 ## 5) Critérios de Escalonamento
 | Situação | Escalonamento |
 |---|---|

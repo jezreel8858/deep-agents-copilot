@@ -56,30 +56,25 @@ workflow_tracking:
       receipt_ref: "<receipt_id | null>"
 ```
 
-### 4.2 `receipt` (copiado do retorno do agent)
+##### 4.2 receipt (copiado do retorno do agent)
 
-```yaml
-receipt:
-  receipt_id: "<id>"
-  n: 1
-  agent: "@agente-1"
-  banner_ref: "<copiado do banner Agente Ativo>"
-  handoff_seq: 1
-  artefato: "<caminho | N/A>"
-  gate_resolucao: "<resposta explícita via ask_questions | none>"
-  verdict_from_agent: "<copiado, nunca inferido>"
-  status: done | failed | blocked
-```
+Todo agent delegado DEVE encerrar sua entrega emitindo o bloco YAML `receipt` (incluindo o sub-bloco obrigatório `step_delta` quando `status == done`) estritamente conforme o schema canônico definido em [`.github/skills/agent-contracts/references/receipt-step-delta-schema.yaml`](../../skills/agent-contracts/references/receipt-step-delta-schema.yaml).
 
-### 4.3 Invariantes do pipeline emitido
+- O `agent-root` copia o bloco emitido pelo subagent para o `workflow_tracking` (`§ 4.1`) e o espelha no `context-mode` MCP (`ctx_index` `source:"wf:<trace>:state"`).
+- Campos raiz obrigatórios: `receipt_id`, `n`, `agent` (slug concreto do catálogo — Invariante 7), `banner_ref`, `handoff_seq`, `artefato`, `plan_ref`, `gate_resolucao`, `verdict_from_agent`, `status` (`done | failed | blocked`) e `step_delta`.
 
-1. `done` somente com recibo completo; `etapa_atual` avança 1 passo por vez, monotônico, seguindo `ordem_execucao`.
-2. Dispensa de etapa somente pelo `@agent-router` (`skipped_by_router` + `motivo`); o raiz nunca dispensa, reordena ou funde etapas (R-068).
+##### 4.3 Invariantes do pipeline emitido
+
+1. `done` somente com recibo completo e `step_delta` aderente ao `receipt-step-delta-schema.yaml`; `etapa_atual` avança 1 passo por vez, monotônico, seguindo `ordem_execucao`.
+2. Dispensa de etapa somente pelo `@agent-router` (`skipped_by_router` + motivo); o raiz nunca dispensa, reordena ou funde etapas (`R-068`).
 3. `gate: human_explicit | none` em toda etapa; só `ask_questions` com resposta explícita abre gate.
-4. Espelho de estado: `ctx_index source:"wf:<trace>:state"`.
+4. Espelho de estado: `ctx_index` `source:"wf:<trace>:state"`.
+5. **Conformidade de Escopo e Teto de Payload (`step_delta`):**
+   - Agentes *Read-Only* / *Advisory* (`Score 0`) emitem `mode: readonly_analysis` com `files_modified: []` e `files_created: []`, registrando relatórios em `artefato` e contratos/regras em `exports_and_signatures`.
+   - Limite de **10 itens** inline por lista; acima disso, gravar o inventário integral via `ctx_index` e preencher `overflow_ref`.
+   - Se `within_allowed_files: false` ou `out_of_scope_files` não estiver vazio, o `agent-root` bloqueia o avanço e retorna ao `@agent-router` (`motivo: "plan_drift_detected"`).
 
 ---
-
 ## 5. Regras de Não-Desvio (Invariantes de Execução)
 
 1. **Invariante de Fast-Path**: Se a mensagem de entrada descreve um bug, erro, crash ou falha visual de layout, o `@agent-router` NUNCA deve invocar `@prompt-structuring`. O ingresso no `WORKFLOW-BUG-FIX` via `@bug-triage` é mandatório.

@@ -1,0 +1,162 @@
+# Schema Canônico de Recibo e Delta de Etapa (R-068 / R-064)
+# Referenciado por:
+# - .github/agents/workflows/invariantes-e-protocolos.md (§ 4.2-4.3)
+# - .github/skills/agent-contracts/SKILL.md (§ 4.1)
+# - .github/skills/handoff-governance/SKILL.md
+
+version: "1.0.0"
+contract_id: "receipt-step-delta"
+
+rules:
+  max_inline_items: 10
+  overflow_storage: "context-mode/ctx_index"
+  overflow_key_pattern: "wf:<trace>:delta:step-<n>"
+  forbid_generic_agent_slug: true        # Invariante 7: proibido 'specialist-<papel>'
+  require_plan_conformance_on_mutation: true
+
+schema:
+  receipt:
+    receipt_id:
+      type: string
+      required: true
+      example: "rcpt-001"
+    n:
+      type: integer
+      required: true
+      description: "Índice sequencial da etapa em ordem_execucao"
+      example: 1
+    agent:
+      type: string
+      required: true
+      pattern: "^@[a-z0-9-]+$"
+      description: "Slug concreto do catálogo (nunca 'specialist-<papel>')"
+      example: "@spring-boot-developer"
+    banner_ref:
+      type: string
+      required: true
+      description: "Valor exato copiado da linha 'Agente Ativo:' do turno"
+      example: "spring-boot-developer"
+    handoff_seq:
+      type: integer
+      required: true
+      example: 1
+    artefato:
+      type: string
+      required: true
+      description: "Caminho do artefato principal gerado/alterado ou 'N/A'"
+      example: "src/main/java/com/projeto/service/PedidoService.java"
+    plan_ref:
+      type: string
+      required: true
+      description: "Caminho do plano aprovado (R-064) ou 'N/A'"
+      example: "docs/plans/implementation/20261118-180000-feature-pedidos.md"
+    gate_resolucao:
+      type: string
+      required: true
+      description: "Resposta explícita via ask_questions ou 'none'"
+      example: "none"
+    verdict_from_agent:
+      type: string
+      required: true
+      description: "Veredito literal emitido pelo agent delegado (nunca inferido)"
+      example: "PASS"
+    status:
+      type: enum
+      required: true
+      values: ["done", "failed", "blocked"]
+
+    step_delta:
+      required_when: "status == 'done'"
+      fields:
+        mode:
+          type: enum
+          required: true
+          values: ["mutation", "readonly_analysis"]
+          description: "'mutation' para executores; 'readonly_analysis' para agentes Score 0"
+        files_modified:
+          type: list[object]
+          max_items: 10
+          item_schema:
+            path: "string (caminho relativo)"
+            summary: "string (resumo objetivo em 1 linha, sem diff inline)"
+        files_created:
+          type: list[object]
+          max_items: 10
+          item_schema:
+            path: "string (caminho relativo)"
+            purpose: "string (finalidade do arquivo criado)"
+        exports_and_signatures:
+          type: list[string]
+          max_items: 10
+          description: "Símbolos públicos, contratos, endpoints ou IDs de regras (ex.: BR-001) novos/alterados"
+        plan_conformance:
+          type: object
+          required: true
+          fields:
+            within_allowed_files:
+              type: boolean
+              description: "true se 100% dos arquivos tocados pertencem a allowed_files do plan_ref"
+            out_of_scope_files:
+              type: list[string]
+              description: "Lista vazia []; qualquer item dispara Plan Drift Detection no agent-root"
+        overflow_ref:
+          type: string
+          default: "N/A"
+          description: "Chave 'wf:<trace>:delta:step-<n>' no ctx_index quando qualquer lista exceder 10 itens"
+        notes_for_next_step:
+          type: string
+          required: true
+          description: "Contexto técnico, mocks necessários ou restrições para a etapa N+1"
+
+examples:
+  mutation:
+    receipt:
+      receipt_id: "rcpt-003"
+      n: 3
+      agent: "@spring-boot-developer"
+      banner_ref: "spring-boot-developer"
+      handoff_seq: 3
+      artefato: "src/main/java/com/projeto/service/PedidoService.java"
+      plan_ref: "docs/plans/implementation/20261118-180000-feature-pedidos.md"
+      gate_resolucao: "none"
+      verdict_from_agent: "IMPLEMENTED"
+      status: "done"
+      step_delta:
+        mode: "mutation"
+        files_modified:
+          - path: "src/main/java/com/projeto/service/PedidoService.java"
+            summary: "Adicionado método processarPedido com validação de idempotência"
+        files_created:
+          - path: "src/main/java/com/projeto/dto/ReceiptDto.java"
+            purpose: "DTO imutável de retorno do processamento de pedido"
+        exports_and_signatures:
+          - "public ReceiptDto processarPedido(PedidoCmd cmd)"
+        plan_conformance:
+          within_allowed_files: true
+          out_of_scope_files: []
+        overflow_ref: "N/A"
+        notes_for_next_step: "Mockar PedidoRepository.salvar() nos testes unitários; validar header X-Trace-Id"
+
+  readonly_analysis:
+    receipt:
+      receipt_id: "rcpt-001"
+      n: 1
+      agent: "@business-rules-extractor"
+      banner_ref: "business-rules-extractor"
+      handoff_seq: 1
+      artefato: "docs/business-rules/pedidos.md"
+      plan_ref: "N/A"
+      gate_resolucao: "none"
+      verdict_from_agent: "EXTRACTED"
+      status: "done"
+      step_delta:
+        mode: "readonly_analysis"
+        files_modified: []
+        files_created: []
+        exports_and_signatures:
+          - "BR-014: Pedido duplicado dentro de 5 min retorna HTTP 409"
+        plan_conformance:
+          within_allowed_files: true
+          out_of_scope_files: []
+        overflow_ref: "N/A"
+        notes_for_next_step: "Preservar invariante BR-014 durante extração do método legado"

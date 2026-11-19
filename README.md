@@ -189,26 +189,40 @@ Permite alternar localmente os modelos de LLM dos agents e prompts (`default`, `
 
 ```mermaid
 flowchart TD
-    A["/init-context\n1x por sessão"] --> B{Binding context\nexiste?}
-    B -- Não --> C["binding-initializer\n1 pergunta: ecossistema"]
-    C --> D["/add-project-context\n1x por projeto"]
-    B -- Sim --> D
-    D --> E["@agent-router\nR-037 — entry point"]
-    E --> FP{"Fast-Path (R-050)\nBug/Refactor/Análise?"}
-    FP -- "Não (Ambíguo/Aberto)" --> P["prompt-structuring\nR-041 — loop máx. 5x"]
-    P --> E
-    FP -- "Sim (Fast-Path R-050)" --> WF["Workflows Canônicos\n(Pipelines Determinísticos)"]
+    U(["Solicitação do Usuário\n(Turno N)"]) --> BYPASS{"Slash Prompt explícito?\n(router_bypass — R-037/R-063)"}
 
-    E & WF --> G1["🎯 Planning/Analysis\nrequirements-analyst · deep-search\nfeature-planner · plan-critic"]
-    E & WF --> G2["📐 Architecture/Design\ntech-solution-architect · codegraph-engine\nbusiness-rules-extractor · refactor-planner\nddd-bounded-context-mapper · adr-sentinel"]
-    E & WF --> G3["💻 Implementation (Domain Routers & Specialists)\nangular-router · react-router · spring-boot-router · spring-reactive-router\nejb-router · struts-router · python-router · database-router · database-specialist"]
-    E & WF --> G4["✅ Quality/Validation\nbug-triage · debugger · test-strategy\ncode-review · code-style-enforcer · security-reviewer\nperformance-agent · devops-engineer · runtime-verifier\nrepo-hygiene-auditor"]
-    E & WF --> G5["📚 Documentation/Learning\ndocs-engineer"]
-    E & WF --> G6["🔄 Governance/Orchestration\ngovernance-factory · governance-maintainer\nagent-root · agent-auditor · binding-initializer\nadapter-generator · compliance-guardrails · pr-gatekeeper"]
+    BYPASS -- "Sim (/init-context, /add-project-context,\n/commit, etc.)" --> SLASH["Execução Direta do .prompt.md\nbinding-initializer · adapter-generator · pr-gatekeeper"]
+    BYPASS -- "Não (Chat livre / /agent-router)" --> ROOT["agent-root (Orquestrador Raiz — R-068)\nGerencia workflow_tracking + correlation_context"]
 
-    G1 & G2 & G3 & G4 & G5 & G6 --> K["Resultado\n(turno N)"]
-    K --> L["/commit\nmensagem gerada"]
-    K -.->|"turno N+1: deriva de intenção (R-042)"| E
+    ROOT -- "1ª ação obrigatória (R-037)\nrun_subagent" --> ROUTER["@agent-router (Triagem & Roteamento — R-054)\nHealth Check R-034 · Deriva R-042 · Fast-Path R-050"]
+
+    ROUTER -- "Ambíguo / Aberto (R-041)" --> PS["@prompt-structuring\nRefinamento (loop máx. 5x)"]
+    PS -- "Retorno para re-triagem" --> ROUTER
+
+    ROUTER -- "Emite ordem_execucao\n(Fast-Path R-050 / Fast-Chaining R-050.1)" --> ROOT
+
+    subgraph FLAT["Execução Plana por Etapa (Flat Delegation — R-068)"]
+        direction TB
+        S1["1️⃣ Planejamento & Arquitetura (Read-Only)\nrequirements-analyst · deep-search · feature-planner\ntech-solution-architect · business-rules-extractor\nrefactor-planner · ddd-bounded-context-mapper · adr-sentinel"]
+        CG["🕸️ @codegraph-engine (R-045)\nSub-rotina determinística de AST, ciclos e blast radius"]
+        S2["2️⃣ Gate Documental & Crítica Pré-HITL (R-064/R-065)\n@docs-engineer (DRAFT) → @plan-critic (≤2x) → ask_questions (APPROVED)"]
+        S3["3️⃣ Implementação por Domínio (8 Routers → 24 Especialistas)\nangular · react · spring-boot · spring-reactive · ejb · struts · python · database\n↳ *-arch-advisor · *-developer · *-test-engineer · database-specialist"]
+        S4["4️⃣ Qualidade, Segurança, Ops & Governança (R-065)\nbug-triage · debugger · test-strategy · code-review · code-style-enforcer\nsecurity-reviewer · performance-agent · devops-engineer · runtime-verifier\nrepo-hygiene-auditor · compliance-guardrails · governance-* · agent-auditor"]
+
+        S1 <-. "consulta estrutural" .-> CG
+        S1 --> S2
+        S2 -- "plan_ref aprovado" --> S3
+        S3 --> S4
+    end
+
+    ROOT -- "Despacha etapa_atual\n(1 subagent por vez)" --> S1
+    S4 -- "Retorna receipt (done/failed/blocked)\na cada etapa concluída" --> ROOT
+
+    MCP[("context-mode MCP\nctx_index · ctx_search · ctx_execute\n(Estado & Memória Compartilhada)")] <--> ROOT
+    MCP <--> FLAT
+
+    ROOT --> DONE(["Resposta Consolidada\n(Turno N)"])
+    DONE -. "Turno N+1: avança pipeline ativo (R-068)\nou Fast-Chaining R-050.1 / Deriva R-042" .-> ROOT
 ```
 
 > 40 agents no catálogo raiz (64 totais com especialistas de stack), agrupados em 6 perfis de mercado — ver [§ Cobertura de Mercado](#cobertura-de-mercado--perfis-de-agents) para o diagrama detalhado por agent e a análise de aderência às práticas consolidadas.
