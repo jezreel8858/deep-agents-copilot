@@ -31,6 +31,7 @@ _USE_CASES_SUPORTADOS = (
     "synth-export",
     "synth-promote",
     "synth-diagnose",
+    "synth-skill-ab",
 )
 
 _SCHEMA_PADRAO = Path(__file__).parent / "routing" / "routing-graph.schema.json"
@@ -85,7 +86,7 @@ def construir_parser() -> argparse.ArgumentParser:
         choices=("sdk", "template"),
         default="template",
     )
-    sg.add_argument("--max-premium-requests", default=None, help="Orcamento (obrigatorio em synth-eval e generate sdk).")
+    sg.add_argument("--max-premium-requests", default=None, help="Orcamento (obrigatorio em synth-eval e modo sdk).")
     sg.add_argument("--targets", default=None, help="Agentes alvo separados por virgula.")
     sg.add_argument("--dimensions", default=None, help="Dimensoes de perturbacao separadas por virgula.")
     sg.add_argument("--per-stratum", type=int, default=2)
@@ -99,6 +100,11 @@ def construir_parser() -> argparse.ArgumentParser:
     sg.add_argument("--routing-graph", default=None, help="Caminho para routing-graph.yaml (default: .github/agents/routing-graph.yaml).")
     sg.add_argument("--graph-seeding", choices=("off", "gaps", "all"), default="off", help="Modo de expansao via grafo (default: off).")
     sg.add_argument("--workflow-seeds", choices=("off", "gaps", "all"), default="off", help="Modo de geracao de seeds por gatilho de workflow (default: off).")
+    sg.add_argument("--skill-seeding", choices=("off", "gaps", "all"), default="off", help="Modo de geracao de seeds pareadas A/B de skills (default: off).")
+    sg.add_argument("--skills", default=None, help="Nomes de skills separados por virgula para filtro em synth-generate/synth-skill-ab.")
+    sg.add_argument("--skill-cases", default=None, help="Caminho para YAML de casos A/B de skills (default: tests/evals/skill_ab_cases.yaml).")
+    sg.add_argument("--include-skill-gaps", action="store_true", help="Inclui skills sem casos manuais via extracao de SKILL.md em synth-skill-ab.")
+    sg.add_argument("--skill-ab-run-id", default=None, help="ID de run synth-skill-ab a cruzar no synth-diagnose (default: ultimo run completed).")
     sg.add_argument("--graph-min-coverage", type=int, default=3, help="Cobertura minima por aresta em --graph-seeding gaps|all (default: 3).")
     sg.add_argument("--run-id", default=None, help="eval: id do run; promote: id do arquivo promoted-<run_id>.yaml.")
     sg.add_argument("--source-run-id", default=None)
@@ -129,12 +135,12 @@ def _ler_arquivos_diff(caminho: str | None) -> tuple[str, ...]:
 
 
 def _publicar_relatorio(
-    relatorio: object,
-    *,
-    canais: str,
-    repo: str | None,
-    sha: str | None,
-    pr_number: int | None,
+        relatorio: object,
+        *,
+        canais: str,
+        repo: str | None,
+        sha: str | None,
+        pr_number: int | None,
 ) -> None:
     canais_solicitados = {c.strip() for c in canais.split(",") if c.strip()}
 
@@ -183,6 +189,7 @@ def _executar_synth(args: argparse.Namespace) -> int:
         executar_synth_export,
         executar_synth_generate,
         executar_synth_promote,
+        executar_synth_skill_ab,
         validar_orcamento_synth,
     )
 
@@ -190,10 +197,12 @@ def _executar_synth(args: argparse.Namespace) -> int:
     try:
         if uc == "synth-eval":
             validar_orcamento_synth(uc, args.max_premium_requests)
-        elif uc == "synth-generate":
+        elif uc in ("synth-generate", "synth-skill-ab"):
             validar_orcamento_synth(uc, args.max_premium_requests, args.generator_mode)
         token = os.environ.get(COPILOT_SDK_TOKEN_ENV)
-        precisa_token = uc == "synth-eval" or (uc == "synth-generate" and args.generator_mode == "sdk")
+        precisa_token = uc == "synth-eval" or (
+                uc in ("synth-generate", "synth-skill-ab") and args.generator_mode == "sdk"
+        )
         if precisa_token and not token:
             print(f"ERRO: variavel de ambiente '{COPILOT_SDK_TOKEN_ENV}' ausente.", file=sys.stderr)
             return 2
@@ -232,6 +241,9 @@ def _executar_synth(args: argparse.Namespace) -> int:
                     graph_seeding=args.graph_seeding,
                     graph_min_coverage=args.graph_min_coverage,
                     workflow_seeds=args.workflow_seeds,
+                    skill_seeding=args.skill_seeding,
+                    skills_filtro=_csv(args.skills),
+                    skill_cases_path=args.skill_cases,
                 )
             elif uc == "synth-eval":
                 rel = executar_synth_eval(
@@ -245,6 +257,18 @@ def _executar_synth(args: argparse.Namespace) -> int:
                     limit=args.limit,
                     modelo=args.model,
                 )
+            elif uc == "synth-skill-ab":
+                rel = executar_synth_skill_ab(
+                    repo=repo,
+                    cases_path=args.skill_cases,
+                    skills_filtro=_csv(args.skills),
+                    include_gap_seeds=bool(args.include_skill_gaps),
+                    generator_mode=args.generator_mode,
+                    max_premium_requests=args.max_premium_requests,
+                    cliente_factory=(lambda: criar_cliente_sdk_real(str(token))) if token else None,
+                    modelo=args.model,
+                    run_id=args.run_id,
+                )
             elif uc == "synth-diagnose":
                 if not args.eval_run_id:
                     print("ERRO: synth-diagnose exige --eval-run-id.", file=sys.stderr)
@@ -252,8 +276,10 @@ def _executar_synth(args: argparse.Namespace) -> int:
                 rel = executar_synth_diagnose(
                     repo=repo,
                     eval_run_id=args.eval_run_id,
+                    skill_ab_run_id=args.skill_ab_run_id,
                     routing_graph_path=args.routing_graph,
                     router_agent_path=args.router_agent,
+                    skill_cases_path=args.skill_cases,
                     min_support=args.min_support,
                     out_dir=args.out,
                     formato=args.format,
@@ -269,14 +295,19 @@ def _executar_synth(args: argparse.Namespace) -> int:
                     only_failures=args.only_failures,
                     include_near_boundary=args.include_near_boundary,
                 )
-        print(f"{rel.comando}: run_id={rel.run_id} status={rel.status} {rel.contadores}")
+        extra_delta = (
+            f" mean_delta={rel.mean_skill_delta_utility:.4f}"
+            if rel.mean_skill_delta_utility is not None
+            else ""
+        )
+        print(f"{rel.comando}: run_id={rel.run_id} status={rel.status} {rel.contadores}{extra_delta}")
         return rel.exit_code
     except (
-        SynthOrcamentoInvalidoError,
-        SynthExportPathError,
-        SynthEvalRunInvalidoError,
-        SynthDiagnosticPathError,
-        RoutingGraphPathError,
+            SynthOrcamentoInvalidoError,
+            SynthExportPathError,
+            SynthEvalRunInvalidoError,
+            SynthDiagnosticPathError,
+            RoutingGraphPathError,
     ) as exc:
         print(f"ERRO [governance-runner]: {exc}", file=sys.stderr)
         return int(exc.exit_code)

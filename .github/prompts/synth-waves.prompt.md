@@ -14,6 +14,8 @@ source_docs:
   - '.github/skills/harness-eval/SKILL.md'
   - '.github/skills/context-mode/SKILL.md'
   - '.github/skills/efficient-batch-code-modification/SKILL.md'
+  - 'tests/evals/skill_ab_cases.yaml'
+  - 'tools/headless-governance-runner/README.md'
 ---
 
 ## 🎯 Contexto e Papel
@@ -63,7 +65,7 @@ Chamar `ask_questions` UMA vez com as 4 perguntas abaixo (`allowFreeformInput: t
 | # | header | Opções |
 |---|---|---|
 | 1 | `Perfil e Volume` | **Meta Prata — Equilibrado (Recomendado)**: `--per-stratum 1`, `--min-support 5..10`, `--max-premium-requests 200`/onda · **Smoke Test — Rápido / Baixo Custo**: `--per-stratum 1`, `--limit 12`/onda, `--min-support 1`, `--max-premium-requests 20`/onda · **Meta Bronze — Triagem Rápida**: 5 dimensões × `--per-stratum 1`, `--min-support 5`, `--max-premium-requests 120`/onda · **Meta Ouro — Exaustivo (Certificação)**: 8 dimensões × `--per-stratum 2`, `--min-support 20`, `--max-premium-requests 500`/onda |
-| 2 | `Escopo de Seeding` | **Cobertura Total: Arestas + Workflows (`--graph-seeding all --workflow-seeds all`) (Recomendado)** · All na Onda 1 + Gaps nas Ondas 2 e 3 · Apenas Workflows Canônicos (`--workflow-seeds all`) · Apenas Arestas (`--graph-seeding all`) |
+| 2 | `Escopo de Seeding` | **Cobertura Total: Arestas + Workflows + Lacunas de Skills (`--graph-seeding all --workflow-seeds all --skill-seeding gaps`) (Recomendado)** · All na Onda 1 + Gaps nas Ondas 2 e 3 · Apenas Workflows Canônicos (`--workflow-seeds all`) · Apenas Arestas (`--graph-seeding all`) |
 | 3 | `Modo e Modelo SDK` | **Híbrido: Onda 1 Template + Ondas 2/3 SDK com claude-sonnet-5.5 (Recomendado)** · Full SDK nas 3 Ondas com claude-sonnet-5.5 · Geração Econômica (claude-haiku-5.5) + Avaliação Sonnet (claude-sonnet-5.5) · 100% Template na Geração + claude-sonnet-5.5 na Avaliação |
 | 4 | `Politica Auto-Promocao` | **Auto-Promover Completo: Silver -> promoted -> casos-roteamento.yaml + golden.py (Recomendado)** · Auto-Promover até Staging (`promoted-<run_id>.yaml`) · Apenas Diagnóstico e Exportação Silver |
 
@@ -75,9 +77,9 @@ Cada Onda = 1 turno = 1 `ctx_execute` (`language: "javascript"`) acionando o CLI
 
 | Onda | Foco | Pipeline |
 |---|---|---|
-| 1 | Baseline Estrutural | Pré-check (ambiente, DB, `git status` limpo, modelo na allowlist) → `synth-generate` dims `parafrase,ruido_ortografico,comprimento_extremo,registro_informal` → `synth-eval` → `synth-diagnose --format both` |
-| 2 | Hardening Semântico e Adversarial | `synth-generate` dims `omissao_palavra_chave,distrator_outro_agente` → `synth-eval` → `synth-diagnose --format both` |
-| 3 | Consolidação Cross-Dimensão + Silver + Promoção | (a) `synth-generate` dims `code_switching_pt_en,multi_intencao` → `synth-eval` → `synth-diagnose --format both`; (b) `synth-export` sobre os runs avaliados das 3 Ondas; (c) auto-curadoria + promoção (abaixo) |
+| 1 | Baseline Estrutural + Eval A/B de Skills | Pré-check (ambiente, DB, `git status` limpo, modelo na allowlist) → `synth-skill-ab --generator-mode template` (captura `skill_ab_run_id`) → `synth-generate` dims `parafrase,ruido_ortografico,comprimento_extremo,registro_informal` → `synth-eval` → `synth-diagnose --skill-ab-run-id <skill_ab_run_id> --format both` |
+| 2 | Hardening Semântico e Adversarial | `synth-generate` dims `omissao_palavra_chave,distrator_outro_agente` → `synth-eval` → `synth-diagnose --skill-ab-run-id <skill_ab_run_id> --format both` |
+| 3 | Consolidação Cross-Dimensão + Silver + Promoção | (a) `synth-generate` dims `code_switching_pt_en,multi_intencao` → `synth-eval` → `synth-diagnose --skill-ab-run-id <skill_ab_run_id> --format both`; (b) `synth-export` sobre os runs avaliados das 3 Ondas; (c) auto-curadoria + promoção (abaixo) |
 
 **Onda 3 (c) — Auto-Curadoria e Promoção Sem Pausa** (conforme Pergunta 4):
 
@@ -103,6 +105,7 @@ Cada Onda = 1 turno = 1 `ctx_execute` (`language: "javascript"`) acionando o CLI
 Emitir (sem perguntas):
 
 - Quadro comparativo Ondas 1 / 2 / 3 × (`acuracia_global`, `workflow_accuracy`, `workflow_macro_f1`, `step1_coherence`, `banner_coverage`).
+- Resultado de utilidade A/B de skills (`skill_ab_run_id`, `mean_delta`, skills redundantes e lacunas de cobertura P5).
 - Artefatos `diagnostic-*.{yaml,md}` gerados por Onda.
 - Casos promovidos (ids, suíte destino), contagens atualizadas e status do `pytest`/rollback.
 - Custo premium estimado vs. teto `--max-premium-requests` por Onda.

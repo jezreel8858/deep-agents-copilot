@@ -1,13 +1,17 @@
 """
-seeds — Coverage-Guided Seeding para arestas e gatilhos de workflows do routing-graph (B2 / §3.1 / §7).
+seeds — Coverage-Guided Seeding para arestas, workflows do routing-graph e skills A/B (B2 / §3.1 / §7 / P5).
 """
 
 from __future__ import annotations
 
+import json
 import random
 import re
 from dataclasses import dataclass, replace
-from typing import Literal, Mapping, Protocol, Sequence, runtime_checkable
+from pathlib import Path
+from typing import Any, Literal, Mapping, Protocol, Sequence, runtime_checkable
+
+import yaml
 
 from governance_runner.synth.golden import GoldenSeed
 from governance_runner.synth.normalize import normalizar, sanitizar_prompt
@@ -23,28 +27,47 @@ from governance_runner.synth.routing_graph import (
 __all__ = [
     "MODOS_GRAPH_SEEDING",
     "MODOS_WORKFLOW_SEEDING",
+    "MODOS_SKILL_SEEDING",
     "ModoGraphSeeding",
     "ModoWorkflowSeeding",
+    "ModoSkillSeeding",
     "SeedLike",
     "SeedRef",
+    "SkillSeedRef",
     "calcular_cobertura_golden",
     "calcular_cobertura_workflows_golden",
+    "calcular_cobertura_skills",
     "enriquecer_seeds_golden",
     "identificar_arestas_uncoverable",
     "identificar_workflows_uncoverable",
+    "identificar_skills_uncoverable",
     "gerar_seeds_grafo",
     "gerar_seeds_workflows",
+    "gerar_seeds_skills",
 ]
 
 ModoGraphSeeding = Literal["off", "gaps", "all"]
 MODOS_GRAPH_SEEDING: tuple[ModoGraphSeeding, ...] = ("off", "gaps", "all")
 ModoWorkflowSeeding = Literal["off", "gaps", "all"]
 MODOS_WORKFLOW_SEEDING: tuple[ModoWorkflowSeeding, ...] = ("off", "gaps", "all")
+ModoSkillSeeding = Literal["off", "gaps", "all"]
+MODOS_SKILL_SEEDING: tuple[ModoSkillSeeding, ...] = ("off", "gaps", "all")
+
+DEFAULT_SKILLS_REL_DIR = Path(".github") / "skills"
+DEFAULT_SKILL_AB_CASES_REL_PATH = Path("tests") / "evals" / "skill_ab_cases.yaml"
 
 _MAX_LEN_TOKEN = 120
 _MAX_LEN_PROMPT = 360
 _REGEX_CONTROLES = re.compile(r"[\x00-\x1f\x7f]+")
 _REGEX_MENCAO_AGENTE = re.compile(r"@[A-Za-z0-9_\-]+")
+_REGEX_CLAUSULA_OBRIGATORIA = re.compile(
+    r"(?:OBRIGAT[ÓO]RIO|MUST|EXIG[EI]|R-\d{3}|`[^`]{3,60}`)",
+    re.IGNORECASE,
+)
+_REGEX_ANTIPADRAO = re.compile(
+    r"(?:NUNCA|PROIBIDO|NEVER|FORBIDDEN|ANTI-?PATTERN)\s*[:\-]?\s*([^\n.;]{6,90})",
+    re.IGNORECASE,
+)
 
 
 @runtime_checkable
@@ -65,7 +88,7 @@ class SeedLike(Protocol):
     def seed_case_id(self) -> str: ...
 
     @property
-    def seed_source(self) -> Literal["manual", "routing_graph"]: ...
+    def seed_source(self) -> Literal["manual", "routing_graph", "skill_ab"]: ...
 
     @property
     def graph_edge_id(self) -> str | None: ...
@@ -79,12 +102,12 @@ class SeedLike(Protocol):
 
 @dataclass(frozen=True)
 class SeedRef:
-    """Referencia de semente gerada a partir de aresta ou gatilho de workflow do grafo."""
+    """Referencia de semente gerada a partir de aresta, gatilho de workflow ou lacuna de skill."""
 
     prompt: str
     expected_route: str | None
     seed_case_id: str
-    seed_source: Literal["manual", "routing_graph"] = "routing_graph"
+    seed_source: Literal["manual", "routing_graph", "skill_ab"] = "routing_graph"
     graph_edge_id: str | None = None
     keywords: tuple[str, ...] = ()
     graph_edge_resolution: str | None = "keyword"
@@ -102,6 +125,17 @@ class SeedRef:
     @property
     def agent_route(self) -> str:
         return self.expected_route or self.expected_workflow or "agent-router"
+
+
+@dataclass(frozen=True)
+class SkillSeedRef(SeedRef):
+    """Semente pareada (baseline vs. treatment) derivada de SKILL.md ou skill_ab_cases.yaml (P5)."""
+
+    skill_name: str = ""
+    baseline_prompt: str = ""
+    required_clauses: tuple[str, ...] = ()
+    forbidden_antipatterns: tuple[str, ...] = ()
+    min_delta_utility: float = 0.05
 
 
 def _limpar_fragmento_inerte(texto: str, *, ids_nos: frozenset[str] = frozenset()) -> str:
@@ -414,7 +448,6 @@ def gerar_seeds_workflows(
                 )
             )
 
-    # Seeds de fronteira para pares colidentes de gatilhos entre workflows distintos
     mapa_gatilhos: dict[str, list[WorkflowGrafo]] = {}
     for wf in snapshot.workflows:
         for gn in wf.gatilhos_norm:
@@ -456,5 +489,216 @@ def gerar_seeds_workflows(
                                 graph_workflow_id=wa.workflow_id,
                             )
                         )
+
+    return tuple(geradas)
+
+
+def _listar_skills_catalogadas(skills_dir: Path) -> list[str]:
+    if not skills_dir.exists():
+        return []
+    index_file = skills_dir / ".index.json"
+    if index_file.exists():
+        try:
+            payload = json.loads(index_file.read_text(encoding="utf-8"))
+            if isinstance(payload, dict) and isinstance(payload.get("skills"), list):
+                nomes = [
+                    str(item.get("name") or item.get("id") or "").strip()
+                    for item in payload["skills"]
+                    if isinstance(item, dict)
+                ]
+                filtrados = [n for n in nomes if n and (skills_dir / n / "SKILL.md").exists()]
+                if filtrados:
+                    return sorted(dict.fromkeys(filtrados))
+        except Exception:  # noqa: BLE001
+            pass
+    return sorted(
+        d.name for d in skills_dir.iterdir() if d.is_dir() and (d / "SKILL.md").exists()
+    )
+
+
+def _carregar_casos_ab_existentes(cases_path: Path) -> list[dict[str, Any]]:
+    if not cases_path.exists():
+        return []
+    try:
+        raw = yaml.safe_load(cases_path.read_text(encoding="utf-8")) or {}
+        if isinstance(raw, dict) and isinstance(raw.get("cases"), list):
+            return [c for c in raw["cases"] if isinstance(c, dict)]
+    except Exception:  # noqa: BLE001
+        return []
+    return []
+
+
+def calcular_cobertura_skills(
+    skills_dir: Path | None = None,
+    cases_path: Path | None = None,
+    *,
+    repo_root: Path | None = None,
+) -> dict[str, int]:
+    """Calcula quantos casos pareados A/B cobrem cada skill catalogada em .github/skills/."""
+    base = repo_root.resolve() if repo_root is not None else Path.cwd().resolve()
+    s_dir = skills_dir if skills_dir is not None else (base / DEFAULT_SKILLS_REL_DIR)
+    c_path = cases_path if cases_path is not None else (base / DEFAULT_SKILL_AB_CASES_REL_PATH)
+    skills = _listar_skills_catalogadas(s_dir)
+    cobertura: dict[str, int] = {s: 0 for s in skills}
+    for caso in _carregar_casos_ab_existentes(c_path):
+        sk = str(caso.get("skill_name") or "").strip()
+        if sk in cobertura:
+            cobertura[sk] += 1
+    return cobertura
+
+
+def _extrair_rubrica_de_skill_md(skill_md_path: Path) -> tuple[str, tuple[str, ...], tuple[str, ...]]:
+    """Extrai (descricao, required_clauses, forbidden_antipatterns) a partir do SKILL.md."""
+    texto = skill_md_path.read_text(encoding="utf-8", errors="replace")
+    descricao = ""
+    corpo = texto
+    if texto.lstrip().startswith("---"):
+        partes = texto.lstrip().split("---", 2)
+        if len(partes) == 3:
+            try:
+                fm = yaml.safe_load(partes[1]) or {}
+                if isinstance(fm, dict):
+                    descricao = str(fm.get("description") or "").strip()
+            except Exception:  # noqa: BLE001
+                descricao = ""
+            corpo = partes[2]
+
+    clausulas: list[str] = []
+    for linha in corpo.splitlines():
+        l_strip = linha.strip()
+        if not l_strip or l_strip.startswith("#"):
+            continue
+        if _REGEX_CLAUSULA_OBRIGATORIA.search(l_strip):
+            ticks = re.findall(r"`([^`]{3,60})`", l_strip)
+            for t in ticks:
+                if t not in clausulas and not t.startswith("http"):
+                    clausulas.append(t)
+                    if len(clausulas) >= 4:
+                        break
+            if len(clausulas) < 4:
+                regras = re.findall(r"\bR-\d{3}\b", l_strip)
+                for r in regras:
+                    if r not in clausulas:
+                        clausulas.append(r)
+                        if len(clausulas) >= 4:
+                            break
+        if len(clausulas) >= 4:
+            break
+
+    antipadroes: list[str] = []
+    for m in _REGEX_ANTIPADRAO.finditer(corpo):
+        trecho = " ".join(m.group(1).split()).strip(" `*:-")
+        if 6 <= len(trecho) <= 80 and trecho not in antipadroes:
+            antipadroes.append(trecho)
+            if len(antipadroes) >= 2:
+                break
+
+    return descricao, tuple(clausulas), tuple(antipadroes)
+
+
+def identificar_skills_uncoverable(
+    skills_dir: Path | None = None,
+    *,
+    repo_root: Path | None = None,
+) -> tuple[str, ...]:
+    """Retorna skills catalogadas cujo SKILL.md nao possui clausulas normativas extrativeis."""
+    base = repo_root.resolve() if repo_root is not None else Path.cwd().resolve()
+    s_dir = skills_dir if skills_dir is not None else (base / DEFAULT_SKILLS_REL_DIR)
+    uncoverable: list[str] = []
+    for skill_name in _listar_skills_catalogadas(s_dir):
+        _, clausulas, _ = _extrair_rubrica_de_skill_md(s_dir / skill_name / "SKILL.md")
+        if not clausulas:
+            uncoverable.append(skill_name)
+    return tuple(sorted(uncoverable))
+
+
+def gerar_seeds_skills(
+    *,
+    modo: ModoSkillSeeding = "off",
+    skills_dir: Path | None = None,
+    cases_path: Path | None = None,
+    skills_filtro: Sequence[str] | None = None,
+    expected_route_padrao: str = "governance-maintainer",
+    repo_root: Path | None = None,
+) -> tuple[SkillSeedRef, ...]:
+    """Gera seeds pareadas A/B para skills descobertas em .github/skills/ (P5 + synth)."""
+    if modo not in MODOS_SKILL_SEEDING:
+        raise ValueError(
+            f"Modo --skill-seeding invalido: {modo!r}. Esperado um de {MODOS_SKILL_SEEDING}."
+        )
+    if modo == "off":
+        return ()
+
+    base = repo_root.resolve() if repo_root is not None else Path.cwd().resolve()
+    s_dir = skills_dir if skills_dir is not None else (base / DEFAULT_SKILLS_REL_DIR)
+    c_path = cases_path if cases_path is not None else (base / DEFAULT_SKILL_AB_CASES_REL_PATH)
+
+    filtro_set: frozenset[str] | None = None
+    if skills_filtro:
+        filtro_set = frozenset(s.strip() for s in skills_filtro if s and s.strip())
+
+    casos_existentes = _carregar_casos_ab_existentes(c_path)
+    casos_por_skill: dict[str, list[dict[str, Any]]] = {}
+    for c in casos_existentes:
+        sk = str(c.get("skill_name") or "").strip()
+        if sk:
+            casos_por_skill.setdefault(sk, []).append(c)
+
+    geradas: list[SkillSeedRef] = []
+    for skill_name in _listar_skills_catalogadas(s_dir):
+        if filtro_set is not None and skill_name not in filtro_set:
+            continue
+        existentes = casos_por_skill.get(skill_name, [])
+        if modo == "gaps" and existentes:
+            continue
+
+        if existentes:
+            for idx, c in enumerate(existentes):
+                cid = str(c.get("case_id") or f"skill-ab:{skill_name}:{idx}")
+                b_prompt = str(c.get("baseline_prompt") or f"Executar tarefa de {skill_name}.").strip()
+                req = tuple(str(x) for x in (c.get("required_clauses") or ()) if str(x).strip())
+                anti = tuple(str(x) for x in (c.get("forbidden_antipatterns") or ()) if str(x).strip())
+                min_d = float(c.get("min_delta_utility") or 0.05)
+                geradas.append(
+                    SkillSeedRef(
+                        prompt=b_prompt,
+                        expected_route=expected_route_padrao,
+                        seed_case_id=cid,
+                        seed_source="skill_ab",
+                        keywords=(skill_name,) + req[:2],
+                        skill_name=skill_name,
+                        baseline_prompt=b_prompt,
+                        required_clauses=req,
+                        forbidden_antipatterns=anti,
+                        min_delta_utility=min_d,
+                    )
+                )
+            continue
+
+        skill_md = s_dir / skill_name / "SKILL.md"
+        desc, clausulas, antipadroes = _extrair_rubrica_de_skill_md(skill_md)
+        if not clausulas:
+            continue
+        tema = _limpar_fragmento_inerte(desc) or skill_name.replace("-", " ")
+        prompt_neutro = (
+            f"Preciso aplicar as praticas canonicas de {skill_name} para {tema.lower()}."
+        )[:_MAX_LEN_PROMPT].strip()
+        ok, _ = sanitizar_prompt(prompt_neutro)
+        if not ok:
+            prompt_neutro = f"Preciso aplicar as diretrizes tecnicas da skill {skill_name}."
+        geradas.append(
+            SkillSeedRef(
+                prompt=prompt_neutro,
+                expected_route=expected_route_padrao,
+                seed_case_id=f"skill-gap:{skill_name}:0",
+                seed_source="skill_ab",
+                keywords=(skill_name,) + clausulas[:2],
+                skill_name=skill_name,
+                baseline_prompt=prompt_neutro,
+                required_clauses=clausulas,
+                forbidden_antipatterns=antipadroes,
+                min_delta_utility=0.05,
+            )
+        )
 
     return tuple(geradas)

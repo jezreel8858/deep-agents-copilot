@@ -95,6 +95,7 @@ Para cada fase:
 
 2. **Verificação automatizada**:
    - Execute cada verificação prevista no plano
+   - Se a implementação tocar `.github/skills/**` ou `tests/evals/**`, execute obrigatoriamente `python tests/evals/skill_ab_eval.py` (gate determinístico P5 de utilidade A/B)
    - Documente pass/fail com evidências
    - Investigue falhas
 

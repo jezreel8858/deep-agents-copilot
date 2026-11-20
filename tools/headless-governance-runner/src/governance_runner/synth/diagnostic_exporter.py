@@ -1,5 +1,5 @@
 """
-diagnostic_exporter — Exportacao deterministica bit-a-bit (YAML + MD) e guardas de path (B3-02 / CA-05 / CA-07).
+diagnostic_exporter — Exportacao deterministica bit-a-bit (YAML + MD) e guardas de path (B3-02 / CA-05 / CA-07 / P5).
 
 Invariantes:
 - Denylist imutavel de escrita (.github/agents/routing-graph.yaml, .github/agents/agent-router.agent.md,
@@ -94,10 +94,10 @@ def _verificar_denylist(alvo: Path, raiz_repo: Path) -> None:
 
 
 def ensure_allowed_write_path(
-    target_path: str | Path,
-    *,
-    repo_root: Path | None = None,
-    allow_root: bool | Path | str = False,
+        target_path: str | Path,
+        *,
+        repo_root: Path | None = None,
+        allow_root: bool | Path | str = False,
 ) -> Path:
     """Valida se target_path eh seguro para escrita, rejeitando traversal, symlinks externos e denylist."""
     raiz = (repo_root if repo_root is not None else _REPO_ROOT_PADRAO).resolve(strict=False)
@@ -149,7 +149,7 @@ def sanitizar_excerto_md(texto: str, *, max_len: int = MAX_EXCERPT_LEN) -> str:
     escapado = (
         limpo.replace("|", "\\|")
         .replace("`", "\\`")
-        .replace("<", "&lt;")
+        .replace("<", "<")
     )
     if len(escapado) > max_len:
         return escapado[:max_len]
@@ -273,6 +273,44 @@ def serializar_diagnostico_dict(diag: DiagnosticoAssertividade) -> dict[str, Any
                 for m in diag.por_workflow
             ],
         }
+    tem_skill_ab = bool(
+        diag.por_skill_ab
+        or diag.skill_ab_run_id
+        or diag.skills_orfas.sem_cobertura_ab
+        or diag.skills_orfas.uncoverable
+    )
+    if tem_skill_ab:
+        payload["resumo"].update(
+            {
+                "mean_skill_delta_utility": _fmt_float_opt(diag.resumo.mean_skill_delta_utility),
+                "skills_avaliadas": int(diag.resumo.skills_avaliadas),
+                "skills_redundantes": int(diag.resumo.skills_redundantes),
+                "skills_sem_cobertura": int(diag.resumo.skills_sem_cobertura),
+            }
+        )
+        payload["skills_ab"] = {
+            "metricas": [
+                {
+                    "casos": int(m.casos),
+                    "mean_baseline_score": round(float(m.mean_baseline_score), 6),
+                    "mean_delta_utility": round(float(m.mean_delta_utility), 6),
+                    "mean_treatment_score": round(float(m.mean_treatment_score), 6),
+                    "min_delta_utility": round(float(m.min_delta_utility), 6),
+                    "missing_clauses": list(m.missing_clauses),
+                    "passed": int(m.passed),
+                    "redundant": bool(m.redundant),
+                    "redundant_cases": int(m.redundant_cases),
+                    "skill_name": m.skill_name,
+                    "triggered_antipatterns": list(m.triggered_antipatterns),
+                }
+                for m in diag.por_skill_ab
+            ],
+            "orfas": {
+                "sem_cobertura_ab": list(diag.skills_orfas.sem_cobertura_ab),
+                "uncoverable": list(diag.skills_orfas.uncoverable),
+            },
+            "skill_ab_run_id": diag.skill_ab_run_id,
+        }
     return payload
 
 
@@ -369,6 +407,42 @@ def renderizar_diagnostico_md(diag: DiagnosticoAssertividade) -> str:
                     f"- `{sanitizar_excerto_md(c.gatilho_norm)}` ({c.tipo}): {list(c.workflows)} {list(c.edges)}"
                 )
 
+    tem_skill_ab = bool(
+        diag.por_skill_ab
+        or diag.skill_ab_run_id
+        or diag.skills_orfas.sem_cobertura_ab
+        or diag.skills_orfas.uncoverable
+    )
+    if tem_skill_ab:
+        linhas.extend(
+            [
+                "",
+                "## Avaliação Pareada de Skills (A/B)",
+                f"- `skill_ab_run_id`: `{sanitizar_excerto_md(diag.skill_ab_run_id or 'none')}`",
+                f"- **Skills Avaliadas**: {diag.resumo.skills_avaliadas}",
+                f"- **Skills Redundantes**: {diag.resumo.skills_redundantes}",
+                f"- **Skills sem Cobertura A/B**: {diag.resumo.skills_sem_cobertura}",
+                f"- **Delta Utility Médio**: {_fmt_num_md(diag.resumo.mean_skill_delta_utility)}",
+                f"- `sem_cobertura_ab`: {list(diag.skills_orfas.sem_cobertura_ab)}",
+                f"- `uncoverable`: {list(diag.skills_orfas.uncoverable)}",
+            ]
+        )
+        if diag.por_skill_ab:
+            linhas.extend(
+                [
+                    "",
+                    "| skill_name | casos | passed | baseline | treatment | delta_utility | min_delta | redundant |",
+                    "| :--- | ---: | ---: | ---: | ---: | ---: | ---: | :--- |",
+                ]
+            )
+            for m in diag.por_skill_ab:
+                linhas.append(
+                    f"| {sanitizar_excerto_md(m.skill_name)} | {m.casos} | {m.passed} | "
+                    f"{_fmt_num_md(m.mean_baseline_score)} | {_fmt_num_md(m.mean_treatment_score)} | "
+                    f"{_fmt_num_md(m.mean_delta_utility)} | {_fmt_num_md(m.min_delta_utility)} | "
+                    f"{'sim' if m.redundant else 'nao'} |"
+                )
+
     linhas.extend(["", "## Divergências `routing-graph.yaml` × `agent-router.agent.md`"])
     linhas.append(f"- `nos_nao_citados`: {list(diag.divergencias_router_md.nos_nao_citados)}")
     linhas.append(f"- `citados_fora_do_grafo`: {list(diag.divergencias_router_md.citados_fora_do_grafo)}")
@@ -391,12 +465,12 @@ def renderizar_diagnostico_md(diag: DiagnosticoAssertividade) -> str:
 
 
 def exportar_diagnostico(
-    diag: DiagnosticoAssertividade,
-    *,
-    out_dir: str | Path | None = None,
-    formato: FormatoDiagnostico = "both",
-    repo_root: Path | None = None,
-    allow_root: bool | Path | str = False,
+        diag: DiagnosticoAssertividade,
+        *,
+        out_dir: str | Path | None = None,
+        formato: FormatoDiagnostico = "both",
+        repo_root: Path | None = None,
+        allow_root: bool | Path | str = False,
 ) -> ResultadoExportDiagnostico:
     """Exporta diagnostic-<eval_run_id>.yaml e/ou .md com escrita deterministica LF e guardas de path."""
     if formato not in FORMATOS_DIAGNOSTICO:

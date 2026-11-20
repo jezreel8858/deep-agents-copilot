@@ -102,7 +102,8 @@ Se o usuário enviar flags (ex.: `--quick`), informe que o comando atual executa
 ├─ .github/skills/.index.json      → ✅/❌ (JSON válido?)
 ├─ total_skills declarado          → <N> (coincide com pastas?)
 ├─ Pastas com SKILL.md             → <N> encontradas
-└─ Skills sem entrada no índice    → <lista ou "nenhuma">
+├─ Skills sem entrada no índice    → <lista ou "nenhuma">
+└─ Eval A/B Utilidade P5 (`python tests/evals/skill_ab_eval.py`) → ✅ PASS / ❌ FAIL (delta médio / redundâncias)
 ```
 
 ### CAT-4: Prompts

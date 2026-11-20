@@ -1,5 +1,5 @@
 """
-storage — Persistência SQLite WAL e migração transacional v1→v2→v3 sem executescript (B1 / §3.2).
+storage — Persistência SQLite WAL e migração transacional v1→v2→v3→v4 sem executescript (B1 / §3.2 / P5).
 """
 
 from __future__ import annotations
@@ -11,7 +11,7 @@ import sqlite3
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Mapping
+from typing import TYPE_CHECKING, Any, Mapping, Sequence
 
 if TYPE_CHECKING:
     from governance_runner.synth.routing_graph import GrafoSnapshot
@@ -29,40 +29,40 @@ __all__ = [
 
 DEFAULT_DB_REL_PATH = Path(".cache") / "routing_synth_history.db"
 GOV_SYNTH_DB_ENV = "GOV_SYNTH_DB"
-SCHEMA_VERSION = "3"
-SEED_SOURCES_VALIDOS: frozenset[str] = frozenset({"manual", "routing_graph"})
+SCHEMA_VERSION = "4"
+SEED_SOURCES_VALIDOS: frozenset[str] = frozenset({"manual", "routing_graph", "skill_ab"})
 
 _SCHEMA_SQL_PATH = Path(__file__).with_name("schema.sql")
 
 _DDL_TABELAS_AUX_V2: tuple[str, ...] = (
     """
     CREATE TABLE IF NOT EXISTS routing_graph_edges (
-      snapshot_sha256        TEXT NOT NULL,
-      edge_id                TEXT NOT NULL,
-      de                     TEXT NOT NULL,
-      para                   TEXT NOT NULL,
-      tipo                   TEXT NOT NULL,
-      regra                  TEXT,
-      prioridade             REAL,
-      threshold_score        REAL,
-      nivel_routing          TEXT,
-      keywords_json          TEXT NOT NULL DEFAULT '[]',
-      valida                 INTEGER NOT NULL CHECK (valida IN (0,1)),
-      PRIMARY KEY (snapshot_sha256, edge_id)
+                                                       snapshot_sha256        TEXT NOT NULL,
+                                                       edge_id                TEXT NOT NULL,
+                                                       de                     TEXT NOT NULL,
+                                                       para                   TEXT NOT NULL,
+                                                       tipo                   TEXT NOT NULL,
+                                                       regra                  TEXT,
+                                                       prioridade             REAL,
+                                                       threshold_score        REAL,
+                                                       nivel_routing          TEXT,
+                                                       keywords_json          TEXT NOT NULL DEFAULT '[]',
+                                                       valida                 INTEGER NOT NULL CHECK (valida IN (0,1)),
+                                                       PRIMARY KEY (snapshot_sha256, edge_id)
     )
     """,
     """
     CREATE TABLE IF NOT EXISTS synth_diagnostics (
-      diagnostic_id          TEXT PRIMARY KEY,
-      eval_run_id            TEXT NOT NULL REFERENCES synth_runs(run_id),
-      routing_graph_sha256   TEXT NOT NULL,
-      router_agent_sha256    TEXT,
-      golden_set_sha256      TEXT,
-      created_at             TEXT NOT NULL,
-      yaml_path              TEXT,
-      md_path                TEXT,
-      metrics_json           TEXT NOT NULL,
-      n_suggestions          INTEGER NOT NULL DEFAULT 0
+                                                     diagnostic_id          TEXT PRIMARY KEY,
+                                                     eval_run_id            TEXT NOT NULL REFERENCES synth_runs(run_id),
+                                                     routing_graph_sha256   TEXT NOT NULL,
+                                                     router_agent_sha256    TEXT,
+                                                     golden_set_sha256      TEXT,
+                                                     created_at             TEXT NOT NULL,
+                                                     yaml_path              TEXT,
+                                                     md_path                TEXT,
+                                                     metrics_json           TEXT NOT NULL,
+                                                     n_suggestions          INTEGER NOT NULL DEFAULT 0
     )
     """,
 )
@@ -70,15 +70,44 @@ _DDL_TABELAS_AUX_V2: tuple[str, ...] = (
 _DDL_TABELAS_AUX_V3: tuple[str, ...] = (
     """
     CREATE TABLE IF NOT EXISTS routing_graph_workflows (
-      workflow_id            TEXT NOT NULL,
-      graph_sha256           TEXT NOT NULL,
-      nome                   TEXT NOT NULL,
-      fast_path              INTEGER NOT NULL DEFAULT 0,
-      gatilhos_json          TEXT NOT NULL DEFAULT '[]',
-      etapa1_padroes_json    TEXT NOT NULL DEFAULT '[]',
-      workflow_hash          TEXT NOT NULL,
-      PRIMARY KEY (workflow_id, graph_sha256)
+                                                           workflow_id            TEXT NOT NULL,
+                                                           graph_sha256           TEXT NOT NULL,
+                                                           nome                   TEXT NOT NULL,
+                                                           fast_path              INTEGER NOT NULL DEFAULT 0,
+                                                           gatilhos_json          TEXT NOT NULL DEFAULT '[]',
+                                                           etapa1_padroes_json    TEXT NOT NULL DEFAULT '[]',
+                                                           workflow_hash          TEXT NOT NULL,
+                                                           PRIMARY KEY (workflow_id, graph_sha256)
     )
+    """,
+)
+
+_DDL_TABELAS_AUX_V4: tuple[str, ...] = (
+    """
+    CREATE TABLE IF NOT EXISTS synth_skill_ab_evals (
+                                                        skill_eval_id          TEXT PRIMARY KEY,
+                                                        run_id                 TEXT NOT NULL REFERENCES synth_runs(run_id),
+                                                        case_id                TEXT NOT NULL,
+                                                        skill_name             TEXT NOT NULL,
+                                                        skill_sha256           TEXT,
+                                                        mode                   TEXT NOT NULL DEFAULT 'offline' CHECK (mode IN ('offline','sdk')),
+                                                        baseline_score         REAL NOT NULL,
+                                                        treatment_score        REAL NOT NULL,
+                                                        delta_utility          REAL NOT NULL,
+                                                        min_delta_utility      REAL NOT NULL DEFAULT 0.05,
+                                                        redundant              INTEGER NOT NULL CHECK (redundant IN (0,1)),
+                                                        passed                 INTEGER NOT NULL CHECK (passed IN (0,1)),
+                                                        missing_clauses_json   TEXT NOT NULL DEFAULT '[]',
+                                                        triggered_anti_json    TEXT NOT NULL DEFAULT '[]',
+                                                        latency_ms             INTEGER,
+                                                        premium_requests       INTEGER NOT NULL DEFAULT 0,
+                                                        created_at             TEXT NOT NULL,
+                                                        UNIQUE (run_id, case_id)
+    )
+    """,
+    """
+    CREATE INDEX IF NOT EXISTS ix_skill_ab_skill_name
+        ON synth_skill_ab_evals(skill_name, created_at)
     """,
 )
 
@@ -121,10 +150,10 @@ def _colunas_tabela(conn: sqlite3.Connection, tabela: str) -> set[str]:
 def _modo_compat_v2_ativo() -> bool:
     atual = os.environ.get("PYTEST_CURRENT_TEST", "")
     return "test_store_migration.py::" in atual and (
-        "test_migracao_v1_v2_adiciona_colunas_antes_do_indice" in atual
-        or "test_migracao_rollback_em_falha_preserva_v1" in atual
-        or "test_migracao_idempotente" in atual
-        or "test_banco_novo_nasce_em_user_version_2" in atual
+            "test_migracao_v1_v2_adiciona_colunas_antes_do_indice" in atual
+            or "test_migracao_rollback_em_falha_preserva_v1" in atual
+            or "test_migracao_idempotente" in atual
+            or "test_banco_novo_nasce_em_user_version_2" in atual
     )
 
 
@@ -139,6 +168,52 @@ def _criar_backup_v2_se_arquivo(conn: sqlite3.Connection) -> None:
                 bak = Path(f"{caminho_db}.bak-v2")
                 if not bak.exists():
                     shutil.copy2(p, bak)
+
+
+def _migrar_tabela_runs_kind_skill_ab(conn: sqlite3.Connection) -> None:
+    """Atualiza CHECK(kind) em synth_runs para aceitar 'skill_ab' caso o DDL antigo nao o contemple."""
+    if not _tabela_existe(conn, "synth_runs"):
+        return
+    row = conn.execute(
+        "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'synth_runs'"
+    ).fetchone()
+    ddl_atual = str(row[0] if row and row[0] else "")
+    if "skill_ab" in ddl_atual:
+        return
+    conn.execute("PRAGMA foreign_keys = OFF")
+    try:
+        conn.execute(
+            """
+            CREATE TABLE synth_runs_v4_tmp (
+                                               run_id                 TEXT PRIMARY KEY,
+                                               kind                   TEXT NOT NULL CHECK (kind IN ('generate','eval','export','promote','skill_ab')),
+                                               parent_run_id          TEXT REFERENCES synth_runs(run_id),
+                                               started_at             TEXT NOT NULL,
+                                               finished_at            TEXT,
+                                               status                 TEXT NOT NULL CHECK (status IN ('running','completed','neutral','failed')),
+                                               motivo                 TEXT,
+                                               generator              TEXT CHECK (generator IN ('sdk','template')),
+                                               model                  TEXT,
+                                               rng_seed               INTEGER,
+                                               params_json            TEXT NOT NULL DEFAULT '{}',
+                                               router_agent_sha256    TEXT,
+                                               golden_set_sha256      TEXT,
+                                               routing_graph_sha256   TEXT,
+                                               premium_requests_used  INTEGER NOT NULL DEFAULT 0,
+                                               n_candidates           INTEGER NOT NULL DEFAULT 0,
+                                               n_rejected_hash        INTEGER NOT NULL DEFAULT 0,
+                                               n_rejected_similarity  INTEGER NOT NULL DEFAULT 0,
+                                               n_rejected_override    INTEGER NOT NULL DEFAULT 0,
+                                               n_accepted             INTEGER NOT NULL DEFAULT 0,
+                                               trace_id               TEXT
+            )
+            """
+        )
+        conn.execute("INSERT INTO synth_runs_v4_tmp SELECT * FROM synth_runs")
+        conn.execute("DROP TABLE synth_runs")
+        conn.execute("ALTER TABLE synth_runs_v4_tmp RENAME TO synth_runs")
+    finally:
+        conn.execute("PRAGMA foreign_keys = ON")
 
 
 def migrar_conexao(conn: sqlite3.Connection) -> str:
@@ -158,7 +233,7 @@ def migrar_conexao(conn: sqlite3.Connection) -> str:
         tem_runs = _tabela_existe(conn, "synth_runs")
         tem_prompts_v1 = _tabela_existe(conn, "synth_prompts") or _tabela_existe(conn, "prompts")
 
-        # Caso (a): Banco novo (vazio) -> cria tudo diretamente em v3 (ou v2 se compat)
+        # Caso (a): Banco novo (vazio) -> cria tudo diretamente em v4 (ou v2 se compat)
         if user_ver == 0 and not tem_runs and not tem_prompts_v1:
             conn.execute("BEGIN IMMEDIATE")
             try:
@@ -273,6 +348,25 @@ def migrar_conexao(conn: sqlite3.Connection) -> str:
                 if conn.in_transaction:
                     conn.execute("ROLLBACK")
                 raise
+            user_ver = 3
+
+        # Caso (d): v3 -> v4 (Skill A/B Evals)
+        if user_ver == 3 and versao_alvo_int >= 4:
+            conn.execute("BEGIN IMMEDIATE")
+            try:
+                _migrar_tabela_runs_kind_skill_ab(conn)
+                for ddl_aux_v4 in _DDL_TABELAS_AUX_V4:
+                    conn.execute(ddl_aux_v4)
+                if _tabela_existe(conn, "schema_meta"):
+                    conn.execute(
+                        "INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('schema_version', '4')"
+                    )
+                conn.execute("PRAGMA user_version = 4")
+                conn.execute("COMMIT")
+            except Exception:
+                if conn.in_transaction:
+                    conn.execute("ROLLBACK")
+                raise
 
         return SCHEMA_VERSION
     finally:
@@ -280,9 +374,9 @@ def migrar_conexao(conn: sqlite3.Connection) -> str:
 
 
 def resolver_caminho_db(
-    db_path: str | Path | None = None,
-    *,
-    repo_root: Path | None = None,
+        db_path: str | Path | None = None,
+        *,
+        repo_root: Path | None = None,
 ) -> str | Path:
     """Resolve e valida o caminho do SQLite, rejeitando qualquer localizacao sob .github/."""
     raw: str | Path | None = db_path
@@ -322,14 +416,14 @@ def _configurar_conexao(conn: sqlite3.Connection) -> None:
 
 
 class SynthRepository:
-    """Repositorio SQLite para execucoes, prompts, avaliacoes, workflows e diagnosticos synth."""
+    """Repositorio SQLite para execucoes, prompts, avaliacoes, skill A/B evals e diagnosticos synth."""
 
     def __init__(
-        self,
-        db_path: str | Path | None = None,
-        *,
-        repo_root: Path | None = None,
-        criar_diretorio: bool = True,
+            self,
+            db_path: str | Path | None = None,
+            *,
+            repo_root: Path | None = None,
+            criar_diretorio: bool = True,
     ) -> None:
         resolved = resolver_caminho_db(db_path, repo_root=repo_root)
         self._db_target: str | Path = resolved
@@ -374,22 +468,22 @@ class SynthRepository:
         return str(u_ver) if u_ver > 0 else SCHEMA_VERSION
 
     def criar_run(
-        self,
-        *,
-        kind: str,
-        run_id: str | None = None,
-        parent_run_id: str | None = None,
-        status: str = "running",
-        motivo: str | None = None,
-        generator: str | None = None,
-        model: str | None = None,
-        rng_seed: int | None = None,
-        params: Mapping[str, Any] | None = None,
-        router_agent_sha256: str | None = None,
-        golden_set_sha256: str | None = None,
-        routing_graph_sha256: str | None = None,
-        trace_id: str | None = None,
-        started_at: str | None = None,
+            self,
+            *,
+            kind: str,
+            run_id: str | None = None,
+            parent_run_id: str | None = None,
+            status: str = "running",
+            motivo: str | None = None,
+            generator: str | None = None,
+            model: str | None = None,
+            rng_seed: int | None = None,
+            params: Mapping[str, Any] | None = None,
+            router_agent_sha256: str | None = None,
+            golden_set_sha256: str | None = None,
+            routing_graph_sha256: str | None = None,
+            trace_id: str | None = None,
+            started_at: str | None = None,
     ) -> str:
         rid = run_id or uuid.uuid4().hex
         inicio = started_at or _utc_now_iso()
@@ -397,9 +491,9 @@ class SynthRepository:
         self._conn.execute(
             """
             INSERT INTO synth_runs (
-              run_id, kind, parent_run_id, started_at, status, motivo,
-              generator, model, rng_seed, params_json, router_agent_sha256,
-              golden_set_sha256, routing_graph_sha256, trace_id
+                run_id, kind, parent_run_id, started_at, status, motivo,
+                generator, model, rng_seed, params_json, router_agent_sha256,
+                golden_set_sha256, routing_graph_sha256, trace_id
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
@@ -423,21 +517,21 @@ class SynthRepository:
         return rid
 
     def finalizar_run(
-        self,
-        run_id: str,
-        *,
-        status: str = "completed",
-        motivo: str | None = None,
-        premium_requests_used: int | None = None,
-        n_candidates: int | None = None,
-        n_rejected_hash: int | None = None,
-        n_rejected_similarity: int | None = None,
-        n_rejected_override: int | None = None,
-        n_accepted: int | None = None,
-        router_agent_sha256: str | None = None,
-        golden_set_sha256: str | None = None,
-        routing_graph_sha256: str | None = None,
-        finished_at: str | None = None,
+            self,
+            run_id: str,
+            *,
+            status: str = "completed",
+            motivo: str | None = None,
+            premium_requests_used: int | None = None,
+            n_candidates: int | None = None,
+            n_rejected_hash: int | None = None,
+            n_rejected_similarity: int | None = None,
+            n_rejected_override: int | None = None,
+            n_accepted: int | None = None,
+            router_agent_sha256: str | None = None,
+            golden_set_sha256: str | None = None,
+            routing_graph_sha256: str | None = None,
+            finished_at: str | None = None,
     ) -> None:
         fim = finished_at or _utc_now_iso()
         atual = self.obter_run(run_id)
@@ -475,15 +569,33 @@ class SynthRepository:
         row = cur.fetchone()
         return dict(row) if row is not None else None
 
+    def obter_ultimo_run_id(self, *, kind: str, status: str | None = "completed") -> str | None:
+        """Retorna o run_id mais recente para o kind informado (ou None se inexistente)."""
+        if status is not None:
+            cur = self._conn.execute(
+                """
+                SELECT run_id FROM synth_runs
+                WHERE kind = ? AND status = ?
+                ORDER BY COALESCE(finished_at, started_at) DESC, rowid DESC
+                    LIMIT 1
+                """,
+                (kind, status),
+            )
+        else:
+            cur = self._conn.execute(
+                """
+                SELECT run_id FROM synth_runs
+                WHERE kind = ?
+                ORDER BY COALESCE(finished_at, started_at) DESC, rowid DESC
+                    LIMIT 1
+                """,
+                (kind,),
+            )
+        row = cur.fetchone()
+        return str(row["run_id"]) if row is not None else None
+
     def reconciliar_runs_orfaos(self, run_id: str | None = None) -> int:
-        """Reconcilia runs órfãos em status 'running' interrompidos por timeout externo.
-
-        Args:
-            run_id: Identificador opcional de um run específico a reconciliar.
-
-        Returns:
-            Quantidade de runs efetivamente reconciliados.
-        """
+        """Reconcilia runs órfãos em status 'running' interrompidos por timeout externo."""
         if run_id is not None:
             cur = self._conn.execute(
                 "SELECT run_id, kind, n_candidates FROM synth_runs WHERE status = 'running' AND run_id = ?",
@@ -514,11 +626,11 @@ class SynthRepository:
                         self._conn.execute(
                             """
                             UPDATE synth_runs
-                               SET status = 'completed',
-                                   n_accepted = ?,
-                                   n_candidates = ?,
-                                   finished_at = COALESCE(finished_at, ?)
-                             WHERE run_id = ? AND status = 'running'
+                            SET status = 'completed',
+                                n_accepted = ?,
+                                n_candidates = ?,
+                                finished_at = COALESCE(finished_at, ?)
+                            WHERE run_id = ? AND status = 'running'
                             """,
                             (count_prompts, n_cand, agora, r_id),
                         )
@@ -526,10 +638,42 @@ class SynthRepository:
                         self._conn.execute(
                             """
                             UPDATE synth_runs
-                               SET status = 'failed',
-                                   motivo = 'interrompido_timeout_orfandade',
-                                   finished_at = COALESCE(finished_at, ?)
-                             WHERE run_id = ? AND status = 'running'
+                            SET status = 'failed',
+                                motivo = 'interrompido_timeout_orfandade',
+                                finished_at = COALESCE(finished_at, ?)
+                            WHERE run_id = ? AND status = 'running'
+                            """,
+                            (agora, r_id),
+                        )
+                elif kind == "skill_ab":
+                    ab_row = self._conn.execute(
+                        "SELECT COUNT(*), COALESCE(SUM(passed), 0), COALESCE(SUM(premium_requests), 0) FROM synth_skill_ab_evals WHERE run_id = ?",
+                        (r_id,),
+                    ).fetchone()
+                    count_ab = int(ab_row[0]) if ab_row is not None else 0
+                    sum_passed = int(ab_row[1]) if ab_row is not None else 0
+                    sum_premium = int(ab_row[2]) if ab_row is not None else 0
+                    if count_ab > 0:
+                        self._conn.execute(
+                            """
+                            UPDATE synth_runs
+                            SET status = 'completed',
+                                n_candidates = ?,
+                                n_accepted = ?,
+                                premium_requests_used = ?,
+                                finished_at = COALESCE(finished_at, ?)
+                            WHERE run_id = ? AND status = 'running'
+                            """,
+                            (count_ab, sum_passed, sum_premium, agora, r_id),
+                        )
+                    else:
+                        self._conn.execute(
+                            """
+                            UPDATE synth_runs
+                            SET status = 'failed',
+                                motivo = 'interrompido_timeout_orfandade',
+                                finished_at = COALESCE(finished_at, ?)
+                            WHERE run_id = ? AND status = 'running'
                             """,
                             (agora, r_id),
                         )
@@ -545,12 +689,12 @@ class SynthRepository:
                         self._conn.execute(
                             """
                             UPDATE synth_runs
-                               SET status = 'completed',
-                                   n_candidates = ?,
-                                   n_accepted = ?,
-                                   premium_requests_used = ?,
-                                   finished_at = COALESCE(finished_at, ?)
-                             WHERE run_id = ? AND status = 'running'
+                            SET status = 'completed',
+                                n_candidates = ?,
+                                n_accepted = ?,
+                                premium_requests_used = ?,
+                                finished_at = COALESCE(finished_at, ?)
+                            WHERE run_id = ? AND status = 'running'
                             """,
                             (count_evals, sum_passed, sum_premium, agora, r_id),
                         )
@@ -558,10 +702,10 @@ class SynthRepository:
                         self._conn.execute(
                             """
                             UPDATE synth_runs
-                               SET status = 'failed',
-                                   motivo = 'interrompido_timeout_orfandade',
-                                   finished_at = COALESCE(finished_at, ?)
-                             WHERE run_id = ? AND status = 'running'
+                            SET status = 'failed',
+                                motivo = 'interrompido_timeout_orfandade',
+                                finished_at = COALESCE(finished_at, ?)
+                            WHERE run_id = ? AND status = 'running'
                             """,
                             (agora, r_id),
                         )
@@ -569,25 +713,25 @@ class SynthRepository:
         return reconciliados
 
     def inserir_prompt(
-        self,
-        *,
-        run_id: str,
-        text: str,
-        text_norm: str,
-        sha256: str,
-        expected_route: str | None,
-        agente_alvo: str,
-        dimensao_perturbacao: str,
-        seed_case_id: str | None = None,
-        seed_source: str = "manual",
-        graph_edge_id: str | None = None,
-        graph_edge_resolution: str | None = None,
-        expected_workflow: str | None = None,
-        graph_workflow_id: str | None = None,
-        max_similarity: float = 0.0,
-        nearest_ref: str | None = None,
-        prompt_id: str | None = None,
-        created_at: str | None = None,
+            self,
+            *,
+            run_id: str,
+            text: str,
+            text_norm: str,
+            sha256: str,
+            expected_route: str | None,
+            agente_alvo: str,
+            dimensao_perturbacao: str,
+            seed_case_id: str | None = None,
+            seed_source: str = "manual",
+            graph_edge_id: str | None = None,
+            graph_edge_resolution: str | None = None,
+            expected_workflow: str | None = None,
+            graph_workflow_id: str | None = None,
+            max_similarity: float = 0.0,
+            nearest_ref: str | None = None,
+            prompt_id: str | None = None,
+            created_at: str | None = None,
     ) -> str:
         if seed_source not in SEED_SOURCES_VALIDOS:
             raise ValueError(
@@ -601,10 +745,10 @@ class SynthRepository:
             self._conn.execute(
                 """
                 INSERT INTO synth_prompts (
-                  prompt_id, run_id, text, text_norm, sha256, expected_route,
-                  agente_alvo, dimensao_perturbacao, seed_case_id, seed_source,
-                  graph_edge_id, graph_edge_resolution, expected_workflow, graph_workflow_id,
-                  max_similarity, nearest_ref, created_at
+                    prompt_id, run_id, text, text_norm, sha256, expected_route,
+                    agente_alvo, dimensao_perturbacao, seed_case_id, seed_source,
+                    graph_edge_id, graph_edge_resolution, expected_workflow, graph_workflow_id,
+                    max_similarity, nearest_ref, created_at
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
@@ -631,9 +775,9 @@ class SynthRepository:
             self._conn.execute(
                 """
                 INSERT INTO synth_prompts (
-                  prompt_id, run_id, text, text_norm, sha256, expected_route,
-                  agente_alvo, dimensao_perturbacao, seed_case_id, seed_source,
-                  graph_edge_id, graph_edge_resolution, max_similarity, nearest_ref, created_at
+                    prompt_id, run_id, text, text_norm, sha256, expected_route,
+                    agente_alvo, dimensao_perturbacao, seed_case_id, seed_source,
+                    graph_edge_id, graph_edge_resolution, max_similarity, nearest_ref, created_at
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
@@ -673,12 +817,12 @@ class SynthRepository:
         return [dict(r) for r in cur.fetchall()]
 
     def listar_pendentes_avaliacao(
-        self,
-        *,
-        eval_run_id: str,
-        source_run_id: str | None = None,
-        only_untested_globally: bool = False,
-        limit: int | None = None,
+            self,
+            *,
+            eval_run_id: str,
+            source_run_id: str | None = None,
+            only_untested_globally: bool = False,
+            limit: int | None = None,
     ) -> list[dict[str, Any]]:
         params: list[Any] = [eval_run_id]
         filtros = [
@@ -711,24 +855,24 @@ class SynthRepository:
         }
 
     def inserir_avaliacao(
-        self,
-        *,
-        run_id: str,
-        prompt_id: str,
-        observed_route: str | None,
-        route_source: str | None,
-        verdict: str,
-        passed: bool | int,
-        observed_workflow: str | None = None,
-        observed_etapa: int | None = None,
-        workflow_source: str | None = None,
-        workflow_route_consistent: int | bool | None = None,
-        response_excerpt: str | None = None,
-        latency_ms: int | None = None,
-        premium_requests: int = 0,
-        error: str | None = None,
-        eval_id: str | None = None,
-        created_at: str | None = None,
+            self,
+            *,
+            run_id: str,
+            prompt_id: str,
+            observed_route: str | None,
+            route_source: str | None,
+            verdict: str,
+            passed: bool | int,
+            observed_workflow: str | None = None,
+            observed_etapa: int | None = None,
+            workflow_source: str | None = None,
+            workflow_route_consistent: int | bool | None = None,
+            response_excerpt: str | None = None,
+            latency_ms: int | None = None,
+            premium_requests: int = 0,
+            error: str | None = None,
+            eval_id: str | None = None,
+            created_at: str | None = None,
     ) -> str:
         eid = eval_id or uuid.uuid4().hex
         criado = created_at or _utc_now_iso()
@@ -742,9 +886,9 @@ class SynthRepository:
             self._conn.execute(
                 """
                 INSERT INTO synth_evaluations (
-                  eval_id, run_id, prompt_id, observed_route, route_source,
-                  observed_workflow, observed_etapa, workflow_source, workflow_route_consistent,
-                  verdict, passed, response_excerpt, latency_ms, premium_requests, error, created_at
+                    eval_id, run_id, prompt_id, observed_route, route_source,
+                    observed_workflow, observed_etapa, workflow_source, workflow_route_consistent,
+                    verdict, passed, response_excerpt, latency_ms, premium_requests, error, created_at
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
@@ -770,8 +914,8 @@ class SynthRepository:
             self._conn.execute(
                 """
                 INSERT INTO synth_evaluations (
-                  eval_id, run_id, prompt_id, observed_route, route_source,
-                  verdict, passed, response_excerpt, latency_ms, premium_requests, error, created_at
+                    eval_id, run_id, prompt_id, observed_route, route_source,
+                    verdict, passed, response_excerpt, latency_ms, premium_requests, error, created_at
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
@@ -793,12 +937,12 @@ class SynthRepository:
         return eid
 
     def listar_avaliacoes(
-        self,
-        run_id: str,
-        *,
-        only_failures: bool = False,
-        include_near_boundary: bool = False,
-        near_boundary_threshold: float = 0.70,
+            self,
+            run_id: str,
+            *,
+            only_failures: bool = False,
+            include_near_boundary: bool = False,
+            near_boundary_threshold: float = 0.70,
     ) -> list[dict[str, Any]]:
         cols_p = _colunas_tabela(self._conn, "synth_prompts")
         extra_select = (
@@ -832,26 +976,112 @@ class SynthRepository:
                 filtradas.append(item)
         return filtradas
 
+    def inserir_avaliacao_skill_ab(
+            self,
+            *,
+            run_id: str,
+            case_id: str,
+            skill_name: str,
+            baseline_score: float,
+            treatment_score: float,
+            delta_utility: float,
+            min_delta_utility: float = 0.05,
+            redundant: bool | int = False,
+            passed: bool | int = True,
+            skill_sha256: str | None = None,
+            mode: str = "offline",
+            missing_clauses: Sequence[str] = (),
+            triggered_antipatterns: Sequence[str] = (),
+            latency_ms: int | None = None,
+            premium_requests: int = 0,
+            skill_eval_id: str | None = None,
+            created_at: str | None = None,
+    ) -> str:
+        """Persiste o resultado pareado (baseline vs treatment) de uma avaliacao A/B de skill (v4)."""
+        if not _tabela_existe(self._conn, "synth_skill_ab_evals"):
+            for ddl in _DDL_TABELAS_AUX_V4:
+                self._conn.execute(ddl)
+        seid = skill_eval_id or uuid.uuid4().hex
+        criado = created_at or _utc_now_iso()
+        self._conn.execute(
+            """
+            INSERT OR REPLACE INTO synth_skill_ab_evals (
+              skill_eval_id, run_id, case_id, skill_name, skill_sha256, mode,
+              baseline_score, treatment_score, delta_utility, min_delta_utility,
+              redundant, passed, missing_clauses_json, triggered_anti_json,
+              latency_ms, premium_requests, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                seid,
+                run_id,
+                case_id,
+                skill_name,
+                skill_sha256,
+                mode,
+                float(baseline_score),
+                float(treatment_score),
+                float(delta_utility),
+                float(min_delta_utility),
+                1 if bool(redundant) else 0,
+                1 if bool(passed) else 0,
+                json.dumps(list(missing_clauses), ensure_ascii=False),
+                json.dumps(list(triggered_antipatterns), ensure_ascii=False),
+                latency_ms,
+                int(premium_requests),
+                criado,
+            ),
+        )
+        self._conn.commit()
+        return seid
+
+    def listar_avaliacoes_skill_ab(
+            self,
+            *,
+            run_id: str | None = None,
+            skill_name: str | None = None,
+            only_redundant: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Consulta historico de avaliacoes A/B de skills persistidas no SQLite (v4)."""
+        if not _tabela_existe(self._conn, "synth_skill_ab_evals"):
+            return []
+        filtros: list[str] = []
+        params: list[Any] = []
+        if run_id is not None:
+            filtros.append("run_id = ?")
+            params.append(run_id)
+        if skill_name is not None:
+            filtros.append("skill_name = ?")
+            params.append(skill_name)
+        if only_redundant:
+            filtros.append("redundant = 1")
+        where = f"WHERE {' AND '.join(filtros)}" if filtros else ""
+        cur = self._conn.execute(
+            f"SELECT * FROM synth_skill_ab_evals {where} ORDER BY created_at ASC, skill_eval_id ASC",
+            tuple(params),
+        )
+        return [dict(r) for r in cur.fetchall()]
+
     def inserir_export(
-        self,
-        *,
-        prompt_id: str,
-        eval_id: str | None,
-        silver_path: str,
-        silver_case_id: str,
-        status: str = "silver",
-        promoted_path: str | None = None,
-        export_id: str | None = None,
-        exported_at: str | None = None,
-        decided_at: str | None = None,
+            self,
+            *,
+            prompt_id: str,
+            eval_id: str | None,
+            silver_path: str,
+            silver_case_id: str,
+            status: str = "silver",
+            promoted_path: str | None = None,
+            export_id: str | None = None,
+            exported_at: str | None = None,
+            decided_at: str | None = None,
     ) -> str:
         xid = export_id or uuid.uuid4().hex
         exp_at = exported_at or _utc_now_iso()
         self._conn.execute(
             """
             INSERT INTO synth_exports (
-              export_id, prompt_id, eval_id, silver_path, silver_case_id,
-              promoted_path, status, exported_at, decided_at
+                export_id, prompt_id, eval_id, silver_path, silver_case_id,
+                promoted_path, status, exported_at, decided_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
@@ -870,12 +1100,12 @@ class SynthRepository:
         return xid
 
     def atualizar_status_export(
-        self,
-        silver_case_id: str,
-        status: str,
-        *,
-        promoted_path: str | None = None,
-        decided_at: str | None = None,
+            self,
+            silver_case_id: str,
+            status: str,
+            *,
+            promoted_path: str | None = None,
+            decided_at: str | None = None,
     ) -> None:
         decidido_val = decided_at or _utc_now_iso()
         self._conn.execute(
@@ -929,10 +1159,10 @@ class SynthRepository:
         return inseridas
 
     def listar_arestas_grafo(
-        self,
-        snapshot_sha256: str,
-        *,
-        apenas_validas: bool = False,
+            self,
+            snapshot_sha256: str,
+            *,
+            apenas_validas: bool = False,
     ) -> list[dict[str, Any]]:
         if apenas_validas:
             cur = self._conn.execute(
@@ -987,18 +1217,18 @@ class SynthRepository:
         return [dict(r) for r in cur.fetchall()]
 
     def inserir_diagnostico(
-        self,
-        *,
-        diagnostic_id: str,
-        eval_run_id: str,
-        routing_graph_sha256: str,
-        router_agent_sha256: str | None = None,
-        golden_set_sha256: str | None = None,
-        created_at: str | None = None,
-        yaml_path: str | None = None,
-        md_path: str | None = None,
-        metrics: Mapping[str, Any] | str,
-        n_suggestions: int = 0,
+            self,
+            *,
+            diagnostic_id: str,
+            eval_run_id: str,
+            routing_graph_sha256: str,
+            router_agent_sha256: str | None = None,
+            golden_set_sha256: str | None = None,
+            created_at: str | None = None,
+            yaml_path: str | None = None,
+            md_path: str | None = None,
+            metrics: Mapping[str, Any] | str,
+            n_suggestions: int = 0,
     ) -> str:
         criado = created_at or _utc_now_iso()
         metrics_str = (

@@ -1,5 +1,5 @@
 """
-diagnostics — Oraculo offline deterministico de assertividade de roteamento (B3-01 / CA-05).
+diagnostics — Oraculo offline deterministico de assertividade de roteamento e utilidade de skills (B3-01 / CA-05 / P5).
 
 Invariantes:
 - Puramente deterministico e 100% offline (zero chamadas LLM / SDK).
@@ -10,11 +10,12 @@ Invariantes:
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 from fnmatch import fnmatchcase
 from collections import Counter
 from dataclasses import dataclass, field
-from typing import Any, Literal, Sequence
+from typing import Any, Literal, Mapping, Sequence
 
 from governance_runner.synth.golden import GoldenSeed
 from governance_runner.synth.normalize import normalizar
@@ -46,6 +47,8 @@ __all__ = [
     "ColisaoKws",
     "MetricaWorkflow",
     "ColisaoWorkflow",
+    "MetricaSkillAB",
+    "SkillsOrfas",
     "DivergenciaRouterMd",
     "SugestaoAcionavel",
     "DiagnosticoAssertividade",
@@ -70,6 +73,9 @@ CODIGOS_SUGESTAO: tuple[str, ...] = (
     "SUG-WF-MISSING-BANNER",
     "SUG-WF-UNKNOWN-ID",
     "SUG-WF-UNCOVERABLE",
+    "SUG-SKILL-REDUNDANT",
+    "SUG-SKILL-COVERAGE-GAP",
+    "SUG-SKILL-UNCOVERABLE",
 )
 
 LIMIAR_F1_WORKFLOW = 0.7
@@ -79,6 +85,7 @@ CATEGORIAS_DIVERGENCIA: tuple[str, ...] = (
     "PROMPT_DRIFT",
     "COVERAGE_GAP",
     "CONFIDENCE_CALIBRATION",
+    "SKILL_UTILITY",
 )
 
 _STOPWORDS_PT: frozenset[str] = frozenset(
@@ -120,6 +127,10 @@ class ResumoDiagnostico:
     workflow_accuracy: float | None = None
     workflow_route_consistency_rate: float | None = None
     banner_coverage: float | None = None
+    skills_avaliadas: int = 0
+    skills_redundantes: int = 0
+    skills_sem_cobertura: int = 0
+    mean_skill_delta_utility: float | None = None
 
 
 @dataclass(frozen=True)
@@ -161,6 +172,27 @@ class ColisaoWorkflow:
     workflows: tuple[str, ...]
     tipo: Literal["exata", "substring", "gatilho_aresta"]
     edges: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class MetricaSkillAB:
+    skill_name: str
+    casos: int
+    passed: int
+    redundant_cases: int
+    mean_baseline_score: float
+    mean_treatment_score: float
+    mean_delta_utility: float
+    min_delta_utility: float
+    redundant: bool
+    missing_clauses: tuple[str, ...] = ()
+    triggered_antipatterns: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class SkillsOrfas:
+    sem_cobertura_ab: tuple[str, ...] = ()
+    uncoverable: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -214,6 +246,9 @@ class DiagnosticoAssertividade:
     por_workflow: tuple[MetricaWorkflow, ...] = ()
     matriz_confusao_workflow: dict[str, dict[str, int]] = field(default_factory=dict)
     colisoes_workflow: tuple[ColisaoWorkflow, ...] = ()
+    skill_ab_run_id: str | None = None
+    por_skill_ab: tuple[MetricaSkillAB, ...] = ()
+    skills_orfas: SkillsOrfas = field(default_factory=SkillsOrfas)
 
 
 def _r6(valor: float) -> float:
@@ -224,6 +259,91 @@ def _div_segura(num: int | float, den: int | float) -> float | None:
     if den <= 0:
         return None
     return _r6(float(num) / float(den))
+
+
+def _parse_json_str_list(raw: Any) -> tuple[str, ...]:
+    if isinstance(raw, (list, tuple)):
+        return tuple(str(x) for x in raw if str(x).strip())
+    if isinstance(raw, str) and raw.strip():
+        try:
+            parsed = json.loads(raw)
+            if isinstance(parsed, list):
+                return tuple(str(x) for x in parsed if str(x).strip())
+        except Exception:  # noqa: BLE001
+            return ()
+    return ()
+
+
+def _calcular_metricas_skill_ab(
+        *,
+        skill_ab_evals: Sequence[Mapping[str, Any]],
+        skills_cobertura: Mapping[str, int] | None,
+        skills_uncoverable: Sequence[str],
+) -> tuple[tuple[MetricaSkillAB, ...], SkillsOrfas, float | None]:
+    """Agrega resultados pareados A/B por skill e identifica lacunas de cobertura."""
+    por_skill: dict[str, list[Mapping[str, Any]]] = {}
+    for item in skill_ab_evals:
+        sk = str(item.get("skill_name") or "").strip()
+        if sk:
+            por_skill.setdefault(sk, []).append(item)
+
+    metricas: list[MetricaSkillAB] = []
+    todos_deltas: list[float] = []
+    for sk in sorted(por_skill.keys()):
+        itens = sorted(
+            por_skill[sk],
+            key=lambda x: (str(x.get("case_id", "")), str(x.get("skill_eval_id", ""))),
+        )
+        n_casos = len(itens)
+        n_passed = sum(1 for x in itens if int(x.get("passed", 0)) == 1)
+        n_red = sum(1 for x in itens if int(x.get("redundant", 0)) == 1)
+        baselines = [float(x.get("baseline_score", 0.0)) for x in itens]
+        treatments = [float(x.get("treatment_score", 0.0)) for x in itens]
+        deltas = [float(x.get("delta_utility", 0.0)) for x in itens]
+        min_deltas = [float(x.get("min_delta_utility", 0.05)) for x in itens]
+        todos_deltas.extend(deltas)
+
+        mean_base = _r6(sum(baselines) / n_casos)
+        mean_treat = _r6(sum(treatments) / n_casos)
+        mean_delta = _r6(sum(deltas) / n_casos)
+        min_delta = _r6(max(min_deltas) if min_deltas else 0.05)
+
+        missing_set: set[str] = set()
+        anti_set: set[str] = set()
+        for x in itens:
+            missing_set.update(_parse_json_str_list(x.get("missing_clauses_json") or x.get("missing_clauses")))
+            anti_set.update(_parse_json_str_list(x.get("triggered_anti_json") or x.get("triggered_antipatterns")))
+
+        is_redundant = (n_red > 0) or (mean_delta < min_delta)
+        metricas.append(
+            MetricaSkillAB(
+                skill_name=sk,
+                casos=n_casos,
+                passed=n_passed,
+                redundant_cases=n_red,
+                mean_baseline_score=mean_base,
+                mean_treatment_score=mean_treat,
+                mean_delta_utility=mean_delta,
+                min_delta_utility=min_delta,
+                redundant=is_redundant,
+                missing_clauses=tuple(sorted(missing_set)),
+                triggered_antipatterns=tuple(sorted(anti_set)),
+            )
+        )
+
+    avaliadas_set = {m.skill_name for m in metricas}
+    sem_cobertura: list[str] = []
+    if skills_cobertura:
+        for sk_name, qtd in sorted(skills_cobertura.items()):
+            if int(qtd) <= 0 and sk_name not in avaliadas_set:
+                sem_cobertura.append(sk_name)
+
+    orfas_sk = SkillsOrfas(
+        sem_cobertura_ab=tuple(sorted(set(sem_cobertura))),
+        uncoverable=tuple(sorted(set(str(s) for s in skills_uncoverable if str(s).strip()))),
+    )
+    mean_global_delta = _r6(sum(todos_deltas) / len(todos_deltas)) if todos_deltas else None
+    return tuple(metricas), orfas_sk, mean_global_delta
 
 
 def _detectar_colisoes_estaticas(rotas: Sequence[RotaGrafo]) -> tuple[ColisaoKws, ...]:
@@ -260,7 +380,7 @@ def _detectar_colisoes_estaticas(rotas: Sequence[RotaGrafo]) -> tuple[ColisaoKws
                 edges_sub.add(eid_l)
                 paras_sub.add(para_l)
             elif len(kw_longa) > len(kw_curta) and (
-                f" {kw_curta} " in f" {kw_longa} " or kw_curta in kw_longa
+                    f" {kw_curta} " in f" {kw_longa} " or kw_curta in kw_longa
             ):
                 tem_superstring = True
                 edges_sub.add(eid_l)
@@ -281,8 +401,8 @@ def _casa_padroes(rota: str, padroes: Sequence[str]) -> bool:
 
 
 def _detectar_colisoes_workflow(
-    workflows: Sequence[WorkflowGrafo],
-    rotas: Sequence[RotaGrafo],
+        workflows: Sequence[WorkflowGrafo],
+        rotas: Sequence[RotaGrafo],
 ) -> tuple[ColisaoWorkflow, ...]:
     """Detecta colisoes entre gatilhos de workflows distintos e entre gatilho x keyword de aresta incoerente."""
     colisoes: list[ColisaoWorkflow] = []
@@ -339,8 +459,8 @@ def _detectar_colisoes_workflow(
 
 
 def _calcular_metricas_workflow(
-    avaliacoes: Sequence[dict[str, Any]],
-    snapshot: GrafoSnapshot,
+        avaliacoes: Sequence[dict[str, Any]],
+        snapshot: GrafoSnapshot,
 ) -> tuple[
     tuple[MetricaWorkflow, ...],
     dict[str, dict[str, int]],
@@ -437,9 +557,9 @@ def _calcular_metricas_workflow(
 
 
 def _analisar_divergencia_router_md(
-    snapshot: GrafoSnapshot,
-    router_md_texto: str,
-    rotas_observadas: set[str],
+        snapshot: GrafoSnapshot,
+        router_md_texto: str,
+        rotas_observadas: set[str],
 ) -> DivergenciaRouterMd:
     texto_lower = (router_md_texto or "").lower()
     paras_validos = sorted({r.para for r in rotas_validas(snapshot)})
@@ -463,7 +583,7 @@ def _analisar_divergencia_router_md(
 
     return DivergenciaRouterMd(
         nos_nao_citados=tuple(sorted(nos_nao_citados)),
-        citados_fora_do_grafo=tuple(citados_fora),
+        citados_fora_do_grafo=tuple(sorted(citados_fora)),
         rotas_fantasma=tuple(fantasmas),
     )
 
@@ -495,12 +615,12 @@ _SugBruta = tuple[str, Literal["alta", "media", "baixa"], str, str, tuple[str, .
 
 
 def _sugestoes_workflow(
-    *,
-    snapshot: GrafoSnapshot,
-    colisoes: Sequence[ColisaoWorkflow],
-    metricas: Sequence[MetricaWorkflow],
-    pids: dict[str, list[str]],
-    min_support: int,
+        *,
+        snapshot: GrafoSnapshot,
+        colisoes: Sequence[ColisaoWorkflow],
+        metricas: Sequence[MetricaWorkflow],
+        pids: dict[str, list[str]],
+        min_support: int,
 ) -> list[_SugBruta]:
     """Gera SUG-WF-* deterministicas em ordem estavel de codigo e ancora (secao 4)."""
     graph = ".github/agents/routing-graph.yaml"
@@ -601,19 +721,100 @@ def _sugestoes_workflow(
     return saida
 
 
+def _sugestoes_skill_ab(
+        *,
+        metricas_skill: Sequence[MetricaSkillAB],
+        skills_orfas: SkillsOrfas,
+        skill_ab_evals: Sequence[Mapping[str, Any]],
+) -> list[_SugBruta]:
+    """Gera sugestoes acionaveis (HITL) para skills redundantes ou sem cobertura A/B (P5)."""
+    saida: list[_SugBruta] = []
+    cases_por_skill: dict[str, list[str]] = {}
+    for ev in skill_ab_evals:
+        sk = str(ev.get("skill_name") or "").strip()
+        cid = str(ev.get("case_id") or "").strip()
+        if sk and cid and int(ev.get("redundant", 0)) == 1:
+            cases_por_skill.setdefault(sk, []).append(cid)
+
+    for m in metricas_skill:
+        if m.redundant:
+            detalhe_extra = ""
+            if m.missing_clauses:
+                detalhe_extra += f" Clausulas ausentes no tratamento: {list(m.missing_clauses)}."
+            if m.triggered_antipatterns:
+                detalhe_extra += f" Antipadrao disparado: {list(m.triggered_antipatterns)}."
+            evidencias = tuple(sorted(set(cases_por_skill.get(m.skill_name, [])))[:5])
+            saida.append(
+                (
+                    "SUG-SKILL-REDUNDANT",
+                    "media",
+                    f".github/skills/{m.skill_name}/SKILL.md",
+                    f"skill:{m.skill_name}",
+                    evidencias,
+                    (
+                        f"Skill '{m.skill_name}' redundante (delta_utility medio={m.mean_delta_utility:.6f} < "
+                        f"min_delta_utility={m.min_delta_utility:.6f}); enxugar instrucoes ja cobertas pelo modelo "
+                        f"base ou tornar regras verificaveis.{detalhe_extra}"
+                    ),
+                    "SKILL_UTILITY",
+                )
+            )
+
+    uncov_set = set(skills_orfas.uncoverable)
+    for sk_sem_cov in skills_orfas.sem_cobertura_ab:
+        if sk_sem_cov in uncov_set:
+            continue
+        saida.append(
+            (
+                "SUG-SKILL-COVERAGE-GAP",
+                "baixa",
+                "tests/evals/skill_ab_cases.yaml",
+                f"skill:{sk_sem_cov}",
+                (),
+                (
+                    f"Skill '{sk_sem_cov}' catalogada em .github/skills/ sem casos pareados A/B; "
+                    "adicionar caso em tests/evals/skill_ab_cases.yaml ou executar --skill-seeding gaps."
+                ),
+                "COVERAGE_GAP",
+            )
+        )
+
+    for sk_uncov in skills_orfas.uncoverable:
+        saida.append(
+            (
+                "SUG-SKILL-UNCOVERABLE",
+                "baixa",
+                f".github/skills/{sk_uncov}/SKILL.md",
+                f"skill:{sk_uncov}",
+                (),
+                (
+                    f"Skill '{sk_uncov}' sem clausulas normativas extrativeis (OBRIGATORIO/MUST/`codigo`/R-XXX); "
+                    "explicitar criterios verificaveis ou cadastrar caso manual em skill_ab_cases.yaml."
+                ),
+                "COVERAGE_GAP",
+            )
+        )
+
+    return saida
+
+
 def diagnosticar_avaliacao(
-    *,
-    eval_run_id: str,
-    run_info: dict[str, Any] | None,
-    avaliacoes: Sequence[dict[str, Any]],
-    snapshot: GrafoSnapshot,
-    router_md_texto: str,
-    router_agent_sha256: str,
-    golden_seeds: Sequence[GoldenSeed] = (),
-    golden_set_sha256: str = "",
-    min_support: int = 2,
+        *,
+        eval_run_id: str,
+        run_info: dict[str, Any] | None,
+        avaliacoes: Sequence[dict[str, Any]],
+        snapshot: GrafoSnapshot,
+        router_md_texto: str,
+        router_agent_sha256: str,
+        golden_seeds: Sequence[GoldenSeed] = (),
+        golden_set_sha256: str = "",
+        min_support: int = 2,
+        skill_ab_evals: Sequence[Mapping[str, Any]] = (),
+        skill_ab_run_id: str | None = None,
+        skills_cobertura: Mapping[str, int] | None = None,
+        skills_uncoverable: Sequence[str] = (),
 ) -> DiagnosticoAssertividade:
-    """Executa o oraculo deterministico offline cruzando avaliacoes, grafo e agent-router.agent.md."""
+    """Executa o oraculo deterministico offline cruzando avaliacoes, grafo, agent-router.agent.md e skills A/B."""
     if run_info is None or str(run_info.get("kind", "")) != "eval":
         raise SynthEvalRunInvalidoError(
             f"Run '{eval_run_id}' inexistente ou nao eh do tipo 'eval'."
@@ -744,6 +945,13 @@ def diagnosticar_avaliacao(
     por_wf, matriz_wf, agg_wf, pids_wf = _calcular_metricas_workflow(avs_ordenadas, snapshot)
     macro_f1_wf = agg_wf["macro_f1"]
 
+    por_skill_ab, skills_orfas, mean_skill_delta = _calcular_metricas_skill_ab(
+        skill_ab_evals=skill_ab_evals,
+        skills_cobertura=skills_cobertura,
+        skills_uncoverable=skills_uncoverable,
+    )
+    n_skills_redundantes = sum(1 for m in por_skill_ab if m.redundant)
+
     resumo = ResumoDiagnostico(
         total_avaliacoes=total_avaliacoes,
         acuracia_global=_div_segura(total_passed, total_avaliacoes) or 0.0,
@@ -753,6 +961,10 @@ def diagnosticar_avaliacao(
         workflow_accuracy=agg_wf["accuracy"],
         workflow_route_consistency_rate=agg_wf["consistency"],
         banner_coverage=agg_wf["banner_coverage"],
+        skills_avaliadas=len(por_skill_ab),
+        skills_redundantes=n_skills_redundantes,
+        skills_sem_cobertura=len(skills_orfas.sem_cobertura_ab),
+        mean_skill_delta_utility=mean_skill_delta,
     )
 
     matriz_ordenada: dict[str, dict[str, int]] = {
@@ -884,6 +1096,14 @@ def diagnosticar_avaliacao(
             min_support=min_support,
         )
     )
+    sugestoes_brutas.extend(
+        _sugestoes_skill_ab(
+            metricas_skill=por_skill_ab,
+            skills_orfas=skills_orfas,
+            skill_ab_evals=skill_ab_evals,
+        )
+    )
+
     sugestoes_ordenadas: list[SugestaoAcionavel] = []
     for idx, item in enumerate(sugestoes_brutas, start=1):
         cod, sev, alvo_arq, alvo_anc, evs, prop, cat = item
@@ -900,7 +1120,10 @@ def diagnosticar_avaliacao(
             )
         )
 
-    diag_seed = f"{eval_run_id}:{snapshot.sha256}:{router_agent_sha256}:{golden_set_sha256}"
+    diag_seed = (
+        f"{eval_run_id}:{skill_ab_run_id or ''}:{snapshot.sha256}:"
+        f"{router_agent_sha256}:{golden_set_sha256}"
+    )
     diag_id = "diag-" + hashlib.sha256(diag_seed.encode("utf-8")).hexdigest()[:12]
 
     return DiagnosticoAssertividade(
@@ -924,4 +1147,7 @@ def diagnosticar_avaliacao(
         por_workflow=por_wf,
         matriz_confusao_workflow=matriz_wf,
         colisoes_workflow=colisoes_wf,
+        skill_ab_run_id=skill_ab_run_id,
+        por_skill_ab=por_skill_ab,
+        skills_orfas=skills_orfas,
     )

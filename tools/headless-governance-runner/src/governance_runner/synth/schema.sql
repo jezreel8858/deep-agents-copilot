@@ -1,4 +1,4 @@
--- Schema SQLite v3 para o pipeline de geração e avaliação sintética (synth-*).
+-- Schema SQLite v4 para o pipeline de geração e avaliação sintética (synth-*).
 -- Aplicado via migrar_conexao() sem executescript().
 
 PRAGMA foreign_keys = ON;
@@ -8,11 +8,11 @@ CREATE TABLE IF NOT EXISTS schema_meta (
   key   TEXT PRIMARY KEY,
   value TEXT NOT NULL
 );
-INSERT OR IGNORE INTO schema_meta (key, value) VALUES ('schema_version', '3');
+INSERT OR IGNORE INTO schema_meta (key, value) VALUES ('schema_version', '4');
 
 CREATE TABLE IF NOT EXISTS synth_runs (
   run_id                 TEXT PRIMARY KEY,
-  kind                   TEXT NOT NULL CHECK (kind IN ('generate','eval','export','promote')),
+  kind                   TEXT NOT NULL CHECK (kind IN ('generate','eval','export','promote','skill_ab')),
   parent_run_id          TEXT REFERENCES synth_runs(run_id),
   started_at             TEXT NOT NULL,
   finished_at            TEXT,
@@ -86,6 +86,30 @@ CREATE TABLE IF NOT EXISTS synth_evaluations (
 CREATE INDEX IF NOT EXISTS ix_eval_failed
   ON synth_evaluations(passed, run_id);
 
+CREATE TABLE IF NOT EXISTS synth_skill_ab_evals (
+  skill_eval_id          TEXT PRIMARY KEY,
+  run_id                 TEXT NOT NULL REFERENCES synth_runs(run_id),
+  case_id                TEXT NOT NULL,
+  skill_name             TEXT NOT NULL,
+  skill_sha256           TEXT,
+  mode                   TEXT NOT NULL DEFAULT 'offline' CHECK (mode IN ('offline','sdk')),
+  baseline_score         REAL NOT NULL,
+  treatment_score        REAL NOT NULL,
+  delta_utility          REAL NOT NULL,
+  min_delta_utility      REAL NOT NULL DEFAULT 0.05,
+  redundant              INTEGER NOT NULL CHECK (redundant IN (0,1)),
+  passed                 INTEGER NOT NULL CHECK (passed IN (0,1)),
+  missing_clauses_json   TEXT NOT NULL DEFAULT '[]',
+  triggered_anti_json    TEXT NOT NULL DEFAULT '[]',
+  latency_ms             INTEGER,
+  premium_requests       INTEGER NOT NULL DEFAULT 0,
+  created_at             TEXT NOT NULL,
+  UNIQUE (run_id, case_id)
+);
+
+CREATE INDEX IF NOT EXISTS ix_skill_ab_skill_name
+  ON synth_skill_ab_evals(skill_name, created_at);
+
 CREATE TABLE IF NOT EXISTS synth_exports (
   export_id              TEXT PRIMARY KEY,
   prompt_id              TEXT NOT NULL REFERENCES synth_prompts(prompt_id),
@@ -137,4 +161,4 @@ CREATE TABLE IF NOT EXISTS synth_diagnostics (
   n_suggestions          INTEGER NOT NULL DEFAULT 0
 );
 
-PRAGMA user_version = 3;
+PRAGMA user_version = 4;
