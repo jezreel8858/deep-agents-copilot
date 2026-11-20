@@ -1,10 +1,14 @@
-"""Pipeline Unificado Factory -> Eval -> Audit (Toolsmith CLI — P6).
+"""Pipeline Unificado Factory -> Eval -> Audit (Toolsmith CLI — P5/P6/P8).
 
 Encadeia em uma única execução determinística:
 1. Sync & Paridade de Protocolo (`python -m tools.agent_protocol_sync --check`)
 2. Sync & Paridade de Catálogos (`python -m tools.governance_sync --check`)
 3. Audit Estrutural & Orçamento R-066 (`pytest tests/governance_audit/ -q`)
 4. Evals de Roteamento & Fluxo Operacional (`pytest tests/operational_flow/ -q`)
+
+Modo `--core`: executa verificação rápida de paridade de catálogo + guardas
+determinísticos de P1–P8 (Stop-Hook, Plan-Drift, Audit/Harvest, Skill A/B Eval,
+Toolsmith CLI e Exportador Multi-Runtime).
 """
 
 from __future__ import annotations
@@ -146,7 +150,7 @@ def run_toolsmith_pipeline(
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Pipeline Unificado Factory -> Eval -> Audit (Toolsmith CLI - P6)."
+        description="Pipeline Unificado Factory -> Eval -> Audit (Toolsmith CLI - P5/P6/P8)."
     )
     parser.add_argument(
         "--repo-root",
@@ -157,7 +161,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--core",
         action="store_true",
-        help="Executa apenas o nucleo rapido (Catalog Sync + Toolsmith/Bundles/Skill A/B/Stop-Hook Guards).",
+        help="Executa apenas o nucleo rapido (Catalog Sync + Guardas P1-P8).",
     )
     parser.add_argument(
         "--fail-fast",
