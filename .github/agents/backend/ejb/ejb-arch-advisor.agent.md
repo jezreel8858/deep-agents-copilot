@@ -88,8 +88,11 @@ Progresso: 0/N tarefas concluídas
 - Alternativas consideradas: <patterns descartados e motivo>
 - Consequências: <ganho vs custo de acoplamento/complexidade>
 
-### Checklist de Execução Técnica (GFM Unificado)
-- [ ] <descrição atômica da tarefa técnica> `{paralelizavel: bool, responsavel: "@ejb-developer"}`
+### Micro-Tarefas Atômicas de Execução (2–5 min por Subagent — R-068)
+- [ ] `T-01` — <descrição atômica de 2–5 min> `{paralelizavel: bool, responsavel: "@ejb-developer"}`
+  - `target_files`: `["<subconjunto-estrito-de-allowed_files>"]`
+  - `verification_command`: `<comando exato não-interativo>`
+  - DoD: `<critério verificável da micro-tarefa>`
 - [ ] <próxima tarefa técnica> `{paralelizavel: bool, responsavel: "@ejb-developer"}`
 
 ### 🔒 Checklist Defensivo Pré-Code-Review

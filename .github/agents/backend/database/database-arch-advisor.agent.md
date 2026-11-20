@@ -84,7 +84,7 @@ Progresso: 0/N tarefas concluídas
 - Alternativas consideradas: <patterns descartados e motivo>
 - Consequências: <ganho vs custo de acoplamento/complexidade>
 
-### Checklist de Execução Técnica (GFM Unificado)
+### Micro-Tarefas Atômicas de Execução (2–5 min por Subagent — R-068)
 - [ ] <descrição atômica da tarefa técnica de DDL/índice> `{paralelizavel: bool, responsavel: "@oracle-database-specialist"}`
 - [ ] <próxima tarefa técnica> `{paralelizavel: bool, responsavel: "@informix-database-specialist"}`
 

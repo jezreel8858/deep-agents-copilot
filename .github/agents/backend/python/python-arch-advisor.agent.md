@@ -1,6 +1,6 @@
 ---
 name: python-arch-advisor
-version: "2.0.0"
+version: "2.1.0"
 description: >-
   Especialista em arquitetura Python Backend corporativa (FastAPI, Flask, Django, Pydantic, SQLAlchemy) e ferramental/testes Python do repositório —
   Clean Architecture, design de APIs assíncronas/síncronas, tipagem estrita PEP 484/mypy, planejamento técnico de implementação e estratégia de testes (pytest)
@@ -64,11 +64,11 @@ Plano de Modernização e Próximos Passos:
 ```
 
 ### Modos de Operação do Gate 2 de Implementação (R-064)
-- **Modo Emitir Plano Completo (Tier `full`)**: Acionado em demandas complexas (>3 arquivos, >1 camada, schema/DDL de banco, auth/segurança, nova dependência). Produz arquitetura técnica completa, decomposição de tarefas e allowlist de arquivos.
-- **Modo Validar Delta / Plano Mínimo (Tier `light`)**: Acionado em correções cirúrgicas (diff em 1 frase, ≤20 linhas, 1 arquivo, 1 camada, hotfix). No `WORKFLOW-BUG-FIX`, consome o plano de RCA do `@bug-triage` (`docs/plans/bug-triage`) como insumo e emite delta validado de 1 parágrafo com allowlist de arquivos.
+- **Modo Emitir Plano Completo (Tier `full`)**: Acionado em demandas complexas (>3 arquivos, >1 camada, schema/DDL de banco, auth/segurança, nova dependência). Produz arquitetura técnica completa, decomposição em micro-tarefas atômicas (`T-01..T-NN` de 2–5 min) e allowlist de arquivos.
+- **Modo Validar Delta / Plano Mínimo (Tier `light`)**: Acionado em correções cirúrgicas (diff em 1 frase, ≤20 linhas, 1 arquivo, 1 camada, hotfix). No `WORKFLOW-BUG-FIX`, consome o plano de RCA do `@bug-triage` (`docs/plans/bug-triage`) como insumo e emite delta validado com micro-tarefa `T-01` e allowlist de arquivos.
 - **Aprovação Humana Obrigatória**: O frontmatter inicia em `status: draft` e só transita para `status: approved` após aprovação humana via `ask_questions`. O executor só recebe o despacho após esta aprovação.
 
-### Template de Plano de Implementação Técnica (R-064)
+### Template de Plano de Implementação Técnica (R-064 / R-068)
 
 ```markdown
 ---
@@ -92,9 +92,15 @@ Progresso: 0/N tarefas concluídas
 - Alternativas consideradas: <patterns descartados e motivo>
 - Consequências: <ganho vs custo de acoplamento/complexidade>
 
-### Checklist de Execução Técnica (GFM Unificado)
-- [ ] <descrição atômica da tarefa técnica> `{paralelizavel: bool, responsavel: "@python-developer"}`
-- [ ] <próxima tarefa técnica> `{paralelizavel: bool, responsavel: "@python-developer"}`
+### Micro-Tarefas Atômicas de Execução (2–5 min por Subagent — GFM Unificado)
+- [ ] `T-01` — <descrição atômica de 2–5 min> `{paralelizavel: bool, responsavel: "@python-developer"}`
+  - `target_files`: `["<subconjunto-estrito-de-allowed_files>"]`
+  - `verification_command`: `<comando exato não-interativo, ex.: bash scripts/dev/py-test.sh tests/unit/test_x.py>`
+  - DoD: `<critério verificável da micro-tarefa>`
+- [ ] `T-02` — <próxima micro-tarefa atômica de 2–5 min> `{paralelizavel: bool, responsavel: "@python-test-engineer"}`
+  - `target_files`: `["<subconjunto-estrito-de-allowed_files>"]`
+  - `verification_command`: `<comando exato não-interativo>`
+  - DoD: `<critério verificável da micro-tarefa>`
 
 ### 🔒 Checklist Defensivo Pré-Code-Review
 - [ ] Sanitização e validação de inputs em todas as bordas expostas
@@ -112,7 +118,7 @@ Progresso: 0/N tarefas concluídas
   - `author` (`"@python-arch-advisor"` — autor intelectual real do plano, mesmo quando persistido via `@docs-engineer`)
   - `plan_type` (`"implementation"` ou `"architecture"` em análises arquiteturais)
   - `created_at` (`"AAAA-MM-DD"`)
-  - `allowed_files` (lista explícita de paths/globs autorizados para modificação na fase executora)
+  - `allowed_files` (lista explícita de paths/globs autorizados para modificação na fase executora, igual à união dos `target_files` das micro-tarefas `T-01..T-NN`)
   - `related-planning-doc` (caminho do plano de Gate 1 em `docs/plans/<tipo>/` ou `"N/A — plano raiz"`)
 - **Subpasta Canônica Alvo**: `docs/plans/implementation/` (padrão `docs/plans/implementation/<AAAAMMDD-HHMMSS>-<workflow>-<slug>.md` e `docs/plans/architecture/` para `plan_type: architecture`), elaborando o Plano de Implementação e Testes (modo `full` ou `light` conforme R-064) tanto para código de aplicação Python quanto para ferramental/testes Python do repositório (`tools/**/*.py`, `scripts/**/*.py`, `tests/**/*.py`, incluindo `tests/governance_audit/**/*.py`).
 - **Vinculação Obrigatória em Demandas Híbridas de Governança (`related-planning-doc`)**: Quando a demanda for oriunda de um plano híbrido de governança (`docs/plans/governance/<arquivo>.md`, ex.: R-055 Q3 ou `tools/**/*.py`), o `@python-arch-advisor` atua no 1º passo do `@python-router` e DEVE preencher `related-planning-doc` (e `parent_plan_ref` no envelope OTel) apontando para o plano de governança aprovado em `docs/plans/governance/`, detalhando o contrato técnico e os casos de teste antes da execução no 2º passo por `@python-developer` e/ou `@python-test-engineer`.

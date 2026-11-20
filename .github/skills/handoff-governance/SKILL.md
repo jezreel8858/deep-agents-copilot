@@ -127,7 +127,7 @@ Orquestrador Raiz despacha o downstream UMA ÚNICA VEZ:
    - `@binding-initializer` (R-034) para inicialização obrigatória de contexto ausente.
 3. **Salvaguarda no Orquestrador**: Quando o orquestrador raiz recebe o retorno do `agent-router`, ele dispara o agente delegado exatamente uma vez. Se por qualquer anomalia a resposta já contiver o resultado final concluído pelo downstream (`Resultado do @<agent>:`), o orquestrador repassa diretamente ao usuário, sem re-invocar o mesmo agent.
 
-### 2.4) Indexação Semântica de Telemetria (FTS5 / BM25)
+### 2.4) Indexação Semântica de Telemetria (FTS5 / BM25) & Audit Log Append-Only (`JSONL` — P4)
 Para habilitar rastreabilidade sem poluição de contexto no chat, transições de handoff podem ser indexadas via `context-mode` MCP (`ctx_index`) para auditoria e recuperação semântica:
 
 | Tag | Finalidade | Gatilho / Momento |
@@ -163,6 +163,11 @@ telemetry_entry:
 > - **Garantia de Retrocompatibilidade**: todos os 4 novos campos são estritamente aditivos e opcionais. A ausência de qualquer um deles em registros indexados anteriormente não quebra consultas via `ctx_search`, relatórios de auditoria nem parsers de mineração de evals.
 >
 > **Consulta e Pruning**: consulte via `ctx_search(queries: ["[INTENT_DRIFT]"], source: "handoff-telemetry:<projeto>")`. O ciclo de vida desta telemetria segue a política de retenção episódica com segmentação por tag (conforme `agent-memory-policy`).
+
+**Trilha Append-Only Offline por Sessão (`JSONL` — P4)**:
+- Além da indexação SQLite em memória/sessão via `ctx_index`, o Stop-Hook determinístico (`tools/hooks/validate_step_receipt.js`) anexa mecanicamente cada evento validado (`approve` ou `block`/`drift_detected`) no arquivo imutável `.context/audit/<workflow_trace_id>.jsonl` (ignorado no Git via `.gitignore`).
+- **Schema mínimo por linha JSONL**: `timestamp`, `event`, `session_id`, `workflow_trace_id`, `etapa`, `task_id`, `agent`, `status`, `mode`, `plan_ref`, `files_touched_count`, `within_allowed_files`, `overflow_ref`, `decision`, `drift_detected`, `errors`.
+- **Consulta Forense Offline**: utilize `python -m tools.audit_log_query` (`--workflow-trace-id`, `--failures-only`, `--stats`) para auditar replays e alimentar `/plan-lessons-harvester`.
 
 ### 2.5) Intake Guardrail & Circuit Breaker em Runtime
 - **Intake Guardrail**: rejeitar payloads sem escopo claro ou com `call_stack_depth > 3`.

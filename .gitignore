@@ -64,6 +64,9 @@ model-profiles.local.yaml
 # Estado efêmero do circuit breaker mecânico ctx-sequence-guard (PreToolUse hook)
 .github/hooks/.state/
 
+# Estado e trilhas de auditoria append-only do harness (P1/P4 — .context/audit/*.jsonl)
+.context/
+
 .codegraph/
 .worktrees/
 .gemini/

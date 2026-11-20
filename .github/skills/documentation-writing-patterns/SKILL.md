@@ -84,9 +84,9 @@ allowed_files:
 
 Estrutura mínima obrigatória: Front-matter → Contexto/Problema → Opções consideradas → Decisão → **Alternativas Rejeitadas (obrigatória)** → **🛡️ Modelagem de Ameaças & Requisitos de Segurança (Shift-Left) (obrigatória)** → Consequências/Riscos → DoD (1 critério único de "pronto" a nível de documento).
 
-### Categoria B — Documento de IMPLEMENTAÇÃO (passos executáveis)
+### Categoria B — Documento de IMPLEMENTAÇÃO (micro-tarefas atômicas executáveis — R-068)
 
-Exemplos: Plano de Implementação, Plano de Refatoração (`refactor-planner`), Subtasks (`feature-planner`). Foco em **executar** uma decisão já aprovada. **Checklist GFM obrigatório.**
+Exemplos: Plano de Implementação (`<stack>-arch-advisor`), Plano de Refatoração (`refactor-planner`), Subtasks (`feature-planner`). Foco em **executar** uma decisão já aprovada em **micro-tarefas atômicas de 2–5 minutos** (1 subagent limpo por micro-tarefa). **Checklist GFM obrigatório.**
 
 Front-matter YAML canônico (superset da Categoria A):
 
@@ -102,17 +102,23 @@ reversibility: T1 | T2 | T3 # obrigatório, R-064 — tier predominante do docum
 ---
 ```
 
-Checklist GFM obrigatório (formato único, GFM puro `[ ]`/`[x]` — substitui convenções customizadas como `[ ] Nó N` ou `[S]`/`[P]`):
+Checklist GFM obrigatório (formato único, GFM puro `[ ]`/`[x]` com micro-tarefas atômicas `T-01..T-NN` — substitui convenções customizadas como `[ ] Nó N` ou `[S]`/`[P]`):
 
 ```markdown
-Progresso: 3/12 tarefas concluídas
+Progresso: 1/3 tarefas concluídas
 
-- [ ] <descrição atômica e rastreável da tarefa> `{paralelizavel: true, responsavel: "<stack>-developer"}`
-- [x] <tarefa já concluída> `{paralelizavel: false, responsavel: "<stack>-developer"}`
+- [x] `T-01` — <descrição atômica de 2–5 min> `{paralelizavel: false, responsavel: "<stack>-developer"}`
+  - `target_files`: `["<caminho-1>"]`
+  - `verification_command`: `<comando exato não-interativo>`
+  - DoD: `<critério verificável da micro-tarefa>`
+- [ ] `T-02` — <próxima micro-tarefa atômica de 2–5 min> `{paralelizavel: true, responsavel: "<stack>-developer"}`
+  - `target_files`: `["<caminho-2>"]`
+  - `verification_command`: `<comando exato não-interativo>`
+  - DoD: `<critério verificável da micro-tarefa>`
 ```
 
 Regras do checklist:
-- Cada item é atômico (uma única unidade de trabalho rastreável) e carrega metadado inline `{paralelizavel: bool, responsavel: "<agent>"}`.
+- Cada item é uma **micro-tarefa atômica de 2–5 minutos** (uma única unidade de trabalho executável por 1 subagent com contexto limpo, `R-068`) e carrega metadado inline `{paralelizavel: bool, responsavel: "<agent>"}`, além de `target_files` (subconjunto estrito de `allowed_files`) e `verification_command` (comando exato não-interativo).
 - GFM define nativamente só 2 estados (`[ ]`/`[x]`); estados extras (in-progress/blocked) **não são padrão** — não inventar novas notações de caixa.
 - Seção de progresso agregado ("Progresso: N/M tarefas concluídas") no topo do documento, antes do primeiro item.
 - **Alternativas Rejeitadas não é obrigatória** (documento é prescritivo, não decisório) — referenciar o doc de planejamento aprovado via `related-planning-doc` para o racional da decisão.
@@ -149,7 +155,7 @@ related-plan: docs/plans/refactor-auth-module-plan.md
 Módulo aprovado por @tech-solution-architect e plano de implementação vinculado existe.
 ```
 
-### Exemplo mínimo — doc de IMPLEMENTAÇÃO (<15 linhas)
+### Exemplo mínimo — doc de IMPLEMENTAÇÃO (<20 linhas)
 
 ```markdown
 ---
@@ -164,10 +170,14 @@ reversibility: T2
 
 # Plano de Refatoração: Módulo de autenticação
 
-Progresso: 0/3 tarefas concluídas
+Progresso: 0/2 tarefas concluídas
 
-- [ ] Extrair `AuthService` para interface `{paralelizavel: false, responsavel: "spring-boot-developer"}`
-- [ ] Atualizar testes unitários `{paralelizavel: true, responsavel: "spring-boot-test-engineer"}`
+- [ ] `T-01` — Extrair `AuthService` para interface `{paralelizavel: false, responsavel: "spring-boot-developer"}`
+  - `target_files`: `["src/main/java/com/projeto/auth/AuthService.java"]`
+  - `verification_command`: `mvn test-compile`
+- [ ] `T-02` — Atualizar testes unitários de autenticação `{paralelizavel: true, responsavel: "spring-boot-test-engineer"}`
+  - `target_files`: `["src/test/java/com/projeto/auth/AuthServiceTest.java"]`
+  - `verification_command`: `mvn test -Dtest=AuthServiceTest`
 
 ## 🔒 Checklist Defensivo Pré-Code-Review
 - [ ] Sanitização e validação de inputs em todas as fronteiras de entrada
@@ -201,7 +211,7 @@ Progresso: 0/3 tarefas concluídas
 
 1. Identificar o tipo de documento (Diátaxis) antes de escrever qualquer linha.
 2. Selecionar a estrutura mínima do artefato (tabela da seção 2).
-3. Redigir seguindo as convenções de formatação (seção 3) e nomenclatura (seção 4).
+3. Redigir seguindo as convenções de formatação (seção 3) e nomenatura (seção 4).
 4. Verificar cada afirmação técnica contra o código/fonte real antes de publicar.
 5. Rodar o checklist abaixo antes de entregar.
 
@@ -223,4 +233,3 @@ Progresso: 0/3 tarefas concluídas
 - standard-readme spec — https://github.com/richardlitt/standard-readme
 - llms.txt proposal — https://llmstxt.org
 - Anthropic, "Writing effective tools for AI agents" — https://www.anthropic.com/engineering/writing-tools-for-agents
-

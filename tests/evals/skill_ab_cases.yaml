@@ -1,0 +1,54 @@
+version: "1.0.0"
+description: "Casos de Eval A/B de Utilidade de Skills (Treatment vs. Baseline — P5)"
+cases:
+  - id: "ab-handoff-governance-01"
+    skill: "handoff-governance"
+    task: "Delegar implementação de testes unitários para @test-engineer mantendo rastreabilidade de sessão"
+    baseline_output: |
+      Vou passar a tarefa para o @test-engineer fazer os testes do OrderService.
+    required_clauses:
+      - "handoff_payload"
+      - "session_id"
+      - "receipt"
+    forbidden_antipatterns:
+      - "lazy handoff"
+    min_delta_utility: 0.50
+
+  - id: "ab-plan-conformance-01"
+    skill: "plan-conformance-patterns"
+    task: "Materializar plano de implementação em docs/plans/implementation/ antes da execução"
+    baseline_output: |
+      # Plano
+      Vamos editar os arquivos do serviço e depois testar.
+    required_clauses:
+      - "allowed_files"
+      - "plan_type"
+      - "status"
+      - "approved"
+    forbidden_antipatterns: []
+    min_delta_utility: 0.50
+
+  - id: "ab-agent-contracts-01"
+    skill: "agent-contracts"
+    task: "Encerrar etapa de execução em pipeline coordenado pelo orquestrador raiz"
+    baseline_output: |
+      Tarefa concluída com sucesso, pode seguir para a próxima etapa.
+    required_clauses:
+      - "Agente Ativo:"
+      - "receipt"
+      - "step_delta"
+      - "plan_conformance"
+    forbidden_antipatterns: []
+    min_delta_utility: 0.50
+
+  - id: "ab-batch-code-mod-01"
+    skill: "efficient-batch-code-modification"
+    task: "Refatorar 6 arquivos de governança em lote com economia de turnos"
+    baseline_output: |
+      Vou abrir o primeiro arquivo, editar, salvar e depois abrir o segundo arquivo.
+    required_clauses:
+      - "ctx_execute"
+      - "ctx_batch"
+      - "get_errors"
+    forbidden_antipatterns: []
+    min_delta_utility: 0.50

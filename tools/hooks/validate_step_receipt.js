@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Stop-Hook Mecânico de Validação de `receipt` + `step_delta`, `allowed_files` e Micro-Tarefas (R-064 / R-068).
+ * Stop-Hook Mecânico de Validação de `receipt` + `step_delta`, `allowed_files`, Micro-Tarefas e Audit Log JSONL (P1/P2/P4 — R-064 / R-068).
  * Fonte de verdade do contrato: .github/skills/agent-contracts/references/receipt-step-delta-schema.yaml
  */
 
@@ -27,12 +27,22 @@ const VALID_MODES = new Set(['mutation', 'readonly_analysis']);
 const MAX_INLINE_ITEMS = 10;
 const HARNESS_IGNORED_PREFIXES = ['.context/', '.worktrees/'];
 const BASELINE_REL_PATH = '.context/.subagent-baseline.json';
+const AUDIT_DIR_REL_PATH = '.context/audit';
 
 function normalizeRelPath(p) {
   return String(p || '')
       .trim()
       .replace(/\\/g, '/')
       .replace(/^\.\//, '');
+}
+
+function sanitizeTraceId(rawId) {
+  const cleaned = String(rawId || '')
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9._-]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  return cleaned || 'default-session';
 }
 
 function stripInlineComment(line) {
@@ -209,6 +219,30 @@ function extractReceiptFromText(text) {
   return parsed && parsed.receipt ? parsed.receipt : null;
 }
 
+function extractCorrelationFromText(text, hookInput = {}) {
+  const sessionIdMatch = text.match(/session_id\s*:\s*["']?([a-zA-Z0-9._-]+)["']?/);
+  const traceIdMatch = text.match(/workflow_trace_id\s*:\s*["']?([a-zA-Z0-9._-]+)["']?/);
+  const bannerMatch = text.match(/^Agente Ativo:\s*([a-z0-9-]+)/m);
+
+  const sessionId =
+      hookInput.session_id ||
+      hookInput.sessionId ||
+      (sessionIdMatch && sessionIdMatch[1]) ||
+      'unknown-session';
+
+  const workflowTraceId =
+      hookInput.workflow_trace_id ||
+      hookInput.workflowTraceId ||
+      (traceIdMatch && traceIdMatch[1]) ||
+      sessionId;
+
+  return {
+    session_id: String(sessionId),
+    workflow_trace_id: sanitizeTraceId(workflowTraceId),
+    banner_agent: bannerMatch ? `@${bannerMatch[1]}` : null,
+  };
+}
+
 function readMarkdownFrontmatter(filePath) {
   if (!fs.existsSync(filePath)) return null;
   const raw = fs.readFileSync(filePath, 'utf8').replace(/\r\n/g, '\n');
@@ -355,7 +389,7 @@ function validateReceiptPayload({ receipt, cwd, gitChangedFiles }) {
     errors.push(
         'R-068: Bloco YAML `receipt:` obrigatório ausente na conclusão da etapa.'
     );
-    return { valid: false, errors, driftDetected: false };
+    return { valid: false, errors, driftDetected: false, touchedCount: (gitChangedFiles || []).length };
   }
 
   for (const field of REQUIRED_RECEIPT_FIELDS) {
@@ -396,7 +430,7 @@ function validateReceiptPayload({ receipt, cwd, gitChangedFiles }) {
       errors.push(
           "R-068: 'receipt.step_delta' é obrigatório quando 'status == done'."
       );
-      return { valid: false, errors, driftDetected };
+      return { valid: false, errors, driftDetected, touchedCount: (gitChangedFiles || []).length };
     }
 
     if (!VALID_MODES.has(delta.mode)) {
@@ -517,7 +551,47 @@ function validateReceiptPayload({ receipt, cwd, gitChangedFiles }) {
     valid: errors.length === 0,
     errors,
     driftDetected,
+    touchedCount: allTouched.length,
   };
+}
+
+function appendAuditLog({ cwd, hookEvent, correlation, receipt, validationResult, decision }) {
+  try {
+    const delta = (receipt && receipt.step_delta) || {};
+    const conformance = delta.plan_conformance || {};
+    const withinAllowed =
+        validationResult.driftDetected
+            ? false
+            : typeof conformance.within_allowed_files === 'boolean'
+            ? conformance.within_allowed_files
+            : true;
+
+    const entry = {
+      timestamp: new Date().toISOString(),
+      event: hookEvent || 'stop',
+      session_id: correlation.session_id,
+      workflow_trace_id: correlation.workflow_trace_id,
+      etapa: receipt && receipt.n !== undefined ? receipt.n : null,
+      task_id: delta.task_id || null,
+      agent: (receipt && receipt.agent) || correlation.banner_agent || 'unknown',
+      status: (receipt && receipt.status) || (decision === 'approve' ? 'done' : 'blocked'),
+      mode: delta.mode || 'readonly_analysis',
+      plan_ref: (receipt && receipt.plan_ref) || 'N/A',
+      files_touched_count: validationResult.touchedCount || 0,
+      within_allowed_files: withinAllowed,
+      overflow_ref: delta.overflow_ref || 'N/A',
+      decision,
+      drift_detected: Boolean(validationResult.driftDetected),
+      errors: validationResult.errors || [],
+    };
+
+    const auditDir = path.resolve(cwd, AUDIT_DIR_REL_PATH);
+    fs.mkdirSync(auditDir, { recursive: true });
+    const auditFile = path.join(auditDir, `${correlation.workflow_trace_id}.jsonl`);
+    fs.appendFileSync(auditFile, `${JSON.stringify(entry)}\n`, 'utf8');
+  } catch {
+    // Nunca interromper execução se o disco estiver readonly
+  }
 }
 
 function extractAssistantText(hookInput) {
@@ -566,6 +640,7 @@ function runHook(rawStdin, defaultCwd = process.cwd()) {
   }
 
   const assistantText = extractAssistantText(hookInput);
+  const correlation = extractCorrelationFromText(assistantText, hookInput);
   const receipt = extractReceiptFromText(assistantText);
 
   if (eventLower === 'stop' && !receipt && /^\s*workflow_tracking\s*:/m.test(assistantText)) {
@@ -595,6 +670,14 @@ function runHook(rawStdin, defaultCwd = process.cwd()) {
   });
 
   if (result.valid) {
+    appendAuditLog({
+      cwd,
+      hookEvent: eventLower || 'stop',
+      correlation,
+      receipt,
+      validationResult: result,
+      decision: 'approve',
+    });
     if (isSubagentStop) {
       captureTurnBaseline(cwd);
     } else {
@@ -605,6 +688,15 @@ function runHook(rawStdin, defaultCwd = process.cwd()) {
       output: { decision: 'approve' },
     };
   }
+
+  appendAuditLog({
+    cwd,
+    hookEvent: eventLower || 'stop',
+    correlation,
+    receipt,
+    validationResult: result,
+    decision: 'block',
+  });
 
   const prefix = result.driftDetected
       ? 'PLAN_DRIFT_DETECTED (R-064)'
@@ -644,5 +736,6 @@ module.exports = {
   getTurnChangedFiles,
   checkAllowedFiles,
   validateReceiptPayload,
+  appendAuditLog,
   runHook,
 };

@@ -4,7 +4,7 @@
 # - .github/skills/agent-contracts/SKILL.md (§ 4.1)
 # - .github/skills/handoff-governance/SKILL.md
 
-version: "1.0.0"
+version: "1.1.0"
 contract_id: "receipt-step-delta"
 
 rules:
@@ -13,6 +13,7 @@ rules:
   overflow_key_pattern: "wf:<trace>:delta:step-<n>"
   forbid_generic_agent_slug: true        # Invariante 7: proibido 'specialist-<papel>'
   require_plan_conformance_on_mutation: true
+  require_micro_task_fields_when_decomposed: true
 
 schema:
   receipt:
@@ -73,6 +74,20 @@ schema:
           required: true
           values: ["mutation", "readonly_analysis"]
           description: "'mutation' para executores; 'readonly_analysis' para agentes Score 0"
+        task_id:
+          type: string
+          pattern: "^T-[0-9]{2,}$"
+          description: "Identificador obrigatório da micro-tarefa atômica (2-5 min) quando o plan_ref define micro-tarefas T-NN"
+          example: "T-01"
+        target_files:
+          type: list[string]
+          description: "Subconjunto estrito de allowed_files declarado para a micro-tarefa T-NN ativa"
+          example:
+            - "src/main/java/com/projeto/service/PedidoService.java"
+        verification_command_output:
+          type: string
+          description: "Saída resumida e exit code do verification_command exato da micro-tarefa T-NN"
+          example: "mvn test -Dtest=PedidoServiceTest -> EXIT 0 (4/4 passed)"
         files_modified:
           type: list[object]
           max_items: 10
@@ -95,7 +110,7 @@ schema:
           fields:
             within_allowed_files:
               type: boolean
-              description: "true se 100% dos arquivos tocados pertencem a allowed_files do plan_ref"
+              description: "true se 100% dos arquivos tocados pertencem a allowed_files (e target_files, se declarado)"
             out_of_scope_files:
               type: list[string]
               description: "Lista vazia []; qualquer item dispara Plan Drift Detection no agent-root"
@@ -106,7 +121,7 @@ schema:
         notes_for_next_step:
           type: string
           required: true
-          description: "Contexto técnico, mocks necessários ou restrições para a etapa N+1"
+          description: "Contexto técnico, mocks necessários ou restrições para a etapa/micro-tarefa N+1"
 
 examples:
   mutation:
@@ -123,6 +138,11 @@ examples:
       status: "done"
       step_delta:
         mode: "mutation"
+        task_id: "T-01"
+        target_files:
+          - "src/main/java/com/projeto/service/PedidoService.java"
+          - "src/main/java/com/projeto/dto/ReceiptDto.java"
+        verification_command_output: "mvn test -Dtest=PedidoServiceTest -> EXIT 0 (3/3 passed)"
         files_modified:
           - path: "src/main/java/com/projeto/service/PedidoService.java"
             summary: "Adicionado método processarPedido com validação de idempotência"
