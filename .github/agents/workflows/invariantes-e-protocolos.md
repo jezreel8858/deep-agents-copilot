@@ -58,9 +58,9 @@ workflow_tracking:
 
 ##### 4.2 receipt (copiado do retorno do agent)
 
-Todo agent delegado DEVE encerrar sua entrega emitindo o bloco YAML `receipt` (incluindo o sub-bloco obrigatório `step_delta` quando `status == done`) estritamente conforme o schema canônico definido em [`.github/skills/agent-contracts/references/receipt-step-delta-schema.yaml`](../../skills/agent-contracts/references/receipt-step-delta-schema.yaml).
+Todo agent delegado DEVE encerrar sua entrega emitindo o bloco YAML `receipt` (incluindo `step_delta` quando `status == done`) conforme o schema canônico em [`.github/skills/agent-contracts/references/receipt-step-delta-schema.yaml`](../../skills/agent-contracts/references/receipt-step-delta-schema.yaml).
 
-- O `agent-root` copia o bloco emitido pelo subagent para o `workflow_tracking` (`§ 4.1`) e o espelha no `context-mode` MCP (`ctx_index` `source:"wf:<trace>:state"`).
+- O `agent-root` copia o recibo para o `workflow_tracking` (`§ 4.1`) e espelha em `ctx_index` (`source:"wf:<trace>:state"`).
 - Campos raiz obrigatórios: `receipt_id`, `n`, `agent` (slug concreto do catálogo — Invariante 7), `banner_ref`, `handoff_seq`, `artefato`, `plan_ref`, `gate_resolucao`, `verdict_from_agent`, `status` (`done | failed | blocked`) e `step_delta`.
 
 ##### 4.3 Invariantes do pipeline emitido
@@ -69,12 +69,10 @@ Todo agent delegado DEVE encerrar sua entrega emitindo o bloco YAML `receipt` (i
 2. Dispensa de etapa somente pelo `@agent-router` (`skipped_by_router` + motivo); o raiz nunca dispensa, reordena ou funde etapas (`R-068`).
 3. `gate: human_explicit | none` em toda etapa; só `ask_questions` com resposta explícita abre gate.
 4. Espelho de estado: `ctx_index` `source:"wf:<trace>:state"`.
-5. **Conformidade de Escopo e Teto de Payload (`step_delta`):**
-   - Agentes *Read-Only* / *Advisory* (`Score 0`) emitem `mode: readonly_analysis` com `files_modified: []` e `files_created: []`, registrando relatórios em `artefato` e contratos/regras em `exports_and_signatures`.
-   - Limite de **10 itens** inline por lista; acima disso, gravar o inventário integral via `ctx_index` e preencher `overflow_ref`.
-   - Se `within_allowed_files: false` ou `out_of_scope_files` não estiver vazio, o `agent-root` bloqueia o avanço e retorna ao `@agent-router` (`motivo: "plan_drift_detected"`).
+5. **Escopo e Teto (`step_delta`):** Agentes `Score 0` usam `mode: readonly_analysis` (`files_modified: []`, `files_created: []`); limite de **10 itens** inline por lista (excedente em `ctx_index` `wf:<trace>:delta:step-<n>` via `overflow_ref`); `within_allowed_files: false` ou `out_of_scope_files != []` bloqueia o pipeline por `plan_drift_detected` (`R-064`).
 
 ---
+
 ## 5. Regras de Não-Desvio (Invariantes de Execução)
 
 1. **Invariante de Fast-Path**: Se a mensagem de entrada descreve um bug, erro, crash ou falha visual de layout, o `@agent-router` NUNCA deve invocar `@prompt-structuring`. O ingresso no `WORKFLOW-BUG-FIX` via `@bug-triage` é mandatório.

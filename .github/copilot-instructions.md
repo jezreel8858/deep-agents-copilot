@@ -1,148 +1,43 @@
 # Instruções de IA — Base de Governança Reutilizável
 
-## 1) Diretriz de Governança
-Este repositório provê a infraestrutura de governança corporativa de IA. As regras normativas canônicas universais residem em [`CLAUDE.md`](../CLAUDE.md) (single source of truth). Este arquivo estabelece as diretrizes operacionais de runtime para o GitHub Copilot.
+## 1) Diretriz & Separação de Camadas (R-003 / R-038 / R-043)
+- **SSOT Normativo:** Regras universais residem em [`CLAUDE.md`](../CLAUDE.md) e [`.github/agents/workflows/invariantes-e-protocolos.md`](agents/workflows/invariantes-e-protocolos.md).
+- **Governança Global (`.github/agents/`, `.github/skills/`, `.github/prompts/`):** Genérica e agnóstica a stack (`R-038`).
+- **Adapters (`.github/instructions/`):** Convenções de ecossistema (`*.instructions.md`) na raiz; bindings específicos de projeto exclusivamente em `local/` e `projects.local.yaml` (gitignored, `R-043`).
 
-### 📋 Separação Clara: Governança Global vs. Adapters
-- **Governança Global (`.github/agents/`, `.github/skills/`, `.github/prompts/`)**: Genérica, reutilizável e desacoplada de projetos e tecnologias exclusivas (R-038).
-- **Adapters e Instruções Específicas (`.github/instructions/`)**: Convenções de ecossistema (`*.instructions.md`) e bindings de projeto em `local/` (gitignored, R-043).
+## 2) Ponto de Entrada & Orquestração Plana (R-037 / R-063 / R-068)
+## Raiz = Executor de Workflow (R-068)
+- **Agent Router First (`R-037` / `R-063`):** Sem agent ativo → **triagem normal** obrigatória via `@agent-router` (`run_subagent`) antes de qualquer tool (exceto Slash Prompts com `router_bypass: utility | slash_workflow`).
+- **Orquestração Plana (`R-068`):** O `agent-root` despacha 1 etapa por vez de `ordem_execucao` — proibição de impersonação pelo Orquestrador Raiz (`R-062`), sem editar código nem pular/reordenar etapas; valida `receipt` + `step_delta` (`.github/skills/agent-contracts/references/receipt-step-delta-schema.yaml`), bloqueia `plan_drift_detected` (`R-064`) e espelha estado em `ctx_index` (`wf:<trace>:state`).
+- **Anti Sticky-Session (`R-042` / `R-052`):** Reavalie intenção a cada turno; avance `etapa_atual` se o pipeline estiver ativo ou retorne ao `@agent-router` em deriva/conclusão.
+- **Pré-condição & Fluxo Canônico (`R-006` / `R-041` / `R-050` / `R-064` / `R-065`):** Pedidos ambíguos → `@prompt-structuring` (máx. 5x) → `@agent-router`. Planos → `@docs-engineer` (`DRAFT` em `docs/plans/<tipo>/`, sem prefixos `PLAN-`/`REQ-`) → `@plan-critic` (Two-Tier Hybrid, máx. 2x/3x, Noise Budget ≤ 5) → Gate HITL (`ask_questions`).
 
-## 1.1) 🚀 **AGENT ROUTER FIRST — Ponto de Entrada Obrigatório** (R-037)
+## 3) Regras Operacionais Não Negociáveis
+- **Context Mode 100% Obrigatório (`R-008` / `R-056`):** Use `context-mode` MCP (`ctx_execute` JS `fs`/`path`, `ctx_batch`, `ctx_search`, `ctx_index`); ferramentas nativas de editor são proibidas quando `context-mode` estiver ativo. Perfis: `COMPUTE_MUTATE`, `COMPUTE_READONLY` (sem escrita), `GATHER_ONLY` (sem `ctx_execute`) e `ROUTER_EXEMPT` (**Blindagem contra Discovery de Modelos (`R-054`)** — Zero Discovery absoluto).
+- **Single-Turn Batching & Limiar >= 2 (`R-046` / `R-059`):** Aplique a **Regra do Limiar >= 2** (`Plan-Then-Batch`) e **Teto Rígido de Tool Turns (≤ 5) (`R-060`)**; no `ctx_execute`, use `language: "javascript"` (proibido `python -c` para I/O por bloqueio AMSI/Defender; máx. 1 retry com troca de estratégia em timeout).
+- **Quality Gates & Reúso (`R-027` / `R-055` / `R-057` / `R-058` / `R-066` / `R-067`):** `ask_questions` com 1ª opção `(Recomendado)` (`R-027`); **Blueprint Técnico obrigatório (`R-058`)** pré-código; proibido delegar edição manual ao usuário (`R-057`); *Progressive Disclosure* (`R-066`); **Portão de Reúso Sistêmico (`R-055`)** (Q0..Q3) e **Protocolo de Avaliação de Pertinência de Importação de Skills (`R-067`)**.
+- **Pergunte Primeiro:** Alterações destrutivas/irreversíveis ou decisões arquiteturais transversais não acordadas.
 
-**SEM EXCEÇÃO:** Toda solicitação deve começar com `@agent-router`. **Exceção Canônica — Slash Prompts Explícitos (`router_bypass: utility | slash_workflow`)**: Quando o usuário invocar explicitamente qualquer Slash Prompt (`.github/prompts/<nome>.prompt.md` com `router_bypass: utility` ou `router_bypass: slash_workflow` no frontmatter — todos os Slash Prompts exceto `/agent-router`), o comando já foi selecionado pelo usuário e possui fluxo determinístico próprio; portanto, o Orquestrador Raiz **NUNCA deve invocar `@agent-router`** na triagem inicial, devendo executar diretamente as instruções/fluxo do `.prompt.md` (ou despachar diretamente para o subagente previsto no próprio `.prompt.md`; nos prompts com `router_bypass: utility`, sem delegar a subagentes e aplicando diretamente o fallback/Compact Error Reporting R-020 definido no próprio prompt caso alguma tool MCP específica não esteja exposta no host).
+## 4) Model Routing Signal (R-021)
+Emita quando a tarefa exigir modelo **1× ou superior** (ou fan-out ≥ 10 alvos `R-021.1` / 2 falhas consecutivas de teste `R-021.2`):
+> 🧠 **Modelo recomendado: `<Claude Sonnet / GPT-5>`** — **Motivo:** `<1 linha>` | Troque o modelo e continue neste chat.
+- **Fan-Out (`R-021.1`) & Retry-Rate Escalation (`R-021.2`):** Escalone para Claude Sonnet / GPT-5 em tarefas com **>= 10 alvos/arquivos/operações** homogêneas ou após 2 falhas consecutivas do mesmo teste.
 
-```text
-Solicitação (turno N)
-    ↓
-@agent-router (triagem inicial & Health Check R-034)
-    ↓
-Agent ativo de turno anterior? (R-042)
-    ├─ Não -> triagem normal (OBRIGATÓRIO invocar @agent-router via run_subagent antes de qualquer tool — R-063; "ausência de agent ativo" NUNCA autoriza execução direta) **Exceção Canônica — Slash Prompts Explícitos (`router_bypass: utility | slash_workflow`)**: Quando o usuário invocar explicitamente qualquer Slash Prompt (`.github/prompts/<nome>.prompt.md` com `router_bypass: utility` ou `router_bypass: slash_workflow` no frontmatter — todos os Slash Prompts exceto `/agent-router`), o comando já foi selecionado pelo usuário e possui fluxo determinístico próprio; portanto, o Orquestrador Raiz **NUNCA deve invocar `@agent-router`** na triagem inicial, devendo executar diretamente as instruções/fluxo do `.prompt.md` (ou despachar diretamente para o subagente previsto no próprio `.prompt.md`; nos prompts com `router_bypass: utility`, sem delegar a subagentes e aplicando diretamente o fallback/Compact Error Reporting R-020 definido no próprio prompt caso alguma tool MCP específica não esteja exposta no host).
-    └─ Sim -> checar deriva de intenção antes de responder
-              ├─ Sem deriva -> devolve ao agent ativo (sem re-rotear)
-              └─ Deriva -> handoff (motivo: "deriva_de_intencao") -> triagem completa
-    ↓
-[CLASSIFICAÇÃO DE WORKFLOW & FAST-PATH (R-041/R-050)]
-    ├─ Fast-Path Determinístico (Bug / Refatoração / Feature / Análise / Governança)
-    │   └─ Ingressa IMEDIATAMENTE no respectivo Workflow Canônico (R-050)
-    └─ Caso Ambíguo / Feature Aberta / Pedido não estruturado
-        └─ @prompt-structuring (R-041 — loop máx. 5 iterações) → retorno obrigatório a @agent-router
-    ↓
-[Execução Sequencial no Workflow Canônico (R-050)]
-    (Planos em docs/plans/<tipo>/<AAAAMMDD-HHMMSS>-<slug>.md e docs/plans/implementation/<AAAAMMDD-HHMMSS>-<workflow>-<slug>.md com aprovação humana R-064 (`docs/plans/<tipo>/` (`feature/`, `refactor/`, `architecture/`, `implementation/`, `test-strategy/`, `bug-triage/`, `requirements/`, `governance/`), proibidos prefixos `PLAN-`/`REQ-`), revisados pré-HITL via @plan-critic (Two-Tier Hybrid Gate, Fast-Pass 1x, teto 2x/3x, Noise Budget <= 5 BLOCKER/HIGH, ESCALATED_HITL), vide invariantes-e-protocolos.md § 10)
- [Cadeia Pós-Plano R-064/R-065: retorno `motivo: "plano_materializacao_pendente"` → `@docs-engineer` (materializador único das 8 subpastas de `docs/plans/<tipo>/` em `DRAFT`) → `@plan-critic` (teto 2x R-065) → Gate HITL (`ask_questions`) → executor; Q&A consultivo puro isento].
-    ↓
-Turno seguinte muda de fase/escopo? (R-042)
-    ├─ Sim -> agent ativo retorna a @agent-router (handoff de deriva)
-    └─ Não -> agent ativo continua respondendo no workflow ("Agente Ativo: <name>") — com pipeline ativo (`emitido_por: @agent-router`) = avanço de `etapa_atual`
-```
-
-## 1.2) 📋 **Matriz de Decisão — Quando Pedir Contexto (R-006)**
-Vide [`.github/agents/agent-router.agent.md`](agents/agent-router.agent.md) § *R-006 (Pré-condições — Matriz de Decisão: Quando Pedir Contexto)*. A pré-condição de contexto é responsabilidade do roteador, priorizando o avanço downstream sempre que o agente tiver condições operacionais de agir.
-
-## 2) 🛑 Regras de Autonomia (não negociáveis)
-
-### ✅ Sempre
-- **Agent Router First (R-037)**: Toda solicitação começa com `@agent-router`. O `@agent-router` despacha a etapa 1; o raiz executa as demais, uma delegação plana por etapa (Flat Delegation — R-068). **Exceção Canônica — Slash Prompts Explícitos (`router_bypass: utility | slash_workflow`)**: Quando o usuário invocar explicitamente qualquer Slash Prompt (`.github/prompts/<nome>.prompt.md` com `router_bypass: utility` ou `router_bypass: slash_workflow` no frontmatter — todos os Slash Prompts exceto `/agent-router`), o Orquestrador Raiz NUNCA deve invocar `@agent-router` na triagem inicial, executando diretamente o fluxo/subagente previsto no próprio `.prompt.md`. Raiz declarada `@agent-root`: ver invariantes-e-protocolos.md § "Raiz declarada" (ADR-0015).
-- **Clarificação e UX de `ask_questions` (R-027)**: Em ambiguidades ou checkpoints HITL, use `ask_questions` com 1–4 perguntas/chamada, `header` ≤ 25 chars, `allowFreeformInput: true`, 2–4 opções reais e mutuamente exclusivas (Anti-Strawman), `description` obrigatório (`[Consequência prática / O que faz] + [Trade-off ou quando escolher]`) e 1ª opção `(Recomendado)` para melhor prática técnica (salvo decisão puramente de negócio) — SSOT: `structured-intake-patterns`.
-- **Re-triagem Obrigatória por Turno (R-042 — Anti Sticky-Session)**: Reavaliar intenção a cada turno; detectada deriva ou nova demanda pós-conclusão de workflow anterior (R-052 / conclusao_de_workflow_anterior), retornar imediatamente a `@agent-router` (*Anti Sticky-Agent*). Com pipeline ativo (`emitido_por: @agent-router`), continuação = avanço de `etapa_atual`; re-triagem só em deriva; reset só ao concluir (R-052).
-- **Zero Execução Direta pelo Orquestrador Raiz sem Router (R-063 — Anti Silent Bypass)**: É terminantemente proibido ao modelo do turno raiz executar diretamente tarefas técnicas sem passar por `@agent-router`; o Orquestrador Raiz deve sempre invocar o router para triagem. **Exceção Canônica — Slash Prompts Explícitos (`router_bypass: utility | slash_workflow`)**: Quando o usuário invocar explicitamente qualquer Slash Prompt (`.github/prompts/<nome>.prompt.md`, exceto `/agent-router`), o comando já foi selecionado pelo usuário e possui fluxo determinístico próprio; portanto, o Orquestrador Raiz NUNCA deve invocar `@agent-router` na triagem inicial, devendo executar diretamente as instruções/fluxo do `.prompt.md` (ou despachar diretamente para o subagente previsto no próprio `.prompt.md`). Raiz declarada `@agent-root`: ver invariantes-e-protocolos.md § "Raiz declarada" (ADR-0015).
-- **Zero Impersonation pelo Orquestrador Raiz (R-062 — Anti Root-Agent-Impersonation)**: O modelo do turno raiz nunca deve se autodenominar ou assinar como qualquer especialista antes de delegar via `run_subagent`. Raiz declarada `@agent-root`: ver invariantes-e-protocolos.md § "Raiz declarada" (ADR-0015).
-- **Precedência Mandatória e 100% Obrigatória de Context Mode (R-008, R-056)**: O uso de `context-mode` MCP (`ctx_execute`, `ctx_batch`, `ctx_search`, `ctx_index`) é 100% OBRIGATÓRIO para leitura, modificação e criação de arquivos; ferramentas nativas de editor são estritamente proibidas quando o context-mode estiver disponível (rebaixadas a fallback exclusivo de indisponibilidade). Taxonomia Canônica de 4 Perfis `context-mode`: (1) `COMPUTE_MUTATE` (executores e híbridos como `database-specialist` usam `ctx_execute` JS para leitura/mutação em lote); (2) `COMPUTE_READONLY` (7 agents Read-Only Score 0 e prompts analíticos `validate.prompt.md`/`strategic-review.prompt.md` usam `ctx_execute` JS estritamente Read-Only para parsing/agregação em memória, sendo vedado `fs.writeFileSync`/`fs.appendFileSync`/`fs.unlinkSync`/`fs.rmSync`); (3) `GATHER_ONLY` (24 agents consultivos/revisores operam exclusivamente via `ctx_batch` e `ctx_search`, sem `ctx_execute`); (4) `ROUTER_EXEMPT` (roteadores puros isentos de `context-mode`, R-054).
-- **Single-Turn MCP Batching e Protocolo Plan-Then-Batch (R-046, R-059 — Smell 2.26)**: Ao atingir o Limiar >= 2 alvos ou comandos, aplicar compulsoriamente o Protocolo Plan-Then-Batch (etapas: ENUMERAR arquivos/comandos, CONSOLIDAR em `ctx_batch` ou script iterativo `ctx_execute`, DESPACHAR & VALIDAR com `get_errors` ao final). Comandos curtos do usuário ("prosseguir", "continue") mantêm o rigor do protocolo.
-- **Teto Rígido de Tool Turns (≤ 5) e Warm Start Compulsório (R-060)**: Orçamento estrito de no máximo 5 turnos de ferramentas por ciclo de execução; inicialização silenciosa de bases pré-computadas (Warm Start) no primeiro comando e consolidação de buscas em lote com Edge Truncation.
-- **Portão de Reúso Sistêmico (R-055 / Anti-Silo Fix / Systemic Reuse Gate)**: Responder a Q0 (origem upstream/RCA, se corretivo), Q1 (peers), Q2 (templates) e Q3 (testes no pytest; artefatos declarativos via `@governance-maintainer` e código/testes Python `*.py` via `@python-router` → 1º `@python-arch-advisor` → 2º `@python-developer` / `@python-test-engineer`) antes de finalizar melhorias de governança.
-- **Blueprint Técnico e Decomposição Obrigatórios (R-058 / Anti-Premature Implementation Bypass)**: Elaboração mandatória de Blueprint Técnico antes de codificar features complexas.
-- **Progressive Disclosure Compulsória de `source_docs:` (R-066)**: Documentos de governança volumosos (> 300 linhas) devem constar sob `source_docs_lazy:`, proibida a leitura integral via `read_file`.
-- **Protocolo de Avaliação de Pertinência de Importação de Skills (R-067)**: Avaliar pertinência de skills externas antes de importação de skill no catálogo.
-
-### ⚠️ Pergunte primeiro
-- Alterações destrutivas ou irreversíveis no repositório.
-- Decisões arquiteturais com impacto transversal não acordadas previamente.
-
-### 🚫 Nunca
-- **Proibição Estrita de Terceirização de Edição Manual ao Usuário (R-057 — Anti-Manual User Delegation)**: Agentes analíticos ou read-only nunca devem delegar edição manual de código ou governança ao usuário quando houver agentes executores aptos no catálogo.
-- **Blindagem contra Discovery de Modelos (R-054)**: Zero Discovery é absoluto e inegociável; nunca vasculhe `catalog.yaml` ou `*.agent.md` em tempo de execução para descobrir modelos de terceiros.
-- **Ferramentas Nativas de Editor com Context-Mode Ativo (R-008 / R-056)**: Ferramentas de editor (`read_file`, `create_file`, `replace_string_in_file`, `insert_edit_into_file`) são estritamente proibidas quando context-mode disponível (fallback exclusivo).
-
-### 2.1) context-mode — Regras Obrigatórias de Roteamento (JetBrains Copilot / VS Code)
-
-| Operação | Ferramenta Canônica | Quando Usar |
-|---|---|---|
-| Leitura / Inspeção em lote | `ctx_execute` (com `file`) | Leitura filtrada, scripts de inspeção no sandbox |
-| Modificação multi-arquivo | `ctx_execute` (script iterativo) | Gravação em lote com verificação atômica |
-| Multi-comandos CLI em lote | `ctx_batch` | Execução paralela de múltiplos comandos shell |
-| Busca em base indexada | `ctx_search` | Consultas estruturadas na base de conhecimento |
-| Indexação documental | `ctx_index` | Armazenamento de documentações e referências |
-
-**Compact Error Reporting (R-020)**: Ao reportar erros, use o formato de 3 linhas:
-`Causa: <causa raiz>` | `Local: <arquivo:linha>` | `Ação: <procedimento corretivo>`
-
-#### Raiz = Executor de Workflow (R-068)
-* **Papel**: executo o pipeline emitido pelo `@agent-router`; não classifico, planejo, reordeno, pulo nem avalio.
-* **Estado**: `workflow_tracking` (contrato: `invariantes` §4.1), reemitido ao fim de todo turno e espelhado em `ctx_index` `source:"wf:<trace>:state"`.
-* **Loop** (só com `emitido_por: "@agent-router"`):
-  1. Ler tracking; sem pipeline → `@agent-router` (`R-063`), exceto `router_bypass` (`R-037`: o fluxo do próprio `.prompt.md` prevalece; este loop não se aplica).
-  2. Alvo = 1ª etapa em `ordem_execucao` com `status` ≠ `done`/`skipped_by_router` (deve igualar `etapa_atual`).
-  3. `gate: human_explicit` sem resposta explícita → `ask_questions` e parar.
-  4. `run_subagent` da etapa com `correlation_context` + `step_delta` (e `overflow_ref`, se `≠ "N/A"`) da etapa anterior.
-  5. Recibo (§4.2) com `step_delta` válido copiado do retorno; sem retorno ou sem `step_delta` quando `status == done` → `failed`.
-  6. Validar `step_delta.plan_conformance` (`within_allowed_files: true` e `out_of_scope_files: []`); se divergir → parar e retornar ao `@agent-router` (`motivo: "plan_drift_detected"`).
-  7. Avançar `etapa_atual` só com recibo `done` validado.
-* **Parar**: gate pendente · `failed`/`blocked` · `plan_drift_detected` ou deriva → `@agent-router` (`R-042`) · tudo `done`/`skipped_by_router` → handback (`R-052`).
-* **Proibido**: pular/reordenar/fundir etapas; `done` sem recibo ou sem `step_delta`; executar o trabalho da etapa; editar o pipeline.
-* Detalhe (lazy): `invariantes-e-protocolos.md` §4.1–4.3.
-
-## 3) 🧠 Model Routing Signal (R-021)
-
-Avalie o tipo da tarefa e emita o sinal abaixo quando exigir modelo **1× ou superior**:
-
-> 🧠 **Modelo recomendado: `<Claude Sonnet / GPT-5>`**
-> **Motivo:** `<razão em 1 linha>`
-> Troque o modelo e continue neste mesmo chat.
-
-| Tipo de tarefa | Modelo | Custo |
+| Perfil de Tarefa | Modelo | Custo |
 |---|---|---|
 | Exploração · contexto · Q&A · confirmação · MCP fetch | **Claude Haiku** | **0×** |
 | Edições pequenas · respostas rápidas | Claude Haiku | 0.33× |
-| Implementação padrão · refactor | Claude Sonnet / GPT-5 | 1× |
+| Implementação padrão · refactor · fan-out ≥ 10 alvos (`R-021.1`) | Claude Sonnet / GPT-5 | 1× |
 | Arquitetura complexa · debug crítico · decisão crítica | Claude Opus 5.5 | 3× |
-| Tarefa multi-arquivo/alto fan-out (≥ 10 alvos/arquivos/operações homogêneas) (R-021.1) | Claude Sonnet / GPT-5 / Gemini Pro | 1× |
 
-- **Nota (R-021.1 — Fan-Out)**: Tarefas com ≥ 10 alvos/arquivos/operações homogêneas devem acionar escalonamento pontual para Claude Sonnet/GPT-5 para execução em lote confiável via `ctx_batch`.
-- **Nota (R-021.2 — Retry-Rate Escalation)**: Agents executores que implementam feature e rodam testes devem emitir o sinal de Retry-Rate Escalation quando o mesmo teste falhar 2 vezes consecutivas.
+## 5) Health Check, Mapa SSOT & Formato de Saída
+- **Health Check (`R-034`):** Validar `.github/instructions/README.md`, confinamento em `local/` (`R-043`) e consulta sob demanda via `catalog.yaml` / `skills/.index.json` (`R-066`).
+- **Compact Error Reporting (`R-020`):** `Causa: <raiz>` | `Local: <arquivo:linha>` | `Ação: <correção>`.
+- **Saída Técnica (`R-028`):** Iniciar com `Agente Ativo: <nome>` seguido de: `1. Abordagem`, `2. Artefatos Modificados`, `3. Economia de Turnos`, `4. Riscos / Alinhamento`, `5. Próximo Passo`.
 
-## 4) 🏥 Health Check — Binding Context (R-034)
-
-Ao iniciar trabalho em novo repositório, o Copilot deve validar:
-- `✓ Existe: `[.github/instructions/README.md](instructions/README.md) (single source of truth de adapters)
-- `✓ Confinamento (R-034/R-043)`: Adapters genéricos residem na raiz de `.github/instructions/`; adapters e configurações de projeto residem exclusivamente em `local/` (`.github/instructions/local/` e `projects.local.yaml`), sendo expressamente gitignored.
-- **Descoberta Progressiva de Catálogo (R-066)**: Para evitar context bloat, consulte agents e skills sob demanda via [`.github/agents/catalog.yaml`](agents/catalog.yaml) e [`.github/skills/.index.json`](skills/.index.json) ou pelos comandos de inspeção (`@agent list`, `@skill list`), sem carregar listagens manuais estáticas.
-
-## 5) Binding de Adapters — Carregamento Hierárquico de Instruções
-1. **Camada 1 (Global)**: `CLAUDE.md` + `.github/copilot-instructions.md` (regras e invariantes corporativos).
-2. **Camada 2 (Stack/Adapter)**: `.github/instructions/*.instructions.md` (convenções com frontmatter `applyTo:`).
-3. **Camada 3 (Projeto Local)**: `.github/instructions/local/*.instructions.md` e `projects.local.yaml` (gitignored, R-043).
-
-## 6) Formato de Saída Padrão (R-028)
-Toda resposta técnica deve iniciar com o banner de agente ativo e estruturar-se no resumo em 5 seções:
-`Agente Ativo: <nome-do-agent>`
-1. **Abordagem**: Estratégia de resolução e padrão aplicado.
-2. **Artefatos Modificados**: Arquivos alterados/criados com caminhos exatos.
-3. **Economia de Turnos**: Operações em lote consolidadas no sandbox.
-4. **Riscos / Alinhamento**: Quality gates e invariantes preservados.
-5. **Próximo Passo**: Conclusão ou recomendação imediata.
-
-### Política Anti-Timeout, Runtime Preferencial JavaScript (`fs` nativo) e Circuit Breaker Fail-Fast (`ctx_execute` / `ctx_batch`)
-
-1. **Runtime Obrigatório `language: "javascript"` no `ctx_execute` (Anti-Defender/AMSI Hang)**:
-   - No Windows, a invocação de `python.exe` (`language: "python"` ou `python -c`) ou cadeias pesadas de subshells a partir do processo Node.js do servidor MCP `context-mode` sofre interceptação síncrona pelo Windows Defender (`MsMpEng.exe` / Behavior Monitoring / AMSI), causando bloqueios severos de I/O e timeouts (`ETIMEDOUT` / `taskkill /F /T`).
-   - Portanto, `language: "javascript"` (com módulos nativos `fs` e `path` do Node.js) é o **runtime obrigatório** no `ctx_execute` para leitura, inspeção, busca, parsing JSON/texto e modificação em lote de arquivos.
-   - É **terminantemente proibido** invocar `language: "python"`, `python -c` ou subshells aninhados para I/O de arquivos. (A execução de binários Python via `child_process` é restrita exclusivamente a ferramentas CLI do ecossistema, como `pytest` ou scripts de sincronização canônicos, nunca para ler/editar arquivos).
-2. **Higiene de Comandos em `ctx_batch`**:
-   - Os comandos shell em `ctx_batch` devem ser leves, atômicos e com escopo de diretório estritamente restrito.
-   - É **proibido** disparar `python -c` inline em lote ou varreduras recursivas irrestritas na raiz do workspace sem filtro de pasta/extensão (evitando estourar o orçamento de tempo do batch).
-3. **Política Fail-Fast & Circuit Breaker de Timeout (Máx. 1 Retry com Troca de Estratégia)**:
-   - Em caso de erro de timeout (`ETIMEDOUT`, `timed out`, `taskkill`) em `ctx_execute` ou `ctx_batch`, o agente tem **tolerância zero para repetir a mesma chamada/runtime**.
-   - É permitido no **máximo 1 retry**, contanto que haja **troca obrigatória de estratégia** (migrar de `python`/`shell` para `language: "javascript"` puro com `fs` nativo, ou dividir o lote em comandos menores/escopo restrito).
-   - Se ocorrer um **2º timeout**, o **Circuit Breaker Fail-Fast** abre imediatamente: o agente deve abortar novas tentativas de spawn, registrar a evidência e acionar o fallback canônico ou reportar o bloqueio em formato Compact Error Reporting (R-020).
+| Domínio Normativo | Fonte Única de Verdade (SSOT — R-003 / R-066) |
+|---|---|
+| Invariantes, pipeline, `workflow_tracking` e gates | `.github/agents/workflows/invariantes-e-protocolos.md` |
+| Schema canônico `receipt` + `step_delta` | `.github/skills/agent-contracts/references/receipt-step-delta-schema.yaml` |
+| Contratos de agentes & handoff/hidratação | `.github/skills/agent-contracts/SKILL.md` · `.github/skills/handoff-governance/SKILL.md` |
+| Catálogo ativo e índice de skills | `.github/agents/catalog.yaml` · `.github/skills/.index.json` |

@@ -1,7 +1,7 @@
 ---
 title: "Guia Canônico de Arquitetura e Governança — deep-agents-copilot"
-version: "1.0.0"
-date: "2026-09-14"
+version: "1.1.0"
+date: "2026-11-20"
 standard: "arc42 v8.2 / IEEE 42010 / Diátaxis Framework (Explanation & Reference)"
 status: "Living Document / Production Standard"
 ecosystem: "Multi-Agent AI Coding Governance"
@@ -20,15 +20,15 @@ O `deep-agents-copilot` é uma infraestrutura de governança reutilizável, desa
 
 ### 1.1 Metas de Negócio e Engenharia
 1. **Orquestração Agent-First Determinística**: Substituir prompts genéricos e chatbots monolíticos por uma divisão de trabalho especializada (64 Agents totais / 40 no catálogo raiz), onde cada agente possui papéis, ferramentas e restrições estritamente delimitadas.
-2. **Eficiência e Token Budget**: Eliminar context bloat e desperdício de créditos por meio do paradigma *Think-in-Code* (processamento em sandbox via `context-mode` MCP) e *Artifact Offloading*.
-3. **Resiliência e Contenção de Falhas**: Garantir que agentes nunca entrem em loops infinitos de tentativa e erro ou corrompam o workspace do desenvolvedor (Circuit Breakers com Retry Budget e Rollback Atômico).
+2. **Eficiência e Token Budget**: Eliminar context bloat e desperdício de créditos por meio do paradigma *Think-in-Code* (processamento em sandbox via `context-mode` MCP), *Progressive Disclosure* (`R-066`) e *Artifact Offloading* (`overflow_ref`).
+3. **Resiliência e Contenção de Falhas**: Garantir que agentes nunca entrem em loops infinitos de tentativa e erro ou corrompam o workspace do desenvolvedor (Circuit Breakers com Retry Budget, *Plan Drift Detection* `R-064` e Rollback Atômico).
 4. **Segurança e Menor Privilégio**: Assegurar conformidade com a taxonomia OWASP Agentic AI 2026 e aplicar zoneamento estrito de permissões MCP (separação física entre agentes de consulta e agentes de mutação de código).
 5. **Interoperabilidade Aberta**: Disponibilizar capacidades e identidades via padrão aberto A2A (*Agent-to-Agent* v1.0.0 / Linux Foundation).
 
 ### 1.2 Árvore de Qualidade Arquitetural
-- **Confiabilidade (ISO 25010 / Reliability)**: 100% de previsibilidade nas rotas através de um Grafo de Roteamento formal (`routing-graph.yaml`) e suíte de 136 testes automatizados.
+- **Confiabilidade (ISO 25010 / Reliability)**: 100% de previsibilidade nas rotas através de um Grafo de Roteamento formal (`routing-graph.yaml`), máquina de estados plana no `agent-root` (`R-068`) e suíte determinística no `pytest`.
 - **Segurança (ISO 25010 / Security)**: Zero vazamento de segredos, zero execução arbitrária fora do workflow e confinamento de privilégios.
-- **Manutenibilidade (ISO 25010 / Maintainability)**: Separação estrita de responsabilidades: Governança Global (`CLAUDE.md`), Instruções Operacionais (`copilot-instructions.md`), Adapters de Stack (`.instructions.md`) e Overlay Privado (`projects.local.yaml`).
+- **Manutenibilidade (ISO 25010 / Maintainability)**: Separação estrita de responsabilidades: Governança Global (`CLAUDE.md`), Instruções Operacionais enxutas (`copilot-instructions.md`), Adapters de Stack (`.instructions.md`) e Overlay Privado (`projects.local.yaml`).
 
 ---
 
@@ -36,10 +36,12 @@ O `deep-agents-copilot` é uma infraestrutura de governança reutilizável, desa
 
 ### 2.1 Restrições Normativas Globais
 - **R-002 / R-031 — Zero Ação Autônoma Crítica**: Proibição terminante de `git push`, `git commit` autônomos ou criação de arquivos desnecessários sem aprovação humana expressa.
-- **R-037 — Agent Router First**: Todo turno ou nova intenção deve ser avaliado pelo `@agent-router`.
+- **R-037 / R-063 — Agent Router First**: Todo turno ou nova intenção inicia no `agent-root` invocando o `@agent-router` antes de qualquer ação técnica (salvo `router_bypass` de Slash Prompts).
 - **R-042 — Re-triagem Obrigatória por Turno (Anti Sticky-Session)**: Prevenção de ancoragem em sessões antigas ou deriva de intenção silenciosa.
 - **R-043 / R-044 — Isolamento Local e Anonimização**: Dados específicos de projetos corporativos reais vivem exclusivamente em arquivos gitignored (`projects.local.yaml`), vedando commit de caminhos reais no repositório de governança.
 - **R-049 — Governança Compulsória de Terminal**: Vedada a execução de terminal sem vinculação à skill `terminal-governance` e sem o uso obrigatório de comandos não-interativos (`--no-pager`).
+- **R-064 / R-068 — Orquestração Plana, Recibo Estruturado & Plan Drift**: O `agent-root` despacha 1 etapa por vez via `run_subagent`, exige `receipt` + `step_delta` aderente ao `receipt-step-delta-schema.yaml` e bloqueia imediatamente desvios de escopo (`plan_drift_detected`).
+- **R-066 — Orçamento de Instruções (Instruction Budget)**: Prompts sempre carregados (`copilot-instructions.md`, `<execution_protocol>`, `agent-root.agent.md`) permanecem telegráficos, delegando detalhes extensos a `source_docs_lazy:` e `references/` sob guarda determinística (`test_instruction_budget.py`).
 
 ---
 
@@ -53,6 +55,7 @@ flowchart TB
     end
 
     subgraph DeepAgents["deep-agents-copilot (Governança Central)"]
+        Root["agent-root\n(Orquestrador Plano — R-068)"]
         Router["@agent-router\n(Triagem & Health Check R-034)"]
         Graph["Grafo de Roteamento\n(routing-graph.yaml — 40 nós)"]
         Workflows["10 Workflows Canônicos\n(Máquinas de Estados)"]
@@ -67,13 +70,15 @@ flowchart TB
     end
 
     User <-->|Prompts & Comandos| Copilot
-    Copilot <-->|Delegação Plana| Router
+    Copilot <-->|Turno Raiz| Root
+    Root <-->|Triagem Inicial / Deriva| Router
     Router -->|Consulta Nós & Arestas| Graph
-    Router -->|Engaja| Workflows
-    Workflows -->|Orquestra| Agents
+    Router -->|Emite ordem_execucao| Workflows
+    Root -->|Delegação Plana + step_delta| Agents
+    Agents -->|Retornam receipt + step_delta| Root
     Agents -->|Consomem| Skills
     Agents <-->|Inspeção & Edição Cirúrgica| LocalApps
-    Agents <-->|Processamento em Sandbox| MCP
+    Agents <-->|Processamento em Sandbox & wf:state| MCP
     Agents -.->|Descoberta via AgentCards| A2A
 ```
 
@@ -83,17 +88,17 @@ flowchart TB
 
 A arquitetura do `deep-agents-copilot` apoia-se em seis pilares estratégicos validados pela indústria:
 
-1. **Delegação Plana (*Flat Delegation*) vs. Aninhamento Profundo**:
-   - O `@agent-router` atua como classificador e supervisor de alto nível, emitindo a decisão de rota para que o orquestrador raiz despache o agente downstream em nível plano.
+1. **Delegação Plana (*Flat Delegation* — R-068) vs. Aninhamento Profundo**:
+   - O `@agent-router` atua como classificador e supervisor de alto nível, emitindo `ordem_execucao` para que o `agent-root` despache cada agente downstream em nível plano, transportando `step_delta` entre etapas consecutivas.
    - *Fundamentação*: Elimina os custos de token e o risco de cascading failures decorrentes do aninhamento recursivo (`router -> subagente -> subagente`).
 2. **Workflows Determinísticos Baseados em Máquinas de Estados**:
    - Todo ciclo de desenvolvimento segue um dos 10 Workflows Canônicos (`WORKFLOW-BUG-FIX`, `WORKFLOW-REFACTORING`, `WORKFLOW-FEATURE-DEVELOPMENT`, etc.), com transições estritas, Gate Cético Pré-HITL (`@plan-critic` / R-064) e Quality Gates formais.
-3. **Paradigma *Think-in-Code* via Sandboxing (R-008)**:
-   - Toda leitura volumosa, agregação ou análise de código acontece dentro do sandbox do `context-mode` MCP (`ctx_execute`, `ctx_search`). Apenas o sumário executivo entra na janela de conversação.
+3. **Paradigma *Think-in-Code* via Sandboxing (R-008 / R-059 / R-060)**:
+   - Toda leitura volumosa, agregação ou mutação em lote acontece dentro do sandbox do `context-mode` MCP (`ctx_execute` JS `fs`/`path`, `ctx_batch`, `ctx_search`) sob teto rígido de 5 tool turns por ciclo. Apenas o sumário executivo entra na janela de conversação.
 4. **Isolamento Físico de Execução via Git Worktrees**:
    - Para execuções concorrentes ou explorações paralelas, cada agente mutante opera em um worktree isolado (`.worktrees/<task>`), protegendo lockfiles e compilações contra concorrência destrutiva.
-5. **Context Engineering e Offloading de Artefatos**:
-   - Adoção dos 4 pilares (*Write, Select, Compress, Isolate*) e uso de referências tipadas por ponteiro/hash (`tipo: "pointer"`) para artefatos superiores a 2 KB / 50 linhas.
+5. **Context Engineering, Instruction Budget (R-066) e Claim-Check (`overflow_ref`)**:
+   - Adoção dos 4 pilares (*Write, Select, Compress, Isolate*), sincronização centralizada do `<execution_protocol>` (`tools/agent_protocol_sync/`), limite de **10 itens inline** por lista no `step_delta` (com transbordo via `ctx_index` `wf:<trace>:delta:step-<n>`) e referências tipadas por ponteiro/hash (`tipo: "pointer"`) para artefatos superiores a 2 KB / 50 linhas.
 6. **Alinhamento Normativo Aberto**:
    - Implementação das taxonomias internacionais de segurança (OWASP ASI01..ASI10:2026), MCP Security da NSA e especificação A2A AgentCard da Linux Foundation.
 
@@ -103,8 +108,9 @@ A arquitetura do `deep-agents-copilot` apoia-se em seis pilares estratégicos va
 
 ```mermaid
 graph TD
-    subgraph Camada1["Camada 1: Entrada e Triagem"]
-        AR["@agent-router (Roteador Universal)"]
+    subgraph Camada1["Camada 1: Orquestração Raiz, Entrada e Triagem"]
+        ROOT["agent-root (Orquestrador Plano R-068)"]
+        AR["@agent-router (Roteador Universal R-037/R-054)"]
         PS["@prompt-structuring (Loop de Refinamento R-041)"]
         BI["@binding-initializer (Health Check R-034)"]
     end
@@ -137,17 +143,18 @@ graph TD
         DOCS["@docs-engineer (Documentação .md)"]
     end
 
+    ROOT <-->|Triagem & ordem_execucao| AR
     AR -->|Ambíguo| PS
     AR -->|Binding Ausente| BI
-    AR -->|Frontend Angular| FrontendR
-    AR -->|Frontend React| ReactR
-    AR -->|Backend Spring| SpringR
-    AR -->|Backend Reativo| ReactiveR
-    AR -->|Legado EJB| EjbR
-    AR -->|Python| PythonR
-    AR -->|Legado Struts| StrutsR
-    AR -->|Banco de Dados| DbR
-    AR -->|Transversal| Camada4
+    ROOT -->|Frontend Angular| FrontendR
+    ROOT -->|Frontend React| ReactR
+    ROOT -->|Backend Spring| SpringR
+    ROOT -->|Backend Reativo| ReactiveR
+    ROOT -->|Legado EJB| EjbR
+    ROOT -->|Python| PythonR
+    ROOT -->|Legado Struts| StrutsR
+    ROOT -->|Banco de Dados| DbR
+    ROOT -->|Transversal| Camada4
 
     FrontendR & ReactR & SpringR & ReactiveR & EjbR & PythonR & StrutsR & DbR --> Camada3
 ```
@@ -156,13 +163,13 @@ graph TD
 
 | Categoria | Componente / Router | Papéis Especialistas Contidos |
 |---|---|---|
-| **Roteamento Central** | `@agent-router` | Triagem universal, Health Check (R-034), Fast-Path (R-041/R-050) |
+| **Orquestração & Roteamento Central** | `agent-root` / `@agent-router` | Orquestração plana (`R-068`), validação de `receipt` + `step_delta`, triagem universal, Health Check (`R-034`), Fast-Path (`R-041`/`R-050`) |
 | **Frontend Angular / React** | `@angular-router` / `@react-router` | angular-arch-advisor, angular-developer, angular-test-engineer, react-arch-advisor, react-developer, react-test-engineer |
 | **Backend Spring Boot** | `@spring-boot-router` | spring-boot-arch-advisor, spring-boot-developer, spring-boot-test-engineer |
 | **Backend Reativo** | `@spring-reactive-router` | spring-reactive-arch-advisor, spring-reactive-developer, spring-reactive-test-engineer |
 | **Backend Legado Java** | `@ejb-router` / `@struts-router` | Especialistas canônicos para EJB (2.x/3.x, CMT/JTA) e Struts (1.x/2.x, Actions, FormBeans) |
 | **Backend Python** | `@python-router` | python-arch-advisor, python-developer, python-test-engineer |
-| **Banco de Dados** | `@database-router` | oracle-migration-dev, oracle-plsql-expert, oracle-query-tuner, informix-migration-dev, informix-spl-expert, informix-query-tuner |
+| **Banco de Dados** | `@database-router` | database-specialist, oracle-migration-dev, oracle-plsql-expert, oracle-query-tuner, informix-migration-dev, informix-spl-expert, informix-query-tuner |
 | **Qualidade, Planos & Segurança** | Transversais | `@plan-critic`, `@security-reviewer`, `@performance-agent`, `@code-review`, `@compliance-guardrails` |
 | **Arquitetura & Grafo** | Transversais | `@codegraph-engine`, `@tech-solution-architect`, `@ddd-bounded-context-mapper`, `@adr-sentinel` |
 
@@ -183,7 +190,7 @@ Todo desenvolvimento de software é executado através de uma máquina de estado
 7. **`WORKFLOW-FRAMEWORK-MIGRATION`**: Pre-Flight Assessment com 5D e Symbol Exhaustion Gate (`@tech-solution-architect` + `@codegraph-engine` + router de origem) → Migration Phasing com Matriz De-Para → Codemod em Lote por Fase com Anti-Omission AST Validator → Paridade Funcional Dual-Verification → Baseline Quality Gate → Post-Migration Verification & Redundancy Gate (Estado 6: Tríplice Redundância com Reverse Orphan Audit, Mutation Parity e Differential Shadow Replay) com **Loop de Revisão de Qualidade** (R-050.4).
 8. **`WORKFLOW-RELEASE-READINESS`**: Verificação de contratos de API e integridade de schema → Auditoria de segurança e higiene de repositório (`@repo-hygiene-auditor`) → Geração de CHANGELOG e PR (`@pr-gatekeeper`) → Veredito de Release.
 
-### 6.2 Ciclo de Vida do Handoff e Banner Universal (R-042 / R-048)
+### 6.2 Ciclo de Vida do Handoff, Banner Universal & Contrato `receipt` + `step_delta` (R-042 / R-048 / R-068)
 
 Todo agente emite obrigatoriamente no início da resposta o banner de rastreabilidade para garantir auditoria em tempo real:
 
@@ -194,6 +201,11 @@ Workflow: <NOME-DO-WORKFLOW>
 Etapa do Workflow: <N> — <Nome da Etapa>
 Skills Carregadas: <skill-1>, <skill-2>
 ```
+
+Ao encerrar a etapa, o agente emite o bloco estruturado `receipt` + `step_delta` conforme o schema canônico [`.github/skills/agent-contracts/references/receipt-step-delta-schema.yaml`](../../.github/skills/agent-contracts/references/receipt-step-delta-schema.yaml):
+- **Paridade de Escopo:** Agentes executores (`Agency Score >= 1`) preenchem `mode: mutation` e validam `plan_conformance` (`within_allowed_files`, `out_of_scope_files` — R-064); agentes analíticos (`Score 0`) emitem `mode: readonly_analysis` com listas de mutação vazias.
+- **Teto Inline & Claim-Check (`overflow_ref`):** Cada lista de `step_delta` comporta até **10 itens inline**; lotes maiores gravam o inventário integral no `ctx_index` (`wf:<trace>:delta:step-<n>`) e referenciam a chave em `overflow_ref`.
+- **Bloqueio de Deriva:** Se `within_allowed_files == false` ou `out_of_scope_files != []`, o `agent-root` interrompe o pipeline e retorna ao `@agent-router` com `motivo: "plan_drift_detected"`.
 
 ### 6.3 Mecanismo de Circuit Breaker Stateful e Rollback
 
@@ -258,12 +270,12 @@ flowchart LR
 
 ## 8. Conceitos Transversais e Boas Práticas (arc42 §8)
 
-### 8.1 Context Engineering e Offloading de Artefatos (Anthropic 2026)
+### 8.1 Context Engineering, Instruction Budget (R-066) e Offloading de Artefatos
 - **Os 4 Pilares**:
-  1. *Write*: Instruções declarativas concisas sem prosa redundante.
-  2. *Select*: Consulta de dados pontuais via busca indexada FTS5 (`ctx_search`).
-  3. *Compress*: Compactação pós-leitura de evidências (`context-compact`).
-  4. *Isolate*: Isolamento de contexto por subagente.
+  1. *Write*: Instruções declarativas concisas sem prosa redundante, governadas por tetos rígidos (`tests/governance_audit/test_instruction_budget.py`) e sincronizadas a partir de `_execution-protocol-fragment.md`.
+  2. *Select*: Consulta de dados pontuais via busca indexada FTS5 (`ctx_search`) e carregamento sob demanda (`source_docs_lazy:`).
+  3. *Compress*: Compactação pós-leitura de evidências (`context-compact`) e limite de 10 itens inline no `step_delta` (`overflow_ref`).
+  4. *Isolate*: Isolamento de contexto por subagente com transporte explícito de `step_delta`.
 - **Regra dos 2 KB / 50 Linhas**: Artefatos que excedem esse limiar são gravados em arquivo ou indexados no context-mode e trafegam no handoff exclusivamente como ponteiro estruturado:
   ```yaml
   evidencias:
@@ -277,6 +289,11 @@ flowchart LR
 - **Single-Turn Batching**: Edições de múltiplos arquivos são enviadas em lote na mesma rodada de tool calls.
 - **Diff Cirúrgico**: Uso de 2-3 linhas de contexto exclusivo para garantir unicidade e evitar loops de re-submissão.
 - **Proteção Anti-Corrupção e Unicidade de Âncora (R-051)**: Para arquivos >200 linhas, formato `.yaml`/`.yml`/`.json` ou **Markdown estruturado** (`.agent.md`, `.instructions.md`, tabelas com entradas parecidas), é proibido usar `insert_edit_into_file` ou `replace_string_in_file` com âncoras ambíguas. O agente deve verificar a unicidade estrita da âncora em memória (`count === 1`), abortando caso haja risco de colisão (evitando o fallback de casamento aproximado/fuzzy da tool que pode corromper ou apagar blocos inteiros), e validar imediatamente a integridade estrutural pós-escrita.
+
+### 8.3 Segurança e Zoneamento de Ferramentas MCP (NSA CSI MCP Security 2026)
+- **Zona 1 (Read-Only)**: `ctx_search`, `ctx_batch` (leitura), `ast_query`. Obrigatória para agentes consultivos (`GATHER_ONLY`).
+- **Zona 2 (Mutating)**: `ctx_execute` (script JS `fs`/`path`), `replace_string_in_file`, `create_file` (fallback). Restrita a Implementers em workflows autorizados (`COMPUTE_MUTATE`).
+- **Zona 3 (Execution)**: `run_in_terminal` estritamente controlado por `terminal-governance` (R-049).
 
 ### 8.4 Visual Feedback Loop (VFL) e Paridade de UI (2026)
 Para eliminar a "cegueira visual" de testes headless (Smell 2.21), o ecossistema adota o ciclo **Visual Feedback Loop (VFL)** agnóstico de tecnologia (`frontend-visual-feedback-loop`):
@@ -293,11 +310,6 @@ Para erradicar o "drift documental" e dispensar ordens manuais do desenvolvedor 
 - **Sincronização Atômica Compulsória**: Se afirmativo, os documentos correspondentes em `docs/`, `README.md`, catálogos de componentes compartilhados e ADRs são atualizados e comitados na mesma entrega como critério de *Definition of Done (DoD)*.
 - **Distinção Normativa (R-033)**: Permanece terminantemente proibido criar arquivos `.md` especulativos ou relatórios prolixos desconectados da alteração real; a regra autoriza e exige exclusivamente a **manutenção da documentação viva existente**.
 
-### 8.3 Segurança e Zoneamento de Ferramentas MCP (NSA CSI MCP Security 2026)
-- **Zona 1 (Read-Only)**: `read_file`, `ast_query`, `grep_search`. Obrigatória para agentes consultivos.
-- **Zona 2 (Mutating)**: `replace_string_in_file`, `create_file`. Restrita a Implementers em workflows autorizados.
-- **Zona 3 (Execution)**: `run_in_terminal` estritamente controlado por `terminal-governance` (R-049).
-
 ---
 
 ## 9. Registro de Decisões Arquiteturais e Validações de Mercado (ADRs / arc42 §9)
@@ -306,9 +318,9 @@ A tabela a seguir correlaciona as principais decisões arquiteturais adotadas no
 
 | ID | Decisão Arquitetural Adotada | Problema Resolvido | Padrão / Publicação de Mercado que Valida a Decisão |
 |---|---|---|---|
-| **ADR-01** | **Orquestração Flat Delegation com Router Central (R-037/R-042)** | Loops recursivos descontrolados e consumo exponencial de tokens em subagentes aninhados. | **Anthropic (2026)**: *Agentic Coding Trends Report 2026* & *Building Effective Agents* (Recomendação de orquestrador central com despacho plano para workers especializados). |
+| **ADR-01** | **Orquestração Flat Delegation com `agent-root` & Router Central (R-037/R-042/R-068)** | Loops recursivos descontrolados e consumo exponencial de tokens em subagentes aninhados. | **Anthropic (2026)**: *Agentic Coding Trends Report 2026* & *Building Effective Agents* (Recomendação de orquestrador central com despacho plano para workers especializados). |
 | **ADR-02** | **Máquinas de Estados Finitos para Workflows (R-050)** | Imprevisibilidade e comportamento emergente caótico de agentes sem fluxo determinístico. | **LangChain / LangGraph (2025-2026)**: Paradigma de grafos cíclicos dirigidos com persistência de estado e checkpoints determinísticos. |
-| **ADR-03** | **Think-in-Code via Sandboxing Context Mode (R-008)** | Esgotamento da janela de contexto e perda de atenção por ingestão de arquivos brutos no chat. | **LangChain (2026)**: *Context Engineering Guide* & Denis Rothman (*Context Engineering for Multi-Agent Systems*, 2026). |
+| **ADR-03** | **Think-in-Code via Sandboxing Context Mode & Instruction Budget (R-008/R-066)** | Esgotamento da janela de contexto e diluição de atenção por excesso de prosa nos prompts. | **LangChain (2026)**: *Context Engineering Guide* & Denis Rothman (*Context Engineering for Multi-Agent Systems*, 2026). |
 | **ADR-04** | **Circuit Breakers com Retry Budget e Rollback Atômico** | Agentes que entram em loops infinitos tentando consertar testes quebrados sem intervenção. | **Enterprise MAS Design Patterns (2026)** & **Gartner Top Strategic Technology Trends 2026**: Contenção de falhas em cascata e circuit breakers para IA autônoma. |
 | **ADR-05** | **Isolamento de Agentes Mutantes via Git Worktrees (R-049)** | Conflito em lockfiles (`package.json`, `pom.xml`), concorrência de compilação e travas de git index. | **Augment Code & Cursor (2026)**: Arquiteturas de execução paralela de agentes em worktrees efêmeros com merge controlado. |
 | **ADR-06** | **Taxonomia OWASP Top 10 for Agentic Applications 2026** | Vulnerabilidades específicas de sistemas agênticos autônomos (ASI01 a ASI10:2026). | **OWASP GenAI Security Project (Dez/2025 - 2026)**: *OWASP Top 10 for Agentic Applications 2026* (ratificado para ASI01..ASI10). |
@@ -328,14 +340,14 @@ graph LR
         G2["G2: Router Precedents Gate (casos-roteamento.yaml)"]
         G3["G3: Testing-First Quality Gate (Red-Green TDD)"]
         G3b["G3b: Pre-HITL Skeptical Plan Gate (@plan-critic / R-064)"]
-        G4["G4: Least-Privilege MCP Tool Gate"]
+        G4["G4: Least-Privilege MCP Tool Gate & Instruction Budget (R-066)"]
         G5["G5: PR & Governance Release Gate (@pr-gatekeeper)"]
     end
 
     G1 --> G2 --> G3 --> G3b --> G4 --> G5
 ```
 
-- **Cobertura de Testes**: 100% de aprovação na suíte global de testes (`pytest`), cobrindo conformidade de smells de governança, integridade de rotas, isolamento de projetos locais, rastreabilidade de incidentes e conformidade com o schema A2A AgentCard.
+- **Cobertura de Testes**: 100% de aprovação na suíte global de testes (`pytest`), cobrindo conformidade de smells de governança, orçamento de instruções (`test_instruction_budget.py`), integridade de rotas, isolamento de projetos locais, rastreabilidade de incidentes e conformidade com o schema A2A AgentCard.
 - **Verificação Contínua de Regressão**: Toda alteração no roteador deve manter pontuação mínima e conformidade com os casos canônicos e de regressão declarados em `evals/casos-roteamento.yaml`.
 
 ---
@@ -344,17 +356,19 @@ graph LR
 
 | Risco Arquitetural | Severidade | Estratégia de Mitigação Implementada |
 |---|:---:|---|
-| **Esgotamento de Janela de Contexto (Context Bloat)** | Alta | Aplicação do limiar de 2 KB / 50 linhas para offloading de artefatos e uso obrigatório de processamento em sandbox do context-mode. |
-| **Loops de Tentativa de Correção Infinitos** | Alta | Multi-Agent Circuit Breaker desarmando em `state: OPEN` após 2 falhas consecutivas, acionando escalonamento humano obrigatório. |
-| **Divergência de Modelos entre IDEs (JetBrains vs VS Code)** | Média | Protocolo de Model Awareness no catálogo e testes agnósticos validados via IDE API e terminal neutro. |
+| **Esgotamento de Janela de Contexto (Context Bloat / Instruction Budget)** | Alta | Aplicação do limiar de 2 KB / 50 linhas para offloading de artefatos, teto de 10 itens inline no `step_delta` (`overflow_ref`), *Progressive Disclosure* (`R-066`) e sandboxing no `context-mode`. |
+| **Loops de Tentativa de Correção Infinitos** | Alta | Multi-Agent Circuit Breaker desarmando em `state: OPEN` após 2 falhas consecutivas e bloqueio automático de *Plan Drift* (`R-064`). |
+| **Divergência de Modelos entre IDEs (JetBrains vs VS Code)** | Média | Protocolo de Model Awareness no catálogo (`model-profiles.yaml`) e testes agnósticos validados via IDE API e terminal neutro. |
 | **Incompatibilidade em Ferramentas MCP Externas** | Média | Zoneamento formal de ferramentas (Zona 1/2/3) e validação estrita de schemas contra injeção de parâmetros (ASI02). |
 
 ---
 
 ## 12. Glossário Terminológico (arc42 §12)
 
-- **Agent Router**: Ponto de entrada obrigatório (R-037) que classifica a intenção do usuário e decide a rota ideal no catálogo.
-- **Flat Delegation**: Padrão de orquestração onde o router apenas declara a rota e o orquestrador raiz despacha o especialista em nível plano, sem aninhamento de subagentes.
+- **Agent Root (`agent-root`)**: Identidade raiz executora de workflow (`R-068`) que invoca o `@agent-router` para triagem, despacha 1 etapa por vez via `run_subagent`, valida `receipt` + `step_delta` e espelha o estado em `ctx_index` (`wf:<trace>:state`).
+- **Agent Router**: Ponto de entrada obrigatório (`R-037`) que classifica a intenção do usuário e decide a rota ideal no catálogo.
+- **Flat Delegation**: Padrão de orquestração onde o router apenas declara a rota e o `agent-root` despacha cada especialista em nível plano, sem aninhamento de subagentes.
+- **Step Delta (`step_delta`)**: Sub-bloco estruturado do `receipt` (`receipt-step-delta-schema.yaml`) contendo arquivos modificados/criados, assinaturas exportadas, `plan_conformance` e `overflow_ref` (claim-check para lotes > 10 itens).
 - **Fast-Path**: Atalho determinístico de roteamento que direciona pedidos claros de bugs, refatorações com alvo ou análises técnicas diretamente para a etapa 1 do workflow canônico, sem passar por `@prompt-structuring`.
 - **Fast-Chaining**: Transição imediata de um diagnóstico analítico (Etapa 3 do `WORKFLOW-TECHNICAL-ANALYSIS`) para a execução tática em `WORKFLOW-REFACTORING` ou `FEATURE-DEVELOPMENT` com transporte de estado.
 - **Typed State Bag (`workflow_state`)**: Estrutura tipada de dados compartilhada entre etapas de um workflow para preservar artefatos, hipóteses e resultados sem perda de fidelidade.
@@ -362,4 +376,3 @@ graph LR
 - **Circuit Breaker**: Mecanismo de resiliência que monitora falhas de etapas e interrompe a automação ao atingir o teto de 2 tentativas consecutivas.
 - **A2A AgentCard**: Especificação aberta padronizada pela Linux Foundation para declaração de identidade, capacidades e contratos de agentes de IA.
 - **Git Worktree Isolation**: Técnica de checkout paralelo em pastas isoladas (`.worktrees/`) para permitir que agentes mutantes alterem código sem colisão de lockfiles ou concorrência de compilação.
-

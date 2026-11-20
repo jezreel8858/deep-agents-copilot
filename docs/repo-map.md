@@ -6,15 +6,15 @@
 ---
 
 ## Metadados do Mapa
-- **Última Atualização:** 2026-09-27
-- **Versão:** v2.42.0
-- **Alinhamento Normativo:** R-015 (Atualização Atômica de Catálogo), R-037/R-040 (Roteamento), R-043 (Overlay Local) e R-064 (Duplo Gate Documental de Planejamento e Implementação)
+- **Última Atualização:** 2026-11-20
+- **Versão:** v2.43.0
+- **Alinhamento Normativo:** R-003 (SSOT), R-015 (Atualização Atômica de Catálogo), R-037/R-040 (Roteamento), R-043 (Overlay Local), R-064 (Duplo Gate Documental), R-066 (Instruction Budget & Progressive Disclosure) e R-068 (Orquestração Plana & `receipt` + `step_delta`)
 
 ---
 
 ## 1) Princípio de Localização Direta (Zero Blind Searches)
 
-Agentes de IA devem sempre priorizar **caminhos canônicos diretos** (`read_file` ou `ctx_execute` com o caminho relativo exato) em vez de buscas exploratórias especulativas (`file_search` ou `grep_search`).
+Agentes de IA devem sempre priorizar **caminhos canônicos diretos** (`ctx_execute` com `fs`/`path` ou `read_file` apenas como fallback) em vez de buscas exploratórias especulativas (`file_search` ou `grep_search`).
 
 Quando for estritamente necessário buscar por padrão:
 - Use glob com curinga inicial: `**/<nome-do-arquivo>` (essencial em workspaces multi-root).
@@ -41,14 +41,18 @@ Quando for estritamente necessário buscar por padrão:
 |---|---|
 | **Regras Globais de Governança (Ground Truth)** | `CLAUDE.md` |
 | **Instruções Operacionais e Roteamento** | `.github/copilot-instructions.md` |
+| **Orquestrador Plano de Workflow (R-068)** | `.github/agents/agent-root.agent.md` |
 | **Catálogo Completo de Agents (ÚNICO)** | `.github/agents/catalog.yaml` |
 | **Grafo Estruturado de Roteamento (R-040)** | `.github/agents/routing-graph.yaml` |
 | **Workflows Operacionais Canônicos** | `.github/agents/workflows.md` |
+| **Invariantes, Pipeline & `workflow_tracking`** | `.github/agents/workflows/invariantes-e-protocolos.md` |
+| **Schema Canônico `receipt` + `step_delta` (SSOT)** | `.github/skills/agent-contracts/references/receipt-step-delta-schema.yaml` |
 | **Suíte de Evals de Roteamento** | `.github/agents/evals/casos-roteamento.yaml` |
 | **Manifest de Binding e Adapters** | `.github/instructions/README.md` |
 | **Índice Estruturado de Skills** | `.github/skills/.index.json` |
 | **Catálogo Textual de Skills** | `.github/skills/README.md` |
 | **Índice Completo de Prompts** | `.github/prompts/README.md` |
+| **Fragmento & Sync do `<execution_protocol>`** | `tools/agent_protocol_sync/_execution-protocol-fragment.md` |
 | **Planos de Planejamento por Workflow (R-064)** | `docs/plans/` |
 | **Planos de Implementação Técnica (R-064)** | `docs/plans/implementation/` |
 | **Portal Unificado de Documentação (Diátaxis)** | `docs/README.md` |
@@ -60,26 +64,31 @@ Quando for estritamente necessário buscar por padrão:
 
 ```
 deep-agents-copilot/
-├── CLAUDE.md                                    # Governança global (regras R-001..R-064)
+├── CLAUDE.md                                    # Governança global (regras R-001..R-068)
 ├── README.md                                    # Visão geral do repositório e estrutura física
 ├── CHANGELOG.md                                 # Histórico SemVer de versões e mudanças
 ├── .ignore / .rgignore                          # Whitelist para ripgrep indexar .github/
 │
 ├── .github/
-│   ├── copilot-instructions.md                  # Instruções operacionais Copilot e fast-paths
+│   ├── copilot-instructions.md                  # Instruções operacionais Copilot (enxuto — R-066)
 │   ├── projects.local.yaml                      # Overlay local de projetos (gitignored, R-043)
 │   ├── projects.local.yaml.example              # Template rastreado do overlay local (R-043)
 │   │
 │   ├── agents/                                  # 40 agents no catálogo raiz (64 totais)
 │   │   ├── catalog.yaml                         # ⭐ Catálogo com modelos e metadados dos agents (ÚNICO)
+│   │   ├── model-profiles.yaml                  # ⭐ Perfis de modelos e tier_map do catálogo
 │   │   ├── routing-graph.yaml                   # ⭐ Grafo estrutural de transições (R-040)
 │   │   ├── workflows.md                         # ⭐ Especificação dos 10 Workflows Canônicos e de Ciclo de Vida
+│   │   ├── agent-root.agent.md                  # Orquestrador plano de workflow (R-068)
 │   │   ├── agent-router.agent.md                # Entry point obrigatório (R-037/R-042)
 │   │   ├── prompt-structuring.agent.md          # Refinamento de prompt (R-041)
 │   │   ├── bug-triage.agent.md                  # Triagem e RCA de bugs
 │   │   ├── pr-gatekeeper.agent.md               # Preparação de PR e commit
 │   │   ├── governance-maintainer.agent.md      # Manutenção transversal e execuções em lote
 │   │   ├── ... (outros agents raiz)
+│   │   │
+│   │   ├── workflows/                           # Invariantes e especificações de estado de pipeline
+│   │   │   └── invariantes-e-protocolos.md      # ⭐ Contrato de workflow_tracking, receipt e gates
 │   │   │
 │   │   ├── evals/                               # Suíte de regressão de roteamento
 │   │   │   └── casos-roteamento.yaml            # Casos canônicos, ambíguos e regressões
@@ -90,6 +99,8 @@ deep-agents-copilot/
 │   ├── skills/                                  # 81 Skills Especializadas
 │   │   ├── .index.json                          # Índice estruturado JSON de skills
 │   │   ├── README.md                            # Catálogo descritivo de skills
+│   │   ├── agent-contracts/                     # Contratos de saída (references/receipt-step-delta-schema.yaml)
+│   │   ├── handoff-governance/                  # Protocolos de handoff, telemetria e overflow_ref
 │   │   └── ... (skills especializadas)
 │   │
 │   ├── prompts/                                 # Prompts Canônicos de Workflow (/init-context, /add-project-context...)
@@ -149,13 +160,14 @@ deep-agents-copilot/
 │       ├── agentcard.schema.json                # Schema A2A Agent Card
 │       ├── migration-ir.schema.json             # Schema da Representação Intermediária (IR)
 │
-├── tools/                                       # Ferramentas Utilitárias e Telemetria
+├── tools/                                       # Ferramentas Utilitárias, Sync e Telemetria
+│   ├── agent_protocol_sync/                     # Sincronizador SSOT do <execution_protocol> (R-059/R-060/R-068)
 │   ├── codegraph-visualizer/                    # Visualizador de grafos de código
 │   ├── context-insight-visualizer/              # Visualizador de insights de contexto
 │   └── otel-langfuse/                           # Coletor OpenTelemetry proxy para Langfuse Cloud
 │
 └── tests/                                       # Suíte de Testes Automatizados (pytest)
-    ├── governance_audit/                        # Auditoria de regras e smells de governança
+    ├── governance_audit/                        # Auditoria de regras, instruction budget (test_instruction_budget.py) e smells
     ├── routing_gate/                            # Quality gate de roteamento
     ├── operational_flow/                        # Testes de workflows operacionais
     ├── evals/                                   # Evals de acurácia de roteamento e seleção de tools
@@ -190,6 +202,7 @@ A pasta `docs/` organiza o conhecimento técnico e os artefatos de governança e
 
 | Data | Versão | Modificações Principais |
 |---|---|---|
+| **2026-11-20** | **v2.43.0** | Registro do orquestrador raiz `agent-root.agent.md` (`R-068`), schema SSOT `receipt-step-delta-schema.yaml` (`R-003`), sincronizador `tools/agent_protocol_sync/` e guardrail `tests/governance_audit/test_instruction_budget.py` (`R-066`). |
 | **2026-09-27** | **v2.42.0** | Inclusão das pastas `docs/plans/` e `docs/plans/implementation/` para fechamento de gap da regra **R-064** (Duplo Gate Documental de Planejamento e Implementação). Atualização da árvore física e do Quick File Finder. |
 | **2026-09-11** | **v2.6.0** | Consolidação arquitetural em `.github/`, extinção de catálogos redundantes e unificação do catálogo de agents em `.github/agents/catalog.yaml`. |
 | **2026-09-10** | **v2.5.0** | Publicação inicial do Repo Map como infraestrutura canônica de navegação determinística para agentes de IA (Zero Blind Searches). |

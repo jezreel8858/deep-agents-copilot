@@ -169,9 +169,9 @@ def resolve_consolidate_clause(path: Path, tools: list[str], text: str | None = 
     content = text if text is not None else path.read_text(encoding="utf-8")
     if "context-mode/ctx_execute" in tools:
         is_readonly = (
-            artifact_id in COMPUTE_READONLY_AGENTS
-            or "Score 0 (Read-Only)" in content
-            or "COMPUTE_READONLY" in content
+                artifact_id in COMPUTE_READONLY_AGENTS
+                or "Score 0 (Read-Only)" in content
+                or "COMPUTE_READONLY" in content
         )
         if is_readonly:
             return CLAUSE_BATCH_OR_EXEC_READONLY
@@ -187,8 +187,8 @@ def build_execution_protocol_block(path: Path, fragments: dict[str, str], text: 
     content = text if text is not None else path.read_text(encoding="utf-8")
 
     has_mutation = (
-        any(t in tools for t in ["replace_string_in_file", "create_file", "insert_edit_into_file", "get_errors"])
-        or "context-mode/ctx_execute" in tools
+            any(t in tools for t in ["replace_string_in_file", "create_file", "insert_edit_into_file", "get_errors"])
+            or "context-mode/ctx_execute" in tools
     )
     has_subagent = "run_subagent" in tools
     has_lazy = bool(fm_data.get("source_docs_lazy"))
@@ -197,19 +197,15 @@ def build_execution_protocol_block(path: Path, fragments: dict[str, str], text: 
     core_text = fragments["CORE"].replace(CLAUSE_BATCH_OR_EXEC, clause)
 
     items = [core_text]
-    next_idx = 6
 
     if has_mutation:
-        items.append(f"{next_idx}. {fragments['CLAUSE_MUTATION']}")
-        next_idx += 1
+        items.append(fragments["CLAUSE_MUTATION"])
 
     if has_subagent:
-        items.append(f"{next_idx}. {fragments['CLAUSE_HANDOFF']}")
-        next_idx += 1
+        items.append(fragments["CLAUSE_HANDOFF"])
 
     if has_lazy:
-        items.append(f"{next_idx}. {fragments['CLAUSE_LAZY_DOCS']}")
-        next_idx += 1
+        items.append(fragments["CLAUSE_LAZY_DOCS"])
 
     body = "\n".join(items).strip()
     return f"## ⚙️ Protocolo de Execução Obrigatório\n\n<execution_protocol>\n\n{body}\n\n</execution_protocol>"

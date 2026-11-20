@@ -65,6 +65,54 @@
         "cwd": "."
       }
     ],
+    "subagentStop": [
+      {
+        "type": "command",
+        "bash": "command -v node >/dev/null 2>&1 || exit 0; IN=$(cat); ROOT=$(printf '%s' \"$IN\" | node -e \"let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{console.log(JSON.parse(d).cwd||'')}catch{}})\" 2>/dev/null); [ -z \"$ROOT\" ] && ROOT=$(pwd); SCRIPT=\"$ROOT/tools/hooks/validate_step_receipt.js\"; [ -f \"$SCRIPT\" ] && printf '%s' \"$IN\" | node \"$SCRIPT\"",
+        "powershell": "if (-not (Get-Command node -ErrorAction SilentlyContinue)) { exit 0 }; $in = [Console]::In.ReadToEnd(); $root = $PWD.Path; try { $j = $in | ConvertFrom-Json; if ($j.cwd) { $root = $j.cwd } } catch {}; $script = Join-Path $root 'tools/hooks/validate_step_receipt.js'; if (Test-Path $script) { $in | node $script; exit $LASTEXITCODE }",
+        "cwd": "."
+      }
+    ],
+    "subagentStart": [
+      {
+        "type": "command",
+        "bash": "command -v node >/dev/null 2>&1 || exit 0; IN=$(cat); ROOT=$(printf '%s' \"$IN\" | node -e \"let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{console.log(JSON.parse(d).cwd||'')}catch{}})\" 2>/dev/null); [ -z \"$ROOT\" ] && ROOT=$(pwd); SCRIPT=\"$ROOT/tools/hooks/validate_step_receipt.js\"; [ -f \"$SCRIPT\" ] && printf '%s' \"$IN\" | node \"$SCRIPT\"",
+        "powershell": "if (-not (Get-Command node -ErrorAction SilentlyContinue)) { exit 0 }; $in = [Console]::In.ReadToEnd(); $root = $PWD.Path; try { $j = $in | ConvertFrom-Json; if ($j.cwd) { $root = $j.cwd } } catch {}; $script = Join-Path $root 'tools/hooks/validate_step_receipt.js'; if (Test-Path $script) { $in | node $script; exit $LASTEXITCODE }",
+        "cwd": "."
+      }
+    ],
+    "SubagentStart": [
+      {
+        "type": "command",
+        "bash": "command -v node >/dev/null 2>&1 || exit 0; IN=$(cat); ROOT=$(printf '%s' \"$IN\" | node -e \"let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{console.log(JSON.parse(d).cwd||'')}catch{}})\" 2>/dev/null); [ -z \"$ROOT\" ] && ROOT=$(pwd); SCRIPT=\"$ROOT/tools/hooks/validate_step_receipt.js\"; [ -f \"$SCRIPT\" ] && printf '%s' \"$IN\" | node \"$SCRIPT\"",
+        "powershell": "if (-not (Get-Command node -ErrorAction SilentlyContinue)) { exit 0 }; $in = [Console]::In.ReadToEnd(); $root = $PWD.Path; try { $j = $in | ConvertFrom-Json; if ($j.cwd) { $root = $j.cwd } } catch {}; $script = Join-Path $root 'tools/hooks/validate_step_receipt.js'; if (Test-Path $script) { $in | node $script; exit $LASTEXITCODE }",
+        "cwd": "."
+      }
+    ],
+    "SubagentStop": [
+      {
+        "type": "command",
+        "bash": "command -v node >/dev/null 2>&1 || exit 0; IN=$(cat); ROOT=$(printf '%s' \"$IN\" | node -e \"let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{console.log(JSON.parse(d).cwd||'')}catch{}})\" 2>/dev/null); [ -z \"$ROOT\" ] && ROOT=$(pwd); SCRIPT=\"$ROOT/tools/hooks/validate_step_receipt.js\"; [ -f \"$SCRIPT\" ] && printf '%s' \"$IN\" | node \"$SCRIPT\"",
+        "powershell": "if (-not (Get-Command node -ErrorAction SilentlyContinue)) { exit 0 }; $in = [Console]::In.ReadToEnd(); $root = $PWD.Path; try { $j = $in | ConvertFrom-Json; if ($j.cwd) { $root = $j.cwd } } catch {}; $script = Join-Path $root 'tools/hooks/validate_step_receipt.js'; if (Test-Path $script) { $in | node $script; exit $LASTEXITCODE }",
+        "cwd": "."
+      }
+    ],
+    "stop": [
+      {
+        "type": "command",
+        "bash": "command -v node >/dev/null 2>&1 || exit 0; IN=$(cat); ROOT=$(printf '%s' \"$IN\" | node -e \"let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{console.log(JSON.parse(d).cwd||'')}catch{}})\" 2>/dev/null); [ -z \"$ROOT\" ] && ROOT=$(pwd); SCRIPT=\"$ROOT/tools/hooks/validate_step_receipt.js\"; [ -f \"$SCRIPT\" ] && printf '%s' \"$IN\" | node \"$SCRIPT\"",
+        "powershell": "if (-not (Get-Command node -ErrorAction SilentlyContinue)) { exit 0 }; $in = [Console]::In.ReadToEnd(); $root = $PWD.Path; try { $j = $in | ConvertFrom-Json; if ($j.cwd) { $root = $j.cwd } } catch {}; $script = Join-Path $root 'tools/hooks/validate_step_receipt.js'; if (Test-Path $script) { $in | node $script; exit $LASTEXITCODE }",
+        "cwd": "."
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "bash": "command -v node >/dev/null 2>&1 || exit 0; IN=$(cat); ROOT=$(printf '%s' \"$IN\" | node -e \"let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{console.log(JSON.parse(d).cwd||'')}catch{}})\" 2>/dev/null); [ -z \"$ROOT\" ] && ROOT=$(pwd); SCRIPT=\"$ROOT/tools/hooks/validate_step_receipt.js\"; [ -f \"$SCRIPT\" ] && printf '%s' \"$IN\" | node \"$SCRIPT\"",
+        "powershell": "if (-not (Get-Command node -ErrorAction SilentlyContinue)) { exit 0 }; $in = [Console]::In.ReadToEnd(); $root = $PWD.Path; try { $j = $in | ConvertFrom-Json; if ($j.cwd) { $root = $j.cwd } } catch {}; $script = Join-Path $root 'tools/hooks/validate_step_receipt.js'; if (Test-Path $script) { $in | node $script; exit $LASTEXITCODE }",
+        "cwd": "."
+      }
+    ],
     "preCompact": [
       {
         "type": "command",

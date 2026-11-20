@@ -2,6 +2,7 @@
   "adapter-generator": "STANDARD",
   "adr-sentinel": "STANDARD",
   "agent-auditor": "STANDARD",
+  "agent-root": "STANDARD",
   "agent-router": "STANDARD",
   "angular-arch-advisor": "STANDARD",
   "angular-developer": "STANDARD",

@@ -185,7 +185,7 @@ handoff:
 ```
 ### 4.1) Contrato de Recibo Estruturado (`receipt` + `step_delta` — R-068)
 
-Ao concluir qualquer etapa despachada pelo `agent-root` em nível plano (`R-068`), o agent delegado DEVE encerrar sua entrega emitindo o bloco `receipt` com `step_delta` conforme o schema canônico em [`references/receipt-step-delta-schema.yaml`](references/receipt-step-delta-schema.yaml) (e `invariantes-e-protocolos.md` § 4.2):
+Ao concluir qualquer etapa despachada pelo `agent-root` em nível plano (`R-068`), o agent delegado DEVE encerrar sua entrega emitindo o bloco `receipt` com `step_delta` conforme o schema canônico em [`.github/skills/agent-contracts/references/receipt-step-delta-schema.yaml`](references/receipt-step-delta-schema.yaml) (e `invariantes-e-protocolos.md` § 4.2):
 
 - **Agentes *Read-Only* / *Advisory* (Score 0):** Usam `mode: readonly_analysis` com `files_modified: []` e `files_created: []`, registrando relatórios em `artefato` e contratos ou IDs de regras em `exports_and_signatures`.
 - **Teto de Payload (`overflow_ref`):** Cada lista comporta até **10 itens** inline; entregas maiores persistem o inventário completo via `ctx_index` (`wf:<trace>:delta:step-<n>`).

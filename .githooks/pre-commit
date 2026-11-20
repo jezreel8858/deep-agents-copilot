@@ -1,24 +1,12 @@
 #!/usr/bin/env bash
-# .githooks/pre-commit — Defesa em profundidade para R-043 (Local Overlay Pattern)
-# e R-044 (Anonimização Obrigatória de Evidência de Análise Real)
-#
-# Bloqueia commits que vazem dados LOCAIS/PRIVADOS de projetos (R-043) ou
-# evidência real de análise (nomes de repo/caminhos absolutos, R-044) para o
-# repositório de governança compartilhado. Complementa (não substitui) o
-# `.gitignore`/revisão manual — protege contra `git add -f` e edições
-# acidentais.
-#
-# SETUP (uma vez por clone):
-#   git config core.hooksPath .githooks
-#
-# Ver: CLAUDE.md § R-043, § R-044
+# .githooks/pre-commit — Defesa em profundidade para R-043 (Local Overlay Pattern),
+# R-044 (Anonimização), R-064 (Planos Canônicos) e R-066 (Instruction Budget).
 
 set -euo pipefail
 
 blocked=0
 
 # 1) Nenhuma entrada de projeto pode ser adicionada a catálogos compartilhados.
-#    Marcador de fingerprint: "path_externo:" só existe em entradas de projeto.
 if git -c core.quotepath=off diff --cached --name-only | grep -E '^(.github/agents/catalog.yaml|docs/ai-context/catalog.yaml)$' >/dev/null 2>&1; then
   if git diff --cached -- .github/agents/catalog.yaml docs/ai-context/catalog.yaml 2>/dev/null | grep -E '^\+.*path_externo:' >/dev/null 2>&1; then
     echo "❌ [R-043] Bloqueado: catálogo compartilhado não pode conter entrada de projeto (path_externo:)."
@@ -27,30 +15,21 @@ if git -c core.quotepath=off diff --cached --name-only | grep -E '^(.github/agen
   fi
 fi
 
-# 2) Nenhum arquivo sob .github/instructions/local/ pode ser commitado
-#    (adapters gerados por-projeto — sempre locais/gitignored).
+# 2) Nenhum arquivo sob .github/instructions/local/ pode ser commitado.
 if git -c core.quotepath=off diff --cached --name-only | grep -E '^\.github/instructions/local/' >/dev/null 2>&1; then
   echo "❌ [R-043] Bloqueado: arquivo(s) staged sob .github/instructions/local/ (adapters locais, nunca commitados)."
   echo "   → Remova do stage: git restore --staged .github/instructions/local/*"
   blocked=1
 fi
 
-# 3) projects.local.yaml (instância real, não o .example) nunca pode ser commitado.
+# 3) projects.local.yaml (instância real) nunca pode ser commitado.
 if git -c core.quotepath=off diff --cached --name-only | grep -E '^(\.github/projects\.local\.yaml|docs/ai-context/catalog\.local\.yaml)$' >/dev/null 2>&1; then
   echo "❌ [R-043] Bloqueado: .github/projects.local.yaml (overlay local real) nunca deve ser commitado."
   echo "   → Remova do stage: git restore --staged .github/projects.local.yaml"
   blocked=1
 fi
 
-# 4) Defesa em profundidade para R-044 (Anonimização Obrigatória de Evidência
-#    de Análise Real): nenhum caminho de sistema de arquivos local ABSOLUTO
-#    pode aparecer em conteúdo ADICIONADO sob .github/** (exceto local/, já
-#    bloqueado acima) — sinal forte de vazamento de nome real de
-#    repositório/usuário via changelog/exemplo de agent analítico.
-#    CLAUDE.md/copilot-instructions.md são EXCLUÍDOS deste check: são os
-#    próprios arquivos de definição da regra R-044 e legitimamente contêm
-#    exemplos ilustrativos de caminho (ex.: "C:\\Users\\...", "D:\\workspace\\...")
-#    para explicar o que NÃO fazer — não são evidência real de projeto.
+# 4) Defesa em profundidade para R-044: caminhos locais absolutos sob .github/**
 staged_gov_files=$(git -c core.quotepath=off diff --cached --name-only | grep '^\.github/' | grep -v '^\.github/instructions/local/' || true)
 if [ -n "$staged_gov_files" ]; then
   while IFS= read -r f; do
@@ -64,13 +43,6 @@ if [ -n "$staged_gov_files" ]; then
 fi
 
 # 5) Bloqueio de nomes de projetos locais EXTERNOS em arquivos staged (R-044).
-#    Projetos cujo path_externo resolve DENTRO da própria raiz deste repositório
-#    (ex.: sub-projetos do monorepo como apps/web ou deploy/local-chat-gateway)
-#    NÃO são "evidência de análise de repositório externo" — são o próprio
-#    código sendo versionado aqui, e seus nomes de pacote aparecem legitimamente
-#    em package.json/pyproject.toml/Dockerfiles/docs. Apenas ids cujo
-#    path_externo aponta para FORA da raiz deste repo são tratados como vazamento
-#    real de nome de projeto local privado (R-043/R-044).
 target_catalog=""
 if [ -f ".github/projects.local.yaml" ]; then
   target_catalog=".github/projects.local.yaml"
@@ -94,7 +66,6 @@ if [ -n "$target_catalog" ]; then
     proj_path=$(printf '%s\n' "$all_paths" | sed -n "${idx}p")
     proj_path_norm=$(printf '%s' "$proj_path" | tr '[:upper:]' '[:lower:]' | sed -E 's#\\\\|\\#/#g' | sed -E 's#^([a-z]):/#/\1/#')
 
-    # Sub-projeto do próprio monorepo (path_externo dentro da raiz do repo atual) — não bloquear.
     case "$proj_path_norm" in
       "$repo_root_norm"/*|"$repo_root_norm") continue ;;
     esac
@@ -107,21 +78,7 @@ if [ -n "$target_catalog" ]; then
   done <<< "$all_ids"
 fi
 
-# 6) Defesa Anti-Truncamento de Histórico para CHANGELOG.md:
-#    O CHANGELOG.md é estritamente aditivo. Comparamos o MULTISET de cabeçalhos
-#    de versão (## [X.Y.Z] — AAAA-MM-DD) entre HEAD e o conteúdo staged (índice).
-#    Bloqueia apenas se um cabeçalho de HEAD estiver genuinamente AUSENTE no
-#    staged — reordenação por inserção de novas entradas antes de um cabeçalho
-#    existente (artefato textual do diff Myers) NÃO é tratada como remoção.
-#
-#    Limitação conhecida (comportamento seguro por padrão):
-#    O comando 'comm -23' opera sobre fluxos ordenados linha a linha e é
-#    sensível à multiplicidade de ocorrências. Se HEAD contiver um cabeçalho
-#    duplicado (ex.: erro histórico anterior) e um commit staged remover uma das
-#    duplicatas mantendo a outra, 'comm -23' detectará a linha excedente como
-#    ausente no staged e bloqueará o commit. Esse falso positivo em correções
-#    legítimas de duplicatas é uma limitação conhecida e aceita: o guard prioriza
-#    sempre a segurança estrita contra perda de histórico (safe by default).
+# 6) Defesa Anti-Truncamento de Histórico para CHANGELOG.md.
 if git -c core.quotepath=off diff --cached --name-only | grep -E '^CHANGELOG\.md$' >/dev/null 2>&1; then
   headers_head=$(git show HEAD:CHANGELOG.md 2>/dev/null | grep -E '^##\s+\[' | sort || true)
   headers_staged=$(git show :CHANGELOG.md 2>/dev/null | grep -E '^##\s+\[' | sort || true)
@@ -136,9 +93,7 @@ if git -c core.quotepath=off diff --cached --name-only | grep -E '^CHANGELOG\.md
   fi
 fi
 
-# 7) Defesa contra vazamento de variantes de perfil de modelo (T-B3.4 / D4'):
-#    Bloqueia commits contendo variantes locais de model-profiles staged em .github/agents/
-#    ou .github/prompts/, garantindo que variantes nunca vazem para o repositório compartilhado.
+# 7) Defesa contra vazamento de variantes de perfil de modelo (T-B3.4 / D4').
 has_staged_agent_prompts=0
 first_agent_prompt=""
 if IFS= read -r -d '' first_agent_prompt < <(git -c core.quotepath=off diff --cached -z --name-only -- .github/agents .github/prompts 2>/dev/null); then
@@ -168,25 +123,53 @@ if [ "$has_staged_agent_prompts" -eq 1 ]; then
 
   if [ "$has_active_state" -eq 1 ] && [ "$staged_has_model_change" -eq 1 ]; then
     echo "❌ [T-B3.4] Bloqueado: perfil de modelo ativo detectado (.model-profiles/state.json) com alterações staged em 'model:'."
-    echo "   → Restaure o perfil default antes de commitar:"
-    echo "     python -m tools.model_profiles restore"
-    echo "   → Escape controlado (mudança canônica intencional): inclua model-profiles.yaml no mesmo commit."
-    echo "   → Ver: docs/guides/model-profiles.md"
+    echo "   → Restaure o perfil default antes de commitar: python -m tools.model_profiles restore"
     blocked=1
   elif [ "$staged_has_model_change" -eq 1 ] && [ "$has_profiles_manifest_staged" -eq 0 ]; then
     echo "❌ [T-B3.4] Bloqueado: alteração na linha 'model:' em agents/prompts sem atualização correspondente em model-profiles.yaml."
-    echo "   → Se você aplicou um perfil local, restaure o default antes de commitar:"
-    echo "     python -m tools.model_profiles restore"
-    echo "   → Se a mudança for canônica/definitiva, inclua model-profiles.yaml no mesmo commit."
-    echo "   → Escape emergencial: git commit --no-verify"
-    echo "   → Ver: docs/guides/model-profiles.md"
+    echo "   → Restaure o default antes de commitar ou inclua model-profiles.yaml no mesmo commit."
     blocked=1
   fi
 fi
 
+# 8) Boundary Quality Gates P3 (R-064 Planos Canônicos & R-066 Instruction Budget).
+staged_plans=$(git -c core.quotepath=off diff --cached --name-only --diff-filter=ACM | grep -E '^docs/plans/[^/]+/[^/]+\.md$' | grep -v '/README\.md$' || true)
+if [ -n "$staged_plans" ]; then
+  while IFS= read -r p; do
+    [ -z "$p" ] && continue
+    base_name=$(basename "$p")
+    if ! printf '%s' "$base_name" | grep -E '^[0-9]{8}-[0-9]{6}-[a-z0-9]+(-[a-z0-9]+)*\.md$' >/dev/null 2>&1; then
+      echo "❌ [R-064] Bloqueado: nome de plano inválido '$p' (esperado <AAAAMMDD-HHMMSS>-<slug>.md)."
+      blocked=1
+    fi
+    plan_content=$(git show ":$p" 2>/dev/null || true)
+    if ! printf '%s' "$plan_content" | grep -E '^status:\s*"?(DRAFT|REVIEW_PENDING|APPROVED|IN_PROGRESS|COMPLETED)"?' >/dev/null 2>&1; then
+      echo "❌ [R-064] Bloqueado: plano '$p' sem status válido (DRAFT|REVIEW_PENDING|APPROVED|IN_PROGRESS|COMPLETED) no frontmatter."
+      blocked=1
+    fi
+  done <<< "$staged_plans"
+fi
+
+staged_agents=$(git -c core.quotepath=off diff --cached --name-only --diff-filter=ACM | grep -E '^\.github/agents/.*\.agent\.md$' || true)
+if [ -n "$staged_agents" ]; then
+  while IFS= read -r ag; do
+    [ -z "$ag" ] && continue
+    base_agent=$(basename "$ag")
+    max_agent_lines=460
+    if [ "$base_agent" = "agent-root.agent.md" ] || [[ "$base_agent" == *-router.agent.md ]]; then
+      max_agent_lines=550
+    fi
+    line_count=$(git show ":$ag" 2>/dev/null | awk 'END {print NR}')
+    if [ "${line_count:-0}" -gt "$max_agent_lines" ]; then
+      echo "❌ [R-066] Bloqueado: '$ag' excedeu o orçamento de instruções ($line_count > $max_agent_lines linhas)."
+      blocked=1
+    fi
+  done <<< "$staged_agents"
+fi
+
 if [ "$blocked" -ne 0 ]; then
   echo ""
-  echo "Commit abortado — violação de R-043/R-044. Ver CLAUDE.md § R-043 / § R-044."
+  echo "Commit abortado — violação de Boundary Quality Gate (R-043/R-044/R-064/R-066)."
   exit 1
 fi
 

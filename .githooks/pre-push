@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# .githooks/pre-push — Boundary Quality Gate pré-push (P3 — R-064 / R-066 / R-068)
+# Executa os testes determinísticos de Stop-Hook e Instruction Budget antes do push.
+
+set -euo pipefail
+
+PYTEST_BIN=""
+if command -v pytest >/dev/null 2>&1; then
+  PYTEST_BIN="pytest"
+elif [ -x ".venv/Scripts/pytest.exe" ]; then
+  PYTEST_BIN=".venv/Scripts/pytest.exe"
+elif [ -x ".venv/bin/pytest" ]; then
+  PYTEST_BIN=".venv/bin/pytest"
+fi
+
+if [ -z "$PYTEST_BIN" ]; then
+  echo "⚠️  [pre-push] pytest não encontrado no PATH nem na .venv; pulando verificação local."
+  exit 0
+fi
+
+echo "🔍 [P3 pre-push] Validando Stop-Hook (R-068) e Instruction Budget (R-066)..."
+"$PYTEST_BIN" -n0 \
+  tests/operational_flow/test_stop_hook_receipt_validator.py \
+  tests/governance_audit/test_instruction_budget.py \
+  -q
+
+echo "✅ [P3 pre-push] Boundary Quality Gates aprovados."
+exit 0

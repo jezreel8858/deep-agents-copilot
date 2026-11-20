@@ -55,7 +55,7 @@ Exemplos:
 Centraliza todo o conhecimento técnico em quatro quadrantes Diátaxis:
 - 🎓 **Tutoriais**: Primeiros passos, setup de ambiente e motor de grafo.
 - 🛠️ **Guias Práticos (How-To)**: Execução dos 10 workflows determinísticos, scanner de projetos e context-mode.
-- 📖 **Referência Técnica**: Catálogos de agentes/skills, regras normativas R-001..R-057 e Schemas JSON (AgentCard, Semantic IR).
+- 📖 **Referência Técnica**: Catálogos de agentes/skills, regras normativas R-001..R-068 e Schemas JSON/YAML (`AgentCard`, `Semantic IR`, `receipt-step-delta-schema.yaml`).
 - 💡 **Conceitos & Arquitetura**: [Guia de Arquitetura arc42](docs/architecture/ARCHITECTURE_AND_GOVERNANCE_GUIDE.md) e [Guia de Documentação em Governança de IA](docs/architecture/AI_GOVERNANCE_DOCUMENTATION_GUIDE.md) (alinhado a NIST AI RMF, ISO 42001 e OWASP Agentic AI).
 
 ---
@@ -69,7 +69,7 @@ deep-agents-copilot/
 ├── .ignore / .rgignore                          # Whitelist para ripgrep indexar .github/
 │
 ├── .github/
-│   ├── copilot-instructions.md                  # Instruções operacionais Copilot
+│   ├── copilot-instructions.md                  # Instruções operacionais Copilot (enxuto — R-066)
 │   ├── projects.local.yaml                      # Overlay local de projetos (gitignored, R-043)
 │   ├── projects.local.yaml.example              # Template rastreado do overlay local (R-043)
 │   │
@@ -77,6 +77,7 @@ deep-agents-copilot/
 │   │   ├── catalog.yaml                         # ⭐ Catálogo com modelos e metadados dos agents (ÚNICO)
 │   │   ├── routing-graph.yaml                   # ⭐ Grafo estrutural de transições (40 nós)
 │   │   ├── workflows.md                         # ⭐ Especificação dos 10 Workflows Canônicos e de Ciclo de Vida
+│   │   ├── agent-root.agent.md                  # Orquestrador plano de workflow (R-068)
 │   │   ├── agent-router.agent.md                # Entry point obrigatório (R-037/R-042)
 │   │   ├── prompt-structuring.agent.md          # Refinamento de prompt (R-041)
 │   │   ├── bug-triage.agent.md                  # Triagem de bugs
@@ -92,6 +93,7 @@ deep-agents-copilot/
 │   ├── skills/                                  # 81 Skills Especializadas
 │   │   ├── .index.json                          # Índice estruturado JSON de skills
 │   │   ├── README.md                            # Catálogo descritivo de skills
+│   │   ├── agent-contracts/                     # Contratos de saída (references/receipt-step-delta-schema.yaml)
 │   │   └── ... (skills especializadas)
 │   │
 │   ├── prompts/                                 # Prompts Canônicos de Workflow (/init-context, /add-project-context...)
@@ -109,21 +111,21 @@ deep-agents-copilot/
 ├── docs/                                        # Documentação de Produto, Arquitetura e Planos
 │   ├── README.md                                # Central unificada de documentação (Diátaxis)
 │   ├── repo-map.md                              # ⭐ Mapa do repositório para navegação determinística
-│   ├── plans/                                   # ⭐ Planos de Planejamento por workflow (R-064)
-│   ├── implementation-plans/                    # ⭐ Planos de Implementação técnica por workflow (R-064)
+│   ├── plans/                                   # ⭐ Planos de Planejamento e Implementação por workflow (R-064)
 │   ├── agent-context/                           # Guias de uso de ferramentas
 │   ├── plan/                                    # Planos arquiteturais
 │   │   └── 20260830-090000-agent-profiles-taxonomy.md           # Taxonomia consolidada de agents de mercado
 │   ├── requirements/                            # Requisitos formais de sistema
 │   └── schemas/                                 # Schemas JSON canônicos (IR de migração)
 │
-├── tools/                                       # Ferramentas Utilitárias e Telemetria
+├── tools/                                       # Ferramentas Utilitárias, Sync e Telemetria
+│   ├── agent_protocol_sync/                     # Sincronizador SSOT do <execution_protocol> (R-059/R-060/R-068)
 │   ├── codegraph-visualizer/                    # Visualizador de grafos de código
 │   ├── context-insight-visualizer/              # Visualizador de insights de contexto
 │   └── otel-langfuse/                           # Coletor OpenTelemetry proxy para Langfuse Cloud (ver docs/context/setup-telemetry-copilot.md)
 │
 └── tests/                                       # Suíte de Testes Automatizados (pytest)
-    ├── governance_audit/                        # Auditoria de regras e smells de governança
+    ├── governance_audit/                        # Auditoria de regras, instruction budget e smells de governança
     ├── routing_gate/                            # Quality gate de roteamento
     └── operational_flow/                        # Testes de workflows operacionais
 ```
@@ -215,10 +217,12 @@ flowchart TD
         S3 --> S4
     end
 
-    ROOT -- "Despacha etapa_atual\n(1 subagent por vez)" --> S1
-    S4 -- "Retorna receipt (done/failed/blocked)\na cada etapa concluída" --> ROOT
+    ROOT -- "Despacha etapa_atual + step_delta\n(1 subagent por vez)" --> S1
+    S4 -- "Retorna receipt + step_delta\n(plan_conformance · overflow_ref ≤ 10 itens)" --> ROOT
 
-    MCP[("context-mode MCP\nctx_index · ctx_search · ctx_execute\n(Estado & Memória Compartilhada)")] <--> ROOT
+    ROOT -- "plan_drift_detected (R-064)" --> ROUTER
+
+    MCP[("context-mode MCP\nctx_index · ctx_search · ctx_execute\n(wf:<trace>:state & delta:step-<n>)")] <--> ROOT
     MCP <--> FLAT
 
     ROOT --> DONE(["Resposta Consolidada\n(Turno N)"])
@@ -276,18 +280,18 @@ Frameworks de referência (Claude Code/Agent SDK da Anthropic, Microsoft Agent F
 flowchart TB
     subgraph COL_A
         direction TB
-        subgraph CAT1["🎯 PLANNING &amp; ANALYSIS"]
+        subgraph CAT1["🎯 PLANNING & ANALYSIS"]
             direction TB
             A1[requirements-analyst] ~~~ A2[deep-search] ~~~ A3[feature-planner] ~~~ A4[plan-critic]
         end
 
-        subgraph CAT2["📐 ARCHITECTURE &amp; DESIGN"]
+        subgraph CAT2["📐 ARCHITECTURE & DESIGN"]
             direction TB
             B1[tech-solution-architect] ~~~ B2[codegraph-engine] ~~~ B3[business-rules-extractor]
             B4[refactor-planner] ~~~ B5["ddd-bounded-context-mapper 🗺️"] ~~~ B6["adr-sentinel 📜"]
         end
 
-        subgraph CAT3["💻 IMPLEMENTATION — Domain Routers &amp; Specialists"]
+        subgraph CAT3["💻 IMPLEMENTATION — Domain Routers & Specialists"]
             direction TB
             C1[angular-router] ~~~ C2[spring-boot-router] ~~~ C3[spring-reactive-router] ~~~ C4[ejb-router]
             C5[python-router] ~~~ C6[database-router] ~~~ C7[database-specialist]
@@ -298,18 +302,18 @@ flowchart TB
 
     subgraph COL_B
         direction TB
-        subgraph CAT4["✅ QUALITY &amp; VALIDATION"]
+        subgraph CAT4["✅ QUALITY & VALIDATION"]
             direction TB
             D1[bug-triage] ~~~ D2[debugger] ~~~ D3[test-strategy] ~~~ D4[code-review] ~~~ D5[code-style-enforcer]
             D6["security-reviewer 🔒"] ~~~ D7["performance-agent ⚡"] ~~~ D8["devops-engineer 🐳"] ~~~ D9["runtime-verifier 🩺"] ~~~ D10["repo-hygiene-auditor 🧹"]
         end
 
-        subgraph CAT5["📚 DOCUMENTATION &amp; LEARNING"]
+        subgraph CAT5["📚 DOCUMENTATION & LEARNING"]
             direction TB
             E1[docs-engineer]
         end
 
-        subgraph CAT6["🔄 GOVERNANCE &amp; ORCHESTRATION"]
+        subgraph CAT6["🔄 GOVERNANCE & ORCHESTRATION"]
             direction TB
             F1["agent-router ⭐"] ~~~ F1a["agent-root"] ~~~ F2[prompt-structuring] ~~~ F3[governance-factory] ~~~ F4[agent-auditor] ~~~ F5[binding-initializer]
             F6[adapter-generator] ~~~ F8["compliance-guardrails 🛡️"] ~~~ F9["pr-gatekeeper 📦"] ~~~ F10["governance-maintainer 🛠️"]
@@ -373,7 +377,8 @@ flowchart TB
 ## Status Atual (2026-09-21 — Versão 2.29.0)
 
 ### Governança Global & Blindagem Sistêmica
-- ✅ **Regras normativas consolidadas** (`CLAUDE.md` — Regras R-001 a R-057).
+- ✅ **Regras normativas consolidadas** (`CLAUDE.md` — Regras R-001 a R-068).
+- ✅ **Alívio de Instruction Budget & Contratos Estruturados (R-066 / R-068)**: Compactação do `<execution_protocol>`, `.github/copilot-instructions.md` e `agent-root.agent.md` com *Progressive Disclosure* (`R-066`), schema canônico `receipt-step-delta-schema.yaml` (`SSOT R-003`), propagação de `step_delta` + `overflow_ref` (claim-check > 10 itens), bloqueio automático de `plan_drift_detected` (`R-064`) e guarda de orçamento em `tests/governance_audit/test_instruction_budget.py`.
 - ✅ **Governança Estrita de Routers (R-054 / Smell 2.23)**: Least privilege com baseline de 7 tools, Zero Pre-Routing Discovery e Flat Delegation universal para eliminar consumo inútil de créditos.
 - ✅ **Portão de Reúso e Generalização Sistêmica (R-055 — Anti-Silo Fix)**: Avaliação compulsória de impacto em peers (Q1), templates canônicos (Q2) e testes determinísticos (Q3) em qualquer manutenção.
 - ✅ **Precedência Mandatória e Blindagem Universal de Context Mode (R-008 e R-056 / Smell 2.24)**: Primazia absoluta de sandboxing para leitura, modificação e criação de arquivos (Think-in-Code) blindada em 100% dos 49 agentes mutadores de todas as stacks, templates canônicos e fábrica (`governance-factory`), com proibição estrita de ferramentas nativas de editor e terminal quando context-mode disponível (rebaixadas a fallback exclusivo de indisponibilidade).

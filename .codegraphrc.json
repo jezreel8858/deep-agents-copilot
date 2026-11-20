@@ -3,15 +3,48 @@
     "boundaries": {
       "modules": {
         "deep-agents-chat": "apps/web/**",
-        "deep-agents-gateway": "deploy/local-chat-gateway/src/**"
+        "deep-agents-gateway": "deploy/local-chat-gateway/src/**",
+        "gateway-tests": "deploy/local-chat-gateway/tests/**",
+        "repo-tests": "tests/**",
+        "tool-codegraph-visualizer": "tools/codegraph-visualizer/**",
+        "tool-context-visualizer": "tools/context-insight-visualizer/**",
+        "tool-governance-runner": "tools/headless-governance-runner/**",
+        "tool-mcp-otel-proxy": "tools/mcp-otel-proxy/**"
       },
       "rules": [
         {
           "from": "deep-agents-chat",
+          "onlyTo": ["deep-agents-chat"]
+        },
+        {
+          "from": "deep-agents-gateway",
           "onlyTo": ["deep-agents-gateway"]
+        },
+        {
+          "from": "gateway-tests",
+          "onlyTo": ["gateway-tests", "deep-agents-gateway"]
+        },
+        {
+          "from": "repo-tests",
+          "onlyTo": ["repo-tests", "tool-governance-runner"]
+        },
+        {
+          "from": "tool-codegraph-visualizer",
+          "onlyTo": ["tool-codegraph-visualizer"]
+        },
+        {
+          "from": "tool-context-visualizer",
+          "onlyTo": ["tool-context-visualizer"]
+        },
+        {
+          "from": "tool-governance-runner",
+          "onlyTo": ["tool-governance-runner"]
+        },
+        {
+          "from": "tool-mcp-otel-proxy",
+          "onlyTo": ["tool-mcp-otel-proxy"]
         }
       ]
     }
   }
 }
-

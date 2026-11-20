@@ -19,28 +19,7 @@ docs/plans/<tipo>/<AAAAMMDD-HHMMSS>-<identificador-curto>.md
   - `docs/plans/bug-triage/` (`plan_type: "bug-triage"`)
   - `docs/plans/requirements/` (`plan_type: "requirements"`)
   - `docs/plans/governance/` (`plan_type: "governance"`)
-- `<AAAAMMDD-HHMMSS>`: Timestamp de elaboração no formato ISO compacto `AAAAMMDD-HHMMSS` (ex.: `20261113-120000`), exigido em todas as 8 subpastas (regex `^\d{8}-\d{6}-[a-z0-9]+(-[a-z0-9]+)*\.md# Planos de Workflow e Arquitetura — Taxonomia Unificada `docs/plans/<tipo>/` (R-064)
-
-Diretório canônico central para persistência versionada de **todos os Planos de Planejamento e Implementação** elaborados nos Workflows Canônicos (R-050), conforme a norma **R-064** e o limite de concisão **R-066** (≤ 300 linhas).
-
----
-
-## 1. Convenção de Nomenclatura e Estrutura de Diretórios
-
-```text
-docs/plans/<tipo>/<AAAAMMDD-HHMMSS>-<identificador-curto>.md
-```
-
-- `<tipo>`: Uma das **8 subpastas canônicas** correspondentes ao discriminador `plan_type` do frontmatter YAML:
-  - `docs/plans/feature/` (`plan_type: "feature"`)
-  - `docs/plans/refactor/` (`plan_type: "refactor"`)
-  - `docs/plans/architecture/` (`plan_type: "architecture"`)
-  - `docs/plans/implementation/` (`plan_type: "implementation"`)
-  - `docs/plans/test-strategy/` (`plan_type: "test-strategy"`)
-  - `docs/plans/bug-triage/` (`plan_type: "bug-triage"`)
-  - `docs/plans/requirements/` (`plan_type: "requirements"`)
-  - `docs/plans/governance/` (`plan_type: "governance"`)
-; proibidos prefixos `PLAN-`, `REQ-` ou nomes sem timestamp; em `docs/plans/implementation/` segue `<AAAAMMDD-HHMMSS>-<workflow>-<slug>.md`).
+- `<AAAAMMDD-HHMMSS>`: Timestamp de elaboração no formato ISO compacto `AAAAMMDD-HHMMSS` (ex.: `20261113-120000`), exigido em todas as 8 subpastas (regex `^\d{8}-\d{6}-[a-z0-9]+(-[a-z0-9]+)*\.md$`; proibidos prefixos `PLAN-`, `REQ-` ou nomes sem timestamp; em `docs/plans/implementation/` segue `<AAAAMMDD-HHMMSS>-<workflow>-<slug>.md`).
 - `<workflow>`: Identificador do workflow canônico em minúsculas sem prefixo `workflow-` (ex.: `feature-development`, `bug-fix`, `code-refactoring`, `governance-maintenance`, `dependency-vulnerability-remediation`, `framework-migration`).
 - `<identificador-curto>`: Slug kebab-case do objetivo ou defeito tratado.
 
@@ -53,7 +32,7 @@ docs/plans/<tipo>/<AAAAMMDD-HHMMSS>-<identificador-curto>.md
 | `docs/plans/feature/` | `feature` | Planos funcionais de feature, fatiamento vertical de épicos/histórias e escopo de entrega. | `WORKFLOW-FEATURE-DEVELOPMENT` |
 | `docs/plans/refactor/` | `refactor` | Planos de refatoração estrutural em ondas atômicas, extração de módulos e blast radius. | `WORKFLOW-CODE-REFACTORING` |
 | `docs/plans/architecture/` | `architecture` | Blueprints de solução multi-stack, migração de frameworks e topologia arquitetural. | `WORKFLOW-FRAMEWORK-MIGRATION`, `WORKFLOW-TECHNICAL-ANALYSIS` |
-| `docs/plans/implementation/` | `implementation` | Planos técnicos de implementação por stack (Gate 2 R-064) com allowlist de arquivos e passos TDD. | Todos os workflows com mutação de código |
+| `docs/plans/implementation/` | `implementation` | Planos técnicos de implementação por stack (Gate 2 R-064) com allowlist de arquivos e micro-tarefas TDD. | Todos os workflows com mutação de código |
 | `docs/plans/test-strategy/` | `test-strategy` | Planos de estratégia de testes, pirâmide de cobertura, contratos de integração e E2E. | `WORKFLOW-FEATURE-DEVELOPMENT`, `WORKFLOW-BUG-FIX` |
 | `docs/plans/bug-triage/` | `bug-triage` | Planos de RCA (Root Cause Analysis), reprodução determinística, blast radius e hipótese de fix. | `WORKFLOW-BUG-FIX`, `WORKFLOW-DEPENDENCY-VULNERABILITY-REMEDIATION` |
 | `docs/plans/requirements/` | `requirements` | Documentos de elicitação de requisitos, critérios Given/When/Then e matriz de rastreabilidade. | `WORKFLOW-FEATURE-DEVELOPMENT` (Etapa 1) |
@@ -99,7 +78,7 @@ allowed_files:
 
 ---
 
-## 5. Template Base de Plano de Planejamento (R-064 / R-066)
+## 5. Template Base de Plano e Micro-Tarefas Atômicas (R-064 / R-066 / R-068)
 
 ### 1. Contexto e Objetivo
 - Problema diagnosticado, motivação técnica/negócio e formulação clara do objetivo.
@@ -113,19 +92,22 @@ allowed_files:
 ### 4. Escopo Delimitado, Arquivos Impactados e Não-Escopo
 - Artefatos/arquivos mapeados (via `@codegraph-engine` quando aplicável) e fronteiras explícitas de Não-Escopo.
 
-### 5. Riscos Técnicos, Blast Radius e Estratégia de Rollback
+### 5. Micro-Tarefas Atômicas de Execução (2–5 min por Subagent — R-068)
+- Todo plano de implementação ou refatoração DEVE decompor a execução em micro-tarefas independentes (escopo de **2–5 minutos**), permitindo que o `agent-root` despache **1 subagent com contexto limpo por micro-tarefa**:
+  - `T-01`: Objetivo único | `responsavel`: `@<agent>` | `target_files`: `[subconjunto estrito de allowed_files]` | `verification_command`: `<comando exato não-interativo>` | `DoD`: `<critério objetivo>`
+  - `T-02`: Objetivo único | `responsavel`: `@<agent>` | `target_files`: `[...]` | `verification_command`: `<comando exato>` | `DoD`: `<critério objetivo>`
+
+### 6. Riscos Técnicos, Blast Radius e Estratégia de Rollback
 - Matriz de riscos, raio de impacto inicial e procedimento determinístico de reversão.
 
-### 6. Critérios de Aceitação e Definition of Done (DoD)
+### 7. Critérios de Aceitação e Definition of Done (DoD)
 - Critérios verificáveis (CA-01..CA-NN) exigidos para encerramento do workflow.
 
-## 7. Modelagem de Ameaças & Requisitos de Segurança (Shift-Left)
-
-Todo documento de planejamento DEVE incluir formalmente a análise de segurança prévia (Shift-Left Security):
-- **Vetores de Risco & Superfície de Ataque (STRIDE)**: Mapeamento preventivo contra vulnerabilidades comuns (STRIDE — Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege; OWASP Top 10 e CWEs relevantes à superfície de ataque).
-- **Autenticação e Autorização**: Controles mandatórios de identidade, sessão, RBAC/ABAC e prevenção de privilégio excessivo.
-- **Dados Sensíveis e LGPD/GDPR**: Classificação de dados, mascaramento de PII em logs/traces, criptografia em trânsito e em repouso.
-- **Dependências e Validações de Borda**: Auditoria de pacotes/dependências (SCA/Reachability), validação estrita de schemas, sanitização de inputs e mitigação de injeções.
+### 8. Modelagem de Ameaças & Requisitos de Segurança (Shift-Left)
+- **Vetores de Risco & Superfície de Ataque (STRIDE)**: Mapeamento preventivo (STRIDE, OWASP Top 10 e CWEs relevantes).
+- **Autenticação e Autorização**: Controles mandatórios de identidade, sessão e RBAC/ABAC.
+- **Dados Sensíveis e LGPD/GDPR**: Classificação de dados, mascaramento de PII em logs/traces e criptografia.
+- **Dependências e Validações de Borda**: Auditoria SCA/Reachability, validação de schemas e mitigação de injeções.
 
 ## Rastreabilidade por Chat/Workflow e Telemetria do `@plan-critic` (Schema v2 — R-064)
 

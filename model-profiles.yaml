@@ -5,6 +5,7 @@ tier_map:
     - tech-solution-architect
     - debugger
   orchestration:
+    - agent-root
     - agent-router
     - database-router
     - ejb-router
